@@ -1,0 +1,1443 @@
+{
+  "schema_version": 1,
+  "case_id": "c02_crossed_near_threshold",
+  "component": "aggregate",
+  "citable": false,
+  "input": {
+    "inference_version": 2,
+    "cluster_unit": "source_family",
+    "required_methods": [
+      "gap/1024/tree",
+      "gap/2048/neural"
+    ],
+    "scheduled_keys": [
+      [
+        "s0",
+        "s0/t0",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t0",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t0",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t0",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t1",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t1",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t1",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s0",
+        "s0/t1",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t0",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t0",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t0",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t0",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t1",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t1",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t1",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s1",
+        "s1/t1",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t0",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t0",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t0",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t0",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t1",
+        "gap/1024/tree",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t1",
+        "gap/1024/tree",
+        "f1",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t1",
+        "gap/2048/neural",
+        "f0",
+        "s0",
+        "l0"
+      ],
+      [
+        "s2",
+        "s2/t1",
+        "gap/2048/neural",
+        "f1",
+        "s0",
+        "l0"
+      ]
+    ],
+    "runs": [
+      {
+        "family_id": "s0",
+        "task_id": "s0/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.057299422303773,
+            10.00938821401467,
+            10.020597653937537,
+            10.143078689192855
+          ],
+          "synthetic": [
+            10.0,
+            10.0,
+            10.041195307875075,
+            10.0
+          ],
+          "null": [
+            12.057299422303773,
+            12.00938821401467,
+            12.020597653937537,
+            12.143078689192855
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.235174501122014,
+            10.187263292832913,
+            10.157277424880704,
+            10.320953768011096
+          ],
+          "synthetic": [
+            10.0,
+            10.0,
+            10.0,
+            10.0
+          ],
+          "null": [
+            12.235174501122014,
+            12.187263292832913,
+            12.157277424880704,
+            12.320953768011096
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.052589737971967,
+            10.02420957854765,
+            10.062563421896531,
+            10.230152637315435
+          ],
+          "synthetic": [
+            10.0,
+            10.0484191570953,
+            10.125126843793062,
+            10.0
+          ],
+          "null": [
+            12.052589737971967,
+            12.02420957854765,
+            12.062563421896531,
+            12.230152637315435
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.230464816790208,
+            10.153665500270591,
+            10.11531165692171,
+            10.408027716133676
+          ],
+          "synthetic": [
+            10.0,
+            10.0,
+            10.0,
+            10.0
+          ],
+          "null": [
+            12.230464816790208,
+            12.153665500270591,
+            12.11531165692171,
+            12.408027716133676
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.625124087222222,
+            10.519505056523723,
+            10.66588407630392,
+            10.428062046093398
+          ],
+          "synthetic": [
+            11.250248174444444,
+            11.039010113047446,
+            11.33176815260784,
+            10.856124092186796
+          ],
+          "null": [
+            12.625124087222222,
+            12.519505056523723,
+            12.66588407630392,
+            12.428062046093398
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.447249008403979,
+            10.341629977705482,
+            10.488008997485679,
+            10.250186967275157
+          ],
+          "synthetic": [
+            10.894498016807958,
+            10.683259955410964,
+            10.976017994971357,
+            10.500373934550314
+          ],
+          "null": [
+            12.447249008403979,
+            12.341629977705482,
+            12.488008997485679,
+            12.250186967275157
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.45311671000886,
+            10.491539571327031,
+            10.86515206892512,
+            10.420424043937816
+          ],
+          "synthetic": [
+            10.90623342001772,
+            10.983079142654063,
+            11.73030413785024,
+            10.840848087875631
+          ],
+          "null": [
+            12.45311671000886,
+            12.491539571327031,
+            12.86515206892512,
+            12.420424043937816
+          ]
+        }
+      },
+      {
+        "family_id": "s0",
+        "task_id": "s0/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.27524163119062,
+            10.31366449250879,
+            10.687276990106877,
+            10.242548965119575
+          ],
+          "synthetic": [
+            10.550483262381238,
+            10.62732898501758,
+            11.374553980213754,
+            10.48509793023915
+          ],
+          "null": [
+            12.27524163119062,
+            12.31366449250879,
+            12.687276990106877,
+            12.242548965119575
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.24275030761091,
+            10.261681327652747,
+            10.035553588563305,
+            10.004014477850042
+          ],
+          "synthetic": [
+            10.48550061522182,
+            10.523362655305494,
+            10.07110717712661,
+            10.0
+          ],
+          "null": [
+            12.24275030761091,
+            12.261681327652747,
+            12.035553588563305,
+            12.004014477850042
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.064875228792669,
+            10.083806248834504,
+            10.142321490254936,
+            10.181889556668285
+          ],
+          "synthetic": [
+            10.129750457585338,
+            10.167612497669008,
+            10.0,
+            10.0
+          ],
+          "null": [
+            12.064875228792669,
+            12.083806248834504,
+            12.142321490254936,
+            12.181889556668285
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.457946750219424,
+            10.317558105365748,
+            10.026798252475785,
+            10.13473186907436
+          ],
+          "synthetic": [
+            10.915893500438848,
+            10.635116210731496,
+            10.053596504951571,
+            10.269463738148719
+          ],
+          "null": [
+            12.457946750219424,
+            12.317558105365748,
+            12.026798252475785,
+            12.13473186907436
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.280071671401181,
+            10.139683026547507,
+            10.151076826342456,
+            10.043143209743882
+          ],
+          "synthetic": [
+            10.560143342802363,
+            10.279366053095014,
+            10.0,
+            10.0
+          ],
+          "null": [
+            12.280071671401181,
+            12.139683026547507,
+            12.151076826342456,
+            12.043143209743882
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.381229808779551,
+            10.566082723563667,
+            10.347877299552103,
+            10.314224285938657
+          ],
+          "synthetic": [
+            10.762459617559102,
+            11.132165447127335,
+            10.695754599104205,
+            10.628448571877314
+          ],
+          "null": [
+            12.381229808779551,
+            12.566082723563667,
+            12.347877299552103,
+            12.314224285938657
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.20335472996131,
+            10.388207644745425,
+            10.170002220733862,
+            10.136349207120416
+          ],
+          "synthetic": [
+            10.40670945992262,
+            10.77641528949085,
+            10.340004441467723,
+            10.272698414240832
+          ],
+          "null": [
+            12.20335472996131,
+            12.388207644745425,
+            12.170002220733862,
+            12.136349207120416
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.310085096525976,
+            10.340025270968352,
+            10.346137606403685,
+            10.295962974381059
+          ],
+          "synthetic": [
+            10.620170193051951,
+            10.680050541936705,
+            10.69227521280737,
+            10.591925948762118
+          ],
+          "null": [
+            12.310085096525976,
+            12.340025270968352,
+            12.346137606403685,
+            12.295962974381059
+          ]
+        }
+      },
+      {
+        "family_id": "s1",
+        "task_id": "s1/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.132210017707735,
+            10.162150192150111,
+            10.168262527585442,
+            10.118087895562818
+          ],
+          "synthetic": [
+            10.264420035415469,
+            10.324300384300223,
+            10.336525055170885,
+            10.236175791125635
+          ],
+          "null": [
+            12.132210017707735,
+            12.162150192150111,
+            12.168262527585442,
+            12.118087895562818
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.157535472021346,
+            10.07407207911517,
+            10.05418167524168,
+            10.088594124393241
+          ],
+          "synthetic": [
+            10.315070944042692,
+            10.148144158230341,
+            10.108363350483359,
+            10.177188248786482
+          ],
+          "null": [
+            12.157535472021346,
+            12.07407207911517,
+            12.05418167524168,
+            12.088594124393241
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.020339606796895,
+            10.103802999703072,
+            10.123693403576562,
+            10.089280954425002
+          ],
+          "synthetic": [
+            10.0,
+            10.0,
+            10.0,
+            10.0
+          ],
+          "null": [
+            12.020339606796895,
+            12.103802999703072,
+            12.123693403576562,
+            12.089280954425002
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.042598807363916,
+            10.033336740234448,
+            10.087379171382288,
+            10.25198651175719
+          ],
+          "synthetic": [
+            10.085197614727832,
+            10.066673480468896,
+            10.174758342764576,
+            10.50397302351438
+          ],
+          "null": [
+            12.042598807363916,
+            12.033336740234448,
+            12.087379171382288,
+            12.25198651175719
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t0",
+        "task_axis_id": "t0",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.135276271454325,
+            10.144538338583793,
+            10.090495907435953,
+            10.074111432938949
+          ],
+          "synthetic": [
+            10.0,
+            10.0,
+            10.0,
+            10.148222865877898
+          ],
+          "null": [
+            12.135276271454325,
+            12.144538338583793,
+            12.090495907435953,
+            12.074111432938949
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.076120880680516,
+            10.310117102883506,
+            10.136182946837803,
+            10.190518666602767
+          ],
+          "synthetic": [
+            10.152241761361033,
+            10.620234205767012,
+            10.272365893675605,
+            10.381037333205533
+          ],
+          "null": [
+            12.076120880680516,
+            12.310117102883506,
+            12.136182946837803,
+            12.190518666602767
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/1024/tree",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.101754198137725,
+            10.132242024065265,
+            10.041692131980438,
+            10.012643587784526
+          ],
+          "synthetic": [
+            10.0,
+            10.26448404813053,
+            10.0,
+            10.025287175569051
+          ],
+          "null": [
+            12.101754198137725,
+            12.132242024065265,
+            12.041692131980438,
+            12.012643587784526
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f0",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g0",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.02399346041577,
+            10.46345768241717,
+            10.250710636940584,
+            10.000232960957392
+          ],
+          "synthetic": [
+            10.04798692083154,
+            10.92691536483434,
+            10.501421273881167,
+            10.0
+          ],
+          "null": [
+            12.02399346041577,
+            12.46345768241717,
+            12.250710636940584,
+            12.000232960957392
+          ]
+        }
+      },
+      {
+        "family_id": "s2",
+        "task_id": "s2/t1",
+        "task_axis_id": "t1",
+        "method_id": "gap/2048/neural",
+        "fit_id": "f1",
+        "sample_id": "s0",
+        "learner_seed_id": "l0",
+        "global_seed_namespace": "stress/common",
+        "global_seed_id": "g1",
+        "scale": 1.0,
+        "margin": {
+          "relative": 0.0,
+          "absolute_scaled": 0.0,
+          "absolute_raw": null
+        },
+        "status": "measured",
+        "pairs": {
+          "query_ids": [
+            "q-0",
+            "q-1",
+            "q-2",
+            "q-3"
+          ],
+          "cluster_ids": [
+            "e0",
+            "e0",
+            "e1",
+            "e2"
+          ],
+          "real": [
+            10.15388161840247,
+            10.285582603598929,
+            10.07283555812234,
+            10.178108039775633
+          ],
+          "synthetic": [
+            10.0,
+            10.571165207197858,
+            10.145671116244682,
+            10.0
+          ],
+          "null": [
+            12.15388161840247,
+            12.285582603598929,
+            12.07283555812234,
+            12.178108039775633
+          ]
+        }
+      }
+    ],
+    "bootstrap_seed": 6302,
+    "bootstrap_draws": 199,
+    "endpoint": "gap",
+    "alpha": 0.05
+  },
+  "expected": {
+    "status": "complete",
+    "alpha": 0.05,
+    "multiplicity": "step_down_max_t",
+    "bound_method": "full_family_max_t",
+    "simultaneous_one_sided_level": 0.95,
+    "two_sided_level_at_least": 0.9,
+    "bounds": {
+      "gap/1024/tree": {
+        "estimate": 0.13115056084739712,
+        "lower": -0.1521316479184362,
+        "lower_stepdown_p": 0.17,
+        "upper": 0.366509794496778,
+        "upper_stepdown_p": 0.845
+      },
+      "gap/2048/neural": {
+        "estimate": 0.1367599186877114,
+        "lower": -0.14370999374729113,
+        "lower_stepdown_p": 0.17,
+        "upper": 0.369782613406169,
+        "upper_stepdown_p": 0.855
+      }
+    },
+    "moment_assumption": "finite_variance",
+    "distribution_free": false,
+    "qualification": false,
+    "calibration": "unmeasured",
+    "campaign": "unmeasured"
+  }
+}
