@@ -76,10 +76,8 @@ def authenticate_source(rel_path: str, root: Path = ROOT) -> tuple[dict, str]:
     """Authenticate a pinned upstream JSON input before parsing."""
     if rel_path not in PINNED_INPUT_SHA256:
         raise ValueError(f"unregistered foundation source path: {rel_path}")
-    candidate = root / rel_path
-    base = root if candidate.is_file() else ROOT
-    path = base / rel_path
-    if path.is_symlink() or not path.resolve().is_relative_to(base.resolve()):
+    path = root / rel_path
+    if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
         raise ValueError(f"symlinked or out-of-tree foundation input: {rel_path}")
     if not path.is_file():
         raise ValueError(f"missing foundation input: {rel_path}")
