@@ -98,6 +98,9 @@ type DatasetMap = BTreeMap<String, SeedMap>;
 type SourceTree = BTreeMap<String, DatasetMap>;
 
 pub fn evaluate(data: &Value) -> Value {
+    if data.get("inference_version").is_some() {
+        return crate::transfer_metrics::inference::evaluate(data);
+    }
     match evaluate_inner(data) {
         Ok(val) => val,
         Err(err) => failure_with_status(err.reason, err.status),

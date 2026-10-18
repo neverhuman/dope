@@ -1,4 +1,5 @@
 from dataclasses import asdict, replace
+from copy import deepcopy
 import json
 import math
 from pathlib import Path
@@ -8,7 +9,9 @@ import numpy as np
 
 from research.transfer.losses import PairedLosses, TrainingScale, training_variance
 from research.transfer.metrics import Margin
-from research.transfer.power import PowerScenario, power_simulation
+from research.transfer.power import PowerScenario, heavy_tail_sensitivity, power_simulation, seeded_stress_cases
+from research.transfer.inference import design_from_payload
+from research.transfer.tdl.aggregate import evaluate as evaluate_aggregate
 from research.transfer.statistics import (
     CrossedDesign, EvaluationRun, bootstrap_effects, cross_task_endpoint, interval_decision,
     leave_one_global_seed_out, paired_family_effect, require_separate_cell_bounds,
@@ -44,6 +47,91 @@ def seed_panel(nfamilies=8, *, methods=("a",), namespaces=None):
 
 
 class StatisticsTests(unittest.TestCase):
+    def test_crossed_stress_goldens_and_robust_sensitivity(self):
+        cases = seeded_stress_cases()
+        self.assertEqual(set(cases), {"near_threshold", "low_gain", "heavy_tailed", "correlated", "few_source"})
+        for name, payload in cases.items():
+            with self.subTest(name=name):
+                path = Path(__file__).resolve().parents[3] / f"tests/golden/aggregate/c02_crossed_{name}.json"
+                case = json.loads(path.read_text())
+                self.assertEqual(payload, case["input"])
+                self.assertEqual(evaluate_aggregate(payload), case["expected"])
+                self.assertFalse(case["expected"]["qualification"])
+                if name == "correlated":
+                    bounds = case["expected"]["bounds"]
+                    self.assertEqual(bounds["gap/1024/tree"], bounds["gap/2048/neural"])
+                elif name == "few_source":
+                    self.assertEqual(case["expected"]["status"], "insufficient_families")
+        design = design_from_payload(cases["heavy_tailed"])
+        sensitivity = heavy_tail_sensitivity(design)
+        self.assertEqual(sensitivity["status"], "sensitivity_only")
+        self.assertFalse(sensitivity["primary_losses_clipped"])
+        self.assertIsNone(sensitivity["bounds"])
+        self.assertEqual(sensitivity, json.loads((Path(__file__).resolve().parents[3] / "tests/golden/aggregate/c02_crossed_heavy_tailed.json").read_text())["robust_expected"])
+        self.assertNotAlmostEqual(sensitivity["estimates"][design.required_methods[0]], paired_family_effect(design)["estimates"][design.required_methods[0]])
+
+    def test_wrong_cluster_learner_source_and_fit_seed_alias_refusal(self):
+        design = design_from_payload(seeded_stress_cases()["correlated"])
+        for unit in ("query_row", "learner_seed", "fit_seed"):
+            with self.subTest(unit=unit), self.assertRaisesRegex(ValueError, "invalid_cluster_unit"):
+                replace(design, cluster_unit=unit)
+        alias = replace(design.runs[0], fit_id="aliased-fit")
+        with self.assertRaisesRegex(ValueError, "duplicate_fit_seed"):
+            scheduled((*design.runs, alias), design.required_methods)
+        for field, value in (("cluster_unit", "PRIVATE-source-header-extrema"), ("required_methods", []), ("bootstrap_draws", True)):
+            payload = deepcopy(seeded_stress_cases()["near_threshold"])
+            payload[field] = value
+            self.assertEqual(evaluate_aggregate(payload), {"status": "failed", "reason": "invalid_crossed_design"})
+        self.assertEqual(task_substream(11, "task", "fit"), 9525942615105419655)
+        self.assertEqual(task_substream(11, "tâche/水", "fit"), 9973167365048566836)
+        payload = deepcopy(seeded_stress_cases()["correlated"])
+        payload["bootstrap_seed"] = task_substream(11, "tâche/水", "fit")
+        case = json.loads((Path(__file__).resolve().parents[3] / "tests/golden/aggregate/c02_crossed_uint64_substream.json").read_text())
+        self.assertEqual(payload, case["input"])
+        self.assertEqual(evaluate_aggregate(payload), case["expected"])
+
+    def test_crossed_tasks_and_nested_paired_seeds_remain_random(self):
+        design = design_from_payload(seeded_stress_cases()["correlated"])
+        runs = []
+        for item in design.runs:
+            for sample in (0, 1):
+                for learner in (0, 1):
+                    values = tuple(v + sample + 2 * learner for v in item.pairs.synthetic)
+                    runs.append(replace(item, sample_id=str(sample), learner_seed_id=str(learner), pairs=replace(item.pairs, synthetic=values)))
+        nested = bootstrap_effects(scheduled(runs, design.required_methods), draws=399, seed=31)
+        np.testing.assert_array_equal(nested["samples"][design.required_methods[0]], nested["samples"][design.required_methods[1]])
+        # Source replication cannot turn a shared task shock into precision.
+        runs = []
+        for source in range(20):
+            for task in range(2):
+                for fit in range(2):
+                    item = run(str(source), f"s{source}/t{task}", fit=str(fit), values=((-3. if task == 0 else 3.),) * 2,
+                               namespace="shared", seed=str(fit))
+                    runs.append(replace(item, task_axis_id=str(task)))
+        boot = bootstrap_effects(scheduled(runs, ("a",)), draws=399, seed=31)
+        self.assertGreater(np.var(boot["samples"]["a"]), 3.)
+        incomplete = scheduled(runs[2:], ("a",))
+        refused = bootstrap_effects(incomplete, draws=199)
+        self.assertEqual(refused["sensitivity"]["estimand"], "complete_case_sensitivity")
+        self.assertIsNone(simultaneous_ucb(refused)["bounds"])
+
+    def test_max_t_retains_family_and_stepdown_p_order(self):
+        base = bootstrap_effects(seed_panel(4), draws=399, seed=19)
+        sample = np.asarray(base["samples"]["a"])
+        joint = {**base, "estimates": {"strong": 5., "weak": 0.}, "samples": {"strong": sample + 5, "weak": sample}}
+        report = simultaneous_ucb(joint)
+        self.assertEqual(report["bound_method"], "full_family_max_t")
+        self.assertLessEqual(report["bounds"]["strong"]["lower_stepdown_p"], report["bounds"]["weak"]["lower_stepdown_p"])
+        single = simultaneous_ucb(base)["bounds"]["a"]
+        self.assertAlmostEqual(report["bounds"]["weak"]["lower"], single["lower"])
+        self.assertAlmostEqual(report["bounds"]["strong"]["lower"] - 5., single["lower"])
+        flat = {**base, "samples": {"a": [0.] * 399}}
+        self.assertEqual(simultaneous_ucb(flat)["status"], "insufficient_variation")
+        rng = np.random.default_rng(36)
+        two = {**base, "estimates": {"a": 0., "b": 0.}, "samples": {"a": rng.normal(size=399), "b": rng.normal(size=399)}}
+        one = {**two, "estimates": {"a": 0.}, "samples": {"a": two["samples"]["a"]}}
+        self.assertLess(simultaneous_ucb(two)["bounds"]["a"]["lower"], simultaneous_ucb(one)["bounds"]["a"]["lower"])
+
     def test_family_balancing_and_duplicate_alias_refusal(self):
         runs = [run("f", f"variant-{i}", values=(0., 0.)) for i in range(10)]
         runs += [run("other", "other", values=(2., 2.))]

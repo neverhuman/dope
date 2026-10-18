@@ -32,6 +32,9 @@ def _parse_required_seeds(raw):
 
 
 def evaluate(data):
+    if type(data) is dict and "inference_version" in data:
+        from ..inference import evaluate as evaluate_inference
+        return evaluate_inference(data)
     try:
         require(type(data) is dict)
         families = _names(data.get("required_families"))
