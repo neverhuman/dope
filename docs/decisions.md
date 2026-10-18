@@ -97,3 +97,22 @@ dope compile data.csv --target price --categorical-mode usability --budget 10KiB
 - Pseudonymous-mode artifacts contain no input category string.
 - The mode appears in `dope inspect`.
 - An unknown mode fails closed without echoing data.
+
+## D19 governance hold and blocker unblock matrix (2026-10-18)
+
+**D19 — internal governance hold.** Sequence gate for the pre-campaign S1 privacy calibration and the M1 development comparison. It holds the empirical campaign order E03 -> E04 -> E05 -> E06. It does not release the P1 GPU freeze and does not authorize sealed-label access. Decision owner: `super_captain`. This text was supplied by captain_dope dispatch `gb_dope_prs_1030` and is not yet recorded as a super_captain decision.
+
+Open conflicts: `FINAL_HANDOFF_POST_MERGE_402954ED.md` names the D19 owner "Human Owner"; `progress.json` uses "D05/D19 statistical freeze" for the Grok lane. Both need resolving.
+
+Authority rule: `super_captain` decides internal governance and GPU-schedule holds (D10, D18, D19). Jepson-reserved applies only when a new paid spend, external license or legal commitment is needed.
+
+| Task | Exact unblock action | Decision authority | Runnable on CPU now, without releasing the GPU hold |
+|---|---|---|---|
+| **W01** Kumo/TabICL official runtimes | Provision the vendor runtime and pinned adapter weights/credentials offline; run the vendor parity suite on live adapter outputs. Check terms and hashes first; accept no new terms or spend implicitly. | Jepson-reserved (new license terms, credentials, possible spend) | Offline ABI tests only (`research.transfer.tests.test_worker_abi`, 9 tests). Live parity needs the runtime and weights. |
+| **E03** smallest observational/adverse pilot | Allocate the external multi-host benchmark window after the P1 GPU freeze lifts; mount the sealed dataset; obtain source/model rights and protected owner admission. | `super_captain` for the GPU schedule hold; Jepson-reserved for rights, human resources, new spend | No full-matrix run is admitted on CPU. Admission comes first. |
+| **E04** precommit confirmatory design | Complete the D19 precommit admission review; ingest signed external baseline artifacts into the comparator. Depends on E03. | `super_captain` for the D19 review; Jepson-reserved if a baseline artifact needs a license | Drafting the precommit only: candidate artifacts, roles, thresholds, seeds, roster. No label access. |
+| **E05** sealed confirmation | After E03 and E04 complete, obtain the D19 unlock token; run the sealed protocol through the sole authorized separate-principal custodian. | `super_captain` for the unlock token; custody stays under the D18 archival fence | Nothing. Sealed data is not opened before unlock. |
+| **E06** four-level reproducibility | Re-run L1–L4 ratification once E03, E04, E05 artifacts exist. L2 and L4 are blocked; L3 is partial. | `super_captain` for sequencing; Jepson-reserved for independent owner resources and private access | L1 replay of aggregate tables and figures from the approved immutable ledger (already passing locally). |
+| **E07** first observational CPU loop | Launch the post-release observation window and collect full-duration telemetry receipts from the external feed. | `super_captain` for the window schedule; Jepson-reserved if the feed needs a new external commitment | Freeze the reduced cpu-smoke panel and partition; run the deterministic adverse-mechanism fixture on public data. The production canary window is not runnable now. |
+
+Machine-readable form: `DECISIONS.json` (proposed; see the packet's `DECISIONS_D19_PROPOSED.json`), because the ledger file is read-only and listed in `SHA256SUMS.json`.
