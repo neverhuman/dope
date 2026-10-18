@@ -1,0 +1,38 @@
+[
+  {
+    "kind": "task",
+    "payload": {
+      "b": false,
+      "a": [
+        1,
+        2
+      ],
+      "label": "Ω",
+      "q": {
+        "numerator": 9,
+        "denominator": 10
+      }
+    },
+    "canonical": "{\"a\":[1,2],\"b\":false,\"label\":\"Ω\",\"q\":{\"denominator\":10,\"numerator\":9}}",
+    "identity": "task:f2209eb380d970aeb61c012095a23e8ce45699e3b37455d8082a6614e36eaa1a"
+  },
+  {
+    "kind": "task",
+    "payload": {
+      "😀": 1,
+      "": 2,
+      "a": "é"
+    },
+    "canonical": "{\"a\":\"é\",\"\":2,\"😀\":1}",
+    "identity": "task:7ef344e07e087fd86a290ed821be68883059cb9d8ca1960624424aea3c49601a"
+  },
+  {
+    "kind": "task",
+    "payload": {
+      "null": null,
+      "escaped": "line\nquote\""
+    },
+    "canonical": "{\"escaped\":\"line\\nquote\\\"\",\"null\":null}",
+    "identity": "task:6599b8a8d722e706a2b407eab7b8893dbb14de2b745db6e40b8a2d80138891d1"
+  }
+]

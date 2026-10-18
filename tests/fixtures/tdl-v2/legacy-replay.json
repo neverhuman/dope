@@ -1,0 +1,36 @@
+{
+  "contract_id": "tdl-contract-v1",
+  "case": {
+    "case_id": "transfer_retention_90",
+    "citable": false,
+    "component": "transfer",
+    "expected": {
+      "clipped_transfer": 0.9,
+      "null_loss": 10.0,
+      "raw_transfer": 0.9,
+      "real_gain": 8.0,
+      "real_loss": 2.0,
+      "reason": null,
+      "status": "informative",
+      "synthetic_loss": 2.8
+    },
+    "input": {
+      "constant_target": false,
+      "null_losses": [
+        10.0,
+        10.0
+      ],
+      "real_gain_lcb": 7.0,
+      "real_losses": [
+        2.0,
+        2.0
+      ],
+      "synthetic_losses": [
+        2.8,
+        2.8
+      ]
+    },
+    "purpose": "Original-unit paired retention and informative-task refusal.",
+    "schema_version": 1
+  }
+}

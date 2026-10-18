@@ -12,6 +12,36 @@ The golden corpus (`tests/golden/`, T-037) holds the two to identical outputs. T
 exploratory predecessor is [`docs/vnext/LEARNING_DENSITY.md`](vnext/LEARNING_DENSITY.md).
 The retired weighted scores are in [the MFS history](archive/mfs-history.md).
 
+## Candidate successor (I00 / C00)
+
+The unified workplan introduces the unfrozen
+[`tdl-contract-v2.candidate`](../contracts/tdl-contract-v2.candidate.json).
+Its identities, schema admission and independent state axes are defined in
+[the candidate protocol decision](decisions/tdl-v1.md). Sections 1–10 below retain
+the historical v1 definitions implemented by the existing Rust/Python conformance
+core; their defaults and receipt semantics do not freeze or certify the successor.
+
+Candidate transfer uses paired harm `z = L_S - 0.10*L_0 - 0.90*L_R` at tau = 0.90
+in original target units, with a simultaneous one-sided upper bound at most zero.
+It does not silently reinterpret historical generic `Margin` or opposite-sign
+benefit receipts. Candidate admission rejects historical receipts unless explicit
+legacy replay is requested; replay preserves v1 semantics and grants no candidate
+qualification. Candidate inference and scoring remain later workplan tasks.
+
+The three informative real-reference parameters (`absolute`, `relative`,
+`lcb_required`), driver stability, absolute importance, synthetic noncollapse and
+the D19 multiplicity procedure remain **null**, pending calibration/decision.
+The plan distinguishes 10,000 bootstrap draws from 2,000 independent calibration
+replications. Unresolved rosters, rights profiles and applicability are explicit;
+the candidate stays `status="candidate"`, `protocol_frozen=false`, `certified=false`.
+
+Seven axes remain independent: `artifact_qualification_state`,
+`scheduled_cell_state`, `campaign_completeness_state`, `empirical_privacy_state`,
+`formal_dp_state`, `release_authorization_state`, and `claim_provenance_state`.
+Schema admission establishes no scientific result or release permission. Candidate
+receipts remain noncitable and uncertified; empirical privacy is never formal DP
+or HIPAA de-identification.
+
 ## 1. The question
 
 > How few dataset-specific bytes does a sampling artifact need before models trained or
