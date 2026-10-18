@@ -1,0 +1,773 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.dev/schemas/model-worker-v1.schema.json",
+  "title": "Bounded fixture-only model worker ABI; binary f64le buffers travel separately. Semantic validation additionally binds shapes, row order, resources and canonical digests. No query labels or filesystem paths.",
+  "anyOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "type",
+        "method",
+        "pins",
+        "resources",
+        "policy",
+        "seed",
+        "counts",
+        "training_role",
+        "inputs",
+        "context_row_ids",
+        "context_sha256",
+        "query_sha256",
+        "output",
+        "request_sha256",
+        "fit_seed",
+        "feature_schema_sha256"
+      ],
+      "properties": {
+        "format": {
+          "const": "dope-model-worker-v1"
+        },
+        "type": {
+          "const": "request"
+        },
+        "method": {
+          "enum": [
+            "capabilities",
+            "qualify",
+            "fit_or_prepare_context",
+            "predict",
+            "predict_perturbations",
+            "release_context",
+            "shutdown"
+          ]
+        },
+        "pins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model_sha256",
+            "panel_sha256",
+            "worker_image_sha256",
+            "checkpoint_sha256",
+            "prepared_sha256",
+            "split_sha256",
+            "dependencies_sha256",
+            "preprocessing_sha256",
+            "recipe_sha256",
+            "runtime_version",
+            "precision",
+            "device"
+          ],
+          "properties": {
+            "model_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "panel_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "worker_image_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "checkpoint_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "prepared_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "split_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "dependencies_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "preprocessing_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recipe_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "runtime_version": {
+              "type": "string",
+              "minLength": 5
+            },
+            "precision": {
+              "enum": [
+                "float32",
+                "float64",
+                "bfloat16"
+              ]
+            },
+            "device": {
+              "enum": [
+                "cpu",
+                "cuda"
+              ]
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threads",
+            "wall_ms",
+            "memory_bytes",
+            "vram_bytes",
+            "disk_bytes",
+            "network"
+          ],
+          "properties": {
+            "threads": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1024
+            },
+            "wall_ms": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3600000
+            },
+            "memory_bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1099511627776
+            },
+            "vram_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1099511627776
+            },
+            "disk_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1099511627776
+            },
+            "network": {
+              "const": false
+            }
+          }
+        },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "primary_n",
+            "sample_multiplier",
+            "context_cap",
+            "truncation",
+            "subsampling",
+            "predict_time_fit",
+            "query_policy",
+            "order_sensitive",
+            "query_batch_size"
+          ],
+          "properties": {
+            "primary_n": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 262144
+            },
+            "sample_multiplier": {
+              "enum": [
+                1,
+                4
+              ]
+            },
+            "context_cap": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            "truncation": {
+              "enum": [
+                "none",
+                "head"
+              ]
+            },
+            "subsampling": {
+              "enum": [
+                "none",
+                "seeded"
+              ]
+            },
+            "predict_time_fit": {
+              "type": "boolean"
+            },
+            "query_policy": {
+              "enum": [
+                "rowwise",
+                "batch",
+                "transductive"
+              ]
+            },
+            "order_sensitive": {
+              "type": "boolean"
+            },
+            "query_batch_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            }
+          }
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requested_rows",
+            "produced_rows",
+            "provided_rows",
+            "consumed_rows"
+          ],
+          "properties": {
+            "requested_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "produced_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "provided_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "consumed_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            }
+          }
+        },
+        "training_role": {
+          "enum": [
+            "development_train",
+            "synthetic_train",
+            null
+          ]
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "train_features",
+            "train_labels",
+            "query_features"
+          ],
+          "properties": {
+            "train_features": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "dtype",
+                    "rows",
+                    "columns",
+                    "row_ids",
+                    "sha256",
+                    "byte_length"
+                  ],
+                  "properties": {
+                    "dtype": {
+                      "const": "f64le"
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1048576
+                    },
+                    "columns": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4096
+                    },
+                    "row_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "byte_length": {
+                      "type": "integer",
+                      "minimum": 8,
+                      "maximum": 67108864
+                    }
+                  }
+                }
+              ]
+            },
+            "train_labels": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "dtype",
+                    "rows",
+                    "columns",
+                    "row_ids",
+                    "sha256",
+                    "byte_length"
+                  ],
+                  "properties": {
+                    "dtype": {
+                      "const": "f64le"
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1048576
+                    },
+                    "columns": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4096
+                    },
+                    "row_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "byte_length": {
+                      "type": "integer",
+                      "minimum": 8,
+                      "maximum": 67108864
+                    }
+                  }
+                }
+              ]
+            },
+            "query_features": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "dtype",
+                    "rows",
+                    "columns",
+                    "row_ids",
+                    "sha256",
+                    "byte_length"
+                  ],
+                  "properties": {
+                    "dtype": {
+                      "const": "f64le"
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 1048576
+                    },
+                    "columns": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4096
+                    },
+                    "row_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "byte_length": {
+                      "type": "integer",
+                      "minimum": 8,
+                      "maximum": 67108864
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "context_row_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "context_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "query_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "class_order",
+            "units"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "point",
+                "probability",
+                "distribution"
+              ]
+            },
+            "class_order": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "units": {
+              "enum": [
+                "target_original",
+                "probability",
+                "distribution_target_original"
+              ]
+            }
+          }
+        },
+        "request_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fit_seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "feature_schema_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "type",
+        "request_sha256",
+        "pins",
+        "counts",
+        "context_sha256",
+        "query_sha256",
+        "status",
+        "error",
+        "prediction",
+        "output",
+        "usage",
+        "qualified",
+        "qualification"
+      ],
+      "properties": {
+        "format": {
+          "const": "dope-model-worker-v1"
+        },
+        "type": {
+          "const": "response"
+        },
+        "request_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model_sha256",
+            "panel_sha256",
+            "worker_image_sha256",
+            "checkpoint_sha256",
+            "prepared_sha256",
+            "split_sha256",
+            "dependencies_sha256",
+            "preprocessing_sha256",
+            "recipe_sha256",
+            "runtime_version",
+            "precision",
+            "device"
+          ],
+          "properties": {
+            "model_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "panel_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "worker_image_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "checkpoint_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "prepared_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "split_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "dependencies_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "preprocessing_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recipe_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "runtime_version": {
+              "type": "string",
+              "minLength": 5
+            },
+            "precision": {
+              "enum": [
+                "float32",
+                "float64",
+                "bfloat16"
+              ]
+            },
+            "device": {
+              "enum": [
+                "cpu",
+                "cuda"
+              ]
+            }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requested_rows",
+            "produced_rows",
+            "provided_rows",
+            "consumed_rows"
+          ],
+          "properties": {
+            "requested_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "produced_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "provided_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "consumed_rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            }
+          }
+        },
+        "context_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "query_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "unavailable",
+            "error"
+          ]
+        },
+        "error": {
+          "enum": [
+            null,
+            "dependency_unavailable",
+            "backend_failed",
+            "resource_budget_exceeded"
+          ]
+        },
+        "prediction": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "dtype",
+                "rows",
+                "columns",
+                "row_ids",
+                "sha256",
+                "byte_length"
+              ],
+              "properties": {
+                "dtype": {
+                  "const": "f64le"
+                },
+                "rows": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1048576
+                },
+                "columns": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4096
+                },
+                "row_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "byte_length": {
+                  "type": "integer",
+                  "minimum": 8,
+                  "maximum": 67108864
+                }
+              }
+            }
+          ]
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "class_order",
+            "units"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "point",
+                "probability",
+                "distribution"
+              ]
+            },
+            "class_order": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "units": {
+              "enum": [
+                "target_original",
+                "probability",
+                "distribution_target_original"
+              ]
+            }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "wall_ms",
+            "memory_bytes",
+            "vram_bytes"
+          ],
+          "properties": {
+            "wall_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3600000
+            },
+            "memory_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1099511627776
+            },
+            "vram_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1099511627776
+            }
+          }
+        },
+        "qualified": {
+          "const": false
+        },
+        "qualification": {
+          "const": "fixture_only"
+        }
+      }
+    }
+  ]
+}
