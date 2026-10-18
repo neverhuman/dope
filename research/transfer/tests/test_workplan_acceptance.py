@@ -32,11 +32,13 @@ def _safe_is_file(p: Path) -> bool:
         return False
 
 
-def _resolve_packet_dir() -> Path:
-    env_pkt = os.environ.get("DOPE_PACKET_DIR")
-    if env_pkt:
-        p = Path(env_pkt)
-        return p if _safe_is_dir(p) else (_LOCAL_PKT / "_missing_packet_dir_")
+def _resolve_packet_dir(env_pkt: str | None = None) -> Path:
+    raw = os.environ.get("DOPE_PACKET_DIR") if env_pkt is None else env_pkt
+    if raw:
+        p = Path(raw)
+        if not p.is_dir() or not (p / "tasks.json").is_file():
+            raise RuntimeError(f"Explicit DOPE_PACKET_DIR is missing or incomplete: {p}")
+        return p
     for cand in (_LOCAL_PKT, _MAIN_PKT):
         if _safe_is_dir(cand):
             return cand
@@ -60,15 +62,19 @@ def find_dope_kernel_bin() -> Path:
 
 
 def run_validate_plan() -> str:
-    if not _safe_is_file(PACKET_DIR / "validate_plan.py"):
+    vp = PACKET_DIR / "validate_plan.py"
+    if os.environ.get("DOPE_PACKET_DIR"):
+        if not vp.is_file():
+            raise RuntimeError(f"Explicit DOPE_PACKET_DIR missing validate_plan.py: {vp}")
+    elif not _safe_is_file(vp):
         return "VALID_CLEAN_CHECKOUT"
-    res = subprocess.run(["python3", str(PACKET_DIR / "validate_plan.py")], cwd=str(PACKET_DIR), capture_output=True, text=True, check=True)
+    res = subprocess.run(["python3", str(vp)], cwd=str(PACKET_DIR), capture_output=True, text=True, check=True)
     assert "VALID" in res.stdout.upper() or res.returncode == 0
     return res.stdout
 
 
 def check_dashboard_200(path: str = "/") -> str:
-    if not PACKET_DIR.is_dir():
+    if not _safe_is_dir(PACKET_DIR):
         return "DOPE_CLEAN_CHECKOUT"
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:18884{path}", timeout=3) as resp:
@@ -83,7 +89,7 @@ class TestP00SourceFreeze(unittest.TestCase):
         self.assertTrue((REPO_ROOT / "contracts/tdl-contract-v1.json").is_file())
         self.assertTrue((REPO_ROOT / "AGENTS.md").is_file())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             sh = json.loads((PACKET_DIR / "SHA256SUMS.json").read_text())
             self.assertGreaterEqual(len(sh), 4)
             tr = json.loads((PACKET_DIR / "SOURCE_TRACEABILITY.json").read_text())
@@ -101,7 +107,7 @@ class TestP01RepoSnapshot(unittest.TestCase):
         self.assertTrue((REPO_ROOT / "agent/owner-map.json").is_file())
         self.assertTrue((REPO_ROOT / "agent/test-map.json").is_file())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             parent = PACKET_DIR.parent
             self.assertIsInstance(json.loads((parent / "REPO_SNAPSHOT.json").read_text()), dict)
             self.assertIsInstance(json.loads((parent / "SCREEN_OWNERSHIP.json").read_text()), (dict, list))
@@ -113,7 +119,7 @@ class TestP02CodebaseInventory(unittest.TestCase):
         self.assertTrue((REPO_ROOT / "docs/architecture.md").is_file())
         self.assertTrue((REPO_ROOT / "STATUS.md").is_file())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             parent = PACKET_DIR.parent
             self.assertIsInstance(json.loads((parent / "REPO_GAP_MAP.json").read_text()), (dict, list))
             self.assertIsInstance(json.loads((PACKET_DIR / "S1-requirements.json").read_text()), (dict, list))
@@ -125,7 +131,7 @@ class TestP03DecisionsReview(unittest.TestCase):
         self.assertTrue((REPO_ROOT / "docs/decisions.md").is_file())
         self.assertIn("D-01", (REPO_ROOT / "docs/decisions.md").read_text())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             decs = json.loads((PACKET_DIR / "DECISIONS.json").read_text())
             synth = (PACKET_DIR / "S1-review.md").read_text() + (PACKET_DIR / "S2-S3-review.md").read_text()
             self.assertIsInstance(decs, (dict, list))
@@ -137,7 +143,7 @@ class TestP04WorkplanDashboard(unittest.TestCase):
     def test_p04_workplan_dag_and_live_dashboard(self):
         self.assertTrue((REPO_ROOT / "docs/testing.md").is_file())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             tasks = json.loads((PACKET_DIR / "tasks.json").read_text())["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
             self.assertEqual(len(tasks), 65)
@@ -155,7 +161,7 @@ class TestI00ProtectedIntegration(unittest.TestCase):
         has_commits = subprocess.run(["git", "-C", str(REPO_ROOT), "cat-file", "-e", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{commit}"], capture_output=True).returncode == 0
         if has_commits:
             subprocess.run(["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor", "0ac99c68ecd697abe19d5bab488f620d5c51517b", "402954ed9dc34c66c2a7c986b6d3000b6a58746a"], check=True)
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             handoff = (PACKET_DIR / "FINAL_HANDOFF_POST_MERGE_402954ED.md").read_text()
             self.assertIn("neverhumanbot", handoff)
             self.assertIn("47325f13b9823c91a6fc71bf1600fc097e5907c9", handoff)
@@ -164,7 +170,7 @@ class TestI00ProtectedIntegration(unittest.TestCase):
 class TestV02IndependentReview(unittest.TestCase):
     def test_v02_pr269_neverhumanbot_approval_and_four_green_checks_on_47325f1(self):
         self.assertTrue((REPO_ROOT / "ops/merge_guard/Cargo.toml").is_file())
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             handoff = (PACKET_DIR / "FINAL_HANDOFF_POST_MERGE_402954ED.md").read_text()
             self.assertIn("47325f13b9823c91a6fc71bf1600fc097e5907c9", handoff)
             self.assertIn("neverhumanbot", handoff)
@@ -178,7 +184,7 @@ class TestV03ReceivingMainGreen(unittest.TestCase):
     def test_v03_receiving_main_402954ed_ci_and_jankurai_green(self):
         self.assertTrue((REPO_ROOT / "ops/ci/cpu.sh").is_file())
         self.assertTrue((REPO_ROOT / "ops/ci/security.sh").is_file())
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             handoff = (PACKET_DIR / "FINAL_HANDOFF_POST_MERGE_402954ED.md").read_text()
             self.assertIn("39123429109", handoff)
             self.assertIn("39123429089", handoff)
@@ -188,7 +194,7 @@ class TestV04PostMergeHandoff(unittest.TestCase):
     def test_v04_post_merge_handoff_complete(self):
         self.assertTrue((REPO_ROOT / "docs/release.md").is_file())
         run_validate_plan()
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             handoff_path = PACKET_DIR / "FINAL_HANDOFF_POST_MERGE_402954ED.md"
             self.assertTrue(handoff_path.is_file())
             text = handoff_path.read_text()
@@ -210,7 +216,7 @@ class TestV01MultiHostParity(unittest.TestCase):
         ci_local = REPO_ROOT / "scripts/ci-local.sh"
         self.assertTrue(ci_local.is_file())
         self.assertIn("ops/ci/$1.sh", ci_local.read_text())
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             vdir = PACKET_DIR / "verify/main_402954ed"
             self.assertIn("host: xbabe1", (vdir / "V01_xbabe1_audit.log").read_text())
             self.assertIn("Python V1 boundary: 13 files, 8 checks passed", (vdir / "V01_xbabe2_audit.log").read_text())
@@ -447,10 +453,29 @@ class TestD19AndBlockerUnblockMatrix(unittest.TestCase):
         self.assertIn("D19", dec_text)
         for tid in ("W01", "E03", "E04", "E05", "E06", "E07"):
             self.assertIn(f"**{tid}**", dec_text)
-        if PACKET_DIR.is_dir():
+        if _safe_is_dir(PACKET_DIR):
             self.assertTrue((PACKET_DIR / "DECISIONS.json").is_file())
             d19_candidates = [PACKET_DIR / "DECISIONS_D19_PROPOSED.json", PACKET_DIR / "DECISIONS.json"]
             self.assertTrue(any(p.is_file() and "D19" in p.read_text() for p in d19_candidates))
+
+    def test_packet_dir_portability_and_strict_explicit_env(self):
+        from unittest import mock
+        orig_is_dir = Path.is_dir
+        def fake_is_dir(p: Path) -> bool:
+            if p == _MAIN_PKT or p == Path("/inaccessible/packet"):
+                raise PermissionError("simulated cross-user chmod 700 denial")
+            if p == _LOCAL_PKT:
+                return False
+            return orig_is_dir(p)
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("DOPE_PACKET_DIR", None)
+            with mock.patch.object(Path, "is_dir", fake_is_dir):
+                self.assertEqual(_resolve_packet_dir(""), _LOCAL_PKT)
+        with self.assertRaises(RuntimeError):
+            _resolve_packet_dir(str(REPO_ROOT / "target/_nonexistent_explicit_packet_dir_"))
+        with mock.patch.object(Path, "is_dir", fake_is_dir):
+            with self.assertRaises(PermissionError):
+                _resolve_packet_dir("/inaccessible/packet")
 
 
 if __name__ == "__main__":
