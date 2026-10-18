@@ -15,7 +15,7 @@ ASSUMPTIONS = {"moment_assumption": "finite_variance", "distribution_free": Fals
 
 
 class _InferenceRng(XorShift64):
-    """Full uint64 task substreams; legacy aggregate keeps its 53-bit admission."""
+    """Full uint64 task substreams; prior aggregate keeps its 53-bit admission."""
     def __init__(self, seed):
         require(type(seed) is int and 0 <= seed < 2**64, "invalid_bootstrap_seed")
         self.state = seed or 1
@@ -182,7 +182,7 @@ def design_from_payload(data):
 
 
 def evaluate(data):
-    """Explicit candidate interface; legacy aggregate receipts keep v1 semantics."""
+    """Explicit candidate interface; prior aggregate receipts keep v1 semantics."""
     from .statistics import bootstrap_effects, simultaneous_ucb
     try:
         design = design_from_payload(data)

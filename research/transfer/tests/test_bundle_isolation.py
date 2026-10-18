@@ -52,8 +52,8 @@ try:
     print(json.dumps({'payload_sha256': hashlib.sha256(verified.retained_payload).hexdigest(),
                      'accounting': dict(verified.accounting), 'denied': denied}, sort_keys=True))
 except BundleError as error:
-    print(error.code)
-    sys.exit(2)
+    print(error.code, flush=True)
+    os._exit(2)
 """
 
 

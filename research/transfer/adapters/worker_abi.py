@@ -4,7 +4,7 @@ JSON contains opaque IDs and descriptors; bounded little-endian f64 buffers trav
 separately. Only training labels are admitted. The custodian supplies trusted pins
 and retains query labels. No pickle, paths, vendor imports or process launch here;
 W01/W02/W04 must independently enforce isolation and verify native measurements.
-The request digest is the worker cache identity (legacy adapter keys are separate).
+The request digest is the worker cache identity (prior adapter keys are separate).
 """
 from dataclasses import dataclass
 import hashlib

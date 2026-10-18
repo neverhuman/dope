@@ -136,7 +136,7 @@ def account(profile, *, expected_adjacency, independent_audit_passed=False,
                        "schema_sha256": schema_digest, "epsilon": epsilon, "delta": delta}
             try:
                 audit_passed = audit_verifier(context) is True
-            except Exception:
+            except (ValueError, TypeError, KeyError, RuntimeError, OSError, ArithmeticError):
                 audit_passed = False
     not_dp = bool(reasons)
     if empirical_screened_only:

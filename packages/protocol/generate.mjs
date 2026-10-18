@@ -23,7 +23,7 @@ const typeOf = (schema) => {
 };
 for (const [file, name] of schemas) {
   const schema = JSON.parse(await readFile(resolve(root, 'schemas', file), 'utf8'));
-  definitions.push(`// Source: schemas/${file}\nexport const ${name}Schema = ${JSON.stringify(schema)} as const;`);
+  definitions.push(`// Source: schemas/${file}\nexport const ${name}Schema = ${JSON.stringify(schema)};`);
   if (name === 'JobV1') definitions.push(`export type JobV1 = ${typeOf(schema)};`);
 }
 await writeFile(new URL('./src/schema-snapshots.ts', import.meta.url), `${definitions.join('\n\n')}\n`);

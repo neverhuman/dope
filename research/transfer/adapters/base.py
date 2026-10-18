@@ -364,7 +364,7 @@ class _Adapter(ABC):
                        sample_multiplier=1, predict_time_fit=False, subsampling="none", output=None):
         """Export the admitted context without query labels; launch is executor-owned.
 
-        request_sha256, rather than the legacy cache_key, binds all native runtime,
+        request_sha256, rather than the prior cache_key, binds all native runtime,
         resource and sensitivity policies. This contract remains fixture-only.
         """
         self._ready()
