@@ -485,3 +485,7 @@ mod staged_search_tests {
         assert!(!retry.observations[0].cache_hit);
     }
 }
+
+#[cfg(test)]
+#[path = "teacher_study.rs"]
+mod teacher_study;
