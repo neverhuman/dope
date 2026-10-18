@@ -110,6 +110,66 @@ needs compute, licenses or owner decisions.
   - A figure never mixes cohorts without a prominent disclosure.
 - **Sealed test.** Opened once, through a frozen release manifest (FOLLOW-SEAL, D-08).
 
+### 4.1 Source-balanced roster plan (E00)
+
+`research/transfer/manifests/datasets.json` is a planning denominator, not an
+acquisition receipt. Its 116 rows are target slots: Quick-12 (12), Open-60 (60),
+Sealed-24 (24), and MechanismLab stress (20). The first three groups are split
+80/20 regression/binary classification (Quick-12: 8/4, Open-60: 40/20,
+Sealed-24: 16/8); multiclass is outside the initial admission and requires a
+separate protocol and power review. The current task labels are candidate task
+types, not verified properties of acquired tables. Horizons for time-shift
+tasks are defined per source before outcomes as the earliest contiguous 60%
+for fit, next 20% for selection, and latest 20% for external audit; non-temporal
+sources use entity-group 60/20/20. Site holdout is an additional external audit
+partition wherever multiple sites exist. If a source cannot support its frozen
+split, it is excluded before outcomes and remains in the denominator with a
+reason; it is never replaced after outcomes.
+
+Candidate pools currently name six possible source organizations/families for
+Quick-12 and Open-60 (UCI, OpenML, StatLib, PMLB, PhysioNet, and World Bank),
+and twelve additional candidate families for Sealed-24 (NHANES, USDA ERS, NOAA,
+Eurostat, NCES, WHO, US Census ACS, CDC, FAOSTAT, OECD, EIA, and BTS). These are
+discovery leads only. The repeated Open-60 slots do not assert 60 independent
+sources, and repeated entries from one family count once. Sealed-24 requires
+at least 12 independently owned, non-overlapping families new to development
+and selection. A dataset and every alias, version, alternate target, repeated
+entity extract, or simulated derivative inherit one parent family; missing
+identity or unresolved overlap blocks admission rather than increasing counts.
+PMLB's 20 MechanismLab stress slots are task cases from one task pool, not 20
+independent sources and never contribute to RealCore or ShiftCore counts.
+
+Before any outcome access, freeze a row for every candidate with exact source
+identity and SHA-256, task and prediction horizon, entity/time/site and source
+partition hashes, duplicate/contamination review digest, license decisions,
+and an attrition/exclusion disposition. All rights, exposure and source hashes
+are currently unresolved, so the roster is not complete for execution and all
+headline eligibility stays false. Fit and selection may use only their frozen
+views; final labels stay with the external evaluator. Regression and binary
+results are reported first. Multiclass rows remain separately pending and
+cannot be counted as initial-benchmark successes.
+
+The primary finite-roster estimand is the equal-weight mean of source-family
+means over the licensed, independent families admitted in the frozen roster;
+within each family, canonical tasks, fits, samples and learners receive equal
+weight. Each family therefore receives weight `1/F` and weights sum to one.
+The future-source estimand is the expected family-level result for a draw from
+the explicitly named source-population frame, with equal family weighting;
+it is not inferred from the finite roster without a sampling frame and
+probability-based inclusion. Report both only when their populations and
+uncertainty procedures are defined before outcomes.
+
+Before admitting any cohort size, attach a per-source cost sheet for rights and
+acquisition, normalization/model development, five fits by three samples,
+driver evaluations, privacy attacks, and the predeclared power expansion.
+Record vendor or compute quote, units, one-time versus marginal cost, wall-time
+and hardware assumptions, and a maximum spend; unresolved quotes mean no
+admission. Power expansion is estimated from blinded pilot variance and the
+predeclared minimum detectable effect, with an explicit cap and no outcome-led
+roster enlargement. The present files contain no quotes or measured pilot
+variance, so Quick-12/Open-60/Sealed-24 are targets only and no campaign is
+authorized by this plan.
+
 ## 5. Where the operational detail lives
 
 The benchmark tooling overview is in

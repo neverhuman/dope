@@ -4,15 +4,15 @@
   "protocol_frozen": false,
   "entries": [
     {
-      "id": "realcore_candidate",
+      "id": "quick12-candidate-01",
       "cohort": "RealCore",
       "campaign_alias": "Quick-12",
-      "source_family": "pending_observational_source",
-      "source_url": "https://www.openml.org/",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
       "source_sha256": null,
       "split_sha256": null,
       "rights": {
-        "license": "per-dataset review pending",
+        "license": "unverified; per-dataset review required",
         "training": "unknown",
         "redistribution": "unknown",
         "review_status": "pending"
@@ -25,44 +25,19 @@
       "status": "specified_unrun",
       "headline_eligible": false,
       "sealed_test_opened": false,
-      "task": "pending",
-      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
     },
     {
-      "id": "shiftcore_candidate",
-      "cohort": "ShiftCore",
-      "campaign_alias": "Open-60",
-      "source_family": "pending_shift_source",
-      "source_url": "https://www.openml.org/",
-      "source_sha256": null,
-      "split_sha256": null,
-      "rights": {
-        "license": "per-dataset review pending",
-        "training": "unknown",
-        "redistribution": "unknown",
-        "review_status": "pending"
-      },
-      "contamination": {
-        "status": "pending",
-        "review_sha256": null,
-        "pretraining_exposure": "unknown"
-      },
-      "status": "specified_unrun",
-      "headline_eligible": false,
-      "sealed_test_opened": false,
-      "task": "pending",
-      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
-    },
-    {
-      "id": "sealed_candidate",
+      "id": "quick12-candidate-02",
       "cohort": "RealCore",
-      "campaign_alias": "Sealed-24",
-      "source_family": "pending_independent_source",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-openml-curated",
       "source_url": "https://www.openml.org/",
       "source_sha256": null,
       "split_sha256": null,
       "rights": {
-        "license": "per-dataset review pending",
+        "license": "unverified; per-dataset review required",
         "training": "unknown",
         "redistribution": "unknown",
         "review_status": "pending"
@@ -75,19 +50,44 @@
       "status": "specified_unrun",
       "headline_eligible": false,
       "sealed_test_opened": false,
-      "task": "pending",
-      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
     },
     {
-      "id": "pmlb_mechanism",
-      "cohort": "MechanismLab",
-      "campaign_alias": "mechanism_only",
-      "source_family": "pmlb",
+      "id": "quick12-candidate-03",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-04",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-pmlb-tasks",
       "source_url": "https://github.com/EpistasisLab/pmlb",
       "source_sha256": null,
       "split_sha256": null,
       "rights": {
-        "license": "per-dataset review pending",
+        "license": "unverified; per-dataset review required",
         "training": "unknown",
         "redistribution": "unknown",
         "review_status": "pending"
@@ -100,19 +100,19 @@
       "status": "specified_unrun",
       "headline_eligible": false,
       "sealed_test_opened": false,
-      "task": "pending",
-      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
     },
     {
-      "id": "stress_candidate",
-      "cohort": "StressCore",
-      "campaign_alias": "stress_only",
-      "source_family": "pending_stress_source",
-      "source_url": "https://github.com/neverhuman/dope",
+      "id": "quick12-candidate-05",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
       "source_sha256": null,
       "split_sha256": null,
       "rights": {
-        "license": "per-dataset review pending",
+        "license": "unverified; per-dataset review required",
         "training": "unknown",
         "redistribution": "unknown",
         "review_status": "pending"
@@ -125,8 +125,2783 @@
       "status": "specified_unrun",
       "headline_eligible": false,
       "sealed_test_opened": false,
-      "task": "pending",
-      "split_policy": "group/time-aware source-family-disjoint; evaluator-only sealed labels"
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-06",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-07",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-08",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-09",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-10",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-11",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "quick12-candidate-12",
+      "cohort": "RealCore",
+      "campaign_alias": "Quick-12",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved."
+    },
+    {
+      "id": "open60-candidate-01",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-02",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-03",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-04",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-05",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-06",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-07",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-08",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-09",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-10",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-11",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-12",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-13",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-14",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-15",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-16",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-17",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-18",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-19",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-20",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-21",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-22",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-23",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-24",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-25",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-26",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-27",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-28",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-29",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-30",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-31",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-32",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-33",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-34",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-35",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-36",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-37",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-38",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-39",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-40",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-41",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-42",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-43",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-44",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-45",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-46",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-47",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-48",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-49",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-50",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-51",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-52",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-53",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-54",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-55",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-uci-ml",
+      "source_url": "https://archive.ics.uci.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-56",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-openml-curated",
+      "source_url": "https://www.openml.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-57",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-statlib-archive",
+      "source_url": "https://lib.stat.cmu.edu/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-58",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-59",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-physionet-tabular",
+      "source_url": "https://physionet.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "open60-candidate-60",
+      "cohort": "ShiftCore",
+      "campaign_alias": "Open-60",
+      "source_family": "candidate-world-bank-open",
+      "source_url": "https://data.worldbank.org/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Shift task requires source/time/site holdout and documented shift definition."
+    },
+    {
+      "id": "sealed24-candidate-01",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-nhanes",
+      "source_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-02",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-usda-ers",
+      "source_url": "https://www.ers.usda.gov/data-products/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-03",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-noaa-climate",
+      "source_url": "https://www.ncei.noaa.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-04",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-eurostat-open",
+      "source_url": "https://ec.europa.eu/eurostat/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-05",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-nces-open",
+      "source_url": "https://nces.ed.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-06",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-who-open",
+      "source_url": "https://www.who.int/data",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-07",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-census-acs",
+      "source_url": "https://www.census.gov/programs-surveys/acs",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-08",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-cdc-open",
+      "source_url": "https://data.cdc.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-09",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-fao-open",
+      "source_url": "https://www.fao.org/faostat/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-10",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-oecd-open",
+      "source_url": "https://www.oecd.org/en/data.html",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-11",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-energy-eia",
+      "source_url": "https://www.eia.gov/opendata/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-12",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-transport-bts",
+      "source_url": "https://www.bts.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-13",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-nhanes",
+      "source_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-14",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-usda-ers",
+      "source_url": "https://www.ers.usda.gov/data-products/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-15",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-noaa-climate",
+      "source_url": "https://www.ncei.noaa.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-16",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-eurostat-open",
+      "source_url": "https://ec.europa.eu/eurostat/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-17",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-nces-open",
+      "source_url": "https://nces.ed.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-18",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-who-open",
+      "source_url": "https://www.who.int/data",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-19",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-census-acs",
+      "source_url": "https://www.census.gov/programs-surveys/acs",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-20",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-cdc-open",
+      "source_url": "https://data.cdc.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-21",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-fao-open",
+      "source_url": "https://www.fao.org/faostat/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-22",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-oecd-open",
+      "source_url": "https://www.oecd.org/en/data.html",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-23",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-energy-eia",
+      "source_url": "https://www.eia.gov/opendata/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "sealed24-candidate-24",
+      "cohort": "RealCore",
+      "campaign_alias": "Sealed-24",
+      "source_family": "candidate-transport-bts",
+      "source_url": "https://www.bts.gov/",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. New family candidates must pass independent ownership and contamination review; sealed labels remain external and unopened."
+    },
+    {
+      "id": "mechanismlab-stress-01",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-02",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-03",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-04",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-05",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-06",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-07",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-08",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-09",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-10",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-11",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-12",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-13",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-14",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "regression",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-15",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-16",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-17",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-18",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-19",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
+    },
+    {
+      "id": "mechanismlab-stress-20",
+      "cohort": "MechanismLab",
+      "campaign_alias": "mechanism_only",
+      "source_family": "candidate-pmlb-tasks",
+      "source_url": "https://github.com/EpistasisLab/pmlb",
+      "source_sha256": null,
+      "split_sha256": null,
+      "rights": {
+        "license": "unverified; per-dataset review required",
+        "training": "unknown",
+        "redistribution": "unknown",
+        "review_status": "pending"
+      },
+      "contamination": {
+        "status": "pending",
+        "review_sha256": null,
+        "pretraining_exposure": "unknown"
+      },
+      "status": "specified_unrun",
+      "headline_eligible": false,
+      "sealed_test_opened": false,
+      "task": "classification",
+      "split_policy": "Candidate only. Freeze source, entity, time, site and family partitions plus attrition/exclusions before outcomes; keep audit labels external. No hash until exact licensed bytes and split are approved. Stress/mechanism task only; PMLB tasks do not count as independent source families or RealCore/ShiftCore evidence."
     }
   ]
 }
