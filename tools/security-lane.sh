@@ -11,7 +11,7 @@ if ! command -v cargo-audit >/dev/null 2>&1; then
       "https://github.com/rustsec/rustsec/releases/download/cargo-audit/v${CARGO_AUDIT_VERSION}/cargo-audit-x86_64-unknown-linux-gnu-v${CARGO_AUDIT_VERSION}.tgz" \
       --output "$archive" && \
       echo "1890badd5f15831a9af4b074399fcd21e6f7c0fe42c84e9254cdffc9f813765c  $archive" | sha256sum --check --status && \
-      tar -xzf "$archive" -C target/tools/cargo-audit cargo-audit; then
+      tar -xzf "$archive" -C target/tools/cargo-audit --strip-components=1 "cargo-audit-x86_64-unknown-linux-gnu-v${CARGO_AUDIT_VERSION}/cargo-audit"; then
       install -D -m 0755 target/tools/cargo-audit/cargo-audit "$HOME/.cargo/bin/cargo-audit"
       install -m 0755 "$HOME/.cargo/bin/cargo-audit" target/tools/cargo-audit/cargo-audit
     else

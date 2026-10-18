@@ -11,7 +11,7 @@ Copying raw rows is unsafe, while shipping multi-megabyte neural generators is b
 
 - **Compact encoding budget:** Quantizes feature marginals, a structural dependence graph, a screened target residual, and heteroscedastic noise into a self-contained binary artifact where every byte read at sample time is charged.
 - **Multi-model and foundation-model transfer:** Evaluates synthetic draws across zero-shot tabular foundation models (**NVIDIA Kumo Tabular Large**, **TabICLv2**, **AutoGluon Mitra-v2**), **neural networks (MLP)**, **linear models**, and **gradient-boosted trees (CatBoost)**.
-- **Active paper:** Read [paper/README.md](paper/README.md), [paper/main.tex](paper/main.tex), and [paper/supplement.tex](paper/supplement.tex); build PDFs with `bash paper/build.sh` into `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation PDFs are [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf) and [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf).
+- **Active paper:** [Guide](paper/README.md), [manuscript](paper/main.tex), [supplement](paper/supplement.tex); build with `bash paper/build.sh` (`target/paper/main.pdf`, `target/paper/supplement.pdf`). Frozen PDFs: [paper](docs/whitepaper/dope-mfs.pdf) and [supplement](docs/whitepaper/supplement.pdf).
 
 ![Horizontal foundation-model transfer bars for DOPE vs. Gaussian copula (charged bytes in legend; selection-exposed validation across Kumo-L, TabICLv2, Mitra-v2; cross-model feature-driver preservation: not yet measured).](paper/generated/hero-frontier.png)
 
