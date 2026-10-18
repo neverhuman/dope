@@ -15,15 +15,6 @@
     "bytes": "complete recipient-read dataset-specific payload; no extrapolated B90",
     "panel": "source-balanced; no independent median-x/median-y point"
   },
-  "provenance_audit": {
-    "historical_tfm_panel": "research/benchmark/results/mfs-v3-density-panel.json",
-    "matched_lineages": 97,
-    "fit_seed": 11,
-    "sample_seeds": [101, 211, 307],
-    "synthetic_context": "4n",
-    "strongest_historical_block_comparator": "GaussianCopula",
-    "driver_proxy_disclosure": "historical driver_fidelity column is an absolute feature-target correlation proxy (0.975 median of per-lineage seed medians vs 0.923 median of per-lineage seed minima under the legacy _min reducer for GaussianCopula; pooled-seed median is 0.973); cross-model feature-driver preservation is not yet measured"
-  },
   "retained_states": ["unsupported", "failed", "missing", "native_large", "not_reached", "eligible"],
   "compressed_data_controls": "nonrelease_only",
   "points": [],

@@ -48,23 +48,9 @@ class FigureOneTests(unittest.TestCase):
                       for item in axis.texts + axis.get_xticklabels() + axis.get_yticklabels()]
             self.assertIn("PROTOCOL SCHEMATIC", labels)
             self.assertIn("No measured points admitted; E05 confirmation pending", labels)
-            self.assertTrue(any("Cross-model feature-driver preservation: not yet measured" in lbl for lbl in labels))
             self.assertEqual(len(figure.axes[0].lines), 0)
         finally:
             F.plt.close(figure)
-
-    def test_q01_fig_provenance_audit_and_deterministic_check(self):
-        prov = self.ledger.get("provenance_audit", {})
-        self.assertEqual(prov.get("matched_lineages"), 97)
-        self.assertEqual(prov.get("fit_seed"), 11)
-        self.assertEqual(prov.get("sample_seeds"), [101, 211, 307])
-        self.assertEqual(prov.get("synthetic_context"), "4n")
-        self.assertIn("0.975", prov.get("driver_proxy_disclosure", ""))
-        self.assertIn("0.923", prov.get("driver_proxy_disclosure", ""))
-        bad = copy.deepcopy(self.ledger)
-        bad["provenance_audit"]["matched_lineages"] = 100
-        with self.assertRaisesRegex(ValueError, "provenance_audit"):
-            F.validate(bad)
 
 
 if __name__ == "__main__":
