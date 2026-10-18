@@ -656,6 +656,8 @@
     "research/transfer/ablations/": "external-evidence",
     "examples/public-regression/cpu-smoke-admission.json": "external-evidence",
     "packages/protocol/": "rust-core",
-    "research/transfer/tests/test_workplan_acceptance.py": "external-evidence"
+    "research/transfer/tests/test_workplan_acceptance.py": "external-evidence",
+    "research/transfer/preflight_readiness.py": "external-evidence",
+    "research/transfer/tests/test_campaign_readiness_preflight.py": "external-evidence"
   }
 }

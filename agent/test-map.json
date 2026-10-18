@@ -2640,6 +2640,14 @@
     "research/transfer/tests/test_workplan_acceptance.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance -v",
       "purpose": "verify durable workplan acceptance and deterministic CPU preflight gates without GPU or sealed data"
+    },
+    "research/transfer/preflight_readiness.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_campaign_readiness_preflight -v",
+      "purpose": "verify W01 modern and classical auditor contracts, E03-E04 1-table x 2-seed CPU calibration and M1 CIs, and E05-E07 manifest replay and sealed-test locks"
+    },
+    "research/transfer/tests/test_campaign_readiness_preflight.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_campaign_readiness_preflight -v",
+      "purpose": "verify W01 modern and classical auditor contracts, E03-E04 1-table x 2-seed CPU calibration and M1 CIs, and E05-E07 manifest replay and sealed-test locks"
     }
   }
 }
