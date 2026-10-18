@@ -126,6 +126,14 @@ pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<&'static
         &["push", "pull_request"]
     })
 }
+pub fn validate_collected_definitions(definitions: &Value) -> Result<&'static [&'static str]> {
+    let events = validate_definitions(definitions, false)?;
+    require(
+        declared_ci_jobs(definitions)? == WORKFLOWS[0].1,
+        "workflow_definition_invalid",
+    )?;
+    Ok(events)
+}
 pub fn validate_runs_for_definitions(
     definitions: &Value,
     runs: &Value,

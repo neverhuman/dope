@@ -22,8 +22,8 @@ Python-native ML model ecosystems, and publication plotting.
 
 | Phase | Target Files | Rust Destination | Exit Criteria |
 | :--- | :--- | :--- | :--- |
-| **Phase 1: CI Evidence & Frozen-Ledger Guards** | `ops/ci/check-frozen-evidence.py`, `ops/ci/verify-jankurai-evidence.py`, `ops/ci/paper-review-outputs.py` | `ops/merge_guard` (or `dope-ci-guard` binary) | Rust subcommand verifies SHA-256 digests, frozen JSON ledgers, and clean-checkout PDF review receipts with identical exit codes; Python scripts removed. |
-| **Phase 2: Claim & Receipt Consistency Verifiers** | `tools/claims/check.py`, `tools/reproduce_claims.py` | `rust/main.rs` (`dope verify-claims`) | Rust CLI validates benchmark claim manifests and receipt hashes directly against `validation/` and `docs/whitepaper/generated/` artifacts. |
+| **Phase 1: CI Evidence & Frozen-Ledger Guards** | `ops/ci/check-frozen-evidence.py`, `ops/ci/paper-review-outputs.py` | `ops/merge_guard` (or `dope-ci-guard` binary) | Rust subcommand verifies SHA-256 digests, frozen JSON ledgers, and clean-checkout PDF review receipts with identical exit codes; Python scripts removed. |
+| **Phase 2: Claim & Receipt Consistency Verifiers** | `tools/claims/check.py` | `rust/main.rs` (`dope verify-claims`) | Rust CLI validates benchmark claim manifests and receipt hashes directly against `validation/` and `docs/whitepaper/generated/` artifacts. |
 
 The first Phase 1 parity candidate is `ops/merge_guard/frozen_evidence.rs`,
 exposed as `check-frozen-evidence`; the Python script remains the CI entrypoint
