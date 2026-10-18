@@ -1,6 +1,6 @@
 //! Original-unit transfer diagnostics, independent of historical certification.
 //!
-//! Deliberately unregistered until the integrator adds `pub mod transfer_metrics;`.
+//! Shared primitives for the authoritative metric core in `crate::metrics`.
 //! Query losses are evaluator-private. Neither a score nor these diagnostics
 //! authorize release. Bytes remain an independent feasibility constraint.
 
@@ -14,6 +14,7 @@ pub enum MetricError {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum LossSpace {
     OriginalMse,
+    DiscreteLogLoss,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -61,77 +62,7 @@ pub fn training_variance(
     })
 }
 
-#[derive(Clone)]
-pub struct PairedLosses {
-    real: Vec<f64>,
-    synthetic: Vec<f64>,
-    null: Vec<f64>,
-    pub loss_space: LossSpace,
-}
-
-impl std::fmt::Debug for PairedLosses {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("PairedLosses")
-            .field("loss_space", &self.loss_space)
-            .finish_non_exhaustive()
-    }
-}
-
-impl PairedLosses {
-    /// Arrays must already have exactly aligned private query/entity identities.
-    pub fn new(real: Vec<f64>, synthetic: Vec<f64>, null: Vec<f64>) -> Result<Self, MetricError> {
-        if real.is_empty() || real.len() != synthetic.len() || real.len() != null.len() {
-            return Err(MetricError::InvalidEvidence);
-        }
-        for value in real.iter().chain(&synthetic).chain(&null) {
-            if finite(*value)? < 0.0 {
-                return Err(MetricError::InvalidEvidence);
-            }
-        }
-        Ok(Self {
-            real,
-            synthetic,
-            null,
-            loss_space: LossSpace::OriginalMse,
-        })
-    }
-
-    pub fn regression(
-        raw_targets: &[f64],
-        real_predictions: &[f64],
-        synthetic_predictions: &[f64],
-        null_predictions: &[f64],
-    ) -> Result<Self, MetricError> {
-        let losses = |predictions: &[f64]| -> Result<Vec<f64>, MetricError> {
-            if predictions.len() != raw_targets.len() {
-                return Err(MetricError::InvalidEvidence);
-            }
-            raw_targets
-                .iter()
-                .zip(predictions)
-                .map(|(y, p)| finite((finite(*y)? - finite(*p)?).powi(2)))
-                .collect()
-        };
-        Self::new(
-            losses(real_predictions)?,
-            losses(synthetic_predictions)?,
-            losses(null_predictions)?,
-        )
-    }
-
-    pub fn means(&self) -> Result<(f64, f64, f64), MetricError> {
-        Ok((mean(&self.real)?, mean(&self.synthetic)?, mean(&self.null)?))
-    }
-
-    /// Paired Z retains the estimated real reference inside each query pair.
-    pub fn query_z(&self, scale: TrainingScale, margin: Margin) -> Result<Vec<f64>, MetricError> {
-        self.real
-            .iter()
-            .zip(&self.synthetic)
-            .map(|(r, s)| finite(s - r - margin.tolerance(*r, scale)?))
-            .collect()
-    }
-}
+include!("transfer_metrics/tdl.rs");
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GuardedRatio {

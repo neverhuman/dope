@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "case_id": "transfer_t90_binary_clipped_endpoint",
+  "citable": false,
+  "component": "transfer",
+  "purpose": "Hand-calculated T90 paired-loss conformance; no scientific qualification.",
+  "input": {
+    "task": "binary",
+    "required_model_present": true,
+    "real_gain_lcb": 50.0,
+    "constant_target": false,
+    "targets": [
+      0
+    ],
+    "class_order": [
+      "class_0",
+      "class_1"
+    ],
+    "real_predictions": [
+      [
+        0.6703200460356393,
+        0.3296799539643607
+      ]
+    ],
+    "synthetic_predictions": [
+      [
+        1.0,
+        0.0
+      ]
+    ],
+    "null_predictions": [
+      [
+        0.36787944117144233,
+        0.6321205588285577
+      ]
+    ]
+  },
+  "expected": {
+    "status": "informative",
+    "reason": null,
+    "null_loss": 1.0,
+    "real_loss": 0.4,
+    "synthetic_loss": 0.0,
+    "real_gain": 0.6,
+    "raw_transfer": 1.6666666666666667,
+    "clipped_transfer": 1.0,
+    "tau": 0.9,
+    "loss_space": "discrete_log_loss",
+    "query_harm_margin": [
+      -0.46
+    ],
+    "harm_margin": -0.46,
+    "benefit_margin": 0.46
+  }
+}

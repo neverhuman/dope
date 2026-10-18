@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "case_id": "transfer_t90_benefit",
+  "citable": false,
+  "component": "transfer",
+  "purpose": "Hand-calculated T90 paired-loss conformance; no scientific qualification.",
+  "input": {
+    "task": "paired_losses",
+    "loss_space": "original_mse",
+    "required_model_present": true,
+    "null_losses": [
+      100.0
+    ],
+    "real_losses": [
+      40.0
+    ],
+    "synthetic_losses": [
+      45.0
+    ],
+    "real_gain_lcb": 50.0,
+    "constant_target": false
+  },
+  "expected": {
+    "status": "informative",
+    "reason": null,
+    "null_loss": 100.0,
+    "real_loss": 40.0,
+    "synthetic_loss": 45.0,
+    "real_gain": 60.0,
+    "raw_transfer": 0.9166666666666666,
+    "clipped_transfer": 0.9166666666666666,
+    "tau": 0.9,
+    "loss_space": "original_mse",
+    "query_harm_margin": [
+      -1.0
+    ],
+    "harm_margin": -1.0,
+    "benefit_margin": 1.0
+  }
+}
