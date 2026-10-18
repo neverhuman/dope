@@ -146,7 +146,41 @@ owner assertions, not source bytes, legal clearance or actual transform executio
 `confirmation_allowed=false` and `sealed_source_claims=false`. No sealed source is
 opened, reconstructed, or qualified by this manifest or its signature.
 
-## 5. Where the operational detail lives
+## 5. Separate public observational example
+
+[`examples/public-regression/bikeshare-observational/`](../examples/public-regression/bikeshare-observational/)
+is a limited real source-system holdout for hourly public-bike rental counts.
+It fits the DOPE generator on Capital Bikeshare Washington 2011 and confirms on
+time-held-out rows from the Seoul Bike Sharing System. UCI declares both sources
+CC BY 4.0 ([Capital Bikeshare](https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset),
+[Seoul Bike Sharing](https://archive.ics.uci.edu/dataset/560/seoul%2Bbike%2Bsharing%2Bdemand));
+the example preserves attribution and exact archive/member hashes in its
+source manifest. The source entities are whole service dates. The target is
+observed system-wide bikes rented per active hour, not a person-level outcome.
+
+The frozen protocol compares a real-trained Ridge reference and mean null with
+four synthetic-trained Ridge arms: two complete-artifact byte caps (16 and 32
+KiB) crossed with `n` and `4n`. The same unseen Seoul test dates feed the TDL
+transfer and aggregate reducers; a feature-permutation driver diagnostic also
+uses those dates. The 2018 source holdout is real, but both datasets come from
+the same UCI curator, so independent-curator confirmation is absent.
+
+Observed run (seed 1729): Washington fit/selection used 6,466/2,179 rows;
+Seoul fit/selection/test used 4,224/1,704/2,537 active rows after excluding
+295 non-operating hours. Real-reference MSE was 273,592.23 bikes²/hour and the
+mean null MSE was 576,024.24; the service-date cluster-bootstrap lower bound
+for real gain was 255,243.09. Every synthetic arm had negative raw transfer
+(−1.019 at `n`, −1.013 at `4n`) and a driver fidelity diagnostic of 0.625.
+All four artifacts were 2,244 bytes, so neither cap changed the selected
+artifact. The source holdout did not support transfer utility. Runtime was
+36.9 seconds with a 472,883,200-byte process RSS upper bound on two assigned
+CPUs. The measured panel is one generator, one auditor and one seed; it does
+not qualify TDL, privacy, the modern panel, or healthcare inference.
+
+Reproduce using the source recipe and command in the example README. Raw
+archives and reports stay under `target/`; no dataset bytes are committed.
+
+## 6. Where the operational detail lives
 
 The benchmark tooling overview is in
 [`research/benchmark/README.md`](../research/benchmark/README.md). The dated campaign
