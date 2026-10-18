@@ -75,6 +75,15 @@
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },
+    "precommit_sha256": {
+      "description": "Digest of the recursively resolved confirmatory precommit governing this campaign, when the ledger is used for confirmation.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precommit": {
+      "description": "Optional embedded copy of the closed confirmatory design bound by precommit_sha256.",
+      "$ref": "#/$defs/confirmatory_precommit"
+    },
     "policies": {
       "type": "object"
     },
@@ -265,5 +274,65 @@
         }
       }
     }
+  },
+  "$defs": {
+    "confirmatory_precommit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format", "version", "campaign_id", "admission_state", "sealed_access_allowed",
+        "protocol_path", "protocol_sha256", "evidence_pins", "design", "source_roles",
+        "model_roles", "prepared_maps", "candidate_budget_slots", "full_comparison_roster",
+        "roster_complete", "thresholds", "sample_schedule", "privacy_outcomes",
+        "budget_and_power", "retry_exclusion", "review_signature", "custodian_attestation",
+        "admission_blockers", "binding_sha256"
+      ],
+      "properties": {
+        "format": {"const": "dope-confirmatory-precommit-v1"},
+        "version": {"const": 1},
+        "campaign_id": {"type": "string", "minLength": 1},
+        "admission_state": {"enum": ["blocked", "admitted"]},
+        "sealed_access_allowed": {"type": "boolean"},
+        "protocol_path": {"type": "string", "minLength": 1},
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_pins": {
+          "type": "object", "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "design": {"type": "object", "minProperties": 1},
+        "source_roles": {"type": "object", "minProperties": 1},
+        "model_roles": {"type": "object", "minProperties": 1},
+        "prepared_maps": {"type": "object", "minProperties": 1},
+        "candidate_budget_slots": {
+          "type": "array", "minItems": 1,
+          "items": {"$ref": "#/$defs/candidate_budget_slot"}
+        },
+        "full_comparison_roster": {"type": "array"},
+        "roster_complete": {"type": "boolean"},
+        "thresholds": {"type": "object", "minProperties": 1},
+        "sample_schedule": {"type": "object", "minProperties": 1},
+        "privacy_outcomes": {"type": "object", "minProperties": 1},
+        "budget_and_power": {"type": "object", "minProperties": 1},
+        "retry_exclusion": {"type": "object", "minProperties": 1},
+        "review_signature": {"type": ["object", "null"]},
+        "custodian_attestation": {"type": ["object", "null"]},
+        "admission_blockers": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "binding_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "candidate_budget_slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "budget_bytes", "selection_state", "artifact_sha256", "recipe_sha256", "eligible_for_minimum_tdl_reporting"],
+      "properties": {
+        "candidate_id": {"type": "string", "minLength": 1},
+        "budget_bytes": {"enum": [512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144]},
+        "selection_state": {"enum": ["not_selected", "selected"]},
+        "artifact_sha256": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "recipe_sha256": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "eligible_for_minimum_tdl_reporting": {"type": "boolean"}
+      }
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   }
 }
