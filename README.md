@@ -42,6 +42,15 @@ target/release/dope inspect --kernel examples/readme-regression/toy.dpk
 target/release/dope sample --kernel examples/readme-regression/toy.dpk --rows 200 --out examples/readme-regression/synth.csv
 ```
 
+### Offline simulated healthcare workflow
+
+Run the [four-step deterministic simulation demo](examples/healthcare-sim/)
+with simulated patients, patient-disjoint and later-time evaluation, and
+preprediction-time features. The CPU smoke uses the native compiler and sampler
+plus a small classical evaluator. It makes no clinical, real-patient,
+HIPAA-de-identification, formal-DP, or observational-confirmation claim. See
+[docs/cli.md](docs/cli.md) for commands and evidence limits.
+
 ---
 
 ## Benchmark: Multi-Model Transfer, Tabular Foundation Models, and Artifact Bytes
