@@ -70,6 +70,8 @@
     "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": "external-evidence",
     "research/benchmark/results/campaign-local-capacity-amendment": "external-evidence",
     "AGENTS.md": "governance",
+    "PYTHON_EXCEPTIONS.md": "governance",
+    "PY_TO_RUST_PLAN.md": "governance",
     "README.md": "governance",
     "CHANGELOG.md": "governance",
     "CITATION.cff": "governance",

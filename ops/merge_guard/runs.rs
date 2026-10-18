@@ -3,10 +3,11 @@ use super::{Refused, Result, array, integer, require, text};
 use serde_json::Value;
 use std::collections::BTreeSet;
 
+pub const LEGACY_CI_JOBS: &[&str] = &["cpu", "paper-clean", "security"];
 pub const WORKFLOWS: [(&str, &[&str]); 2] = [
     (
         ".github/workflows/ci.yml",
-        &["cpu", "paper-clean", "security"],
+        &["arm64-portability", "cpu", "paper-clean", "security"],
     ),
     (".github/workflows/jankurai.yml", &["jankurai-audit"]),
 ];
@@ -65,6 +66,21 @@ fn main_only_event(source: &str, event: &str) -> Result<bool> {
         _ => Err(Refused("workflow_definition_invalid")),
     }
 }
+fn job_set(jobs: &[&str]) -> BTreeSet<String> {
+    jobs.iter().map(|j| (*j).to_owned()).collect()
+}
+pub fn declared_ci_jobs(definitions: &Value) -> Result<&'static [&'static str]> {
+    let source = text(&definitions[WORKFLOWS[0].0])?;
+    let filtered = main_only_event(source, "push")?;
+    let actual = keys(block(source, "jobs")?, true);
+    if actual == job_set(WORKFLOWS[0].1) {
+        Ok(WORKFLOWS[0].1)
+    } else if !filtered && actual == job_set(LEGACY_CI_JOBS) {
+        Ok(LEGACY_CI_JOBS)
+    } else {
+        Err(Refused("workflow_definition_invalid"))
+    }
+}
 pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<&'static [&'static str]> {
     let map = definitions
         .as_object()
@@ -94,8 +110,13 @@ pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<&'static
             "workflow_definition_invalid",
         )?;
         main_only = Some(filtered);
+        let expected = if path == WORKFLOWS[0].0 {
+            declared_ci_jobs(definitions)?
+        } else {
+            jobs
+        };
         require(
-            keys(block(source, "jobs")?, true) == jobs.iter().map(|j| (*j).to_owned()).collect(),
+            keys(block(source, "jobs")?, true) == job_set(expected),
             "workflow_definition_invalid",
         )?;
     }
@@ -105,13 +126,26 @@ pub fn validate_definitions(definitions: &Value, queue: bool) -> Result<&'static
         &["push", "pull_request"]
     })
 }
-pub fn validate_runs(
+pub fn validate_runs_for_definitions(
+    definitions: &Value,
     runs: &Value,
     source: &Value,
     events: &[&str],
     pr: Option<&Value>,
     branch: Option<&Value>,
     base: Option<&Value>,
+) -> Result<Vec<u64>> {
+    let ci_jobs = declared_ci_jobs(definitions)?;
+    validate_runs_inner(runs, source, events, pr, branch, base, ci_jobs)
+}
+fn validate_runs_inner(
+    runs: &Value,
+    source: &Value,
+    events: &[&str],
+    pr: Option<&Value>,
+    branch: Option<&Value>,
+    base: Option<&Value>,
+    ci_jobs: &[&str],
 ) -> Result<Vec<u64>> {
     let mut seen = BTreeSet::new();
     let mut ids = Vec::new();
@@ -120,11 +154,15 @@ pub fn validate_runs(
             .split('@')
             .next()
             .ok_or(Refused("check_source_mismatch"))?;
-        let jobs = WORKFLOWS
-            .iter()
-            .find(|(p, _)| *p == path)
-            .map(|(_, j)| *j)
-            .ok_or(Refused("check_source_mismatch"))?;
+        let jobs = if path == WORKFLOWS[0].0 {
+            ci_jobs
+        } else {
+            WORKFLOWS
+                .iter()
+                .find(|(p, _)| *p == path)
+                .map(|(_, j)| *j)
+                .ok_or(Refused("check_source_mismatch"))?
+        };
         require(&run["head_sha"] == source, "check_source_mismatch")?;
         let event = text(&run["event"])?;
         require(events.contains(&event), "unexpected_workflow_event")?;
@@ -153,7 +191,7 @@ pub fn validate_runs(
             .map(|j| text(&j["name"]).map(str::to_owned))
             .collect::<Result<_>>()?;
         require(
-            actual.len() == jobs.len() && names == jobs.iter().map(|j| (*j).to_owned()).collect(),
+            actual.len() == jobs.len() && names == job_set(jobs),
             "missing_or_duplicate_jobs",
         )?;
         for job in actual {

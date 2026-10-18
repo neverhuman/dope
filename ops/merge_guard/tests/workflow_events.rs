@@ -14,12 +14,36 @@ fn baseline() -> (Value, Value, Value) {
     )
 }
 
+fn add_arm64_job(runs: &mut Value) {
+    for run in runs.as_array_mut().unwrap() {
+        if run["path"] == ".github/workflows/ci.yml" {
+            let head_sha = run["head_sha"].clone();
+            let jobs = run["jobs"].as_array_mut().unwrap();
+            if !jobs.iter().any(|j| j["name"] == "arm64-portability") {
+                jobs.push(json!({
+                    "conclusion": "success",
+                    "head_sha": head_sha,
+                    "id": 1999,
+                    "name": "arm64-portability",
+                    "status": "completed"
+                }));
+            }
+        }
+    }
+}
+
 fn main_push(evidence: &mut Value) {
     for (path, _) in runs::WORKFLOWS {
-        let definition = evidence["workflow_definitions"][path].as_str().unwrap();
-        evidence["workflow_definitions"][path] =
-            json!(definition.replace("  push:\n", "  push:\n    branches:\n      - main\n"));
+        let mut definition = evidence["workflow_definitions"][path]
+            .as_str()
+            .unwrap()
+            .replace("  push:\n", "  push:\n    branches:\n      - main\n");
+        if path == ".github/workflows/ci.yml" && !definition.contains("arm64-portability:") {
+            definition.push_str("  arm64-portability:\n    runs-on: fixture\n");
+        }
+        evidence["workflow_definitions"][path] = json!(definition);
     }
+    add_arm64_job(&mut evidence["runs"]);
 }
 
 fn pr_only(evidence: &mut Value, receipt: &mut Value) {
@@ -52,7 +76,13 @@ fn main_push_profile_requires_both_source_pr_workflows_and_exact_jobs() {
     main_push(&mut original);
     pr_only(&mut original, &mut receipt);
     assert!(evidence::evaluate_preflight(&original, &pins, &receipt).is_ok());
-    for name in ["cpu", "paper-clean", "security", "jankurai-audit"] {
+    for name in [
+        "arm64-portability",
+        "cpu",
+        "paper-clean",
+        "security",
+        "jankurai-audit",
+    ] {
         for condition in ["missing", "cancelled", "wrong-source"] {
             let mut candidate = original.clone();
             for run in candidate["runs"].as_array_mut().unwrap() {
@@ -145,6 +175,7 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
     let mut receipt = prior["review_receipt"].clone();
     main_push(&mut source);
     pr_only(&mut source, &mut receipt);
+    add_arm64_job(&mut receiving["receiving_runs"]);
     prior["evidence"] = source;
     prior["review_receipt"] = receipt;
     assert_eq!(
@@ -156,6 +187,28 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
     assert_eq!(
         evidence::evaluate_merge(&receiving, &prior),
         Ok("merged_verified")
+    );
+    let mut missing_arm64 = receiving.clone();
+    missing_arm64["receiving_runs"][0]["jobs"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|job| job["name"] != "arm64-portability");
+    assert_eq!(
+        evidence::evaluate_merge(&missing_arm64, &prior).err(),
+        Some(Refused("missing_or_duplicate_jobs"))
+    );
+    let mut foreign_arm64 = receiving.clone();
+    for job in foreign_arm64["receiving_runs"][0]["jobs"]
+        .as_array_mut()
+        .unwrap()
+    {
+        if job["name"] == "arm64-portability" {
+            job["head_sha"] = json!("ffffffffffffffffffffffffffffffffffffffff");
+        }
+    }
+    assert_eq!(
+        evidence::evaluate_merge(&foreign_arm64, &prior).err(),
+        Some(Refused("check_source_mismatch"))
     );
     let mut missing = receiving.clone();
     missing["receiving_runs"].as_array_mut().unwrap().pop();
