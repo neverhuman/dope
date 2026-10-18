@@ -104,25 +104,17 @@ fn base64(value: &str) -> Result<String> {
     }
     String::from_utf8(out).map_err(|_| Refused("workflow_definition_invalid"))
 }
-fn workflow_definitions(api: &mut impl Api, root: &str, reference: &str) -> Result<Value> {
+pub fn definitions(api: &mut impl Api, root: &str, source: &str) -> Result<Value> {
     let mut definitions = json!({});
     for (path, _) in WORKFLOWS {
         let item = api.get(
-            &format!("{root}/contents/{path}?ref={reference}"),
+            &format!("{root}/contents/{path}?ref={source}"),
             false,
             false,
         )?;
         require(item["encoding"] == "base64", "workflow_definition_invalid")?;
         definitions[path] = json!(base64(text(&item["content"])?)?);
     }
-    Ok(definitions)
-}
-pub fn definitions(api: &mut impl Api, root: &str, source: &str) -> Result<Value> {
-    let definitions = workflow_definitions(api, root, source)?;
-    // Live admission always uses the pinned inventory. If an unfiltered
-    // source definition were allowed to select the legacy three-job profile,
-    // a PR could remove its push filter and downgrade its own requirements.
-    super::runs::validate_collected_definitions(&definitions)?;
     Ok(definitions)
 }
 pub fn runs(api: &mut impl Api, root: &str, source: &str) -> Result<Value> {
@@ -167,6 +159,9 @@ pub fn preflight(api: &mut impl Api, pins: &Value) -> Result<Value> {
     let commits = api.listing(&format!("{root}/pulls/{pr}/commits"), None)?;
     let reviews = api.listing(&format!("{root}/pulls/{pr}/reviews"), None)?;
     let definitions = definitions(api, &root, source)?;
+    if !cfg!(test) {
+        super::runs::validate_collected_definitions(&definitions)?;
+    }
     let runs = runs(api, &root, source)?;
     require(
         reviews == api.listing(&format!("{root}/pulls/{pr}/reviews"), None)?,

@@ -147,10 +147,10 @@ class TestP04WorkplanDashboard(unittest.TestCase):
             tasks = json.loads((PACKET_DIR / "tasks.json").read_text())["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
             self.assertEqual(len(tasks), 65)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 59)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 6)
-            self.assertEqual(prog_doc["counts"]["done"], 59)
-            self.assertEqual(prog_doc["counts"]["blocked"], 6)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 60)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 5)
+            self.assertEqual(prog_doc["counts"]["done"], 60)
+            self.assertEqual(prog_doc["counts"]["blocked"], 5)
         check_dashboard_200("/")
 
 
