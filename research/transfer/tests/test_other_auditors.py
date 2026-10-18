@@ -1,5 +1,8 @@
 """Offline interface regressions; fixture factories do not qualify vendor weights."""
 import ast
+import copy
+import io
+import contextlib
 from dataclasses import FrozenInstanceError, replace
 import json
 from pathlib import Path
@@ -17,46 +20,36 @@ from research.transfer.adapters.auditors.conventional import (
     ConventionalAdapter, ConventionalLearnerRecipe, OfflineArtifacts, OfflineRuntime,
     file_sha256, port_source_sha256, select_conventional_recipe,
 )
+from research.transfer.adapters.auditors.challengers import (
+    ChallengerAdapter, ChallengerRecipe, load_challenger_lock, validate_challenger_lock, validate_model_registry,
+)
 from research.transfer.adapters.auditors.mitra import MitraAdapter, MitraRecipe
 from research.transfer.adapters.auditors.tabicl import CODE_REVISION, TabICLAdapter, TabICLRecipe
 from research.transfer.tests.test_adapters import identity, pin, registry
-
-
 ROOT = Path(__file__).resolve().parents[3]
 TEMP = ROOT / "target/vnext/auditor-fixtures"
-
-
 def batch(xs=(0., 1., 2.), targets=(10., 30., 50.), prefix="context", role="development_train"):
     view = FeatureBatch(tuple(pin(f"{prefix}-{i}") for i in range(len(xs))),
                         tuple((x,) for x in xs), pin("numeric-port-schema"))
     return TrainingBatch(view, targets, role)
-
-
 def query(xs=(3., 4.)):
     return batch(xs, (0.,) * len(xs), "query").features
-
-
 class NativeFixture:
     """A recording public sklearn interface; not an official reference model."""
     def __init__(self, values=None, classes=(0, 1)):
         self.values = values
         self.classes_ = np.asarray(classes)
         self.calls = []
-
     def fit(self, X, y, **kwargs):
         self.calls.append(("fit", np.asarray(X).copy(), np.asarray(y).copy(), kwargs))
         self.n_samples_in_ = len(y)
         return self
-
     def predict(self, X, **kwargs):
         self.calls.append(("predict", np.asarray(X).copy(), kwargs))
         return np.asarray(self.values if self.values is not None else [70., 90.])
-
     def predict_proba(self, X):
         self.calls.append(("probability", np.asarray(X).copy()))
         return np.asarray(self.values if self.values is not None else [[.7, .3], [.2, .8]])
-
-
 class PortFixture:
     """Private synthetic artifacts plus explicit test-only executor observations."""
     def __init__(self, testcase, recipe, name, revision, mode="frozen_context", factory=None):
@@ -100,13 +93,10 @@ class PortFixture:
             return ResourceUsage(self.rows, 128, 0)
         self.rows = 3
         self.runtime = OfflineRuntime(self.artifacts, observe, create, lambda _: "1.0")
-
     def adapter(self, cls, recipe, model=None, runtime=None):
         model = model or self.identity
         admission = AdapterAdmission.from_registry(registry(model), model, "learner")
         return cls(model, admission, recipe, runtime or self.runtime)
-
-
 class OtherAuditorTests(unittest.TestCase):
     def test_tabicl_passes_only_local_checkpoint_and_declared_recipe(self):
         recipe = TabICLRecipe("regression", estimators=4, estimator_batch_size=2, kv_cache=True)
@@ -124,7 +114,6 @@ class OtherAuditorTests(unittest.TestCase):
         np.testing.assert_array_equal(fixture.native.calls[1][1], [[3.], [4.]])
         self.assertEqual(out.values, ((70.,), (90.,)))
         self.assertEqual(fixture.events, ["prepare", "predict"])
-
     def test_classification_reorders_native_codes_and_refuses_absent_classes(self):
         recipe = TabICLRecipe("classification", class_order=("positive", "negative"))
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -140,7 +129,6 @@ class OtherAuditorTests(unittest.TestCase):
             self.assertNotIn("source_secret", str(caught.exception))
             with self.assertRaisesRegex(AdapterError, "adapter_not_prepared"):
                 port.predict(query(), 8)
-
     def test_context_caps_queries_and_observed_consumption(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -157,7 +145,6 @@ class OtherAuditorTests(unittest.TestCase):
         fixture.rows = 1
         with self.assertRaises(AdapterError):
             port.prepare(batch(), 1)
-
     def test_artifacts_dependencies_and_licenses_fail_before_vendor_loading(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -179,7 +166,6 @@ class OtherAuditorTests(unittest.TestCase):
         with self.assertRaises(AdapterUnavailable):
             fresh.adapter(TabICLAdapter, recipe, runtime=bad).prepare(batch(), 7)
         self.assertEqual(fresh.kwargs, [])
-
     def test_symlink_artifacts_are_unavailable(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -187,7 +173,6 @@ class OtherAuditorTests(unittest.TestCase):
         link.symlink_to(fixture.artifacts.code)
         with self.assertRaisesRegex(AdapterUnavailable, "artifact_unavailable"):
             file_sha256(link)
-
     def test_native_errors_and_resource_mismatch_are_redacted(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -202,7 +187,6 @@ class OtherAuditorTests(unittest.TestCase):
         bad = replace(fixture.runtime, observer=lambda _: ResourceUsage(3, 2 * 1024 * 1024, 0))
         with self.assertRaisesRegex(AdapterError, "resource_budget_exceeded"):
             fixture.adapter(TabICLAdapter, recipe, runtime=bad).prepare(batch(), 7)
-
     def test_recipe_immutable_and_cache_keys_bind_seed_cap_batch_ensemble_and_weights(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -223,7 +207,6 @@ class OtherAuditorTests(unittest.TestCase):
                         replace(fixture.identity, weights_sha256=pin("different weights"))):
             self.assertNotEqual(changed.sha256, fixture.identity.sha256)
         self.assertNotEqual(old, port.cache_key(query().sha256, 9, 2))
-
     def test_recipe_binds_actual_first_party_bytes_and_refuses_stale_wrapper_identity(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -238,7 +221,6 @@ class OtherAuditorTests(unittest.TestCase):
             self.assertNotEqual(original, recipe.sha256)
             with self.assertRaisesRegex(AdapterError, "recipe_pin_mismatch"):
                 fixture.adapter(TabICLAdapter, recipe)
-
     def test_mitra_classifier_v2_is_frozen_with_explicit_seed_and_raw_context(self):
         recipe = MitraRecipe("classification", pin("{}"), class_order=("b", "a"))
         fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision)
@@ -251,7 +233,6 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual(port.predict(query(), 12).values, ((.7, .3), (.2, .8)))
         self.assertEqual(port.attempts[0]["operation"], "frozen_classifier_fit")
         self.assertEqual(port.attempts[0]["status"], "returned")
-
     def test_mitra_regression_charges_prediction_time_fits_and_refuses_frozen_mode(self):
         recipe = MitraRecipe("regression", pin("{}"))
         fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision, mode="fine_tuning")
@@ -275,7 +256,6 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual(port.attempts[-1]["status"], "failed")
         port.attempts[0]["status"] = "mutated"
         self.assertEqual(port.attempts[0]["status"], "returned")
-
     def test_native_linear_control_matches_independent_formula(self):
         recipe = ConventionalLearnerRecipe("linear", "regression", ())
         fixture = PortFixture(self, recipe, "linear", pin("native sklearn fixture"), mode="scratch")
@@ -287,7 +267,6 @@ class OtherAuditorTests(unittest.TestCase):
         port = fixture.adapter(ConventionalAdapter, recipe, model, runtime)
         port.prepare(batch(), 7)
         np.testing.assert_allclose(port.predict(query(), 8).values, [[70.], [90.]], atol=1e-10)
-
     def test_native_catboost_keeps_raw_units_and_independent_families_run_offline(self):
         recipes = (
             ConventionalLearnerRecipe("catboost", "regression", (("iterations", 12), ("depth", 2)),
@@ -312,7 +291,6 @@ class OtherAuditorTests(unittest.TestCase):
                 else:
                     self.assertEqual(result.kind, "probability")
                     self.assertEqual(result.class_order, ("b", "a"))
-
     def test_native_primary_dependency_is_required_and_no_backend_fallback_occurs(self):
         recipe = TabICLRecipe("regression")
         fixture = PortFixture(self, recipe, "tabicl_v2", CODE_REVISION)
@@ -320,7 +298,6 @@ class OtherAuditorTests(unittest.TestCase):
         with self.assertRaises(AdapterUnavailable):
             fixture.adapter(TabICLAdapter, recipe, runtime=runtime).prepare(batch(), 7)
         self.assertEqual(fixture.kwargs, [])
-
     def test_mitra_refuses_undeclared_native_environment_overrides(self):
         recipe = MitraRecipe("regression", pin("{}"))
         fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision, mode="fine_tuning")
@@ -328,7 +305,6 @@ class OtherAuditorTests(unittest.TestCase):
             with self.assertRaises(AdapterUnavailable):
                 fixture.adapter(MitraAdapter, recipe).prepare(batch(), 7)
         self.assertEqual(fixture.kwargs, [])
-
     def test_mitra_refuses_undeclared_snapshot_entries_before_vendor_loading(self):
         recipe = MitraRecipe("regression", pin("{}"))
         for kind in ("file", "directory", "symlink"):
@@ -345,7 +321,6 @@ class OtherAuditorTests(unittest.TestCase):
                     fixture.adapter(MitraAdapter, recipe).prepare(batch(), 7)
                 self.assertNotIn("source_secret", str(caught.exception))
                 self.assertEqual(fixture.kwargs, [])
-
     def test_mitra_native_config_is_tied_to_public_checkpoint_before_import(self):
         recipe = MitraRecipe("classification", pin("{}"), class_order=("a", "b"))
         fixture = PortFixture(self, recipe, "mitra_v2", recipe.code_revision)
@@ -358,7 +333,6 @@ class OtherAuditorTests(unittest.TestCase):
         # official model weights are acquired or imported for this negative test.
         with self.assertRaisesRegex(AdapterUnavailable, "checkpoint_config_unavailable"):
             port._create_backend(7)
-
     def test_tuning_rejects_overlap_mutable_parameters_and_reserved_resource_overrides(self):
         with self.assertRaisesRegex(AdapterError, "invalid_parameters"):
             ConventionalLearnerRecipe("linear", "regression", (("bad", ({"mutable": 1},)),))
@@ -367,7 +341,6 @@ class OtherAuditorTests(unittest.TestCase):
         candidate = ConventionalLearnerRecipe("linear", "regression", ())
         with self.assertRaisesRegex(AdapterError, "development_overlap"):
             select_conventional_recipe((candidate,), batch(), batch(), lambda *_: None, ResourceLimits(60., 1024, 0))
-
     def test_tuning_contains_backend_failures_and_enforces_budget(self):
         candidate = ConventionalLearnerRecipe("linear", "regression", ())
         validation = batch((3., 4.), (70., 90.), "validation")
@@ -378,7 +351,6 @@ class OtherAuditorTests(unittest.TestCase):
         with self.assertRaisesRegex(AdapterError, "resource_budget_exceeded"):
             select_conventional_recipe((candidate,), batch(), validation,
                                        lambda *_: (1., ResourceUsage(3, 1025, 0)), ResourceLimits(60., 1024, 0))
-
     def test_selection_identity_ignores_measured_elapsed_and_peak_variation(self):
         candidate = ConventionalLearnerRecipe("linear", "regression", ())
         validation = batch((3., 4.), (70., 90.), "validation")
@@ -391,7 +363,6 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual(results[0][0].sha256, results[1][0].sha256)
         self.assertNotEqual(results[0][1]["elapsed_seconds"], results[1][1]["elapsed_seconds"])
         self.assertNotEqual(results[0][1]["attempts"], results[1][1]["attempts"])
-
     def test_development_search_retains_all_candidates_and_freezes_selected_recipe(self):
         candidates = tuple(ConventionalLearnerRecipe("catboost", "regression", (("depth", d),), precision="float32") for d in (4, 6, 8))
         train, validation = batch(), batch((3., 4.), (70., 90.), "validation")
@@ -415,7 +386,6 @@ class OtherAuditorTests(unittest.TestCase):
                                        fit_and_score, ResourceLimits(60., 1024, 0))
         with self.assertRaisesRegex(AdapterError, "development_selection_required"):
             fixture.adapter(ConventionalAdapter, candidates[0])
-
     def test_locks_keep_related_lineages_and_unmeasured_gates_visible(self):
         lock = json.loads((ROOT / "research/transfer/locks/other-auditors.json").read_text())
         self.assertEqual(lock["status"], "unqualified")
@@ -423,7 +393,95 @@ class OtherAuditorTests(unittest.TestCase):
         self.assertEqual(lock["mitra"]["family_group"], "mitra_architecture")
         self.assertIn("official_checkpoint_minimal_example_parity", lock["unmeasured_gates"])
         self.assertIsNone(lock["exact_dependency_closure"])
-
+    def test_challenger_lock_schema_and_cr10_disclosures_fail_closed(self):
+        lock = load_challenger_lock()
+        models = json.loads((ROOT / "research/transfer/registries/models.json").read_bytes())
+        self.assertEqual(len(validate_model_registry(models)["entries"]), 12)
+        for state in ("unknown", "overlapping"):
+            for value, validate, entry in ((models, validate_model_registry, models["entries"][0]),
+                                          (lock, validate_challenger_lock, lock["mitra"])):
+                entry["pretraining_corpus_disclosure"] = {"state": state, "caveat_required": True}
+                validate(value)
+                entry["pretraining_corpus_disclosure"]["caveat_required"] = False
+                with self.assertRaisesRegex(AdapterError, "pretraining_caveat_required"):
+                    validate(value)
+                entry["pretraining_corpus_disclosure"]["caveat_required"] = True
+        mutations = (("package", {**lock["challengers"]["entries"][0]["package"], "version": ">=1"}),
+                     ("package", {**lock["challengers"]["entries"][0]["package"], "sha256": None}),
+                     ("checkpoint_sha256", pin("undeclared checkpoint")), ("seed_schedule", [True]),
+                     ("seed_schedule", [7, 7]), ("qualification_state", "native_runtime_qualified"),
+                     ("parameter_grid", [{"thread_count": 8}]), ("surprise", "source_secret"))
+        for key, value in mutations:
+            broken = copy.deepcopy(lock)
+            broken["challengers"]["entries"][0][key] = value
+            with self.assertRaises(AdapterError) as caught:
+                validate_challenger_lock(broken)
+            self.assertNotIn("source_secret", str(caught.exception))
+        for key in ("pretraining_corpus_disclosure", "qualification_state"):
+            broken = copy.deepcopy(models)
+            del broken["entries"][0][key]
+            with self.assertRaises(AdapterError):
+                validate_model_registry(broken)
+    @patch.dict("sys.modules", {name: None for name in ("catboost", "lightgbm", "xgboost", "pytabkit", "sklearn")})
+    def test_challenger_fixtures_conserve_context_and_query_rows_without_native_claims(self):
+        for entry in load_challenger_lock()["challengers"]["entries"]:
+            for task in ("regression", "classification"):
+                recipe = ChallengerRecipe(entry["name"], task, tuple(entry["parameter_grid"][0].items()),
+                                          class_order=("b", "a") if task == "classification" else (),
+                                          precision=entry["precision"])
+                fixture = PortFixture(self, recipe, recipe.family, pin("challenger fixture"), mode="scratch")
+                lock = load_challenger_lock()
+                record = next(e for e in lock["challengers"]["entries"] if e["name"] == recipe.family)
+                dep = fixture.artifacts.dependencies[0]
+                record["package"]["sha256"] = file_sha256(dep)
+                model = replace(fixture.identity, code_sha256=file_sha256(dep),
+                                dependencies=((record["package"]["name"], record["package"]["version"], file_sha256(dep)),))
+                runtime = replace(fixture.runtime, artifacts=replace(fixture.artifacts, code=dep),
+                                  version_reader=lambda _: record["package"]["version"])
+                admission = AdapterAdmission.from_registry(registry(model), model, "learner")
+                port = ChallengerAdapter(model, admission, recipe, runtime, lock)
+                context = batch(targets=("b", "a", "b") if task == "classification" else (10., 30., 50.))
+                receipt = port.fit(context, 7)
+                self.assertEqual([receipt[k] for k in ("requested_rows", "produced_rows", "provided_rows", "consumed_rows")], [3]*4)
+                self.assertEqual(receipt["qualification_state"], "fixture_verified_only")
+                self.assertFalse(receipt["qualified"])
+                result = port.predict(query(), 17)
+                self.assertEqual((result.row_ids, len(result.values)), (query().row_ids, 2))
+                self.assertEqual(len(fixture.native.calls[1]), 3 if task == "regression" else 2)
+                np.testing.assert_array_equal(fixture.native.calls[1][1], [[3.], [4.]])
+                with patch.dict("sys.modules", {"research.transfer.adapters.worker_abi": None}), self.assertRaisesRegex(AdapterUnavailable, "worker_abi_unavailable"):
+                    port.worker_request(query(), 17, worker_image_sha256=pin("image"), prepared_sha256=pin("prepared"), split_sha256=pin("split"), primary_n=3)
+                with self.assertRaisesRegex(AdapterError, "query_features_required"):
+                    port.predict(batch(), 17)
+                fixture.native.values = [1.] if task == "regression" else [[.5, .5]]
+                with self.assertRaises(AdapterError):
+                    port.predict(query(), 17)
+                with self.assertRaises(AdapterError):
+                    port.prepare(batch(), 99)
+                with self.assertRaisesRegex(AdapterError, "adapter_not_prepared"):
+                    port.predict(query(), 17)
+                for bad in (replace(runtime, factory=None), replace(runtime, version_reader=lambda _: "0.0")):
+                    with self.assertRaises(AdapterUnavailable):
+                        ChallengerAdapter(model, admission, recipe, bad, lock).prepare(context, 7)
+                with self.assertRaises(AdapterError):
+                    ChallengerAdapter(model, admission, recipe, replace(runtime, observer=lambda _: ResourceUsage(2, 128, 0)), lock).prepare(context, 7)
+                with self.assertRaisesRegex(AdapterError, "challenger_policy_mismatch"):
+                    ChallengerAdapter(replace(model, context_policy="head"), admission, recipe, runtime, lock)
+                port.prepare(context, 7)
+                secret = "private_cell header extreme /private/source.csv"
+                def fail(*args):
+                    print(secret)
+                    raise RuntimeError(secret)
+                with patch.object(fixture.native, "predict" if task == "regression" else "predict_proba", side_effect=fail):
+                    output = io.StringIO()
+                    with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+                        with self.assertRaisesRegex(AdapterError, "^backend_failed$"):
+                            port.predict(query(), 17)
+                    self.assertEqual(output.getvalue(), "")
+                while port.receipt()["fit_attempts"] < record["budget"]["max_total_fits"]:
+                    port.prepare(context, 7)
+                with self.assertRaises(AdapterError):
+                    port.prepare(context, 7)
     def test_port_source_has_no_network_subprocess_workstation_or_product_imports(self):
         for path in (ROOT / "research/transfer/adapters/auditors").glob("*.py"):
             source = path.read_text()
@@ -437,7 +495,5 @@ class OtherAuditorTests(unittest.TestCase):
                     modules = []
                 self.assertFalse(any(m.split('.')[0] in {"subprocess", "socket", "urllib", "requests",
                                                          "sqlite3", "dope_kernel"} for m in modules))
-
-
 if __name__ == "__main__":
     unittest.main()
