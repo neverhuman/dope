@@ -31,7 +31,10 @@ fn number(value: &Value) -> u64 {
     n(value).unwrap_or(u64::MAX)
 }
 fn array(value: &Value) -> &[Value] {
-    value.as_array().map(Vec::as_slice).unwrap_or_default()
+    match value.as_array() {
+        Some(items) => items.as_slice(),
+        None => &[],
+    }
 }
 fn hash(value: &Value) -> Result<String> {
     Ok(sha(&canonical_json(value).map_err(|_| invalid())?))

@@ -74,8 +74,10 @@ pub fn evaluate(data: &Value) -> Value {
         None | Some(Value::String(_)) if data.get("protocol_version").is_none_or(|v| v == "v1") => {
         }
         Some(v) if v == "v2" => {
-            let mut out =
-                evaluate_v2(data).unwrap_or_else(|e| failure_with_status(e.reason, e.status));
+            let mut out = match evaluate_v2(data) {
+                Ok(v) => v,
+                Err(e) => failure_with_status(e.reason, e.status),
+            };
             out["format"] = json!("driver-result-v1");
             out["protocol_version"] = json!("v2");
             return out;

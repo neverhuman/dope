@@ -468,10 +468,10 @@ class OtherAuditorTests(unittest.TestCase):
                 with self.assertRaisesRegex(AdapterError, "challenger_policy_mismatch"):
                     ChallengerAdapter(replace(model, context_policy="head"), admission, recipe, runtime, lock)
                 port.prepare(context, 7)
-                secret = "private_cell header extreme /private/source.csv"
+                canary_text = "private_cell header extreme /private/source.csv"
                 def fail(*args):
-                    print(secret)
-                    raise RuntimeError(secret)
+                    print(canary_text)
+                    raise RuntimeError(canary_text)
                 with patch.object(fixture.native, "predict" if task == "regression" else "predict_proba", side_effect=fail):
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):

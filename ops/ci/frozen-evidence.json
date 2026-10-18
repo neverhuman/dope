@@ -7,6 +7,30 @@
     "docs/whitepaper/generated/teaser-figure-hashes.json": {
       "reason": "Upgraded Page-1 hero figure (docs/whitepaper/figures/teaser.pdf) to two-panel multi-model, zero-shot foundation-model (Kumo, TabICL, Mitra), and holdout driver-fidelity display from frozen panel.json and mfs-v3-density-panel.json.",
       "sha256": "baa07f5c93b0802fbe87d68272c3d8696f37f1d52fabaf0084f0ba331583b1a0"
+    },
+    "docs/whitepaper/generated/figure-one-caption.txt": {
+      "sha256": "56b49864ecde99f72ddf831e76eb75ad59b67f71debffb61a9113707f21fa3b0",
+      "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "docs/whitepaper/generated/figure-one-hashes.json": {
+      "sha256": "21f6e546d73e7b689eebff52008ea19d00a13338a407a678f3d4745c82094503",
+      "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "docs/whitepaper/generated/figure-one-ledger.json": {
+      "sha256": "b810a7c0aee85371008a5bd2bbe1904db283b7c8134bb915c21eb0622a8ea4e3",
+      "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "docs/whitepaper/generated/figure-one.pdf": {
+      "sha256": "67b02a2fd774bc174fa9ccd28977fb0ed22318b8433fb09f32d9208d1a7d6268",
+      "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "docs/whitepaper/generated/figure-one.png": {
+      "sha256": "835a18115d265f7cf2a62ad444766a119270efde1dd24517de1189c82df29a81",
+      "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "docs/whitepaper/generated/figure-one.svg": {
+      "sha256": "b768d0b183de9abdea2d6065c18d60bda2c2d8a99ca4edfa8c7109747aa7c56d",
+      "reason": "Q01 protocol-only Figure 1 generated output"
     }
   },
   "baseline_commit": "b8340ec41799ccfe18d7aeee25bc6a23c2e0a093",

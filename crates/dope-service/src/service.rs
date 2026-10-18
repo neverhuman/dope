@@ -292,25 +292,29 @@ impl App {
                         }
                     }
                     let start = Instant::now();
-                    let result = dope_kernel::inspect_kernel(&path).map(|value| {
-                        let hash = digest(&serde_json::to_vec_pretty(&value).unwrap_or_default());
-                        let full = serde_json::to_value(value).unwrap_or(Value::Null);
-                        let mut safe = full;
-                        if let Some(o) = safe.as_object_mut() {
-                            for k in [
-                                "task",
-                                "schema",
-                                "marginals",
-                                "dependence",
-                                "target",
-                                "noise",
-                                "sexpr",
-                            ] {
-                                o.remove(k);
-                            }
-                        }
-                        (safe, hash)
-                    });
+                    let result =
+                        dope_kernel::inspect_kernel(&path)
+                            .map_err(|_| ())
+                            .and_then(|value| {
+                                let hash =
+                                    digest(&serde_json::to_vec_pretty(&value).map_err(|_| ())?);
+                                let full = serde_json::to_value(value).map_err(|_| ())?;
+                                let mut safe = full;
+                                if let Some(o) = safe.as_object_mut() {
+                                    for k in [
+                                        "task",
+                                        "schema",
+                                        "marginals",
+                                        "dependence",
+                                        "target",
+                                        "noise",
+                                        "sexpr",
+                                    ] {
+                                        o.remove(k);
+                                    }
+                                }
+                                Ok((safe, hash))
+                            });
                     let (mut final_state, report, report_hash) = match result {
                         Ok((v, _hash))
                             if serde_json::to_vec(&v).map_or(true, |b| b.len() > MAX_REPORT) =>
@@ -359,7 +363,10 @@ impl App {
         }
         match self.jobs.get(id) {
             Some(job) => match job.receipt.lock() {
-                Ok(r) if receipt => json(200, serde_json::to_value(&*r).unwrap_or(Value::Null)),
+                Ok(r) if receipt => match serde_json::to_value(&*r) {
+                    Ok(v) => json(200, v),
+                    Err(_) => json(500, json!({"error":"serialization_failed"})),
+                },
                 Ok(r) => json(
                     200,
                     json!({"job_id":id,"job_state":r.job_state,"qualified":false}),

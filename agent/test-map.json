@@ -2628,6 +2628,14 @@
     "research/transfer/ablations/": {
       "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
       "purpose": "Verify development ablation contracts and measured limitations"
+    },
+    "examples/public-regression/cpu-smoke-admission.json": {
+      "command": "python3 -B examples/public-regression/bikeshare-observational/test_runner.py",
+      "purpose": "verify public regression CPU smoke admission manifest and runner contract"
+    },
+    "packages/protocol/": {
+      "command": "cargo test --locked -p dope-service",
+      "purpose": "verify loopback local service protocol schema and generated TypeScript snapshots"
     }
   }
 }

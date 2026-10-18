@@ -386,7 +386,7 @@ def cpu_smoke_lock():
     """Repository-owned reduced panel; a lock is not foundation/GPU admission."""
     try:
         return json.loads((Path(__file__).resolve().parents[2] / "locks/cpu-smoke.json").read_text())
-    except Exception:
+    except (ValueError, TypeError, KeyError, RuntimeError, OSError, ArithmeticError):
         raise AdapterUnavailable("cpu_smoke_lock_unavailable") from None
 
 

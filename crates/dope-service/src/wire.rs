@@ -83,7 +83,13 @@ pub(super) fn read_request(stream: &mut TcpStream) -> Result<Request, &'static s
 
 pub(super) fn respond(stream: &mut TcpStream, response: Response) {
     let mut status = response.status;
-    let mut body = serde_json::to_vec(&response.body).unwrap_or_else(|_| b"{}".to_vec());
+    let mut body = match serde_json::to_vec(&response.body) {
+        Ok(b) => b,
+        Err(_) => {
+            status = 500;
+            b"{\"error\":\"serialization_failed\"}".to_vec()
+        }
+    };
     if body.len() > MAX_RESPONSE {
         status = 413;
         body = b"{\"error\":\"response_limit\"}".to_vec();

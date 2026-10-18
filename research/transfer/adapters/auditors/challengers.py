@@ -50,7 +50,7 @@ def validate_disclosure(value):
 
 
 def validate_model_registry(value):
-    """Validate CR-10 metadata and return a copy for the closed legacy reader.
+    """Validate CR-10 metadata and return a copy for the closed prior reader.
 
     Callers must retain the original metadata with scientific claim evidence.
     The projected registry supplies execution admission only.

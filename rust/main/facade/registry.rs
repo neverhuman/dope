@@ -17,7 +17,7 @@ pub struct Cli {
     /// Explicit network requests are refused before any file is opened.
     #[arg(long, global = true)]
     pub network: bool,
-    /// Development panel only. --panel-tag is a deprecated migration alias.
+    /// Development panel only. --panel-tag is a retired migration alias.
     #[arg(long, global = true, visible_alias = "panel-tag", default_value = "development", value_parser = ["development", "tdl-candidate"])]
     pub panel: String,
     #[command(subcommand)]
