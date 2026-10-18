@@ -15,7 +15,7 @@ The retired weighted scores are in [the MFS history](archive/mfs-history.md).
 ## Candidate successor (I00 / C00)
 
 The unified workplan introduces the unfrozen
-[`tdl-contract-v2.candidate`](../contracts/tdl-contract-v2.candidate.json).
+[`tdl-contract-v2.candidate`](../contracts/tdl-contract-v2-candidate.json).
 Its identities, schema admission and independent state axes are defined in
 [the candidate protocol decision](decisions/tdl-v1.md). Sections 1–10 below retain
 the historical v1 definitions implemented by the existing Rust/Python conformance

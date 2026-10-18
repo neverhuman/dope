@@ -25,10 +25,16 @@ goldens. This adds no parallel scorer, fitted-transform type or worker registry.
 ## Successor and historical boundary
 
 The successor is
-[`contracts/tdl-contract-v2.candidate.json`](../../contracts/tdl-contract-v2.candidate.json).
+[`contracts/tdl-contract-v2-candidate.json`](../../contracts/tdl-contract-v2-candidate.json).
 `contracts/tdl-task-1.json` is **withdrawn as a file path**. That name exists solely
 as a historical/semantic alias for the candidate successor; no file or redirect is
 created at the withdrawn path.
+
+D21 changes only the candidate filename from `tdl-contract-v2.candidate.json`
+to `tdl-contract-v2-candidate.json`. The former path is withdrawn; the candidate
+JSON bytes, `contract_id="tdl-contract-v2.candidate"`, and protocol digest stay
+unchanged. The active path is governed by the same schemas, owner and proofs,
+without an audit waiver or a second schema.
 
 Historical `contracts/tdl-contract-v1.json` remains read-only, 4820 bytes, SHA-256
 `281923c33da12e218d54c2226d138bbea2a22d86936bae5c3d7edfbfaf2c63ab`.

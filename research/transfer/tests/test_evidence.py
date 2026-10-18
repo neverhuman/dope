@@ -333,7 +333,7 @@ class CacheTests(unittest.TestCase):
         (f.root / f.nodes[0]['path']).write_bytes(b'changed-after-caching')
         with self.assertRaises(EvidenceError): load_completed_receipt(cache, f.root, f.policy())
 
-    def test_partial_corrupt_and_fabricated_completion_marker_fail(self):
+    def test_partial_corrupt_and_forged_completion_marker_fail(self):
         for state in ('partial_only', 'truncated', 'false_marker', 'wrong_digest'):
             f = ReceiptFixture()
             cache = f.root / 'cache'

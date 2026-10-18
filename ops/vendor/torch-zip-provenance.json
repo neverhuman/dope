@@ -1,0 +1,385 @@
+{
+  "schema": "dope.torch-zip-security-patch/v1",
+  "purpose": "Preserve pinned Torch 0.20 ABI while replacing ZIP <9; no package-version relabeling or advisory exception.",
+  "zip_version": "9.0.5",
+  "packages": {
+    "tch": {
+      "version": "0.20.0",
+      "archive_url": "https://static.crates.io/crates/tch/tch-0.20.0.crate",
+      "archive_sha256": "a760143efe7e4bb5b56e95d01f52ee6773bc315202e7c47db6a6429b0705a1f2",
+      "files": {
+        "LICENSE-APACHE": {
+          "upstream_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        "LICENSE-MIT": {
+          "upstream_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "build.rs": {
+          "upstream_sha256": "28c5a8099b785cc068e0484006a0e03badd67d4992822ecd9e09ae194739c224",
+          "sha256": "28c5a8099b785cc068e0484006a0e03badd67d4992822ecd9e09ae194739c224"
+        },
+        "rustfmt.toml": {
+          "upstream_sha256": "976b4ed388544f55349256eb91d07e16f4bcce42ce325d09bf090cc003ec72aa",
+          "sha256": "976b4ed388544f55349256eb91d07e16f4bcce42ce325d09bf090cc003ec72aa"
+        },
+        "src/data.rs": {
+          "upstream_sha256": "442dda726016da0e48a8aba2d37ba8724c76564e70e5a2527ef0e4637605cedf",
+          "sha256": "442dda726016da0e48a8aba2d37ba8724c76564e70e5a2527ef0e4637605cedf"
+        },
+        "src/error.rs": {
+          "upstream_sha256": "176156fe1a1c60f46ec4d1eace32d23454917cde98e3ebd6c3e7509e5f9855bb",
+          "sha256": "176156fe1a1c60f46ec4d1eace32d23454917cde98e3ebd6c3e7509e5f9855bb"
+        },
+        "src/lib.rs": {
+          "upstream_sha256": "af659efd91873381e49a86cc2c13f030851363f24479ee498c6f157e3a45b4dd",
+          "sha256": "af659efd91873381e49a86cc2c13f030851363f24479ee498c6f157e3a45b4dd"
+        },
+        "src/nn/batch_norm.rs": {
+          "upstream_sha256": "b98a8cc4f570a00c1c6d06700ceb413bfe186b9f56b5ba0a9b97d0bb24a5213d",
+          "sha256": "b98a8cc4f570a00c1c6d06700ceb413bfe186b9f56b5ba0a9b97d0bb24a5213d"
+        },
+        "src/nn/conv.rs": {
+          "upstream_sha256": "4de67d22462918cb67eee394eeaec3659dbd47ea8934304a3272c94b4ecd9c39",
+          "sha256": "4de67d22462918cb67eee394eeaec3659dbd47ea8934304a3272c94b4ecd9c39"
+        },
+        "src/nn/conv_transpose.rs": {
+          "upstream_sha256": "d881e48332ff94ae5a751d939cae64f7da1728b974010da8cc04995b214bb24c",
+          "sha256": "d881e48332ff94ae5a751d939cae64f7da1728b974010da8cc04995b214bb24c"
+        },
+        "src/nn/func.rs": {
+          "upstream_sha256": "0353023499b3424d5b270c240c169d03050a26189a00b89f8ebd0cacfa142558",
+          "sha256": "0353023499b3424d5b270c240c169d03050a26189a00b89f8ebd0cacfa142558"
+        },
+        "src/nn/group_norm.rs": {
+          "upstream_sha256": "5361fd0be596bb29baf44a6803b8be0bcbc5a3e946d580e029d83528ace04777",
+          "sha256": "5361fd0be596bb29baf44a6803b8be0bcbc5a3e946d580e029d83528ace04777"
+        },
+        "src/nn/init.rs": {
+          "upstream_sha256": "8568346e1f460d0d15be56988608a44cd8d153537ecd9d055544881b286aaa57",
+          "sha256": "8568346e1f460d0d15be56988608a44cd8d153537ecd9d055544881b286aaa57"
+        },
+        "src/nn/layer_norm.rs": {
+          "upstream_sha256": "00165a19464fa8f2917725bdd494ba7e73ff5107f58e67dd9e5eaa644ed395ab",
+          "sha256": "00165a19464fa8f2917725bdd494ba7e73ff5107f58e67dd9e5eaa644ed395ab"
+        },
+        "src/nn/linear.rs": {
+          "upstream_sha256": "1195ebadc53485ae45abd68f9c817274330fcfa12d501d81fe8944654e66bc78",
+          "sha256": "1195ebadc53485ae45abd68f9c817274330fcfa12d501d81fe8944654e66bc78"
+        },
+        "src/nn/mod.rs": {
+          "upstream_sha256": "f64e448ed6fe04391178347f4f8eb44283994cdd933babcbd4b2a1f3dc033c30",
+          "sha256": "f64e448ed6fe04391178347f4f8eb44283994cdd933babcbd4b2a1f3dc033c30"
+        },
+        "src/nn/module.rs": {
+          "upstream_sha256": "f2d8a75740c0ab58362f5177708bf1e838c8a77dcacb8ffd0ff241b2069020c4",
+          "sha256": "f2d8a75740c0ab58362f5177708bf1e838c8a77dcacb8ffd0ff241b2069020c4"
+        },
+        "src/nn/optimizer.rs": {
+          "upstream_sha256": "de0149e1e30e3ff1616ee48a84971f413e0f21baa6f89e4f24303f7b822c4353",
+          "sha256": "de0149e1e30e3ff1616ee48a84971f413e0f21baa6f89e4f24303f7b822c4353"
+        },
+        "src/nn/rnn.rs": {
+          "upstream_sha256": "4d3351230b3678ff1a49158d6d88b0c407f30468dd4c46c6dece343c38d46353",
+          "sha256": "4d3351230b3678ff1a49158d6d88b0c407f30468dd4c46c6dece343c38d46353"
+        },
+        "src/nn/sequential.rs": {
+          "upstream_sha256": "a1a7db1e8addeffa920ca44183d8304158dd71b62ac697de1bbf2875f71ae180",
+          "sha256": "a1a7db1e8addeffa920ca44183d8304158dd71b62ac697de1bbf2875f71ae180"
+        },
+        "src/nn/sparse.rs": {
+          "upstream_sha256": "a20f93d1f004f29aaa8022cf0f4ead95c71d622eb1f4429c7ebf52f3f93c71f5",
+          "sha256": "a20f93d1f004f29aaa8022cf0f4ead95c71d622eb1f4429c7ebf52f3f93c71f5"
+        },
+        "src/nn/var_store.rs": {
+          "upstream_sha256": "68dc10667c87de1515dec0fe64cf8347f7cdf2f135b933210e5c1f1a0af35645",
+          "sha256": "68dc10667c87de1515dec0fe64cf8347f7cdf2f135b933210e5c1f1a0af35645"
+        },
+        "src/tensor/convert.rs": {
+          "upstream_sha256": "32933952a4f072c08499a23a17e7c781f3643fe6a5ad691855c735f85844aae3",
+          "sha256": "32933952a4f072c08499a23a17e7c781f3643fe6a5ad691855c735f85844aae3"
+        },
+        "src/tensor/display.rs": {
+          "upstream_sha256": "1b25afd950ec9c85a68007f9699986dcd4696a198a0c03ae0b47c2b1da6c9b77",
+          "sha256": "1b25afd950ec9c85a68007f9699986dcd4696a198a0c03ae0b47c2b1da6c9b77"
+        },
+        "src/tensor/index.rs": {
+          "upstream_sha256": "b7d86aea010c98a0c14a5c1899bcba0100039b7c992d1ac52f8b57ac56116173",
+          "sha256": "b7d86aea010c98a0c14a5c1899bcba0100039b7c992d1ac52f8b57ac56116173"
+        },
+        "src/tensor/iter.rs": {
+          "upstream_sha256": "d069c87a72eef94643421a791865cc9d2313ac027809fac16ed601b00f266b6a",
+          "sha256": "d069c87a72eef94643421a791865cc9d2313ac027809fac16ed601b00f266b6a"
+        },
+        "src/tensor/mod.rs": {
+          "upstream_sha256": "c6023b05b03cfe8d806bf2a7d36bb4a377092383eff07fe49218e68fda6aaf91",
+          "sha256": "c6023b05b03cfe8d806bf2a7d36bb4a377092383eff07fe49218e68fda6aaf91"
+        },
+        "src/tensor/npy.rs": {
+          "upstream_sha256": "ccc0a1234385c9e103311f8ab3fec82322da4801739f6f93a98025fdf25bb57f",
+          "sha256": "7ce63a4ea0ff1fecb7682abde691b230760724cc9e22abf569fbb8e206627fb1",
+          "patch": "Use SimpleFileOptions for existing Stored writer; propagate fallible ZIP name/index access without panicking."
+        },
+        "src/tensor/ops.rs": {
+          "upstream_sha256": "0b653a7c9e135a5b98ca41ffa612d5ded438b8b08d99c1568077c6bb32a1abaa",
+          "sha256": "0b653a7c9e135a5b98ca41ffa612d5ded438b8b08d99c1568077c6bb32a1abaa"
+        },
+        "src/tensor/safetensors.rs": {
+          "upstream_sha256": "37574f8fda829956d79e6a19a1d74c00413970c5cb35a29cd4a03b7eb83bf2af",
+          "sha256": "37574f8fda829956d79e6a19a1d74c00413970c5cb35a29cd4a03b7eb83bf2af"
+        },
+        "src/vision/alexnet.rs": {
+          "upstream_sha256": "8d56ae9d6bdc4546969f115fba41e3fb8d86ac1bc441151648830c60bdb88182",
+          "sha256": "8d56ae9d6bdc4546969f115fba41e3fb8d86ac1bc441151648830c60bdb88182"
+        },
+        "src/vision/cifar.rs": {
+          "upstream_sha256": "6f36e04700a6ce5638cedee14d3303433682f97cbc4ee7ae3c618b91749bdadc",
+          "sha256": "6f36e04700a6ce5638cedee14d3303433682f97cbc4ee7ae3c618b91749bdadc"
+        },
+        "src/vision/convmixer.rs": {
+          "upstream_sha256": "4440d6bb206528ecaf790168e3f867f75c9bb8432bba61bf75872c25e3ce0648",
+          "sha256": "4440d6bb206528ecaf790168e3f867f75c9bb8432bba61bf75872c25e3ce0648"
+        },
+        "src/vision/dataset.rs": {
+          "upstream_sha256": "71bfc17de04742e9e45f6552a098674008e3044cd1d23e9fd3016891d958d83d",
+          "sha256": "71bfc17de04742e9e45f6552a098674008e3044cd1d23e9fd3016891d958d83d"
+        },
+        "src/vision/densenet.rs": {
+          "upstream_sha256": "f8c427602f2d8a202f0da8fe0274b3e2ac1cad890874a96ac6adc4734b3a2941",
+          "sha256": "f8c427602f2d8a202f0da8fe0274b3e2ac1cad890874a96ac6adc4734b3a2941"
+        },
+        "src/vision/dinov2.rs": {
+          "upstream_sha256": "a5f28c0e4f2b06175f69209522b273e9b38c55fd757f6258b60ecda0cebf5e9d",
+          "sha256": "a5f28c0e4f2b06175f69209522b273e9b38c55fd757f6258b60ecda0cebf5e9d"
+        },
+        "src/vision/efficientnet.rs": {
+          "upstream_sha256": "acf386a6e4d34918b159c23dfb93b2ac6f4534d52e692eb8768060b51e59a736",
+          "sha256": "acf386a6e4d34918b159c23dfb93b2ac6f4534d52e692eb8768060b51e59a736"
+        },
+        "src/vision/image.rs": {
+          "upstream_sha256": "13db66d8de4845d235322af48c02f80e46b441c0a06be0b94e13da56e43433f7",
+          "sha256": "13db66d8de4845d235322af48c02f80e46b441c0a06be0b94e13da56e43433f7"
+        },
+        "src/vision/imagenet.rs": {
+          "upstream_sha256": "afd4332f031b911513023bbab02f6b143dbf0e1b113ccfdfbf2c2fd03436c33d",
+          "sha256": "afd4332f031b911513023bbab02f6b143dbf0e1b113ccfdfbf2c2fd03436c33d"
+        },
+        "src/vision/inception.rs": {
+          "upstream_sha256": "a2486d88d91adcbacfe583e12facb4f1a78b1eb15a5a4848bce5dd5f165f2bfd",
+          "sha256": "a2486d88d91adcbacfe583e12facb4f1a78b1eb15a5a4848bce5dd5f165f2bfd"
+        },
+        "src/vision/mnist.rs": {
+          "upstream_sha256": "fdb52596029d72a8004f1c1a0a281385882321aff3787a35b25f6e67ac7b9642",
+          "sha256": "fdb52596029d72a8004f1c1a0a281385882321aff3787a35b25f6e67ac7b9642"
+        },
+        "src/vision/mobilenet.rs": {
+          "upstream_sha256": "14bd40b7642181f6ddaf548f60d76e4ca78cff6256b4996119bbc9c149c72cec",
+          "sha256": "14bd40b7642181f6ddaf548f60d76e4ca78cff6256b4996119bbc9c149c72cec"
+        },
+        "src/vision/mod.rs": {
+          "upstream_sha256": "32cf8ebd17678f80673dac2f2a9718b164e9ef1d0b1a6f6f8d9dd3b98d99449d",
+          "sha256": "32cf8ebd17678f80673dac2f2a9718b164e9ef1d0b1a6f6f8d9dd3b98d99449d"
+        },
+        "src/vision/resnet.rs": {
+          "upstream_sha256": "dca15a6d5cfbe7f37e942c173087fdaeb19a347bfca2718ce45721ef244d2433",
+          "sha256": "dca15a6d5cfbe7f37e942c173087fdaeb19a347bfca2718ce45721ef244d2433"
+        },
+        "src/vision/rust_image.rs": {
+          "upstream_sha256": "2b13844118406c0de90c44d0e0d989a53481a5f919d328269366c7debfdea46a",
+          "sha256": "2b13844118406c0de90c44d0e0d989a53481a5f919d328269366c7debfdea46a"
+        },
+        "src/vision/squeezenet.rs": {
+          "upstream_sha256": "406e5036ab0688b5279bbc149f89c6032c722d9bf5db51d07d58fd8b89b7b547",
+          "sha256": "406e5036ab0688b5279bbc149f89c6032c722d9bf5db51d07d58fd8b89b7b547"
+        },
+        "src/vision/vgg.rs": {
+          "upstream_sha256": "4f35d9d27df98eb1879394e8451b29a99c01a46c94f28b00079884d8b1fb4fb5",
+          "sha256": "4f35d9d27df98eb1879394e8451b29a99c01a46c94f28b00079884d8b1fb4fb5"
+        },
+        "src/wrappers/device.rs": {
+          "upstream_sha256": "c3294ab621b92affb11323257fd3fc21877a9404c0826143b4800e5bfaf42142",
+          "sha256": "c3294ab621b92affb11323257fd3fc21877a9404c0826143b4800e5bfaf42142"
+        },
+        "src/wrappers/image.rs": {
+          "upstream_sha256": "368abc92ebb07db9fdc89d4b068e81e8b48fa07bb6a52ff9d82e1220bad7275d",
+          "sha256": "368abc92ebb07db9fdc89d4b068e81e8b48fa07bb6a52ff9d82e1220bad7275d"
+        },
+        "src/wrappers/jit.rs": {
+          "upstream_sha256": "639110766cc62981ef48c48d7bf4f9b755941d6250b8e38c2340f84e74670cfe",
+          "sha256": "639110766cc62981ef48c48d7bf4f9b755941d6250b8e38c2340f84e74670cfe"
+        },
+        "src/wrappers/kind.rs": {
+          "upstream_sha256": "93d2a7f93983863ef95f3064a51997604a57244474cbe6362bd9a881b6c71fb4",
+          "sha256": "93d2a7f93983863ef95f3064a51997604a57244474cbe6362bd9a881b6c71fb4"
+        },
+        "src/wrappers/layout.rs": {
+          "upstream_sha256": "b6ca7feb4408dcb0b78fc16679013f0f6764d843e89504e231d8c308754b0b06",
+          "sha256": "b6ca7feb4408dcb0b78fc16679013f0f6764d843e89504e231d8c308754b0b06"
+        },
+        "src/wrappers/mod.rs": {
+          "upstream_sha256": "6a94ed3c44fb1fb1db729cfe938f41e2cf47a7fa64e4d5245d7c1a168835e513",
+          "sha256": "6a94ed3c44fb1fb1db729cfe938f41e2cf47a7fa64e4d5245d7c1a168835e513"
+        },
+        "src/wrappers/optimizer.rs": {
+          "upstream_sha256": "c04cf4f4113a340d2e1ac7f67230eed51d7aff1139027ead196f665ec467ceba",
+          "sha256": "c04cf4f4113a340d2e1ac7f67230eed51d7aff1139027ead196f665ec467ceba"
+        },
+        "src/wrappers/python.rs": {
+          "upstream_sha256": "85e660baa0735954d4003fad47d24a8066451131c56303bf9fee88025eb44bd3",
+          "sha256": "85e660baa0735954d4003fad47d24a8066451131c56303bf9fee88025eb44bd3"
+        },
+        "src/wrappers/scalar.rs": {
+          "upstream_sha256": "cf532532527c50cc6fba9688b0a5d8addb191c248bd251fcca57c468647f3be2",
+          "sha256": "cf532532527c50cc6fba9688b0a5d8addb191c248bd251fcca57c468647f3be2"
+        },
+        "src/wrappers/stream.rs": {
+          "upstream_sha256": "9af1abd309cd2c5b2b0d1e6a42505f983d081e5edbebb82c327b2b48dd1c2ae1",
+          "sha256": "9af1abd309cd2c5b2b0d1e6a42505f983d081e5edbebb82c327b2b48dd1c2ae1"
+        },
+        "src/wrappers/tensor.rs": {
+          "upstream_sha256": "965eea22e487b9cc801c6c96730dd297c9f18d22c2fc8104bc698e5d4eceeb60",
+          "sha256": "965eea22e487b9cc801c6c96730dd297c9f18d22c2fc8104bc698e5d4eceeb60"
+        },
+        "src/wrappers/tensor_fallible_generated.rs": {
+          "upstream_sha256": "e6b6da3f66c6eefa6c1005a2910e037f57bd3abd245b14943ef5c2df0a3b9fe3",
+          "sha256": "e6b6da3f66c6eefa6c1005a2910e037f57bd3abd245b14943ef5c2df0a3b9fe3"
+        },
+        "src/wrappers/tensor_generated.rs": {
+          "upstream_sha256": "5abb7e12c0395fffdb255818ce0b16fdb280226507bd1cee4c5f31b273bcf73e",
+          "sha256": "5abb7e12c0395fffdb255818ce0b16fdb280226507bd1cee4c5f31b273bcf73e"
+        },
+        "src/wrappers/utils.rs": {
+          "upstream_sha256": "08c4ef6bd592d83db52d8fb0d518d8b055c3c8b0c1ec02a398d0896009542b39",
+          "sha256": "08c4ef6bd592d83db52d8fb0d518d8b055c3c8b0c1ec02a398d0896009542b39"
+        },
+        "Cargo.toml": {
+          "upstream_sha256": "09f8e1ac761e7c6a803f9fb62b68e774b2ee874c9973b0b13b1c26bd7db019dd",
+          "sha256": "7594bb0cef67ca384b9d9b684b110735a48ab93df495960e2c8815ca878a0a59",
+          "patch": "Replace zip with pinned 9.0.5, retain old codec families; omit non-runtime example/test/dev targets."
+        }
+      }
+    },
+    "torch-sys": {
+      "version": "0.20.0",
+      "archive_url": "https://static.crates.io/crates/torch-sys/torch-sys-0.20.0.crate",
+      "archive_sha256": "ad6fa4ac5662b84047081375b007f102d4968d5a0191f567a9776294445af9ac",
+      "files": {
+        "build.rs": {
+          "upstream_sha256": "6af3f7b697e24cd7aca101d6a9fa373ffabde9583760995f81f4fbc080f35fc4",
+          "sha256": "ef205226a3a06f2166be6cd74835595ffb14e198d84f9497b0718f96b2fd8b7c",
+          "patch": "Propagate ZIP 9 fallible name and mangled-path access in the existing extraction loop."
+        },
+        "libtch/CMakeLists.txt": {
+          "upstream_sha256": "5cbec8dde02e45be4789454d42d35fe7365785e6ed2fdca6499bd844ef4137a1",
+          "sha256": "5cbec8dde02e45be4789454d42d35fe7365785e6ed2fdca6499bd844ef4137a1"
+        },
+        "libtch/stb_image.h": {
+          "upstream_sha256": "599c64066c333d9b125d65f3394de642a42cf4888c3626535dcf62fcfaee1227",
+          "sha256": "599c64066c333d9b125d65f3394de642a42cf4888c3626535dcf62fcfaee1227"
+        },
+        "libtch/stb_image_resize.h": {
+          "upstream_sha256": "5ef7cd32cfbd9de3f87606711fdf8543958302cafc95905f9397d4bee3ad67cb",
+          "sha256": "5ef7cd32cfbd9de3f87606711fdf8543958302cafc95905f9397d4bee3ad67cb"
+        },
+        "libtch/stb_image_write.h": {
+          "upstream_sha256": "dd0ec918c4cc4477a24a2fd268b8a55c3da6767ba50f4e7a9142b9d8e2592487",
+          "sha256": "dd0ec918c4cc4477a24a2fd268b8a55c3da6767ba50f4e7a9142b9d8e2592487"
+        },
+        "libtch/torch_api.cpp": {
+          "upstream_sha256": "65d6427fc6e02c1b5ba52f75799fe5ee2fd1d0b3586462650e6735e5ca634798",
+          "sha256": "65d6427fc6e02c1b5ba52f75799fe5ee2fd1d0b3586462650e6735e5ca634798"
+        },
+        "libtch/torch_api.h": {
+          "upstream_sha256": "b5120b143c396a0ed0c1ca19f3cad1dbe2b605351e2ab5eba2b536e17131bb97",
+          "sha256": "b5120b143c396a0ed0c1ca19f3cad1dbe2b605351e2ab5eba2b536e17131bb97"
+        },
+        "libtch/torch_api_generated.cpp": {
+          "upstream_sha256": "465491d4a6b53d985ad3ab21aec1392f17197427be6e58af7abf9d9004f5307b",
+          "sha256": "465491d4a6b53d985ad3ab21aec1392f17197427be6e58af7abf9d9004f5307b"
+        },
+        "libtch/torch_api_generated.h": {
+          "upstream_sha256": "eb6d613d0ebd5677bf611e607f7b8433a95dbcfdd73d00490dc285368b2de21e",
+          "sha256": "eb6d613d0ebd5677bf611e607f7b8433a95dbcfdd73d00490dc285368b2de21e"
+        },
+        "libtch/torch_python.cpp": {
+          "upstream_sha256": "fdfd9bb88687fb47e7066a9358af97292a7fdb3c6222c62f6a8b1f554b613b2f",
+          "sha256": "fdfd9bb88687fb47e7066a9358af97292a7fdb3c6222c62f6a8b1f554b613b2f"
+        },
+        "libtch/torch_python.h": {
+          "upstream_sha256": "da330a4c846a15fddc4ab3142ecaa535273724393bad963aa19cf622c5237e2f",
+          "sha256": "da330a4c846a15fddc4ab3142ecaa535273724393bad963aa19cf622c5237e2f"
+        },
+        "src/c_generated.rs": {
+          "upstream_sha256": "d53ab830fbd147f47f4e506c4e9defc59b3492d87f9b5f5246cf114b63400e9a",
+          "sha256": "d53ab830fbd147f47f4e506c4e9defc59b3492d87f9b5f5246cf114b63400e9a"
+        },
+        "src/cuda.rs": {
+          "upstream_sha256": "5041c0ab989d13aa3a800c4b3070c74d7e587b7b884e66f431a83e5dfcbd699e",
+          "sha256": "5041c0ab989d13aa3a800c4b3070c74d7e587b7b884e66f431a83e5dfcbd699e"
+        },
+        "src/io.rs": {
+          "upstream_sha256": "fcf37f38ce57acddfa4141fd392dcd5a45a106aa4e76344cfd3902909759bcf6",
+          "sha256": "fcf37f38ce57acddfa4141fd392dcd5a45a106aa4e76344cfd3902909759bcf6"
+        },
+        "src/lib.rs": {
+          "upstream_sha256": "3b01047fc37f8f8de98fed728f0492286da49ac346c3ea1457d97597f1ca8ecf",
+          "sha256": "3b01047fc37f8f8de98fed728f0492286da49ac346c3ea1457d97597f1ca8ecf"
+        },
+        "src/python.rs": {
+          "upstream_sha256": "1f11411d6f1f8664f85a48d10957dfbf79667af2ccb9bd548f749cd597df5f8c",
+          "sha256": "1f11411d6f1f8664f85a48d10957dfbf79667af2ccb9bd548f749cd597df5f8c"
+        },
+        "src/traits.rs": {
+          "upstream_sha256": "c986a2595e1ee98545579e9b46f14e0059aab4d7c02554c9d53c47d74af15ae0",
+          "sha256": "c986a2595e1ee98545579e9b46f14e0059aab4d7c02554c9d53c47d74af15ae0"
+        },
+        "Cargo.toml": {
+          "upstream_sha256": "3e680e91bf9a5cbc2773448f3105b4aa9733bd98f38b71e57138f69cdf44c666",
+          "sha256": "da65e62fed93a06e6e410237024bcbb114194e0c1026c3afe63758d75dad839c",
+          "patch": "Replace zip with pinned 9.0.5, retain old codec families; omit non-runtime example/test/dev targets."
+        },
+        "LICENSE-APACHE": {
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "upstream_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "origin": "Shared tch-rs 0.20.0 license, authenticated from tch crate archive."
+        },
+        "LICENSE-MIT": {
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "upstream_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "origin": "Shared tch-rs 0.20.0 license, authenticated from tch crate archive."
+        },
+        "rustfmt.toml": {
+          "sha256": "976b4ed388544f55349256eb91d07e16f4bcce42ce325d09bf090cc003ec72aa",
+          "origin": "tch-rs 0.20.0 shared formatting configuration."
+        }
+      }
+    }
+  },
+  "omitted_nonruntime_members": [
+    {
+      "crate": "tch",
+      "member": "Cargo.toml.orig",
+      "sha256": "8b771596d11103e3c9a07cbd593ad67d2dc3a2ea881b51ae9b6ebe6240ebab33",
+      "reason": "Uncompiled upstream manifest/export utility; not part of retained library/build graph."
+    },
+    {
+      "crate": "torch-sys",
+      "member": "Cargo.toml.orig",
+      "sha256": "6e0d083a1130e5861b4374b2411d1227fecf4359c78c9b02bf45738233d63d42",
+      "reason": "Uncompiled upstream manifest/export utility; not part of retained library/build graph."
+    },
+    {
+      "crate": "tch",
+      "member": "src/vision/export_model.py",
+      "sha256": "81aeaf9851b7dc1975e60a554a5f6b87a371444425eb2461a80e35202c76b213",
+      "reason": "Uncompiled upstream manifest/export utility; not part of retained library/build graph."
+    },
+    {
+      "crate": "tch",
+      "member": "src/vision/export_dinov2.py",
+      "sha256": "b3a8011f7dbb73acf5b3f1d9517cde392343df29528caf786151164419c09758",
+      "reason": "Uncompiled upstream manifest/export utility; not part of retained library/build graph."
+    }
+  ]
+}

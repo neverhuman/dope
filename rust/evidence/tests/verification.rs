@@ -13,7 +13,7 @@ fn executor_receipt_pins_and_confirmation_fail_closed() {
 }
 
 #[test]
-fn fabricated_booleans_versions_byte_sums_losses_and_rows_fail() {
+fn forged_booleans_versions_byte_sums_losses_and_rows_fail() {
     for (field, value) in [
         ("version", json!(true)),
         ("version", json!(2)),

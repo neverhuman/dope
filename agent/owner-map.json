@@ -590,12 +590,13 @@
     "SECURITY.md": "governance",
     "STATUS.md": "governance",
     "THIRD_PARTY_NOTICES.md": "governance",
-    "contracts/tdl-contract-v2.candidate.json": "rust-core",
+    "contracts/tdl-contract-v2-candidate.json": "rust-core",
     "schemas/tdl-protocol-v1.schema.json": "governance",
     "schemas/tdl-result-v1.schema.json": "governance",
     "docs/decisions/tdl-v1.md": "governance",
     "docs/metric.md": "governance",
     "research/transfer/tests/test_tdl_result_schemas.py": "rust-core",
-    "tests/fixtures/tdl-v2/": "rust-core"
+    "tests/fixtures/tdl-v2/": "rust-core",
+    "ops/vendor/": "rust-core"
   }
 }
