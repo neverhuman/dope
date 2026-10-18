@@ -1,0 +1,82 @@
+{
+  "case_id": "P02-REPRO-DRIVERS-additive",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "components": {
+      "mass": {
+        "a_rr": 1.0,
+        "a_rs": 1.0,
+        "descriptive_ratio": 1.0,
+        "lcbs": {
+          "control_strength": 10.0,
+          "margin": 0.19999999999999996,
+          "real_strength": 10.0,
+          "stability": 1.0,
+          "synthetic_strength": 1.0
+        },
+        "margin": 0.19999999999999996
+      }
+    },
+    "driver_fidelity": 1.0,
+    "driver_pass": true,
+    "format": "driver-result-v1",
+    "protocol_version": "v2",
+    "reason": null,
+    "status": "complete"
+  },
+  "input": {
+    "groups_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "importance_floor": 0.1,
+    "inference": {
+      "bound_method": "full_family_max_t",
+      "bounds": {
+        "mass.control_strength": {
+          "estimate": 10.0,
+          "lower": 10.0
+        },
+        "mass.margin": {
+          "estimate": 0.19999999999999996,
+          "lower": 0.19999999999999996
+        },
+        "mass.real_strength": {
+          "estimate": 10.0,
+          "lower": 10.0
+        },
+        "mass.stability": {
+          "estimate": 1.0,
+          "lower": 1.0
+        },
+        "mass.synthetic_strength": {
+          "estimate": 1.0,
+          "lower": 1.0
+        }
+      },
+      "status": "complete"
+    },
+    "perturbation_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "perturbation_status": "complete",
+    "prepared_view_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "protocol_version": "v2",
+    "query_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "real_control_importances": [
+      8.0,
+      2.0
+    ],
+    "real_importances": [
+      8.0,
+      2.0
+    ],
+    "required_components": [
+      "mass"
+    ],
+    "stability_floor": 0.7,
+    "synthetic_importances": [
+      8.0,
+      2.0
+    ],
+    "synthetic_strength_floor": 0.5
+  },
+  "purpose": "Additive recovery declares mass only; absent sign and interaction are inapplicable.",
+  "schema_version": 2
+}

@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.local/schemas/driver-result-v1.schema.json",
+  "title": "Candidate paired D80 driver result (result format v1, protocol v2)",
+  "description": "Evaluator diagnostics with C02 simultaneous bounds. This result does not certify a protocol or authorize release. Historical protocol v1 results retain their original shape.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "protocol_version",
+    "status",
+    "reason"
+  ],
+  "properties": {
+    "format": {
+      "const": "driver-result-v1"
+    },
+    "protocol_version": {
+      "const": "v2"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "uninformative",
+        "incomplete",
+        "failed",
+        "timed_out",
+        "unsupported"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mass"
+      ],
+      "properties": {
+        "mass": {
+          "$ref": "#/$defs/component"
+        },
+        "rank": {
+          "$ref": "#/$defs/component"
+        },
+        "sign": {
+          "$ref": "#/$defs/component"
+        },
+        "interaction": {
+          "$ref": "#/$defs/component"
+        }
+      }
+    },
+    "driver_fidelity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "driver_pass": {
+      "type": "boolean"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "status": {
+          "const": "complete"
+        },
+        "reason": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "components",
+        "driver_fidelity",
+        "driver_pass"
+      ]
+    },
+    {
+      "properties": {
+        "status": {
+          "enum": [
+            "uninformative",
+            "incomplete",
+            "failed",
+            "timed_out",
+            "unsupported"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "components"
+            ]
+          },
+          {
+            "required": [
+              "driver_fidelity"
+            ]
+          },
+          {
+            "required": [
+              "driver_pass"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "a_rs",
+        "a_rr",
+        "margin",
+        "descriptive_ratio",
+        "lcbs"
+      ],
+      "properties": {
+        "a_rs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "a_rr": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "margin": {
+          "type": "number",
+          "minimum": -0.8,
+          "maximum": 1
+        },
+        "descriptive_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lcbs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "margin",
+            "stability",
+            "real_strength",
+            "control_strength",
+            "synthetic_strength"
+          ],
+          "properties": {
+            "margin": {
+              "type": "number"
+            },
+            "stability": {
+              "type": "number"
+            },
+            "real_strength": {
+              "type": "number"
+            },
+            "control_strength": {
+              "type": "number"
+            },
+            "synthetic_strength": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  }
+}
