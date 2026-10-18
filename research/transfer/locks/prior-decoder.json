@@ -1,0 +1,62 @@
+{
+  "format": "dope-prior-decoder-lock-v1",
+  "status": "unqualified",
+  "study_manifest": "research/transfer/adapters/generators/prior_decoder_study.json",
+  "study_manifest_sha256": "c56c17b77dc5034be463becdf43541f38bf6836aa1e9da1d540d8ffd867a0303",
+  "teacher": {
+    "name": "TabICLv2",
+    "role": "distillation_teacher_only",
+    "package": "tabicl==2.0.3",
+    "code_repository": "soda-inria/tabicl",
+    "code_revision": "10719e21fd72b8945d4a4f9ae077e350ba8650d9",
+    "checkpoint_repository": "jingang/TabICL",
+    "checkpoint_revision": "4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+    "classification_checkpoint_sha256": "bdc7dbd5e4ff21f8f0456fcf90c6b7cdf72dbea960f2d05b19bec19f9b3d4ed0",
+    "regression_checkpoint_sha256": "0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a",
+    "code_license": "BSD-3-Clause",
+    "source_license_sha256": "c959a1db8bc4b2f41c315a9b077c822372a4a84e1a83636bdb962715aaae6874",
+    "checkpoint_license": "bsd-3-clause",
+    "checkpoint_terms_source": "pinned Hugging Face model-card metadata; metadata review is not license acceptance",
+    "code_license_review": "unresolved",
+    "checkpoint_license_review": "unresolved",
+    "distillation_permission": "unresolved",
+    "output_redistribution_permission": "unresolved",
+    "checkpoint_local_verification": false,
+    "dependency_closure_sha256": null,
+    "pretraining_source_independence": "unresolved"
+  },
+  "decoder": {
+    "implementation": null,
+    "code_sha256": null,
+    "weights_sha256": null,
+    "export_reload_sha256": null,
+    "sampling_closure_sha256": null,
+    "native_reference_sha256": null,
+    "compatibility_validity": "unmeasured",
+    "confirmatory_auditor_eligible": false
+  },
+  "comparison": {
+    "no_prior_candidate": "same decoder architecture, fit budget, source rows, seed schedule, and total cold/amortized closure caps; teacher outputs disabled",
+    "cold_closure_limit_bytes": 32000000,
+    "amortization_counts": [
+      1,
+      16,
+      128
+    ],
+    "measured_cold_bytes": null,
+    "measured_amortized_bytes": null,
+    "study_state": "preregistered_blocked"
+  },
+  "fixture_pilot": {
+    "status": "passed",
+    "receipt": "research/transfer/adapters/generators/prior_decoder_pilot.json",
+    "receipt_sha256": "4686d4be8341602c664ea382d20f4b532bc8c43188db4f083f627994c477d127"
+  },
+  "admission_blockers": [
+    "Custodian legal review of teacher code and checkpoint terms for distillation and redistribution is absent.",
+    "Teacher pretraining source independence and contamination review are absent.",
+    "No verified local checkpoint bytes or complete offline dependency closure are available.",
+    "No candidate decoder implementation has native parity or compatibility/validity evidence.",
+    "No prior-relative development result is measured; no TDL claim is admitted."
+  ]
+}

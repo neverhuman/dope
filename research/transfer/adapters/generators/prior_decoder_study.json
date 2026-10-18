@@ -1,0 +1,86 @@
+{
+  "format": "dope-prior-relative-decoder-study-v1",
+  "version": 1,
+  "state": "preregistered_blocked",
+  "hypothesis": "For the pinned TabICLv2 teacher, a distilled model-specific decoder can improve development TDL retention over the same decoder trained without prior outputs while both remain under identical full cold and amortized sampling-closure byte ceilings.",
+  "claim_scope": "TabICLv2-teacher-specific only; no universal TDL, privacy, legal, or release claim.",
+  "teacher": {
+    "model": "TabICLv2",
+    "package": "tabicl==2.0.3",
+    "source_revision": "10719e21fd72b8945d4a4f9ae077e350ba8650d9",
+    "checkpoint_repository": "jingang/TabICL",
+    "checkpoint_revision": "4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+    "classification_checkpoint_sha256": "bdc7dbd5e4ff21f8f0456fcf90c6b7cdf72dbea960f2d05b19bec19f9b3d4ed0",
+    "regression_checkpoint_sha256": "0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a",
+    "role": "distillation_teacher_only",
+    "may_score_its_own_decoder": false
+  },
+  "source_holdouts": {
+    "training_families": ["synthetic_linear_v1", "synthetic_interaction_v1"],
+    "heldout_families": ["synthetic_rare_gate_v1"],
+    "fit_seeds": [11, 23, 37],
+    "heldout_seeds": [53, 71],
+    "external_source_ids": [],
+    "status": "fixture_design_only; no external source has been admitted"
+  },
+  "model_holdouts": {
+    "confirmatory_models": [
+      {"name": "catboost", "version": "1.2.10", "role": "confirmatory_auditor"},
+      {"name": "linear", "version": "scikit-learn==1.7.2", "role": "confirmatory_auditor"}
+    ],
+    "excluded_from_confirmation": ["TabICLv2 teacher", "decoder student"],
+    "status": "model identities preregistered; admission and independence evidence absent"
+  },
+  "candidates": [
+    {
+      "id": "prior_distilled_decoder",
+      "recipe": "same decoder architecture and fit budget as no_prior_decoder; teacher predictions available during training only",
+      "closure_ceiling_bytes": 32000000,
+      "components": [
+        {"role": "shared_learned_state", "name": "distilled_prior_state", "ceiling_bytes": 8000000},
+        {"role": "sampling_payload", "name": "decoder_payload", "ceiling_bytes": 12000000},
+        {"role": "transform", "name": "fitted_transform", "ceiling_bytes": 4000000},
+        {"role": "runtime", "name": "runtime_closure", "ceiling_bytes": 7995904}
+      ]
+    },
+    {
+      "id": "no_prior_decoder",
+      "recipe": "same decoder architecture and fit budget; teacher predictions disabled",
+      "closure_ceiling_bytes": 32000000,
+      "components": [
+        {"role": "sampling_payload", "name": "decoder_payload", "ceiling_bytes": 15995904},
+        {"role": "transform", "name": "fitted_transform", "ceiling_bytes": 4000000},
+        {"role": "runtime", "name": "runtime_closure", "ceiling_bytes": 12000000}
+      ]
+    }
+  ],
+  "byte_comparison": {
+    "budget_basis": "sum of every required sampler-reachable payload, learned state, transform, dictionary, runtime and manifest byte; transport framing must be included or reported unmeasured identically",
+    "cold_closure_limit_bytes": 32000000,
+    "amortization_counts": [1, 16, 128],
+    "amortization_rule": "divide only explicitly shared learned-state bytes by consumer count with ceiling; retain all payload, transform, dictionary, runtime and manifest bytes per consumer",
+    "candidate_byte_ceiling_equal_at_each_amortization_count": true,
+    "manifest_ceiling_bytes": 4096,
+    "measured_candidate_bytes": null
+  },
+  "cost_cap": {
+    "fixture_pilot": {"usd": 0, "cpu_wall_seconds": 10, "gpu_seconds": 0, "external_download_bytes": 0, "runs": 1},
+    "vendor_study": {"usd": 0, "cpu_wall_seconds": 0, "gpu_seconds": 0, "runs": 0, "status": "not_admitted"}
+  },
+  "study_seed_schedule": {"decoder_fit": [11, 23, 37], "sample_replay": [11, 23, 37], "heldout_sources": [53, 71]},
+  "decision_rule": "A model-specific development win requires the prior_distilled_decoder to exceed no_prior_decoder on the frozen paired lower confidence bound for TDL transfer, pass compatibility and validity for every required cell, and satisfy both equal byte ceilings at cold and every declared amortization count. Otherwise retain the negative, unsupported, or unresolved result.",
+  "stop_rule": [
+    "Do not fetch or execute the teacher until the exact checkpoint and code licenses, distillation rights, output rights, and redistribution terms have a custodian review receipt.",
+    "Stop before fitting if source independence, source holdouts, package closure, or external source rights are unresolved.",
+    "Stop if any required full sampling-closure component is missing, cannot be measured, exceeds 32,000,000 bytes, or differs in measurement policy between candidates.",
+    "Stop at the first pilot wall-time, memory, GPU, or cost-cap breach; do not retry without a recorded repair and new admission.",
+    "Never use the teacher or student decoder as its own confirmatory auditor."
+  ],
+  "admission_blockers": [
+    "No custodian review of TabICLv2 checkpoint distillation, output, or redistribution rights is recorded.",
+    "Teacher pretraining contamination/source-independence evidence is absent.",
+    "No admitted external source holdout registry or exact dependency/runtime closure is available.",
+    "No vendor execution or priced native pilot is admitted; only deterministic accounting fixtures are authorized by this plan."
+  ],
+  "execution": {"vendor_study_started": false, "fixture_pilot_status": "pending"}
+}

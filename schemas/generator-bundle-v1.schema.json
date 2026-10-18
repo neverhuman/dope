@@ -35,9 +35,19 @@
         "enum": ["byte-inventory", "native-dpk-sample", "native-raw-sample"]
       }
     },
-    "amortization_count": {"description": "Historical v1 estimate parameter, not authority to discount recipient-required state.", "type": "integer", "minimum": 1, "maximum": 1000000},
-    "transport_framing": {"type": "string", "enum": ["included", "unmeasured"]},
+    "amortization_count": {
+      "description": "Consumers used only for the separately reported shared learned-state amortization. Cold closure always charges the complete state.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "transport_framing": {
+      "description": "Compare candidates only with the same framing policy; unmeasured framing is not zero bytes.",
+      "type": "string",
+      "enum": ["included", "unmeasured"]
+    },
     "components": {
+      "description": "Complete bundle closure, including every sampler-reachable prior, decoder, transform, dictionary, and runtime component.",
       "type": "array",
       "maxItems": 32,
       "items": {"$ref": "#/$defs/component"}
@@ -63,6 +73,7 @@
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$"},
         "role": {
+          "description": "Use shared_learned_state for prior-derived shared weights. Its full bytes remain in cold closure and only this declared role may be amortized.",
           "type": "string",
           "enum": [
             "dictionary",
