@@ -232,3 +232,83 @@ fn numeric_predictor_types_survive_reload_with_counted_repairs() {
         sample_raw(&result.artifact, 128, Some(87)).unwrap()
     );
 }
+
+#[test]
+fn held_out_test_and_domain_poison_cannot_change_fit_map_or_selected_artifact() {
+    use dope_kernel::typed_data::{Cell, FittedTransforms};
+    let declaration = json!({"format":"dope-table-schema","version":1,"columns":[
+        {"id":"c0001","source_name":"private_feature","role":"feature","dtype":"continuous"},
+        {"id":"c0002","source_name":"private_label","role":"target","dtype":"continuous"}
+    ]});
+    let make = |select: (f64, f64), test: (f64, f64), domain: (f64, f64)| {
+        let mut csv = String::from("private_feature,private_label\n");
+        for row in 0..64 {
+            let x = row as f64 / 63.;
+            csv.push_str(&format!("{},{}\n", 10. + 20. * x, 100. + 200. * x));
+        }
+        for (x, y) in [select, test, domain] {
+            csv.push_str(&format!("{x},{y}\n"));
+        }
+        TypedTable::read_csv(
+            csv.as_bytes(),
+            TableSchemaV1::from_private_json(&serde_json::to_vec(&declaration).unwrap()).unwrap(),
+            InputLimits::default(),
+        )
+        .unwrap()
+    };
+    let rows = (0..64).collect::<Vec<_>>();
+    let base = make((15., 150.), (20., 200.), (25., 250.));
+    let state = FittedTransforms::fit_transform(&base, &rows).unwrap();
+    let bytes = state.sampling_state_bytes().unwrap();
+    let digest = state.fit_row_digest().unwrap();
+    let compile_options = CompileOptions {
+        seed: Some(1729),
+        ..CompileOptions::default()
+    };
+    let compiled = compile_raw(&base, &rows, &compile_options, 32768).unwrap();
+    assert!(compiled.report.candidate_count > 1);
+    let state_bytes = u64::from_le_bytes(compiled.artifact[8..16].try_into().unwrap()) as usize;
+    let bundled =
+        FittedTransforms::reload_for_fit(&compiled.artifact[56..56 + state_bytes], digest).unwrap();
+    assert_eq!(bundled.sampling_state_bytes().unwrap(), bytes);
+    // D_select poison must preserve only the map: later development selection
+    // is allowed to consume that partition and change its chosen candidate.
+    let select_poison = make((-9e12, 8e12), (20., 200.), (25., 250.));
+    assert_eq!(
+        FittedTransforms::fit_transform(&select_poison, &rows)
+            .unwrap()
+            .sampling_state_bytes()
+            .unwrap(),
+        bytes
+    );
+    for (test, domain) in [
+        ((20., -987654321.), (25., 250.)),
+        ((-9e12, 200.), (25., 250.)),
+        ((20., 200.), (25., -987654321.)),
+        ((20., 200.), (9e12, 250.)),
+        ((-9e12, 8e12), (7e12, -6e12)),
+    ] {
+        let poisoned = make((15., 150.), test, domain);
+        let map = FittedTransforms::fit_transform(&poisoned, &rows).unwrap();
+        assert!(map.fit_only());
+        assert_eq!(map.fit_row_digest(), Some(digest));
+        assert_eq!(map.sampling_state_bytes().unwrap(), bytes);
+        let artifact = compile_raw(&poisoned, &rows, &compile_options, 32768).unwrap();
+        assert_eq!(
+            artifact.report.selected_candidate,
+            compiled.report.selected_candidate
+        );
+        assert_eq!(artifact.artifact, compiled.artifact);
+    }
+    let reloaded = FittedTransforms::reload_for_fit(&bytes, digest).unwrap();
+    for row in [64, 65, 66] {
+        let Cell::Number(z) = reloaded
+            .transform_cell("c0001", base.cell(row, "c0001").unwrap())
+            .unwrap()
+        else {
+            panic!("numeric");
+        };
+        let original = Cell::Number(reloaded.inverse_transform("c0001", &[z]).unwrap()[0]);
+        assert_eq!(&original, base.cell(row, "c0001").unwrap());
+    }
+}

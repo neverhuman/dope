@@ -31,34 +31,6 @@ fn column_digest(table: &TypedTable) -> Result<String> {
     json_digest(&(table.schema.metadata_visibility, columns))
 }
 
-fn fit_digest(table: &TypedTable, fit_rows: &[usize]) -> String {
-    let mut hash = Sha256::new();
-    hash.update(b"prepared-view-v1:fit-rows\0");
-    hash.update((fit_rows.len() as u64).to_le_bytes());
-    hash.update((table.columns.len() as u64).to_le_bytes());
-    for row in fit_rows {
-        hash.update((*row as u64).to_le_bytes());
-        for column in &table.columns {
-            match &column[*row] {
-                Cell::Number(x) => {
-                    hash.update([0]);
-                    hash.update(x.to_bits().to_le_bytes());
-                }
-                Cell::Boolean(x) => {
-                    hash.update([1, u8::from(*x)]);
-                }
-                Cell::Category(x) => {
-                    hash.update([2]);
-                    hash.update((x.len() as u64).to_le_bytes());
-                    hash.update(x.as_bytes());
-                }
-                Cell::Mask(state) => hash.update([3, *state as u8]),
-            }
-        }
-    }
-    format!("{:x}", hash.finalize())
-}
-
 /// Explicit raw operation. Only `fit_rows` determine maps and output rows.
 /// Entity/split digests are caller attestations; no sealed source is opened.
 pub fn prepare(table: &TypedTable, fit_rows: &[usize], spec: PrepareSpec) -> Result<PreparedView> {
@@ -151,7 +123,10 @@ pub fn prepare(table: &TypedTable, fit_rows: &[usize], spec: PrepareSpec) -> Res
         target: spec.target,
         policies: PreparedPolicies::default(),
         provenance: PreparedProvenance {
-            fit_digest: fit_digest(table, fit_rows),
+            fit_digest: fitted
+                .fit_row_digest()
+                .ok_or_else(|| error("fit_row_digest_required"))?
+                .into(),
             entity_digest: spec.entity_digest,
             split_digest: spec.split_digest,
             column_digest: column_digest(table)?,

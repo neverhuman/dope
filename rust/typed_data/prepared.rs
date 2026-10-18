@@ -95,11 +95,13 @@ pub fn implementation_hash() -> String {
         include_str!("../schema.rs"),
         include_str!("../typed_data.rs"),
         include_str!("transforms.rs"),
+        include_str!("transforms_replay.rs"),
         include_str!("prepared.rs"),
         include_str!("prepared_contract.rs"),
         include_str!("prepared_contract_validation.rs"),
         include_str!("prepared_fit.rs"),
         include_str!("prepared_adapter.rs"),
+        include_str!("prepared_replay.rs"),
         include_str!("../../schemas/prepared-view-v1.schema.json"),
     ] {
         hash.update((source.len() as u64).to_le_bytes());
@@ -252,6 +254,7 @@ pub fn validate_input(bytes: &[u8], contract: &PreparedContract) -> Result<Prepa
 
 include!("prepared_fit.rs");
 include!("prepared_adapter.rs");
+include!("prepared_replay.rs");
 
 #[cfg(test)]
 #[path = "prepared_tests.rs"]
