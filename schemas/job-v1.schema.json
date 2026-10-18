@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.org/dope/schemas/job-v1.schema.json",
+  "title": "Loopback local service protocol v1",
+  "$defs": {
+    "job_state": {
+      "type": "string",
+      "enum": ["queued", "running", "complete", "failed", "incomplete", "cancelled", "timed_out", "unsupported", "over_budget"]
+    },
+    "capability_request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relative_path"],
+      "properties": {"relative_path": {"type": "string", "minLength": 1, "maxLength": 1024}}
+    },
+    "capability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["format", "version", "capability_id", "sha256", "bytes"],
+      "properties": {
+        "format": {"const": "dope-local-capability"}, "version": {"const": 1},
+        "capability_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 0, "maximum": 16777216}
+      }
+    },
+    "job_response": {
+      "type": "object", "additionalProperties": false,
+      "required": ["job_id", "job_state", "qualified"],
+      "properties": {
+        "job_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "job_state": {"$ref": "#/$defs/job_state"}, "qualified": {"const": false}
+      }
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["format", "version", "job_id", "job_state", "kind", "input_sha256", "input_bytes", "report_sha256", "report", "utility_state", "empirical_privacy_state", "formal_dp_state", "release_authorization_state", "qualified"],
+      "properties": {
+        "format": {"const": "dope-local-job-receipt"}, "version": {"const": 1},
+        "job_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "job_state": {"$ref": "#/$defs/job_state"},
+        "kind": {"enum": ["inspect", "prepare", "compile", "evaluate"]},
+        "input_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "input_bytes": {"type": "integer", "minimum": 0, "maximum": 16777216},
+        "report_sha256": {"type": ["string", "null"]}, "report": {"type": ["object", "null"]},
+        "utility_state": {"type": "string"}, "empirical_privacy_state": {"type": "string"},
+        "formal_dp_state": {"type": "string"}, "release_authorization_state": {"type": "string"},
+        "qualified": {"const": false}
+      }
+    }
+  },
+  "type": "object", "additionalProperties": false,
+  "required": ["format", "version", "kind", "capability_id"],
+  "properties": {
+    "format": {"const": "dope-local-job"},
+    "version": {"const": 1},
+    "kind": {"enum": ["inspect", "prepare", "compile", "evaluate"]},
+    "capability_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"}
+  }
+}

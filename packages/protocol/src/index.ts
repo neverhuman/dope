@@ -3,6 +3,7 @@
 export type EvidenceState = 'unmeasured' | 'incomplete' | 'complete' | 'failed' | 'unsupported' | 'missing';
 export type PrivacyState = 'unassessed' | 'passed' | 'failed' | 'incomplete' | 'not_claimed' | 'unverified' | 'verified';
 export type RightsState = 'unknown' | 'restricted' | 'cleared';
+export type { JobV1 } from './schema-snapshots.js';
 
 export interface TdlResultV2 {
   format: 'dope-tdl-result-v2'; contract_id: 'tdl-contract-v2.candidate'; version: 2;
