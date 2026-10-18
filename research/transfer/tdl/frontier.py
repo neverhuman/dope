@@ -16,6 +16,11 @@ def _parse_grid(raw):
 def evaluate(data):
     try:
         require(type(data) is dict)
+        version = data.get("protocol_version", 1)
+        require(type(version) is int and version in (1, 2), "invalid_frontier_version")
+        if version == 2:
+            from ..frontier_coverage import evaluate_frontier_v2
+            return evaluate_frontier_v2(data)
         cells = data.get("cells")
         if cells is None:
             return failure("missing_budget_cell", "incomplete")

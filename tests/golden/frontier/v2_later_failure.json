@@ -1,0 +1,79 @@
+{
+  "case_id": "P02-REPRO-FRONTIER-LATER-FAIL",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "admitted_tasks": 1,
+    "frontier": [
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 800,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 900,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 1200,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 2000,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      }
+    ],
+    "global_optimum_claimed": false,
+    "minimum_qualified_bytes": [
+      900
+    ],
+    "non_monotone_tasks": 1,
+    "protocol_version": 2,
+    "reason": null,
+    "require_monotone": false,
+    "status": "complete"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-a"
+    ],
+    "byte_grid": [
+      800,
+      900,
+      1200,
+      2000
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 900,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 900,
+        "seed_id": "seed-a",
+        "status": "qualified",
+        "task_id": "task-a"
+      },
+      {
+        "artifact_bytes": null,
+        "candidate_id": "candidate-b",
+        "method_id": "method-a",
+        "search_cap_bytes": 1200,
+        "seed_id": "seed-a",
+        "status": "oom",
+        "task_id": "task-a"
+      }
+    ],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "A later failed/OOM search cannot erase the earlier qualified 900-byte artifact; raw nonmonotonicity stays visible.",
+  "schema_version": 1
+}
