@@ -1,0 +1,200 @@
+{
+  "format": "dope-precision-allocation-study-v1",
+  "study_id": "R02-precision-pilot-v1",
+  "status": "pilot_stopped_cost_cap_exceeded_no_admission",
+  "hypothesis": "At the same complete encoded artifact bytes, uncertainty or sensitivity allocation can improve held-out transfer by at least 0.02, or preserve transfer while reducing matched T/D by at least 20%, relative to fixed q4/q8/q16 quantization.",
+  "estimand": "paired held-out transfer difference and complete encoded artifact byte difference, evaluated per held-out source and model before aggregation",
+  "source_model_holdouts": {
+    "pilot": {
+      "kind": "synthetic_deterministic_fixture_only",
+      "source_id": "synthetic-linear-rare-weak-v1",
+      "model_id": "sparse-linear-baseline-v1",
+      "training_seed": 170201,
+      "validation_seed": 170202,
+      "rows": 256,
+      "coefficients": [
+        0.82,
+        -0.45,
+        0.125,
+        0.015625,
+        0.002,
+        0.0004
+      ],
+      "standard_errors": [
+        0.02,
+        0.03,
+        0.1,
+        0.05,
+        0.08,
+        0.2
+      ],
+      "fisher_information": [
+        2500.0,
+        1111.1111111111,
+        100.0,
+        400.0,
+        156.25,
+        25.0
+      ],
+      "measured_sensitivity": [
+        1.0,
+        0.8,
+        0.1,
+        0.05,
+        0.7,
+        0.03
+      ],
+      "bootstrap_sensitivity_draws": [
+        [
+          0.95,
+          0.77,
+          0.11,
+          0.05,
+          0.66,
+          0.02
+        ],
+        [
+          1.02,
+          0.82,
+          0.09,
+          0.06,
+          0.73,
+          0.04
+        ],
+        [
+          0.98,
+          0.79,
+          0.12,
+          0.04,
+          0.69,
+          0.03
+        ],
+        [
+          1.05,
+          0.84,
+          0.08,
+          0.05,
+          0.75,
+          0.02
+        ]
+      ],
+      "qualification": "fixture_only_not_a_source_or_model_holdout"
+    },
+    "development": {
+      "status": "blocked_pending_preregistered_real_source_and_model_rosters",
+      "source_roster_sha256": null,
+      "model_roster_sha256": null
+    }
+  },
+  "candidate_set": [
+    "fixed_q4",
+    "fixed_q8",
+    "fixed_q16",
+    "delta_kappa_se_kappa_1_equal_nominal_bits",
+    "fisher_information_equal_nominal_bits",
+    "bootstrap_sensitivity_equal_nominal_bits",
+    "measured_sensitivity_equal_nominal_bits"
+  ],
+  "cost_and_bytes": {
+    "pilot_nominal_coefficient_bit_budget": 48,
+    "pilot_cost_cap_cpu_seconds": 1.0,
+    "development_cost_cap_cpu_seconds": 600.0,
+    "complete_encoded_bytes_required_for_admission": true,
+    "pilot_complete_encoded_bytes": null,
+    "packet_framing_and_coupled_tariffs": "must be included from canonical encoder before any byte claim; not represented by nominal coefficient bits"
+  },
+  "seed_schedule": [
+    170201,
+    170202,
+    170203,
+    170204
+  ],
+  "stop_rule": "Run exactly one deterministic pilot. Stop without a development campaign if it exceeds the CPU cap, changes unsupported or rare coefficients, lacks complete canonical bytes, or shows no preregistered threshold. Development remains blocked until source/model holdouts, compatibility checks, and complete-byte costing are admitted.",
+  "admission_gates": [
+    "complete canonical encoded artifact sizes are available for every candidate",
+    "measured compatibility and validity pass on each held-out source/model",
+    "paired uncertainty intervals use only the preregistered source/model holdouts",
+    "rare and weak coefficients remain visible in every result",
+    "a preregistered transfer or byte target is met without exceeding cost cap"
+  ],
+  "production_wiring": "disabled_until_all_admission_gates_pass",
+  "pilot_results": {
+    "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=line-tables-only rtk cargo test --locked --lib precision_allocation_pilot -- --nocapture",
+    "deterministic_fixture": "passed",
+    "measured_command_cpu_seconds_including_build": 34.93,
+    "preregistered_cpu_cap_seconds": 1.0,
+    "cost_cap_passed": false,
+    "outcomes": {
+      "fixed_q4": {
+        "nominal_bits": 24,
+        "sensitivity_weighted_squared_error": 0.006658820495562492,
+        "rare_weak_coefficient_erased": true
+      },
+      "fixed_q8": {
+        "nominal_bits": 48,
+        "sensitivity_weighted_squared_error": 6.446014399999922e-05,
+        "rare_weak_coefficient_erased": true
+      },
+      "fixed_q16": {
+        "nominal_bits": 96,
+        "sensitivity_weighted_squared_error": 2.479296388631514e-10,
+        "rare_weak_coefficient_erased": false
+      },
+      "delta_kappa_se_kappa_1_equal_nominal_bits": {
+        "nominal_bits": 48,
+        "sensitivity_weighted_squared_error": 0.00015882064457411194,
+        "bits_by_coefficient": [
+          16,
+          16,
+          4,
+          4,
+          4,
+          4
+        ],
+        "rare_weak_coefficient_erased": true
+      },
+      "fisher_information_equal_nominal_bits": {
+        "nominal_bits": 48,
+        "sensitivity_weighted_squared_error": 0.00015882207508558654,
+        "bits_by_coefficient": [
+          16,
+          15,
+          4,
+          4,
+          5,
+          4
+        ],
+        "rare_weak_coefficient_erased": true
+      },
+      "bootstrap_sensitivity_equal_nominal_bits": {
+        "nominal_bits": 48,
+        "sensitivity_weighted_squared_error": 0.00015903456206793216,
+        "bits_by_coefficient": [
+          15,
+          11,
+          4,
+          4,
+          10,
+          4
+        ],
+        "rare_weak_coefficient_erased": true
+      },
+      "measured_sensitivity_equal_nominal_bits": {
+        "nominal_bits": 48,
+        "sensitivity_weighted_squared_error": 0.0001592111742066803,
+        "bits_by_coefficient": [
+          16,
+          11,
+          4,
+          4,
+          9,
+          4
+        ],
+        "rare_weak_coefficient_erased": true
+      }
+    },
+    "interpretation": "All adaptive methods had greater sensitivity-weighted error than fixed q8 on this synthetic fixture. Nominal coefficient bits are not complete artifact bytes; no transfer, compatibility, or production qualification is claimed.",
+    "development_study": "blocked_and_not_run",
+    "stop_reason": "priced pilot exceeded preregistered CPU cap; real source/model holdouts and complete canonical byte measurements are absent"
+  }
+}
