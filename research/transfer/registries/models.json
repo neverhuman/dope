@@ -8,7 +8,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "mitra_v2",
@@ -16,7 +21,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "tabicl_v2",
@@ -24,7 +34,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "catboost",
@@ -32,7 +47,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "independent_boosting",
@@ -40,7 +60,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "independent_neural",
@@ -48,7 +73,12 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
     },
     {
       "name": "linear",
@@ -56,7 +86,77 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
+    },
+    {
+      "name": "lightgbm",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
+    },
+    {
+      "name": "xgboost",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
+    },
+    {
+      "name": "realmlp",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
+    },
+    {
+      "name": "knn",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
+    },
+    {
+      "name": "kernel",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only"
     }
   ]
 }

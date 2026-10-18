@@ -64,7 +64,8 @@
             "url": "https://huggingface.co/autogluon/mitra-classifier-2/resolve/edada0d20759c58ada8c8605c25f22f6e98ea5f0/config.json"
           }
         },
-        "local_verification": false
+        "local_verification": false,
+        "pretraining_corpus_disclosure": {"state": "unknown", "caveat_required": true}
       },
       "regression": {
         "repo": "autogluon/mitra-regressor-2",
@@ -83,7 +84,8 @@
             "url": "https://huggingface.co/autogluon/mitra-regressor-2/resolve/246c7d310fff04296a2388df5f448e3ffe809283/config.json"
           }
         },
-        "local_verification": false
+        "local_verification": false,
+        "pretraining_corpus_disclosure": {"state": "unknown", "caveat_required": true}
       }
     },
     "primary_distribution": {
@@ -99,7 +101,9 @@
     "missing_config": "config.json digest is pinned with the task checkpoint; only config.json and model.safetensors are permitted in the supplied vendor snapshot directory",
     "native_retries": "native OOM support reduction is not accepted as full context; executor must count all attempts and reject changed consumption",
     "environment": "MITRA_* overrides refused; pinned default support/fit/heldout/memo behavior only",
-    "cost_receipts": "port records requested child fits and returned/failed native calls; actual child fits, native retries and consumed per-child rows require executor observations and are never inferred as measured zero"
+    "cost_receipts": "port records requested child fits and returned/failed native calls; actual child fits, native retries and consumed per-child rows require executor observations and are never inferred as measured zero",
+    "pretraining_corpus_disclosure": {"state": "unknown", "caveat_required": true},
+    "qualification_state": "fixture_verified_only"
   },
   "tabicl": {
     "family_group": "tabicl_architecture",
@@ -144,7 +148,8 @@
           "verification": "upstream LFS metadata only"
         }
       },
-      "local_verification": false
+      "local_verification": false,
+      "pretraining_corpus_disclosure": {"state": "unknown", "caveat_required": true}
     },
     "primary_distribution": {
       "tabicl": "2.0.3"
@@ -152,7 +157,9 @@
     "mode": "frozen_context",
     "target_inverse": "native regressor original-unit output; no second inverse",
     "query_behavior": "one provided batch in provided order; native ensemble batch is separately explicit",
-    "offline": "explicit model_path and allow_auto_download=False"
+    "offline": "explicit model_path and allow_auto_download=False",
+    "pretraining_corpus_disclosure": {"state": "unknown", "caveat_required": true},
+    "qualification_state": "fixture_verified_only"
   },
   "conventional": {
     "family_groups": {
@@ -193,7 +200,9 @@
       "histogram_boosting": "float64 numeric interface",
       "mlp": "float64 numeric interface",
       "linear": "float64 numeric interface"
-    }
+    },
+    "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false},
+    "qualification_state": "fixture_verified_only"
   },
   "exact_dependency_closure": null,
   "unmeasured_gates": [
@@ -208,5 +217,237 @@
     "api": "huggingface_hub.snapshot_download(repo_id=checkpoint.repo, revision=checkpoint.revision, local_dir=executor_cache, allow_patterns=declared_files)",
     "after_fetch": "verify all local bytes and exact license texts; record complete dependency closure and independent native parity; then immutable offline executor with network denied",
     "status": "not performed; no checkpoint or license compatibility claimed"
+  },
+  "challengers": {
+    "format": "dope-challenger-lock-v1",
+    "package_pin_verification": "public_index_metadata_only",
+    "entries": [
+      {
+        "name": "catboost",
+        "family_group": "catboost_oblivious_trees",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float32",
+        "package": {
+          "name": "catboost",
+          "version": "1.2.10",
+          "artifact": "catboost-1.2.10.tar.gz",
+          "sha256": "26ae6d423acaf0e9d8160f2477a990431057ed04522d993c2f42dac62743b4f7",
+          "url": "https://files.pythonhosted.org/packages/e9/0e/09e8fa0858570fda88090bc3f441b69c18ea3d6f4a02fd41aa5426c157bf/catboost-1.2.10.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "iterations": 64,
+            "depth": 4
+          },
+          {
+            "iterations": 64,
+            "depth": 6
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      },
+      {
+        "name": "lightgbm",
+        "family_group": "leafwise_histogram_trees",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float64",
+        "package": {
+          "name": "lightgbm",
+          "version": "4.6.0",
+          "artifact": "lightgbm-4.6.0.tar.gz",
+          "sha256": "cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe",
+          "url": "https://files.pythonhosted.org/packages/68/0b/a2e9f5c5da7ef047cc60cef37f86185088845e8433e54d2e7ed439cce8a3/lightgbm-4.6.0.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "n_estimators": 64,
+            "num_leaves": 15
+          },
+          {
+            "n_estimators": 64,
+            "num_leaves": 31
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      },
+      {
+        "name": "xgboost",
+        "family_group": "levelwise_histogram_trees",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float64",
+        "package": {
+          "name": "xgboost",
+          "version": "2.1.4",
+          "artifact": "xgboost-2.1.4.tar.gz",
+          "sha256": "ab84c4bbedd7fae1a26f61e9dd7897421d5b08454b51c6eb072abc1d346d08d7",
+          "url": "https://files.pythonhosted.org/packages/e2/5e/860a1ef13ce38db8c257c83e138be64bcffde8f401e84bf1e2e91838afa3/xgboost-2.1.4.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "n_estimators": 64,
+            "max_depth": 4
+          },
+          {
+            "n_estimators": 64,
+            "max_depth": 6
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      },
+      {
+        "name": "realmlp",
+        "family_group": "realmlp_neural",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float32",
+        "package": {
+          "name": "pytabkit",
+          "version": "1.7.3",
+          "artifact": "pytabkit-1.7.3.tar.gz",
+          "sha256": "1b7c931390df1f7fea9caf8f0b9023ee7780099b6b033c505460487cee2566b2",
+          "url": "https://files.pythonhosted.org/packages/f3/62/37e9133b7d539d9e5d04e92a171476e0b332c3dd0c08f3df26acf1b984a6/pytabkit-1.7.3.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "n_epochs": 64
+          },
+          {
+            "n_epochs": 128
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      },
+      {
+        "name": "knn",
+        "family_group": "nearest_neighbors",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float64",
+        "package": {
+          "name": "scikit-learn",
+          "version": "1.7.2",
+          "artifact": "scikit_learn-1.7.2.tar.gz",
+          "sha256": "20e9e49ecd130598f1ca38a1d85090e1a600147b9c02fa6f15d69cb53d968fda",
+          "url": "https://files.pythonhosted.org/packages/98/c2/a7855e41c9d285dfe86dc50b250978105dce513d6e459ea66a6aeb0e1e0c/scikit_learn-1.7.2.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "n_neighbors": 1
+          },
+          {
+            "n_neighbors": 3
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      },
+      {
+        "name": "kernel",
+        "family_group": "rbf_kernel",
+        "tasks": ["regression", "classification"],
+        "mode": "scratch",
+        "precision": "float64",
+        "package": {
+          "name": "scikit-learn",
+          "version": "1.7.2",
+          "artifact": "scikit_learn-1.7.2.tar.gz",
+          "sha256": "20e9e49ecd130598f1ca38a1d85090e1a600147b9c02fa6f15d69cb53d968fda",
+          "url": "https://files.pythonhosted.org/packages/98/c2/a7855e41c9d285dfe86dc50b250978105dce513d6e459ea66a6aeb0e1e0c/scikit_learn-1.7.2.tar.gz"
+        },
+        "checkpoint_sha256": null,
+        "dependency_closure": null,
+        "parameter_grid": [
+          {
+            "C": 1.0
+          },
+          {
+            "C": 10.0
+          }
+        ],
+        "budget": {
+          "max_candidates": 2,
+          "max_total_fits": 6,
+          "wall_seconds": 600,
+          "memory_bytes": 2147483648,
+          "gpu_bytes": 0,
+          "threads": 1
+        },
+        "seed_schedule": [7, 17, 29],
+        "qualification_state": "fixture_verified_only",
+        "native_evidence": null,
+        "pretraining_corpus_disclosure": {"state": "known_none", "caveat_required": false}
+      }
+    ],
+    "excluded_families": {
+      "resnet_tabular": "RealMLP supplies the declared neural challenger; no ResNet runtime pinned",
+      "survival_competing_risks": "not_applicable: worker tasks lack censored/event-time targets; no survival qualification"
+    }
   }
 }
