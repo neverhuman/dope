@@ -32,7 +32,10 @@ def _mean(values) -> float:
     values = tuple(values)
     if not values:
         raise ValueError("empty loss evidence")
-    return finite_number(math.fsum(v / len(values) for v in values))
+    try:
+        return finite_number(math.fsum(v / len(values) for v in values))
+    except OverflowError:
+        raise ValueError("nonfinite loss mean") from None
 
 
 @dataclass(frozen=True)
