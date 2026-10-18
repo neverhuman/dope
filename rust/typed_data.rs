@@ -17,12 +17,24 @@ pub mod mixed;
 pub mod prepared;
 pub mod workflow;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Cell {
     Number(f64),
     Boolean(bool),
     Category(String),
     Mask(MaskState),
+}
+
+impl fmt::Debug for Cell {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let kind = match self {
+            Self::Number(_) => "Number",
+            Self::Boolean(_) => "Boolean",
+            Self::Category(_) => "Category",
+            Self::Mask(_) => "Mask",
+        };
+        f.debug_tuple(kind).finish_non_exhaustive()
+    }
 }
 
 impl Cell {
