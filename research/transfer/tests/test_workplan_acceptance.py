@@ -382,9 +382,14 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["median_of_seed_mins"], 0.923106, places=5)
         self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["pooled_seed_median"], 0.973214, places=5)
         hero_svg = (REPO_ROOT / "paper/generated/hero-frontier.svg").read_text()
-        for tok in ("More predictive gain. About one-third the state.", "DOPE (1,844 B)", "Gaussian copula (5,464 B)", "86.3%", "74.7%", "87.1%", "75.4%", "85.8%", "71.3%", "Cross-model driver preservation: not yet measured"):
+        for tok in ("More predictive gain. About one-third the state.", "DOPE (1,844 B)", "Gaussian copula (5,464 B)", "86.3%", "74.7%", "87.1%", "75.4%", "85.8%", "71.3%", "Cross-model feature-driver preservation: not yet measured"):
             self.assertIn(tok, hero_svg)
         self.assertNotIn("Proposed T90", hero_svg)
+        import csv as _csv, io as _io
+        hero_rows = list(_csv.DictReader(_io.StringIO((REPO_ROOT / "paper/generated/hero-frontier.csv").read_text())))
+        self.assertEqual(len(hero_rows), 6)
+        self.assertEqual(render.hero_csv_agreement_failures(hero_rows, foundation.hero_six_bar_rows(f_sum)), [])
+        self.assertTrue((REPO_ROOT / "paper/generated/legacy-v2-catboost.csv").is_file())
         self.assertEqual([k for k, v in render.expected_outputs(REPO_ROOT).items() if (REPO_ROOT / k).read_bytes() != v], [])
 
 

@@ -40,7 +40,22 @@ class HeroFigureTests(unittest.TestCase):
             self.assertIn(pct, svg)
         self.assertNotIn("Proposed T90", svg)
         self.assertNotIn("Proposed T95", svg)
-        self.assertIn("Cross-model driver preservation: not yet measured", svg)
+        self.assertIn("Cross-model feature-driver preservation: not yet measured", svg)
+
+    def test_hero_csv_matches_six_plotted_foundation_rows_and_legacy_catboost_is_separate(self):
+        from tools.claims import foundation
+        f_summary = foundation.load_foundation_summary(ROOT)
+        six_bars = foundation.hero_six_bar_rows(f_summary)
+        self.assertEqual(len(self.rows), 6)
+        self.assertEqual(render.hero_csv_agreement_failures(self.rows, six_bars), [])
+        self.assertEqual([int(r["artifact_bytes"]) for r in self.rows], [1844, 5464, 1844, 5464, 1844, 5464])
+        legacy_rows = list(csv.DictReader(io.StringIO((ROOT / "paper/generated/legacy-v2-catboost.csv").read_text())))
+        self.assertEqual(len(legacy_rows), 11)
+        self.assertEqual(legacy_rows[0]["cohort_id"], "legacy-v2-catboost-99")
+        tampered = [dict(r) for r in self.rows]
+        tampered[0]["artifact_bytes"] = "1895"
+        with self.assertRaisesRegex(ValueError, "CSV disagreement"):
+            render.figure_outputs(rows_to_csv(tampered), self.data["thresholds"])
 
     def test_point_outside_either_axis_is_refused(self):
         for key, value in (("artifact_bytes", "5e9"), ("artifact_bytes", "500"), ("retention", "-0.6"),
