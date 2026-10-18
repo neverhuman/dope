@@ -7,10 +7,71 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
+#[path = "typed_data/prepared_contract.rs"]
+mod prepared_contract;
+pub use prepared_contract::*;
+
 pub const SCHEMA_FORMAT: &str = "dope-table-schema";
 pub const MAX_COLUMNS: usize = 4096;
 pub const MAX_SCHEMA_BYTES: usize = 2 * 1024 * 1024;
 pub const DEFAULT_MAX_FIELD_BYTES: usize = 4096;
+
+#[cfg(test)]
+mod prepared_schema_tests {
+    use serde_json::Value;
+
+    #[test]
+    fn prepared_schema_closes_every_object() {
+        let schema: Value =
+            serde_json::from_str(include_str!("../schemas/prepared-view-v1.schema.json")).unwrap();
+        fn visit(value: &Value) {
+            match value {
+                Value::Object(fields) => {
+                    if fields.get("type").and_then(Value::as_str) == Some("object") {
+                        assert_eq!(
+                            fields.get("additionalProperties"),
+                            Some(&Value::Bool(false))
+                        );
+                        let required = fields["required"].as_array().unwrap();
+                        assert_eq!(
+                            required.len(),
+                            fields["properties"].as_object().unwrap().len()
+                        );
+                    }
+                    for child in fields.values() {
+                        visit(child);
+                    }
+                }
+                Value::Array(values) => {
+                    for child in values {
+                        visit(child);
+                    }
+                }
+                _ => {}
+            }
+        }
+        visit(&schema);
+        assert_eq!(
+            schema["$schema"],
+            "https://json-schema.org/draft/2020-12/schema"
+        );
+    }
+
+    #[test]
+    fn prepared_task_fixtures_validate_with_explicit_capabilities() {
+        use crate::typed_data::prepared::PreparedView;
+        for bytes in [
+            include_bytes!("../tests/fixtures/prepared-view-v1/regression.json").as_slice(),
+            include_bytes!("../tests/fixtures/prepared-view-v1/binary.json").as_slice(),
+            include_bytes!("../tests/fixtures/prepared-view-v1/multiclass.json").as_slice(),
+        ] {
+            let view = PreparedView::from_private_json(bytes).unwrap();
+            assert!(view.metadata().capabilities.regression.qualified);
+            assert!(view.metadata().capabilities.binary.qualified);
+            assert!(!view.metadata().capabilities.multiclass.qualified);
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SchemaError {

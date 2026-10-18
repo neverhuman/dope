@@ -1,0 +1,88 @@
+[
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/columns/0/id",
+    "value": 2,
+    "reason": "invalid_prepared_contract"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/group_map",
+    "value": [
+      {
+        "id": 2,
+        "column_ids": [
+          2
+        ]
+      },
+      {
+        "id": 1,
+        "column_ids": [
+          1
+        ]
+      }
+    ],
+    "reason": "prepared_group_mismatch"
+  },
+  {
+    "fixture": "binary.json",
+    "pointer": "/metadata/target/class_order",
+    "value": [
+      1,
+      0
+    ],
+    "reason": "prepared_class_mismatch"
+  },
+  {
+    "fixture": "multiclass.json",
+    "pointer": "/metadata/target/class_order",
+    "value": [
+      0,
+      2,
+      1
+    ],
+    "reason": "prepared_class_mismatch"
+  },
+  {
+    "fixture": "binary.json",
+    "pointer": "/rows/0/2",
+    "value": 2,
+    "reason": "prepared_class_mismatch"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/projection/state",
+    "value": "public",
+    "reason": "invalid_prepared_contract"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/columns/0/bounds",
+    "value": {
+      "lower": 1.0,
+      "upper": 0.0
+    },
+    "reason": "invalid_prepared_contract"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/provenance/fit_digest",
+    "value": "private_value_987",
+    "reason": "invalid_prepared_contract"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/metadata/capabilities/multiclass/qualified",
+    "value": true,
+    "reason": "invalid_prepared_contract"
+  },
+  {
+    "fixture": "regression.json",
+    "pointer": "/rows/0",
+    "value": [
+      0,
+      0
+    ],
+    "reason": "prepared_column_mismatch"
+  }
+]
