@@ -1,0 +1,63 @@
+{
+  "study_id": "R01-true-coefficient-section-bitpacking",
+  "status": "pilot_complete_development_not_admitted",
+  "hypothesis": "For identical validated model parameters, packing signed coefficients and the complete encoded section payload will reduce full-artifact bytes by at least 20% on at least 75% of development tasks, without material codec or downstream validity regression, compared with the canonical DPK3 artifact.",
+  "comparison": {
+    "baseline": "canonical DPK3 encode_kernel output, including 56-byte header, checksums, section tags, varints, and compression",
+    "existing_candidate": "candidate DPK4 encode_kernel output, including 64-byte header, packet headers, checksums, model layout, q4/q8 unit packets, and f32 packet",
+    "proposed_candidates": ["signed coefficient q4 with per-tensor scale", "signed coefficient q8 with per-tensor scale", "bit-packed section framing with canonical decoder"]
+  },
+  "source_and_model_holdouts": {
+    "sources": "No external or sealed sources in this deterministic codec pilot; no source data is read.",
+    "models": "Synthetic validated regression and binary kernels at 4, 12, and 24 feature widths are development fixtures only. They are not source/model holdouts and cannot establish generalization.",
+    "holdout_admission": "Require separately authorized, sealed development holdouts before any production admission claim."
+  },
+  "candidate_set": ["DPK3 canonical baseline", "DPK4 current exact-unit q4", "DPK4 current exact-unit q8", "future signed-coefficient q4/q8 and section-framing variants"],
+  "measurement": {
+    "unit": "complete artifact bytes from identical in-memory numerical parameters",
+    "saving_fraction": "(DPK3 bytes - candidate bytes) / DPK3 bytes",
+    "success_rule": "At least 20% byte savings on at least 75% of dev tasks, with canonical decode, validity, downstream behavior, and legacy compatibility intact.",
+    "stricter_s2_target": "25% savings, reported separately and not used as the initial pass threshold."
+  },
+  "budget": {
+    "pilot_runs": 1,
+    "development_runs": 1,
+    "maximum_fixture_encodes": 36,
+    "wall_clock_seconds": 60,
+    "external_cost_usd": 0,
+    "gpu_hours": 0,
+    "retry_policy": "No unchanged retry. A failed run requires a recorded repair before one bounded rerun."
+  },
+  "seed_schedule": [17, 29, 43],
+  "stop_rule": "Stop after the single pilot if full-artifact savings fail the 20%/75% threshold, if either decoder is non-canonical or invalid, if any legacy fixture changes, or if the 60-second/36-encode cap is reached. Only an admitted pilot may proceed to the one development run; no automatic campaign.",
+  "results": {
+    "pilot_command": "cargo test --locked --lib preregistered_full_artifact_bitpacking_pilot -- --nocapture",
+    "pilot_exit_code": 0,
+    "priced_pilot_cost_usd": 0,
+    "fixture_execution_seconds": 0.13,
+    "cold_compile_seconds": 163,
+    "wall_clock_cap_status": "exceeded by cold compilation (60-second preregistered cap); fixture execution itself was 0.13 seconds; preserved as a protocol deviation and no retry is authorized",
+    "fixture_cases": 36,
+    "canonical_round_trip_cases": 72,
+    "savings_at_least_20_percent": "0/36",
+    "savings_at_least_25_percent": "0/36",
+    "full_artifact_bytes_by_task_width_precision": [
+      {"task":"regression","features":4,"bits":4,"baseline_dpk3":165,"candidate_dpk4":1562},
+      {"task":"regression","features":4,"bits":8,"baseline_dpk3":165,"candidate_dpk4":1572},
+      {"task":"regression","features":12,"bits":4,"baseline_dpk3":237,"candidate_dpk4":3692},
+      {"task":"regression","features":12,"bits":8,"baseline_dpk3":237,"candidate_dpk4":3723},
+      {"task":"regression","features":24,"bits":4,"baseline_dpk3":346,"candidate_dpk4":6902},
+      {"task":"regression","features":24,"bits":8,"baseline_dpk3":346,"candidate_dpk4":6963},
+      {"task":"binary","features":4,"bits":4,"baseline_dpk3":165,"candidate_dpk4":1572},
+      {"task":"binary","features":4,"bits":8,"baseline_dpk3":165,"candidate_dpk4":1582},
+      {"task":"binary","features":12,"bits":4,"baseline_dpk3":237,"candidate_dpk4":3702},
+      {"task":"binary","features":12,"bits":8,"baseline_dpk3":237,"candidate_dpk4":3733},
+      {"task":"binary","features":24,"bits":4,"baseline_dpk3":346,"candidate_dpk4":6912},
+      {"task":"binary","features":24,"bits":8,"baseline_dpk3":346,"candidate_dpk4":6973}
+    ],
+    "seed_schedule": [17,29,43],
+    "decision": "Stop after pilot under the preregistered rule. Current DPK4 candidate fails the byte target on every case and has substantial JSON-layout/framing overhead. The cold build also exceeded the 60-second wall-clock cap, recorded as a protocol deviation. The proposed signed-coefficient and section-bitpacking variants were not implemented or measured; no development study is admitted.",
+    "limitations": "Synthetic fixtures are development examples, not source/model holdouts. These results do not establish behavior on sealed or production workloads."
+  },
+  "admission": "Blocked by the failed pilot gate: no winning coefficient/section packing mechanism exists, and the measured DPK4 candidate is larger on every fixture. Preserve DPK3 as the canonical writer; do not claim a byte saving or run an unchanged retry."
+}
