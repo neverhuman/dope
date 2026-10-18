@@ -116,3 +116,18 @@ Authority rule: `super_captain` decides internal governance and GPU-schedule hol
 | **E07** first observational CPU loop | Launch the post-release observation window and collect full-duration telemetry receipts from the external feed. | `super_captain` for the window schedule; Jepson-reserved if the feed needs a new external commitment | Freeze the reduced cpu-smoke panel and partition; run the deterministic adverse-mechanism fixture on public data. The production canary window is not runnable now. |
 
 Machine-readable form: `DECISIONS.json` (proposed; see the packet's `DECISIONS_D19_PROPOSED.json`), because the ledger file is read-only and listed in `SHA256SUMS.json`.
+
+## CPU preflight tests for the blocked tasks (W01, E03–E07)
+
+Each blocked task has a deterministic CPU-only preflight class. It runs on CPU with no GPU, no sealed-label access and no external runtime. It checks that the admission path executes and fails closed when the external input is absent. A preflight pass does not unblock its task.
+
+| Task | Preflight class | Command |
+|---|---|---|
+| W01 | `TestW01CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestW01CpuPreflight -v` |
+| E03 | `TestE03CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE03CpuPreflight -v` |
+| E04 | `TestE04CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE04CpuPreflight -v` |
+| E05 | `TestE05CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE05CpuPreflight -v` |
+| E06 | `TestE06CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE06CpuPreflight -v` |
+| E07 | `TestE07CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE07CpuPreflight -v` |
+
+Status: the classes exist on `origin/feat/durable-workplan-acceptance-tests` (commit `d560468`, from the gemini lane). They are **not on this branch**, and they were **not run from this branch**. Run them after that branch lands, or cherry-pick it. Until then, the matrix above is the only record of the preflight commands.
