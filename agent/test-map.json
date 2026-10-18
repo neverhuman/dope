@@ -2373,7 +2373,7 @@
       "command": "actionlint .github/workflows/*.yml",
       "purpose": "verify thin public fork smoke script and workflow wiring"
     },
-    "contracts/tdl-contract-v2.candidate.json": {
+    "contracts/tdl-contract-v2-candidate.json": {
       "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
       "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
     },
@@ -2400,6 +2400,10 @@
     "tests/fixtures/tdl-v2/": {
       "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
       "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "ops/vendor/": {
+      "command": "cargo test --locked --test feature_boundary && cargo check --locked --offline --features gpu-training,tch/doc-only",
+      "purpose": "preserve pinned optional Torch 0.20 API and authenticated upstream runtime source while replacing vulnerable ZIP; verify archive codecs, symlink confinement and privileged permission masking without native/GPU qualification"
     }
   }
 }

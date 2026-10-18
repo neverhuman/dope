@@ -127,7 +127,7 @@ class CandidateAdmissionTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.protocol = strict_load((ROOT / "contracts/tdl-contract-v2.candidate.json").read_text())
+        cls.protocol = strict_load((ROOT / "contracts/tdl-contract-v2-candidate.json").read_text())
         cls.result = cls.fixture("candidate-result.json")
         cls.schemas = {}
         for name in ("protocol", "result"):
