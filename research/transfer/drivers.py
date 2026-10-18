@@ -15,6 +15,32 @@ import numpy as np
 from .losses import finite_number
 
 
+def positive_importances(values):
+    """Truncate noisy negative loss increases before normalizing group mass."""
+    from .tdl.common import require, vector
+    values = vector(values)
+    require(bool(values), "invalid_driver_evidence")
+    return [max(0.0, value) for value in values]
+
+
+def mass_agreement(real, other):
+    from .tdl.common import require, sum_checked
+    real, other = positive_importances(real), positive_importances(other)
+    require(len(real) == len(other), "importance_shape_mismatch")
+    rt, ot = sum_checked(real), sum_checked(other)
+    require(rt > 0.0, "degenerate_real_importance")
+    if ot == 0.0:
+        return 0.0
+    l1 = sum_checked([abs(r / rt - o / ot) for r, o in zip(real, other)])
+    return min(1.0, max(0.0, 1.0 - 0.5 * l1))
+
+
+def paired_margin(real_synthetic, real_real):
+    """D80 endpoint on matched query/group/perturbation evidence, before inference."""
+    from .tdl.common import unit
+    return unit(real_synthetic) - 0.8 * unit(real_real)
+
+
 def _columns(columns):
     columns = tuple(tuple(column) for column in columns)
     if not columns:

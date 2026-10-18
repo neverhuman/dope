@@ -28,6 +28,19 @@ def rank_agreement(real, synthetic):
 
 
 def evaluate(data):
+    version = data.get("protocol_version", "v1") if type(data) is dict else "v1"
+    if version == "v1":
+        return _evaluate_v1(data)
+    if version != "v2":
+        return failure("unsupported_driver_protocol")
+    try:
+        out = _evaluate_v2(data)
+    except (MetricError, OverflowError) as error:
+        out = failure(str(error) if isinstance(error, MetricError) else "nonfinite_or_invalid_number")
+    return {"format": "driver-result-v1", "protocol_version": "v2", **out}
+
+
+def _evaluate_v1(data):
     try:
         require(type(data) is dict)
         required = data.get("required_components", ["mass", "rank", "sign", "interaction"])
@@ -88,3 +101,100 @@ def evaluate(data):
                 "driver_pass": score >= threshold}
     except (MetricError, OverflowError) as error:
         return failure(str(error) if isinstance(error, MetricError) else "nonfinite_or_invalid_number")
+
+
+def _evaluate_v2(data):
+    """Consume evaluator-owned C02 full-family bounds, never infer from a ratio.
+
+    Components and positive floors are explicit draft inputs. Common pins bind
+    aligned real/synthetic/independent-real arms on D00 PreparedView groups.
+    Neither these diagnostics nor fixture bounds authorize a campaign release.
+    """
+    from ..drivers import mass_agreement as mass, paired_margin, positive_importances
+    missing = lambda: failure("missing_driver_component", "incomplete")
+    state = data.get("perturbation_status")
+    if state in (None, "missing"):
+        return failure("missing_perturbation", "incomplete")
+    if state in ("failed", "timed_out", "unsupported"):
+        return failure("perturbation_" + state, state)
+    require(state == "complete", "invalid_perturbation_status")
+    pins = ("query_sha256", "groups_sha256", "perturbation_sha256", "prepared_view_sha256")
+    if any(data.get(key) is None for key in pins):
+        return missing()
+    for key in pins:
+        pin = data[key]
+        require(type(pin) is str and len(pin) == 64 and all(c in "0123456789abcdef" for c in pin), "invalid_driver_pin")
+    if data.get("required_components") is None:
+        return missing()
+    required = data["required_components"]
+    require(type(required) is list and all(type(c) is str for c in required), "invalid_components")
+    require(len(set(required)) == len(required) and "mass" in required and
+            set(required) <= {"mass", "rank", "sign", "interaction"}, "invalid_components")
+    fields = ["stability_floor", "importance_floor", "synthetic_strength_floor",
+              "real_importances", "synthetic_importances", "real_control_importances"]
+    if "interaction" in required:
+        fields += ["real_interactions", "synthetic_interactions", "real_control_interactions"]
+    if "sign" in required:
+        fields += ["real_signs", "synthetic_signs", "real_control_signs"]
+    if any(data.get(key) is None for key in fields):
+        return missing()
+    stability_floor, importance_floor, strength_floor = [number(data[k]) for k in fields[:3]]
+    require(0 < stability_floor <= 1 and importance_floor > 0 and 0 < strength_floor <= 1, "invalid_driver_floor")
+    real, syn, control = [positive_importances(data[k]) for k in fields[3:6]]
+    require(len(real) == len(syn) == len(control), "importance_shape_mismatch")
+    if data.get("inference") is None:
+        return failure("missing_simultaneous_bounds", "incomplete")
+    inference = data["inference"]
+    require(type(inference) is dict, "invalid_driver_bounds")
+    if inference.get("status") != "complete":
+        return failure("incomplete_driver_inference", "incomplete")
+    require(inference.get("bound_method") == "full_family_max_t", "non_simultaneous_driver_bounds")
+    bounds = inference.get("bounds")
+    require(type(bounds) is dict, "invalid_driver_bounds")
+    components, passed, fidelity = {}, True, 1.0
+    for name in sorted(required):
+        r, s, c = ([positive_importances(data[k]) for k in fields[6:9]]
+                   if name == "interaction" else (real, syn, control))
+        require(len(r) == len(s) == len(c), "importance_shape_mismatch")
+        rt, st, ct = [sum_checked(v) for v in (r, s, c)]
+        if rt < importance_floor or ct < importance_floor:
+            return failure("degenerate_real_importance", "uninformative")
+        if name == "rank":
+            rs, rr = rank_agreement(r, s), rank_agreement(r, c)
+        elif name == "sign":
+            a, b, d = [data[k] for k in ("real_signs", "synthetic_signs", "real_control_signs")]
+            require(all(type(v) is list and len(v) == len(r) for v in (a, b, d)), "sign_shape_mismatch")
+            require(all(type(v) is int and v in (-1, 0, 1) for v in a + b + d), "invalid_sign")
+            active = [i for i in range(len(r)) if a[i] != 0 and r[i] > 0]
+            if not active:
+                return failure("no_stable_direction", "uninformative")
+            def agreement(signs, imp):
+                return sum(a[i] == signs[i] and imp[i] > 0 for i in active) / len(active)
+            rs, rr = agreement(b, s), agreement(d, c)
+        else:
+            rs, rr = mass(r, s), mass(r, c)
+        if rr < stability_floor:
+            return failure("unstable_real_drivers", "uninformative")
+        margin = paired_margin(rs, rr)
+        endpoints = {"margin": margin, "stability": rr, "real_strength": rt,
+                     "control_strength": ct, "synthetic_strength": number(st / rt)}
+        lcbs = {}
+        for endpoint, estimate in endpoints.items():
+            coordinate = name + "." + endpoint
+            if coordinate not in bounds:
+                return failure("missing_simultaneous_bounds", "incomplete")
+            bound = bounds[coordinate]
+            require(type(bound) is dict, "invalid_driver_bounds")
+            require(abs(number(bound.get("estimate")) - estimate) <= 1e-12, "driver_bound_estimate_mismatch")
+            lower = number(bound.get("lower"))
+            require(lower <= estimate + 1e-12, "invalid_driver_bounds")
+            lcbs[endpoint] = lower
+        passed &= (lcbs["margin"] >= 0 and lcbs["stability"] >= stability_floor and
+                   lcbs["real_strength"] >= importance_floor and lcbs["control_strength"] >= importance_floor and
+                   lcbs["synthetic_strength"] >= strength_floor)
+        ratio = min(1.0, max(0.0, rs / rr))
+        fidelity = min(fidelity, ratio)
+        components[name] = {"a_rs": rs, "a_rr": rr, "margin": margin,
+                            "descriptive_ratio": ratio, "lcbs": lcbs}
+    return {"status": "complete", "reason": None, "components": components,
+            "driver_fidelity": fidelity, "driver_pass": bool(passed)}

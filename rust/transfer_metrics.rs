@@ -4,7 +4,7 @@
 //! Query losses are evaluator-private. Neither a score nor these diagnostics
 //! authorize release. Bytes remain an independent feasibility constraint.
 
-pub mod frontier;
+pub mod drivers;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MetricError {
