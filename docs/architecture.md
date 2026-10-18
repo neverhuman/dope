@@ -42,3 +42,45 @@ verification. `production/kpi-contract-v3.json` pre-registers MFS-v3 and
 compactness score), superseded by `contracts/tdl-contract-v1.json`. A v3 or v4
 scalar stays null until its components and hard gates are measured. Neither
 legacy receipts nor V1 Python output acquire an L3 label.
+
+## Unified-spec authority and incremental extraction
+
+Rust owns product decoding, compilation, metric admission and release decisions.
+`rust/lib.rs` retains the public exports; the existing compiler and codec facade
+paths remain stable. `rust/metrics/` and `rust/transfer_metrics.rs` are the current
+metric boundary, with fixture parity against `research/transfer/tdl/`.
+Extraction keeps one implementation and the existing call sites. The development
+interaction helper's fold-fitting functions live in
+`rust/compiler/interactions/support_fit.rs`, included at their original position
+in `rust/compiler/interactions.rs` with the same privacy, arithmetic and order.
+This helper remains a term-tariff diagnostic; it does not rank production tiers.
+Its extraction does not alter production candidate hash inputs. Changes to a
+production source closure must include every new section in its lineage hash.
+
+`contracts/tdl-contract-v1.json` and its schema remain immutable historical
+inputs. `contracts/tdl-contract-v2-candidate.json` is an unfrozen successor:
+`status=candidate`, `protocol_frozen=false`, `certified=false`. Its protocol and
+result schemas are `schemas/tdl-protocol-v1.schema.json` and
+`schemas/tdl-result-v1.schema.json`. Unresolved calibration and multiplicity
+parameters remain null. Artifact qualification, scheduled cells, campaign
+completeness, empirical privacy, formal DP, release authorization and claim
+provenance are independent state axes; fixture success does not freeze them.
+
+Python adapters under `research/transfer/adapters/` are bounded evidence workers.
+Their locked runtime and model admission cannot grant Rust certification.
+`research/transfer/frontier.py` retains historical family-coverage diagnostics;
+its `evaluate` entry is a direct alias of `research/transfer/tdl/frontier.py`.
+The diagnostic coverage and censoring states do not replace TDL receipt states.
+The Python component oracle is checked against Rust through shared goldens;
+it is not a second source of product metric semantics.
+
+The proposed `packages/protocol/` surface is for generated TypeScript types
+from the versioned schemas. It has no independent scorer or release authority.
+`src/dope_kernel/` remains the bounded V1 compatibility boundary. DPK3.2 and
+historical v1 receipt decoding continue through their existing readers.
+
+Ownership and proof routing use `agent/owner-map.json` and `agent/test-map.json`.
+The existing `rust/` route covers the included fitting section as `rust-core`
+with `just check`; the historical frontier paths already have exact test routes.
+Custody worktrees and ignored evidence are inventoried read-only under `target/`.
+Extraction never implies permission to clean, relocate or discard those assets.
