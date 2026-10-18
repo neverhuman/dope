@@ -169,6 +169,37 @@ mod tests {
         );
     }
 
+    #[test]
+    fn progressive_packets_accept_only_complete_advertised_boundaries() {
+        let packet = encode_kernel(&kernel()).unwrap();
+        let (envelope, boundaries) = encode_progressive_packets(&[packet.clone(), packet]).unwrap();
+        assert_eq!(boundaries.len(), 2);
+        assert_eq!(boundaries[1].charged_bytes, envelope.len());
+        assert_eq!(
+            decode_progressive_prefix(&envelope[..boundaries[0].end_offset], 1)
+                .unwrap()
+                .len(),
+            1
+        );
+        assert_eq!(decode_progressive_prefix(&envelope, 2).unwrap().len(), 2);
+        assert!(decode_progressive_prefix(&envelope[..boundaries[0].end_offset + 1], 1).is_err());
+        assert!(decode_progressive_prefix(&envelope, 0).is_err());
+        assert!(decode_progressive_prefix(&envelope, 3).is_err());
+    }
+
+    #[test]
+    fn progressive_packets_reject_truncation_corruption_and_oversize_lengths() {
+        let packet = encode_kernel(&kernel()).unwrap();
+        let (envelope, boundaries) = encode_progressive_packets(&[packet]).unwrap();
+        assert!(decode_progressive_prefix(&envelope[..boundaries[0].end_offset - 1], 1).is_err());
+        let mut corrupt = envelope.clone();
+        *corrupt.last_mut().unwrap() ^= 1;
+        assert!(decode_progressive_prefix(&corrupt, 1).is_err());
+        let mut oversized = envelope;
+        oversized[8..16].copy_from_slice(&((MAX_ARTIFACT_BYTES as u64) + 1).to_le_bytes());
+        assert!(decode_progressive_prefix(&oversized, 1).is_err());
+    }
+
     proptest! {
         #[test]
         fn encoded_section_totals_and_roundtrip_hold_for_valid_parameters(
