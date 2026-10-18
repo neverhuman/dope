@@ -8,7 +8,7 @@ export CARGO_NET_RETRY=0
 for entry in root:Cargo.toml tool:ops/merge_guard/Cargo.toml; do
   label=${entry%%:*}
   manifest=${entry#*:}
-  if timeout --signal=KILL 120s cargo metadata --locked --manifest-path "$manifest" --format-version 1 \
+  if timeout --signal=KILL 120s cargo metadata --locked --all-features --manifest-path "$manifest" --format-version 1 \
     > "$metadata_dir/$label.json" 2> "$metadata_dir/$label.stderr"; then
     test -s "$metadata_dir/$label.json"
   else

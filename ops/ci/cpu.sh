@@ -14,9 +14,9 @@ bash ops/ci/check-budgets.sh
 bash ops/ci/check-contracts.sh
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
+bash ops/ci/prepare-merge-guard.sh
 cargo test --locked
 cargo run --locked --offline --bin dope-native-notices -- --check
-bash ops/ci/prepare-merge-guard.sh
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
 cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
