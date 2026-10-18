@@ -219,3 +219,29 @@ are not substitutes for a native external runtime or native-objective parity.
 DP AIM/MST remain in a separate matched privacy track. Large native states and
 methods with 40 MB or larger exports stay visible in results and rate grids; they
 are not silently omitted because they miss a small byte rung.
+
+## 7. E03 observational and adverse-mechanism pilot (blocked before launch)
+
+The frozen pilot design is in
+[`research/transfer/manifests/e03-pilot.json`](../research/transfer/manifests/e03-pilot.json).
+It specifies one observational task and one adverse mechanism task, DOPE and the
+Gaussian-copula reference at two budgets, plus compressed real rows as a non-generator
+reference. Required traces cover prepare, compile, reload, source-free sampling,
+real/null/synthetic model evaluation, driver analysis, Rust receipt, and report. The
+manifest's native launch command remains null and execution is unauthorized.
+
+No run is admitted: `manifests/datasets.json` leaves candidate source rights and
+contamination review pending, while `locks/comparators.json` records external runtimes
+as unresolved and portable controls as unqualified references. Source ownership and
+collision review, a protected-owner admission, concrete resource budget, and W03 modern
+panel/scheduler admission are also absent. E07's earlier CPU smoke is a separate evidence
+scope and does not satisfy E03. No native work was launched and no observational,
+privacy, driver, or cost result is claimed.
+
+Quick-12/three-budget/one-fit cost remains unestimated until an admitted smoke provides
+observed runtime and uncertainty, driver, and privacy accounting. The suggested next
+smoke is three tasks, two budgets, and two models. Private per-query receipts and public
+redacted aggregates remain separate requirements. Ordinary fixtures are locked as the
+manifest preflight command; they cannot clear the external admission gates. The pilot
+must stop on inadequate references, weak attack power, a critical rare slice, unresolved
+identity, unbounded cost, or any unqualified required model.
