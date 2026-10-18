@@ -120,7 +120,7 @@ needs compute, licenses or owner decisions.
   - A figure never mixes cohorts without a prominent disclosure.
 - **Sealed test.** Opened once, through a frozen release manifest (FOLLOW-SEAL, D-08).
 
-### 4.1 Source-balanced roster plan (E00)
+### Source-balanced roster plan (E00)
 
 `research/transfer/manifests/datasets.json` is a planning denominator, not an
 acquisition receipt. Its 116 rows are target slots: Quick-12 (12), Open-60 (60),
@@ -180,7 +180,77 @@ roster enlargement. The present files contain no quotes or measured pilot
 variance, so Quick-12/Open-60/Sealed-24 are targets only and no campaign is
 authorized by this plan.
 
-## 5. Where the operational detail lives
+### Source admission (D02; development metadata only)
+
+[`source-manifest-v1.schema.json`](../schemas/source-manifest-v1.schema.json) is a
+closed Draft 2020-12 schema for **private** source mappings. It requires acquisition
+URI/method, source version/content SHA-256, license and reviewed rights, target and
+prediction-time definitions, group/site/entity/time hierarchy, feature availability,
+and corpus-overlap lineage for each exact foundation checkpoint (including Kumo and
+TabICL). `known_none` and `overlapping` require corpus/review identities; `unknown`
+and `overlapping` carry explicit caveats. Unknown contamination never becomes clean.
+
+`research.transfer.lineage.admit_source_manifest(manifest, registry, signing_key=key)`
+checks the schema and registry grants before returning a public projection. The
+declared split must be `entity_then_time_then_fit`, with operations `entity`, `time`,
+`fit_transforms` in that order and transforms fitted only on `train`. Canonical
+parent families (including aliases and derivatives), and identical content, cannot
+span `train`/`eval` cohorts. Features available after prediction time, target-as-input,
+unresolved acquisition/training rights, and unapproved redistribution are refused.
+An explicit `owner_only_custody` or `prohibited` redistribution status permits only
+owner use; it grants no redistribution right. Absent group/site levels are explicit
+nulls; entity/time definitions are mandatory.
+
+Keep private manifests and a random custody key of at least 32 bytes outside public
+artifacts. The returned allowlisted projection contains keyed opaque identities,
+rights dispositions and checkpoint overlap states, with a domain-separated
+`hmac-sha256-custody-v1` signature. `verify_source_projection` authenticates it using
+the custody key; this is a MAC, not a publicly verifiable signature. Headers, cells,
+extrema, URIs, timestamps, private paths and unkeyed source hashes are never copied.
+Unknown/overlapping checkpoints produce `development_only_caveated` admission.
+
+The compatibility inventory in `research/transfer/registries/sources.json` remains
+unfrozen with unknown rights; it supplies no admitted TDL source. These checks validate
+owner assertions, not source bytes, legal clearance or actual transform execution.
+**D18 custody HOLD remains unresolved**: every projection fixes
+`confirmation_allowed=false` and `sealed_source_claims=false`. No sealed source is
+opened, reconstructed, or qualified by this manifest or its signature.
+
+## 6. Separate public observational example
+
+[`examples/public-regression/bikeshare-observational/`](../examples/public-regression/bikeshare-observational/)
+is a limited real source-system holdout for hourly public-bike rental counts.
+It fits the DOPE generator on Capital Bikeshare Washington 2011 and confirms on
+time-held-out rows from the Seoul Bike Sharing System. UCI declares both sources
+CC BY 4.0 ([Capital Bikeshare](https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset),
+[Seoul Bike Sharing](https://archive.ics.uci.edu/dataset/560/seoul%2Bbike%2Bsharing%2Bdemand));
+the example preserves attribution and exact archive/member hashes in its
+source manifest. The source entities are whole service dates. The target is
+observed system-wide bikes rented per active hour, not a person-level outcome.
+
+The frozen protocol compares a real-trained Ridge reference and mean null with
+four synthetic-trained Ridge arms: two complete-artifact byte caps (16 and 32
+KiB) crossed with `n` and `4n`. The same unseen Seoul test dates feed the TDL
+transfer and aggregate reducers; a feature-permutation driver diagnostic also
+uses those dates. The 2018 source holdout is real, but both datasets come from
+the same UCI curator, so independent-curator confirmation is absent.
+
+Observed run (seed 1729): Washington fit/selection used 6,466/2,179 rows;
+Seoul fit/selection/test used 4,224/1,704/2,537 active rows after excluding
+295 non-operating hours. Real-reference MSE was 273,592.23 bikes²/hour and the
+mean null MSE was 576,024.24; the service-date cluster-bootstrap lower bound
+for real gain was 255,243.09. Every synthetic arm had negative raw transfer
+(−1.019 at `n`, −1.013 at `4n`) and a driver fidelity diagnostic of 0.625.
+All four artifacts were 2,244 bytes, so neither cap changed the selected
+artifact. The source holdout did not support transfer utility. Runtime was
+36.9 seconds with a 472,883,200-byte process RSS upper bound on two assigned
+CPUs. The measured panel is one generator, one auditor and one seed; it does
+not qualify TDL, privacy, the modern panel, or healthcare inference.
+
+Reproduce using the source recipe and command in the example README. Raw
+archives and reports stay under `target/`; no dataset bytes are committed.
+
+## 7. Where the operational detail lives
 
 The benchmark tooling overview is in
 [`research/benchmark/README.md`](../research/benchmark/README.md). The dated campaign

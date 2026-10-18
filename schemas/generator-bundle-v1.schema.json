@@ -36,7 +36,7 @@
       }
     },
     "amortization_count": {
-      "description": "Consumers used only for the separately reported shared learned-state amortization. Cold closure always charges the complete state.",
+      "description": "Historical v1 estimate parameter for separately reported shared learned-state amortization, not authority to discount recipient-required state. Cold closure always charges the complete state.",
       "type": "integer",
       "minimum": 1,
       "maximum": 1000000

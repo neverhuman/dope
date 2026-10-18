@@ -4,6 +4,8 @@
 //! Query losses are evaluator-private. Neither a score nor these diagnostics
 //! authorize release. Bytes remain an independent feasibility constraint.
 
+pub mod drivers;
+pub mod frontier;
 pub mod inference;
 
 #[derive(Clone, Copy, Debug, PartialEq)]

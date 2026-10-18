@@ -196,6 +196,8 @@ pub fn convert_release(
             missing_auditors.join(",")
         )));
     }
+    // No trusted evidence/rights-owner adapter is installed in this CLI path.
+    // Certification or compact artifacts cannot supply those independent axes.
     let release_view = profile::ReleaseProfile::default().view(
         profile::ReleaseSurface::Export,
         options.compile_options.release_policy.require_formal_dp,
