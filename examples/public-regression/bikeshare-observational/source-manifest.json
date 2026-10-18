@@ -1,0 +1,43 @@
+{
+  "format": "dope-public-observation-source-v1",
+  "redistribution": "source archives are acquired by the user and not committed",
+  "sources": [
+    {
+      "id": "capital_bikeshare",
+      "uci_dataset_id": 275,
+      "uri": "https://archive.ics.uci.edu/static/public/275/bike%2Bsharing%2Bdataset.zip",
+      "metadata_uri": "https://archive.ics.uci.edu/dataset/275/bike%2Bsharing%2Bdataset",
+      "doi": "10.24432/C5W894",
+      "citation": "Fanaee-T, H. (2013). Bike Sharing [Dataset]. UCI Machine Learning Repository.",
+      "license": "CC-BY-4.0",
+      "rights_review": "UCI dataset page declares CC BY 4.0; attribution is retained here.",
+      "operational_population": "hourly aggregate rental counts in the Capital Bikeshare system, Washington DC",
+      "observation_period": "2011-01 through 2011-12 for fit and selection; 2012 excluded",
+      "archive_sha256": "b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401",
+      "archive_bytes": 279992,
+      "member": "hour.csv",
+      "member_bytes": 1156736,
+      "member_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f"
+    },
+    {
+      "id": "seoul_bikeshare",
+      "uci_dataset_id": 560,
+      "uri": "https://archive.ics.uci.edu/static/public/560/seoul%2Bbike%2Bsharing%2Bdemand.zip",
+      "metadata_uri": "https://archive.ics.uci.edu/dataset/560/seoul%2Bbike%2Bsharing%2Bdemand",
+      "doi": "10.24432/C5F62R",
+      "citation": "Seoul Bike Sharing Demand [Dataset]. (2020). UCI Machine Learning Repository.",
+      "license": "CC-BY-4.0",
+      "rights_review": "UCI dataset page declares CC BY 4.0; attribution is retained here.",
+      "operational_population": "hourly aggregate public-bike rental counts in the Seoul Bike Sharing System",
+      "observation_period": "2017-12 through 2018-11; date entities split chronologically",
+      "archive_sha256": "139e9908f0a3544bb222386855c9ce107e96467306bb8e4ce936aab59e7baac4",
+      "archive_bytes": 604298,
+      "member": "SeoulBikeData.csv",
+      "member_bytes": 604166,
+      "member_sha256": "373339b71a8935d69e9af0abf26a70744632119862eeb3919efb389a7b749c60"
+    }
+  ],
+  "source_holdout_meaning": "different bike-share operating systems; both datasets are curated by UCI, so this is not an independent-curator replication",
+  "person_level_data": false,
+  "healthcare_data": false
+}
