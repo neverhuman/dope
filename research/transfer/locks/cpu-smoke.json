@@ -1,0 +1,75 @@
+{
+  "format": "dope-cpu-smoke-lock-v1",
+  "qualification_scope": "cpu_smoke_only",
+  "foundation_model_qualified": false,
+  "gpu_panel_qualified": false,
+  "tdl_panel_qualified": false,
+  "python": "3.12.3",
+  "platform": "Linux",
+  "precision": "float64",
+  "native_precision": "float64 external arrays/results; sklearn CART computes feature splits internally in float32",
+  "dependencies": {
+    "numpy": "1.26.4",
+    "scipy": "1.16.3",
+    "scikit-learn": "1.7.2",
+    "joblib": "1.3.2",
+    "threadpoolctl": "3.6.0"
+  },
+  "seeds": [1729],
+  "n_jobs": 1,
+  "threadpool_limit": 1,
+  "thread_policy": "n_jobs=1 where supported; all fit/predict calls inside threadpoolctl(limits=1)",
+  "max_train_rows": 256,
+  "max_query_rows": 64,
+  "max_columns": 16,
+  "resources": {"wall_seconds": 30.0, "memory_bytes": 2147483648, "gpu_bytes": 0},
+  "memory_measurement": "Linux process ru_maxrss upper bound including runtime/imports/prior calls, not per-fit allocation",
+  "count_fields": ["requested_rows", "produced_rows", "provided_rows", "consumed_rows"],
+  "context_policy": "all rows passed once to native fit; no truncation or subsampling; counts refer to training context, not query rows",
+  "query_policy": "feature-only batch in provided order; no query-dependent fitting",
+  "execution_lifecycle": "stateless explicit train fit then predict per invocation; executor must charge one training fit per invocation; no additional fit or target calibration",
+  "preprocessing": "finite prepared numeric features only; StandardScaler and optional univariate spline basis fit on training features only; target original units",
+  "probability_clip": 1e-12,
+  "calibration": "identity temperature 1; native probabilities clipped then normalized in float64; no label-fitted calibration",
+  "class_order": {
+    "regression": [],
+    "binary": ["f1a5aa7c0a965ce38a0c2f381f4b5170d263dca1357c5d45725dd513726d19a5", "cbfd6ebcaa4df6e820f05bc767c38820bbda061b85c740c31ea22a66bf2f0dc3"],
+    "multiclass": ["f1a5aa7c0a965ce38a0c2f381f4b5170d263dca1357c5d45725dd513726d19a5", "cbfd6ebcaa4df6e820f05bc767c38820bbda061b85c740c31ea22a66bf2f0dc3", "66b04abcc4a55e30d91c2d51315e3dac4dbd5b353850792c2c3c8755f68e2af7"]
+  },
+  "label_codes": "dense integers 0..K-1 in the declared opaque class order; every class must be observed",
+  "spline": {"n_knots": 3, "degree": 2, "knots": "uniform", "extrapolation": "linear", "include_bias": false, "order": "C", "sparse_output": false},
+  "estimators": {
+    "logistic_l2": {
+      "family": "linear diagnostic",
+      "native": "sklearn.linear_model.LogisticRegression",
+      "task_grids": {
+        "binary": [{"penalty": "l2", "C": 1.0, "solver": "lbfgs", "tol": 1e-9, "max_iter": 200}],
+        "multiclass": [{"penalty": "l2", "C": 1.0, "solver": "lbfgs", "tol": 1e-9, "max_iter": 200}]
+      }
+    },
+    "ridge": {
+      "family": "linear diagnostic",
+      "native": "sklearn.linear_model.Ridge",
+      "task_grids": {"regression": [{"alpha": 1.0, "solver": "cholesky", "tol": 1e-9}]}
+    },
+    "decision_tree": {
+      "family": "independent CART tree",
+      "native": "sklearn.tree.DecisionTreeClassifier/DecisionTreeRegressor",
+      "task_grids": {
+        "binary": [{"criterion": "gini", "splitter": "best", "max_depth": 3, "min_samples_leaf": 2}],
+        "multiclass": [{"criterion": "gini", "splitter": "best", "max_depth": 3, "min_samples_leaf": 2}],
+        "regression": [{"criterion": "squared_error", "splitter": "best", "max_depth": 3, "min_samples_leaf": 2}]
+      }
+    },
+    "additive_spline_surrogate": {
+      "family": "transparent additive main-effects spline surrogate; not EBM",
+      "native": "sklearn.preprocessing.SplineTransformer + StandardScaler + LogisticRegression/Ridge",
+      "task_grids": {
+        "binary": [{"penalty": "l2", "C": 1.0, "solver": "lbfgs", "tol": 1e-9, "max_iter": 200}],
+        "multiclass": [{"penalty": "l2", "C": 1.0, "solver": "lbfgs", "tol": 1e-9, "max_iter": 200}],
+        "regression": [{"alpha": 1.0, "solver": "cholesky", "tol": 1e-9}]
+      }
+    }
+  },
+  "admission": "simulated/public tiny CPU parity only; W00 owns wire/buffer/schema admission and isolated execution; D02 owns source provenance/rights; no external checkpoints or paid compute"
+}
