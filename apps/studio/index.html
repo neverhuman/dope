@@ -101,7 +101,8 @@ async function openFile(file) {
     const fileHash = [...new Uint8Array(digest)].map(x => x.toString(16).padStart(2, '0')).join('');
     render(data, file, fileHash); status.textContent = `Loaded ${file.name} locally.`; retry.hidden = true;
   } catch (error) {
-    review.hidden = true; status.textContent = `Could not open evidence: ${error.message}`; retry.hidden = false;
+    const message = error && (error.message === "File exceeds the 10 MB viewer limit." || error.message === "Expected a JSON object.") ? error.message : "Invalid or unreadable JSON receipt.";
+    review.hidden = true; status.textContent = "Could not open evidence: " + message; retry.hidden = false;
   }
 }
 input.addEventListener('change', () => openFile(input.files[0]));
