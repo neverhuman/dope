@@ -11,5 +11,8 @@ include!("compiler/target_preparation.rs");
 
 pub mod interactions;
 
+#[cfg(test)]
+pub(crate) mod repro_tests;
+
 #[cfg(all(test, feature = "gpu-training"))]
 mod gpu_readout_tests;
