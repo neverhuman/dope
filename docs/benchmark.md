@@ -188,3 +188,34 @@ diary moved out of that file is in
 [`docs/archive/benchmark-operations.md`](archive/benchmark-operations.md). The README
 material that described MFS-v4, the artifact format and the full command catalog is in
 [`docs/archive/mfs-history.md`](archive/mfs-history.md).
+
+## 6. Comparator execution contract (E01)
+
+`research/transfer/locks/comparators.json` records the method inventory and the
+external-runtime dispositions. The portable controls are development-only numeric
+reference controls; they are not claims that ARF, synthpop, TabSyn, TabDiff,
+TabDDPM, ForestDiffusion, CTGAN or TVAE have executed. Those external entries stay
+unresolved until an exact source/license/runtime pin and native parity receipt exist.
+The existing neural lock preserves the pinned TabSyn, TabDiff and TabDDPM source
+revisions and licenses; it does not qualify their runtime.
+
+Portable artifacts use the versioned canonical JSON closure in
+`research.transfer.adapters.generators.comparators`: the manifest, payload digest,
+codec and decoder identity are included in the charged artifact bytes. Native,
+float32, float16 and int8/pruned encodings use this same closure. A byte-infeasible
+artifact is a terminal disposition. `protocol_pin` binds release scope, development
+split, auditor/model, loss and byte cap. `ComputeSchedule` divides one total
+fit/selection budget and rejects mismatched totals. Native defaults, equal-total
+fit/selection compute and rate-constrained artifacts remain separate comparison
+tracks; no track borrows budget from another.
+
+`compressed_full_source` and `real_row_copy` are nonrelease controls. They retain
+real development rows and cannot be sampled through the release API. The selected,
+random, stratified, farthest-first coreset and prototype controls use only the
+provided development rows. Any LAD/data-line diagnostic must use a development-only
+selector; it does not open the sealed test. The portable numeric reference controls
+are not substitutes for a native external runtime or native-objective parity.
+
+DP AIM/MST remain in a separate matched privacy track. Large native states and
+methods with 40 MB or larger exports stay visible in results and rate grids; they
+are not silently omitted because they miss a small byte rung.

@@ -1,0 +1,37 @@
+{
+  "format": "dope-comparator-lock-v1",
+  "version": 1,
+  "portable_controls": {
+    "runtime": "research.transfer.adapters.generators.comparators",
+    "artifact": "canonical JSON with embedded decoder identity and payload hash; zlib only for compressed_full_source",
+    "rungs": ["native", "float32", "float16", "int8_pruned"],
+    "method_status": "reference_control_only; no scientific qualification implied",
+    "methods": [
+      {"name":"marginal","scope":"independent empirical univariate marginals"},
+      {"name":"targetprior","scope":"development target prior marginal"},
+      {"name":"copula","scope":"empirical rank-marginal reference; not an external copula package"},
+      {"name":"chow_liu","scope":"pairwise reference control; external Chow-Liu implementation not admitted"},
+      {"name":"predictor_independent_x","scope":"independent-X predictor control"},
+      {"name":"predictor_dependent_x","scope":"dependent-X predictor control"},
+      {"name":"selected_rows","scope":"development-only selected row subset"},
+      {"name":"random_rows","scope":"development-only random row subset"},
+      {"name":"stratified_rows","scope":"development-only target-stratified row subset"},
+      {"name":"compressed_full_source","scope":"exact development table compressed as a size/adversary reference; nonrelease"},
+      {"name":"real_row_copy","scope":"development row-copy adversary; nonrelease"},
+      {"name":"strong_coreset","scope":"development-only farthest-first scaled Euclidean subset"},
+      {"name":"prototypes","scope":"development-only farthest-first cluster means"}
+    ],
+    "protocol": "same release-scope, development split, auditor/model, loss and actual serialized artifact-byte limit are bound by protocol_pin; compute schedule charges fit and selection against one total budget",
+    "privacy": "no formal privacy claim; real-row controls are never release eligible"
+  },
+  "external_runtimes": {
+    "arf": {"source":"https://github.com/bips-hb/arfpy", "license":"unresolved pending pinned root license text", "runtime":"official package not installed or parity-tested", "status":"unresolved"},
+    "synthpop": {"source":"https://cran.r-project.org/package=synthpop", "license":"GPL-2 | GPL-3", "runtime":"official R package; offline pinned runtime and parity evidence pending", "status":"unresolved"},
+    "tabsyn": {"source":"https://github.com/amazon-science/tabsyn", "license":"Apache-2.0 per existing neural lock", "runtime":"official runtime; execution and adapter parity pending", "status":"unresolved"},
+    "tabdiff": {"source":"https://github.com/MinkaiXu/TabDiff", "license":"MIT per existing neural lock", "runtime":"official runtime; execution and adapter parity pending", "status":"unresolved"},
+    "tabddpm": {"source":"https://github.com/rotot0/tab-ddpm", "license":"MIT per existing neural lock", "runtime":"official runtime; execution and adapter parity pending", "status":"unresolved"},
+    "forest_diffusion": {"source":"https://github.com/SamsungSAILMontreal/ForestDiffusion", "license":"unresolved for pinned package scope", "runtime":"official runtime and license scope unresolved", "status":"unresolved"},
+    "ctgan_tvae": {"source":"https://github.com/sdv-dev/CTGAN", "license":"Business Source License; compatibility unresolved", "runtime":"official SDV runtime; permission and parity unresolved", "status":"unresolved"}
+  },
+  "privacy_track": "DP AIM/MST are excluded from the utility comparator cohort and require a separate matched privacy budget, mechanism, and accounting contract"
+}
