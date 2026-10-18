@@ -21,6 +21,8 @@ import declared_facts  # noqa: E402
 from figure_spec import TEASER_X_LIM  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
 HEADLINE = REPO / "docs" / "whitepaper" / "generated" / "v2-headline.json"
 README = REPO / "README.md"
 PNGS = (REPO / "docs" / "readme" / "pareto.png", REPO / "docs" / "readme" / "paired.png")
@@ -71,42 +73,16 @@ def load_facts(headline: dict) -> dict:
     return panel_facts(headline, json.loads(PREDECLARE.read_text()), json.loads(CONTRACT.read_text()))
 
 
-V2_PANEL = REPO / "research" / "benchmark" / "results" / "review-fixes-v2" / "panel.json"
-MFS_PANEL = REPO / "research" / "benchmark" / "results" / "mfs-v3-density-panel.json"
-
-
-def _load_extra_tables() -> tuple[dict, dict, dict]:
+def _load_classical_table() -> dict[tuple[str, str], dict[str, dict]]:
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from tools.claims import foundation as _fnd
+    v2, _ = _fnd.authenticate_source(_fnd.V2_PANEL_REL, root=REPO)
     classical: dict[tuple[str, str], dict[str, dict]] = {}
-    if V2_PANEL.is_file():
-        v2 = json.loads(V2_PANEL.read_text())
-        for row in v2.get("levels", ()):
-            if row.get("size") == 4:
-                classical.setdefault((row["method"], row["configuration"]), {})[row["auditor"]] = row
-    tfm: dict[str, dict] = {}
-    driver: dict[str, tuple[float, float, float, int]] = {}
-    if MFS_PANEL.is_file():
-        mfs = json.loads(MFS_PANEL.read_text())
-        tfm = mfs.get("retention_summary", {})
-        by_m: dict[str, list[float]] = {}
-        for lin in mfs.get("lineages", ()):
-            vals = sorted(
-                float(s["holdout"]["driver_fidelity"])
-                for s in lin.get("seeds", ())
-                if isinstance(s.get("holdout", {}).get("driver_fidelity"), (int, float))
-            )
-            if vals:
-                mid = len(vals) // 2
-                med = vals[mid] if len(vals) % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
-                by_m.setdefault(lin["method"], []).append(med)
-        for m, vals in by_m.items():
-            vals.sort()
-            n = len(vals)
-            mid = n // 2
-            med = vals[mid] if n % 2 == 1 else 0.5 * (vals[mid - 1] + vals[mid])
-            q1 = vals[max(0, int(round(0.25 * (n - 1))))]
-            q3 = vals[min(n - 1, int(round(0.75 * (n - 1))))]
-            driver[m] = (med, q1, q3, n)
-    return classical, tfm, driver
+    for row in v2.get("levels", ()):
+        if row.get("size") == 4:
+            classical.setdefault((row["method"], row["configuration"]), {})[row["auditor"]] = row
+    return classical
 
 
 def benchmark_block(headline: dict, facts: dict | None = None) -> str:
@@ -114,7 +90,12 @@ def benchmark_block(headline: dict, facts: dict | None = None) -> str:
     cap = f"{facts['cap']:,}"
     arms = {arm["code"]: arm for arm in headline["arms"]}
     dope = arms["Dope"]
-    classical, tfm, driver = _load_extra_tables()
+    classical = _load_classical_table()
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from tools.claims import foundation as _fnd
+    f_summary = _fnd.load_foundation_summary(REPO)
+    f_rows = _fnd.foundation_table_rows(f_summary)
     key = (headline["strongest"]["method"], headline["strongest"]["configuration"])
     strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
     others = [arm["bytes"]["median"] for arm in headline["arms"]
@@ -123,15 +104,16 @@ def benchmark_block(headline: dict, facts: dict | None = None) -> str:
     lines = [
         "![Multi-model retention at synthetic size 4n against median charged artifact bytes on a log axis, "
         "and cross-architecture transfer across zero-shot tabular foundation models (NVIDIA Kumo-L, TabICLv2, Mitra-v2), "
-        f"classical learners, and feature driver fidelity. DOPE's median artifact is {size(dope['bytes']['median'])}; "
+        f"classical learners, and historical feature-target correlation proxy (cross-model feature-driver preservation: not yet measured). DOPE's median artifact is {size(dope['bytes']['median'])}; "
         f"the other generators' medians run from {size(min(others))} to {size(max(others))}.](docs/readme/pareto.png)",
         "",
         f"Validation panel: {facts['panel']} PMLB regression tables across three task-trained model families "
-        "(CatBoost, Linear, Neural MLP) and three zero-shot tabular foundation models "
-        "(NVIDIA Kumo Tabular Large, TabICLv2, AutoGluon Mitra-v2), synthetic size 4n. "
+        "(CatBoost, Linear, Neural MLP), synthetic size 4n. "
         f"DOPE uses {facts['fit_seeds']} fit seeds; intervals are {facts['level']}% nested bootstrap intervals "
         "(simulated-family clusters, then lineages, then fit seeds). "
-        "The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann).",
+        "The difference column is DOPE minus the method on shared lineages (Hodges–Lehmann). "
+        "The zero-shot tabular foundation-model block below is a separate 97-lineage matched historical cohort "
+        "(fit seed 11; sample seeds 101, 211, 307; lineage-level bootstrap intervals).",
         "",
         "#### 1. Multi-Model Task-Trained Transfer & Charged Artifact Bytes (Synthetic Size `4n`)",
         "",
@@ -162,32 +144,34 @@ def benchmark_block(headline: dict, facts: dict | None = None) -> str:
             f"| {name} | {level['n']} | {cb_cell} | {lin_cell} | {mlp_cell} | {diff} | {wtl} | {artifact} | {within} |"
         )
 
-    if tfm:
-        lines += [
-            "",
-            "#### 2. Zero-Shot Tabular Foundation Models (TFM) & Holdout Feature Driver Fidelity",
-            "",
-            "| Method | Lineages | NVIDIA Kumo Large (`kumo_tabular_l`) | TabICLv2 (`tabicl2`) | AutoGluon Mitra-v2 (`mitra_v2`) | Holdout Feature Driver Fidelity | Median artifact |",
-            "| --- | ---: | --- | --- | --- | --- | ---: |",
-        ]
-        tfm_arms = (
-            ("DOPE", "**DOPE (ours)**", arms["Dope"]["bytes"]),
-            ("GaussianCopula", "Gaussian copula", arms["Gauss"]["bytes"]),
-            ("Chow-Liu", "Chow-Liu tree", arms["Chow"]["bytes"]),
-            ("independent_marginals", "Independent marginals", arms["Ind"]["bytes"]),
-        )
-        for m_key, m_disp, b_stats in tfm_arms:
-            k_row = tfm.get("kumo_tabular_l", {}).get("methods", {}).get(m_key)
-            t_row = tfm.get("tabicl2", {}).get("methods", {}).get(m_key)
-            m_row = tfm.get("mitra_v2", {}).get("methods", {}).get(m_key)
-            d_row = driver.get(m_key)
-            n_val = k_row["n"] if k_row else "—"
-            k_cell = "—" if not k_row else f"{fmt(k_row['median'])} [{fmt(k_row['lo'])}, {fmt(k_row['hi'])}]"
-            t_cell = "—" if not t_row else f"{fmt(t_row['median'])} [{fmt(t_row['lo'])}, {fmt(t_row['hi'])}]"
-            m_cell = "—" if not m_row else f"{fmt(m_row['median'])} [{fmt(m_row['lo'])}, {fmt(m_row['hi'])}]"
-            d_cell = "—" if not d_row else f"{fmt(d_row[0])} (IQR [{fmt(d_row[1])}, {fmt(d_row[2])}])"
-            b_cell = "—" if not b_stats else size(b_stats["median"])
-            lines.append(f"| {m_disp} | {n_val} | {k_cell} | {t_cell} | {m_cell} | {d_cell} | {b_cell} |")
+    lines += [
+        "",
+        "#### 2. Zero-Shot Tabular Foundation Models (TFM) & Historical Feature-Target Correlation Proxy",
+        "",
+        "| Method | Lineages | NVIDIA Kumo Large (`kumo_tabular_l`) | TabICLv2 (`tabicl2`) | AutoGluon Mitra-v2 (`mitra_v2`) | Feature-Target Correlation Proxy (`driver_fidelity` proxy) | Matched median artifact |",
+        "| --- | ---: | --- | --- | --- | --- | ---: |",
+    ]
+    for f_row in f_rows:
+        m_disp = "**DOPE (ours)**" if f_row["method"] == "DOPE" else f_row["display"]
+        k_row = f_row["kumo_tabular_l"]
+        t_row = f_row["tabicl2"]
+        m_row = f_row["mitra_v2"]
+        d_row = f_row["target_correlation_proxy"]
+        b_med = f_row["matched_artifact_bytes"]
+        n_val = f_row["n_lineages"]
+        k_cell = f"{fmt(k_row['median'])} [{fmt(k_row['lo'])}, {fmt(k_row['hi'])}]"
+        t_cell = f"{fmt(t_row['median'])} [{fmt(t_row['lo'])}, {fmt(t_row['hi'])}]"
+        m_cell = f"{fmt(m_row['median'])} [{fmt(m_row['lo'])}, {fmt(m_row['hi'])}]"
+        d_cell = f"{fmt(d_row['median'])} (IQR [{fmt(d_row['q1'])}, {fmt(d_row['q3'])}])"
+        b_cell = f"{size(b_med)} ({b_med:,} B)"
+        lines.append(f"| {m_disp} | {n_val} | {k_cell} | {t_cell} | {m_cell} | {d_cell} | {b_cell} |")
+    lines += [
+        "",
+        "On these matched historical TFM lineages (fit seed 11; sample seeds 101, 211, 307; synthetic size 4n; pretraining overlap is unknown), "
+        "Gaussian copula is the strongest measured comparator on this historical block (not universally strongest), and "
+        "cross-model feature-driver preservation is not yet measured (the proxy column reports absolute feature-target correlation agreement; "
+        "Gaussian copula is 0.975 median of lineage medians vs. 0.923 median of lineage minima from historical assembler::_min; pooled-seed median is 0.973).",
+    ]
 
     lines += [
         "",

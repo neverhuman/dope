@@ -2640,6 +2640,10 @@
     "research/transfer/tests/test_workplan_acceptance.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance -v",
       "purpose": "verify durable workplan acceptance and deterministic CPU preflight gates without GPU or sealed data"
+    },
+    "tools/claims/foundation.py": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
+      "purpose": "authenticate canonical historical foundation receipts, matched charged artifact bytes, and driver correlation proxy reducers"
     }
   }
 }
