@@ -597,6 +597,7 @@
     "docs/metric.md": "governance",
     "research/transfer/tests/test_tdl_result_schemas.py": "rust-core",
     "tests/fixtures/tdl-v2/": "rust-core",
-    "ops/vendor/": "rust-core"
+    "ops/vendor/": "rust-core",
+    "ops/ci/install-python-v1.sh": "governance"
   }
 }

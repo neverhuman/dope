@@ -2401,6 +2401,10 @@
       "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
       "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
     },
+    "ops/ci/install-python-v1.sh": {
+      "command": "bash -n ops/ci/install-python-v1.sh && just check",
+      "purpose": "verify installer syntax and V1 compatibility proofs while preserving pinned requirements, the selected interpreter and the Torch CPU version check"
+    },
     "ops/vendor/": {
       "command": "cargo test --locked --test feature_boundary && cargo check --locked --offline --features gpu-training,tch/doc-only",
       "purpose": "preserve pinned optional Torch 0.20 API and authenticated upstream runtime source while replacing vulnerable ZIP; verify archive codecs, symlink confinement and privileged permission masking without native/GPU qualification"

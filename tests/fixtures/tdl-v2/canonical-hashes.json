@@ -34,5 +34,14 @@
     },
     "canonical": "{\"escaped\":\"line\\nquote\\\"\",\"null\":null}",
     "identity": "task:6599b8a8d722e706a2b407eab7b8893dbb14de2b745db6e40b8a2d80138891d1"
+  },
+  {
+    "kind": "artifact",
+    "payload": {
+      "escaped": "quote\" backslash\\ tab\t newline\n return\r backspace\b formfeed\f control\u0001",
+      "unicode": "Ω😀"
+    },
+    "canonical": "{\"escaped\":\"quote\\\" backslash\\\\ tab\\t newline\\n return\\r backspace\\b formfeed\\f control\\u0001\",\"unicode\":\"Ω😀\"}",
+    "identity": "artifact:da129e6607dfe7389195e6a45af621a7d5c042612b37a6003149d699982ed31b"
   }
 ]
