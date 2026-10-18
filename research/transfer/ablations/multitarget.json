@@ -1,0 +1,60 @@
+{
+  "format": "dope-workload-tdl-study",
+  "version": 1,
+  "status": "design_only",
+  "qualification_gate": {
+    "required_receipt_sha256": null,
+    "required_panel_sha256": null,
+    "state": "blocked_missing_single_task_qualified_artifact_receipt"
+  },
+  "hypothesis": "For the frozen qualified single-task supported panel only, one shared synthetic X artifact with separate per-target and per-horizon heads may reduce the total encoded artifact bytes across the fixed workload relative to independently fitted full artifacts, while every held-out target/horizon preserves its single-task validity and transfer qualification. The claim does not extend to arbitrary future tables, sources, or model panels.",
+  "source_holdout": {
+    "development_source_sha256": null,
+    "confirmation_source_sha256": null,
+    "status": "blocked_until_qualified_receipt"
+  },
+  "model_holdout": {
+    "development_model_sha256": null,
+    "confirmation_model_sha256": null,
+    "status": "blocked_until_qualified_receipt"
+  },
+  "target_horizon_holdout": {
+    "development_task_sha256": null,
+    "confirmation_task_sha256": null,
+    "status": "blocked_until_qualified_receipt"
+  },
+  "candidate_set": [
+    "shared_x_per_target_head",
+    "independent_full_artifact"
+  ],
+  "accounting": {
+    "included_bytes": [
+      "shared_x_payload",
+      "every_target_head",
+      "per_target_metadata",
+      "indexes",
+      "required_runtime_closure"
+    ],
+    "comparison_rule": "sum_all_shared_x_and_target_head_bytes_vs_sum_independent_full_artifact_bytes",
+    "pilot_cost_cap_cpu_core_seconds": 3600,
+    "development_cost_cap_cpu_core_seconds": 14400
+  },
+  "seed_schedule": {
+    "pilot": [17],
+    "development": [29, 43, 59],
+    "confirmation": [71, 89, 107],
+    "reuse_rule": "disjoint_role_specific_seed_rosters"
+  },
+  "stop_rule": [
+    "Do not start the pilot until a single-task qualified artifact receipt matches the frozen supported panel and the receipt is independently verified.",
+    "Stop without development execution if the one priced pilot exceeds its 3600 CPU core second cap, is incomplete, fails validity, or fails the predeclared byte comparison.",
+    "After a completed pilot, require a separate review and explicit admission before the fixed development study; never launch an automatic campaign.",
+    "Stop and preserve all artifacts on any target or horizon validity failure, source/model holdout overlap, or total-byte accounting mismatch.",
+    "A negative or incomplete result remains negative or incomplete and cannot support arbitrary future table replacement."
+  ],
+  "execution": {
+    "pilot": "not_run_prerequisite_missing",
+    "development": "not_admitted",
+    "automatic_campaign": false
+  }
+}
