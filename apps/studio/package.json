@@ -1,0 +1,1 @@
+{"name":"@dope/studio","private":true,"version":"0.1.0","scripts":{"typecheck":"node --check studio.js","build":"npm run typecheck"}}
