@@ -181,3 +181,7 @@ mod tests {
         decode_kernel(&result.artifact).unwrap();
     }
 }
+
+#[cfg(test)]
+#[path = "teacher_study.rs"]
+mod teacher_study;
