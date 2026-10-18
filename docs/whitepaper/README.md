@@ -15,6 +15,12 @@ the official test split is sealed. The release score MFS-v3 is printed as null. 
 evidence label is `selection_exposed_validation` (see the
 [claims policy](../claims-policy.md)).
 
+The current active manuscript is [`paper/`](../../paper/README.md). For its future
+first-page review, [`COMPREHENSION_v2.md`](COMPREHENSION_v2.md) preregisters five
+unaffiliated technically literate reviewers, the questions, and the pass threshold.
+No reviews have been collected. [`COMPREHENSION_v1.md`](COMPREHENSION_v1.md) remains
+an earlier, separate historical check and its scores are not pooled with v2.
+
 ## Build
 
 | Command | What it does |
