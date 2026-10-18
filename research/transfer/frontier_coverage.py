@@ -3,7 +3,7 @@
 Frontier trial qualification is an upstream evaluator-owned conjunction of
 T90, D80 and all required gates for one frozen method/seed. It is not inferred
 from descriptive scores here. Neither arithmetic nor fixture parity certifies
-those decisions or establishes a global minimum. Legacy cell coverage retains
+those decisions or establishes a global minimum. Prior cell coverage retains
 its measured-calibration requirement and family weighting.
 """
 from __future__ import annotations

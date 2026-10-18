@@ -42,7 +42,7 @@ pub fn main() -> ExitCode {
         }
     };
     if migrated_panel {
-        eprintln!("migration: --panel-tag is deprecated; use --panel");
+        eprintln!("migration: --panel-tag is retired; use --panel");
     }
     match dispatch::run(cli) {
         Ok(()) => ExitCode::SUCCESS,

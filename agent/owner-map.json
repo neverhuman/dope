@@ -653,6 +653,8 @@
     "apps/studio/": "rust-core",
     "examples/healthcare-sim/": "external-evidence",
     "examples/public-regression/bikeshare-observational/": "external-evidence",
-    "research/transfer/ablations/": "external-evidence"
+    "research/transfer/ablations/": "external-evidence",
+    "examples/public-regression/cpu-smoke-admission.json": "external-evidence",
+    "packages/protocol/": "rust-core"
   }
 }

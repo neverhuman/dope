@@ -434,7 +434,10 @@ pub fn evaluate(data: &Value) -> Value {
         result["campaign"] = json!("unmeasured");
         Ok(result)
     };
-    inner().unwrap_or_else(|_| json!({"status": "failed", "reason": "invalid_crossed_design"}))
+    match inner() {
+        Ok(v) => v,
+        Err(_) => json!({"status": "failed", "reason": "invalid_crossed_design"}),
+    }
 }
 
 #[cfg(test)]

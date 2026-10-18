@@ -119,10 +119,12 @@ pub fn json(bytes: &[u8]) -> Result<serde_json::Value> {
 }
 
 /// Pin bounded captured bytes for older library APIs that accept paths only.
-/// This is an in-memory regular file, never a user-controlled temporary path.
+/// This is an in-memory regular file, never a user-controlled scratch path.
 #[cfg(target_os = "linux")]
 pub fn sink() -> Result<(File, PathBuf)> {
     use std::os::fd::{AsRawFd, FromRawFd};
+    // SAFETY: The name is a static NUL-terminated C string, and the flags request a new
+    // close-on-exec anonymous file descriptor with sealing enabled.
     let fd = unsafe {
         libc::memfd_create(
             c"dope-cli".as_ptr(),
@@ -132,6 +134,7 @@ pub fn sink() -> Result<(File, PathBuf)> {
     if fd < 0 {
         return Err(Failure::new(Code::Internal, "snapshot_failed"));
     }
+    // SAFETY: `fd` was returned as a newly owned descriptor by `memfd_create` above.
     let file = unsafe { File::from_raw_fd(fd) };
     let path = PathBuf::from(format!("/proc/self/fd/{}", file.as_raw_fd()));
     Ok((file, path))
@@ -144,6 +147,7 @@ pub fn snapshot(bytes: &[u8]) -> Result<(File, PathBuf)> {
     file.write_all(bytes)
         .map_err(|_| Failure::new(Code::Internal, "snapshot_failed"))?;
     let seals = libc::F_SEAL_WRITE | libc::F_SEAL_GROW | libc::F_SEAL_SHRINK | libc::F_SEAL_SEAL;
+    // SAFETY: `file` owns a valid descriptor, and F_ADD_SEALS accepts the integer seal mask.
     if unsafe { libc::fcntl(file.as_raw_fd(), libc::F_ADD_SEALS, seals) } < 0 {
         return Err(Failure::new(Code::Internal, "snapshot_failed"));
     }

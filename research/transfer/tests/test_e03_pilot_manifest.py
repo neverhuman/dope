@@ -35,7 +35,7 @@ class E03PilotManifestTests(unittest.TestCase):
             "real_null_synthetic_models", "driver_analysis", "rust_receipt", "report",
         ])
 
-    def test_price_is_not_fabricated_without_observed_runtime(self):
+    def test_price_is_not_invented_without_observed_runtime(self):
         manifest = json.loads(MANIFEST.read_text())
         price = manifest["quick12_price"]
         self.assertEqual((price["tasks"], price["budgets_per_task"], price["fits_per_cell"]), (12, 3, 1))

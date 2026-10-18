@@ -53,7 +53,10 @@ fn python_wire_fixtures_have_exact_rust_admission_and_receipt_parity() {
             );
             continue;
         }
-        let admitted = result.unwrap_or_else(|_| panic!("valid request rejected: {name}"));
+        let admitted = match result {
+            Ok(v) => v,
+            Err(_) => panic!("valid request rejected: {name}"),
+        };
         assert_eq!(
             admitted.identity(),
             untrusted["request_sha256"].as_str().unwrap()
@@ -68,7 +71,10 @@ fn python_wire_fixtures_have_exact_rust_admission_and_receipt_parity() {
         );
         if case["expected_response"] == true {
             assert_eq!(
-                result.unwrap_or_else(|_| panic!("valid response rejected: {name}")),
+                match result {
+                    Ok(v) => v,
+                    Err(_) => panic!("valid response rejected: {name}"),
+                },
                 case["expected_receipt"],
                 "{name}"
             );
