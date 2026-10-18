@@ -655,6 +655,7 @@
     "examples/public-regression/bikeshare-observational/": "external-evidence",
     "research/transfer/ablations/": "external-evidence",
     "examples/public-regression/cpu-smoke-admission.json": "external-evidence",
-    "packages/protocol/": "rust-core"
+    "packages/protocol/": "rust-core",
+    "research/transfer/tests/test_workplan_acceptance.py": "external-evidence"
   }
 }
