@@ -17,11 +17,11 @@ run="target/native-release-smoke/$stamp-$$"
 mkdir -p -- "$run/package" "$run/install-prefix/bin"
 binary=target/release/dope-kernel
 # Ignore ambient machine-specific flags so this exercises the generic portable build.
-env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
+env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}" cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
 install -m 0755 -- "$binary" "$run/package/dope-kernel"
 first=$(sha256sum -- "$run/package/dope-kernel" | cut -d ' ' -f1)
 # A second locked offline invocation records the same-worktree rebuild result.
-env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
+env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}" cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
 install -m 0755 -- "$binary" "$run/package/dope-kernel-repeat"
 second=$(sha256sum -- "$run/package/dope-kernel-repeat" | cut -d ' ' -f1)
 [[ "$first" == "$second" ]] || { printf '%s\n' 'native_release_smoke_binary_not_repeatable' >&2; exit 1; }

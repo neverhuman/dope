@@ -113,10 +113,22 @@ Authority rule: `super_captain` decides internal governance and GPU-schedule hol
 | **E04** precommit confirmatory design | Complete the D19 precommit admission review; ingest signed external baseline artifacts into the comparator. Depends on E03. | `super_captain` for the D19 review; Jepson-reserved if a baseline artifact needs a license | Drafting the precommit only: candidate artifacts, roles, thresholds, seeds, roster. No label access. |
 | **E05** sealed confirmation | After E03 and E04 complete, obtain the D19 unlock token; run the sealed protocol through the sole authorized separate-principal custodian. | `super_captain` for the unlock token; custody stays under the D18 archival fence | Nothing. Sealed data is not opened before unlock. |
 | **E06** four-level reproducibility | Re-run L1–L4 ratification once E03, E04, E05 artifacts exist. L2 and L4 are blocked; L3 is partial. | `super_captain` for sequencing; Jepson-reserved for independent owner resources and private access | L1 replay of aggregate tables and figures from the approved immutable ledger (already passing locally). |
-| **E07** first observational CPU loop | Launch the post-release observation window and collect full-duration telemetry receipts from the external feed. | `super_captain` for the window schedule; Jepson-reserved if the feed needs a new external commitment | Freeze the reduced cpu-smoke panel and partition; run the deterministic adverse-mechanism fixture on public data. The production canary window is not runnable now. |
+| **E07** first observational CPU loop | Run the early public Bikeshare observational CPU loop with DOPE, copula, and compressed-row controls at two caps, retaining persistent real/null/synthetic and driver receipts. E05 is the separate sealed confirmation; post-release monitoring follows release. | `super_captain` for the window schedule; Jepson-reserved if the feed needs a new external commitment | Public-data preflight fixtures may run after admission. E07 is currently held/partial (`blocked`): the 21-test preflight passed, but the empirical two-cap run is held. |
 
 Machine-readable form: `DECISIONS.json` (proposed; see the packet's `DECISIONS_D19_PROPOSED.json`), because the ledger file is read-only and listed in `SHA256SUMS.json`.
 
 ### SC-DEC-097 E07 CPU smoke admission (2026-10-18)
 
-`SC-DEC-097` authorized local CPU-only execution of the bounded `bikeshare-observational` CPU smoke loop on `xbabe2`. This advanced the workplan to **60 / 65** tasks done and **5 / 65** tasks blocked (`W01`, `E03`, `E04`, `E05`, `E06`). The Rust frozen-evidence parity binary in `ops/merge_guard/Cargo.toml` is named `check-frozen-evidence`.
+`SC-DEC-097` authorized local CPU-only execution of the bounded `bikeshare-observational` CPU smoke loop on `xbabe2`. The preflight fixtures passed, but the required empirical loop is not evidenced; E07 remains held/partial. The Rust frozen-evidence parity binary in `ops/merge_guard/Cargo.toml` is named `check-frozen-evidence`.
+
+### SC-DEC-101 E07 held/partial and Q01.FIG-3A/3B separation (2026-10-18)
+
+The workplan currently records **59 / 65** tasks done and **6 / 65** blocked: `W01`,
+`E03`, `E04`, `E05`, `E06`, and `E07`. E07's 21-test preflight receipt is not an empirical
+two-cap run: the admitted run still requires DOPE, copula, and compressed-row controls plus
+persistent real/null/synthetic and driver receipts. Keep E07 blocked/held-partial until those
+receipts qualify; E05 remains the sealed confirmation gate.
+
+`Q01.FIG-3A` is the completed deterministic figure regeneration/regression gate recorded in
+`tasks.json`. `Q01.FIG-3B` is the future joint prediction-and-driver chart in `WORKPLAN.md` and
+remains blocked; it is not counted as done.

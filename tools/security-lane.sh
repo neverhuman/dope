@@ -4,7 +4,22 @@ cd "$(dirname "$0")/.."
 source ops/ci/lib.sh
 mkdir -p target/security
 if ! command -v cargo-audit >/dev/null 2>&1; then
-  cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked --force
+  if [[ "$(uname -s):$(uname -m)" == "Linux:x86_64" ]] && command -v curl >/dev/null 2>&1 && command -v tar >/dev/null 2>&1; then
+    mkdir -p target/tools/cargo-audit
+    archive="target/tools/cargo-audit/cargo-audit-x86_64-unknown-linux-gnu-v${CARGO_AUDIT_VERSION}.tgz"
+    if curl --fail --location --silent --show-error --retry 3 \
+      "https://github.com/rustsec/rustsec/releases/download/cargo-audit/v${CARGO_AUDIT_VERSION}/cargo-audit-x86_64-unknown-linux-gnu-v${CARGO_AUDIT_VERSION}.tgz" \
+      --output "$archive" && \
+      echo "1890badd5f15831a9af4b074399fcd21e6f7c0fe42c84e9254cdffc9f813765c  $archive" | sha256sum --check --status && \
+      tar -xzf "$archive" -C target/tools/cargo-audit cargo-audit; then
+      install -D -m 0755 target/tools/cargo-audit/cargo-audit "$HOME/.cargo/bin/cargo-audit"
+      install -m 0755 "$HOME/.cargo/bin/cargo-audit" target/tools/cargo-audit/cargo-audit
+    else
+      CARGO_BUILD_JOBS=2 cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked --force
+    fi
+  else
+    CARGO_BUILD_JOBS=2 cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked --force
+  fi
 fi
 cargo audit --json > target/security/cargo-audit.json
 ci_require_artifact target/security/cargo-audit.json
