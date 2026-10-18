@@ -19,28 +19,29 @@ import matplotlib.pyplot as plt
 ROOT = Path(__file__).resolve().parents[3]
 GEN = ROOT / "docs/whitepaper/generated"
 LEDGER = GEN / "figure-one-ledger.json"
-DEFAULT_LEDGER = {
-    "format": "dope-figure-one-ledger-v1",
-    "mode": "protocol_only",
-    "contract": {
-        "question": "How few complete dataset-specific bytes preserve learning across required models?",
-        "x": "actual_complete_recipient_bytes",
-        "y": "source_balanced_eligible_task_coverage",
-        "thresholds": {"transfer": 0.9, "drivers": 0.8},
-        "mandatory_models": [],
-        "max_main_comparators": 5,
-        "supplement_comparators": "all_preregistered",
-        "uncertainty": "source_cluster",
-        "privacy_label": "empirical privacy unmeasured; no formal DP claim",
-        "denominator": "eligible tasks fixed before outcomes; unsupported, failed and missing remain in denominator disposition",
-        "bytes": "complete recipient-read dataset-specific payload; no extrapolated B90",
-        "panel": "source-balanced; no independent median-x/median-y point",
-    },
-    "retained_states": ["unsupported", "failed", "missing", "native_large", "not_reached", "eligible"],
-    "compressed_data_controls": "nonrelease_only",
-    "points": [],
-    "status": "E05 admission absent; engineering renderer only",
+DEFAULT_LEDGER_TEXT = '''{
+  "format": "dope-figure-one-ledger-v1",
+  "mode": "protocol_only",
+  "contract": {
+    "question": "How few complete dataset-specific bytes preserve learning across required models?",
+    "x": "actual_complete_recipient_bytes",
+    "y": "source_balanced_eligible_task_coverage",
+    "thresholds": {"transfer": 0.9, "drivers": 0.8},
+    "mandatory_models": [],
+    "max_main_comparators": 5,
+    "supplement_comparators": "all_preregistered",
+    "uncertainty": "source_cluster",
+    "privacy_label": "empirical privacy unmeasured; no formal DP claim",
+    "denominator": "eligible tasks fixed before outcomes; unsupported, failed and missing remain in denominator disposition",
+    "bytes": "complete recipient-read dataset-specific payload; no extrapolated B90",
+    "panel": "source-balanced; no independent median-x/median-y point"
+  },
+  "retained_states": ["unsupported", "failed", "missing", "native_large", "not_reached", "eligible"],
+  "compressed_data_controls": "nonrelease_only",
+  "points": [],
+  "status": "E05 admission absent; engineering renderer only"
 }
+'''
 CAPTION = ("Figure 1. How few complete dataset-specific bytes preserve learning across required models? "
            "Protocol schematic only; measured inputs await E05 admission. The planned x-axis is actual "
            "complete recipient bytes and the y-axis is source-balanced eligible-task C(B), requiring "
@@ -112,7 +113,7 @@ def draw():
 def render() -> None:
     GEN.mkdir(parents=True, exist_ok=True)
     if not LEDGER.exists():
-        LEDGER.write_text(json.dumps(DEFAULT_LEDGER, indent=2) + "\n")
+        LEDGER.write_text(DEFAULT_LEDGER_TEXT)
     data = json.loads(LEDGER.read_text())
     validate(data)
     figure = draw()
