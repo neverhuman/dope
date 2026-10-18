@@ -1,0 +1,33 @@
+{
+  "case_id": "C04-SEED-POOLING-REFUSED",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "reason": "frontier_identity_mismatch",
+    "status": "failed"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-a"
+    ],
+    "byte_grid": [
+      1000
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 900,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "another-seed",
+        "status": "qualified",
+        "task_id": "task-a"
+      }
+    ],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "Malformed or out-of-profile evidence fails closed with a stable source-free reason.",
+  "schema_version": 1
+}

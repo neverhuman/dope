@@ -42,10 +42,130 @@ fn parse_grid(value: Option<&Value>) -> MetricResult<Option<BTreeSet<u64>>> {
 }
 
 pub fn evaluate(data: &Value) -> Value {
-    match evaluate_inner(data) {
+    let result = match data.get("protocol_version") {
+        None => evaluate_inner(data),
+        Some(v) if v.as_u64() == Some(1) && !v.is_f64() => evaluate_inner(data),
+        Some(v) if v.as_u64() == Some(2) && !v.is_f64() => evaluate_v2(data),
+        _ => Err(MetricError::new("invalid_frontier_version")),
+    };
+    match result {
         Ok(val) => val,
         Err(err) => failure_with_status(err.reason, err.status),
     }
+}
+
+/// V2 consumes evaluator-owned joint qualification decisions for a frozen
+/// method/seed and roster. The golden envelope remains version 1 so the shared
+/// historical runner can dispatch this component's explicit protocol version.
+fn evaluate_v2(data: &Value) -> MetricResult<Value> {
+    use crate::transfer_metrics::frontier::{ArtifactTrial, non_monotone, roster_coverage};
+    let obj = data.as_object().ok_or(MetricError::new("invalid_input"))?;
+    let roster = parse_unique_strings(
+        obj.get("admitted_tasks"),
+        "invalid_roster",
+        "duplicate_task",
+    )?;
+    let task_indices: BTreeMap<_, _> = roster
+        .iter()
+        .enumerate()
+        .map(|(i, task)| (task.as_str(), i))
+        .collect();
+    for key in ["method_id", "seed_id"] {
+        require(
+            obj.get(key)
+                .and_then(Value::as_str)
+                .is_some_and(|s| !s.is_empty()),
+            "invalid_frontier_identity",
+        )?;
+    }
+    let grid = parse_grid(obj.get("byte_grid"))?.ok_or(MetricError::new("invalid_byte_grid"))?;
+    let monotone = match obj.get("require_monotone") {
+        None => false,
+        Some(v) => v
+            .as_bool()
+            .ok_or(MetricError::new("invalid_monotone_policy"))?,
+    };
+    let cells = obj
+        .get("cells")
+        .and_then(Value::as_array)
+        .ok_or(MetricError::new("invalid_cells"))?;
+    let mut trials = Vec::new();
+    let mut identities = BTreeSet::new();
+    for cell in cells {
+        let cell = cell.as_object().ok_or(MetricError::new("invalid_cells"))?;
+        for key in ["method_id", "seed_id"] {
+            require(cell.get(key) == obj.get(key), "frontier_identity_mismatch")?;
+        }
+        let task = cell
+            .get("task_id")
+            .and_then(Value::as_str)
+            .ok_or(MetricError::new("invalid_roster_task"))?;
+        let task_index = *task_indices
+            .get(task)
+            .ok_or(MetricError::new("unscheduled_task"))?;
+        let candidate = cell
+            .get("candidate_id")
+            .and_then(Value::as_str)
+            .ok_or(MetricError::new("invalid_candidate_identity"))?;
+        require(!candidate.is_empty(), "invalid_candidate_identity")?;
+        require(
+            identities.insert((task_index, candidate)),
+            "duplicate_candidate",
+        )?;
+        let status = cell
+            .get("status")
+            .and_then(Value::as_str)
+            .ok_or(MetricError::new("invalid_cell_status"))?;
+        require(
+            matches!(
+                status,
+                "qualified"
+                    | "unqualified"
+                    | "failed"
+                    | "crashed"
+                    | "technical_failure"
+                    | "incomplete"
+                    | "timeout"
+                    | "timed_out"
+                    | "oom"
+                    | "unsupported"
+                    | "unevaluated"
+                    | "unresolved"
+            ),
+            "invalid_cell_status",
+        )?;
+        let cap = count(cell.get("search_cap_bytes").unwrap_or(&Value::Null), 1)?;
+        let bytes = match cell.get("artifact_bytes") {
+            None | Some(Value::Null) => None,
+            Some(v) => Some(count(v, 1)?),
+        };
+        require(bytes.is_none_or(|b| b <= cap), "artifact_exceeds_budget")?;
+        require(
+            status != "qualified" || bytes.is_some(),
+            "missing_qualified_artifact",
+        )?;
+        trials.push(ArtifactTrial {
+            task_index,
+            search_cap_bytes: cap,
+            artifact_bytes: bytes,
+            qualified: status == "qualified",
+        });
+    }
+    let mut rows = Vec::new();
+    for cap in grid {
+        let coverage = roster_coverage(roster.len(), &trials, cap, monotone)
+            .map_err(|_| MetricError::new("invalid_frontier_evidence"))?;
+        rows.push(json!({"budget_bytes": cap, "qualified_tasks": coverage.qualified_tasks, "admitted_tasks": coverage.admitted_tasks, "coverage": coverage.coverage}));
+    }
+    let minimum = roster_coverage(roster.len(), &trials, u64::MAX, monotone)
+        .map_err(|_| MetricError::new("invalid_frontier_evidence"))?;
+    Ok(json!({
+        "protocol_version": 2, "status": "complete", "reason": Value::Null,
+        "admitted_tasks": roster.len(), "minimum_qualified_bytes": minimum.minimum_bytes,
+        "frontier": rows, "require_monotone": monotone,
+        "non_monotone_tasks": (0..roster.len()).filter(|task| non_monotone(&trials, *task)).count(),
+        "global_optimum_claimed": false,
+    }))
 }
 
 fn evaluate_inner(data: &Value) -> MetricResult<Value> {
