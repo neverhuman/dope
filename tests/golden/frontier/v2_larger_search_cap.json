@@ -1,0 +1,63 @@
+{
+  "case_id": "C04-SEARCH-CAP-IS-NOT-CHARGED-BYTES",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "admitted_tasks": 1,
+    "frontier": [
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 799,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 800,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 1000,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      }
+    ],
+    "global_optimum_claimed": false,
+    "minimum_qualified_bytes": [
+      800
+    ],
+    "non_monotone_tasks": 0,
+    "protocol_version": 2,
+    "reason": null,
+    "require_monotone": false,
+    "status": "complete"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-a"
+    ],
+    "byte_grid": [
+      799,
+      800,
+      1000
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 800,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 2000,
+        "seed_id": "seed-a",
+        "status": "qualified",
+        "task_id": "task-a"
+      }
+    ],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "A qualified 800-byte artifact discovered under a 2000-byte search cap counts at an 800-byte release allowance.",
+  "schema_version": 1
+}

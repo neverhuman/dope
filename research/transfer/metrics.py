@@ -10,13 +10,15 @@ not authorize release.
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
 import hashlib
 import math
 
-from .calibration_receipt import verify_calibration_receipt
 from .evidence import digest
+from .frontier_coverage import (  # noqa: F401
+    ArtifactTrial, minimum_qualified_bytes, observed_coverage, qualified_coverage, roster_coverage,
+)
 from .losses import PairedLosses, TrainingScale, finite_number
 from .objectives import (  # noqa: F401
     control_contrastive_lift,
@@ -343,98 +345,6 @@ def bound_qualification(task, cell_id, bound, expected) -> dict:
         "calibration": "unmeasured",
         "uncertainty": "absent",
     }
-
-
-def _admissible_uncertainty(decision) -> bool:
-    """Caller flags are not a calibration manifest.
-
-    Both inferential directions stay closed unless a receipt verifies as
-    measured N13b. The development protocol does not.
-    """
-    if not isinstance(decision, dict):
-        return False
-    receipt = decision.get("calibration_receipt")
-    if not isinstance(receipt, dict):
-        return False
-    try:
-        verified = verify_calibration_receipt(receipt)
-    except ValueError:
-        return False
-    return (
-        verified.get("n13b") is True
-        and verified.get("qualifies") is True
-        and verified.get("calibration") == "measured"
-    )
-
-
-def _task_feasible(task) -> bool:
-    if task.artifact_bytes > task.byte_budget or not task.resources_within_budget:
-        return False
-    if not task.artifacts:
-        return True
-    seen = set()
-    for artifact in task.artifacts:
-        if artifact.artifact_bytes > task.byte_budget:
-            return False
-        seen.add(artifact.cell_id)
-    return set(task.required_cells) <= seen
-
-
-def _coverage(tasks, *, supported: bool, verify_bound=None) -> dict:
-    tasks = tuple(tasks)
-    if not tasks or len({t.task_id for t in tasks}) != len(tasks):
-        raise ValueError("empty or duplicate task schedule")
-    families = defaultdict(list)
-    counts = Counter({k: 0 for k in ("qualified", "observed_only", "observed_outside", "harmful",
-                                     "technical_failure", "unsupported", "unresolved")})
-    for task in tasks:
-        feasible = _task_feasible(task)
-        passed, potential = feasible, feasible
-        for key in task.required_cells:
-            cell = task.cells.get(key, CellResult())
-            if cell.status != "measured":
-                counts[cell.status] += 1
-                passed = False
-                potential &= cell.status == "unresolved"
-                continue
-            observed = cell.z <= 0
-            admissible = False
-            if cell.bound is not None and verify_bound is not None:
-                admissible = _admissible_uncertainty(verify_bound(task, key, cell.bound))
-            inferential_harm = (
-                admissible and cell.bound is not None and cell.bound.lower_z is not None and cell.bound.lower_z > 0
-            )
-            inferential_benefit = (
-                admissible and observed and cell.bound is not None and cell.bound.upper_z <= 0 and not inferential_harm
-            )
-            if inferential_benefit:
-                counts["qualified"] += 1
-            elif inferential_harm:
-                counts["harmful"] += 1
-            elif observed:
-                counts["observed_only"] += 1
-            else:
-                counts["observed_outside"] += 1
-            passed &= inferential_benefit if supported else observed
-            potential &= inferential_benefit if supported else observed
-        families[task.family_id].append((int(passed), int(potential)))
-    lower = math.fsum(math.fsum(v[0] for v in members) / len(members) for members in families.values()) / len(families)
-    upper = math.fsum(math.fsum(v[1] for v in members) / len(members) for members in families.values()) / len(families)
-    if lower > upper:
-        raise ValueError("completion bounds are reversed")
-    return {"coverage": lower, "lower": lower, "upper": upper, "families": len(families),
-            "tasks": len(tasks), "scheduled_cells": sum(len(t.required_cells) for t in tasks),
-            "cell_counts": dict(counts), "byte_infeasible_tasks": sum(t.artifact_bytes > t.byte_budget for t in tasks),
-            "resource_infeasible_tasks": sum(not t.resources_within_budget for t in tasks),
-            "meaning": "completion", "confidence_interval": None}
-
-
-def observed_coverage(tasks) -> dict:
-    return _coverage(tasks, supported=False)
-
-
-def qualified_coverage(tasks, *, verify_bound=None) -> dict:
-    return _coverage(tasks, supported=True, verify_bound=verify_bound)
 
 
 def harm_summary(tasks, *, catastrophic_threshold: float) -> dict:

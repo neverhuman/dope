@@ -1,0 +1,50 @@
+{
+  "case_id": "C04-EMPTY-EVALUATIONS-FULL-ROSTER",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "admitted_tasks": 3,
+    "frontier": [
+      {
+        "admitted_tasks": 3,
+        "budget_bytes": 1000,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      },
+      {
+        "admitted_tasks": 3,
+        "budget_bytes": 2000,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      }
+    ],
+    "global_optimum_claimed": false,
+    "minimum_qualified_bytes": [
+      null,
+      null,
+      null
+    ],
+    "non_monotone_tasks": 0,
+    "protocol_version": 2,
+    "reason": null,
+    "require_monotone": false,
+    "status": "complete"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-a",
+      "task-b",
+      "task-c"
+    ],
+    "byte_grid": [
+      1000,
+      2000
+    ],
+    "cells": [],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "No evaluated artifacts means zero coverage over the complete three-task roster.",
+  "schema_version": 1
+}
