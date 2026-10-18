@@ -1,0 +1,72 @@
+{
+  "format": "dope-confirmatory-precommit-protocol-v1",
+  "version": 1,
+  "design_rule": "A fixed development-selected artifact is confirmed once at each declared byte budget. Every budget endpoint that can contribute to a minimum-TDL claim belongs to one joint error-control family.",
+  "candidate_artifact_rule": "Before any sealed access, bind one exact generator artifact payload, recipe, implementation, dependency closure, prepared map, and real-only eligibility record to every budget slot. No candidate may be added, removed, or substituted after the first sealed access.",
+  "source_role_rule": "Fit and development-selection sources are disjoint from confirmation sources by parent lineage, entity, and time; confirmation labels remain with the protected external custodian.",
+  "model_role_rule": "Freeze exact model implementation, checkpoint, dependency, adapter, and auditor identities; development-selection models cannot serve as confirmation-only models unless their role is declared before exposure.",
+  "prepared_map_rule": "Freeze each fit-only prepared-view mapping and its digest; share it across all generator arms for the same source/task. Query and confirmation labels cannot affect map fitting.",
+  "real_only_eligibility_rule": "Confirmation sources must be rights-cleared real observational data with source lineage, split, contamination, and custody evidence. Simulated, mechanism, stress, copied, and synthetic derivatives are ineligible.",
+  "budget_grid_bytes": [512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144],
+  "sample_policy": {
+    "primary": "1n real fit rows",
+    "sensitivity": "4n real fit rows",
+    "context": "matched to real fit rows or a separately pinned declared context cap"
+  },
+  "seed_schedule": {
+    "fit": [101, 211, 307, 401, 509],
+    "sample": [101, 211, 307],
+    "auditor": null,
+    "query_cluster_bootstrap": null,
+    "note": "Fit/sample seeds are inherited as a candidate schedule. Auditor and cluster schedules remain unresolved and block freeze."
+  },
+  "candidate_reporting_family": {
+    "enumeration": "One fixed development-selected artifact slot per each of the ten budget endpoints; include every endpoint in simultaneous minimum-TDL reporting, including endpoints where a selected artifact is unavailable or fails.",
+    "slots": 10,
+    "familywise_alpha": 0.05,
+    "joint_error_control": "Bonferroni one-sided bounds across all ten budget slots and all mandatory model/source/task contrasts; no per-budget development selection removes the across-budget family.",
+    "per_slot_alpha_upper_bound": 0.005,
+    "frontier_plot": "Plot all ten declared budgets, all scheduled methods, and every disposition; show simultaneous intervals and mark missing/failed slots without complete-case omission.",
+    "practical_superiority_margin": null
+  },
+  "analysis_policy": {
+    "metric": "TDL v2 candidate only; the active TDL contract is not frozen or certified",
+    "candidate_operating_point": "T90/D80 (aspirational working point; not an approved threshold)",
+    "required_families": ["tree", "linear", "neural"],
+    "held_out_family": "foundation_tabular",
+    "family_gate": "all required family and source/task contrasts pass; no averaging away a failed required family",
+    "inference": "Paired source/task and query/entity-cluster design; Bonferroni simultaneous bounds; retain raw losses and all scheduled failures",
+    "bootstrap_draws_min": 10000,
+    "confirmation_calibration_repetitions_min": 2000,
+    "equivalence_margin": null,
+    "power_target": null,
+    "driver_applicability": null,
+    "privacy_outcomes": {
+      "empirical_privacy": "must be measured on the frozen privacy panel; absent or inconclusive is incomplete",
+      "formal_dp": "not claimed unless separately verified under its own contract",
+      "release_authorization": "not authorized by this precommit"
+    }
+  },
+  "retry_exclusion_policy": {
+    "failed_or_missing_attempts": "retain in the denominator and report as scheduled failures",
+    "retry": "no retry after an exposed confirmation result; infrastructure retry only if preauthorized, bounded, same identity, and recorded as a child attempt",
+    "exclusion": "no outcome-dependent source, model, budget, seed, or candidate exclusions"
+  },
+  "budget_admission": {
+    "state": "blocked",
+    "reserved_compute_seconds": null,
+    "per_cell_caps": null,
+    "power_receipt_sha256": null,
+    "note": "No approved compute reservation or exact-design calibration receipt is registered."
+  },
+  "required_independent_review": {
+    "reviewer_identity": null,
+    "qualified_role_evidence_sha256": null,
+    "signature_algorithm": null,
+    "signature": null,
+    "custodian_identity": null,
+    "protected_custody_attestation_sha256": null
+  },
+  "successor_rule": "Any material change after precommit requires a new version and fresh independent review before any authorized evaluation. Exposed confirmation sources are permanently marked exposed and cannot be reread as untouched.",
+  "sealed_access_rule": "Deny unless every exact source, model, generator, prepared-map, metric, protocol, cache, closure, roster, privacy, budget, power, reviewer, and custodian gate is complete and independently signed."
+}
