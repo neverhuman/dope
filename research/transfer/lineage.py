@@ -269,6 +269,24 @@ def independent_source_count(families: list[SourceFamily]) -> int:
     return len({family.parent_lineage_id for family in families})
 
 
+def deduplicate_exact_source_proofs(proofs: list[dict]) -> list[dict]:
+    """Keep one proof per exact source and proof identity; aliases add no fit."""
+    kept = {}
+    for proof in proofs:
+        if not isinstance(proof, dict):
+            raise LineageError("source proof is not registered")
+        source = proof.get("source_sha256")
+        identity = proof.get("proof_sha256")
+        if not isinstance(source, str) or not SHA256_HEX.fullmatch(source):
+            raise LineageError("source proof is not registered")
+        if not isinstance(identity, str) or not SHA256_HEX.fullmatch(identity):
+            raise LineageError("source proof is not registered")
+        if source in kept and kept[source]["proof_sha256"] != identity:
+            raise LineageError("exact source proof identity changed")
+        kept.setdefault(source, proof)
+    return list(kept.values())
+
+
 def _add_order(family: SourceFamily) -> tuple[int, str]:
     if family.relation is Relation.ORIGINAL:
         rank = 0
