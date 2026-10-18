@@ -4,6 +4,7 @@ import unittest
 
 from research.transfer.calibration_receipt import development_protocol, verify_calibration_receipt
 from research.transfer.evidence import digest
+from research.transfer.power import stress_simulation
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -32,6 +33,39 @@ def receipt(**overrides):
 
 
 class CalibrationReceiptTests(unittest.TestCase):
+    def test_c02_protocol_is_separate_and_historical_v1_receipt_authenticates(self):
+        protocol = json.loads((ROOT / "research/transfer/protocols/statistics-v2-development.json").read_text())
+        self.assertEqual(protocol["protocol_id"], "transfer-statistics-v2-development")
+        self.assertEqual(protocol["inference"]["default_draws"], 10000)
+        self.assertFalse(protocol["frozen_for_confirmation"])
+        self.assertFalse(protocol["qualification"])
+        self.assertEqual(protocol["parent_protocol_digest"], digest(development_protocol()))
+        historical = json.loads((ROOT / "tests/fixtures/vnext-successors/development-calibration-v1.json").read_text())
+        self.assertTrue(verify_calibration_receipt(historical)["authenticates"])
+        proposed = receipt(protocol_id=protocol["protocol_id"], protocol_digest=digest(protocol))
+        self.assertFalse(verify_calibration_receipt(proposed)["qualifies"])
+        self.assertEqual(verify_calibration_receipt(proposed)["reason"], "unknown_protocol")
+
+    def test_s5_seeded_monte_carlo_smoke_cannot_freeze_confirmation(self):
+        evidence = stress_simulation()
+        self.assertEqual(set(evidence["scenarios"]), {"near_threshold", "low_gain", "heavy_tailed", "correlated", "few_source"})
+        self.assertFalse(evidence["qualification"])
+        self.assertEqual(evidence["calibration"], "unmeasured")
+        for name, result in evidence["scenarios"].items():
+            self.assertEqual(result["repetitions"], 20)
+            self.assertFalse(result["qualification_authority"])
+            if name == "few_source":
+                self.assertEqual(result["failed_repetitions"], {"insufficient_families": 20})
+                self.assertIsNone(result["metrics"]["upper_covered"]["mc95"])
+            else:
+                self.assertEqual(result["valid_repetitions"], 20)
+                self.assertIsNotNone(result["metrics"]["upper_covered"]["mc_se"])
+                self.assertIsNotNone(result["metrics"]["noninferior"]["mc95"])
+        output = ROOT / "target/vnext/c02-seeded-stress-simulation.json"
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(evidence, indent=2, allow_nan=False) + "\n")
+        self.assertFalse(development_protocol()["frozen_for_confirmation"])
+
     def test_schema_has_no_qualification_field(self):
         schema = json.loads((ROOT / "schemas/calibration-receipt-v1.schema.json").read_text())
         self.assertEqual(schema["$id"], "urn:dope:calibration-receipt:v1")

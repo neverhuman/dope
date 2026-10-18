@@ -33,9 +33,9 @@ def _with_assumptions(payload):
 
 def task_substream(master_seed: int, task_id: str, component_id: str) -> int:
     """Prospective RNG identity includes task and algorithm/component namespace."""
-    if type(master_seed) is not int or master_seed < 0 or not task_id or not component_id:
+    if type(master_seed) is not int or not 0 <= master_seed < 2**64 or type(task_id) is not str or type(component_id) is not str or not task_id or not component_id:
         raise ValueError("invalid random stream identity")
-    identity = json.dumps(["transfer-statistics-v1", master_seed, task_id, component_id], separators=(",", ":"))
+    identity = json.dumps(["transfer-statistics-v1", master_seed, task_id, component_id], separators=(",", ":"), ensure_ascii=False)
     return int.from_bytes(hashlib.sha256(identity.encode()).digest()[:8], "little")
 
 
@@ -53,6 +53,7 @@ class EvaluationRun:
     status: str = "measured"
     global_seed_namespace: str | None = None
     global_seed_id: str | None = None
+    task_axis_id: str | None = None
 
     def __post_init__(self):
         if not all(isinstance(v, str) and v for v in self.key):
@@ -65,6 +66,10 @@ class EvaluationRun:
             raise ValueError("global randomness requires an explicit coupling namespace")
         if self.global_seed_namespace is not None and (not self.global_seed_namespace or not self.global_seed_id):
             raise ValueError("empty global seed identity")
+        if self.global_seed_namespace is not None and any(type(v) is not str for v in (self.global_seed_namespace, self.global_seed_id)):
+            raise ValueError("invalid_seed_namespace")
+        if self.task_axis_id is not None and (type(self.task_axis_id) is not str or not self.task_axis_id):
+            raise ValueError("invalid_task_axis")
 
     @property
     def key(self):
@@ -92,8 +97,11 @@ class CrossedDesign:
     runs: tuple[EvaluationRun, ...] = field(repr=False)
     required_methods: tuple[str, ...]
     scheduled_keys: tuple[tuple[str, ...], ...] = field(repr=False)
+    cluster_unit: str = "source_family"
 
     def __post_init__(self):
+        if self.cluster_unit != "source_family":
+            raise ValueError("invalid_cluster_unit")
         object.__setattr__(self, "runs", tuple(self.runs))
         object.__setattr__(self, "required_methods", tuple(self.required_methods))
         object.__setattr__(self, "scheduled_keys", tuple(tuple(k) for k in self.scheduled_keys))
@@ -103,12 +111,15 @@ class CrossedDesign:
             raise ValueError("duplicate run or aliased fit identity")
         if len(set(self.scheduled_keys)) != len(self.scheduled_keys) or set(self.scheduled_keys) != {r.key for r in self.runs}:
             raise ValueError("run dispositions do not cover the declared schedule")
-        tasks, query_sets, policies, fit_couplings = {}, {}, {}, {}
+        tasks, query_sets, policies, fit_couplings, seed_fits, task_axes = {}, {}, {}, {}, {}, {}
         for run in self.runs:
             if run.method_id not in self.required_methods:
                 raise ValueError("unscheduled method")
-            if tasks.setdefault(run.task_id, run.family_id) != run.family_id:
+            if tasks.setdefault(run.task_id, (run.family_id, run.task_axis_id)) != (run.family_id, run.task_axis_id):
                 raise ValueError("task has inconsistent family lineage")
+            axis_key = (run.family_id, run.task_axis_id) if run.task_axis_id else run.task_id
+            if task_axes.setdefault(axis_key, run.task_id) != run.task_id:
+                raise ValueError("inconsistent_task_axis")
             policy_key = (run.task_id, run.method_id)
             policy = (run.scale, run.margin, run.global_seed_namespace)
             if policies.setdefault(policy_key, policy) != policy:
@@ -117,6 +128,10 @@ class CrossedDesign:
             fit_key = (run.task_id, run.method_id, run.fit_id)
             if fit_couplings.setdefault(fit_key, coupling) != coupling:
                 raise ValueError("fit identity has inconsistent global seed")
+            if run.global_seed_namespace is not None:
+                seed_key = (run.task_id, run.method_id, *coupling)
+                if seed_fits.setdefault(seed_key, run.fit_id) != run.fit_id:
+                    raise ValueError("duplicate_fit_seed")
             if run.pairs is not None:
                 signature = (run.pairs.query_ids, run.pairs.cluster_ids, run.pairs.loss_space)
                 if query_sets.setdefault(run.task_id, signature) != signature:
@@ -206,7 +221,7 @@ def _bootstrap_refusal(point, estimand, draws, status, reason=None):
 
 
 def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: str = "method_new_source",
-                      draws: int = 1999, seed: int = 0) -> dict:
+                      draws: int = 10000, seed: int = 0) -> dict:
     """Cross sources/global fits; nest independent fits/sample/learner seeds.
 
     Query clusters are drawn once per task and shared across all its fits and
@@ -218,6 +233,9 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
         raise ValueError("invalid bootstrap budget or stream")
     if estimand not in ("method_new_source", "fixed_artifact"):
         raise ValueError("unknown estimand")
+    if any(r.task_axis_id is not None for r in design.runs):
+        from .inference import crossed_bootstrap
+        return crossed_bootstrap(design, endpoint=endpoint, estimand=estimand, draws=draws, seed=seed)
     point = paired_family_effect(design, endpoint=endpoint)
 
     def refuse(status, reason=None):
@@ -286,30 +304,9 @@ def bootstrap_effects(design: CrossedDesign, *, endpoint: str = "z", estimand: s
 
 
 def simultaneous_ucb(bootstrap: dict, *, alpha: float = 0.05) -> dict:
-    """Bonferroni basic-bootstrap bounds for the frozen contrast family.
-
-    Bias centering uses point minus bootstrap deviation. These are approximate
-    bounds, not distribution-free guarantees or verified qualification receipts.
-    """
-    alpha = finite_number(alpha)
-    if not 0 < alpha < 0.5:
-        raise ValueError("invalid inference alpha")
-    if bootstrap["status"] != "complete":
-        return _with_assumptions({"status": bootstrap["status"], "bounds": None})
-    samples = bootstrap["samples"]
-    per_tail = alpha / len(samples)
-    if per_tail * bootstrap["draws"] < 5:
-        return _with_assumptions({"status": "insufficient_tail_draws", "bounds": None})
-    bounds = {}
-    for method, draws in samples.items():
-        point = bootstrap["estimates"][method]
-        lo, hi = np.quantile(draws - point, [per_tail, 1 - per_tail])
-        bounds[method] = {"estimate": point, "lower": float(point - hi), "upper": float(point - lo)}
-    return _with_assumptions({
-        "status": "complete", "alpha": alpha, "multiplicity": "bonferroni_one_sided",
-        "simultaneous_one_sided_level": 1 - alpha, "two_sided_level_at_least": 1 - 2 * alpha,
-        "bounds": bounds,
-    })
+    """Paired max-T bounds and step-down tests; finite-variance approximation."""
+    from .inference import max_t_bounds
+    return max_t_bounds(bootstrap, alpha=alpha)
 
 
 def interval_decision(lower: float, upper: float, *, endpoint: str = "gap",
