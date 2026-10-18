@@ -2408,6 +2408,206 @@
     "ops/vendor/": {
       "command": "cargo test --locked --test feature_boundary && cargo check --locked --offline --features gpu-training,tch/doc-only",
       "purpose": "preserve pinned optional Torch 0.20 API and authenticated upstream runtime source while replacing vulnerable ZIP; verify archive codecs, symlink confinement and privileged permission masking without native/GPU qualification"
+    },
+    "docs/prepared-view.md": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "docs/privacy.md": {
+      "command": "cargo test --locked --lib release:: && PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "research/transfer/privacy/release_profile.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/compiler/interactions/support_fit.rs": {
+      "command": "cargo test --locked --test vnext_interactions",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/release/profile.rs": {
+      "command": "cargo test --locked --lib release::",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/release/profile_tests.rs": {
+      "command": "cargo test --locked --lib release::",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/transfer_metrics/tdl.rs": {
+      "command": "cargo test --locked --lib transfer_metrics::tests && just golden-parity",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_adapter.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_adversarial_tests.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_contract.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_contract_validation.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_fit.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/typed_data/prepared_tests.rs": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "schemas/prepared-view-v1.schema.json": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "schemas/release-profile-v1.schema.json": {
+      "command": "cargo test --locked --lib release:: && PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "schemas/tdl-golden-v1.schema.json": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_tdl.GoldenCorpusTests -v",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "tests/fixtures/prepared-view-v1/adversarial.json": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "tests/fixtures/prepared-view-v1/binary.json": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "tests/fixtures/prepared-view-v1/multiclass.json": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "tests/fixtures/prepared-view-v1/regression.json": {
+      "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
+      "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "tests/golden/transfer/v2_t90_above_one_raw.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_below_absolute_floor.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_below_floor.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_benefit.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_binary_clipped_endpoint.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_binary_invalid_probability.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_binary_invalid_target.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_binary_log.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_boundary.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_constant_target.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_custom_tau.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_floor_boundary.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_harm.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_inf_loss.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_invalid_tau.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_missing_lcb.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_missing_model.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_multiclass_clipped_endpoint.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_multiclass_invalid_probability.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_multiclass_invalid_target.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_multiclass_log.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_nan_loss.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_negative_gain.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_negative_raw.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_nonpositive_lcb.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_paired_queries.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_regression_inverse.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_unpaired.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
+    },
+    "tests/golden/transfer/v2_t90_zero_gain.json": {
+      "command": "just golden-parity",
+      "purpose": "Verify Wave-1 shared metric golden parity without scientific qualification"
     }
   }
 }
