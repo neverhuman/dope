@@ -1,0 +1,442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:release-profile:v1",
+  "title": "Independent utility, empirical privacy, formal DP and legal release profile",
+  "description": "Local research defaults to unassessed. Positive states require independently verified, scope-bound receipts; schema validity and hash commitments alone grant no authority. Empirical screening is a scoped report with qualified attack power, never anonymity or de-identification. Formal DP is optional and separately verified.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "utility_qualification_state",
+    "empirical_privacy_state",
+    "formal_dp_state",
+    "legal_release_state",
+    "accounting",
+    "evidence"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-release-profile"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "utility_qualification_state": {
+      "type": "string",
+      "enum": [
+        "unassessed",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "default": "unassessed"
+    },
+    "empirical_privacy_state": {
+      "type": "string",
+      "enum": [
+        "unassessed",
+        "pending",
+        "screened",
+        "inconclusive",
+        "failed"
+      ],
+      "default": "unassessed"
+    },
+    "formal_dp_state": {
+      "type": "string",
+      "enum": [
+        "unassessed",
+        "pending",
+        "verified",
+        "failed"
+      ],
+      "default": "unassessed"
+    },
+    "legal_release_state": {
+      "type": "string",
+      "enum": [
+        "unassessed",
+        "pending",
+        "authorized",
+        "denied"
+      ],
+      "default": "unassessed"
+    },
+    "accounting": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/accounting"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "default": []
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "utility_qualification_state": {
+            "const": "passed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "accounting": {
+            "$ref": "#/$defs/accounting"
+          },
+          "evidence": {
+            "contains": {
+              "properties": {
+                "axis": {
+                  "const": "utility"
+                }
+              },
+              "required": [
+                "axis"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "evidence": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "axis": {
+                    "const": "utility"
+                  }
+                },
+                "required": [
+                  "axis"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "empirical_privacy_state": {
+            "const": "screened"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "accounting": {
+            "$ref": "#/$defs/accounting"
+          },
+          "evidence": {
+            "contains": {
+              "properties": {
+                "axis": {
+                  "const": "empirical_privacy"
+                }
+              },
+              "required": [
+                "axis"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "evidence": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "axis": {
+                    "const": "empirical_privacy"
+                  }
+                },
+                "required": [
+                  "axis"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "formal_dp_state": {
+            "const": "verified"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "accounting": {
+            "$ref": "#/$defs/accounting"
+          },
+          "evidence": {
+            "contains": {
+              "properties": {
+                "axis": {
+                  "const": "formal_dp"
+                }
+              },
+              "required": [
+                "axis"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "evidence": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "axis": {
+                    "const": "formal_dp"
+                  }
+                },
+                "required": [
+                  "axis"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legal_release_state": {
+            "const": "authorized"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "accounting": {
+            "$ref": "#/$defs/accounting"
+          },
+          "evidence": {
+            "contains": {
+              "properties": {
+                "axis": {
+                  "const": "legal_release"
+                }
+              },
+              "required": [
+                "axis"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "evidence": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "axis": {
+                    "const": "legal_release"
+                  }
+                },
+                "required": [
+                  "axis"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_inventory_sha256",
+        "release_history_sha256",
+        "source_derived_lengths_sha256",
+        "source_derived_statuses_sha256",
+        "source_derived_metrics_sha256",
+        "release_count"
+      ],
+      "properties": {
+        "artifact_inventory_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "release_history_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_derived_lengths_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_derived_statuses_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_derived_metrics_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "release_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        }
+      },
+      "description": "Exact inventories include repeated artifacts and recipient-required files. Channel commitments include independently source-derived lengths, statuses (including failures) and metrics. History covers all prior releases; a changed scope invalidates every positive state."
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "receipt_sha256",
+            "accounting_sha256"
+          ],
+          "properties": {
+            "axis": {
+              "const": "utility"
+            },
+            "receipt_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "accounting_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "receipt_sha256",
+            "accounting_sha256",
+            "threat_model_sha256",
+            "attack_power_sha256"
+          ],
+          "properties": {
+            "axis": {
+              "const": "empirical_privacy"
+            },
+            "receipt_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "accounting_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "threat_model_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "attack_power_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "receipt_sha256",
+            "accounting_sha256",
+            "mechanism_sha256",
+            "accountant_sha256",
+            "proof_sha256",
+            "epsilon",
+            "delta"
+          ],
+          "properties": {
+            "axis": {
+              "const": "formal_dp"
+            },
+            "receipt_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "accounting_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "mechanism_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "accountant_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "proof_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "epsilon": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "delta": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMaximum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "axis",
+            "receipt_sha256",
+            "accounting_sha256",
+            "rights_owner_sha256"
+          ],
+          "properties": {
+            "axis": {
+              "const": "legal_release"
+            },
+            "receipt_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "accounting_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "rights_owner_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

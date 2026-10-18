@@ -129,6 +129,9 @@ class DisclosureThreatModel:
     sample_budget: int
     reference_rows: int
     repeated_releases: int = 1
+    source_derived_lengths_sha256: str | None = None
+    source_derived_statuses_sha256: str | None = None
+    source_derived_metrics_sha256: str | None = None
 
     def __post_init__(self):
         require(type(self.access) is str and self.access in {"row_only", "query_access", "white_box"}, "invalid_access")
@@ -138,6 +141,8 @@ class DisclosureThreatModel:
         require(type(self.sample_budget) is int and 1 <= self.sample_budget <= 100_000, "invalid_sample_budget")
         require(type(self.reference_rows) is int and 1 <= self.reference_rows <= 100_000, "invalid_reference_count")
         require(type(self.repeated_releases) is int and 1 <= self.repeated_releases <= 100_000, "invalid_release_count")
+        require(all(x is None or is_pin(x) for x in (self.source_derived_lengths_sha256,
+                    self.source_derived_statuses_sha256, self.source_derived_metrics_sha256)), "invalid_threat_identity")
 
     @property
     def sha256(self):
@@ -207,13 +212,15 @@ class AttackEvidence:
                     "tpr_bounds", "fpr_bounds", "advantage_bounds", "low_fpr_target", "low_fpr_resolved",
                     "true_positives", "false_positives", "members", "nonmembers", "independent_units",
                     "attacker_prior", "confidence", "comparisons", "formal_dp", "legal_route", "release_authorized"}
-        require(set(data) == expected and data["format"] == "dope-privacy-evidence" and type(data["version"]) is int
+        require(set(data) in (expected, expected | {"release_profile"})
+                and data["format"] == "dope-privacy-evidence" and type(data["version"]) is int
                 and data["version"] == 1 and data["attack"] == "calibrated_membership", "invalid_evidence")
         require(data["status"] == "inconclusive" and data["formal_dp"] == data["legal_route"] == "unverified"
                 and data["release_authorized"] is False, "invalid_evidence")
         require(all(is_pin(v) for k, v in data.items() if k.endswith("sha256")), "invalid_evidence")
         allowed_reasons = {"custody_controls_and_policy_unqualified", "low_fpr_unresolved",
-                           "cluster_or_release_inference_required", "access_threat_unmeasured"}
+                           "cluster_or_release_inference_required", "access_threat_unmeasured",
+                           "release_channels_unaccounted"}
         require(type(data["reasons"]) is list and bool(data["reasons"]) and all(type(x) is str and x in allowed_reasons
                 for x in data["reasons"]) and len(set(data["reasons"])) == len(data["reasons"]), "invalid_evidence")
         for key in ("members", "nonmembers", "independent_units", "comparisons"):
@@ -236,6 +243,10 @@ class AttackEvidence:
         require(all(x is None for x in intervals) or all(x is not None for x in intervals), "invalid_evidence")
         resolved = data["fpr_bounds"] is not None and data["fpr_bounds"][1] <= data["low_fpr_target"]
         require(data["low_fpr_resolved"] == resolved, "invalid_evidence")
+        if "release_profile" in data:
+            from .release_profile import ReleaseProfile, local_empirical_profile
+            profile = ReleaseProfile._from_value(data["release_profile"])
+            require(profile.value == local_empirical_profile(), "invalid_evidence")
 
     @property
     def value(self):
@@ -298,6 +309,9 @@ class AttackCalibration:
         tpr, fpr = tp / len(view.members), fp / len(view.nonmembers)
         tpr_ci = fpr_ci = auc_ci = advantage_ci = None
         reasons = ["custody_controls_and_policy_unqualified"]
+        if any(x is None for x in (threat.source_derived_lengths_sha256,
+                                  threat.source_derived_statuses_sha256, threat.source_derived_metrics_sha256)):
+            reasons.append("release_channels_unaccounted")
         if view.independent and threat.repeated_releases == 1:
             event_alpha = self.policy.alpha / (6 * self.policy.comparisons)
             tpr_ci = rate_bounds(tp, len(view.members), event_alpha)
@@ -327,11 +341,15 @@ class AttackCalibration:
                   "independent_units": len(set(view.units)), "attacker_prior": self.policy.attacker_prior,
                   "confidence": 1 - self.policy.alpha, "comparisons": self.policy.comparisons,
                   "formal_dp": "unverified", "legal_route": "unverified", "release_authorized": False}
+        from .release_profile import local_empirical_profile
+        result["release_profile"] = local_empirical_profile()
         return AttackEvidence(json.dumps(result, sort_keys=True, separators=(",", ":"), allow_nan=False).encode())
 
 
 def uncalibrated(view):
     require(type(view) is ScoreView, "invalid_scores")
     raw = auc(view.members, view.nonmembers)
+    from .release_profile import local_empirical_profile
     return {"status": "inconclusive", "reason": "direction_evidence_missing", "raw_auc": raw,
-            "reversible_diagnostic_auc": max(raw, 1 - raw), "formal_dp": "unverified", "release_authorized": False}
+            "reversible_diagnostic_auc": max(raw, 1 - raw), "formal_dp": "unverified", "release_authorized": False,
+            "release_profile": local_empirical_profile()}
