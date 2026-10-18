@@ -1,6 +1,6 @@
 {
-  "format": "dope-bikeshare-observation-protocol-v1",
-  "status": "frozen_before_source_acquisition_and_scoring",
+  "format": "dope-bikeshare-observation-protocol-v2",
+  "status": "development_extension_frozen_before_comparator_execution",
   "task": "predict public-bike rentals per active hour from weather and calendar features",
   "source_holdout": {
     "fit_source": "Capital Bikeshare, Washington DC, UCI dataset 275",
@@ -11,18 +11,94 @@
     "entity": "service date; all hourly rows for one date stay in one partition",
     "capital_bikeshare": "retain 2011 only; first 75 percent of ordered service dates fit, final 25 percent select",
     "seoul": "sort all service dates; first 50 percent fit, next 20 percent select, final 30 percent test",
-    "order": ["entity", "time", "fit_transforms"],
+    "order": [
+      "entity",
+      "time",
+      "fit_transforms"
+    ],
     "fit_transforms": "fit only on the source fit rows; do not tune on selection or confirmation rows"
   },
-  "prepared_features": ["hour", "weekday", "month", "holiday", "workingday", "temperature_c", "humidity_pct", "windspeed_m_s"],
-  "target": {"field": "rental_count", "units": "bikes per hour", "estimand": "observed aggregate rentals in the held-out source's active operating hours"},
-  "selection": {"candidate": "single frozen DOPE Chow-Liu profile and single Ridge(alpha=1.0) auditor", "rows_consumed_for_selection": 0},
-  "recipes": ["null_mean", "real_source_reference", "dope_n", "dope_4n"],
+  "prepared_features": [
+    "hour",
+    "weekday",
+    "month",
+    "holiday",
+    "workingday",
+    "temperature_c",
+    "humidity_pct",
+    "windspeed_m_s"
+  ],
+  "target": {
+    "field": "rental_count",
+    "units": "bikes per hour",
+    "estimand": "observed aggregate rentals in the held-out source's active operating hours"
+  },
+  "selection": {
+    "candidate": "No model selection; fixed DOPE, Gaussian copula, and compressed-row controls are run under both byte caps and both sample sizes.",
+    "rows_consumed_for_selection": 0
+  },
+  "recipes": [
+    "null_mean",
+    "real_source_reference",
+    "dope_n",
+    "dope_4n",
+    "gaussian_copula_n",
+    "gaussian_copula_4n",
+    "compressed_row_subsample_n",
+    "compressed_row_subsample_4n"
+  ],
   "seed": 1729,
-  "complete_artifact_byte_caps": [16384, 32768],
-  "sample_sizes": ["n=number of Seoul fit rows", "4n"],
-  "auditor": {"name": "sklearn StandardScaler + Ridge", "alpha": 1.0, "threads": 1},
+  "complete_artifact_byte_caps": [
+    16384,
+    32768
+  ],
+  "sample_sizes": [
+    "n=number of Seoul fit rows",
+    "4n"
+  ],
+  "auditor": {
+    "name": "sklearn StandardScaler + Ridge",
+    "alpha": 1.0,
+    "threads": 1
+  },
   "primary_loss": "mean squared error in bikes-squared per hour",
   "driver_diagnostic": "single-feature permutation-loss increase and Ridge coefficient sign on the same held-out Seoul rows; report TDL reducer state and keep interaction unavailable",
-  "campaign_claims": {"source_holdout_observed": true, "privacy": false, "tdl_qualified": false, "modern_panel_qualified": false, "healthcare_inference": false}
+  "campaign_claims": {
+    "source_holdout_observed": true,
+    "privacy": false,
+    "tdl_qualified": false,
+    "modern_panel_qualified": false,
+    "healthcare_inference": false,
+    "confirmatory": false,
+    "control_comparisons_complete": true
+  },
+  "exposure_disclosure": "The public sources were previously used in an unqualified DOPE-only observational run. This comparator extension is exploratory and is not confirmatory or an untouched-data result.",
+  "control_arms": {
+    "gaussian_copula": {
+      "fit_source": "Capital Bikeshare fit rows only",
+      "artifact_byte_caps": [
+        16384,
+        32768
+      ],
+      "sample_sizes": [
+        "n",
+        "4n"
+      ],
+      "sampler": "Gaussian rank transform, fitted correlation, inverse empirical marginal quantiles",
+      "status": "development_only_unqualified"
+    },
+    "compressed_row_subsample": {
+      "fit_source": "Capital Bikeshare fit rows only",
+      "artifact_byte_caps": [
+        16384,
+        32768
+      ],
+      "sample_sizes": [
+        "n",
+        "4n"
+      ],
+      "sampler": "seeded fit-row subsample sampled with replacement",
+      "status": "nonrelease_development_control"
+    }
+  }
 }
