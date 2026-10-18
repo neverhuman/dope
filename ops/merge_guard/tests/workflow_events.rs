@@ -15,21 +15,26 @@ fn baseline() -> (Value, Value, Value) {
 }
 
 #[test]
-fn live_collection_cannot_self_select_legacy_inventory_by_unfiltering_push() {
+fn live_and_collected_definitions_reject_legacy_inventory() {
     let (evidence, _, _) = baseline();
     let mut definitions = evidence["workflow_definitions"].clone();
     let ci = runs::WORKFLOWS[0].0;
-    let source = definitions[ci].as_str().unwrap();
-    let unfiltered_legacy = source
-        .replace("    branches:\n      - main\n", "")
-        .replace("  arm64-portability:\n    runs-on: fixture\n", "");
-    definitions[ci] = json!(unfiltered_legacy);
+    let source = include_str!("../../../.github/workflows/ci.yml");
+    let unfiltered_real_workflow = source
+        .replace("  push:\n    branches:\n      - main\n", "  push:\n")
+        .split("\n  arm64-portability:\n")
+        .next()
+        .unwrap()
+        .to_owned();
+    definitions[ci] = json!(unfiltered_real_workflow);
     assert_eq!(
-        runs::validate_definitions(&definitions, false).unwrap(),
-        &["push", "pull_request"]
+        runs::validate_definitions(&definitions, false).err(),
+        Some(Refused("workflow_definition_invalid"))
     );
+
+    let (fixture_evidence, _, _) = baseline();
     assert_eq!(
-        runs::validate_collected_definitions(&definitions).err(),
+        runs::validate_collected_definitions(&fixture_evidence["workflow_definitions"]).err(),
         Some(Refused("workflow_definition_invalid"))
     );
 }
