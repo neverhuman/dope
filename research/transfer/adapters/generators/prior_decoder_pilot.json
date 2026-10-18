@@ -1,0 +1,28 @@
+{
+  "format": "dope-prior-decoder-fixture-pilot-v1",
+  "study_manifest_sha256": "c56c17b77dc5034be463becdf43541f38bf6836aa1e9da1d540d8ffd867a0303",
+  "status": "passed",
+  "pilot_scope": "deterministic synthetic byte-accounting fixture only",
+  "vendor_model_loaded": false,
+  "external_source_read": false,
+  "external_download_bytes": 0,
+  "external_spend_usd": 0,
+  "scientific_result": "unmeasured",
+  "candidate_closure_ceilings": {
+    "no_prior_decoder": 32000000,
+    "prior_distilled_decoder": 32000000
+  },
+  "synthetic_fixture_accounting": {
+    "no_prior_decoder": {
+      "1": {"cold_bytes": 33, "amortized_bytes": 33, "shared_bytes": 0},
+      "16": {"cold_bytes": 33, "amortized_bytes": 33, "shared_bytes": 0},
+      "128": {"cold_bytes": 33, "amortized_bytes": 33, "shared_bytes": 0}
+    },
+    "prior_distilled_decoder": {
+      "1": {"cold_bytes": 33, "amortized_bytes": 33, "shared_bytes": 8},
+      "16": {"cold_bytes": 33, "amortized_bytes": 26, "shared_bytes": 8},
+      "128": {"cold_bytes": 33, "amortized_bytes": 26, "shared_bytes": 8}
+    }
+  },
+  "admission_blocker": "No custodian approval for distillation/redistribution rights, source independence evidence, verified checkpoint bytes, complete dependency closure, native parity, or priced vendor pilot."
+}
