@@ -6,6 +6,7 @@
 
 pub mod drivers;
 pub mod frontier;
+pub mod inference;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MetricError {
