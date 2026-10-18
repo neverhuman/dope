@@ -4,6 +4,13 @@ include!("candidate_search/part_02.rs");
 #[path = "candidate_search/staged_cache.rs"]
 pub mod staged_cache;
 
+#[path = "candidate_search/coupled.rs"]
+pub mod coupled;
+
+#[cfg(test)]
+#[path = "candidate_search/tests.rs"]
+mod candidate_search_tests;
+
 use crate::typed_data::prepared::PreparedCompileInput;
 use staged_cache::{CacheIdentity, DevelopmentCache, DevelopmentMetrics, SearchPartition};
 
