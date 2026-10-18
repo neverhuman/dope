@@ -1,0 +1,27 @@
+{
+  "schema_version": 2,
+  "case_id": "transfer_t90_constant_target",
+  "citable": false,
+  "component": "transfer",
+  "purpose": "Hand-calculated T90 paired-loss conformance; no scientific qualification.",
+  "input": {
+    "task": "paired_losses",
+    "loss_space": "original_mse",
+    "required_model_present": true,
+    "null_losses": [
+      100.0
+    ],
+    "real_losses": [
+      40.0
+    ],
+    "synthetic_losses": [
+      46.0
+    ],
+    "real_gain_lcb": 50.0,
+    "constant_target": true
+  },
+  "expected": {
+    "status": "uninformative",
+    "reason": "constant_target"
+  }
+}

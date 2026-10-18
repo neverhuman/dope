@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "case_id": "transfer_t90_below_absolute_floor",
+  "citable": false,
+  "component": "transfer",
+  "purpose": "Hand-calculated T90 paired-loss conformance; no scientific qualification.",
+  "input": {
+    "task": "paired_losses",
+    "loss_space": "original_mse",
+    "required_model_present": true,
+    "null_losses": [
+      100.0
+    ],
+    "real_losses": [
+      40.0
+    ],
+    "synthetic_losses": [
+      46.0
+    ],
+    "real_gain_lcb": 50.0,
+    "constant_target": false,
+    "absolute_gain_floor": 61.0
+  },
+  "expected": {
+    "status": "uninformative",
+    "reason": "real_gain_not_informative"
+  }
+}

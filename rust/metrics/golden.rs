@@ -13,13 +13,21 @@ use super::{
 
 pub const COMPONENTS: &[&str] = &["transfer", "aggregate", "drivers", "frontier", "charge"];
 
+/// Historical replay must never dispatch candidate T90 semantics.
 pub fn run_case(case: &Value) -> MetricResult<Value> {
+    require(case["schema_version"] == 1, "invalid_golden_schema")?;
+    run_versioned_case(case)
+}
+
+pub fn run_versioned_case(case: &Value) -> MetricResult<Value> {
     let obj = case
         .as_object()
         .ok_or(MetricError::new("invalid_golden_schema"))?;
     require(
-        obj.get("schema_version").and_then(Value::as_i64) == Some(1)
-            && !obj["schema_version"].is_f64(),
+        matches!(
+            obj.get("schema_version").and_then(Value::as_i64),
+            Some(1 | 2)
+        ) && !obj["schema_version"].is_f64(),
         "invalid_golden_schema",
     )?;
     require(
@@ -36,6 +44,10 @@ pub fn run_case(case: &Value) -> MetricResult<Value> {
         .and_then(Value::as_str)
         .ok_or(MetricError::new("unknown_component"))?;
     let input = obj.get("input").unwrap_or(&Value::Null);
+    if obj["schema_version"] == 2 {
+        require(component == "transfer", "invalid_golden_schema")?;
+        return Ok(transfer::evaluate_tdl(input));
+    }
     match component {
         "transfer" => Ok(transfer::evaluate(input)),
         "aggregate" => Ok(aggregate::evaluate(input)),
@@ -74,16 +86,13 @@ pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
             .as_str()
             .ok_or(MetricError::new("invalid_case_id"))?
             .to_owned();
-        require(ids.insert(case_id.clone()), "duplicate_case_id")?;
-        let actual = run_case(&case)?;
+        require(ids.insert(case_id), "duplicate_case_id")?;
+        let actual = run_versioned_case(&case)?;
         let expected = case
             .get("expected")
             .ok_or(MetricError::new("invalid_golden_schema"))?;
         if !values_close(&actual, expected, GOLDEN_TOLERANCE) {
-            panic!(
-                "golden mismatch for case `{case_id}` ({}):\n  actual:   {actual}\n  expected: {expected}",
-                path.display()
-            );
+            return Err(MetricError::new("golden_mismatch"));
         }
     }
     Ok(paths.len())
@@ -92,6 +101,16 @@ pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn historical_replay_refuses_t90_cases() {
+        let case = strict_parse_json(include_str!(
+            "../../tests/golden/transfer/v2_t90_boundary.json"
+        ))
+        .unwrap();
+        assert_eq!(run_case(&case).unwrap_err().reason, "invalid_golden_schema");
+        assert_eq!(run_versioned_case(&case).unwrap()["harm_margin"], 0.0);
+    }
 
     #[test]
     fn rust_matches_golden_parity_corpus() {

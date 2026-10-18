@@ -64,6 +64,67 @@ def frontier_input():
 
 
 class TransferTests(unittest.TestCase):
+    def t90_input(self, **changes):
+        return dict(transfer_input(null_losses=[100.], real_losses=[40.], synthetic_losses=[46.]),
+                    task="paired_losses", loss_space="original_mse", required_model_present=True, **changes)
+
+    def test_t90_hand_calculation_keeps_harm_and_benefit_orientation(self):
+        for loss, z in ((46., 0.), (45., -1.), (47., 1.), (160., 114.), (10., -36.)):
+            data = self.t90_input()
+            data["synthetic_losses"] = [loss]
+            report = transfer.evaluate_tdl(data)
+            self.assertEqual(report["harm_margin"], z)
+            self.assertEqual(report["benefit_margin"], -z)
+            self.assertEqual(report["query_harm_margin"], [z])
+            self.assertEqual(report["raw_transfer"], (100 - loss) / 60)
+            self.assertEqual(transfer.query_benefit(loss, 40., 100.), -z)
+            self.assertNotIn("tdl_pass", report)
+        self.assertEqual(transfer.evaluate_tdl(self.t90_input())["raw_transfer"], .9)
+
+    def test_t90_fails_closed_without_models_gain_or_valid_evidence(self):
+        for changes in ({"required_model_present": False}, {"real_losses": [100.]},
+                        {"real_losses": [110.]}, {"real_losses": [99.5]}, {"real_gain_lcb": 0.},
+                        {"absolute_gain_floor": 61.}, {"constant_target": True},
+                        {"real_gain_lcb": None}, {"tau": None}, {"tau": 1.1}):
+            data = self.t90_input()
+            data.update(changes)
+            report = transfer.evaluate_tdl(data)
+            self.assertNotEqual(report["status"], "informative")
+            self.assertNotIn("harm_margin", report)
+        for value in (float("nan"), float("inf"), True, "private-header-value-extremum"):
+            data = self.t90_input()
+            data["synthetic_losses"] = [value]
+            report = transfer.evaluate_tdl(data)
+            self.assertEqual(report["status"], "failed")
+            self.assertNotIn(str(value), report["reason"])
+
+    def test_t90_classification_validates_all_classes_before_clipping(self):
+        data = dict(task="binary", required_model_present=True, class_order=["a", "b"],
+                    targets=[0], real_predictions=[[.8, .2]], synthetic_predictions=[[1., 0.]],
+                    null_predictions=[[.5, .5]], real_gain_lcb=.1, constant_target=False)
+        report = transfer.evaluate_tdl(data)
+        self.assertEqual(report["status"], "informative")
+        self.assertAlmostEqual(report["real_loss"], -math.log(.8))
+        self.assertGreaterEqual(report["synthetic_loss"], 0.)
+        for row in ([.7, .7], [-.1, 1.1], [float("nan"), .5], [float("inf"), .5], [1.]):
+            result = transfer.evaluate_tdl(dict(data, synthetic_predictions=[row]))
+            self.assertEqual(result["status"], "failed")
+        for changes in ({"class_order": ["a", "a"]}, {"targets": [2]}, {"targets": [True]}):
+            self.assertEqual(transfer.evaluate_tdl(dict(data, **changes))["status"], "failed")
+        for tau in (-1., 1.1, float("nan"), float("inf")):
+            with self.assertRaises(MetricError):
+                transfer.query_harm(1., 1., 1., tau)
+
+    def test_t90_regression_inverse_transform_and_pairing(self):
+        data = dict(task="regression", required_model_present=True, targets=[10., 14.],
+                    real_predictions=[.5, .5], synthetic_predictions=[.75, .25], null_predictions=[0., 0.],
+                    prediction_offset=10., prediction_scale=4., real_gain_lcb=1., constant_target=False)
+        report = transfer.evaluate_tdl(data)
+        self.assertEqual((report["null_loss"], report["real_loss"], report["synthetic_loss"]), (8., 4., 9.))
+        self.assertTrue(close(report["query_harm_margin"], [5.4, 3.8]))
+        for changes in ({"real_predictions": [.5]}, {"prediction_scale": 0.}, {"prediction_scale": float("inf")}):
+            self.assertEqual(transfer.evaluate_tdl(dict(data, **changes))["status"], "failed")
+
     def test_original_units_unclipped_ratio_and_informative_gate(self):
         self.assertAlmostEqual(transfer.evaluate(transfer_input())["raw_transfer"], .9)
         self.assertEqual(transfer.evaluate(transfer_input(synthetic_losses=[0., 0.]))["raw_transfer"], 1.25)
@@ -297,8 +358,28 @@ class StandaloneGeneratorTests(unittest.TestCase):
 
 
 class GoldenCorpusTests(unittest.TestCase):
+    def test_transfer_schema_covers_v1_and_v2_and_rejects_unknown_fields(self):
+        from jsonschema import Draft202012Validator
+        schema = strict_load((ROOT / "schemas/tdl-golden-v1.schema.json").read_text())
+        Draft202012Validator.check_schema(schema)
+        validator = Draft202012Validator(schema)
+        historical = 0
+        for path in (ROOT / "tests/golden/transfer").glob("*.json"):
+            case = strict_load(path.read_text())
+            validator.validate(case)
+            historical += case["schema_version"] == 1
+        self.assertEqual(historical, 16)
+        case = strict_load((ROOT / "tests/golden/transfer/v2_t90_boundary.json").read_text())
+        from research.transfer.tdl.golden import run_case
+        with self.assertRaisesRegex(MetricError, "invalid_golden_schema"):
+            run_case(case)
+        for location in (case, case["input"], case["expected"]):
+            location["unexpected"] = "private-header-value-extremum"
+            self.assertFalse(validator.is_valid(case))
+            del location["unexpected"]
+
     def test_every_shared_case_matches_reference_and_is_noncitable(self):
-        from research.transfer.tdl.golden import cases, run_case
+        from research.transfer.tdl.golden import cases, run_versioned_case
         paths = cases()
         self.assertGreaterEqual(len(paths), 40)
         seen = set()
@@ -307,7 +388,7 @@ class GoldenCorpusTests(unittest.TestCase):
             with self.subTest(case=case["case_id"]):
                 self.assertNotIn(case["case_id"], seen)
                 seen.add(case["case_id"])
-                self.assertTrue(close(run_case(case), case["expected"]))
+                self.assertTrue(close(run_versioned_case(case), case["expected"]))
                 with self.assertRaisesRegex(MetricError, "noncitable_fixture"):
                     require_citable(case)
 
