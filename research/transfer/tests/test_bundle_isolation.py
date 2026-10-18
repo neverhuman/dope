@@ -52,8 +52,7 @@ try:
     print(json.dumps({'payload_sha256': hashlib.sha256(verified.retained_payload).hexdigest(),
                      'accounting': dict(verified.accounting), 'denied': denied}, sort_keys=True))
 except BundleError as error:
-    print(error.code, flush=True)
-    os._exit(2)
+    print(json.dumps({'rejected': error.code}, sort_keys=True), flush=True)
 """
 
 
@@ -102,8 +101,8 @@ class BundleIsolationTests(unittest.TestCase):
             )
 
     def assert_rejected(self, result, code):
-        self.assertEqual(result.returncode, 2, result.stderr)
-        self.assertEqual(result.stdout.strip(), code)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {"rejected": code})
         self.assertEqual(result.stderr, "")
 
     def test_clean_directory_reload_after_deleted_source_is_identical(self):
