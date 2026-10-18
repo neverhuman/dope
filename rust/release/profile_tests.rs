@@ -346,10 +346,10 @@ fn current_cli_export_blocks_before_source_access_or_output_creation() {
         private,
         &crate::release::ConversionOptions::default(),
     );
-    assert_eq!(
-        result.unwrap_err().to_string(),
-        "invalid data: release_authorization_required"
-    );
+    let error = result.unwrap_err().to_string();
+    assert_eq!(error, "invalid data: release_authorization_required");
+    assert!(!error.contains("PRIVATE_HEADER_97531"));
+    assert!(!private.exists());
 }
 
 #[test]

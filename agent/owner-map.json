@@ -648,6 +648,11 @@
     "tests/golden/transfer/v2_t90_paired_queries.json": "external-evidence",
     "tests/golden/transfer/v2_t90_regression_inverse.json": "external-evidence",
     "tests/golden/transfer/v2_t90_unpaired.json": "external-evidence",
-    "tests/golden/transfer/v2_t90_zero_gain.json": "external-evidence"
+    "tests/golden/transfer/v2_t90_zero_gain.json": "external-evidence",
+    "crates/dope-service/": "rust-core",
+    "apps/studio/": "rust-core",
+    "examples/healthcare-sim/": "external-evidence",
+    "examples/public-regression/bikeshare-observational/": "external-evidence",
+    "research/transfer/ablations/": "external-evidence"
   }
 }

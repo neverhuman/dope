@@ -184,6 +184,7 @@ pub fn evaluation_code_hash() -> String {
     h.update(include_bytes!("access.rs"));
     h.update(include_bytes!("certification.rs"));
     h.update(include_bytes!("certification/privacy_attacks.rs"));
+    h.update(include_bytes!("certification/privacy_attacks/certify.rs"));
     h.update(include_bytes!("certification/part_01.rs"));
     h.update(include_bytes!("certification/part_02.rs"));
     h.update(include_bytes!(

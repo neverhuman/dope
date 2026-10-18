@@ -90,3 +90,51 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+// Historical Python areas remain explicit while new files obey the source cap.
+#[cfg(test)]
+const PYTHON_LINE_EXCEPTIONS: &[&str] = &[
+    "docs/whitepaper/scripts/claim_registry.py",
+    "docs/whitepaper/scripts/compute_panel.py",
+    "docs/whitepaper/scripts/paper_emit.py",
+    "docs/whitepaper/scripts/review_fit_seeds.py",
+    "docs/whitepaper/scripts/review_v2_emit.py",
+    "docs/whitepaper/scripts/vnext_paper.py",
+    "ops/ci/paper-review-outputs.py",
+    "research/benchmark/legacy/mfs_v3_assemble.py",
+    "research/benchmark/pilot24_neural_comparison.py",
+    "research/benchmark/publish_arf_population_matched.py",
+    "research/benchmark/publish_dope_q8_fivefit.py",
+    "research/benchmark/publish_forestdiffusion_native.py",
+    "research/benchmark/publish_lineage_appendix.py",
+    "research/benchmark/publish_native_neural_fivefit.py",
+    "research/benchmark/publish_s3_confirmation.py",
+    "research/benchmark/publish_s3_matched.py",
+    "research/benchmark/publish_tabpc_native.py",
+    "research/benchmark/publish_target_research.py",
+    "research/benchmark/publish_work_order_b_costs.py",
+    "research/benchmark/review_fixes/fit_seeds.py",
+    "research/benchmark/review_fixes/receipt_panel.py",
+    "research/benchmark/review_fixes/sealed_once.py",
+    "research/benchmark/review_fixes/tabsyn_sample.py",
+    "research/benchmark/review_fixes/test_tabsyn_seeds_v2.py",
+    "research/benchmark/runner.py",
+    "research/benchmark/tests/test_mfs_v3_panel.py",
+    "research/benchmark/tests/test_paper_build_pipeline.py",
+    "research/benchmark/verify_paper_numbers.py",
+    "research/transfer/adapters/generators/structured.py",
+    "research/transfer/claims.py",
+    "research/transfer/geometry.py",
+    "research/transfer/geometry_distributions.py",
+    "research/transfer/tests/test_bundle.py",
+    "research/transfer/tests/test_geometry.py",
+    "research/transfer/tests/test_geometry_distributions.py",
+    "research/transfer/tests/test_metrics.py",
+    "research/transfer/tests/test_raw_profile.py",
+    "research/transfer/tests/test_structured_generators.py",
+    "src/dope_kernel/tuner.py",
+    "tests/test_tuner.py",
+];
+
+#[cfg(test)]
+mod source_limits;
