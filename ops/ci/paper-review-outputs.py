@@ -250,7 +250,7 @@ def code_snapshot():
     # Bind the transitive local Python implementation, including reducers and
     # renderer helpers. No numerical source, lock or result is modified.
     paths = set()
-    for directory in ('research', 'docs/whitepaper/scripts'):
+    for directory in ('research', 'docs/whitepaper/scripts', 'tools/claims'):
         paths.update(p for p in (REPO / directory).rglob('*.py')
                      if 'tests' not in p.parts and not p.name.startswith('test_'))
     paths.update((REPO / 'ops/ci').glob('paper-*.py'))

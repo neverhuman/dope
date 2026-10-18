@@ -537,6 +537,34 @@ elif args and args[0]=='docs/whitepaper/scripts/build_pdf.sh':
                 self.assertEqual(output.stat().st_mtime_ns, initial_stat)
             self.assertIs(verified, admitted[0])
 
+    def test_code_snapshot_binds_tools_claims_and_runs_isolated_outside_repo_tree(self):
+        self.write('tools/claims/foundation.py', (ROOT / 'tools/claims/foundation.py').read_bytes())
+        verified = self.admit()
+        self.assertIn('tools/claims/foundation.py', dict(verified.code))
+        self.write('tools/claims/foundation.py', b'# tampered foundation helper\n')
+        with self.assertRaisesRegex(ValueError, 'stale paper build source identity'):
+            verified.revalidate()
+        with patch.object(REVIEW, 'REPO', ROOT):
+            real_code = dict(REVIEW.code_snapshot())
+        self.assertIn('tools/claims/foundation.py', real_code)
+        self.assertIn('tools/claims/render.py', real_code)
+        with tempfile.TemporaryDirectory(prefix='dope-isolated-render-') as ext_dir:
+            iso = Path(ext_dir)
+            for rel, raw in real_code.items():
+                dst = iso / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(raw)
+            for rel in ('README.md', 'docs/whitepaper/generated/v2-headline.json',
+                        'research/benchmark/results/review-fixes-v2/panel.json',
+                        'research/benchmark/review_fixes/predeclare_v2.json'):
+                dst = iso / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes((ROOT / rel).read_bytes())
+            res = subprocess.run([sys.executable, '-B', str(iso / 'docs/whitepaper/scripts/readme_benchmark.py'), '--write-readme'],
+                                 cwd=iso, capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, res.stderr)
+            self.assertEqual((iso / 'README.md').read_bytes(), (ROOT / 'README.md').read_bytes())
+            (iso / 'research/benchmark/results/review-fixes-v2/panel.json').unlink()
+            missing = subprocess.run([sys.executable, '-B', str(iso / 'docs/whitepaper/scripts/readme_benchmark.py'), '--write-readme'],
+                                     cwd=iso, capture_output=True, text=True)
+            self.assertNotEqual(missing.returncode, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

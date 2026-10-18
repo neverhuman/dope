@@ -21,10 +21,8 @@ import declared_facts  # noqa: E402
 from figure_spec import TEASER_X_LIM  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
-CLAIMS_REPO = next((p for p in (REPO, *REPO.parents) if (p / "tools/claims/foundation.py").is_file()), REPO)
-for _p in (REPO, CLAIMS_REPO):
-    if str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
 HEADLINE = REPO / "docs" / "whitepaper" / "generated" / "v2-headline.json"
 README = REPO / "README.md"
 PNGS = (REPO / "docs" / "readme" / "pareto.png", REPO / "docs" / "readme" / "paired.png")
@@ -76,10 +74,10 @@ def load_facts(headline: dict) -> dict:
 
 
 def _load_classical_table() -> dict[tuple[str, str], dict[str, dict]]:
-    if str(CLAIMS_REPO) not in sys.path:
-        sys.path.insert(0, str(CLAIMS_REPO))
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
     from tools.claims import foundation as _fnd
-    v2, _ = _fnd.authenticate_source(_fnd.V2_PANEL_REL, root=CLAIMS_REPO)
+    v2, _ = _fnd.authenticate_source(_fnd.V2_PANEL_REL, root=REPO)
     classical: dict[tuple[str, str], dict[str, dict]] = {}
     for row in v2.get("levels", ()):
         if row.get("size") == 4:
@@ -93,10 +91,10 @@ def benchmark_block(headline: dict, facts: dict | None = None) -> str:
     arms = {arm["code"]: arm for arm in headline["arms"]}
     dope = arms["Dope"]
     classical = _load_classical_table()
-    if str(CLAIMS_REPO) not in sys.path:
-        sys.path.insert(0, str(CLAIMS_REPO))
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
     from tools.claims import foundation as _fnd
-    f_summary = _fnd.load_foundation_summary(CLAIMS_REPO)
+    f_summary = _fnd.load_foundation_summary(REPO)
     f_rows = _fnd.foundation_table_rows(f_summary)
     key = (headline["strongest"]["method"], headline["strongest"]["configuration"])
     strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
