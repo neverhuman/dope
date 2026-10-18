@@ -183,24 +183,29 @@ jobs:
               sudo apt-get update
               sudo apt-get -o DPkg::Lock::Timeout=300 install -y poppler-utils
             else
-              mkdir -p "$PWD/target/arm64-poppler/debs"
-              (
-                cd "$PWD/target/arm64-poppler/debs"
-                apt-get download \
-                  poppler-utils libpoppler134 liblcms2-2 libopenjp2-7 libnss3 libnspr4 \
-                  libtiff6 libjpeg-turbo8 libfontconfig1 libfreetype6 libpng16-16t64 \
-                  libdeflate0 libjbig0 liblerc4 libwebp7 libsharpyuv0 libcairo2 \
-                  libpixman-1-0 libxcb-render0 libxcb-shm0 libxrender1 libxext6 libx11-6 \
-                  libxcb1 libxau6 libxdmcp6
-                for deb in *.deb; do
-                  dpkg-deb -x "$deb" "$PWD/.."
-                done
-              )
-              export PATH="$PWD/target/arm64-poppler/usr/bin:$PATH"
-              export LD_LIBRARY_PATH="$PWD/target/arm64-poppler/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH:-}"
+              mkdir -p "$RUNNER_TEMP/apt-lists" "$RUNNER_TEMP/apt-cache/partial" "$RUNNER_TEMP/apt-debs" "$RUNNER_TEMP/poppler-root"
+              cp -a /var/lib/apt/lists/* "$RUNNER_TEMP/apt-lists/" 2>/dev/null || true
+              if ! apt-cache -o Dir::State::lists="$RUNNER_TEMP/apt-lists" -o Dir::Cache="$RUNNER_TEMP/apt-cache" show poppler-utils >/dev/null 2>&1; then
+                apt-get -o Dir::State::lists="$RUNNER_TEMP/apt-lists" -o Dir::Cache="$RUNNER_TEMP/apt-cache" -o Debug::NoLocking=1 update
+              fi
+              mapfile -t pkgs < <(apt-get -o Dir::State::lists="$RUNNER_TEMP/apt-lists" -o Dir::Cache="$RUNNER_TEMP/apt-cache" -s install poppler-utils | awk '/^Inst /{print $2}')
+              echo "Resolved rootless poppler-utils closure: ${pkgs[*]}"
+              test "${#pkgs[@]}" -gt 0
+              (cd "$RUNNER_TEMP/apt-debs" && apt-get -o Dir::State::lists="$RUNNER_TEMP/apt-lists" -o Dir::Cache="$RUNNER_TEMP/apt-cache" download "${pkgs[@]}")
+              for deb in "$RUNNER_TEMP/apt-debs"/*.deb; do
+                dpkg-deb -x "$deb" "$RUNNER_TEMP/poppler-root"
+              done
+              export PATH="$RUNNER_TEMP/poppler-root/usr/bin:$PATH"
+              export LD_LIBRARY_PATH="$RUNNER_TEMP/poppler-root/usr/lib/aarch64-linux-gnu:$RUNNER_TEMP/poppler-root/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
+              echo "$RUNNER_TEMP/poppler-root/usr/bin" >> "$GITHUB_PATH"
+              echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
             fi
           fi
+          command -v pdftotext
+          ldd "$(command -v pdftotext)"
+          if ldd "$(command -v pdftotext)" | grep -F "not found"; then exit 1; fi
           pdftotext -v
+          test -n "$(pdftotext docs/whitepaper/dope-mfs.pdf - | head -c 64)"
           uv venv target/arm64-python
           uv pip install --python target/arm64-python/bin/python --constraint validation/requirements-v1.txt numpy scipy pandas 'matplotlib==3.10.8' pytest jsonschema
           target/arm64-python/bin/python -B tools/claims/check.py
