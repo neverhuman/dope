@@ -30,6 +30,10 @@ path = "rust/mfs_v3_holdout.rs"
 name = "dope-native-notices"
 path = "scripts/native-notices.rs"
 
+[[bin]]
+name = "dope-service"
+path = "crates/dope-service/src/main.rs"
+
 [[test]]
 name = "feature_boundary"
 path = "ops/vendor/feature_boundary.rs"
