@@ -1,3 +1,35 @@
+/// Explicit DPK4 unit-parameter fitting boundary. The returned packet stores
+/// actual q4 nibbles or q8 bytes when passed to `codec::dpk4::encode`.
+/// Legacy DPK3 encoding and its historical precision ladder remain unchanged.
+pub fn quantized_unit_packet(values: &[f32], bits: u8) -> Result<crate::codec::dpk4::Packet> {
+    use crate::codec::dpk4::{MAX_VALUES, Packet};
+
+    if !matches!(bits, 4 | 8) {
+        return Err(DopeError::Codec("DPK4 unsupported precision".into()));
+    }
+    if values.len() > MAX_VALUES {
+        return Err(DopeError::Codec(
+            "DPK4 element count exceeds its bound".into(),
+        ));
+    }
+    if values
+        .iter()
+        .any(|value| !value.is_finite() || !(0.0..=1.0).contains(value))
+    {
+        return Err(DopeError::Codec("DPK4 invalid unit parameter".into()));
+    }
+    let maximum = ((1u32 << bits) - 1) as f32;
+    let levels = values
+        .iter()
+        .map(|&value| (quantize(value, bits, true) * maximum).round() as u8)
+        .collect();
+    Ok(if bits == 4 {
+        Packet::Q4(levels)
+    } else {
+        Packet::Q8(levels)
+    })
+}
+
 fn quantize(value: f32, bits: u8, unit: bool) -> f32 {
     let levels = ((1u32 << bits.min(16)) - 1) as f32;
     if unit {
