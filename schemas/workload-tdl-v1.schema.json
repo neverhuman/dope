@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:workload-tdl-v1-proposed",
+  "title": "Proposed workload TDL study design",
+  "description": "Design-only admission record for target and horizon holdouts. It does not qualify an artifact or authorize execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "status",
+    "qualification_gate",
+    "hypothesis",
+    "source_holdout",
+    "model_holdout",
+    "target_horizon_holdout",
+    "candidate_set",
+    "accounting",
+    "seed_schedule",
+    "stop_rule",
+    "execution"
+  ],
+  "properties": {
+    "format": { "const": "dope-workload-tdl-study" },
+    "version": { "const": 1 },
+    "status": { "enum": ["design_only", "admitted"] },
+    "qualification_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_receipt_sha256", "required_panel_sha256", "state"],
+      "properties": {
+        "required_receipt_sha256": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          ]
+        },
+        "required_panel_sha256": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          ]
+        },
+        "state": {
+          "enum": [
+            "blocked_missing_single_task_qualified_artifact_receipt",
+            "admitted_after_single_task_qualification"
+          ]
+        }
+      }
+    },
+    "hypothesis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["development_source_sha256", "confirmation_source_sha256", "status"],
+      "properties": {
+        "development_source_sha256": { "$ref": "#/$defs/hashList" },
+        "confirmation_source_sha256": { "$ref": "#/$defs/hashList" },
+        "status": { "enum": ["frozen", "blocked_until_qualified_receipt"] }
+      }
+    },
+    "model_holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["development_model_sha256", "confirmation_model_sha256", "status"],
+      "properties": {
+        "development_model_sha256": { "$ref": "#/$defs/hashList" },
+        "confirmation_model_sha256": { "$ref": "#/$defs/hashList" },
+        "status": { "enum": ["frozen", "blocked_until_qualified_receipt"] }
+      }
+    },
+    "target_horizon_holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["development_task_sha256", "confirmation_task_sha256", "status"],
+      "properties": {
+        "development_task_sha256": { "$ref": "#/$defs/hashList" },
+        "confirmation_task_sha256": { "$ref": "#/$defs/hashList" },
+        "status": { "enum": ["frozen", "blocked_until_qualified_receipt"] }
+      }
+    },
+    "candidate_set": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["shared_x_per_target_head", "independent_full_artifact"]
+      }
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["included_bytes", "comparison_rule", "pilot_cost_cap_cpu_core_seconds", "development_cost_cap_cpu_core_seconds"],
+      "properties": {
+        "included_bytes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["shared_x_payload", "every_target_head", "per_target_metadata", "indexes", "required_runtime_closure"]
+          }
+        },
+        "comparison_rule": { "const": "sum_all_shared_x_and_target_head_bytes_vs_sum_independent_full_artifact_bytes" },
+        "pilot_cost_cap_cpu_core_seconds": { "type": "integer", "minimum": 1 },
+        "development_cost_cap_cpu_core_seconds": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "seed_schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pilot", "development", "confirmation", "reuse_rule"],
+      "properties": {
+        "pilot": { "$ref": "#/$defs/seeds" },
+        "development": { "$ref": "#/$defs/seeds" },
+        "confirmation": { "$ref": "#/$defs/seeds" },
+        "reuse_rule": { "const": "disjoint_role_specific_seed_rosters" }
+      }
+    },
+    "stop_rule": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pilot", "development", "automatic_campaign"],
+      "properties": {
+        "pilot": { "enum": ["not_run_prerequisite_missing", "priced_once", "complete", "failed", "incomplete"] },
+        "development": { "enum": ["not_admitted", "admitted_after_pilot_review"] },
+        "automatic_campaign": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "hashList": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      ]
+    },
+    "seeds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+    }
+  }
+}
