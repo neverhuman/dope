@@ -59,9 +59,15 @@ jobs:
         run: target/ci-python/bin/python -B -m unittest research.transfer.privacy.test_summary_study -v
 
       - name: U04 observational admissions fixtures
-        run: python3 -B examples/public-regression/bikeshare-observational/test_runner.py
+        run: target/ci-python/bin/python -B examples/public-regression/bikeshare-observational/test_runner.py
 
       - name: U03 simulated healthcare CLI journey
+        env:
+          CARGO_INCREMENTAL: '0'
+          CARGO_PROFILE_DEV_DEBUG: line-tables-only
+          RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
         run: |
           out=target/healthcare-sim
           target/ci-python/bin/python -B examples/healthcare-sim/demo.py prepare --out "$out"
@@ -74,6 +80,7 @@ jobs:
             --rows 640 --seed 1729 --out "$out/sampled.json"
           target/ci-python/bin/python -B examples/healthcare-sim/demo.py evaluate \
             --out "$out" --sampled "$out/sampled.json"
+          rm -rf "$out"
 
       - name: Verify public claims and golden parity
         run: |
