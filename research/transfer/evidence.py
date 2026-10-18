@@ -177,9 +177,14 @@ class EvaluationIdentity:
         return parse_json(self._bytes)
 
 
-def scientific_cache_key(identity: EvaluationIdentity) -> str:
-    return digest({"format": "dope-scientific-cache-key", "version": 1,
-                   "identity": identity.value})
+def scientific_cache_key(identity: EvaluationIdentity, policies=None) -> str:
+    """Key evidence by scientific identity and, when supplied, frozen run policies."""
+    key = {"format": "dope-scientific-cache-key", "version": 1,
+           "identity": identity.value}
+    if policies is not None:
+        canonical_json(policies)
+        key["policies"] = policies
+    return digest(key)
 
 
 def fit_replicate_key(identity: EvaluationIdentity) -> str:
@@ -396,12 +401,13 @@ def verify_receipt(unverified: UnverifiedReceipt, root: Path,
     return VerifiedEvaluationReceipt(unverified._bytes, _TOKEN)
 
 
-def commit_completed_receipt(cache_dir: Path, verified: VerifiedEvaluationReceipt) -> Path:
+def commit_completed_receipt(cache_dir: Path, verified: VerifiedEvaluationReceipt, policies=None) -> Path:
     if type(verified) is not VerifiedEvaluationReceipt:
         _fail("verification_required")
-    key = scientific_cache_key(verified.identity)
+    key = scientific_cache_key(verified.identity, policies)
     envelope = {"format": "dope-scientific-cache", "version": 1, "state": "complete",
-                "cache_key": key, "receipt_hash": verified.receipt_hash, "receipt": verified.value}
+                "cache_key": key, "receipt_hash": verified.receipt_hash, "receipt": verified.value,
+                "policies": policies}
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     destination = cache_dir / (key + ".json")
@@ -423,11 +429,11 @@ def commit_completed_receipt(cache_dir: Path, verified: VerifiedEvaluationReceip
         _fail("cache_commit_failed")
 
 
-def load_completed_receipt(cache_dir: Path, root: Path, policy: VerificationPolicy) -> VerifiedEvaluationReceipt:
-    key = scientific_cache_key(policy.identity)
+def load_completed_receipt(cache_dir: Path, root: Path, policy: VerificationPolicy, policies=None) -> VerifiedEvaluationReceipt:
+    key = scientific_cache_key(policy.identity, policies)
     _, _, data = _read_file(Path(cache_dir), key + ".json", True)
     envelope = parse_json(data)
-    _closed(envelope, ("format", "version", "state", "cache_key", "receipt_hash", "receipt"))
-    if envelope["format"] != "dope-scientific-cache" or type(envelope["version"]) is not int or envelope["version"] != 1 or envelope["state"] != "complete" or envelope["cache_key"] != key or envelope["receipt_hash"] != policy.receipt_hash:
+    _closed(envelope, ("format", "version", "state", "cache_key", "receipt_hash", "receipt", "policies"))
+    if envelope["format"] != "dope-scientific-cache" or type(envelope["version"]) is not int or envelope["version"] != 1 or envelope["state"] != "complete" or envelope["cache_key"] != key or envelope["receipt_hash"] != policy.receipt_hash or envelope["policies"] != policies:
         _fail("cache_incomplete_or_mismatched")
     return verify_receipt(UnverifiedReceipt(canonical_json(envelope["receipt"])), root, policy)
