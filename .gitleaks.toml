@@ -1,0 +1,21 @@
+title = "DOPE Gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Limit known test and frozen-input false positives to their exact source lines."
+condition = "AND"
+regexTarget = "line"
+regexes = [
+  '''CANARY_PRIVATE_HEADER_[A-Za-z0-9_]+''',
+  '''[a]a[b]b[c]c[d]d[e]e[f]f[0]0[1]1[2]2[3]3[4]4[5]5[6]6[7]7[8]8[9]9''',
+  '''forest-key-errors\.csv''',
+  '''mitra-api\.py''',
+]
+paths = [
+  '''^research/transfer/tests/test_drivers\.py$''',
+  '''^crates/dope-service/src/service_tests\.rs$''',
+  '''^ops/ci/frozen-evidence\.json$''',
+  '''^research/transfer/locks/other-auditors\.json$''',
+]

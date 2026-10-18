@@ -55,6 +55,26 @@ jobs:
           RUSTC_WRAPPER: sccache
         run: bash ops/ci/cpu.sh
 
+      - name: R10 privacy summary study fixtures
+        run: target/ci-python/bin/python -B -m unittest research.transfer.privacy.test_summary_study -v
+
+      - name: U04 observational admissions fixtures
+        run: python3 -B examples/public-regression/bikeshare-observational/test_runner.py
+
+      - name: U03 simulated healthcare CLI journey
+        run: |
+          out=target/healthcare-sim
+          target/ci-python/bin/python -B examples/healthcare-sim/demo.py prepare --out "$out"
+          target/ci-python/bin/python -B examples/healthcare-sim/demo.py verify --out "$out"
+          cargo build --locked --bin dope-kernel
+          target/debug/dope-kernel compile-csv --csv "$out/fit.csv" \
+            --target event_30d --candidate chow_liu --seed 1729 \
+            --deadline-seconds 60 --out "$out/model.dpk"
+          target/debug/dope-kernel sample-mixed --artifact "$out/model.dpk" \
+            --rows 640 --seed 1729 --out "$out/sampled.json"
+          target/ci-python/bin/python -B examples/healthcare-sim/demo.py evaluate \
+            --out "$out" --sampled "$out/sampled.json"
+
       - name: Verify public claims and golden parity
         run: |
           target/ci-python/bin/python tools/claims/check.py
@@ -124,3 +144,6 @@ jobs:
         with:
           path: .
           artifact-name: dope-sbom.spdx.json
+          output-file: target/security/sbom.spdx.json
+      - name: Q03 native release and installer smoke
+        run: bash ops/ci/native-release-smoke.sh
