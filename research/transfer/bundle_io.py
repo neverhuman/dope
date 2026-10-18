@@ -255,3 +255,49 @@ def preflight_dpk(artifact, limits=None):
     if saw_neural and not v3:
         _fail("unknown_section")
     return {"features": features, "minor": artifact[5], "v3": v3}
+
+
+def recipient_accounting(bundle):
+    """Measured declared inventory; no sharing credit without independence proof.
+
+    Runtime labels do not prove public source, licensing, or independence. They
+    therefore remain fully in R(A,H), including at K > 1. Generated rows are a
+    separate delivery scope; required/reachable rows are already in the closure.
+    External inventory is not an executable-sampler or release qualification.
+    Historical account_inventory estimates remain available for v1 replay only.
+    """
+    from research.transfer.bundle import VerifiedBundle, checked_sum
+
+    if type(bundle) is not VerifiedBundle:
+        _fail("verification_required")
+    a = bundle.accounting
+    sections = {name: a[name + "_bytes"] for name in (
+        "sampling_payload", "shared_learned_state", "runtime_package",
+        "evidence_authorization", "materialized_rows", "transform", "dictionary",
+    )}
+    sections["runtime"] = sections.pop("runtime_package")
+    component_bytes = checked_sum(sections.values())
+    physical_bytes = checked_sum((component_bytes, a["manifest_bytes"]))
+    cold = a["charged_sampling_bytes"]
+    if cold > physical_bytes:
+        _fail("inconsistent_byte_ledger")
+    return {
+        "format": "dope.recipient-inventory/v1",
+        "status": "inventory_verified",
+        "sampling_closure_qualification": "unmeasured",
+        "scope": "declared_recipient_bundle",
+        "amortization_status": "unverified_full_charge",
+        "dataset_specific_bytes": cold,
+        "declared_runtime_bytes": a["runtime_package_bytes"],
+        "shared_source_independent_decoder_bytes": None,
+        "cold_closure_bytes": cold,
+        "amortized_k_closure_bytes": cold,
+        "amortization_count": a["amortization_count"],
+        "generated_samples_bytes": a["materialized_rows_bytes"],
+        "component_bytes": component_bytes,
+        "manifest_framing_bytes": a["manifest_bytes"],
+        "physical_file_bytes": physical_bytes,
+        "nonrecipient_delivery_bytes": physical_bytes - cold,
+        "complete_delivery_bytes": a.get("complete_delivery_bytes"),
+        "section_bytes": sections,
+    }

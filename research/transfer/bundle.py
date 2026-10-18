@@ -203,7 +203,7 @@ def _sorted_unique(values, code):
     return values
 
 
-_IO_EXPORTS = frozenset({"_inventory", "_read_bytes", "_scan_open_directory", "preflight_dpk"})
+_IO_EXPORTS = frozenset({"_inventory", "_read_bytes", "_scan_open_directory", "preflight_dpk", "recipient_accounting"})
 
 
 def __getattr__(name):

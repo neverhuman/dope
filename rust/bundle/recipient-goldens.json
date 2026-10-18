@@ -1,0 +1,61 @@
+{
+  "cases": {
+    "amortized-unmeasured": {
+      "amortization_count": 4,
+      "amortization_status": "unverified_full_charge",
+      "amortized_k_closure_bytes": 2121,
+      "cold_closure_bytes": 2121,
+      "complete_delivery_bytes": null,
+      "component_bytes": 40,
+      "dataset_specific_bytes": 2121,
+      "declared_runtime_bytes": 5,
+      "format": "dope.recipient-inventory/v1",
+      "generated_samples_bytes": 9,
+      "manifest_framing_bytes": 2097,
+      "nonrecipient_delivery_bytes": 16,
+      "physical_file_bytes": 2137,
+      "sampling_closure_qualification": "unmeasured",
+      "scope": "declared_recipient_bundle",
+      "section_bytes": {
+        "dictionary": 3,
+        "evidence_authorization": 7,
+        "materialized_rows": 9,
+        "runtime": 5,
+        "sampling_payload": 4,
+        "shared_learned_state": 10,
+        "transform": 2
+      },
+      "shared_source_independent_decoder_bytes": null,
+      "status": "inventory_verified"
+    },
+    "included-evidence-required": {
+      "amortization_count": 1,
+      "amortization_status": "unverified_full_charge",
+      "amortized_k_closure_bytes": 2136,
+      "cold_closure_bytes": 2136,
+      "complete_delivery_bytes": 2145,
+      "component_bytes": 40,
+      "dataset_specific_bytes": 2136,
+      "declared_runtime_bytes": 5,
+      "format": "dope.recipient-inventory/v1",
+      "generated_samples_bytes": 9,
+      "manifest_framing_bytes": 2105,
+      "nonrecipient_delivery_bytes": 9,
+      "physical_file_bytes": 2145,
+      "sampling_closure_qualification": "unmeasured",
+      "scope": "declared_recipient_bundle",
+      "section_bytes": {
+        "dictionary": 3,
+        "evidence_authorization": 7,
+        "materialized_rows": 9,
+        "runtime": 5,
+        "sampling_payload": 4,
+        "shared_learned_state": 10,
+        "transform": 2
+      },
+      "shared_source_independent_decoder_bytes": null,
+      "status": "inventory_verified"
+    }
+  },
+  "legacy_fixture_sha256": "cfa8d3cf7f70d2b7a9249b190e7ba40273f5615b49b4879ac4c87d929dfce4a3"
+}
