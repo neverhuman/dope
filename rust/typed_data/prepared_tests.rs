@@ -2,6 +2,7 @@ use super::*;
 use serde_json::{Value, json};
 
 include!("prepared_adversarial_tests.rs");
+include!("prepared_replay_tests.rs");
 
 fn declaration(category: bool) -> Value {
     json!({"format":"dope-table-schema","version":1,"columns":[

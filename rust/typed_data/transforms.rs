@@ -24,6 +24,9 @@ pub struct FittedTransforms {
     format: String,
     version: u32,
     fit_rows: usize,
+    // Absent only in historical unbound v1 sampling states.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fit_row_digest: Option<String>,
     #[serde(default = "default_max_field_bytes")]
     max_field_bytes: usize,
     visibility: MetadataVisibility,
@@ -133,6 +136,7 @@ pub fn fit_transform(table: &TypedTable, fit_rows: &[usize]) -> Result<FittedTra
         format: "dope-affine-state".into(),
         version: 1,
         fit_rows: fit_rows.len(),
+        fit_row_digest: Some(fit_row_digest(table, fit_rows)),
         max_field_bytes: table.max_field_bytes,
         visibility: table.schema.metadata_visibility,
         columns,
@@ -147,6 +151,10 @@ impl FittedTransforms {
             || self.version != 1
             || self.fit_rows == 0
             || self.max_field_bytes == 0
+            || self
+                .fit_row_digest
+                .as_deref()
+                .is_some_and(|digest| !crate::schema::prepared_digest(digest))
             || self.columns.len() < 2
             || self.columns.len() > MAX_COLUMNS
         {
@@ -343,6 +351,8 @@ impl FittedTransforms {
             .collect())
     }
 }
+
+include!("transforms_replay.rs");
 
 struct BoundedStateBytes(Vec<u8>);
 
