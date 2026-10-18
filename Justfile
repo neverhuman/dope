@@ -37,6 +37,12 @@ focus filter:
     cargo check -p dope-kernel --locked
     cargo test -p dope-kernel --locked --lib {{filter}}
 
+release-local-native:
+    RUSTFLAGS="-C target-cpu=native" cargo build --locked --release --offline -p dope-kernel --bin dope
+
+native-release-smoke:
+    bash ops/ci/native-release-smoke.sh
+
 fast-audit:
     bash agent/run-jankurai-fast.sh
 
