@@ -1,14 +1,18 @@
 # TDL paper package
 
 The canonical manuscript package for **Transfer Description Length for Synthetic Tables**
-(working title; the metric name awaits owner decision D-01). Status: **skeleton, specified,
-not measured.** It contains no result. Every number it will print comes from `generated/`
-through the claims firewall (T-070, T-071). The historical v2 validation paper stays frozen in
-[`docs/whitepaper/`](../docs/whitepaper/README.md).
+(working title; the metric name awaits owner decision D-01). This is the active paper landing
+page for the manuscript in `main.tex` and supplement in `supplement.tex`. Figure 1 and Table 1
+present the authenticated historical selection-exposed foundation-model transfer comparison;
+prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
+`target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
+paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/dope-mfs.pdf)
+and [`docs/whitepaper/supplement.pdf`](../docs/whitepaper/supplement.pdf), with its
+qualifications documented in [`docs/whitepaper/`](../docs/whitepaper/README.md).
 
 | Path | Contents | Owner |
 | --- | --- | --- |
-| `main.tex`, `supplement.tex` | manuscript and supplement skeletons (T-110) | L3 |
+| `main.tex`, `supplement.tex` | active manuscript and supplement | L3 |
 | `macros.tex` | shared macros; reads generated macro files first, then typesets visible `[pending]` placeholders | L3 |
 | `references.bib` | starts as a copy of the historical paper's DOI-checked bibliography; add only verified entries | L3 |
 | `build.sh` | checks the contract macros, then builds both PDFs into `target/paper/` and fails on unresolved references or citations | L3 |
@@ -24,8 +28,7 @@ bash paper/build.sh        # check them, then write target/paper/main.pdf and ta
 ```
 
 Toolchain: pdfTeX from TeX Live 2023, `latexmk` 4.83 and BibTeX 0.99d, using only standard
-packages (`amsmath`, `booktabs`, `graphicx`, `xcolor`, `natbib`, `hyperref`). The PDFs are
-build output and are not committed while the paper is a skeleton.
+packages (`amsmath`, `booktabs`, `graphicx`, `xcolor`, `natbib`, `hyperref`). The PDFs are build output under `target/paper/`.
 
 ## Generated inputs
 

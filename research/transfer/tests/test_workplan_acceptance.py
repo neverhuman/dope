@@ -143,19 +143,24 @@ class TestP04WorkplanDashboard(unittest.TestCase):
     def test_p04_workplan_dag_and_live_dashboard(self):
         self.assertTrue((REPO_ROOT / "docs/testing.md").is_file())
         decisions = (REPO_ROOT / "docs/decisions.md").read_text()
-        for expected in ("SC-DEC-097", "60 / 65", "5 / 65"):
+        for expected in ("SC-DEC-101", "59 / 65", "6 / 65"):
             self.assertIn(expected, decisions)
         run_validate_plan()
         if os.environ.get("DOPE_PACKET_DIR"):
             self.assertTrue(_safe_is_dir(PACKET_DIR))
         if _safe_is_dir(PACKET_DIR):
-            tasks = json.loads((PACKET_DIR / "tasks.json").read_text())["tasks"]
+            task_doc = json.loads((PACKET_DIR / "tasks.json").read_text())
+            tasks = task_doc["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
             self.assertEqual(len(tasks), 65)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 60)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 5)
-            self.assertEqual(prog_doc["counts"]["done"], 60)
-            self.assertEqual(prog_doc["counts"]["blocked"], 5)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 59)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 6)
+            self.assertEqual(task_doc["summary_counts"]["done"], 59)
+            self.assertEqual(task_doc["summary_counts"]["blocked"], 6)
+            self.assertEqual(prog_doc["counts"]["done"], 59)
+            self.assertEqual(prog_doc["counts"]["blocked"], 6)
+            self.assertEqual(prog_doc["status_summary"]["done"], 59)
+            self.assertEqual(prog_doc["status_summary"]["blocked"], 6)
         check_dashboard_200("/")
 
 
