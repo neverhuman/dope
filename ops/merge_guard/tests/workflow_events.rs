@@ -14,6 +14,26 @@ fn baseline() -> (Value, Value, Value) {
     )
 }
 
+#[test]
+fn live_collection_cannot_self_select_legacy_inventory_by_unfiltering_push() {
+    let (evidence, _, _) = baseline();
+    let mut definitions = evidence["workflow_definitions"].clone();
+    let ci = runs::WORKFLOWS[0].0;
+    let source = definitions[ci].as_str().unwrap();
+    let unfiltered_legacy = source
+        .replace("    branches:\n      - main\n", "")
+        .replace("  arm64-portability:\n    runs-on: fixture\n", "");
+    definitions[ci] = json!(unfiltered_legacy);
+    assert_eq!(
+        runs::validate_definitions(&definitions, false).unwrap(),
+        &["push", "pull_request"]
+    );
+    assert_eq!(
+        runs::validate_collected_definitions(&definitions).err(),
+        Some(Refused("workflow_definition_invalid"))
+    );
+}
+
 fn add_arm64_job(runs: &mut Value) {
     for run in runs.as_array_mut().unwrap() {
         if run["path"] == ".github/workflows/ci.yml" {
