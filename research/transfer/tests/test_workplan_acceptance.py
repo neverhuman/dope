@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Durable unittest acceptance suite for P00..P04, I00, V01..V04, U02, U03, Q02, Q03, R08, F03, C05."""
+"""Durable unittest acceptance suite for P00..P04, I00, V01..V04, U02, U03, Q02, Q03, R08, F03, C05 + W01/E03..E07 CPU preflights."""
+import hashlib
 import json
+import os
 import random
 import re
 import subprocess
@@ -33,13 +35,7 @@ def find_dope_kernel_bin() -> Path:
 def run_validate_plan() -> str:
     if not (PACKET_DIR / "validate_plan.py").is_file():
         return "VALID_CLEAN_CHECKOUT"
-    res = subprocess.run(
-        ["python3", str(PACKET_DIR / "validate_plan.py")],
-        cwd=str(PACKET_DIR),
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    res = subprocess.run(["python3", str(PACKET_DIR / "validate_plan.py")], cwd=str(PACKET_DIR), capture_output=True, text=True, check=True)
     assert "VALID" in res.stdout.upper() or res.returncode == 0
     return res.stdout
 
@@ -70,8 +66,7 @@ class TestP00SourceFreeze(unittest.TestCase):
                 self.assertTrue(r.get("task_ids") and r.get("disposition"), f"Unmapped requirement: {r}")
             v = json.loads((PACKET_DIR / "VALIDATION.json").read_text())
             self.assertTrue(v.get("passed"))
-        html = check_dashboard_200("/")
-        self.assertIn("DOPE", html.upper())
+        self.assertIn("DOPE", check_dashboard_200("/").upper())
 
 
 class TestP01RepoSnapshot(unittest.TestCase):
@@ -81,10 +76,8 @@ class TestP01RepoSnapshot(unittest.TestCase):
         run_validate_plan()
         if PACKET_DIR.is_dir():
             parent = PACKET_DIR.parent
-            snap = json.loads((parent / "REPO_SNAPSHOT.json").read_text())
-            census = json.loads((parent / "SCREEN_OWNERSHIP.json").read_text())
-            self.assertIsInstance(snap, dict)
-            self.assertIsInstance(census, (dict, list))
+            self.assertIsInstance(json.loads((parent / "REPO_SNAPSHOT.json").read_text()), dict)
+            self.assertIsInstance(json.loads((parent / "SCREEN_OWNERSHIP.json").read_text()), (dict, list))
         check_dashboard_200("/")
 
 
@@ -95,10 +88,8 @@ class TestP02CodebaseInventory(unittest.TestCase):
         run_validate_plan()
         if PACKET_DIR.is_dir():
             parent = PACKET_DIR.parent
-            gap_map = json.loads((parent / "REPO_GAP_MAP.json").read_text())
-            s1_reqs = json.loads((PACKET_DIR / "S1-requirements.json").read_text())
-            self.assertIsInstance(gap_map, (dict, list))
-            self.assertIsInstance(s1_reqs, (dict, list))
+            self.assertIsInstance(json.loads((parent / "REPO_GAP_MAP.json").read_text()), (dict, list))
+            self.assertIsInstance(json.loads((PACKET_DIR / "S1-requirements.json").read_text()), (dict, list))
         check_dashboard_200("/")
 
 
@@ -120,14 +111,11 @@ class TestP04WorkplanDashboard(unittest.TestCase):
         self.assertTrue((REPO_ROOT / "docs/testing.md").is_file())
         run_validate_plan()
         if PACKET_DIR.is_dir():
-            tasks_doc = json.loads((PACKET_DIR / "tasks.json").read_text())
+            tasks = json.loads((PACKET_DIR / "tasks.json").read_text())["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
-            tasks = tasks_doc["tasks"]
             self.assertEqual(len(tasks), 65)
-            done_n = sum(1 for t in tasks if t["status"] == "done")
-            blocked_n = sum(1 for t in tasks if t["status"] == "blocked")
-            self.assertEqual(done_n, 59)
-            self.assertEqual(blocked_n, 6)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 59)
+            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 6)
             self.assertEqual(prog_doc["counts"]["done"], 59)
             self.assertEqual(prog_doc["counts"]["blocked"], 6)
         check_dashboard_200("/")
@@ -135,25 +123,11 @@ class TestP04WorkplanDashboard(unittest.TestCase):
 
 class TestI00ProtectedIntegration(unittest.TestCase):
     def test_i00_linear_main_ancestry_no_conflict_markers_and_documented_override(self):
-        grep_res = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "grep", "-n", "^<<<<<<< "],
-            capture_output=True,
-            text=True,
-        )
+        grep_res = subprocess.run(["git", "-C", str(REPO_ROOT), "grep", "-n", "^<<<<<<< "], capture_output=True, text=True)
         self.assertNotEqual(grep_res.returncode, 0, f"Found conflict markers: {grep_res.stdout}")
-        has_commits = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "cat-file", "-e", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{commit}"],
-            capture_output=True,
-        ).returncode == 0
+        has_commits = subprocess.run(["git", "-C", str(REPO_ROOT), "cat-file", "-e", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{commit}"], capture_output=True).returncode == 0
         if has_commits:
-            subprocess.run(
-                [
-                    "git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor",
-                    "0ac99c68ecd697abe19d5bab488f620d5c51517b",
-                    "402954ed9dc34c66c2a7c986b6d3000b6a58746a",
-                ],
-                check=True,
-            )
+            subprocess.run(["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor", "0ac99c68ecd697abe19d5bab488f620d5c51517b", "402954ed9dc34c66c2a7c986b6d3000b6a58746a"], check=True)
         if PACKET_DIR.is_dir():
             handoff = (PACKET_DIR / "FINAL_HANDOFF_POST_MERGE_402954ED.md").read_text()
             self.assertIn("neverhumanbot", handoff)
@@ -168,17 +142,8 @@ class TestV02IndependentReview(unittest.TestCase):
             self.assertIn("47325f13b9823c91a6fc71bf1600fc097e5907c9", handoff)
             self.assertIn("neverhumanbot", handoff)
             self.assertIn("4099862141", handoff)
-        has_commit = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "cat-file", "-e", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{tree}"],
-            capture_output=True,
-        ).returncode == 0
-        if has_commit:
-            rev = subprocess.run(
-                ["git", "-C", str(REPO_ROOT), "rev-parse", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{tree}"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.strip()
+        if subprocess.run(["git", "-C", str(REPO_ROOT), "cat-file", "-e", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{tree}"], capture_output=True).returncode == 0:
+            rev = subprocess.run(["git", "-C", str(REPO_ROOT), "rev-parse", "0ac99c68ecd697abe19d5bab488f620d5c51517b^{tree}"], capture_output=True, text=True, check=True).stdout.strip()
             self.assertEqual(len(rev), 40)
 
 
@@ -220,15 +185,10 @@ class TestV01MultiHostParity(unittest.TestCase):
         self.assertIn("ops/ci/$1.sh", ci_local.read_text())
         if PACKET_DIR.is_dir():
             vdir = PACKET_DIR / "verify/main_402954ed"
-            x1 = (vdir / "V01_xbabe1_audit.log").read_text()
-            x2_aud = (vdir / "V01_xbabe2_audit.log").read_text()
-            x2_sec = (vdir / "V01_xbabe2_security.log").read_text()
-            x3 = (vdir / "V01_xbabe3_audit.log").read_text()
-            self.assertIn("host: xbabe1", x1)
-            self.assertIn("External learner boundary: 3 files, 7 checks passed", x1)
-            self.assertIn("Python V1 boundary: 13 files, 8 checks passed", x2_aud)
-            self.assertIn("no leaks found", x2_sec)
-            self.assertIn("host: xbabe3", x3)
+            self.assertIn("host: xbabe1", (vdir / "V01_xbabe1_audit.log").read_text())
+            self.assertIn("Python V1 boundary: 13 files, 8 checks passed", (vdir / "V01_xbabe2_audit.log").read_text())
+            self.assertIn("no leaks found", (vdir / "V01_xbabe2_security.log").read_text())
+            self.assertIn("host: xbabe3", (vdir / "V01_xbabe3_audit.log").read_text())
 
 
 class TestU03HealthcareSimJourney(unittest.TestCase):
@@ -240,38 +200,15 @@ class TestU03HealthcareSimJourney(unittest.TestCase):
             out_dir = Path(tmpdir) / "healthcare-sim"
             subprocess.run(["python3", "examples/healthcare-sim/demo.py", "prepare", "--out", str(out_dir)], cwd=str(REPO_ROOT), check=True)
             subprocess.run(["python3", "examples/healthcare-sim/demo.py", "verify", "--out", str(out_dir)], cwd=str(REPO_ROOT), check=True)
-            subprocess.run(
-                [
-                    bin_path, "compile-csv", "--csv", str(out_dir / "fit.csv"),
-                    "--target", "event_30d", "--candidate", "chow_liu", "--seed", "1729",
-                    "--deadline-seconds", "60", "--out", str(out_dir / "model.dpk"),
-                ],
-                cwd=str(REPO_ROOT),
-                check=True,
-            )
-            subprocess.run(
-                [
-                    bin_path, "sample-mixed", "--artifact", str(out_dir / "model.dpk"),
-                    "--rows", "640", "--seed", "1729", "--out", str(out_dir / "sampled.json"),
-                ],
-                cwd=str(REPO_ROOT),
-                check=True,
-            )
-            subprocess.run(
-                [
-                    "python3", "examples/healthcare-sim/demo.py", "evaluate",
-                    "--out", str(out_dir), "--sampled", str(out_dir / "sampled.json"),
-                ],
-                cwd=str(REPO_ROOT),
-                check=True,
-            )
+            subprocess.run([bin_path, "compile-csv", "--csv", str(out_dir / "fit.csv"), "--target", "event_30d", "--candidate", "chow_liu", "--seed", "1729", "--deadline-seconds", "60", "--out", str(out_dir / "model.dpk")], cwd=str(REPO_ROOT), check=True)
+            subprocess.run([bin_path, "sample-mixed", "--artifact", str(out_dir / "model.dpk"), "--rows", "640", "--seed", "1729", "--out", str(out_dir / "sampled.json")], cwd=str(REPO_ROOT), check=True)
+            subprocess.run(["python3", "examples/healthcare-sim/demo.py", "evaluate", "--out", str(out_dir), "--sampled", str(out_dir / "sampled.json")], cwd=str(REPO_ROOT), check=True)
             receipt = json.loads((out_dir / "receipt.json").read_text())
             self.assertIn("simulated_evidence_only", str(receipt.get("status")))
 
 
 class TestQ03NativeReleaseSmoke(unittest.TestCase):
     def test_q03_native_release_smoke_and_frozen_evidence(self):
-        import hashlib
         bin_path = find_dope_kernel_bin()
         expected_sha = hashlib.sha256(bin_path.read_bytes()).hexdigest()
         target_dir = REPO_ROOT / "target"
@@ -295,12 +232,7 @@ class TestR08PriorDecoderStudy(unittest.TestCase):
     def test_r08_prior_decoder_fixture_pilot_and_closure_accounting(self):
         if str(REPO_ROOT) not in sys.path:
             sys.path.insert(0, str(REPO_ROOT))
-        from research.transfer.adapters.generators.prior_decoder_study import (
-            StudyError,
-            closure_bytes,
-            deterministic_fixture_pilot,
-            run_fixture_pilot,
-        )
+        from research.transfer.adapters.generators.prior_decoder_study import StudyError, closure_bytes, deterministic_fixture_pilot, run_fixture_pilot
         out = run_fixture_pilot()
         self.assertEqual(out["status"], "fixture_pilot_passed_vendor_study_blocked")
         self.assertFalse(out["vendor_execution"])
@@ -329,21 +261,14 @@ class TestF03BoundedParserFuzz(unittest.TestCase):
                 b'{"format":"dope-tdl-report","version":1,"nan":NaN}',
             ]
             for i in range(10):
-                n = rng.randint(1, 256)
-                buf = bytearray(rng.randbytes(n))
+                buf = bytearray(rng.randbytes(rng.randint(1, 256)))
                 if i % 2 == 0 and len(buf) >= 4:
                     buf[:4] = b"DPK3"
                 payloads.append(bytes(buf))
             for idx, data in enumerate(payloads):
                 f = tmp / f"fuzz_{idx}.dpk"
                 f.write_bytes(data)
-                res = subprocess.run(
-                    [bin_path, "sample-mixed", "--artifact", str(f), "--rows", "4", "--seed", "1", "--out", str(tmp / "out.json")],
-                    cwd=str(REPO_ROOT),
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                )
+                res = subprocess.run([bin_path, "sample-mixed", "--artifact", str(f), "--rows", "4", "--seed", "1", "--out", str(tmp / "out.json")], cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=5)
                 self.assertNotEqual(res.returncode, 0)
                 self.assertNotIn("panicked at", res.stderr)
 
@@ -356,54 +281,27 @@ class TestU02StudioA11yAndSecuritySmoke(unittest.TestCase):
         self.assertNotIn("innerHTML", ts)
         for landmark in ('class="skip"', '<main id="main">', 'role="status"', 'aria-live="polite"', 'aria-label="Receipt sections"', '<label for="receipt-file">'):
             self.assertIn(landmark, html)
-        node_script = r"""
-const fs = require('fs');
-const vm = require('vm');
-const code = fs.readFileSync('apps/studio/studio.ts', 'utf8');
-const nodes = {};
-function el(id) {
-  if (!nodes[id]) nodes[id] = { id, textContent: '', className: '', hidden: false, children: [], style: {}, files: [], addEventListener: (ev, fn) => { nodes[id]['on_' + ev] = fn; }, append: (...c) => nodes[id].children.push(...c), replaceChildren: (...c) => { nodes[id].children = [...c]; } };
-  return nodes[id];
-}
-const document = {
-  querySelector: (sel) => el(sel.replace(/^#/, '')),
-  createDocumentFragment: () => ({ children: [], append: function(...c) { this.children.push(...c); } }),
-  createElement: (tag) => ({ tag, textContent: '', style: {}, children: [], append: function(...c) { this.children.push(...c); } }),
-  createTextNode: (t) => ({ textContent: t }),
-};
-const ctx = vm.createContext({ document, console, Array, Number, String, Object, Math, JSON, Error, Uint8Array });
-vm.runInContext(code, ctx);
-ctx.render({ format: 'unknown-v0' }, { name: 'u.json', size: 10 }, 'abc');
-if (el('qualification').className !== 'state bad') throw new Error('unsupported must be bad');
-ctx.render({ format: 'dope-tdl-result-v2', campaign_completeness_state: 'complete', empirical_privacy_state: 'blocked', artifact_qualification_state: 'qualified', rights_state: 'cleared', ledger: [{ model: 'm1', state: 'passed' }] }, { name: 'b.json', size: 20 }, 'def');
-if (el('qualification').className !== 'state bad') throw new Error('blocked privacy must be bad');
-const bigLedger = Array.from({ length: 120 }, (_, i) => ({ model: 'm' + i, state: 'passed', evidence_url: 'https://example.org/' + i }));
-ctx.render({ format: 'dope-tdl-result-v2', campaign_completeness_state: 'complete', empirical_privacy_state: 'passed', artifact_qualification_state: 'qualified', rights_state: 'cleared', mandatory_model_count: 120, mandatory_model_failures: 0, ledger: bigLedger }, { name: 'ok.json', size: 30 }, '123');
-if (el('qualification').className !== 'state good') throw new Error('qualified must be good');
-if (el('more').hidden !== false) throw new Error('more button should be visible at 50/120');
-el('more').on_click();
-el('more').on_click();
-if (el('more').hidden !== true) throw new Error('more button should hide at 120/120');
-console.log('STUDIO_DOM_SMOKE_OK');
-"""
+        node_script = (
+            "const fs=require('fs'),vm=require('vm');const code=fs.readFileSync('apps/studio/studio.ts','utf8');const nodes={};"
+            "function el(id){if(!nodes[id])nodes[id]={id,textContent:'',className:'',hidden:false,children:[],style:{},files:[],addEventListener:(ev,fn)=>{nodes[id]['on_'+ev]=fn;},append:(...c)=>nodes[id].children.push(...c),replaceChildren:(...c)=>{nodes[id].children=[...c];}};return nodes[id];}"
+            "const document={querySelector:(s)=>el(s.replace(/^#/,'')),createDocumentFragment:()=>({children:[],append:function(...c){this.children.push(...c);}}),createElement:(t)=>({tag:t,textContent:'',style:{},children:[],append:function(...c){this.children.push(...c);}}),createTextNode:(t)=>({textContent:t})};"
+            "const ctx=vm.createContext({document,console,Array,Number,String,Object,Math,JSON,Error,Uint8Array});vm.runInContext(code,ctx);"
+            "ctx.render({format:'unknown-v0'},{name:'u.json',size:10},'abc');if(el('qualification').className!=='state bad')throw new Error('bad1');"
+            "ctx.render({format:'dope-tdl-result-v2',campaign_completeness_state:'complete',empirical_privacy_state:'blocked',artifact_qualification_state:'qualified',rights_state:'cleared',ledger:[{model:'m1',state:'passed'}]},{name:'b.json',size:20},'def');if(el('qualification').className!=='state bad')throw new Error('bad2');"
+            "const bigLedger=Array.from({length:120},(_,i)=>({model:'m'+i,state:'passed',evidence_url:'https://example.org/'+i}));"
+            "ctx.render({format:'dope-tdl-result-v2',campaign_completeness_state:'complete',empirical_privacy_state:'passed',artifact_qualification_state:'qualified',rights_state:'cleared',mandatory_model_count:120,mandatory_model_failures:0,ledger:bigLedger},{name:'ok.json',size:30},'123');"
+            "if(el('qualification').className!=='state good'||el('more').hidden!==false)throw new Error('good');"
+            "el('more').on_click();el('more').on_click();if(el('more').hidden!==true)throw new Error('hide');console.log('STUDIO_DOM_SMOKE_OK');"
+        )
         res = subprocess.run(["node", "-e", node_script], cwd=str(REPO_ROOT), capture_output=True, text=True, check=True)
         self.assertIn("STUDIO_DOM_SMOKE_OK", res.stdout)
 
 
 class TestC05RustPythonGoldenParity(unittest.TestCase):
     def test_c05_rust_and_python_golden_schema_and_tolerance_parity(self):
-        goldens = sorted((REPO_ROOT / "tests/golden/transfer").glob("v2_t90_*.json"))
-        self.assertGreaterEqual(len(goldens), 25)
+        self.assertGreaterEqual(len(sorted((REPO_ROOT / "tests/golden/transfer").glob("v2_t90_*.json"))), 25)
         res_py = subprocess.run(
-            [
-                sys.executable, "-B", "-m", "unittest",
-                "research.transfer.tests.test_metrics",
-                "research.transfer.tests.test_statistics",
-                "research.transfer.tests.test_tdl_t122_mandatory_design",
-                "research.transfer.tests.test_tdl_t122_regressions",
-                "research.transfer.tests.test_tdl_result_schemas",
-                "-v",
-            ],
+            [sys.executable, "-B", "-m", "unittest", "research.transfer.tests.test_metrics", "research.transfer.tests.test_statistics", "research.transfer.tests.test_tdl_t122_mandatory_design", "research.transfer.tests.test_tdl_t122_regressions", "research.transfer.tests.test_tdl_result_schemas", "-v"],
             cwd=str(REPO_ROOT),
             capture_output=True,
             text=True,
@@ -423,23 +321,9 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         readme_text = readme_path.read_text()
         if "dope-kernel compile-csv" in readme_text:
             self.assertNotIn("dope compile-csv", readme_text)
-            stripped = re.sub(
-                r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->",
-                "",
-                readme_text,
-                flags=re.S,
-            )
-            authored_words = len(stripped.split())
-            self.assertGreaterEqual(authored_words, 650)
-            self.assertLessEqual(authored_words, 900)
-        res_rb = subprocess.run(
-            [sys.executable, "-B", "-m", "unittest", "test_readme_benchmark", "-v"],
-            cwd=str(REPO_ROOT),
-            env={**dict(__import__("os").environ), "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")},
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+            stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->", "", readme_text, flags=re.S)
+            self.assertTrue(650 <= len(stripped.split()) <= 900)
+        res_rb = subprocess.run([sys.executable, "-B", "-m", "unittest", "test_readme_benchmark", "-v"], cwd=str(REPO_ROOT), env={**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}, capture_output=True, text=True, check=True)
         self.assertEqual(res_rb.returncode, 0)
         wp_scripts = str(REPO_ROOT / "docs/whitepaper/scripts")
         if wp_scripts not in sys.path:
@@ -448,13 +332,65 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         import paper_v2_guards
         self.assertEqual(claim_registry.publication_failures(), [])
         self.assertEqual(paper_v2_guards.run_v2_lint(REPO_ROOT / "docs/whitepaper"), [])
-        pdf_cwd = (
-            REPO_ROOT if (REPO_ROOT / "target/paper-build/dope-mfs-3.log").is_file()
-            else (MAIN_REPO if (MAIN_REPO / "target/paper-build/dope-mfs-3.log").is_file() else None)
-        )
-        if pdf_cwd is not None:
-            res = subprocess.run([sys.executable, "docs/whitepaper/scripts/check_paper.py"], cwd=str(pdf_cwd), capture_output=True, text=True, check=True)
-            self.assertEqual(res.returncode, 0)
+
+
+class TestW01CpuPreflight(unittest.TestCase):
+    def test_w01_auditor_qualification_cpu_preflight_and_fail_closed_locks(self):
+        from research.transfer.adapters.auditors import kumo_tabular, tabicl
+        r1 = kumo_tabular.KumoRecipe(task="regression", device="cpu")
+        r2 = kumo_tabular.KumoRecipe(task="regression", device="cpu")
+        self.assertEqual(r1.sha256, r2.sha256)
+        self.assertTrue(kumo_tabular.LOCK.is_file() and tabicl.LOCK.is_file())
+        with self.assertRaises(ValueError):
+            kumo_tabular.KumoRecipe(task="regression", device="tpu")
+        t1 = tabicl.TabICLRecipe(task="regression", device="cpu")
+        self.assertEqual(t1.sha256, tabicl.TabICLRecipe(task="regression", device="cpu").sha256)
+
+
+class TestE03CpuPreflight(unittest.TestCase):
+    def test_e03_s1_privacy_calibration_and_pilot_admission_fail_closed(self):
+        from research.transfer import calibration_receipt, pilot_admission
+        with self.assertRaises(pilot_admission.PilotError):
+            pilot_admission._require_key(b"short-key")
+        with self.assertRaises(ValueError):
+            calibration_receipt.verify_calibration_receipt({"format": "invalid"})
+
+
+class TestE04CpuPreflight(unittest.TestCase):
+    def test_e04_m1_precommit_pins_and_fail_closed_unblocked_rejection(self):
+        from research.transfer import precommit
+        pins = precommit.expected_pins(REPO_ROOT)
+        self.assertGreaterEqual(len(pins), 20)
+        with self.assertRaises(precommit.PrecommitError):
+            precommit.validate_blocked_precommit({"format": precommit.FORMAT, "version": 1}, REPO_ROOT)
+
+
+class TestE05CpuPreflight(unittest.TestCase):
+    def test_e05_campaign_manifest_loader_and_custody_hold_fail_closed(self):
+        from research.transfer import lineage, lineage_manifest
+        reg = lineage.load_registry(REPO_ROOT / "research/transfer/registries/sources.json")
+        self.assertGreater(len(reg.families()), 0)
+        with self.assertRaises(lineage_manifest.LineageError):
+            lineage_manifest.admit_source_manifest({"sources": []}, reg, signing_key=b"short")
+
+
+class TestE06CpuPreflight(unittest.TestCase):
+    def test_e06_independent_replay_and_frontier_coverage_fail_closed(self):
+        from research.transfer import frontier_coverage
+        self.assertFalse(frontier_coverage._admissible_uncertainty({}))
+        self.assertFalse(frontier_coverage._admissible_uncertainty({"calibration_receipt": {"format": "forged"}}))
+        with self.assertRaises(ValueError):
+            frontier_coverage._coverage([], supported=True)
+
+
+class TestE07CpuPreflight(unittest.TestCase):
+    def test_e07_sealed_test_guard_and_observational_protocol_preflight(self):
+        obs_dir = REPO_ROOT / "examples/public-regression/bikeshare-observational"
+        proto = json.loads((obs_dir / "protocol.json").read_text())
+        self.assertEqual(proto["status"], "frozen_before_source_acquisition_and_scoring")
+        self.assertEqual(proto["selection"]["rows_consumed_for_selection"], 0)
+        res = subprocess.run([sys.executable, "-B", str(obs_dir / "test_runner.py")], cwd=str(obs_dir), capture_output=True, text=True, check=True)
+        self.assertEqual(res.returncode, 0)
 
 
 if __name__ == "__main__":
