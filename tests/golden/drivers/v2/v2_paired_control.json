@@ -1,0 +1,82 @@
+{
+  "case_id": "P02-REPRO-DRIVERS-paired_control",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "components": {
+      "mass": {
+        "a_rr": 0.7,
+        "a_rs": 0.6,
+        "descriptive_ratio": 0.8571428571428572,
+        "lcbs": {
+          "control_strength": 10.0,
+          "margin": 0.040000000000000036,
+          "real_strength": 10.0,
+          "stability": 0.7,
+          "synthetic_strength": 1.0
+        },
+        "margin": 0.040000000000000036
+      }
+    },
+    "driver_fidelity": 0.8571428571428572,
+    "driver_pass": true,
+    "format": "driver-result-v1",
+    "protocol_version": "v2",
+    "reason": null,
+    "status": "complete"
+  },
+  "input": {
+    "groups_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "importance_floor": 0.1,
+    "inference": {
+      "bound_method": "full_family_max_t",
+      "bounds": {
+        "mass.control_strength": {
+          "estimate": 10.0,
+          "lower": 10.0
+        },
+        "mass.margin": {
+          "estimate": 0.040000000000000036,
+          "lower": 0.040000000000000036
+        },
+        "mass.real_strength": {
+          "estimate": 10.0,
+          "lower": 10.0
+        },
+        "mass.stability": {
+          "estimate": 0.7,
+          "lower": 0.7
+        },
+        "mass.synthetic_strength": {
+          "estimate": 1.0,
+          "lower": 1.0
+        }
+      },
+      "status": "complete"
+    },
+    "perturbation_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "perturbation_status": "complete",
+    "prepared_view_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "protocol_version": "v2",
+    "query_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "real_control_importances": [
+      5.0,
+      5.0
+    ],
+    "real_importances": [
+      8.0,
+      2.0
+    ],
+    "required_components": [
+      "mass"
+    ],
+    "stability_floor": 0.7,
+    "synthetic_importances": [
+      4.0,
+      6.0
+    ],
+    "synthetic_strength_floor": 0.5
+  },
+  "purpose": "D80 uses a matched noisy real-real reference, not absolute 80% identity.",
+  "schema_version": 2
+}
