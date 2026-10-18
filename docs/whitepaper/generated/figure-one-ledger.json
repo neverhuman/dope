@@ -1,0 +1,22 @@
+{
+  "format": "dope-figure-one-ledger-v1",
+  "mode": "protocol_only",
+  "contract": {
+    "question": "How few complete dataset-specific bytes preserve learning across required models?",
+    "x": "actual_complete_recipient_bytes",
+    "y": "source_balanced_eligible_task_coverage",
+    "thresholds": {"transfer": 0.9, "drivers": 0.8},
+    "mandatory_models": [],
+    "max_main_comparators": 5,
+    "supplement_comparators": "all_preregistered",
+    "uncertainty": "source_cluster",
+    "privacy_label": "empirical privacy unmeasured; no formal DP claim",
+    "denominator": "eligible tasks fixed before outcomes; unsupported, failed and missing remain in denominator disposition",
+    "bytes": "complete recipient-read dataset-specific payload; no extrapolated B90",
+    "panel": "source-balanced; no independent median-x/median-y point"
+  },
+  "retained_states": ["unsupported", "failed", "missing", "native_large", "not_reached", "eligible"],
+  "compressed_data_controls": "nonrelease_only",
+  "points": [],
+  "status": "E05 admission absent; engineering renderer only"
+}
