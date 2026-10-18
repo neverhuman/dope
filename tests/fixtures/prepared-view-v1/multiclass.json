@@ -1,0 +1,134 @@
+{
+  "format": "prepared-view-v1",
+  "version": 1,
+  "metadata": {
+    "task": "multiclass",
+    "horizon": {
+      "steps": 1,
+      "unit": "rows"
+    },
+    "columns": [
+      {
+        "id": 1,
+        "source_id": "c0001",
+        "dtype": "continuous",
+        "role": "feature",
+        "transform": {
+          "kind": "affine",
+          "offset": 0.0,
+          "scale": 10.0
+        },
+        "bounds": {
+          "lower": null,
+          "upper": null
+        }
+      },
+      {
+        "id": 2,
+        "source_id": "c0002",
+        "dtype": "continuous",
+        "role": "feature",
+        "transform": {
+          "kind": "affine",
+          "offset": 0.0,
+          "scale": 10.0
+        },
+        "bounds": {
+          "lower": null,
+          "upper": null
+        }
+      },
+      {
+        "id": 3,
+        "source_id": "c0003",
+        "dtype": "integer",
+        "role": "target",
+        "transform": {
+          "kind": "identity"
+        },
+        "bounds": {
+          "lower": null,
+          "upper": null
+        }
+      }
+    ],
+    "group_map": [
+      {
+        "id": 1,
+        "column_ids": [
+          1
+        ]
+      },
+      {
+        "id": 2,
+        "column_ids": [
+          2
+        ]
+      }
+    ],
+    "target": {
+      "kind": "discrete",
+      "class_order": [
+        0,
+        1,
+        2
+      ]
+    },
+    "policies": {
+      "missing": "reject",
+      "category": "fit_dictionary",
+      "oov": "reject",
+      "support": "declared_bounds",
+      "saturation": "none"
+    },
+    "provenance": {
+      "fit_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "entity_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "split_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "column_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "implementation_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "rights": {
+      "state": "research_unassessed",
+      "evidence_digest": null
+    },
+    "projection": {
+      "state": "private",
+      "public": "opaque_only"
+    },
+    "capabilities": {
+      "regression": {
+        "schema": true,
+        "adapter": true,
+        "qualified": true
+      },
+      "binary": {
+        "schema": true,
+        "adapter": true,
+        "qualified": true
+      },
+      "multiclass": {
+        "schema": true,
+        "adapter": true,
+        "qualified": false
+      }
+    }
+  },
+  "rows": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      2.0,
+      2.0,
+      2.0
+    ]
+  ]
+}

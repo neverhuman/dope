@@ -1,0 +1,562 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.local/schemas/prepared-view-v1.schema.json",
+  "title": "Private PreparedView v1",
+  "$comment": "PreparedTable is a Rust migration alias only. Native validation is mandatory for ordered identities, group partition/order, task/target consistency, finite numbers, UTF-8 byte limits, total cells/metadata bytes, bounds, class membership and frozen-contract binding. This is a fit-view contract, not arbitrary future-table compression. Public projections are a separate redacted summary and cannot be compiled.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "metadata",
+    "rows"
+  ],
+  "properties": {
+    "format": {
+      "const": "prepared-view-v1"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100000,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 4096,
+        "items": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "horizon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "steps",
+        "unit"
+      ],
+      "properties": {
+        "steps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "unit": {
+          "enum": [
+            "rows",
+            "seconds"
+          ]
+        }
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lower",
+        "upper"
+      ],
+      "properties": {
+        "lower": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "upper": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "affine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "offset",
+        "scale"
+      ],
+      "properties": {
+        "kind": {
+          "const": "affine"
+        },
+        "offset": {
+          "type": "number"
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "const": "identity"
+        }
+      }
+    },
+    "category_index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "categories"
+      ],
+      "properties": {
+        "kind": {
+          "const": "category_index"
+        },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_id",
+        "dtype",
+        "role",
+        "transform",
+        "bounds"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^c[0-9]{4}$"
+        },
+        "dtype": {
+          "enum": [
+            "continuous",
+            "integer",
+            "boolean",
+            "category_code"
+          ]
+        },
+        "role": {
+          "enum": [
+            "feature",
+            "target"
+          ]
+        },
+        "transform": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/affine"
+            },
+            {
+              "$ref": "#/$defs/identity"
+            },
+            {
+              "$ref": "#/$defs/category_index"
+            }
+          ]
+        },
+        "bounds": {
+          "$ref": "#/$defs/bounds"
+        }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "column_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "column_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4095,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "regression_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "units"
+      ],
+      "properties": {
+        "kind": {
+          "const": "regression"
+        },
+        "units": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "discrete_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "class_order"
+      ],
+      "properties": {
+        "kind": {
+          "const": "discrete"
+        },
+        "class_order": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4096,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "missing",
+        "category",
+        "oov",
+        "support",
+        "saturation"
+      ],
+      "properties": {
+        "missing": {
+          "const": "reject"
+        },
+        "category": {
+          "const": "fit_dictionary"
+        },
+        "oov": {
+          "const": "reject"
+        },
+        "support": {
+          "const": "declared_bounds"
+        },
+        "saturation": {
+          "const": "none"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fit_digest",
+        "entity_digest",
+        "split_digest",
+        "column_digest",
+        "implementation_hash"
+      ],
+      "properties": {
+        "fit_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "entity_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "split_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "column_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "implementation_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "evidence_digest"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "research_unassessed",
+            "approved",
+            "blocked"
+          ]
+        },
+        "evidence_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "public"
+      ],
+      "properties": {
+        "state": {
+          "const": "private"
+        },
+        "public": {
+          "const": "opaque_only"
+        }
+      }
+    },
+    "initial_capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "adapter",
+        "qualified"
+      ],
+      "properties": {
+        "schema": {
+          "const": true
+        },
+        "adapter": {
+          "const": true
+        },
+        "qualified": {
+          "const": true
+        }
+      }
+    },
+    "multiclass_capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "adapter",
+        "qualified"
+      ],
+      "properties": {
+        "schema": {
+          "const": true
+        },
+        "adapter": {
+          "const": true
+        },
+        "qualified": {
+          "const": false
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regression",
+        "binary",
+        "multiclass"
+      ],
+      "properties": {
+        "regression": {
+          "$ref": "#/$defs/initial_capability"
+        },
+        "binary": {
+          "$ref": "#/$defs/initial_capability"
+        },
+        "multiclass": {
+          "$ref": "#/$defs/multiclass_capability"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task",
+        "horizon",
+        "columns",
+        "group_map",
+        "target",
+        "policies",
+        "provenance",
+        "rights",
+        "projection",
+        "capabilities"
+      ],
+      "properties": {
+        "task": {
+          "enum": [
+            "regression",
+            "binary",
+            "multiclass"
+          ]
+        },
+        "horizon": {
+          "$ref": "#/$defs/horizon"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4096,
+          "items": {
+            "$ref": "#/$defs/column"
+          }
+        },
+        "group_map": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4095,
+          "items": {
+            "$ref": "#/$defs/group"
+          }
+        },
+        "target": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/regression_target"
+            },
+            {
+              "$ref": "#/$defs/discrete_target"
+            }
+          ]
+        },
+        "policies": {
+          "$ref": "#/$defs/policies"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "rights": {
+          "$ref": "#/$defs/rights"
+        },
+        "projection": {
+          "$ref": "#/$defs/projection"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/capabilities"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "task": {
+                "const": "regression"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "$ref": "#/$defs/regression_target"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "target": {
+                "$ref": "#/$defs/discrete_target"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "task": {
+                "const": "binary"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "class_order": {
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "task": {
+                "const": "multiclass"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "class_order": {
+                    "minItems": 3
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
