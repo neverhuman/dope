@@ -5,6 +5,12 @@
 //! decoder and sampler run on the retained bytes. Verification is identity and
 //! closure, not utility, privacy, or release authority.
 
+// The historical standalone test harness includes this file without the
+// typed-data module. Integration tests exercise this production worker API.
+#[cfg(not(test))]
+#[path = "bundle/source_free_closure.rs"]
+pub mod source_free_closure;
+
 use std::collections::{BTreeMap, BTreeSet};
 #[cfg(test)]
 use std::fs;
