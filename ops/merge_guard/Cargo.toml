@@ -13,6 +13,10 @@ autotests = false
 name = "dope-merge-guard"
 path = "main.rs"
 
+[[bin]]
+name = "check-frozen-evidence"
+path = "frozen_evidence.rs"
+
 [dependencies]
 clap = { version = "=4.6.2", features = ["derive"] }
 libc = { version = "=0.2.186" }

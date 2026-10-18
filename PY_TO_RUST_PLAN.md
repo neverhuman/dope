@@ -14,7 +14,7 @@ Python-native ML model ecosystems, and publication plotting.
 2. **Keep-With-Reason Python (`keep-with-reason`)**:
    - **`python/dope_v1/*`**: Frozen historical reference implementation required by [`docs/architecture.md`](docs/architecture.md) for cross-language bit/receipt parity tests. Never extended with new features.
    - **`research/*`**: Empirical benchmark harnesses invoking Python-native ML libraries (`catboost`, `lightgbm`, `xgboost`, `scikit-learn`, `torch`, `tabpfn`, `tabicl`).
-   - **`docs/whitepaper/scripts/*`, `tools/claims/{foundation,render,test_figure}.py`, `scripts/generate_paper_figures.py`**: Publication figure/table rendering (`matplotlib`) and LaTeX build orchestration.
+   - **`docs/whitepaper/scripts/*`, `tools/claims/{foundation,render,test_figure}.py`**: Publication figure/table rendering (`matplotlib`) and LaTeX build orchestration.
 3. **Port Candidates (`port-candidate`)**:
    - Deterministic JSON/manifest/PDF-metadata checks in `ops/ci/*` and `tools/claims/check.py` that do not require Python ML or plotting libraries.
 
@@ -25,7 +25,15 @@ Python-native ML model ecosystems, and publication plotting.
 | **Phase 1: CI Evidence & Frozen-Ledger Guards** | `ops/ci/check-frozen-evidence.py`, `ops/ci/verify-jankurai-evidence.py`, `ops/ci/paper-review-outputs.py` | `ops/merge_guard` (or `dope-ci-guard` binary) | Rust subcommand verifies SHA-256 digests, frozen JSON ledgers, and clean-checkout PDF review receipts with identical exit codes; Python scripts removed. |
 | **Phase 2: Claim & Receipt Consistency Verifiers** | `tools/claims/check.py`, `tools/reproduce_claims.py` | `rust/main.rs` (`dope verify-claims`) | Rust CLI validates benchmark claim manifests and receipt hashes directly against `validation/` and `docs/whitepaper/generated/` artifacts. |
 
+The first Phase 1 parity candidate is `ops/merge_guard/frozen_evidence.rs`,
+exposed as `check-frozen-evidence`; the Python script remains the CI entrypoint
+until behavior and failure cases are fully parity-checked.
+
 ## 3. Per-File Disposition Matrix
+
+This matrix contains exactly the tracked Python paths reported by
+`git ls-files '*.py'` at the revision where it is updated. Recheck that path set
+whenever tracked Python files change.
 
 | File | Disposition | Target Action / Owner Boundary |
 | :--- | :--- | :--- |

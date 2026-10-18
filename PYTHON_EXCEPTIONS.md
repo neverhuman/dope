@@ -10,6 +10,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 - **Total tracked `.py` files**: 667
 - **`keep-with-reason`**: 656 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, and their direct pytest/unittest suites)
 - **`port-candidate`**: 11 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
+- The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
 ## PR #276 (`paper/q01-figures`) Added / Modified Python Scope
 
@@ -20,7 +21,6 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `ops/ci/paper-review-outputs.py` | `port-candidate` | PR #276 clean-checkout paper/supplement PDF and figure review artifact verifier | Performs deterministic file-existence, PDF page-count, and SHA-256 receipt checks suitable for a Rust CI guard binary. |
 | `research/benchmark/tests/test_paper_build_pipeline.py` | `keep-with-reason` | PR #276 end-to-end whitepaper and supplement build pipeline regression tests | Tests the Python `paper_build.py` and `paper_v2_guards.py` orchestration layer. |
 | `research/transfer/tests/test_workplan_acceptance.py` | `keep-with-reason` | PR #276 workplan acceptance, Q02 fresh-user PDF QA, and P04 dashboard tests | Validates Python transfer/whitepaper research harnesses and markdown/PDF QA gates. |
-| `scripts/generate_paper_figures.py` | `keep-with-reason` | PR #276 top-level entrypoint for deterministic paper and README figure regeneration | Delegates to `tools/claims` and `docs/whitepaper/scripts` matplotlib pipelines. |
 | `tools/claims/check.py` | `port-candidate` | PR #276 deterministic claim-manifest and receipt consistency verifier | Pure JSON/manifest schema and threshold verification; candidate for Rust migration into `dope` verification subcommands. |
 | `tools/claims/foundation.py` | `keep-with-reason` | PR #276 foundation-model claim verification and empirical receipt aggregation | Depends on heterogeneous Python tabular/foundation model ecosystems and matplotlib/JSON receipt readers outside the Rust kernel boundary. |
 | `tools/claims/render.py` | `keep-with-reason` | PR #276 hero frontier and multi-auditor publication figure renderer | Uses matplotlib vector/raster layout and PDF/PNG typography pipelines not available in the zero-dependency Rust CLI. |
