@@ -1,0 +1,39 @@
+{
+  "case_id": "P02-REPRO-DRIVERS-missing_bounds",
+  "citable": false,
+  "component": "drivers",
+  "expected": {
+    "format": "driver-result-v1",
+    "protocol_version": "v2",
+    "reason": "missing_simultaneous_bounds",
+    "status": "incomplete"
+  },
+  "input": {
+    "groups_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "importance_floor": 0.1,
+    "perturbation_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "perturbation_status": "complete",
+    "prepared_view_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "protocol_version": "v2",
+    "query_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "real_control_importances": [
+      8.0,
+      2.0
+    ],
+    "real_importances": [
+      8.0,
+      2.0
+    ],
+    "required_components": [
+      "mass"
+    ],
+    "stability_floor": 0.7,
+    "synthetic_importances": [
+      8.0,
+      2.0
+    ],
+    "synthetic_strength_floor": 0.5
+  },
+  "purpose": "No qualification without simultaneous inference.",
+  "schema_version": 2
+}

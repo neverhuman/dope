@@ -70,10 +70,231 @@ fn parse_signs(value: &Value, expected_len: usize) -> MetricResult<Vec<i64>> {
 }
 
 pub fn evaluate(data: &Value) -> Value {
+    match data.get("protocol_version") {
+        None | Some(Value::String(_)) if data.get("protocol_version").is_none_or(|v| v == "v1") => {
+        }
+        Some(v) if v == "v2" => {
+            let mut out =
+                evaluate_v2(data).unwrap_or_else(|e| failure_with_status(e.reason, e.status));
+            out["format"] = json!("driver-result-v1");
+            out["protocol_version"] = json!("v2");
+            return out;
+        }
+        _ => return failure_with_status("unsupported_driver_protocol", "failed"),
+    }
     match evaluate_inner(data) {
         Ok(val) => val,
         Err(err) => failure_with_status(err.reason, err.status),
     }
+}
+
+/// Candidate reducer consumes evaluator-owned full-family C02 bounds. The
+/// estimates are checked against these paired endpoints. This is fixture
+/// qualification only; D05/D19 calibration and release authorization are separate.
+fn evaluate_v2(data: &Value) -> MetricResult<Value> {
+    use crate::transfer_metrics::drivers::{mass_agreement, paired_margin, positive_importances};
+    let missing = || MetricError::with_status("missing_driver_component", "incomplete");
+    let obj = data.as_object().ok_or(MetricError::new("invalid_input"))?;
+    let get = |key: &str| obj.get(key).filter(|v| !v.is_null());
+    require(
+        get("perturbation_status").is_none_or(Value::is_string),
+        "invalid_perturbation_status",
+    )?;
+    match obj.get("perturbation_status").and_then(Value::as_str) {
+        Some("complete") => {}
+        Some("failed") => return Err(MetricError::new("perturbation_failed")),
+        Some("timed_out") => {
+            return Err(MetricError::with_status(
+                "perturbation_timed_out",
+                "timed_out",
+            ));
+        }
+        Some("unsupported") => {
+            return Err(MetricError::with_status(
+                "perturbation_unsupported",
+                "unsupported",
+            ));
+        }
+        None | Some("missing") => {
+            return Err(MetricError::with_status(
+                "missing_perturbation",
+                "incomplete",
+            ));
+        }
+        _ => return Err(MetricError::new("invalid_perturbation_status")),
+    }
+    // Common evaluator pins bind the aligned arms; never project their values.
+    for key in [
+        "query_sha256",
+        "groups_sha256",
+        "perturbation_sha256",
+        "prepared_view_sha256",
+    ] {
+        let pin = get(key)
+            .ok_or_else(missing)?
+            .as_str()
+            .ok_or(MetricError::new("invalid_driver_pin"))?;
+        require(
+            pin.len() == 64
+                && pin
+                    .bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+            "invalid_driver_pin",
+        )?;
+    }
+    let list = get("required_components")
+        .ok_or_else(missing)?
+        .as_array()
+        .ok_or(MetricError::new("invalid_components"))?;
+    let mut required = BTreeSet::new();
+    for item in list {
+        let name = item
+            .as_str()
+            .ok_or(MetricError::new("invalid_components"))?;
+        require(
+            matches!(name, "mass" | "rank" | "sign" | "interaction") && required.insert(name),
+            "invalid_components",
+        )?;
+    }
+    require(required.contains("mass"), "invalid_components")?;
+    let floor = |key| -> MetricResult<f64> {
+        let value = number(get(key).ok_or_else(missing)?)?;
+        require(value > 0.0, "invalid_driver_floor")?;
+        Ok(value)
+    };
+    let stability_floor = floor("stability_floor")?;
+    let importance_floor = floor("importance_floor")?;
+    let strength_floor = floor("synthetic_strength_floor")?;
+    require(
+        stability_floor <= 1.0 && strength_floor <= 1.0,
+        "invalid_driver_floor",
+    )?;
+    let read = |key: &str| -> MetricResult<Vec<f64>> {
+        let values = vector(get(key).ok_or_else(missing)?, false)?;
+        positive_importances(&values).map_err(|_| MetricError::new("invalid_driver_evidence"))
+    };
+    let real = read("real_importances")?;
+    let syn = read("synthetic_importances")?;
+    let control = read("real_control_importances")?;
+    require(
+        real.len() == syn.len() && real.len() == control.len(),
+        "importance_shape_mismatch",
+    )?;
+    let inference = get("inference")
+        .ok_or_else(|| MetricError::with_status("missing_simultaneous_bounds", "incomplete"))?;
+    require(inference.is_object(), "invalid_driver_bounds")?;
+    if inference["status"] != "complete" {
+        return Err(MetricError::with_status(
+            "incomplete_driver_inference",
+            "incomplete",
+        ));
+    }
+    require(
+        inference["bound_method"] == "full_family_max_t",
+        "non_simultaneous_driver_bounds",
+    )?;
+    let bounds = inference["bounds"]
+        .as_object()
+        .ok_or(MetricError::new("invalid_driver_bounds"))?;
+    let mut components = Map::new();
+    let mut pass = true;
+    let mut fidelity = 1.0_f64;
+    for name in required {
+        let (r, s, c) = if name == "interaction" {
+            (
+                read("real_interactions")?,
+                read("synthetic_interactions")?,
+                read("real_control_interactions")?,
+            )
+        } else {
+            (real.clone(), syn.clone(), control.clone())
+        };
+        require(
+            r.len() == s.len() && r.len() == c.len(),
+            "importance_shape_mismatch",
+        )?;
+        let (rt, st, ct) = (sum_checked(&r)?, sum_checked(&s)?, sum_checked(&c)?);
+        if rt < importance_floor || ct < importance_floor {
+            return Err(MetricError::with_status(
+                "degenerate_real_importance",
+                "uninformative",
+            ));
+        }
+        let numeric = |result: Result<f64, crate::transfer_metrics::MetricError>| {
+            result.map_err(|_| MetricError::new("invalid_driver_evidence"))
+        };
+        let (rs, rr) = match name {
+            "rank" => (rank_agreement(&r, &s), rank_agreement(&r, &c)),
+            "sign" => {
+                let read_sign = |key| parse_signs(get(key).ok_or_else(missing)?, r.len());
+                let (a, b, d) = (
+                    read_sign("real_signs")?,
+                    read_sign("synthetic_signs")?,
+                    read_sign("real_control_signs")?,
+                );
+                let active: Vec<_> = (0..r.len()).filter(|&i| a[i] != 0 && r[i] > 0.0).collect();
+                if active.is_empty() {
+                    return Err(MetricError::with_status(
+                        "no_stable_direction",
+                        "uninformative",
+                    ));
+                }
+                let agreement = |signs: &[i64], imp: &[f64]| {
+                    active
+                        .iter()
+                        .filter(|&&i| a[i] == signs[i] && imp[i] > 0.0)
+                        .count() as f64
+                        / active.len() as f64
+                };
+                (agreement(&b, &s), agreement(&d, &c))
+            }
+            _ => (
+                numeric(mass_agreement(&r, &s))?,
+                numeric(mass_agreement(&r, &c))?,
+            ),
+        };
+        if rr < stability_floor {
+            return Err(MetricError::with_status(
+                "unstable_real_drivers",
+                "uninformative",
+            ));
+        }
+        let margin = numeric(paired_margin(rs, rr))?;
+        let strength = number(&json!(st / rt))?;
+        let endpoints = [
+            ("margin", margin),
+            ("stability", rr),
+            ("real_strength", rt),
+            ("control_strength", ct),
+            ("synthetic_strength", strength),
+        ];
+        let mut lcbs = Map::new();
+        for (endpoint, estimate) in endpoints {
+            let coordinate = format!("{name}.{endpoint}");
+            let bound = bounds.get(&coordinate).ok_or_else(|| {
+                MetricError::with_status("missing_simultaneous_bounds", "incomplete")
+            })?;
+            require(bound.is_object(), "invalid_driver_bounds")?;
+            require(
+                (number(&bound["estimate"])? - estimate).abs() <= 1e-12,
+                "driver_bound_estimate_mismatch",
+            )?;
+            let lower = number(&bound["lower"])?;
+            require(lower <= estimate + 1e-12, "invalid_driver_bounds")?;
+            lcbs.insert(endpoint.to_owned(), json!(lower));
+        }
+        pass &= lcbs["margin"].as_f64().unwrap() >= 0.0
+            && lcbs["stability"].as_f64().unwrap() >= stability_floor
+            && lcbs["real_strength"].as_f64().unwrap() >= importance_floor
+            && lcbs["control_strength"].as_f64().unwrap() >= importance_floor
+            && lcbs["synthetic_strength"].as_f64().unwrap() >= strength_floor;
+        let ratio = (rs / rr).clamp(0.0, 1.0);
+        fidelity = fidelity.min(ratio);
+        components.insert(name.to_owned(), json!({"a_rs": rs, "a_rr": rr, "margin": margin, "descriptive_ratio": ratio, "lcbs": lcbs}));
+    }
+    Ok(
+        json!({"status": "complete", "reason": Value::Null, "components": components, "driver_fidelity": fidelity, "driver_pass": pass}),
+    )
 }
 
 fn evaluate_inner(data: &Value) -> MetricResult<Value> {
