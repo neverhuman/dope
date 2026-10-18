@@ -8,8 +8,15 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
-from dope_kernel.kernel import fit_kernel_from_dir, kernel_to_canonical_json, sample_kernel, save_kernel
+from dope_kernel.kernel import (
+    fit_kernel_from_dir,
+    kernel_to_canonical_json,
+    load_kernel,
+    sample_kernel,
+    save_kernel,
+)
 
 
 def write_dataset(path: Path, task: str = "regression", rows: int = 80) -> np.ndarray:
@@ -47,6 +54,24 @@ def test_kernel_is_anonymous_and_deterministic(tmp_path: Path) -> None:
     assert "leaky_feature" not in text1
     assert k1["metadata_policy"]["source_metadata_stored"] is False
     assert k1["metadata_policy"]["feature_order_stored"] is False
+
+
+def test_loader_rejects_pickle_and_executable_decoder_text(tmp_path: Path) -> None:
+    pickle_path = tmp_path / "untrusted.pkl"
+    pickle_path.write_bytes(b"\x80\x04cos\nsystem\n.")
+    with pytest.raises((UnicodeDecodeError, json.JSONDecodeError)):
+        load_kernel(pickle_path)
+
+    marker = tmp_path / "executed"
+    code = f"__import__('pathlib').Path('{marker}').touch()"
+    decoder_path = tmp_path / "decoder.json"
+    decoder_path.write_text(
+        json.dumps({"format": "dope-kernel", "version": 1, "program": code}),
+        encoding="utf-8",
+    )
+    with pytest.raises((ValueError, KeyError)):
+        load_kernel(decoder_path)
+    assert not marker.exists()
 
 
 def test_sampler_values_and_regression_guard(tmp_path: Path) -> None:
