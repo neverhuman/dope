@@ -15,6 +15,11 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+from research.transfer.lineage_manifest import (
+    LineageError,
+    admit_source_manifest,
+    verify_source_projection,
+)
 
 REGISTRY_FORMAT = "dope-source-family-registry-v1"
 DEFAULT_REGISTRY = Path(__file__).resolve().parent / "registries" / "sources.json"
@@ -31,14 +36,22 @@ FORBIDDEN_PUBLIC_KEYS = frozenset({
     "column_names",
     "sensitive_id",
     "sensitive_ids",
+    "cell_values",
+    "values",
+    "sample_extrema",
+    "extrema",
+    "minimum",
+    "maximum",
+    "min",
+    "max",
+    "private_path",
+    "source_path",
+    "filesystem_path",
 })
 HASH_KEYS = frozenset({"sha256", "hash", "digest", "content_hash"})
 MIN_PREIMAGE_BYTES = 16
 MIN_HASH_ENTROPY_BITS = 3.0
-
-
-class LineageError(ValueError):
-    """A lineage, rights, exposure, or public-provenance rule failed."""
+PRIVATE_PATH = re.compile(r"(?:^|[\s\"'])(?:/(?:home|Users|root|tmp|var|etc|mnt|opt)/|file:|[A-Za-z]:[\\/])")
 
 
 class Relation(str, Enum):
@@ -382,7 +395,9 @@ def _reject_public(value: object) -> None:
         ):
             raise LineageError("public provenance discloses a low-entropy hash")
         for key, item in value.items():
-            lowered = key.lower()
+            if not isinstance(key, str):
+                raise LineageError("public provenance has an invalid field")
+            lowered = key.lower().replace("-", "_")
             if lowered in FORBIDDEN_PUBLIC_KEYS:
                 raise LineageError("public provenance discloses a forbidden field")
             if lowered in HASH_KEYS or lowered.endswith("_sha256"):
@@ -398,6 +413,8 @@ def _reject_public(value: object) -> None:
     elif isinstance(value, list):
         for item in value:
             _reject_public(item)
+    elif isinstance(value, str) and PRIVATE_PATH.search(value):
+        raise LineageError("public provenance discloses a private path")
 
 
 def assert_public_provenance(document: dict) -> dict:
@@ -410,7 +427,10 @@ def assert_public_provenance(document: dict) -> dict:
 
 def load_registry(path: Path | None = None) -> Registry:
     document_path = Path(path or DEFAULT_REGISTRY)
-    document = json.loads(document_path.read_text(encoding="utf-8"))
+    try:
+        document = json.loads(document_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, UnicodeError):
+        raise LineageError("source registry could not be read") from None
     if not isinstance(document, dict):
         raise LineageError("source registry is not an object")
     if document.get("format") != REGISTRY_FORMAT:

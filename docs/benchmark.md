@@ -110,6 +110,42 @@ needs compute, licenses or owner decisions.
   - A figure never mixes cohorts without a prominent disclosure.
 - **Sealed test.** Opened once, through a frozen release manifest (FOLLOW-SEAL, D-08).
 
+### Source admission (D02; development metadata only)
+
+[`source-manifest-v1.schema.json`](../schemas/source-manifest-v1.schema.json) is a
+closed Draft 2020-12 schema for **private** source mappings. It requires acquisition
+URI/method, source version/content SHA-256, license and reviewed rights, target and
+prediction-time definitions, group/site/entity/time hierarchy, feature availability,
+and corpus-overlap lineage for each exact foundation checkpoint (including Kumo and
+TabICL). `known_none` and `overlapping` require corpus/review identities; `unknown`
+and `overlapping` carry explicit caveats. Unknown contamination never becomes clean.
+
+`research.transfer.lineage.admit_source_manifest(manifest, registry, signing_key=key)`
+checks the schema and registry grants before returning a public projection. The
+declared split must be `entity_then_time_then_fit`, with operations `entity`, `time`,
+`fit_transforms` in that order and transforms fitted only on `train`. Canonical
+parent families (including aliases and derivatives), and identical content, cannot
+span `train`/`eval` cohorts. Features available after prediction time, target-as-input,
+unresolved acquisition/training rights, and unapproved redistribution are refused.
+An explicit `owner_only_custody` or `prohibited` redistribution status permits only
+owner use; it grants no redistribution right. Absent group/site levels are explicit
+nulls; entity/time definitions are mandatory.
+
+Keep private manifests and a random custody key of at least 32 bytes outside public
+artifacts. The returned allowlisted projection contains keyed opaque identities,
+rights dispositions and checkpoint overlap states, with a domain-separated
+`hmac-sha256-custody-v1` signature. `verify_source_projection` authenticates it using
+the custody key; this is a MAC, not a publicly verifiable signature. Headers, cells,
+extrema, URIs, timestamps, private paths and unkeyed source hashes are never copied.
+Unknown/overlapping checkpoints produce `development_only_caveated` admission.
+
+The compatibility inventory in `research/transfer/registries/sources.json` remains
+unfrozen with unknown rights; it supplies no admitted TDL source. These checks validate
+owner assertions, not source bytes, legal clearance or actual transform execution.
+**D18 custody HOLD remains unresolved**: every projection fixes
+`confirmation_allowed=false` and `sealed_source_claims=false`. No sealed source is
+opened, reconstructed, or qualified by this manifest or its signature.
+
 ## 5. Where the operational detail lives
 
 The benchmark tooling overview is in
