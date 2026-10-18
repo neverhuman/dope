@@ -347,20 +347,7 @@ fn current_cli_export_blocks_before_source_access_or_output_creation() {
         &crate::release::ConversionOptions::default(),
     );
     let error = result.unwrap_err().to_string();
-    let unavailable: Vec<_> = crate::contract::auditor_specs()
-        .into_iter()
-        .filter(|spec| !spec.available)
-        .map(|spec| spec.id)
-        .collect();
-    let expected = if unavailable.is_empty() {
-        "invalid data: release_authorization_required".to_owned()
-    } else {
-        format!(
-            "unsupported operation: release requires complete frozen auditor coverage; unavailable: {}",
-            unavailable.join(",")
-        )
-    };
-    assert_eq!(error, expected);
+    assert_eq!(error, "invalid data: release_authorization_required");
     assert!(!error.contains("PRIVATE_HEADER_97531"));
     assert!(!private.exists());
 }

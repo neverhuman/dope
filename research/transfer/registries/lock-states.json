@@ -2,6 +2,66 @@
   "format": "dope-lock-state-index-v1",
   "entries": [
     {
+      "path": "research/transfer/locks/comparators.json",
+      "sha256": "d39e6436bb848531240de6eb2f8f59e654c2852eeb8d07563645389b63207edc",
+      "legacy_format": "dope-comparator-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-comparator-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/cpu-smoke.json",
+      "sha256": "a5b319d6347edd68ee11dec522a9fe92ac736db26c04162e75d52b56a1454bb8",
+      "legacy_format": "dope-cpu-smoke-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-cpu-smoke-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
       "path": "research/transfer/locks/kumo-tabular.json",
       "sha256": "e3a2b6eb40849c506d36a1c3a217bb23873380376e2de5626bc97779c78d8a6b",
       "legacy_format": "dope-kumo-lock-v1",
@@ -63,7 +123,7 @@
     },
     {
       "path": "research/transfer/locks/other-auditors.json",
-      "sha256": "ae7c3de3096e3802e18e491bf26328e61c97541c1fcf51b1a24230e1c1831c84",
+      "sha256": "846bd50da0bea1743bda2ded83104d5b23bd2a91f100806c5befce67cdff616c",
       "legacy_format": "dope-other-auditors-lock-v1",
       "qualification": {
         "state": "specified",
@@ -72,6 +132,66 @@
         "rejection_reason": "Qualification evidence and D-07 approval are pending."
       },
       "model_version": "dope-other-auditors-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/prior-decoder.json",
+      "sha256": "38f710cf1a55e550f841eedeb4b5ed2c2be0da1f01541f9b0adc964f7b45631f",
+      "legacy_format": "dope-prior-decoder-lock-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-prior-decoder-lock-v1",
+      "source_revision": null,
+      "code_sha256": null,
+      "checkpoint_sha256": null,
+      "code_license": "unreviewed",
+      "weight_license": "unreviewed",
+      "dependency_closure_sha256": null,
+      "tasks": [
+        "regression",
+        "classification"
+      ],
+      "mode": "legacy_reference",
+      "context_cap": null,
+      "preprocessing_sha256": null,
+      "native_parity_sha256": null,
+      "resource_evidence_sha256": null,
+      "license_review_sha256": null,
+      "contamination_review_sha256": null,
+      "last_verified": null
+    },
+    {
+      "path": "research/transfer/locks/public-prior.json",
+      "sha256": "fa45d2f27256bf0b32950623107fecbd29d7383bcc97fb0d5808d99554662c99",
+      "legacy_format": "dope-public-prior-study-v1",
+      "qualification": {
+        "state": "specified",
+        "admission_status": "unqualified",
+        "history": [],
+        "rejection_reason": "Qualification evidence and D-07 approval are pending."
+      },
+      "model_version": "dope-public-prior-study-v1",
       "source_revision": null,
       "code_sha256": null,
       "checkpoint_sha256": null,

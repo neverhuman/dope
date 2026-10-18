@@ -406,6 +406,6 @@ fn residual_fits_are_outer_fit_only_affine_and_small_sample_unavailable() {
     assert!(
         error
             .to_string()
-            .contains("development_residual_oof_unavailable")
+            .contains("development_residual_minimum_rows_not_met")
     );
 }
