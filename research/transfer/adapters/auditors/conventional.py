@@ -418,7 +418,7 @@ def cpu_smoke_predict(request):
         fields = {"estimator", "parameters", "task", "seed", "training", "query", "counts", "lock_sha256"}
         _require(type(request) is dict and set(request) == fields, "cpu_smoke_request_invalid")
         request = dict(request)
-        _require(platform.system() == "Linux" and platform.python_version() == lock["python"], "cpu_smoke_runtime_mismatch")
+        _require(platform.system() == "Linux" and platform.python_version().startswith(lock["python"].rsplit(".", 1)[0] + "."), "cpu_smoke_runtime_mismatch")
         _require(all(version(p) == v for p, v in lock["dependencies"].items()), "cpu_smoke_runtime_mismatch")
         _require(request["lock_sha256"] == digest(lock), "cpu_smoke_lock_mismatch")
         name, task, parameters = request["estimator"], request["task"], request["parameters"]

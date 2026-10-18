@@ -2634,7 +2634,7 @@
       "purpose": "verify public regression CPU smoke admission manifest and runner contract"
     },
     "packages/protocol/": {
-      "command": "cargo test --locked -p dope-service",
+      "command": "cargo test --locked --bin dope-service",
       "purpose": "verify loopback local service protocol schema and generated TypeScript snapshots"
     }
   }

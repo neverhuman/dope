@@ -6,6 +6,7 @@ snapshot are source inputs. This step never scans a live benchmark filesystem.
 """
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -125,6 +126,7 @@ def main():
     (OUT / 'mfs-v3-examples.tex').write_text(
         r'\newcommand{\MfsVThreePerfect}{' + f'{perfect:.0f}' + '}\n' +
         r'\newcommand{\MfsVThreeZeroCompact}{' + f'{zero:.2f}' + '}\n')
+    subprocess.run([sys.executable, str(SCRIPTS / 'figure_one.py')], check=True)
     import render_figures
     render_figures.draw_loss()
     print('paper inputs and appendix tables regenerated from committed pins')
