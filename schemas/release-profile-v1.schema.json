@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:dope:release-profile:v1",
   "title": "Independent utility, empirical privacy, formal DP and legal release profile",
-  "description": "Local research defaults to unassessed. Positive states require independently verified, scope-bound receipts; schema validity and hash commitments alone grant no authority. Empirical screening is a scoped report with qualified attack power, never anonymity or de-identification. Formal DP is optional and separately verified.",
+  "description": "Local research defaults to unassessed. Positive states require independently verified, scope-bound receipts; schema validity and hash commitments alone grant no authority. Empirical screening is a scoped report with qualified attack power, never anonymity or de-identification. Formal DP is optional and separately verified. Asset redistribution/commercial/distillation rights and organization authorization are separate operation-scoped evidence; see $defs/operation_rights_manifest.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -280,6 +280,22 @@
     }
   ],
   "$defs": {
+    "operation_rights_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_redistribution", "model_commercial", "model_distillation", "source_redistribution", "source_commercial", "source_distillation", "organization_authorized", "operation_scope_sha256"],
+      "properties": {
+        "model_redistribution": {"type": "boolean", "default": false},
+        "model_commercial": {"type": "boolean", "default": false},
+        "model_distillation": {"type": "boolean", "default": false},
+        "source_redistribution": {"type": "boolean", "default": false},
+        "source_commercial": {"type": "boolean", "default": false},
+        "source_distillation": {"type": "boolean", "default": false},
+        "organization_authorized": {"type": "boolean", "default": false},
+        "operation_scope_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "description": "Review exact assets, recipients, files, sidecars, and intended use before export. Model/source grants and organization authorization are independent. Missing or denied rights block the affected operation. This manifest does not establish privacy, HIPAA, clinical, or legal status."
+    },
     "sha256": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"

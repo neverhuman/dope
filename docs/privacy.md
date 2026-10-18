@@ -99,6 +99,24 @@ the unresolved custody incidents unchanged. Fixture validation commands are
 `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v`.
 Neither these fixtures nor the schema certify a dataset or permit publication.
 
+## Operation rights are separate from privacy evidence
+
+The release profile's legal-release evidence is not a substitute for a
+per-operation rights manifest. Review model and source redistribution,
+commercial-use, and distillation permissions independently, then record
+organization authorization separately for the exact operation scope and
+recipient set. Missing or denied rights refuse the affected asset/export while
+other admitted work can continue. A manifest must describe operation scope,
+not merely assert that an output is public. The current CLI has no trusted
+manifest ingress, so it cannot issue a shareable package.
+
+Local research outputs contain only distributable assets and carry no privacy
+assurance. Simulations, scores, certification, and ordinary CI establish no
+PHI, legal-readiness, HIPAA, safe-harbor, expert-determination, or clinical-use
+status. Those require actual external legal/clinical review. Keep generated
+private source maps, caches, logs, crash dumps, tempfiles, and report projections
+restricted; egress and telemetry are disabled by default.
+
 ## Formal DP profile and complete private-read ledger
 
 `schemas/dp-profile-v1.schema.json` is a closed Draft 2020-12 design profile.
