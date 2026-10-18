@@ -1,0 +1,52 @@
+{
+  "format": "dope-cpu-smoke-manifest-v1",
+  "status": "blocked_before_partition_or_run",
+  "scope": "early_observational_cpu_smoke_only",
+  "task_candidate": {
+    "id": "airfoil_self_noise",
+    "source": "UCI Machine Learning Repository dataset 291",
+    "doi": "10.24432/C5VW2C",
+    "declared_license": "CC-BY-4.0",
+    "local_d02_admission": "absent",
+    "dataset_registry_admission": "absent"
+  },
+  "frozen_panel": null,
+  "fit_select_test_partition": null,
+  "proposed_row_caps": [96, 192],
+  "partition_state": "not_frozen_no_source_use_without_d02_rights_and_custody_admission",
+  "run_schedule": null,
+  "required_arms": ["dope", "gaussian_copula", "gzip_original_control"],
+  "arm_states": {
+    "dope": "available_native_adapter_not_run_without_admitted_source",
+    "gaussian_copula": "specified_unrun_stub",
+    "gzip_original_control": "literal_control_adapter_available_unqualified"
+  },
+  "adverse_mechanism_fixture": {
+    "fixture": "deterministic_seeded_target_permutation",
+    "source": "research/transfer/tests/test_cpu_smoke_lane.py",
+    "source_status": "simulated_fixture_only"
+  },
+  "reducer": "research.transfer.tdl.aggregate.evaluate",
+  "bundle_reload_and_isolated_sampler": "available_as_separate_conformance_adapters; no admitted composite E07 runner",
+  "qualification": {
+    "full_modern_panel": "unqualified",
+    "tdl": false,
+    "gpu": false,
+    "foundation_models": false
+  },
+  "blockers": [
+    {
+      "kind": "rights_and_custody_admission",
+      "evidence": "research/transfer/manifests/datasets.json has no Airfoil entry; registry README requires private D02 rights and snapshot admission before source use"
+    },
+    {
+      "kind": "generator_implementation",
+      "evidence": "research/transfer/tdl/generators.py marks gaussian_copula specified/native=false; fit/export/reload/sample return generator_specified_unrun"
+    },
+    {
+      "kind": "composite_runner",
+      "evidence": "no admitted command composes the two-cap DOPE/copula/gzip panel, complete-bundle reload, driver states, and authoritative reduction"
+    }
+  ],
+  "claim": "No observational run occurred; the proposed partition is not frozen and no source bytes were read."
+}
