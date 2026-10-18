@@ -1,0 +1,79 @@
+{
+  "case_id": "P02-REPRO-FRONTIER-900-800",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "admitted_tasks": 1,
+    "frontier": [
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 799,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 800,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 900,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 1,
+        "budget_bytes": 1200,
+        "coverage": 1.0,
+        "qualified_tasks": 1
+      }
+    ],
+    "global_optimum_claimed": false,
+    "minimum_qualified_bytes": [
+      800
+    ],
+    "non_monotone_tasks": 0,
+    "protocol_version": 2,
+    "reason": null,
+    "require_monotone": false,
+    "status": "complete"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-a"
+    ],
+    "byte_grid": [
+      799,
+      800,
+      900,
+      1200
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 900,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "qualified",
+        "task_id": "task-a"
+      },
+      {
+        "artifact_bytes": 800,
+        "candidate_id": "candidate-b",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "qualified",
+        "task_id": "task-a"
+      }
+    ],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "Protocol v2 minimizes charged bytes among multiple frozen qualified artifacts under the same search cap; the historical golden envelope stays v1.",
+  "schema_version": 1
+}

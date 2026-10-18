@@ -1,0 +1,98 @@
+{
+  "case_id": "P02-REPRO-ROSTER",
+  "citable": false,
+  "component": "frontier",
+  "expected": {
+    "admitted_tasks": 5,
+    "frontier": [
+      {
+        "admitted_tasks": 5,
+        "budget_bytes": 800,
+        "coverage": 0.0,
+        "qualified_tasks": 0
+      },
+      {
+        "admitted_tasks": 5,
+        "budget_bytes": 900,
+        "coverage": 0.2,
+        "qualified_tasks": 1
+      },
+      {
+        "admitted_tasks": 5,
+        "budget_bytes": 1200,
+        "coverage": 0.2,
+        "qualified_tasks": 1
+      }
+    ],
+    "global_optimum_claimed": false,
+    "minimum_qualified_bytes": [
+      900,
+      null,
+      null,
+      null,
+      null
+    ],
+    "non_monotone_tasks": 0,
+    "protocol_version": 2,
+    "reason": null,
+    "require_monotone": false,
+    "status": "complete"
+  },
+  "input": {
+    "admitted_tasks": [
+      "task-e",
+      "task-d",
+      "task-c",
+      "task-b",
+      "task-a"
+    ],
+    "byte_grid": [
+      800,
+      900,
+      1200
+    ],
+    "cells": [
+      {
+        "artifact_bytes": 900,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "qualified",
+        "task_id": "task-a"
+      },
+      {
+        "artifact_bytes": null,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "failed",
+        "task_id": "task-b"
+      },
+      {
+        "artifact_bytes": null,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "timeout",
+        "task_id": "task-c"
+      },
+      {
+        "artifact_bytes": null,
+        "candidate_id": "candidate-a",
+        "method_id": "method-a",
+        "search_cap_bytes": 1000,
+        "seed_id": "seed-a",
+        "status": "unevaluated",
+        "task_id": "task-d"
+      }
+    ],
+    "method_id": "method-a",
+    "protocol_version": 2,
+    "seed_id": "seed-a"
+  },
+  "purpose": "Failed, timed-out, unevaluated and entirely omitted admitted tasks remain in the fixed five-task denominator.",
+  "schema_version": 1
+}
