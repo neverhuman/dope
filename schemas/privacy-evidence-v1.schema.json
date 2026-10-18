@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:dope:privacy-evidence:v1",
   "title": "Unqualified calibrated empirical membership measurement",
-  "description": "Aggregate local measurements. Hashes are commitments; custody, attack coverage, controls and application margins require independent qualification. No formal privacy, legal route or release authorization follows. Runtime additionally validates rate/count consistency, ordered bounds and low-FPR resolution.",
+  "description": "Aggregate local measurements. Hashes are commitments; custody, attack coverage, controls and application margins require independent qualification. No formal privacy, legal route or release authorization follows. Runtime additionally validates rate/count consistency, ordered bounds and low-FPR resolution. Optional release_profile is the aligned local inconclusive profile; historical v1 measurements without it remain readable.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -62,7 +62,8 @@
           "custody_controls_and_policy_unqualified",
           "low_fpr_unresolved",
           "cluster_or_release_inference_required",
-          "access_threat_unmeasured"
+          "access_threat_unmeasured",
+          "release_channels_unaccounted"
         ]
       }
     },
@@ -251,6 +252,25 @@
     },
     "release_authorized": {
       "const": false
+    },
+    "release_profile": {
+      "allOf": [
+        {
+          "$ref": "urn:dope:release-profile:v1"
+        },
+        {
+          "const": {
+            "format": "dope-release-profile",
+            "version": 1,
+            "utility_qualification_state": "unassessed",
+            "empirical_privacy_state": "inconclusive",
+            "formal_dp_state": "unassessed",
+            "legal_release_state": "unassessed",
+            "accounting": null,
+            "evidence": []
+          }
+        }
+      ]
     }
   }
 }

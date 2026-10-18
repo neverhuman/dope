@@ -18,6 +18,7 @@ from threadpoolctl import threadpool_limits
 
 from .attacks import (AttackCalibration, DisclosurePolicy, DisclosureThreatModel,
                       PrivacyError, ScoreView, is_pin, number, pin, require)
+from .release_profile import local_empirical_profile
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -242,7 +243,8 @@ def control_check(positive, negative, minimum_detection, maximum_null_advantage)
     powerful = resolved and positive["tpr_bounds"][0] >= minimum_detection
     clean_null = resolved and negative["advantage_bounds"][1] <= maximum_null_advantage
     return {"matched": bool(matched), "positive_detected": bool(powerful), "negative_compatible": bool(clean_null),
-            "status": "inconclusive", "reason": "control_provenance_unqualified"}
+            "status": "inconclusive", "reason": "control_provenance_unqualified",
+            "release_profile": local_empirical_profile()}
 
 
 def attribute_increment(artifact, auxiliary, artifact_capacity, auxiliary_capacity, artifact_aux, baseline_aux):
@@ -288,7 +290,8 @@ def attribute_inference(released, auxiliary, evaluation, hidden, recipe):
             "evaluation_sha256": evaluation.sha256, "reference_rows": len(a), "queries": len(q),
             "independent_units": len(set(evaluation.units)), "artifact_mse": losses[0], "auxiliary_mse": losses[1],
             "incremental_mse_improvement": losses[1] - losses[0], "uncertainty": None,
-            "formal_dp": "unverified", "legal_route": "unverified", "release_authorized": False}
+            "formal_dp": "unverified", "legal_route": "unverified", "release_authorized": False,
+            "release_profile": local_empirical_profile()}
 
 
 def holdout_nndr(released, fit_reference, holdout_reference, recipe):
@@ -315,4 +318,5 @@ def holdout_nndr(released, fit_reference, holdout_reference, recipe):
             "sample_rows": len(rows), "reference_rows": len(fit_reference.rows),
             "exact_fit_matches": sum(x == 0 for x in fit), "zero_holdout_distances": sum(x == 0 for x in holdout),
             "identified_ratios": len(ratios), "median_ratio": float(np.median(ratios)) if ratios else None,
-            "formal_dp": "unverified", "legal_route": "unverified", "release_authorized": False}
+            "formal_dp": "unverified", "legal_route": "unverified", "release_authorized": False,
+            "release_profile": local_empirical_profile()}

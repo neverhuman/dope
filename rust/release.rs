@@ -20,6 +20,8 @@ use crate::evaluation::{
 use crate::model::{KernelProgram, Target, Task};
 use crate::sample::{SampleOptions, sample_kernel, sample_kernel_to_csv};
 
+pub mod profile;
+
 #[derive(Clone, Debug)]
 pub struct ConversionOptions {
     pub seed: u64,
@@ -87,6 +89,8 @@ pub struct ConversionReport {
     pub release_seed: u64,
     pub certified: bool,
     pub release_label: String,
+    #[serde(default)]
+    pub release_profile: profile::ReleaseProfile,
     pub evaluated_candidates: Vec<String>,
     pub certified_candidates: Vec<String>,
     pub compiler: CompileReport,
@@ -162,6 +166,13 @@ pub fn convert_release(
     out: &Path,
     options: &ConversionOptions,
 ) -> Result<ConversionResult> {
+    // No trusted evidence/rights-owner adapter is installed in this CLI path.
+    // Certification or compact artifacts cannot supply those independent axes.
+    let release_view = profile::ReleaseProfile::default().view(
+        profile::ReleaseSurface::Export,
+        options.compile_options.release_policy.require_formal_dp,
+        &profile::NoReleaseEvidence,
+    )?;
     if out.exists() {
         return Err(DopeError::Data(
             "release output already exists; choose a new directory".into(),
@@ -410,7 +421,8 @@ pub fn convert_release(
         version: 3,
         release_seed: options.seed,
         certified: true,
-        release_label: "certified".into(),
+        release_label: release_view.label.into(),
+        release_profile: release_view.profile,
         evaluated_candidates,
         certified_candidates,
         compiler: compiler_report,
