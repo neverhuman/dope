@@ -399,3 +399,21 @@ fn legacy_v1_json_reader_remains_unchanged() {
     };
     assert_eq!(loaded, value);
 }
+
+#[test]
+fn dpk3_rejects_noncanonical_and_overflowing_section_varints() {
+    let valid = codec::encode_kernel(&fixture(8, false)).unwrap();
+    for replacement in [&[0x80, 0x00][..], &[0xff; 10][..]] {
+        let mut malformed = valid.clone();
+        // The first section length starts after its tag. Replace the canonical
+        // one-byte length, then update the payload checksum so framing is tested.
+        malformed.splice(57..58, replacement.iter().copied());
+        let payload_length = (malformed.len() - codec::HEADER_BYTES) as u64;
+        malformed[32..40].copy_from_slice(&payload_length.to_le_bytes());
+        let checksum = blake3::hash(&malformed[codec::HEADER_BYTES..]);
+        malformed[40..56].copy_from_slice(&checksum.as_bytes()[..16]);
+        let error = codec::decode_kernel(&malformed).unwrap_err().to_string();
+        assert!(error.contains("varint"), "{error}");
+        assert!(!error.contains("PRIVATE_SOURCE_HEADER"));
+    }
+}
