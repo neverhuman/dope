@@ -5,3 +5,5 @@
 43170d78dcf3d58d0254b94babe0db581e46cb78:ops/ci/frozen-evidence.json:generic-api-key:160
 # Same frozen-evidence checksum after PR #250's rebase merge onto main.
 8c51e463828bcc30500a212d49d89915ecb4ce00:ops/ci/frozen-evidence.json:generic-api-key:160
+# Synthetic adversarial-input marker in the C03 no-echo unit test; exact historical finding only.
+26f21a6d5e7e9f9f241e86030a738b59d9635e41:research/transfer/tests/test_drivers.py:generic-api-key:82
