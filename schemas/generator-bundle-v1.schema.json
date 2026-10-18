@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dope.local/schemas/generator-bundle-v1.schema.json",
   "title": "Generator bundle manifest v1",
+  "description": "Byte inventory only. Required fitted transforms, codebooks, target inverses, selected seeds, prompts, prototypes, priors and adaptations must be declared with actual wire bytes. Runtime/shared labels, hashes and amortization_count do not prove public independence or licensing; recipient accounting fully charges them until qualified. Generated samples are a separate delivery scope; required or reachable rows/evidence remain charged.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -34,7 +35,7 @@
         "enum": ["byte-inventory", "native-dpk-sample", "native-raw-sample"]
       }
     },
-    "amortization_count": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "amortization_count": {"description": "Historical v1 estimate parameter, not authority to discount recipient-required state.", "type": "integer", "minimum": 1, "maximum": 1000000},
     "transport_framing": {"type": "string", "enum": ["included", "unmeasured"]},
     "components": {
       "type": "array",
@@ -75,7 +76,7 @@
         },
         "path": {"type": "string", "minLength": 1, "maxLength": 512},
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "bytes": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "bytes": {"description": "Measured wire byte length; precision labels such as q4 never substitute for this count.", "type": "integer", "minimum": 0, "maximum": 9007199254740991},
         "kind": {"type": "string", "enum": ["dpk2", "dpk3", "opaque", "doperaw1"]},
         "required": {"type": "boolean"},
         "consumed_by_sampler": {"type": "boolean"},
