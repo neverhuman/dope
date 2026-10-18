@@ -5,7 +5,11 @@
   "byte_budget": 128,
   "teacher": {
     "form": "nonlinear",
-    "parameters": {"bias": 0, "linear": 0, "quadratic": 1},
+    "parameters": {
+      "bias": 0,
+      "linear": 0,
+      "quadratic": 1
+    },
     "noise_scale": 1
   },
   "controls": [
@@ -18,5 +22,93 @@
     "direct_predictor",
     "coreset",
     "distillation"
-  ]
+  ],
+  "study": {
+    "format": "dope-diverse-oof-teacher-study-v1",
+    "status": "priced_pilot_and_deterministic_development_fixture_complete",
+    "hypothesis": "At a fixed total fitting plus selection budget, one or more out-of-fold teacher targets may improve held-out synthetic-task utility over no-teacher training; any gain must survive source-family and teacher-architecture holdouts.",
+    "candidate_set": [
+      "no_teacher",
+      "single_teacher:tvae",
+      "multiple_teachers:tvae+masked_autoregressive_transformer"
+    ],
+    "teacher_target_kinds": [
+      "mean",
+      "probability",
+      "residual",
+      "group_response"
+    ],
+    "target_kinds_are_separate_candidates": true,
+    "development_sources": [
+      "synthetic_continuous_linear",
+      "synthetic_continuous_nonlinear"
+    ],
+    "heldout_source_families": [
+      "synthetic_categorical_interaction",
+      "pmlb_lineage"
+    ],
+    "teacher_architectures": [
+      "tvae",
+      "masked_autoregressive_transformer"
+    ],
+    "heldout_teacher_architectures": [
+      "tabular_diffusion"
+    ],
+    "exposed_auditors_confirmatory_reuse": false,
+    "cost": {
+      "unit": "deterministic fixture training operation",
+      "total_fit_and_selection_units_per_candidate": 144,
+      "selection_units": 24,
+      "teacher_fit_units_per_teacher": 12,
+      "student_fit_units_reallocated_to_hold_total": true,
+      "max_teacher_state_bytes": 16384,
+      "max_total_study_operations": 1728
+    },
+    "seeds": {
+      "pilot": [
+        11
+      ],
+      "development": [
+        11,
+        23,
+        37
+      ]
+    },
+    "stop_rule": "Run one 12-row priced pilot. Continue only if all candidates reconcile to exactly 144 operations, fit within the declared teacher-state byte cap, and the poisoned-label OOF exclusion check passes. The deterministic development fixture then runs the three preregistered seeds. Stop immediately on leakage, cost, byte, nonfinite, or unsupported-target failure; no retry with unchanged inputs.",
+    "admission_gates": [
+      "source_family_holdout_measured",
+      "teacher_architecture_holdout_measured",
+      "all_target_kinds_reported_separately",
+      "no_exposed_auditor_confirmatory_reuse",
+      "compatibility_and_validity_measured"
+    ],
+    "mechanism_wiring": "none_until_all_admission_gates_pass_and_a_candidate_wins; negative_or_unsupported_result_is_retained",
+    "pilot_record": {
+      "status": "completed_fixture_integrity_only",
+      "seed": 11,
+      "candidate_count": 3,
+      "priced_units": 432,
+      "cost_cap_units": 432,
+      "max_teacher_state_bytes": 16384,
+      "result": "equal-cost schedule and OOF poison exclusion passed; no transfer-quality result or winner is inferred from synthetic fixture data",
+      "source_artifact": "rust/compiler/neural_candidates/teacher_study.rs deterministic 12-row fixture",
+      "max_teacher_state_bytes_observed": 195
+    },
+    "campaign": "none; no automatic campaign or external data access",
+    "development_record": {
+      "status": "completed_deterministic_fixture_only",
+      "seeds": [
+        11,
+        23,
+        37
+      ],
+      "candidate_runs": 9,
+      "source_family_holdout_result": "unsupported_fixture_only",
+      "teacher_architecture_holdout_result": "unsupported_fixture_only",
+      "winner": null,
+      "admission_blocker": "No admitted source-native teacher runtimes or measured held-out compatibility/validity evidence are present in this lane.",
+      "priced_operations": 1296,
+      "max_teacher_state_bytes_observed": 195
+    }
+  }
 }
