@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import gzip
 import io
 import json
 import math
@@ -175,6 +176,78 @@ def squared_losses(truth, prediction):
     return np.square(truth - prediction).astype(np.float64).tolist()
 
 
+def gaussian_copula_artifact(rows, byte_cap, seed=SEED):
+    """Fit a deterministic development-only Gaussian copula under a stored-byte cap."""
+    import numpy as np
+    from scipy.special import ndtri
+    from scipy.stats import rankdata
+    values=np.asarray(rows,dtype=np.float64)
+    if values.ndim != 2 or values.shape[0] < 3 or not np.isfinite(values).all():
+        raise ValueError("copula_fit_rows_invalid")
+    normal=np.column_stack([ndtri((rankdata(values[:,j],method="average")-.5)/len(values)) for j in range(values.shape[1])])
+    corr=np.corrcoef(normal,rowvar=False)
+    corr=np.nan_to_num(corr,nan=0.0,posinf=0.0,neginf=0.0)
+    np.fill_diagonal(corr,1.0)
+    corr=(corr+corr.T)/2
+    eig,vec=np.linalg.eigh(corr)
+    corr=vec @ np.diag(np.maximum(eig,1e-8)) @ vec.T
+    scale=np.sqrt(np.diag(corr)); corr=corr/np.outer(scale,scale)
+    probs=np.linspace(0.0,1.0,256)
+    marginals=[np.quantile(values[:,j],probs).tolist() for j in range(values.shape[1])]
+    document={"format":"dope-bikeshare-gaussian-copula-v1","seed":seed,"fit_rows":len(values),
+              "correlation":corr.tolist(),"marginal_quantiles":marginals,"quantile_probabilities":probs.tolist()}
+    packed=gzip.compress(json.dumps(document,sort_keys=True,separators=(",",":"),allow_nan=False).encode(),mtime=0)
+    if len(packed)>byte_cap:
+        raise ValueError("copula_artifact_exceeds_cap")
+    return packed
+
+
+def gaussian_copula_sample(artifact, count, seed=SEED+1):
+    import numpy as np
+    from scipy.special import ndtr
+    document=json.loads(gzip.decompress(artifact))
+    if document.get("format")!="dope-bikeshare-gaussian-copula-v1":
+        raise ValueError("copula_artifact_invalid")
+    rng=np.random.default_rng(seed)
+    latent=rng.multivariate_normal(np.zeros(len(document["correlation"])),document["correlation"],size=count,check_valid="raise")
+    uniforms=ndtr(latent)
+    probs=np.asarray(document["quantile_probabilities"],dtype=np.float64)
+    marginals=np.asarray(document["marginal_quantiles"],dtype=np.float64)
+    return np.column_stack([np.interp(uniforms[:,j],probs,marginals[j]) for j in range(marginals.shape[0])])
+
+
+def compressed_row_artifact(rows, byte_cap, seed=SEED):
+    """Store a deterministic fit-only row subsample in a bounded gzip JSON artifact."""
+    import numpy as np
+    values=np.asarray(rows,dtype=np.float64)
+    if values.ndim != 2 or not len(values) or not np.isfinite(values).all():
+        raise ValueError("compressed_rows_invalid")
+    order=np.random.default_rng(seed).permutation(len(values))
+    def pack(k):
+        body={"format":"dope-bikeshare-compressed-row-subsample-v1","seed":seed,
+              "source_rows":len(values),"rows":values[order[:k]].tolist()}
+        return gzip.compress(json.dumps(body,sort_keys=True,separators=(",",":"),allow_nan=False).encode(),mtime=0)
+    low,high,best=1,len(values),None
+    while low<=high:
+        mid=(low+high)//2; candidate=pack(mid)
+        if len(candidate)<=byte_cap:
+            best=candidate; low=mid+1
+        else:
+            high=mid-1
+    if best is None:
+        raise ValueError("compressed_row_artifact_exceeds_cap")
+    return best
+
+
+def compressed_row_sample(artifact, count, seed=SEED+1):
+    import numpy as np
+    body=json.loads(gzip.decompress(artifact))
+    if body.get("format")!="dope-bikeshare-compressed-row-subsample-v1":
+        raise ValueError("compressed_row_artifact_invalid")
+    rows=np.asarray(body["rows"],dtype=np.float64)
+    return rows[np.random.default_rng(seed).integers(0,len(rows),size=count)]
+
+
 def gain_lcb(null_losses, real_losses, days, seed=SEED, replicates=2000):
     import numpy as np
     rng = np.random.default_rng(seed)
@@ -291,6 +364,33 @@ def run(capital_zip: Path, seoul_zip: Path, binary: Path, output: Path) -> dict:
         "rank": min(drivers.rank_agreement(real_importance.tolist(), sig[0].tolist()) for sig in real_signatures),
         "sign": min(float(np.mean(np.sign(real_sign) == np.sign(sig[1]))) for sig in real_signatures)})
 
+    def evaluate_control(method_name, cap_bytes, multiplier, synthetic, artifact):
+        count_rows=len(seoul_fit)*multiplier
+        with threadpool_limits(limits=1):
+            fitted=step(f"{method_name}_ridge_fit_{cap_bytes}_{multiplier}n", lambda: model().fit(synthetic[:,:8],synthetic[:,8]))
+            prediction=fitted.predict(X_test)
+        transfer_report=transfer.evaluate({"null_losses":null_row_loss,"real_losses":real_row_loss,
+            "synthetic_losses":squared_losses(y_test,prediction),"real_gain_lcb":real_gain_lcb,
+            "constant_target":bool(np.ptp(y_real)==0)})
+        importance,sign=model_signature(fitted)
+        driver_report=drivers.evaluate({"required_components":["mass","rank","sign"],
+            "real_importances":real_importance.tolist(),"synthetic_importances":importance.tolist(),
+            "real_signs":np.sign(real_sign).astype(int).tolist(),
+            "synthetic_signs":np.sign(sign).astype(int).tolist(),"real_real_ceiling":ceiling})
+        family=f"{method_name}_{cap_bytes}_{multiplier}n"
+        row={"source_family":"seoul_bikeshare_system","dataset":"uci_560_source_holdout",
+             "seed":SEED,"family":family,"auditor":"ridge",
+             "status":"complete" if transfer_report["status"]=="informative" else transfer_report["status"],
+             "informative":transfer_report["status"]=="informative","transfer":transfer_report.get("raw_transfer")}
+        aggregate_report=aggregate.evaluate({"required_families":[family],"required_auditors":{family:["ridge"]},
+            "required_seeds":[SEED],"rows":[row],"bootstrap_replicates":1000,"bootstrap_seed":SEED})
+        arms.append({"method":method_name,"cap_bytes":cap_bytes,"complete_artifact_bytes":len(artifact),
+            "generated_multiplier":multiplier,"requested_rows":count_rows,"produced_rows":len(synthetic),
+            "consumed_rows":len(synthetic),"artifact_sha256":sha(artifact),"sample_sha256":sha(synthetic.astype("<f8").tobytes()),
+            "mse_bikes_squared":float(np.mean((y_test-prediction)**2)),"transfer":transfer_report,"driver":driver_report,
+            "driver_interaction":"unavailable_not_estimated","authoritative_aggregate":aggregate_report,
+            "qualification":"development_only_unqualified"})
+
     for cap_bytes in CAPS:
         artifact = output / f"dope-{cap_bytes}.raw"
         compiled = step(f"dope_compile_cap_{cap_bytes}", lambda: native(binary, ["compile-raw", "--csv", str(output / "fit.csv"),
@@ -332,12 +432,26 @@ def run(capital_zip: Path, seoul_zip: Path, binary: Path, output: Path) -> dict:
             aggregate_report = aggregate.evaluate({"required_families": [row["family"]],
                 "required_auditors": {row["family"]: ["ridge"]}, "required_seeds": [SEED],
                 "rows": [row], "bootstrap_replicates": 1000, "bootstrap_seed": SEED})
-            arms.append({"cap_bytes": cap_bytes, "complete_artifact_bytes": complete_bytes,
+            arms.append({"method":"dope", "cap_bytes": cap_bytes, "complete_artifact_bytes": complete_bytes,
                 "generated_multiplier": multiplier, "requested_rows": count, "produced_rows": draw.get("produced_rows", count),
                 "consumed_rows": int(synthetic.shape[0]), "artifact_sha256": sha(artifact.read_bytes()),
                 "sample_sha256": replay["sample_sha256"], "mse_bikes_squared": float(np.mean((y_test - prediction) ** 2)),
                 "transfer": transfer_report, "driver": driver_report, "driver_interaction": "unavailable_not_estimated",
                 "authoritative_aggregate": aggregate_report})
+
+    fit_matrix=np.asarray([[*r["x"],r["y"]] for r in cap_fit],dtype=np.float64)
+    for method_name, fit_artifact, sample_fn in (
+        ("gaussian_copula", gaussian_copula_artifact, gaussian_copula_sample),
+        ("compressed_row_subsample", compressed_row_artifact, compressed_row_sample)):
+        for cap_bytes in CAPS:
+            artifact=step(f"{method_name}_fit_cap_{cap_bytes}",lambda:fit_artifact(fit_matrix,cap_bytes,SEED))
+            (output/f"{method_name}-{cap_bytes}.artifact.gz").write_bytes(artifact)
+            for multiplier in (1,4):
+                count_rows=len(seoul_fit)*multiplier
+                synthetic=step(f"{method_name}_sample_{cap_bytes}_{multiplier}n",lambda:sample_fn(artifact,count_rows,SEED+1))
+                if synthetic.shape!=(count_rows,9) or not np.isfinite(synthetic).all():
+                    raise ValueError("sample_shape_invalid")
+                evaluate_control(method_name,cap_bytes,multiplier,synthetic,artifact)
     return {"format": "dope-bikeshare-observation-v1", "scope": "public_observational_source_holdout_development",
         "status": "observed_unqualified", "protocol_sha256": sha((Path(__file__).with_name("protocol.json")).read_bytes()),
         "source_manifest_sha256": sha((Path(__file__).with_name("source-manifest.json")).read_bytes()),

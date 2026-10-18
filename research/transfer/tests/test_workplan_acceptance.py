@@ -455,7 +455,9 @@ class TestE07CpuPreflight(unittest.TestCase):
     def test_e07_sealed_test_guard_and_observational_protocol_preflight(self):
         obs_dir = REPO_ROOT / "examples/public-regression/bikeshare-observational"
         proto = json.loads((obs_dir / "protocol.json").read_text())
-        self.assertEqual(proto["status"], "frozen_before_source_acquisition_and_scoring")
+        self.assertEqual(proto["status"], "development_extension_frozen_before_comparator_execution")
+        self.assertIn("previously used in an unqualified DOPE-only observational run", proto["exposure_disclosure"])
+        self.assertFalse(proto["campaign_claims"]["confirmatory"])
         self.assertEqual(proto["selection"]["rows_consumed_for_selection"], 0)
         res = subprocess.run([sys.executable, "-B", str(obs_dir / "test_runner.py")], cwd=str(obs_dir), capture_output=True, text=True, check=True)
         self.assertEqual(res.returncode, 0)
