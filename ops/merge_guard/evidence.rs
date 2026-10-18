@@ -94,7 +94,8 @@ pub fn evaluate_preflight(e: &Value, pins: &Value, receipt: &Value) -> Result<co
         e["source_commit"]["sha"] == pins["source_sha"],
         "head_moved",
     )?;
-    let ids = runs::validate_runs(
+    let ids = runs::validate_runs_for_definitions(
+        &e["workflow_definitions"],
         &e["runs"],
         &pins["source_sha"],
         source_events,
@@ -184,7 +185,8 @@ pub fn evaluate_merge(e: &Value, prior: &Value) -> Result<&'static str> {
         parents.len() == 1 && parents[0]["sha"] == pins["base_sha"],
         "receiving_base_mismatch",
     )?;
-    runs::validate_runs(
+    runs::validate_runs_for_definitions(
+        &prior["evidence"]["workflow_definitions"],
         &e["receiving_runs"],
         &commit["sha"],
         &["push"],

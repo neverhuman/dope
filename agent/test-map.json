@@ -1,6 +1,14 @@
 {
   "workspace": "dope",
   "tests": {
+    "PYTHON_EXCEPTIONS.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "PY_TO_RUST_PLAN.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
     "docs/release.md": {
       "command": "cargo test --locked --test vnext_custody",
       "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
