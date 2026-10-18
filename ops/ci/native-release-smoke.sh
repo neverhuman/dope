@@ -15,13 +15,13 @@ sbom=target/security/sbom.spdx.json
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 run="target/native-release-smoke/$stamp-$$"
 mkdir -p -- "$run/package" "$run/install-prefix/bin"
-binary=target/release/dope
+binary=target/release/dope-kernel
 # Ignore ambient machine-specific flags so this exercises the generic portable build.
-env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope
+env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
 install -m 0755 -- "$binary" "$run/package/dope-kernel"
 first=$(sha256sum -- "$run/package/dope-kernel" | cut -d ' ' -f1)
 # A second locked offline invocation records the same-worktree rebuild result.
-env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope
+env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS cargo build --locked --release --offline -p dope-kernel --bin dope-kernel
 install -m 0755 -- "$binary" "$run/package/dope-kernel-repeat"
 second=$(sha256sum -- "$run/package/dope-kernel-repeat" | cut -d ' ' -f1)
 [[ "$first" == "$second" ]] || { printf '%s\n' 'native_release_smoke_binary_not_repeatable' >&2; exit 1; }
@@ -77,7 +77,7 @@ receipt = {
     "platform_tested": sys.argv[2],
     "rustc": sys.argv[3],
     "cargo": sys.argv[4],
-    "build": {"command": "cargo build --locked --release --offline -p dope-kernel --bin dope",
+    "build": {"command": "cargo build --locked --release --offline -p dope-kernel --bin dope-kernel",
               "first_sha256": sys.argv[5], "repeat_sha256": sys.argv[6],
               "same_worktree_repeat_only": True,
               "independent_clean_machine_reproducibility": "not_established"},
