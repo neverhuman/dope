@@ -186,7 +186,12 @@ jobs:
               mkdir -p "$PWD/target/arm64-poppler/debs"
               (
                 cd "$PWD/target/arm64-poppler/debs"
-                apt-get download poppler-utils libpoppler134 libpoppler-glib8 2>/dev/null || apt-get download poppler-utils
+                apt-get download \
+                  poppler-utils libpoppler134 liblcms2-2 libopenjp2-7 libnss3 libnspr4 \
+                  libtiff6 libjpeg-turbo8 libfontconfig1 libfreetype6 libpng16-16t64 \
+                  libdeflate0 libjbig0 liblerc4 libwebp7 libsharpyuv0 libcairo2 \
+                  libpixman-1-0 libxcb-render0 libxcb-shm0 libxrender1 libxext6 libx11-6 \
+                  libxcb1 libxau6 libxdmcp6
                 for deb in *.deb; do
                   dpkg-deb -x "$deb" "$PWD/.."
                 done
