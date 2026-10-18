@@ -1,0 +1,611 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "contract_id",
+    "version",
+    "protocol_family",
+    "metric_name",
+    "status",
+    "protocol_frozen",
+    "certified",
+    "parent_contract_id",
+    "parent_contract_sha256",
+    "protocol_id",
+    "canonicalization",
+    "identity_fields",
+    "workload",
+    "roles",
+    "panel",
+    "losses",
+    "transforms",
+    "seeds",
+    "byte_grid_bytes",
+    "transfer",
+    "calibration",
+    "inference",
+    "multiplicity",
+    "release_profiles",
+    "applicability",
+    "comparison_plan",
+    "state_axes"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-tdl-protocol"
+    },
+    "contract_id": {
+      "const": "tdl-contract-v2.candidate"
+    },
+    "version": {
+      "const": 2
+    },
+    "protocol_family": {
+      "const": "task-tdl"
+    },
+    "metric_name": {
+      "const": "TDL"
+    },
+    "status": {
+      "const": "candidate"
+    },
+    "protocol_frozen": {
+      "const": false
+    },
+    "certified": {
+      "const": false
+    },
+    "parent_contract_id": {
+      "const": "tdl-contract-v1"
+    },
+    "parent_contract_sha256": {
+      "const": "281923c33da12e218d54c2226d138bbea2a22d86936bae5c3d7edfbfaf2c63ab"
+    },
+    "protocol_id": {
+      "type": "string",
+      "pattern": "^protocol:[0-9a-f]{64}$"
+    },
+    "canonicalization": {
+      "const": "dope-canonical-json-v1"
+    },
+    "identity_fields": {
+      "const": {
+        "task": [
+          "source_sha256",
+          "workload_sha256",
+          "target_sha256",
+          "prepared_view_sha256",
+          "split_sha256"
+        ],
+        "method": [
+          "implementation_sha256",
+          "recipe_sha256",
+          "environment_sha256"
+        ],
+        "panel": [
+          "models_sha256",
+          "roles_sha256"
+        ],
+        "artifact": [
+          "protocol_id",
+          "task_id",
+          "method_id",
+          "payload_sha256",
+          "closure_sha256"
+        ],
+        "campaign": [
+          "protocol_id",
+          "panel_id",
+          "schedule_sha256",
+          "source_roster_sha256"
+        ],
+        "release_profile": [
+          "policy_sha256",
+          "rights_sha256",
+          "privacy_profile_sha256"
+        ]
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_roster",
+        "task_roster"
+      ],
+      "properties": {
+        "source_roster": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          ]
+        },
+        "task_roster": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^task:[0-9a-f]{64}$"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "development",
+        "confirmation"
+      ],
+      "properties": {
+        "development": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          ]
+        },
+        "confirmation": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "panel": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required_families",
+            "eligible_models"
+          ],
+          "properties": {
+            "required_families": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "tree",
+                  "linear",
+                  "neural",
+                  "foundation_tabular"
+                ]
+              }
+            },
+            "eligible_models": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "family",
+                  "role"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "family": {
+                    "type": "string",
+                    "enum": [
+                      "tree",
+                      "linear",
+                      "neural",
+                      "foundation_tabular"
+                    ]
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "development",
+                      "confirmation"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "losses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regression",
+        "binary",
+        "multiclass",
+        "raw_transfer_clipping"
+      ],
+      "properties": {
+        "regression": {
+          "const": "squared_error_original_units"
+        },
+        "binary": {
+          "const": "log_loss"
+        },
+        "multiclass": {
+          "const": "log_loss"
+        },
+        "raw_transfer_clipping": {
+          "const": "none"
+        }
+      }
+    },
+    "transforms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "fit_policy",
+        "prepared_view_roster"
+      ],
+      "properties": {
+        "format": {
+          "const": "PreparedView-v1"
+        },
+        "fit_policy": {
+          "const": "fit_only_shared_across_arms"
+        },
+        "prepared_view_roster": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "seeds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fit",
+        "sample",
+        "auditor",
+        "perturbation"
+      ],
+      "properties": {
+        "fit": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          ]
+        },
+        "sample": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          ]
+        },
+        "auditor": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          ]
+        },
+        "perturbation": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          ]
+        }
+      }
+    },
+    "byte_grid_bytes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      }
+    },
+    "transfer": {
+      "const": {
+        "orientation": "harm",
+        "formula": "L_S - 0.10*L_0 - 0.90*L_R",
+        "tau": {
+          "numerator": 9,
+          "denominator": 10
+        },
+        "pass_rule": "simultaneous_one_sided_ucb_le_zero",
+        "loss_units": "original_target_units"
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "real_gain",
+        "driver_stability",
+        "absolute_importance",
+        "synthetic_noncollapse"
+      ],
+      "properties": {
+        "decision": {
+          "const": "D05_HOLD"
+        },
+        "real_gain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "absolute",
+            "relative",
+            "lcb_required"
+          ],
+          "properties": {
+            "absolute": {
+              "type": "null"
+            },
+            "relative": {
+              "type": "null"
+            },
+            "lcb_required": {
+              "type": "null"
+            }
+          }
+        },
+        "driver_stability": {
+          "type": "null"
+        },
+        "absolute_importance": {
+          "type": "null"
+        },
+        "synthetic_noncollapse": {
+          "type": "null"
+        }
+      }
+    },
+    "inference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "estimand",
+        "independent_unit",
+        "bootstrap_draws_min",
+        "calibration_replications_min",
+        "alpha",
+        "type_i_tolerance",
+        "power_target",
+        "convergence_tolerance",
+        "small_cluster_abstention"
+      ],
+      "properties": {
+        "estimand": {
+          "type": "null"
+        },
+        "independent_unit": {
+          "type": "null"
+        },
+        "bootstrap_draws_min": {
+          "const": 10000
+        },
+        "calibration_replications_min": {
+          "const": 2000
+        },
+        "alpha": {
+          "const": {
+            "numerator": 1,
+            "denominator": 20
+          }
+        },
+        "type_i_tolerance": {
+          "type": "null"
+        },
+        "power_target": {
+          "type": "null"
+        },
+        "convergence_tolerance": {
+          "type": "null"
+        },
+        "small_cluster_abstention": {
+          "type": "null"
+        }
+      }
+    },
+    "multiplicity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "procedure",
+        "family",
+        "fixed_artifact_rule"
+      ],
+      "properties": {
+        "decision": {
+          "const": "D19_HOLD"
+        },
+        "procedure": {
+          "type": "null"
+        },
+        "family": {
+          "type": "null"
+        },
+        "fixed_artifact_rule": {
+          "const": "intersection_union_all_required"
+        }
+      }
+    },
+    "applicability": {
+      "type": "null"
+    },
+    "comparison_plan": {
+      "type": "null"
+    },
+    "state_axes": {
+      "const": {
+        "artifact_qualification_state": [
+          "unmeasured",
+          "qualified",
+          "not_reached_in_tested_range",
+          "unqualified",
+          "incomplete",
+          "failed"
+        ],
+        "scheduled_cell_state": [
+          "planned",
+          "running",
+          "complete",
+          "failed",
+          "timed_out",
+          "unsupported",
+          "over_budget",
+          "missing"
+        ],
+        "campaign_completeness_state": [
+          "unmeasured",
+          "incomplete",
+          "complete"
+        ],
+        "empirical_privacy_state": [
+          "unassessed",
+          "passed",
+          "failed",
+          "incomplete"
+        ],
+        "formal_dp_state": [
+          "not_claimed",
+          "unverified",
+          "verified",
+          "failed"
+        ],
+        "release_authorization_state": [
+          "not_authorized",
+          "authorized",
+          "denied"
+        ],
+        "claim_provenance_state": [
+          "unverified",
+          "verified",
+          "rejected"
+        ]
+      }
+    },
+    "release_profiles": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^release_profile:[0-9a-f]{64}$"
+          }
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.org/dope/schemas/tdl-protocol-v1.schema.json",
+  "title": "Unfrozen TDL v2 candidate protocol admission"
+}

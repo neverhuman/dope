@@ -1,0 +1,80 @@
+{
+  "format": "dope-tdl-result-v2",
+  "contract_id": "tdl-contract-v2.candidate",
+  "version": 2,
+  "protocol_id": "protocol:27d09788bbe704ff33415a5c16976e790039e5aa76101ed2bda92e7b6513b130",
+  "citable": false,
+  "certified": false,
+  "identities": {
+    "task": {
+      "kind": "task",
+      "bindings": {
+        "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "workload_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "target_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "prepared_view_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "split_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "task:2067e917555c3785fb216dc73157026be41a10cfb2e0262952627da20fd188b3"
+    },
+    "method": {
+      "kind": "method",
+      "bindings": {
+        "implementation_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "recipe_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "environment_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "method:ea44e58b426f7f0b56aa9637d215dbce11a801709fcd74ec3324485447dd263e"
+    },
+    "panel": {
+      "kind": "panel",
+      "bindings": {
+        "models_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "roles_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "panel:83ac6f8357921de60f8c12884706db1ae294ecb15a56d31fd2284ff565180ea8"
+    },
+    "artifact": {
+      "kind": "artifact",
+      "bindings": {
+        "protocol_id": "protocol:27d09788bbe704ff33415a5c16976e790039e5aa76101ed2bda92e7b6513b130",
+        "task_id": "task:2067e917555c3785fb216dc73157026be41a10cfb2e0262952627da20fd188b3",
+        "method_id": "method:ea44e58b426f7f0b56aa9637d215dbce11a801709fcd74ec3324485447dd263e",
+        "payload_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "artifact:b049b1ec6536dc1d972be7be22e757729a6578b40c8a5919a257a03b24a81648"
+    },
+    "campaign": {
+      "kind": "campaign",
+      "bindings": {
+        "protocol_id": "protocol:27d09788bbe704ff33415a5c16976e790039e5aa76101ed2bda92e7b6513b130",
+        "panel_id": "panel:83ac6f8357921de60f8c12884706db1ae294ecb15a56d31fd2284ff565180ea8",
+        "schedule_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "source_roster_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "campaign:0963045a1614ce0562dccc49e60813e0c3decdce5aeb7ce4b93d2e43ef8d3c9c"
+    },
+    "release_profile": {
+      "kind": "release_profile",
+      "bindings": {
+        "policy_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "rights_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "privacy_profile_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "id": "release_profile:bbc46980bddbafd6d98473e801870e26399a18efec719c0093d44770ecd86624"
+    }
+  },
+  "artifact_qualification_state": "unmeasured",
+  "scheduled_cell_state": "planned",
+  "campaign_completeness_state": "unmeasured",
+  "empirical_privacy_state": "unassessed",
+  "formal_dp_state": "not_claimed",
+  "release_authorization_state": "not_authorized",
+  "claim_provenance_state": "unverified",
+  "measurements": {
+    "harm_ucb": null,
+    "driver_lcb": null,
+    "recipient_bytes": null
+  }
+}

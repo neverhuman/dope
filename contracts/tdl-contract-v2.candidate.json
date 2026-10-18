@@ -1,0 +1,179 @@
+{
+  "format": "dope-tdl-protocol",
+  "contract_id": "tdl-contract-v2.candidate",
+  "version": 2,
+  "protocol_family": "task-tdl",
+  "metric_name": "TDL",
+  "status": "candidate",
+  "protocol_frozen": false,
+  "certified": false,
+  "parent_contract_id": "tdl-contract-v1",
+  "parent_contract_sha256": "281923c33da12e218d54c2226d138bbea2a22d86936bae5c3d7edfbfaf2c63ab",
+  "canonicalization": "dope-canonical-json-v1",
+  "identity_fields": {
+    "task": [
+      "source_sha256",
+      "workload_sha256",
+      "target_sha256",
+      "prepared_view_sha256",
+      "split_sha256"
+    ],
+    "method": [
+      "implementation_sha256",
+      "recipe_sha256",
+      "environment_sha256"
+    ],
+    "panel": [
+      "models_sha256",
+      "roles_sha256"
+    ],
+    "artifact": [
+      "protocol_id",
+      "task_id",
+      "method_id",
+      "payload_sha256",
+      "closure_sha256"
+    ],
+    "campaign": [
+      "protocol_id",
+      "panel_id",
+      "schedule_sha256",
+      "source_roster_sha256"
+    ],
+    "release_profile": [
+      "policy_sha256",
+      "rights_sha256",
+      "privacy_profile_sha256"
+    ]
+  },
+  "workload": {
+    "source_roster": null,
+    "task_roster": null
+  },
+  "roles": {
+    "development": null,
+    "confirmation": null
+  },
+  "panel": null,
+  "losses": {
+    "regression": "squared_error_original_units",
+    "binary": "log_loss",
+    "multiclass": "log_loss",
+    "raw_transfer_clipping": "none"
+  },
+  "transforms": {
+    "format": "PreparedView-v1",
+    "fit_policy": "fit_only_shared_across_arms",
+    "prepared_view_roster": null
+  },
+  "seeds": {
+    "fit": null,
+    "sample": null,
+    "auditor": null,
+    "perturbation": null
+  },
+  "byte_grid_bytes": [
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    262144
+  ],
+  "transfer": {
+    "orientation": "harm",
+    "formula": "L_S - 0.10*L_0 - 0.90*L_R",
+    "tau": {
+      "numerator": 9,
+      "denominator": 10
+    },
+    "pass_rule": "simultaneous_one_sided_ucb_le_zero",
+    "loss_units": "original_target_units"
+  },
+  "calibration": {
+    "decision": "D05_HOLD",
+    "real_gain": {
+      "absolute": null,
+      "relative": null,
+      "lcb_required": null
+    },
+    "driver_stability": null,
+    "absolute_importance": null,
+    "synthetic_noncollapse": null
+  },
+  "inference": {
+    "estimand": null,
+    "independent_unit": null,
+    "bootstrap_draws_min": 10000,
+    "calibration_replications_min": 2000,
+    "alpha": {
+      "numerator": 1,
+      "denominator": 20
+    },
+    "type_i_tolerance": null,
+    "power_target": null,
+    "convergence_tolerance": null,
+    "small_cluster_abstention": null
+  },
+  "multiplicity": {
+    "decision": "D19_HOLD",
+    "procedure": null,
+    "family": null,
+    "fixed_artifact_rule": "intersection_union_all_required"
+  },
+  "applicability": null,
+  "comparison_plan": null,
+  "state_axes": {
+    "artifact_qualification_state": [
+      "unmeasured",
+      "qualified",
+      "not_reached_in_tested_range",
+      "unqualified",
+      "incomplete",
+      "failed"
+    ],
+    "scheduled_cell_state": [
+      "planned",
+      "running",
+      "complete",
+      "failed",
+      "timed_out",
+      "unsupported",
+      "over_budget",
+      "missing"
+    ],
+    "campaign_completeness_state": [
+      "unmeasured",
+      "incomplete",
+      "complete"
+    ],
+    "empirical_privacy_state": [
+      "unassessed",
+      "passed",
+      "failed",
+      "incomplete"
+    ],
+    "formal_dp_state": [
+      "not_claimed",
+      "unverified",
+      "verified",
+      "failed"
+    ],
+    "release_authorization_state": [
+      "not_authorized",
+      "authorized",
+      "denied"
+    ],
+    "claim_provenance_state": [
+      "unverified",
+      "verified",
+      "rejected"
+    ]
+  },
+  "protocol_id": "protocol:27d09788bbe704ff33415a5c16976e790039e5aa76101ed2bda92e7b6513b130",
+  "release_profiles": null
+}

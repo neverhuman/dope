@@ -1,0 +1,316 @@
+[
+  {
+    "id": "unknown_enum",
+    "target": "protocol",
+    "path": "/status",
+    "value": "CANARY_PRIVATE_HEADER",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "missing_nested",
+    "target": "protocol",
+    "path": "/calibration/real_gain/lcb_required",
+    "value": null,
+    "remove": true,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "duplicate_source_id",
+    "target": "protocol",
+    "path": "/workload/source_roster",
+    "value": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "wrong_parent_digest",
+    "target": "protocol",
+    "path": "/parent_contract_sha256",
+    "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "wrong_protocol_digest",
+    "target": "protocol",
+    "path": "/protocol_id",
+    "value": "protocol:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remove": false,
+    "resign": false,
+    "reason": "candidate_protocol_digest_mismatch"
+  },
+  {
+    "id": "inconsistent_panel",
+    "target": "protocol",
+    "path": "/panel",
+    "value": {
+      "required_families": [
+        "tree"
+      ],
+      "eligible_models": [
+        {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "family": "linear",
+          "role": "development"
+        }
+      ]
+    },
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_inconsistent_panel"
+  },
+  {
+    "id": "freeze_with_null",
+    "target": "protocol",
+    "path": "/protocol_frozen",
+    "value": true,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "certified_candidate",
+    "target": "protocol",
+    "path": "/certified",
+    "value": true,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "zero_absolute",
+    "target": "protocol",
+    "path": "/calibration/real_gain/absolute",
+    "value": 0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "zero_relative",
+    "target": "protocol",
+    "path": "/calibration/real_gain/relative",
+    "value": 0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "uncalibrated_lcb_flag",
+    "target": "protocol",
+    "path": "/calibration/real_gain/lcb_required",
+    "value": false,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "zero_driver_stability",
+    "target": "protocol",
+    "path": "/calibration/driver_stability",
+    "value": 0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "zero_synthetic_floor",
+    "target": "protocol",
+    "path": "/calibration/synthetic_noncollapse",
+    "value": 0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "premature_multiplicity",
+    "target": "protocol",
+    "path": "/multiplicity/procedure",
+    "value": "bonferroni",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "float_grid",
+    "target": "protocol",
+    "path": "/byte_grid_bytes",
+    "value": [
+      512.0
+    ],
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_noncanonical_number"
+  },
+  {
+    "id": "unknown_result_state",
+    "target": "result",
+    "path": "/formal_dp_state",
+    "value": "CANARY_PRIVATE_EXTREMUM",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "wrong_result_protocol",
+    "target": "result",
+    "path": "/protocol_id",
+    "value": "protocol:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_receipt_protocol_mismatch"
+  },
+  {
+    "id": "wrong_identity_digest",
+    "target": "result",
+    "path": "/identities/task/id",
+    "value": "task:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_identity_mismatch"
+  },
+  {
+    "id": "cross_artifact_binding",
+    "target": "result",
+    "path": "/identities/artifact/bindings/task_id",
+    "value": "task:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_binding_mismatch",
+    "resign_identity": true
+  },
+  {
+    "id": "duplicate_model_id",
+    "target": "protocol",
+    "path": "/panel",
+    "value": {
+      "required_families": [
+        "tree"
+      ],
+      "eligible_models": [
+        {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "family": "tree",
+          "role": "development"
+        },
+        {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "family": "tree",
+          "role": "confirmation"
+        }
+      ]
+    },
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_inconsistent_panel"
+  },
+  {
+    "id": "unknown_identity_kind",
+    "target": "result",
+    "path": "/identities/task/kind",
+    "value": "CANARY_PRIVATE_SOURCE",
+    "remove": false,
+    "resign": false,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "zero_absolute_importance",
+    "target": "protocol",
+    "path": "/calibration/absolute_importance",
+    "value": 0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "overlapping_panel_roles",
+    "target": "protocol",
+    "path": "/roles",
+    "value": {
+      "development": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "confirmation": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ]
+    },
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_inconsistent_panel"
+  },
+  {
+    "id": "unknown_nested_field",
+    "target": "protocol",
+    "path": "/calibration/real_gain",
+    "value": {
+      "absolute": null,
+      "relative": null,
+      "lcb_required": null,
+      "CANARY_PRIVATE_PATH": null
+    },
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "empty_release_profiles",
+    "target": "protocol",
+    "path": "/release_profiles",
+    "value": [],
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "noncanonical_result_float",
+    "target": "result",
+    "path": "/measurements/harm_ucb",
+    "value": 1.0,
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_noncanonical_number"
+  },
+  {
+    "id": "missing_identity_binding",
+    "target": "result",
+    "path": "/identities/task/bindings/source_sha256",
+    "value": null,
+    "remove": true,
+    "resign": false,
+    "reason": "candidate_schema_mismatch"
+  },
+  {
+    "id": "mismatched_model_role_roster",
+    "target": "protocol",
+    "path": "/roles",
+    "value": {
+      "development": [
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ],
+      "confirmation": null
+    },
+    "remove": false,
+    "resign": true,
+    "reason": "candidate_inconsistent_panel",
+    "setup_panel": {
+      "required_families": [
+        "tree"
+      ],
+      "eligible_models": [
+        {
+          "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "family": "tree",
+          "role": "development"
+        }
+      ]
+    }
+  }
+]

@@ -2372,6 +2372,34 @@
     "ops/ci/public-smoke.sh": {
       "command": "actionlint .github/workflows/*.yml",
       "purpose": "verify thin public fork smoke script and workflow wiring"
+    },
+    "contracts/tdl-contract-v2.candidate.json": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "schemas/tdl-protocol-v1.schema.json": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "schemas/tdl-result-v1.schema.json": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "docs/decisions/tdl-v1.md": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "docs/metric.md": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "research/transfer/tests/test_tdl_result_schemas.py": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "tests/fixtures/tdl-v2/": {
+      "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
+      "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
     }
   }
 }

@@ -1,0 +1,474 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "contract_id",
+    "version",
+    "protocol_id",
+    "citable",
+    "certified",
+    "identities",
+    "artifact_qualification_state",
+    "scheduled_cell_state",
+    "campaign_completeness_state",
+    "empirical_privacy_state",
+    "formal_dp_state",
+    "release_authorization_state",
+    "claim_provenance_state",
+    "measurements"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-tdl-result-v2"
+    },
+    "contract_id": {
+      "const": "tdl-contract-v2.candidate"
+    },
+    "version": {
+      "const": 2
+    },
+    "protocol_id": {
+      "type": "string",
+      "pattern": "^protocol:[0-9a-f]{64}$"
+    },
+    "citable": {
+      "const": false
+    },
+    "certified": {
+      "const": false
+    },
+    "identities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task",
+        "method",
+        "panel",
+        "artifact",
+        "campaign",
+        "release_profile"
+      ],
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/task"
+        },
+        "method": {
+          "$ref": "#/$defs/method"
+        },
+        "panel": {
+          "$ref": "#/$defs/panel"
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "campaign": {
+          "$ref": "#/$defs/campaign"
+        },
+        "release_profile": {
+          "$ref": "#/$defs/release_profile"
+        }
+      }
+    },
+    "artifact_qualification_state": {
+      "type": "string",
+      "enum": [
+        "unmeasured",
+        "qualified",
+        "not_reached_in_tested_range",
+        "unqualified",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "scheduled_cell_state": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "running",
+        "complete",
+        "failed",
+        "timed_out",
+        "unsupported",
+        "over_budget",
+        "missing"
+      ]
+    },
+    "campaign_completeness_state": {
+      "type": "string",
+      "enum": [
+        "unmeasured",
+        "incomplete",
+        "complete"
+      ]
+    },
+    "empirical_privacy_state": {
+      "type": "string",
+      "enum": [
+        "unassessed",
+        "passed",
+        "failed",
+        "incomplete"
+      ]
+    },
+    "formal_dp_state": {
+      "type": "string",
+      "enum": [
+        "not_claimed",
+        "unverified",
+        "verified",
+        "failed"
+      ]
+    },
+    "release_authorization_state": {
+      "type": "string",
+      "enum": [
+        "not_authorized",
+        "authorized",
+        "denied"
+      ]
+    },
+    "claim_provenance_state": {
+      "type": "string",
+      "enum": [
+        "unverified",
+        "verified",
+        "rejected"
+      ]
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "harm_ucb",
+        "driver_lcb",
+        "recipient_bytes"
+      ],
+      "properties": {
+        "harm_ucb": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/rational"
+            }
+          ]
+        },
+        "driver_lcb": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/rational"
+            }
+          ]
+        },
+        "recipient_bytes": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neverhuman.org/dope/schemas/tdl-result-v1.schema.json",
+  "title": "Non-citable candidate receipt with independent state axes",
+  "$defs": {
+    "rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "task"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^task:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_sha256",
+            "workload_sha256",
+            "target_sha256",
+            "prepared_view_sha256",
+            "split_sha256"
+          ],
+          "properties": {
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "workload_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "target_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "prepared_view_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "split_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "method"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^method:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "implementation_sha256",
+            "recipe_sha256",
+            "environment_sha256"
+          ],
+          "properties": {
+            "implementation_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recipe_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "environment_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "panel"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^panel:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "models_sha256",
+            "roles_sha256"
+          ],
+          "properties": {
+            "models_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "roles_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "artifact"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^artifact:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocol_id",
+            "task_id",
+            "method_id",
+            "payload_sha256",
+            "closure_sha256"
+          ],
+          "properties": {
+            "protocol_id": {
+              "type": "string",
+              "pattern": "^protocol:[0-9a-f]{64}$"
+            },
+            "task_id": {
+              "type": "string",
+              "pattern": "^task:[0-9a-f]{64}$"
+            },
+            "method_id": {
+              "type": "string",
+              "pattern": "^method:[0-9a-f]{64}$"
+            },
+            "payload_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "closure_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "campaign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "campaign"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^campaign:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocol_id",
+            "panel_id",
+            "schedule_sha256",
+            "source_roster_sha256"
+          ],
+          "properties": {
+            "protocol_id": {
+              "type": "string",
+              "pattern": "^protocol:[0-9a-f]{64}$"
+            },
+            "panel_id": {
+              "type": "string",
+              "pattern": "^panel:[0-9a-f]{64}$"
+            },
+            "schedule_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "source_roster_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "release_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "bindings"
+      ],
+      "properties": {
+        "kind": {
+          "const": "release_profile"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^release_profile:[0-9a-f]{64}$"
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "policy_sha256",
+            "rights_sha256",
+            "privacy_profile_sha256"
+          ],
+          "properties": {
+            "policy_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rights_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "privacy_profile_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

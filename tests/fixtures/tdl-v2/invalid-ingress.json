@@ -1,0 +1,27 @@
+[
+  {
+    "id": "duplicate_json_key",
+    "text": "{\"CANARY_PRIVATE_HEADER\":1,\"CANARY_PRIVATE_HEADER\":2}",
+    "reason": "duplicate_json_key"
+  },
+  {
+    "id": "nan",
+    "text": "{\"CANARY_PRIVATE_SOURCE\":NaN}",
+    "reason": "nonstandard_json_number"
+  },
+  {
+    "id": "positive_infinity",
+    "text": "{\"CANARY_PRIVATE_EXTREMUM\":Infinity}",
+    "reason": "nonstandard_json_number"
+  },
+  {
+    "id": "negative_infinity",
+    "text": "{\"CANARY_PRIVATE_PATH\":-Infinity}",
+    "reason": "nonstandard_json_number"
+  },
+  {
+    "id": "overflow_to_infinity",
+    "text": "{\"CANARY_PRIVATE_VALUE\":1e999}",
+    "reason": "nonstandard_json_number"
+  }
+]
