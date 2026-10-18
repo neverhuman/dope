@@ -7,7 +7,7 @@
 
 **Tabular data is an organization's accumulated operational experience, yet security, compliance, and legal barriers routinely lock tables inside silos where external researchers, benchmarks, and foundation models cannot access them.**
 
-Copying raw rows is unsafe, while shipping multi-megabyte neural generators is bloated, opaque, and prone to memorization. **D.O.P.E. (`Downstream Objective-Preserving Encoding`)** compiles a private table into a compact **sampling program** under a strict byte budget, then measures how much predictive lift and feature-driver structure survive when downstream learners train only on synthetic draws and evaluate on untouched real rows.
+Copying raw rows is unsafe, while shipping multi-megabyte neural generators is bloated, opaque, and prone to memorization. **D.O.P.E. (`Downstream Objective-Preserving Encoding`)** compiles a private table into a small **sampling program** under a strict byte budget, then measures how much predictive lift and feature-driver structure survive when downstream learners train only on synthetic draws and evaluate on untouched real rows.
 
 - **Compact encoding budget:** Quantizes feature marginals, a structural dependence graph, a screened target residual, and heteroscedastic noise into a self-contained binary artifact where every byte read at sample time is charged.
 - **Multi-model and foundation-model transfer:** Evaluates synthetic draws across zero-shot tabular foundation models (**NVIDIA Kumo Tabular Large**, **TabICLv2**, **AutoGluon Mitra-v2**), **neural networks (MLP)**, **linear models**, and **gradient-boosted trees (CatBoost)**.
