@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "case_id": "transfer_t90_multiclass_invalid_probability",
+  "citable": false,
+  "component": "transfer",
+  "purpose": "Hand-calculated T90 paired-loss conformance; no scientific qualification.",
+  "input": {
+    "task": "multiclass",
+    "required_model_present": true,
+    "real_gain_lcb": 50.0,
+    "constant_target": false,
+    "targets": [
+      0
+    ],
+    "class_order": [
+      "class_0",
+      "class_1",
+      "class_2"
+    ],
+    "real_predictions": [
+      [
+        0.6703200460356393,
+        0.16483997698218034,
+        0.16483997698218034
+      ]
+    ],
+    "synthetic_predictions": [
+      [
+        0.7,
+        0.7,
+        0.7
+      ]
+    ],
+    "null_predictions": [
+      [
+        0.36787944117144233,
+        0.31606027941427883,
+        0.31606027941427883
+      ]
+    ]
+  },
+  "expected": {
+    "status": "failed",
+    "reason": "invalid_paired_loss_evidence"
+  }
+}

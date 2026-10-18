@@ -46,12 +46,21 @@ def close(actual, expected, tolerance=1e-12):
 
 
 def run_case(case):
+    """Historical replay retains v1 semantics and refuses candidate cases."""
+    require(type(case) is dict and case.get("schema_version") == 1, "invalid_golden_schema")
+    return run_versioned_case(case)
+
+
+def run_versioned_case(case):
     require(type(case) is dict and type(case.get("schema_version")) is int and
-            case["schema_version"] == 1, "invalid_golden_schema")
+            case["schema_version"] in (1, 2), "invalid_golden_schema")
     require(case.get("citable") is False, "golden_must_be_noncitable")
     require(type(case.get("case_id")) is str and case["case_id"], "invalid_case_id")
     component = case.get("component")
     require(type(component) is str and component in COMPONENTS, "unknown_component")
+    if case["schema_version"] == 2:
+        require(component == "transfer", "invalid_golden_schema")
+        return transfer.evaluate_tdl(case.get("input"))
     return COMPONENTS[component](case.get("input"))
 
 
@@ -71,9 +80,9 @@ def main():
         case = strict_load(path.read_text())
         require(case["case_id"] not in ids, "duplicate_case_id")
         ids.add(case["case_id"])
-        actual = run_case(case)
+        actual = run_versioned_case(case)
         if args.check:
-            require(close(actual, case["expected"]), "golden_mismatch_" + case["case_id"])
+            require(close(actual, case["expected"]), "golden_mismatch")
         else:
             print(json.dumps({"case_id": case["case_id"], "actual": actual}, sort_keys=True, allow_nan=False))
     if args.check:
