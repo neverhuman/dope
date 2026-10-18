@@ -1,0 +1,28 @@
+{
+  "format": "dope-bikeshare-observation-protocol-v1",
+  "status": "frozen_before_source_acquisition_and_scoring",
+  "task": "predict public-bike rentals per active hour from weather and calendar features",
+  "source_holdout": {
+    "fit_source": "Capital Bikeshare, Washington DC, UCI dataset 275",
+    "confirmation_source": "Seoul Bike Sharing System, UCI dataset 560",
+    "independent_source_rule": "all learned generator state is fit only on Capital Bikeshare; Seoul labels are not passed to generator fit or source transforms"
+  },
+  "entity_and_time_policy": {
+    "entity": "service date; all hourly rows for one date stay in one partition",
+    "capital_bikeshare": "retain 2011 only; first 75 percent of ordered service dates fit, final 25 percent select",
+    "seoul": "sort all service dates; first 50 percent fit, next 20 percent select, final 30 percent test",
+    "order": ["entity", "time", "fit_transforms"],
+    "fit_transforms": "fit only on the source fit rows; do not tune on selection or confirmation rows"
+  },
+  "prepared_features": ["hour", "weekday", "month", "holiday", "workingday", "temperature_c", "humidity_pct", "windspeed_m_s"],
+  "target": {"field": "rental_count", "units": "bikes per hour", "estimand": "observed aggregate rentals in the held-out source's active operating hours"},
+  "selection": {"candidate": "single frozen DOPE Chow-Liu profile and single Ridge(alpha=1.0) auditor", "rows_consumed_for_selection": 0},
+  "recipes": ["null_mean", "real_source_reference", "dope_n", "dope_4n"],
+  "seed": 1729,
+  "complete_artifact_byte_caps": [16384, 32768],
+  "sample_sizes": ["n=number of Seoul fit rows", "4n"],
+  "auditor": {"name": "sklearn StandardScaler + Ridge", "alpha": 1.0, "threads": 1},
+  "primary_loss": "mean squared error in bikes-squared per hour",
+  "driver_diagnostic": "single-feature permutation-loss increase and Ridge coefficient sign on the same held-out Seoul rows; report TDL reducer state and keep interaction unavailable",
+  "campaign_claims": {"source_holdout_observed": true, "privacy": false, "tdl_qualified": false, "modern_panel_qualified": false, "healthcare_inference": false}
+}
