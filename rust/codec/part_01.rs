@@ -178,8 +178,15 @@ impl<'a> Reader<'a> {
 
     fn varint(&mut self) -> Result<u64> {
         let mut value = 0u64;
-        for shift in (0..70).step_by(7) {
+        for index in 0..10 {
             let byte = self.byte()?;
+            let shift = index * 7;
+            if index == 9 && byte > 1 {
+                return Err(DopeError::Codec("varint exceeds 64 bits".into()));
+            }
+            if index > 0 && byte == 0 {
+                return Err(DopeError::Codec("noncanonical varint".into()));
+            }
             value |= u64::from(byte & 0x7f) << shift;
             if byte & 0x80 == 0 {
                 return Ok(value);
