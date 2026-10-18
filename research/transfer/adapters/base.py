@@ -5,12 +5,13 @@ executor still owns isolation, artifact verification and scientific receipts.
 """
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
-import math
 import re
 import time
 
 from research.transfer.evidence import digest
-
+from research.transfer.adapters.worker_abi import (
+    AdapterError, ResourceLimits, _require, _hash, _count, _finite, _cells, build_request,
+)
 
 MODES = frozenset({"scratch", "frozen_context", "fine_tuning", "pretraining"})
 REFUSED_ENCODERS = frozenset({
@@ -19,30 +20,8 @@ REFUSED_ENCODERS = frozenset({
 })
 
 
-class AdapterError(ValueError):
-    """Stable codes only: never include source values or backend diagnostics."""
-
-
 class AdapterUnavailable(AdapterError):
     """A model, license, or required offline dependency is unavailable."""
-
-
-def _require(condition, code):
-    if not condition:
-        raise AdapterError(code)
-
-
-def _hash(value):
-    _require(type(value) is str and re.fullmatch(r"[a-f0-9]{64}", value), "invalid_pin")
-
-
-def _count(value, minimum=0):
-    _require(type(value) is int and minimum <= value <= 2**53 - 1, "invalid_count")
-
-
-def _finite(value):
-    return ((type(value) is int and abs(value) <= 2**53 - 1) or
-            (type(value) is float and math.isfinite(value)))
 
 
 def _choice(value, choices):
@@ -55,27 +34,6 @@ def _backend_failure(error):
     if isinstance(error, AdapterUnavailable):
         return AdapterUnavailable("backend_unavailable")
     return AdapterError("backend_failed")
-
-
-def _cells(rows):
-    _require(type(rows) is tuple and bool(rows), "invalid_rows")
-    width = len(rows[0]) if type(rows[0]) is tuple else 0
-    _require(width > 0, "invalid_rows")
-    for row in rows:
-        _require(type(row) is tuple and len(row) == width, "invalid_rows")
-        _require(all(v is None or type(v) in (str, bool) or _finite(v) for v in row), "invalid_cell")
-
-
-@dataclass(frozen=True)
-class ResourceLimits:
-    wall_seconds: float
-    memory_bytes: int
-    gpu_bytes: int
-
-    def __post_init__(self):
-        _require(_finite(self.wall_seconds) and self.wall_seconds > 0, "invalid_budget")
-        _count(self.memory_bytes, 1)
-        _count(self.gpu_bytes)
 
 
 @dataclass(frozen=True)
@@ -316,6 +274,7 @@ class _Adapter(ABC):
         self._identity = identity
         self._kind = kind
         self._training = None
+        self._provided_training = None
         self._provided_sha256 = None
         self._provided_ids = ()
         self._provided_rows = 0
@@ -357,6 +316,7 @@ class _Adapter(ABC):
     def _prepare(self, training, seed, operation):
         # Invalidate old state before calling any fallible backend operation.
         self._training = None
+        self._provided_training = None
         self._provided_sha256 = None
         self._wall_seconds = 0.0
         context = self._context(training, seed)
@@ -364,6 +324,7 @@ class _Adapter(ABC):
         _require(type(usage) is ResourceUsage, "invalid_resource_usage")
         self._usage(usage, len(context.targets))
         self._training = context
+        self._provided_training = training
         self._provided_sha256 = training.sha256
         self._provided_ids = training.features.row_ids
         self._provided_rows = len(training.targets)
@@ -400,6 +361,35 @@ class _Adapter(ABC):
                 "fit_seed": self._fit_seed, "provided_rows": self._provided_rows,
                 "consumed_rows": len(self._training.targets),
                 "wall_seconds": self._wall_seconds, "citable": False}
+
+    def worker_request(self, pins, resources, *, seed, primary_n, query=None,
+                       sample_multiplier=1, predict_time_fit=False, subsampling="none", output=None):
+        """Export the admitted context without query labels; launch is executor-owned.
+
+        request_sha256, rather than the legacy cache_key, binds all native runtime,
+        resource and sensitivity policies. This contract remains fixture-only.
+        """
+        self._ready()
+        _require(type(pins) is dict and pins.get("model_sha256") == self.identity.sha256,
+                 "invalid_worker_pins")
+        if self.identity.weights_sha256 is not None:
+            _require(pins.get("checkpoint_sha256") == self.identity.weights_sha256, "invalid_worker_pins")
+        _require(type(resources) is dict and all(type(resources.get(k)) is int for k in
+                 ("memory_bytes", "vram_bytes", "wall_ms"))
+                 and resources["memory_bytes"] <= self.identity.resources.memory_bytes
+                 and resources.get("vram_bytes", 2**53) <= self.identity.resources.gpu_bytes
+                 and resources.get("wall_ms", 2**53) <= self.identity.resources.wall_seconds * 1000,
+                 "invalid_worker_resources")
+        policy = {"primary_n": primary_n, "sample_multiplier": sample_multiplier,
+                  "context_cap": self.identity.context_cap,
+                  "truncation": "head" if self.identity.context_policy == "head" else "none",
+                  "subsampling": subsampling, "predict_time_fit": predict_time_fit,
+                  "query_policy": self.identity.query_policy, "query_batch_size": self.identity.query_batch_size,
+                  "order_sensitive": self.identity.order_sensitive}
+        return build_request(pins, resources, policy,
+                             "predict" if query is not None else "fit_or_prepare_context", seed,
+                             training=self._provided_training, query=query,
+                             context_row_ids=self._training.features.row_ids, fit_seed=self._fit_seed, output=output)
 
 
 class LearnerAdapter(_Adapter):

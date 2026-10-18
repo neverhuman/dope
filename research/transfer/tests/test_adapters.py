@@ -361,7 +361,8 @@ class AdapterTests(unittest.TestCase):
                 imports.update(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom):
                 imports.add(node.module)
-        self.assertEqual(imports, {"abc", "dataclasses", "math", "re", "time", "research.transfer.evidence"})
+        self.assertEqual(imports, {"abc", "dataclasses", "re", "time", "research.transfer.evidence",
+                                   "research.transfer.adapters.worker_abi"})
 
 
 class AdmissionTests(unittest.TestCase):
