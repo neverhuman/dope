@@ -13,6 +13,10 @@ export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
 export CARGO_PROFILE_DEV_DEBUG="${CARGO_PROFILE_DEV_DEBUG:-line-tables-only}"
 mkdir -p "$PWD/target/tmp"
 export TMPDIR="$PWD/target/tmp"
+export PATH="$HOME/.cargo/bin:$PATH"
+if [[ -n "${GITHUB_PATH:-}" ]]; then
+  echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+fi
 
 ci_require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then

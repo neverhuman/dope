@@ -142,7 +142,12 @@ class TestP03DecisionsReview(unittest.TestCase):
 class TestP04WorkplanDashboard(unittest.TestCase):
     def test_p04_workplan_dag_and_live_dashboard(self):
         self.assertTrue((REPO_ROOT / "docs/testing.md").is_file())
+        decisions = (REPO_ROOT / "docs/decisions.md").read_text()
+        for expected in ("SC-DEC-097", "60 / 65", "5 / 65"):
+            self.assertIn(expected, decisions)
         run_validate_plan()
+        if os.environ.get("DOPE_PACKET_DIR"):
+            self.assertTrue(_safe_is_dir(PACKET_DIR))
         if _safe_is_dir(PACKET_DIR):
             tasks = json.loads((PACKET_DIR / "tasks.json").read_text())["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())

@@ -116,3 +116,7 @@ Authority rule: `super_captain` decides internal governance and GPU-schedule hol
 | **E07** first observational CPU loop | Launch the post-release observation window and collect full-duration telemetry receipts from the external feed. | `super_captain` for the window schedule; Jepson-reserved if the feed needs a new external commitment | Freeze the reduced cpu-smoke panel and partition; run the deterministic adverse-mechanism fixture on public data. The production canary window is not runnable now. |
 
 Machine-readable form: `DECISIONS.json` (proposed; see the packet's `DECISIONS_D19_PROPOSED.json`), because the ledger file is read-only and listed in `SHA256SUMS.json`.
+
+### SC-DEC-097 E07 CPU smoke admission (2026-10-18)
+
+`SC-DEC-097` authorized local CPU-only execution of the bounded `bikeshare-observational` CPU smoke loop on `xbabe2`. This advanced the workplan to **60 / 65** tasks done and **5 / 65** tasks blocked (`W01`, `E03`, `E04`, `E05`, `E06`). The Rust frozen-evidence parity binary in `ops/merge_guard/Cargo.toml` is named `check-frozen-evidence`.

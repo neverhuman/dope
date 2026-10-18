@@ -23,7 +23,9 @@ for missing in "${tools[@]}"; do
   done
   output="$fixture/$missing/output.log"
   sentinel="$fixture/$missing/executed"
-  if PATH="$bin" CPU_READINESS_SENTINEL="$sentinel" "$bash_bin" ops/ci/cpu.sh > "$output" 2>&1; then
+  home="$fixture/$missing/home"
+  mkdir -p "$home"
+  if HOME="$home" PATH="$bin" CPU_READINESS_SENTINEL="$sentinel" "$bash_bin" ops/ci/cpu.sh > "$output" 2>&1; then
     echo "CPU accepted missing tool: $missing" >&2
     exit 1
   else
