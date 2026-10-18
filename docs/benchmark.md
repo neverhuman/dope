@@ -46,7 +46,17 @@ family and no held-out source family, and it does not measure driver fidelity. E
 attacks cover only the stated cells, and measured copy, membership and attribute gates
 already fail on some of them. It therefore supports no TDL, cross-model or privacy claim.
 
-## 2. Auditor status (T-065)
+## 2. Frozen TDL panel edition (2026-10-18)
+
+The immutable `tdl-panel-2026-10-18-edition-1` role roster is specified in the example in [`panel-v1.schema.json`](../schemas/panel-v1.schema.json) and bound to each checkpoint in `research/transfer/registries/models.json`. The edition fixes regression and classification as mandatory workloads at equal weight (1.0 each), uses real-only references for eligibility, and lists CatBoost, LightGBM, XGBoost, RealMLP, linear, independent boosting, and independent neural as mandatory models. These commitments precede generator outcomes.
+
+For every checkpoint and workload, the panel roster declares `compiler_teacher`, `selection`, `required_confirmatory`, `challenger_only`, and `native_recipe_sensitivity`. CatBoost, LightGBM, XGBoost, RealMLP, and linear are compiler teachers; Kumo Tabular, Mitra-v2, and TabICLv2 are selection exposed. Independent boosting and independent neural are mandatory confirmation-only families, held out from compiler-teacher and selection roles. KNN and kernel are challenger-only. Teacher lineage overlap is explicit per checkpoint (`known_none` or `unknown`); unknown foundation-model overlap remains a conflict and cannot be read as clean independence.
+
+The panel is specified and unqualified. Role, conflict, and rights signatures are SHA-256 content digests over the roster assertions; they provide integrity fingerprints, not external approval or proof of rights. Rights and checkpoint identities remain unresolved where the registry has no evidence. Recursive resolution and all three signatures are prerequisites for qualification. Missing mandatory native qualification blocks a panel-qualified pass; family averages cannot rescue it.
+
+Future challenge panels append a new immutable edition against the same artifact zoo. They do not recompile that zoo or overwrite historical scores. A new model edition schedules only its newly required evaluation cells. Historical panel scores retain their original edition and interpretation.
+
+## 3. Auditor status (T-065)
 
 | Auditor | Where it appears | Status |
 | --- | --- | --- |
@@ -63,7 +73,7 @@ An auditor counts toward TDL only after its lock reaches `qualified`. The lock p
 `parity_verified`, `resource_verified`, `qualified`. Qualification needs owner decision
 D-07 (licenses and GPU budget) and is follow-on work (FOLLOW-AUDQ).
 
-## 3. Reproduce the v2 numbers
+## 4. Reproduce the v2 numbers
 
 ```bash
 just setup          # Python environment for the paper scripts
@@ -78,7 +88,7 @@ with its ledger. The public data path needs no credentials:
 `python3 -m research.benchmark.fetch_pmlb --list` lists the tables, and
 `python3 -m research.benchmark.fetch_pmlb DATASET_ID OUTPUT_DIRECTORY` fetches one.
 
-## 4. The TDL benchmark (specified, not run)
+## 5. The TDL benchmark (specified, not run)
 
 The design comes from the 2026-10-15 specifications. Execution is follow-on work that
 needs compute, licenses or owner decisions.
@@ -110,7 +120,43 @@ needs compute, licenses or owner decisions.
   - A figure never mixes cohorts without a prominent disclosure.
 - **Sealed test.** Opened once, through a frozen release manifest (FOLLOW-SEAL, D-08).
 
-## 5. Where the operational detail lives
+### Source admission (D02; development metadata only)
+
+[`source-manifest-v1.schema.json`](../schemas/source-manifest-v1.schema.json) is a
+closed Draft 2020-12 schema for **private** source mappings. It requires acquisition
+URI/method, source version/content SHA-256, license and reviewed rights, target and
+prediction-time definitions, group/site/entity/time hierarchy, feature availability,
+and corpus-overlap lineage for each exact foundation checkpoint (including Kumo and
+TabICL). `known_none` and `overlapping` require corpus/review identities; `unknown`
+and `overlapping` carry explicit caveats. Unknown contamination never becomes clean.
+
+`research.transfer.lineage.admit_source_manifest(manifest, registry, signing_key=key)`
+checks the schema and registry grants before returning a public projection. The
+declared split must be `entity_then_time_then_fit`, with operations `entity`, `time`,
+`fit_transforms` in that order and transforms fitted only on `train`. Canonical
+parent families (including aliases and derivatives), and identical content, cannot
+span `train`/`eval` cohorts. Features available after prediction time, target-as-input,
+unresolved acquisition/training rights, and unapproved redistribution are refused.
+An explicit `owner_only_custody` or `prohibited` redistribution status permits only
+owner use; it grants no redistribution right. Absent group/site levels are explicit
+nulls; entity/time definitions are mandatory.
+
+Keep private manifests and a random custody key of at least 32 bytes outside public
+artifacts. The returned allowlisted projection contains keyed opaque identities,
+rights dispositions and checkpoint overlap states, with a domain-separated
+`hmac-sha256-custody-v1` signature. `verify_source_projection` authenticates it using
+the custody key; this is a MAC, not a publicly verifiable signature. Headers, cells,
+extrema, URIs, timestamps, private paths and unkeyed source hashes are never copied.
+Unknown/overlapping checkpoints produce `development_only_caveated` admission.
+
+The compatibility inventory in `research/transfer/registries/sources.json` remains
+unfrozen with unknown rights; it supplies no admitted TDL source. These checks validate
+owner assertions, not source bytes, legal clearance or actual transform execution.
+**D18 custody HOLD remains unresolved**: every projection fixes
+`confirmation_allowed=false` and `sealed_source_claims=false`. No sealed source is
+opened, reconstructed, or qualified by this manifest or its signature.
+
+## 6. Where the operational detail lives
 
 The benchmark tooling overview is in
 [`research/benchmark/README.md`](../research/benchmark/README.md). The dated campaign

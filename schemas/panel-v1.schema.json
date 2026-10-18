@@ -1,0 +1,679 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.invalid/schemas/panel-v1.schema.json",
+  "title": "DOPE immutable evaluation panel edition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "edition",
+    "status",
+    "artifact_zoo",
+    "real_only_eligibility",
+    "mandatory_tasks",
+    "mandatory_models",
+    "weights",
+    "missing_native_qualification",
+    "family_average_rescue",
+    "edition_policy",
+    "resolution",
+    "roles",
+    "checkpoints",
+    "workloads"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-panel-edition-v1"
+    },
+    "edition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "specified_unqualified",
+        "qualified"
+      ]
+    },
+    "artifact_zoo": {
+      "type": "string",
+      "minLength": 1
+    },
+    "real_only_eligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "policy"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mandatory_tasks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "mandatory_models": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "weights": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "required": [
+        "weighting_frozen_before_generator_outcomes"
+      ],
+      "properties": {
+        "weighting_frozen_before_generator_outcomes": {
+          "const": true
+        }
+      }
+    },
+    "missing_native_qualification": {
+      "const": "blocks_panel_qualified_pass"
+    },
+    "family_average_rescue": {
+      "const": false
+    },
+    "edition_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "append_only",
+        "recompile_artifact_zoo",
+        "overwrite_historical_scores",
+        "new_model_edition_evaluates_only_newly_required_cells"
+      ],
+      "properties": {
+        "append_only": {
+          "const": true
+        },
+        "recompile_artifact_zoo": {
+          "const": false
+        },
+        "overwrite_historical_scores": {
+          "const": false
+        },
+        "new_model_edition_evaluates_only_newly_required_cells": {
+          "const": true
+        }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recursive",
+        "immutable",
+        "role_signature_sha256",
+        "conflict_signature_sha256",
+        "rights_signature_sha256",
+        "signatures_required_before_qualification"
+      ],
+      "properties": {
+        "recursive": {
+          "const": true
+        },
+        "immutable": {
+          "const": true
+        },
+        "role_signature_sha256": {
+          "$ref": "#/$defs/digestOrNull"
+        },
+        "conflict_signature_sha256": {
+          "$ref": "#/$defs/digestOrNull"
+        },
+        "rights_signature_sha256": {
+          "$ref": "#/$defs/digestOrNull"
+        },
+        "signatures_required_before_qualification": {
+          "const": true
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/checkpoint"
+      }
+    },
+    "workloads": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/workload"
+      }
+    }
+  },
+  "$defs": {
+    "digestOrNull": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "roleFlags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compiler_teacher",
+        "selection",
+        "required_confirmatory",
+        "challenger_only",
+        "native_recipe_sensitivity"
+      ],
+      "properties": {
+        "compiler_teacher": {
+          "type": "boolean"
+        },
+        "selection": {
+          "type": "boolean"
+        },
+        "required_confirmatory": {
+          "type": "boolean"
+        },
+        "challenger_only": {
+          "type": "boolean"
+        },
+        "native_recipe_sensitivity": {
+          "type": "boolean"
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "architecture_family",
+        "checkpoint_sha256",
+        "teacher_lineage_overlap",
+        "roles_by_workload",
+        "rights_status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "architecture_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checkpoint_sha256": {
+          "$ref": "#/$defs/digestOrNull"
+        },
+        "teacher_lineage_overlap": {
+          "enum": [
+            "known_none",
+            "overlapping",
+            "unknown"
+          ]
+        },
+        "roles_by_workload": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/roleFlags"
+          }
+        },
+        "rights_status": {
+          "enum": [
+            "reviewed",
+            "unresolved",
+            "restricted"
+          ]
+        }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "mandatory",
+        "weight",
+        "required_models",
+        "real_only_eligible"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "required_models": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "real_only_eligible": {
+          "const": true
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "format": "dope-panel-edition-v1",
+      "edition": "tdl-panel-2026-10-18-edition-1",
+      "status": "specified_unqualified",
+      "artifact_zoo": "shared-immutable-artifact-zoo-v1",
+      "real_only_eligibility": {
+        "required": true,
+        "policy": "real-only must be the mandatory reference; synthetic data may not train or select panel learners"
+      },
+      "mandatory_tasks": [
+        "regression",
+        "classification"
+      ],
+      "mandatory_models": [
+        "catboost",
+        "lightgbm",
+        "xgboost",
+        "realmlp",
+        "linear",
+        "independent_boosting",
+        "independent_neural"
+      ],
+      "weights": {
+        "regression": 1.0,
+        "classification": 1.0,
+        "weighting_frozen_before_generator_outcomes": true
+      },
+      "missing_native_qualification": "blocks_panel_qualified_pass",
+      "family_average_rescue": false,
+      "edition_policy": {
+        "append_only": true,
+        "recompile_artifact_zoo": false,
+        "overwrite_historical_scores": false,
+        "new_model_edition_evaluates_only_newly_required_cells": true
+      },
+      "resolution": {
+        "recursive": true,
+        "immutable": true,
+        "role_signature_sha256": "7cd377cff7cf4b088a568c96732ab7c0046e0bd976805cd631311017770edef6",
+        "conflict_signature_sha256": "d28f50ff1172a59cf0a9ae3be1db34c599ab1e477ce16ae9f771f025d2162c8d",
+        "rights_signature_sha256": "cf235daea82d43e7051d4ca9a917d80efd45135457dcc56bc4112c21f8e7195b",
+        "signatures_required_before_qualification": true
+      },
+      "roles": {
+        "selection": [
+          "kumo_tabular",
+          "mitra_v2",
+          "tabicl_v2"
+        ],
+        "required_confirmatory": [
+          "independent_boosting",
+          "independent_neural"
+        ],
+        "challenger_only": [
+          "knn",
+          "kernel"
+        ],
+        "compiler_teacher": [
+          "catboost",
+          "linear",
+          "lightgbm",
+          "xgboost",
+          "realmlp"
+        ]
+      },
+      "checkpoints": [
+        {
+          "id": "kumo_tabular",
+          "architecture_family": "foundation_tabular",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "unknown",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "mitra_v2",
+          "architecture_family": "foundation_tabular",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "unknown",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "tabicl_v2",
+          "architecture_family": "foundation_tabular",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "unknown",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": true,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": false
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "catboost",
+          "architecture_family": "tree",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "independent_boosting",
+          "architecture_family": "boosting",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": true,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": true,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "independent_neural",
+          "architecture_family": "neural",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": true,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": true,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "linear",
+          "architecture_family": "linear",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "lightgbm",
+          "architecture_family": "tree",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "xgboost",
+          "architecture_family": "tree",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "realmlp",
+          "architecture_family": "neural",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            },
+            "classification": {
+              "compiler_teacher": true,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": false,
+              "native_recipe_sensitivity": true
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "knn",
+          "architecture_family": "instance_based",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": true,
+              "native_recipe_sensitivity": false
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": true,
+              "native_recipe_sensitivity": false
+            }
+          },
+          "rights_status": "unresolved"
+        },
+        {
+          "id": "kernel",
+          "architecture_family": "kernel",
+          "checkpoint_sha256": null,
+          "teacher_lineage_overlap": "known_none",
+          "roles_by_workload": {
+            "regression": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": true,
+              "native_recipe_sensitivity": false
+            },
+            "classification": {
+              "compiler_teacher": false,
+              "selection": false,
+              "required_confirmatory": false,
+              "challenger_only": true,
+              "native_recipe_sensitivity": false
+            }
+          },
+          "rights_status": "unresolved"
+        }
+      ],
+      "workloads": [
+        {
+          "id": "regression",
+          "mandatory": true,
+          "weight": 1.0,
+          "required_models": [
+            "catboost",
+            "lightgbm",
+            "xgboost",
+            "realmlp",
+            "linear",
+            "independent_boosting",
+            "independent_neural"
+          ],
+          "real_only_eligible": true
+        },
+        {
+          "id": "classification",
+          "mandatory": true,
+          "weight": 1.0,
+          "required_models": [
+            "catboost",
+            "lightgbm",
+            "xgboost",
+            "realmlp",
+            "linear",
+            "independent_boosting",
+            "independent_neural"
+          ],
+          "real_only_eligible": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/neverhuman/dope/schemas/source-manifest-v1.schema.json",
+  "title": "Private development source manifest; never a sealed-source authorization",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "custody", "custody_hold", "sources"],
+  "properties": {
+    "format": {"const": "dope-source-manifest-v1"},
+    "version": {"const": 1},
+    "custody": {"const": "development_only"},
+    "custody_hold": {"const": "D18_HOLD"},
+    "sources": {
+      "type": "array", "minItems": 1,
+      "items": {"$ref": "#/$defs/source"}
+    }
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "uri": {"type": "string", "format": "uri", "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*:"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "overlap": {"enum": ["known_none", "overlapping", "unknown"]},
+    "redistribution": {"enum": ["permitted_redistribution", "owner_only_custody", "prohibited", "unknown"]},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "family_id", "source_family", "cohort", "use", "acquisition",
+        "version", "content_sha256", "rights", "target", "prediction_time",
+        "hierarchy", "features", "split", "pretraining"
+      ],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/id"},
+        "family_id": {"$ref": "#/$defs/id"},
+        "source_family": {"$ref": "#/$defs/id"},
+        "cohort": {"enum": ["train", "eval"]},
+        "use": {"enum": ["owner_only", "redistribute"]},
+        "acquisition": {
+          "type": "object", "additionalProperties": false,
+          "required": ["uri", "method"],
+          "properties": {
+            "uri": {"$ref": "#/$defs/uri"},
+            "method": {"enum": ["download", "owner_delivery", "generated"]}
+          }
+        },
+        "version": {"$ref": "#/$defs/text"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "rights": {
+          "type": "object", "additionalProperties": false,
+          "required": ["license", "acquisition", "training", "redistribution", "redistribution_approved", "review_sha256"],
+          "properties": {
+            "license": {"$ref": "#/$defs/text"},
+            "acquisition": {"enum": ["granted", "denied", "unknown"]},
+            "training": {"enum": ["granted", "denied", "unknown"]},
+            "redistribution": {"$ref": "#/$defs/redistribution"},
+            "redistribution_approved": {"type": "boolean"},
+            "review_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "target": {
+          "type": "object", "additionalProperties": false,
+          "required": ["column", "definition"],
+          "properties": {
+            "column": {"$ref": "#/$defs/text"},
+            "definition": {"$ref": "#/$defs/text"}
+          }
+        },
+        "prediction_time": {
+          "type": "object", "additionalProperties": false,
+          "required": ["definition", "timestamp"],
+          "properties": {
+            "definition": {"$ref": "#/$defs/text"},
+            "timestamp": {"$ref": "#/$defs/timestamp"}
+          }
+        },
+        "hierarchy": {
+          "type": "object", "additionalProperties": false,
+          "required": ["group", "site", "entity", "time"],
+          "properties": {
+            "group": {"oneOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+            "site": {"oneOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]},
+            "entity": {"$ref": "#/$defs/text"},
+            "time": {"$ref": "#/$defs/text"}
+          }
+        },
+        "features": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["column", "feature_timestamp"],
+            "properties": {
+              "column": {"$ref": "#/$defs/text"},
+              "feature_timestamp": {"$ref": "#/$defs/timestamp"}
+            }
+          }
+        },
+        "split": {
+          "type": "object", "additionalProperties": false,
+          "required": ["order", "operations", "fit_transforms_cohort"],
+          "properties": {
+            "order": {"const": "entity_then_time_then_fit"},
+            "operations": {"const": ["entity", "time", "fit_transforms"]},
+            "fit_transforms_cohort": {"const": "train"}
+          }
+        },
+        "pretraining": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["checkpoint", "checkpoint_sha256", "corpus_uri", "status", "review_sha256", "caveat"],
+            "properties": {
+              "checkpoint": {"$ref": "#/$defs/text"},
+              "checkpoint_sha256": {"$ref": "#/$defs/sha256"},
+              "corpus_uri": {"oneOf": [{"$ref": "#/$defs/uri"}, {"type": "null"}]},
+              "status": {"$ref": "#/$defs/overlap"},
+              "review_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+              "caveat": {"oneOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]}
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"status": {"enum": ["known_none", "overlapping"]}}},
+                "then": {"properties": {"corpus_uri": {"$ref": "#/$defs/uri"}, "review_sha256": {"$ref": "#/$defs/sha256"}}}
+              },
+              {
+                "if": {"properties": {"status": {"enum": ["unknown", "overlapping"]}}},
+                "then": {"properties": {"caveat": {"$ref": "#/$defs/text"}}}
+              }
+            ]
+          }
+        }
+      }
+    },
+    "public_source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_token", "family_token", "cohort", "use", "redistribution", "admission", "pretraining"],
+      "properties": {
+        "source_token": {"$ref": "#/$defs/sha256"},
+        "family_token": {"$ref": "#/$defs/sha256"},
+        "cohort": {"enum": ["train", "eval"]},
+        "use": {"enum": ["owner_only", "redistribute"]},
+        "redistribution": {"$ref": "#/$defs/redistribution"},
+        "admission": {"enum": ["development_only", "development_only_caveated"]},
+        "pretraining": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["checkpoint_token", "status", "caveated"],
+            "properties": {
+              "checkpoint_token": {"$ref": "#/$defs/sha256"},
+              "status": {"$ref": "#/$defs/overlap"},
+              "caveated": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "public_projection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["format", "version", "custody_hold", "confirmation_allowed", "sealed_source_claims", "manifest_commitment", "sources", "signature_scheme", "signature"],
+      "properties": {
+        "format": {"const": "dope-source-projection-v1"},
+        "version": {"const": 1},
+        "custody_hold": {"const": "D18_HOLD"},
+        "confirmation_allowed": {"const": false},
+        "sealed_source_claims": {"const": false},
+        "manifest_commitment": {"$ref": "#/$defs/sha256"},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/public_source"}},
+        "signature_scheme": {"const": "hmac-sha256-custody-v1"},
+        "signature": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

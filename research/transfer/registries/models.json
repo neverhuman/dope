@@ -8,7 +8,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "foundation_tabular",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "unknown",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "mitra_v2",
@@ -16,7 +42,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "foundation_tabular",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "unknown",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "tabicl_v2",
@@ -24,7 +76,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "unknown",
+        "caveat_required": true
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "foundation_tabular",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "unknown",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": true,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": false
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "catboost",
@@ -32,7 +110,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "tree",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "independent_boosting",
@@ -40,7 +144,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "boosting",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": true,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": true,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "independent_neural",
@@ -48,7 +178,33 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "neural",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": true,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": true,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
     },
     {
       "name": "linear",
@@ -56,7 +212,203 @@
       "identity_sha256": null,
       "eligibility_sha256": null,
       "native_reference_sha256": null,
-      "license_status": "unresolved"
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "linear",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
+    },
+    {
+      "name": "lightgbm",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "tree",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
+    },
+    {
+      "name": "xgboost",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "tree",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
+    },
+    {
+      "name": "realmlp",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "neural",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        },
+        "classification": {
+          "compiler_teacher": true,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": false,
+          "native_recipe_sensitivity": true
+        }
+      },
+      "rights_status": "unresolved"
+    },
+    {
+      "name": "knn",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "instance_based",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": true,
+          "native_recipe_sensitivity": false
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": true,
+          "native_recipe_sensitivity": false
+        }
+      },
+      "rights_status": "unresolved"
+    },
+    {
+      "name": "kernel",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved",
+      "pretraining_corpus_disclosure": {
+        "state": "known_none",
+        "caveat_required": false
+      },
+      "qualification_state": "fixture_verified_only",
+      "panel_edition": "tdl-panel-2026-10-18-edition-1",
+      "architecture_family": "kernel",
+      "checkpoint_sha256": null,
+      "teacher_lineage_overlap": "known_none",
+      "roles_by_workload": {
+        "regression": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": true,
+          "native_recipe_sensitivity": false
+        },
+        "classification": {
+          "compiler_teacher": false,
+          "selection": false,
+          "required_confirmatory": false,
+          "challenger_only": true,
+          "native_recipe_sensitivity": false
+        }
+      },
+      "rights_status": "unresolved"
     }
   ]
 }
