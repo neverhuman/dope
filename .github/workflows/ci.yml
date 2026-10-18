@@ -122,7 +122,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Install Rust toolchain manager in the disposable guest
-        run: sudo apt-get update && sudo apt-get -o DPkg::Lock::Timeout=300 install -y rustup
+        run: sudo apt-get update && sudo apt-get -o DPkg::Lock::Timeout=300 install -y rustup strace ripgrep
       - name: Dependency advisory scan
         run: bash ops/ci/security.sh
       - name: Verify Cargo advisories
@@ -146,4 +146,6 @@ jobs:
           artifact-name: dope-sbom.spdx.json
           output-file: target/security/sbom.spdx.json
       - name: Q03 native release and installer smoke
-        run: bash ops/ci/native-release-smoke.sh
+        run: |
+          cargo fetch --locked
+          bash ops/ci/native-release-smoke.sh
