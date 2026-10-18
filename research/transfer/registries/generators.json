@@ -57,6 +57,150 @@
       "eligibility_sha256": null,
       "native_reference_sha256": null,
       "license_status": "unresolved"
+    },
+    {
+      "name": "marginal",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "targetprior",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "copula",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "chow_liu",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "predictor_independent_x",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "predictor_dependent_x",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "selected_rows",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "random_rows",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "stratified_rows",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "compressed_full_source",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "real_row_copy",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "strong_coreset",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "prototypes",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "arf",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "synthpop",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "forest_diffusion",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "ctgan",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
+    },
+    {
+      "name": "tvae",
+      "status": "unresolved",
+      "identity_sha256": null,
+      "eligibility_sha256": null,
+      "native_reference_sha256": null,
+      "license_status": "unresolved"
     }
   ]
 }
