@@ -8,6 +8,7 @@ import hashlib
 import io
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from tools.claims.cohorts import cohort_failures, refresh_cohorts  # noqa: E402
+from tools.claims import registry  # noqa: E402
 # The interval level comes from the v2 pre-declaration through the README benchmark's helper.
 if str(ROOT / "docs/whitepaper/scripts") not in sys.path:
     sys.path.append(str(ROOT / "docs/whitepaper/scripts"))
@@ -25,6 +27,61 @@ BEGIN, END = "<!-- BEGIN TDL RESULTS -->", "<!-- END TDL RESULTS -->"
 DEMO_BEGIN, DEMO_END = "<!-- BEGIN PINNED DEMOS -->", "<!-- END PINNED DEMOS -->"
 
 
+def claim_ledger(data: dict, status: dict, *, root: Path = ROOT) -> dict:
+    """Derive claim classes and limitations without changing historical publication bytes."""
+    rows = {row["id"]: row for row in data["results"]}
+    claims = []
+    forbidden = ["No equivalence or superiority claim", "No reusable or relational generalization",
+                 "No formal DP", "No HIPAA de-identification", "No safe-share authorization"]
+
+    def entry(name, kind, scope, protocol, receipts, allowed, disclosure=None):
+        return {"claim_id": name, "claim_class": kind, "capability_scope": scope,
+                "protocol_id": protocol, "receipt_sha256s": receipts,
+                "release_profile_state": "unassessed_local",
+                "pretraining_corpus_disclosure": disclosure or {
+                    "state": "not_applicable", "caveat_required": False},
+                "equivalence_procedure": {"claimed": False, "verified": False,
+                                          "bound_side": None, "equivalence_margin": None},
+                "allowed_scope": allowed, "prohibited_extrapolations": list(forbidden)}
+
+    if len(rows) != len(data["results"]):
+        raise ValueError("claim ledger: duplicate result id")
+    labels = {row["id"]: row["evidence_status"] for row in status["results"]}
+    if len(labels) != len(status["results"]) or not set(rows).issubset(labels):
+        raise ValueError("claim ledger: result/status coverage disagrees")
+    for label in status["results"]:
+        row = rows.get(label["id"])
+        if row is not None and row["evidence_status"] != label["evidence_status"]:
+            raise ValueError("claim ledger: result/status evidence disagrees")
+        historical = row is not None or label["evidence_status"] == "historical"
+        claims.append(entry(
+            label["id"], "historical" if historical else "specified",
+            "historical_validation" if historical else "protocol_specification",
+            "historical-v2-validation" if row else
+            "historical-" + label['id'] if historical else "tdl-draft-v1",
+            [row["source"]["sha256"]] if row else [],
+            "Historical selection-exposed validation; declared CatBoost cohort only."
+            if row else label["qualification"], registry.pretraining_disclosure(row) if row else None))
+    declarations = (root / "docs/vnext/CLAIMS.md").read_text()
+    declared = re.findall(r"^\| `([^`]+)` / `([^`]+)` \| ([^|]+) \|", declarations, re.M)
+    if len(declared) != 5 or {scope for _, scope, _ in declared} != {
+            "task_replacement", "reusable_table", "augmentation", "relational_replacement", "foundation_pretraining"}:
+        raise ValueError("claim ledger: declared capability table is incomplete")
+    for name, scope, hypothesis in declared:
+        claims.append(entry(name, "specified", scope, "tdl-draft-v1", [],
+                            "Specified, unmeasured hypothesis: " + hypothesis.strip()))
+    return {"format": "dope-claim-ledger-v1", "version": 1,
+            "protocol_frozen": data.get("protocol_frozen") is True, "claims": claims}
+
+
+def validate_publication(data: dict, status: dict, root: Path = ROOT) -> None:
+    from tools.claims.check import publication_failures
+    failures = publication_failures(data, status, root)
+    if failures:
+        # Callers may publish exception text; all failures contain codes and trusted surface labels only.
+        raise ValueError("; ".join(failures))
+
+
 def load_results(path: Path = RESULTS, *, root: Path = ROOT, derive_cohorts: bool = False) -> dict:
     data = json.loads(path.read_text())
     if data.get("citable") is not True or data.get("fixture") is True:
@@ -32,6 +89,9 @@ def load_results(path: Path = RESULTS, *, root: Path = ROOT, derive_cohorts: boo
     for row in data["results"]:
         if row.get("citable") is not True:
             raise ValueError("publication renderer refuses non-citable result")
+    failures = registry.validate_result_claims(data)
+    if failures:
+        raise ValueError("; ".join(failures))
     if derive_cohorts:
         refresh_cohorts(data, root)
     else:
@@ -46,6 +106,9 @@ def interval_level(root: Path = ROOT) -> int:
 
 
 def text_outputs(data: dict, status: dict, percent: int | None = None) -> dict[str, bytes]:
+    failures = registry.validate_result_claims(data)
+    if failures:
+        raise ValueError("; ".join(failures))
     percent = interval_level() if percent is None else percent
     table = [r"% Generated historical validation; separate cohorts; no TDL result.",
              r"\begingroup\scriptsize",
@@ -67,12 +130,16 @@ def text_outputs(data: dict, status: dict, percent: int | None = None) -> dict[s
     writer.writeheader()
     for row in data["results"]:
         level, amount, cohort = row["retention"], row["artifact_bytes"], row["cohort"]
+        disclosure = registry.pretraining_disclosure(row)
+        display = row['display']
+        if disclosure['caveat_required']:
+            display += f" (pretraining overlap {disclosure['state']})"
         interval = f"{level['estimate']:.3f} [{level['lo']:.3f}, {level['hi']:.3f}]" if level else "unmeasured"
         if row.get("paper_card") or row["id"] in ("Chow", "Ind"):
-            card.append(f"| {row['display']} | {interval} | {amount['median'] if amount else 'unmeasured'} | {cohort['observed_lineages']}/{cohort['prepared_lineages']} | `{row['evidence_status']}` |")
+            card.append(f"| {display} | {interval} | {amount['median'] if amount else 'unmeasured'} | {cohort['observed_lineages']}/{cohort['prepared_lineages']} | `{row['evidence_status']}` |")
         if row.get("paper_card"):
             estimate = f"{level['estimate']:.3f} [{level['lo']:.3f}, {level['hi']:.3f}]" if level else "unmeasured"
-            table.append(f"{tex(row['display'])} & {estimate} & {amount['median'] if amount else '---'} & {cohort['observed_lineages']} & selection-exposed validation " + r"\\")
+            table.append(f"{tex(display)} & {estimate} & {amount['median'] if amount else '---'} & {cohort['observed_lineages']} & selection-exposed validation " + r"\\")
         prefix = "Historical" + row["macro_id"]
         if level:
             for suffix, key in (("Retention", "estimate"), ("Lower", "lo"), ("Upper", "hi")):
@@ -81,12 +148,17 @@ def text_outputs(data: dict, status: dict, percent: int | None = None) -> dict[s
             macros.append(f"\\newcommand{{\\{prefix}Bytes}}{{{amount['median']}}}")
         macros.append(f"\\newcommand{{\\{prefix}Lineages}}{{{cohort['observed_lineages']}}}")
         if amount and level:
-            writer.writerow(dict(id=row["id"], method=row["display"], artifact_bytes=amount["median"], retention=level["estimate"], interval_lo=level["lo"], interval_hi=level["hi"], observed_lineages=cohort["observed_lineages"], prepared_lineages=cohort["prepared_lineages"], evidence_status=row["evidence_status"], cohort_id=cohort["id"], complete_budget_grid="false", driver_gate="unmeasured", cohort_complete=str(cohort["complete"]).lower()))
+            writer.writerow(dict(id=row["id"], method=display, artifact_bytes=amount["median"], retention=level["estimate"], interval_lo=level["lo"], interval_hi=level["hi"], observed_lineages=cohort["observed_lineages"], prepared_lineages=cohort["prepared_lineages"], evidence_status=row["evidence_status"], cohort_id=cohort["id"], complete_budget_grid="false", driver_gate="unmeasured", cohort_complete=str(cohort["complete"]).lower()))
     card += ["", "Bytes are historical charged artifacts; cold sampling closure and driver gates are unmeasured.",
              "Smaller cohorts are separate comparisons. These points do not establish a TDL frontier.", END, ""]
     lines = ["<!-- Generated by tools/claims/render.py from evidence/status.json. -->", "# Evidence status", "", status["summary"], "", "| Result | Evidence status | Qualification |", "|---|---|---|"]
     for row in status["results"]:
-        lines.append(f"| {row['display']} | `{row['evidence_status']}` | {row['qualification']} |")
+        source = next((result for result in data['results'] if result['id'] == row['id']), row)
+        disclosure = registry.pretraining_disclosure(source)
+        qualification = row['qualification']
+        if disclosure['caveat_required']:
+            qualification += f"; pretraining overlap {disclosure['state']}"
+        lines.append(f"| {row['display']} | `{row['evidence_status']}` | {qualification} |")
     lines += ["", "TDL protocol is unfrozen. No sealed-test result or qualified TDL headline is available.", ""]
     table += [r"\bottomrule", r"\end{tabular}", r"\endgroup", ""]
     demos = [DEMO_BEGIN, "<!-- Generated historical engineering notes; not a TDL result. -->", *data["demo_notes"]["paragraphs"], DEMO_END, ""]
@@ -222,6 +294,10 @@ def figure_outputs(csv_bytes: bytes, thresholds: dict, percent: int | None = Non
 def expected_outputs(root: Path = ROOT) -> dict[str, bytes]:
     data = load_results(root / "paper/generated/headline-results.json", root=root)
     status = json.loads((root / "evidence/status.json").read_text())
+    validate_publication(data, status, root)
+    failures = registry.validate_claim_ledger(claim_ledger(data, status, root=root), root)
+    if failures:
+        raise ValueError("; ".join(failures))
     percent = interval_level(root)
     outputs = text_outputs(data, status, percent)
     outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"], data["thresholds"], percent))
@@ -233,7 +309,19 @@ def expected_outputs(root: Path = ROOT) -> dict[str, bytes]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--ledger", action="store_true", help="Print the generated claim-v1 ledger; write no artifacts")
     args = parser.parse_args()
+    if args.ledger:
+        data = load_results()
+        status = json.loads((ROOT / "evidence/status.json").read_text())
+        validate_publication(data, status)
+        ledger = claim_ledger(data, status)
+        failures = registry.validate_claim_ledger(ledger)
+        if failures:
+            print("\n".join(failures), file=sys.stderr)
+            return 1
+        print(json.dumps(ledger, indent=2))
+        return 0
     if not args.check:
         data = load_results(derive_cohorts=True)
         content = (json.dumps(data, indent=2) + "\n").encode()
