@@ -183,3 +183,47 @@ avoid copying a source field into an issue or report. For an artifact failure,
 compare its recorded digest and regenerate it from the same source commit.
 For a backend failure, check the build feature and the scheduled GPU report.
 Rerun the narrow failing command before repeating a whole campaign.
+
+## Unified-spec extraction and compatibility proof
+
+Keep `rust/` exports stable while extracting one coherent section at a time.
+Compare its expanded source bytes before and after the move, record source and
+contract hashes, then replay the existing deterministic fixtures. A move of
+production code must preserve the complete implementation-hash source closure.
+The included interaction fitting section is development code; its existing
+eight integration fixtures cover fold complements, widths, seeded proposals,
+permutations, substitutions and code-only refusals. Its tariff is not encoded
+artifact size or an independent generalization estimate.
+
+Run these commands from the checkout, reusing its `target/` directory:
+
+```sh
+rtk cargo test --locked --test vnext_interactions
+rtk cargo test --locked --lib codec::
+rtk cargo test --locked --test rust_cli
+PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_frontier research.transfer.tests.test_learning_density -v
+rtk just fast
+rtk just check
+```
+
+The codec suite retains DPK2/DPK3 minor-version decode and round-trip checks;
+the CLI suite also samples historical v1 JSON artifacts. The frontier tests
+replay all shared frontier goldens through the historical module's canonical
+`evaluate` alias, while the existing family-coverage diagnostics retain their
+own denominator and censoring tests. Full `fast`/`check` discovery keeps both
+paths exercised. Rust/Python TDL parity additionally requires both commands:
+
+```sh
+python3 -B -m research.transfer.tdl.golden --check
+rtk cargo test --locked --lib metrics::golden
+```
+
+Candidate protocol admission uses the unfrozen
+`contracts/tdl-contract-v2-candidate.json`, its protocol/result schemas and the
+shared fixtures under `tests/fixtures/tdl-v2/`. Run the Rust candidate tests and
+`python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v` for
+those changes. These proofs do not resolve null calibration or multiplicity
+decisions, qualify a Python worker/model, or authorize a release. TypeScript
+protocol types must be schema-generated and must not implement another reducer.
+Inventory custody assets by hashes and Git identities; do not clean them as
+part of an extraction. Record local proof separately from exact-head CI.
