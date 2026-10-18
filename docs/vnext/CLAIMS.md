@@ -40,3 +40,31 @@ held-out learner, held-out source-family, transferable-knowledge, intelligence,
 minimum-size, formal-DP or HIPAA claim. Only the pre-declared sealed test run
 can give a selection-free estimate for that profile. The claims in the table
 above remain unmeasured and are unaffected by this narrative decision.
+
+## Generated machine-readable ledger (Q00)
+
+The five capability rows above are the declaration input for
+`PYTHONPATH=. python3 -B -m tools.claims.render --ledger`. The command combines
+them with `evidence/status.json` and pinned historical results and prints a
+deterministic `dope-claim-ledger-v1` JSON document. Missing or duplicate capability
+rows, inconsistent status labels and historical reclassification fail the gate.
+It does not rewrite existing paper artifacts or `STATUS.md`.
+
+Every entry includes `claim_id`, `claim_class`, `capability_scope`, `protocol_id`,
+`receipt_sha256s`, `release_profile_state`, `pretraining_corpus_disclosure`,
+`equivalence_procedure`, `allowed_scope` and `prohibited_extrapolations`.
+[`claim-v1.schema.json`](../../schemas/claim-v1.schema.json) defines the closed
+Draft 2020-12 interface. The generated ledger is checked by
+`PYTHONPATH=. python3 -B -m tools.claims.check`; an externally supplied ledger can
+also be checked with `--claim-ledger PATH`.
+
+Measured claims require frozen protocols and receipt digests. Known pretraining
+overlap prevents a measured claim; unknown overlap remains an explicit caveat.
+Kumo and TabICL disclosures bind individual checkpoint digests. Neither a
+non-significant test nor an interval containing zero supplies a verified
+two-sided equivalence procedure or its positive finite margin.
+
+All current release summaries are `unassessed_local`. S00's independent utility,
+empirical privacy, formal-DP and legal release axes remain authoritative; the
+summary enum does not combine them into a certification. The ledger validates
+references and wording, not receipt authenticity or a protected campaign.

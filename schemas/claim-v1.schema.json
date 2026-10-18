@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dope:claim:v1",
+  "title": "Public claim ledger; structural validity grants no scientific or release authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "protocol_frozen", "claims"],
+  "properties": {
+    "format": {"const": "dope-claim-ledger-v1"},
+    "version": {"type": "integer", "const": 1},
+    "protocol_frozen": {"type": "boolean"},
+    "claims": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claim"}}
+  },
+  "allOf": [{
+    "if": {"properties": {"claims": {"contains": {
+      "properties": {"claim_class": {"const": "measured"}}, "required": ["claim_class"]
+    }}}},
+    "then": {"properties": {"protocol_frozen": {"const": true}}}
+  }],
+  "$defs": {
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-fA-F]{64}$"},
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "caveat_required"],
+      "properties": {
+        "state": {"enum": ["known_none", "overlapping", "unknown", "not_applicable"]},
+        "caveat_required": {"type": "boolean"},
+        "caveat_text": {"$ref": "#/$defs/text"},
+        "checkpoint_sha256": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [{
+        "if": {"properties": {"state": {"enum": ["unknown", "overlapping"]}}, "required": ["state"]},
+        "then": {
+          "required": ["caveat_text"],
+          "properties": {"caveat_required": {"const": true}}
+        }
+      }]
+    },
+    "equivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimed", "verified", "bound_side", "equivalence_margin"],
+      "properties": {
+        "claimed": {"type": "boolean"},
+        "verified": {"type": "boolean"},
+        "bound_side": {"enum": ["both", "upper", "lower", null]},
+        "equivalence_margin": {
+          "anyOf": [
+            {"type": "number", "exclusiveMinimum": 0, "maximum": 1.7976931348623157e308},
+            {"type": "null"}
+          ]
+        }
+      },
+      "allOf": [{
+        "if": {"properties": {"claimed": {"const": true}}, "required": ["claimed"]},
+        "then": {"properties": {
+          "verified": {"const": true},
+          "bound_side": {"const": "both"},
+          "equivalence_margin": {"type": "number", "exclusiveMinimum": 0, "maximum": 1.7976931348623157e308}
+        }}
+      }]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id", "claim_class", "capability_scope", "protocol_id", "receipt_sha256s",
+        "release_profile_state", "pretraining_corpus_disclosure", "equivalence_procedure",
+        "allowed_scope", "prohibited_extrapolations"
+      ],
+      "properties": {
+        "claim_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"},
+        "claim_class": {"enum": ["measured", "historical", "specified", "illustrative"]},
+        "capability_scope": {"enum": [
+          "task_replacement", "reusable_table", "augmentation", "relational_replacement",
+          "foundation_pretraining", "historical_validation", "protocol_specification"
+        ]},
+        "protocol_id": {"$ref": "#/$defs/text"},
+        "receipt_sha256s": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}},
+        "release_profile_state": {"enum": [
+          "unassessed_local", "empirical_screened_only", "formal_dp_verified", "legal_release_authorized"
+        ]},
+        "pretraining_corpus_disclosure": {"$ref": "#/$defs/disclosure"},
+        "equivalence_procedure": {"$ref": "#/$defs/equivalence"},
+        "allowed_scope": {"$ref": "#/$defs/text"},
+        "prohibited_extrapolations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}}
+      },
+      "allOf": [{
+        "if": {"properties": {"claim_class": {"const": "measured"}}, "required": ["claim_class"]},
+        "then": {"properties": {
+          "receipt_sha256s": {"minItems": 1},
+          "pretraining_corpus_disclosure": {"properties": {"state": {"not": {"const": "overlapping"}}}}
+        }}
+      }, {
+        "if": {"properties": {"equivalence_procedure": {"properties": {"claimed": {"const": true}}}}},
+        "then": {"properties": {"receipt_sha256s": {"minItems": 1}}}
+      }, {
+        "if": {"properties": {"release_profile_state": {"not": {"const": "unassessed_local"}}}},
+        "then": {"properties": {"receipt_sha256s": {"minItems": 1}}}
+      }]
+    }
+  }
+}
