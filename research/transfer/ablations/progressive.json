@@ -1,0 +1,78 @@
+{
+  "byte_budgets": {
+    "maximum_artifact_bytes": 16777216,
+    "maximum_budget_points": 5,
+    "rule": "Predeclare identical byte budgets for both arms; charge the complete DPP1 header, each length and digest frame, each DPK payload, and all control artifact framing. Do not compare payload-only bytes.",
+    "status": "not_admitted"
+  },
+  "candidate_set": [
+    "progressive: complete independently decodable packets in DPP1, development order frozen once before query evaluation",
+    "control: independent compile and artifact for each byte budget"
+  ],
+  "compute_and_price": {
+    "admission_blockers": [
+      "DPP1 currently frames complete DPK artifacts; it does not define a progressive learning program or cumulative shared compiler state.",
+      "Compiler reports do not expose a common measured compute ledger that can prove equal total compute between prefix and independent-budget arms.",
+      "No source-lineage and model-family holdout registration for this intervention is present in the lane inputs; the inline kernel fixture is insufficient for utility admission."
+    ],
+    "equal_compute_rule": "Match the sum of compiler search offers and measured fit/sample/encode CPU-seconds per task and seed across arms; do not equate number of output files with compute.",
+    "pilot_cpu_seconds_cap": 30,
+    "pilot_wall_seconds_cap": 120,
+    "priced_pilot": {
+      "charged_envelope_bytes": "not captured by this codec refusal/boundary smoke test; no utility comparison claimed",
+      "command": "cargo test -p dope-kernel --locked --lib codec::tests::progressive_packets_accept_only_complete_advertised_boundaries",
+      "exit_code": 0,
+      "max_rss_kb": 1405556,
+      "measurement": "record process CPU seconds, wall seconds, and charged envelope bytes; this prices codec framing/refusal only and is not a utility result",
+      "retry_rule": "one invocation; retain a failure as an outcome and do not repeat unchanged",
+      "status": "completed_once_over_cpu_cap_no_retry",
+      "system_cpu_seconds": 4.48,
+      "total_cpu_seconds": 36.87,
+      "user_cpu_seconds": 32.39,
+      "wall_seconds": 37.55
+    },
+    "study_cpu_seconds_cap": 3600
+  },
+  "format": "dope-progressive-program-ablation-v1",
+  "hypothesis": {
+    "alternative": "At equal total compiler compute, qualifying a DPP1 progressive program yields higher mean held-out utility per charged byte over the registered byte budgets than separately compiled per-budget artifacts, while preserving every earlier valid boundary after a later candidate failure.",
+    "no_win_rule": "Retain the independent per-budget mechanism and all raw outcomes when no qualifying progressive program wins. No monotone utility envelope or interpolated values.",
+    "null": "The progressive program does not improve the preregistered held-out utility-per-byte endpoint over independent per-budget artifacts, or cannot be compared at equal compiler compute and complete framing charge."
+  },
+  "recording": {
+    "framing": "report common DPP1 bytes and per-packet framing separately and in the charged total",
+    "later_failure": "retain the exact earlier valid DPK artifacts and boundaries; later failure does not invalidate them",
+    "pilot_result": {
+      "cap_disposition": "CPU cap of 30 seconds exceeded by 6.87 seconds; recorded as a stop-rule breach; no unchanged retry",
+      "exit_code": 0,
+      "fixture": "inline deterministic symbolic kernel; one advertised complete DPP1 boundary",
+      "interpretation": "Codec framing/refusal smoke only; not a compiler-compute or held-out utility result.",
+      "max_rss_kb": 1405556,
+      "outcome": "PASS for deterministic prefix decode",
+      "system_cpu_seconds": 4.48,
+      "total_cpu_seconds": 36.87,
+      "user_cpu_seconds": 32.39,
+      "wall_seconds": 37.55
+    },
+    "raw_prefix_outcomes": "retain per-boundary bytes, train utility, development utility, validity, and failure disposition without smoothing",
+    "study_result": null
+  },
+  "scope": "engineering development only; no certification, privacy, or population-transfer claim",
+  "seed_schedule": {
+    "master_seed": 20261018,
+    "pilot": [
+      1
+    ],
+    "study": "after admission only: derive task-independent fit, candidate-order, sampling, and query substreams from SHA256(master_seed, canonical_task_id, namespace); preregister the master seed and complete schedule before opening query outcomes"
+  },
+  "source_and_model_holdouts": {
+    "available_fixture": "inline deterministic symbolic kernel in rust/codec/decoding/part_02.rs",
+    "current_admissible_sources": [],
+    "fixture_role": "codec framing and refusal smoke only; it is not a source-family development set and cannot qualify utility",
+    "model_holdout_plan": "Predeclare symbolic candidate families for fitting and hold out at least one candidate family from ordering/selection; current codec fixture contains one kernel shape and does not establish this holdout.",
+    "source_holdout_plan": "Before admission, register disjoint development-fit and development-query source lineages with rights, exposure, owner, and identity evidence; reserve at least one source lineage as untouched confirmation and exclude aliases from independent counts."
+  },
+  "status": "admission_blocked_after_one_priced_codec_pilot",
+  "stop_rule": "Stop the pilot on the first nonzero exit, 30 CPU seconds, 120 wall seconds, invalid boundary, or 16 MiB artifact cap. Do not retry unchanged. Do not start the development study until all admission blockers are resolved and the full schedule, compute ledger, query holdouts, and costs are frozen.",
+  "version": 1
+}
