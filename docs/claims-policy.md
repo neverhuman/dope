@@ -145,3 +145,51 @@ the default compile search, and historical research and refined profiles can dif
 Paper and README prose remain under L3 ownership. Demo license, DOI and positional-feature counts (U5)
 are checked against the native pin's `source_data` and `INSPECT.txt` by the public
 claims registry, including missing or contradictory metadata.
+
+## 7. Generated claim ledger and public firewall (Q00)
+
+`PYTHONPATH=. python3 -B -m tools.claims.render --ledger` emits a deterministic
+`dope-claim-ledger-v1` JSON document, validated by
+[`claim-v1.schema.json`](../schemas/claim-v1.schema.json). The inputs are the pinned
+historical results, `evidence/status.json`, and the five capability rows in
+[`vnext/CLAIMS.md`](vnext/CLAIMS.md). Historical entries stay historical; the five
+future capabilities stay specified and unmeasured. This additional output does
+not change `paper/generated/*` or `STATUS.md`.
+
+Each entry declares its class (`measured`, `historical`, `specified`, or
+`illustrative`), capability, protocol, receipt digests, allowed scope and prohibited
+extrapolations. A measured entry requires a frozen protocol, nonempty SHA-256
+receipt references and no known pretraining overlap. Schema validation checks
+structure; it does not verify receipt contents or admit a campaign. The existing
+receipt graph and publication gates remain necessary.
+
+CR-13 / S1-R074 rejects affirmative equivalence, parity, on-par, matches or ties
+conclusions from “no significant difference”, “non-significant difference”,
+“not statistically significant” or `p > 0.05`. A supported equivalence procedure
+requires verified two-sided bounds, a positive finite equivalence margin and
+receipt references. A direct negative disclaimer is allowed; a later affirmative
+conclusion in the same paragraph still fails. Unregistered public prose cannot
+self-authorize an equivalence exception.
+
+CR-10 / D10 requires an explicit overlap disclosure for each Kumo or TabICL
+checkpoint (also Mitra and TabPFN). `known_none`, `overlapping` and `unknown`
+are distinct states; the latter two require a visible caveat. A declaration must
+bind its exact checkpoint digest. An unrun legacy registry stub is treated as
+unknown and unqualified without rewriting historical locks. Qualification or a
+contamination-review digest cannot silently turn unknown overlap into a clean
+source-disjoint result. Contradictory contamination-free statements fail even
+when a caveat is present.
+
+CR-04 refuses unbacked HIPAA, anonymous, formal-DP and safe-share language,
+private host/bucket paths, and raw source column/value echoes. New diagnostics
+report only the violated rule and trusted surface label, without the offending
+text, source headers or extrema. The historical firewall still runs, with its
+input-quoting failures replaced by a safe diagnostic at the public command.
+
+`PYTHONPATH=. python3 -B -m tools.claims.check` validates the generated ledger
+and public surfaces. `--claim-ledger PATH` additionally checks an external ledger.
+The renderer invokes the same new surface checks from the existing paper gate.
+All generated entries currently use `unassessed_local`. The claim schema's
+release labels are summaries, not an ordered promotion ladder: empirical screening,
+formal DP and legal authorization remain separate S00 evidence axes. Utility,
+an equivalence result or schema validity grants none of those authorities.

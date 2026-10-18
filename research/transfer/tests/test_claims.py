@@ -56,6 +56,55 @@ def _graph(comparison="raw_gap_superiority"):
 
 
 class ClaimGraphTests(unittest.TestCase):
+    def test_equivalence_needs_both_bounds_and_its_own_finite_margin(self):
+        fixture = synthetic_fixture('equivalence')
+        for field, value in (('lower', None), ('upper', None), ('equivalence_margin', None),
+                             ('equivalence_margin', 0), ('equivalence_margin', True)):
+            with self.subTest(field=field, value=value):
+                document, receipts = _replace_receipt(
+                    fixture['document'], fixture['receipts'], 'receipt-equivalence',
+                    lambda receipt: receipt.update({field: value}))
+                with self.assertRaises(ClaimError):
+                    verify_claim_graph(document, receipts, fixture['expected'])
+        from tools.claims import registry
+        for margin in (None, 0, -0.1, True, float('nan'), float('inf')):
+            self.assertFalse(registry.equivalence_passed({
+                'claimed': True, 'verified': True, 'bound_side': 'both', 'equivalence_margin': margin}))
+        for side in ('upper', 'lower', None):
+            self.assertFalse(registry.equivalence_passed({
+                'claimed': True, 'verified': True, 'bound_side': side, 'equivalence_margin': 0.1}))
+        _, _, projection = _graph('equivalence')
+        claim = projection['claims'][0]
+        self.assertEqual(claim['equivalence']['bound_side'], 'both')
+        self.assertFalse(claim['qualified'])
+        self.assertFalse(claim['campaign_admitted'])
+
+    def test_pretraining_overlap_unknown_never_becomes_an_uncaveated_pass(self):
+        from tools.claims import check, registry
+        for model in ('kumo_tabular', 'tabicl_v2'):
+            entry = {'id': model, 'checkpoint_sha256': 'a' * 64}
+            for fields in registry.REQUIRED.values():
+                entry.update({field: 'b' * 64 if field.endswith('sha256') else 'reviewed'
+                              for field in fields})
+            entry['checkpoint_sha256'] = 'a' * 64
+            entry['qualification'] = {
+                'state': 'qualified', 'admission_status': 'qualified',
+                'history': [{'state': state, 'receipt_sha256': 'c' * 64} for state in registry.STATES[1:]]}
+            with self.assertRaisesRegex(ValueError, 'CR-10'):
+                registry.validate_qualification(entry['qualification'], entry)
+            entry['pretraining_corpus_disclosure'] = {
+                'state': 'unknown', 'checkpoint_sha256': 'a' * 64,
+                'caveat_required': True, 'caveat_text': 'Pretraining overlap is unknown.'}
+            registry.validate_qualification(entry['qualification'], entry)
+            self.assertTrue(registry.pretraining_disclosure(entry)['caveat_required'])
+            row = {**entry, 'auditor': model, 'claim_allowed': True}
+            failures = check.lint_cr10_pretraining_overlap_caveats(
+                {'results': [row]}, {'entries': [entry]}, {})
+            self.assertTrue(any('unqualified claim' in failure for failure in failures))
+            entry['pretraining_corpus_disclosure']['caveat_required'] = False
+            with self.assertRaisesRegex(ValueError, 'explicit caveat'):
+                registry.validate_qualification(entry['qualification'], entry)
+
     def test_each_comparison_stays_unqualified(self):
         for comparison in ("raw_gap_superiority", "adjusted_z_noninferiority", "equivalence"):
             fixture, graph, projection = _graph(comparison)

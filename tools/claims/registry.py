@@ -6,6 +6,8 @@ import argparse
 import copy
 import hashlib
 import json
+import math
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,12 +23,130 @@ REQUIRED = {
 }
 
 
+def foundation_model(entry: dict) -> bool:
+    return entry.get("family") == "foundation_tabular" or bool(re.search(
+        r"kumo|tabicl|mitra|tabpfn", " ".join(str(entry.get(key, ""))
+                                            for key in ("id", "auditor", "display")), re.I))
+
+
+def pretraining_disclosure(entry: dict) -> dict:
+    """Unrun legacy stubs have unknown overlap; no checkpoint receives an implicit pass."""
+    disclosure = entry.get("pretraining_corpus_disclosure")
+    required = foundation_model(entry) or disclosure is not None
+    if disclosure is None:
+        if required and (entry.get("checkpoint_sha256") is not None or
+                         entry.get("qualification", {}).get("state", "specified") != "specified"):
+            raise ValueError("CR-10: checkpoint requires pretraining-corpus disclosure")
+        return ({"state": "unknown", "caveat_required": True,
+                 "caveat_text": "Pretraining overlap is unknown; source-disjoint benefit is unverified."}
+                if required else {"state": "not_applicable", "caveat_required": False})
+    if not isinstance(disclosure, dict) or disclosure.get("state") not in (
+            "known_none", "overlapping", "unknown", "not_applicable"):
+        raise ValueError("CR-10: invalid pretraining-corpus disclosure")
+    if required and foundation_model(entry) and disclosure["state"] == "not_applicable":
+        raise ValueError("CR-10: foundation checkpoint requires an overlap state")
+    if type(disclosure.get("caveat_required")) is not bool:
+        raise ValueError("CR-10: disclosure requires explicit caveat state")
+    if disclosure["state"] in ("unknown", "overlapping") and (
+            disclosure["caveat_required"] is not True or
+            not isinstance(disclosure.get("caveat_text"), str) or not disclosure["caveat_text"].strip()):
+        raise ValueError("CR-10: unknown or overlapping pretraining requires an explicit caveat")
+    checkpoint = entry.get("checkpoint_sha256")
+    if checkpoint is not None and disclosure.get("checkpoint_sha256") != checkpoint:
+        raise ValueError("CR-10: disclosure must bind the exact checkpoint")
+    return copy.deepcopy(disclosure)
+
+
+def equivalence_passed(procedure: dict | None) -> bool:
+    if not isinstance(procedure, dict):
+        return False
+    margin = procedure.get("equivalence_margin")
+    return (procedure.get("claimed") is True and procedure.get("verified") is True and
+            procedure.get("bound_side") == "both" and type(margin) in (int, float) and
+            0 < margin <= 1.7976931348623157e308)
+
+
+def receipt_digests(value) -> bool:
+    return isinstance(value, list) and bool(value) and all(
+        isinstance(pin, str) and re.fullmatch(r"[0-9a-fA-F]{64}", pin) for pin in value)
+
+
+def validate_result_claims(data: dict) -> list[str]:
+    """Check optional successor fields without reclassifying historical results."""
+    failures = []
+    for row in data.get("results", []):
+        kind = row.get("claim_class")
+        if kind is not None and kind not in ("measured", "historical", "specified", "illustrative"):
+            failures.append("results: invalid claim class")
+        historical = row.get("source", {}).get("path") == "docs/whitepaper/generated/v2-headline.json"
+        if historical and kind not in (None, "historical"):
+            failures.append("results: historical source cannot change claim class")
+        if kind == "measured" and (data.get("protocol_frozen") is not True or
+                                   not receipt_digests(row.get("receipt_sha256s"))):
+            failures.append("results: measured claim requires frozen protocol and receipts")
+        try:
+            if foundation_model(row) and (not row.get("checkpoint_sha256") or
+                                           "pretraining_corpus_disclosure" not in row):
+                raise ValueError("CR-10: foundation result requires per-checkpoint disclosure")
+            disclosure = pretraining_disclosure(row)
+            if kind == "measured" and disclosure["state"] == "overlapping":
+                failures.append("CR-10: overlapping pretraining cannot support a measured claim")
+            if disclosure["state"] in ("unknown", "overlapping") and row.get("claim_allowed") is True:
+                failures.append("CR-10: uncertain overlap cannot grant an unqualified claim")
+        except ValueError as error:
+            failures.append(str(error))
+        procedure = row.get("equivalence_procedure", {})
+        if not isinstance(procedure, dict) or (procedure.get("claimed") is True and (
+                not equivalence_passed(procedure) or not receipt_digests(row.get("receipt_sha256s")))):
+            failures.append("CR-13: equivalence requires verified two-sided bounds and a positive finite margin")
+    return failures
+
+
+def validate_claim_ledger(ledger: dict, root: Path = ROOT, *, check_sources: bool = False) -> list[str]:
+    """Validate structure and safe semantics; diagnostics never quote supplied data."""
+    from jsonschema import Draft202012Validator
+    schema = json.loads((root / "schemas/claim-v1.schema.json").read_text())
+    failures = [f"claim ledger: schema {error.validator} violation"
+                for error in Draft202012Validator(schema).iter_errors(ledger)]
+    if failures:
+        return failures
+    ids = [row["claim_id"] for row in ledger["claims"]]
+    if len(ids) != len(set(ids)):
+        failures.append("claim ledger: duplicate claim id")
+    from tools.claims.check import (lint_cr04_redaction_and_unbacked_badges,
+                                   lint_s1_r074_no_significant_difference_equivalence, overlap_language_failures)
+    for row in ledger["claims"]:
+        procedure = row["equivalence_procedure"]
+        margin = procedure["equivalence_margin"]
+        if margin is not None and (type(margin) not in (int, float) or not math.isfinite(margin)):
+            failures.append("CR-13: equivalence margin must be finite")
+        if procedure["claimed"] and not equivalence_passed(procedure):
+            failures.append("CR-13: equivalence procedure has not passed")
+        failures.extend(lint_s1_r074_no_significant_difference_equivalence(
+            row["allowed_scope"], "claim ledger", procedure, row["receipt_sha256s"]))
+        disclosure = row["pretraining_corpus_disclosure"]
+        if disclosure["state"] in ("unknown", "overlapping"):
+            failures.extend(overlap_language_failures(
+                row["allowed_scope"] + ' ' + disclosure['caveat_text'], "claim ledger",
+                {'kumo', 'tabicl', 'mitra', 'tabpfn'}))
+        failures.extend(lint_cr04_redaction_and_unbacked_badges(json.dumps(row), "claim ledger"))
+    if check_sources:
+        from tools.claims.render import claim_ledger
+        data = json.loads((root / "paper/generated/headline-results.json").read_text())
+        status = json.loads((root / "evidence/status.json").read_text())
+        if ledger != claim_ledger(data, status, root=root):
+            failures.append("claim ledger: differs from evidence status or declared capability scopes")
+    return failures
+
+
 def specified() -> dict:
     return {"state": "specified", "admission_status": "unqualified", "history": [],
             "rejection_reason": "Qualification evidence and D-07 approval are pending."}
 
 
 def validate_qualification(value: dict, entry: dict) -> None:
+    if foundation_model(entry) or "pretraining_corpus_disclosure" in entry:
+        pretraining_disclosure(entry)
     state = value["state"]
     if state not in STATES:
         raise ValueError("unknown qualification state")
@@ -73,7 +193,7 @@ def validate(root: Path = ROOT) -> list[str]:
         value = json.loads((root / "research/transfer/registries" / filename).read_text())
         schema = json.loads((root / "schemas" / schema_name).read_text())
         for error in Draft202012Validator(schema).iter_errors(value):
-            failures.append(f"{filename}: {error.json_path}: {error.message}")
+            failures.append(f"{filename}: schema {error.validator} violation")
         names = [row["id"] for row in value["entries"]]
         if len(names) != len(set(names)):
             failures.append(f"{filename}: duplicate entry id")
@@ -83,10 +203,10 @@ def validate(root: Path = ROOT) -> list[str]:
                 if entry["status"] != entry["qualification"]["state"]:
                     raise ValueError("registry status disagrees with typed state")
             except (KeyError, ValueError) as error:
-                failures.append(f"{filename}: {entry['id']}: {error}")
+                failures.append(f"{filename}: invalid qualification ({type(error).__name__})")
     path = root / "research/transfer/manifests/datasets.json"
     schema = json.loads((root / "schemas/dataset-manifest-v1.schema.json").read_text())
-    failures.extend(f"datasets: {e.json_path}: {e.message}"
+    failures.extend(f"datasets: schema {e.validator} violation"
                     for e in Draft202012Validator(schema).iter_errors(json.loads(path.read_text())))
     index = json.loads((root / "research/transfer/registries/lock-states.json").read_text())
     mapped = {item["path"]: item for item in index["entries"]}
