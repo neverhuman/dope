@@ -131,3 +131,18 @@ Each blocked task has a deterministic CPU-only preflight class. It runs on CPU w
 | E07 | `TestE07CpuPreflight` | `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance.TestE07CpuPreflight -v` |
 
 Status: the classes exist on `origin/feat/durable-workplan-acceptance-tests` (commit `d560468`, from the gemini lane). They are **not on this branch**, and they were **not run from this branch**. Run them after that branch lands, or cherry-pick it. Until then, the matrix above is the only record of the preflight commands.
+
+## CPU preflight receipt digests (item 6)
+
+Six CPU-only preflight receipts were generated for the blocked tasks. Their directory is named `preflight_31966ba2`, but **the commands ran on `d953f9b2caa800a51fe88e44d380046136d5da33`**, which is on `origin/feat/w01-e03-e07-cpu-readiness-harness`. The preflight test classes are **not on `origin/main` (`31966ba2`)**, so these receipts do not attest to main. Each receipt records `exit_code: 0` and its log shows a non-zero test count with `OK`.
+
+| Task | Receipt | SHA-256 | Tests run (log) |
+|---|---|---|---|
+| W01 | `verify/preflight_31966ba2/W01_preflight.json` | `911b882aabdec6c231d6a376b6c9e4034cd9807ee25a31d7bce5da48cab1ad05` | 42 |
+| E03 | `verify/preflight_31966ba2/E03_preflight.json` | `6a5455509f071633141595940911387e89b58720a8c7769b2e127d5314ba06a4` | 52 |
+| E04 | `verify/preflight_31966ba2/E04_preflight.json` | `0dec7a86606cff39362f98b2a880f874b5d0782fefb87d4bd0cf46a2d2a7fa97` | 10 |
+| E05 | `verify/preflight_31966ba2/E05_preflight.json` | `04eb8fafd6d75f2a500cc7142117fba1edfb9f9953352ccb621c2957c702d59d` | 48 |
+| E06 | `verify/preflight_31966ba2/E06_preflight.json` | `2eb8d3fc8c7af3f5b1f28e2d5b960a80b80ed5e05e8b5f324c5d8a761665d0d0` | 37 |
+| E07 | `verify/preflight_31966ba2/E07_preflight.json` | `779a1bcf30e09c61836c209ea13e59f5d1e05f7f96d92ea18adc3f112450122d` | 9 |
+
+**Not yet linked into `tasks.json`.** Linking waits until PR #275 merges. The plan: run the six preflight commands on the new `origin/main`, link those receipts to W01 and E03–E07, and re-pin the 59 done tasks to the same SHA. Those tasks stay `blocked`: the GPU and campaign holds (D10, D18, D19, D05) are still active, so a preflight pass does not unblock any of them.
