@@ -21,7 +21,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "Development rows follow the entity and time grain of this parent collection. Audit labels are not stored in the producer repository.",
+        "rationale": "Development rows follow the entity and time grain of this parent collection. Audit labels are not stored in the producer repository. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -48,7 +48,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "This name repeats the parent collection and is not a second independent source.",
+        "rationale": "This name repeats the parent collection and is not a second independent source. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -75,7 +75,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "A transformed view of the same parent collection stays inside the parent meta partition.",
+        "rationale": "A transformed view of the same parent collection stays inside the parent meta partition. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -102,7 +102,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "An alternate target on the same entities stays inside the parent meta partition.",
+        "rationale": "An alternate target on the same entities stays inside the parent meta partition. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -129,7 +129,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "A simulation derived from the parent stays inside the parent meta partition.",
+        "rationale": "A simulation derived from the parent stays inside the parent meta partition. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -156,7 +156,7 @@
       "split": {
         "split_id": "part-alpha",
         "kind": "entity_time",
-        "rationale": "A repeated extract of the same entities is audit-only here and is not a new source.",
+        "rationale": "A repeated extract of the same entities is audit-only here and is not a new source. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-alpha",
         "fit_view": "producer",
         "selection_view": "producer",
@@ -183,7 +183,7 @@
       "split": {
         "split_id": "part-beta",
         "kind": "entity_time",
-        "rationale": "This parent collection is a separate development lineage. Its final labels stay external.",
+        "rationale": "This parent collection is a separate development lineage. Its final labels stay external. Compatibility inventory only; source use requires a private D02 manifest and explicit rights grants. D18 custody HOLD remains unresolved.",
         "meta_partition": "part-beta",
         "fit_view": "producer",
         "selection_view": "producer",

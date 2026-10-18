@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import unittest
+from copy import deepcopy
+from itertools import permutations
 from pathlib import Path
 
 import jsonschema
@@ -21,16 +23,20 @@ from research.transfer.lineage import (
     SourceFamily,
     SplitManifest,
     Suite,
+    admit_source_manifest,
     assert_public_provenance,
     confirmation_allowed,
     load_registry,
     protocol_frozen,
+    verify_source_projection,
 )
 
 
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA = ROOT / "schemas" / "source-family-v1.schema.json"
 SHA256_EMPTY = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+KEY = bytes(range(32))
+MANIFEST_SCHEMA = ROOT / "schemas/source-manifest-v1.schema.json"
 
 
 def split(partition: str = "part-alpha") -> SplitManifest:
@@ -60,6 +66,43 @@ def family(**overrides: object) -> SourceFamily:
     }
     payload.update(overrides)
     return SourceFamily(**payload)  # type: ignore[arg-type]
+
+
+def private_manifest() -> dict:
+    return {
+        "format": "dope-source-manifest-v1", "version": 1,
+        "custody": "development_only", "custody_hold": "D18_HOLD",
+        "sources": [{
+            "source_id": "private-source-canary", "family_id": "dev-lineage-alpha",
+            "source_family": "dev-lineage-alpha", "cohort": "train", "use": "redistribute",
+            "acquisition": {"uri": "file:///home/private/canary.csv", "method": "owner_delivery"},
+            "version": "private-version-canary", "content_sha256": SHA256_EMPTY,
+            "rights": {"license": "fixture-license-canary", "acquisition": "granted", "training": "granted",
+                       "redistribution": "permitted_redistribution", "redistribution_approved": True,
+                       "review_sha256": SHA256_EMPTY},
+            "target": {"column": "private-target-canary", "definition": "private-outcome-canary"},
+            "prediction_time": {"definition": "private-time-canary", "timestamp": "2026-01-01T00:00:00Z"},
+            "hierarchy": {"group": "private-group-canary", "site": None,
+                          "entity": "private-entity-canary", "time": "private-clock-canary"},
+            "features": [{"column": "private-feature-canary", "feature_timestamp": "2025-12-31T23:00:00Z"}],
+            "split": {"order": "entity_then_time_then_fit", "operations": ["entity", "time", "fit_transforms"],
+                      "fit_transforms_cohort": "train"},
+            "pretraining": [{"checkpoint": "private-kumo-canary", "checkpoint_sha256": SHA256_EMPTY,
+                             "corpus_uri": None, "status": "unknown", "review_sha256": None,
+                             "caveat": "private-corpus-canary"}],
+        }],
+    }
+
+
+def admitted_registry() -> Registry:
+    grants = RightsRecord(Permission.GRANTED, Permission.GRANTED, Permission.GRANTED)
+    return Registry([
+        family(rights=grants),
+        family(family_id="dev-lineage-alpha-alias", relation=Relation.ALIAS,
+               alias_of="dev-lineage-alpha", rights=grants),
+        family(family_id="dev-lineage-beta", parent_lineage_id="dev-lineage-beta",
+               split=split("part-beta"), rights=grants),
+    ], final_label_custody="external")
 
 
 class LineageTests(unittest.TestCase):
@@ -277,6 +320,158 @@ class LineageTests(unittest.TestCase):
         path.write_text(json.dumps(mixed), encoding="utf-8")
         with self.assertRaisesRegex(LineageError, "development inventory"):
             load_registry(path)
+
+    def test_private_manifest_schema_is_closed_and_all_source_fields_required(self) -> None:
+        schema = json.loads(MANIFEST_SCHEMA.read_text())
+        jsonschema.Draft202012Validator.check_schema(schema)
+        validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+        validator.validate(private_manifest())
+        for field in schema["$defs"]["source"]["required"]:
+            document = private_manifest()
+            del document["sources"][0][field]
+            with self.subTest(field=field), self.assertRaisesRegex(LineageError, "source_manifest_schema_invalid"):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        document = private_manifest()
+        document["sources"][0]["target"]["raw_values"] = ["private-cell-canary"]
+        with self.assertRaisesRegex(LineageError, "^source_manifest_schema_invalid$"):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_split_order_and_train_only_transform_fit_are_mandatory(self) -> None:
+        for order in permutations(["entity", "time", "fit_transforms"]):
+            if order == ("entity", "time", "fit_transforms"):
+                continue
+            document = private_manifest()
+            document["sources"][0]["split"]["operations"] = list(order)
+            with self.assertRaisesRegex(LineageError, "source_manifest_schema_invalid"):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        for field, value in (("order", "time_then_entity"), ("fit_transforms_cohort", "eval")):
+            document = private_manifest()
+            document["sources"][0]["split"][field] = value
+            with self.assertRaises(LineageError):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_alias_family_and_identical_content_cannot_cross_cohorts(self) -> None:
+        for identifier in ("dev-lineage-alpha", "dev-lineage-alpha-alias", "dev-lineage-beta"):
+            document = private_manifest()
+            other = deepcopy(document["sources"][0])
+            other.update(source_id="private-other", cohort="eval", family_id=identifier)
+            if identifier == "dev-lineage-beta":
+                other["source_family"] = identifier  # Same content, different registered parent.
+            else:
+                other["content_sha256"] = "b" * 64  # Different content, same canonical parent.
+            document["sources"].append(other)
+            with self.assertRaisesRegex(LineageError, "^source_family_cohort_leakage$"):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        document["sources"][1]["content_sha256"] = "b" * 64
+        self.assertEqual(len(admit_source_manifest(document, admitted_registry(), signing_key=KEY)["sources"]), 2)
+        document["sources"][1]["source_family"] = "dev-lineage-alpha"
+        with self.assertRaisesRegex(LineageError, "source_family_unregistered"):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_feature_availability_compares_instants_and_excludes_target(self) -> None:
+        for timestamp, allowed in (("2026-01-01T01:00:00+01:00", True),
+                                   ("2026-01-01T00:00:01Z", False), ("2026-01-01", False)):
+            document = private_manifest()
+            document["sources"][0]["features"][0]["feature_timestamp"] = timestamp
+            if allowed:
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+            else:
+                with self.assertRaises(LineageError):
+                    admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        document["sources"][0]["features"][0]["column"] = "private-target-canary"
+        with self.assertRaisesRegex(LineageError, "source_feature_leakage"):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_rights_admission_refuses_unlicensed_unknown_and_unapproved_use(self) -> None:
+        for field, value in (("license", "unlicensed"), ("license", " UNKNOWN "),
+                             ("training", "unknown"), ("acquisition", "denied"),
+                             ("redistribution", "unknown"), ("redistribution_approved", False),
+                             ("redistribution", "owner_only_custody"), ("redistribution", "prohibited")):
+            document = private_manifest()
+            document["sources"][0]["rights"][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(LineageError):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        with self.assertRaisesRegex(LineageError, "source_rights_unapproved"):
+            admit_source_manifest(private_manifest(), load_registry(), signing_key=KEY)
+        document["sources"][0]["use"] = "owner_only"
+        document["sources"][0]["rights"].update(redistribution="owner_only_custody", redistribution_approved=False)
+        result = admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        self.assertEqual(result["sources"][0]["redistribution"], "owner_only_custody")
+
+    def test_checkpoint_overlap_unknown_and_reviewed_overlap_stay_caveated(self) -> None:
+        for state in ("unknown", "overlapping", "known_none"):
+            document = private_manifest()
+            checkpoint = document["sources"][0]["pretraining"][0]
+            checkpoint.update(status=state, corpus_uri="https://example.invalid/private-corpus", review_sha256=SHA256_EMPTY)
+            result = admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+            source = result["sources"][0]
+            self.assertEqual(source["pretraining"][0]["status"], state)
+            self.assertEqual(source["pretraining"][0]["caveated"], state != "known_none")
+            self.assertEqual(source["admission"], "development_only" if state == "known_none" else "development_only_caveated")
+            self.assertFalse(result["confirmation_allowed"])
+        checkpoint["review_sha256"] = None
+        with self.assertRaisesRegex(LineageError, "source_manifest_schema_invalid"):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        document = private_manifest()
+        document["sources"][0]["pretraining"][0]["caveat"] = None
+        with self.assertRaises(LineageError):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_checkpoint_caveats_remain_separate_and_admission_does_not_mutate_input(self) -> None:
+        document = private_manifest()
+        document["sources"][0]["pretraining"].append({
+            "checkpoint": "private-tabicl-canary", "checkpoint_sha256": "b" * 64,
+            "corpus_uri": "https://example.invalid/corpus", "review_sha256": SHA256_EMPTY,
+            "status": "known_none", "caveat": None,
+        })
+        original = deepcopy(document)
+        result = admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        self.assertEqual(document, original)
+        states = result["sources"][0]["pretraining"]
+        self.assertEqual([item["caveated"] for item in states], [True, False])
+        self.assertNotEqual(states[0]["checkpoint_token"], states[1]["checkpoint_token"])
+        self.assertEqual(result["sources"][0]["admission"], "development_only_caveated")
+
+    def test_duplicate_sources_and_unreadable_private_registry_errors_are_redacted(self) -> None:
+        document = private_manifest()
+        document["sources"].append(deepcopy(document["sources"][0]))
+        with self.assertRaisesRegex(LineageError, "^source_duplicate_id$"):
+            admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        with self.assertRaisesRegex(LineageError, "^source registry could not be read$"):
+            load_registry(ROOT / "target/d02-validation/private-missing-canary.json")
+
+    def test_projection_is_opaque_authenticated_and_bound_to_private_metadata(self) -> None:
+        document = private_manifest()
+        result = admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        self.assertEqual(verify_source_projection(result, signing_key=KEY), result)
+        assert_public_provenance(result)
+        for secret in ("canary", "dev-lineage", "/home/", "file:", "2026-01-01", SHA256_EMPTY):
+            self.assertNotIn(secret, json.dumps(result))
+        document["sources"][0]["version"] = "private-version-changed"
+        changed = admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        self.assertNotEqual(result["manifest_commitment"], changed["manifest_commitment"])
+        self.assertNotEqual(result["signature"], changed["signature"])
+        for tampered in (dict(result, confirmation_allowed=True), dict(result, private_path="/home/private"),
+                         dict(result, signature="a" * 64)):
+            with self.assertRaises(LineageError):
+                verify_source_projection(tampered, signing_key=KEY)
+        with self.assertRaisesRegex(LineageError, "source_projection_signature_invalid"):
+            verify_source_projection(result, signing_key=KEY[::-1])
+        with self.assertRaisesRegex(LineageError, "source_projection_key_invalid"):
+            admit_source_manifest(document, admitted_registry(), signing_key=b"short")
+
+    def test_custody_hold_and_public_redaction_cannot_be_overridden(self) -> None:
+        for field, value in (("custody_hold", "released"), ("custody", "confirmation")):
+            document = private_manifest()
+            document[field] = value
+            with self.assertRaises(LineageError) as error:
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+            self.assertEqual(str(error.exception), "source_manifest_schema_invalid")
+            self.assertNotIn("canary", str(error.exception))
+        for document in ({"sample_extrema": [0, 9]}, {"cell_values": ["private-cell-canary"]},
+                         {"note": "local /home/private/canary.csv"}, {"note": "C:\\private\\canary.csv"}):
+            with self.assertRaises(LineageError):
+                assert_public_provenance(document)
 
 
 if __name__ == "__main__":
