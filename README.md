@@ -10,14 +10,19 @@ The measured evidence is a historical, selection-exposed validation study on PML
 
 ## Demonstration
 
-The reproducible public example uses the UCI Airfoil Self-Noise development split (Creative Commons Attribution license). From the repository root:
+Run the offline engineering fixture from the repository root:
 
-1. `cargo build --locked --release --bin dope`
-2. `target/release/dope compile-csv --csv examples/public-regression/train.csv --out model.raw`
-3. `target/release/dope inspect --kernel model.raw`
-4. `target/release/dope sample --kernel model.raw --rows 500 --seed 1729 --out synthetic.csv`
+1. `cargo build --locked --bin dope`
+2. `target/debug/dope demo --out target/readme-demo.dpk --report target/readme-demo.json`
+3. `target/debug/dope inspect --artifact target/readme-demo.dpk`
+4. `target/debug/dope sample --artifact target/readme-demo.dpk --rows 500 --seed 1729 --out target/readme-synthetic.csv`
 
-The pinned example receipt reports the artifact's total and decomposes framing, fitted schema and transforms, and sampling payload. This is one engineering conformance example, not a benchmark; privacy, driver, and geometry checks are unmeasured. Runtime closure is separate. The toy regression example is also separate and does not certify a release.
+The fixture compiles a built-in simulated table, with no download or input file.
+Use fresh output paths for another run. Its receipt explicitly reports that it
+is unqualified and uncertified. Privacy, driver, and geometry checks are
+unmeasured; runtime closure remains separate. The [public regression example](examples/public-regression/)
+provides the UCI Airfoil acquisition and development recipe with its pinned
+artifact byte decomposition. Neither example certifies a release.
 
 ## Evidence and interpretation
 

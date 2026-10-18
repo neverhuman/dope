@@ -6,10 +6,14 @@ import hashlib
 import json
 from pathlib import Path
 import unittest
+import tempfile
 
 from research.transfer.evidence import canonical_json
 from research.transfer.precommit import (
     BYTE_GRID,
+    FORMAT,
+    PROTOCOL,
+    expected_pins,
     PrecommitError,
     load_precommit,
     sealed_access_allowed,
@@ -17,7 +21,6 @@ from research.transfer.precommit import (
 )
 
 ROOT = Path(__file__).resolve().parents[3]
-PRECOMMIT = ROOT / "target/confirmatory-e04/PRECOMMIT.json"
 
 
 def bind(document):
@@ -30,7 +33,40 @@ def bind(document):
 class PrecommitTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.document, cls.blockers = load_precommit(PRECOMMIT, ROOT)
+        # Build a blocked synthetic packet from tracked inputs. A lane-local
+        # ignored campaign packet must never be a fresh-checkout prerequisite.
+        protocol = json.loads((ROOT / PROTOCOL).read_text())
+        pins = expected_pins(ROOT)
+        document = bind({
+            "format": FORMAT, "version": 1,
+            "campaign_id": "synthetic-precommit-fixture",
+            "admission_state": "blocked", "sealed_access_allowed": False,
+            "protocol_path": PROTOCOL, "protocol_sha256": pins[PROTOCOL],
+            "evidence_pins": pins,
+            "design": {"fixture_only": True, "rule": protocol["design_rule"]},
+            "source_roles": [], "model_roles": [], "prepared_maps": [],
+            "candidate_budget_slots": [
+                {"budget_bytes": budget,
+                 "candidate_id": f"development-selected-at-{budget}-bytes",
+                 "artifact_sha256": None, "recipe_sha256": None,
+                 "eligible_for_minimum_tdl_reporting": False}
+                for budget in BYTE_GRID
+            ],
+            "full_comparison_roster": [], "roster_complete": False,
+            "thresholds": protocol["analysis_policy"],
+            "sample_schedule": protocol["seed_schedule"],
+            "privacy_outcomes": protocol["analysis_policy"]["privacy_outcomes"],
+            "budget_and_power": protocol["budget_admission"],
+            "retry_exclusion": protocol["retry_exclusion_policy"],
+            "review_signature": None, "custodian_attestation": None,
+            "admission_blockers": ["synthetic_fixture_only", "roster_missing",
+                                   "independent_review_and_custody_missing"],
+        })
+        directory = tempfile.TemporaryDirectory(prefix="precommit-fixture-", dir=ROOT / "target")
+        cls.addClassCleanup(directory.cleanup)
+        path = Path(directory.name) / "PRECOMMIT.json"
+        path.write_bytes(canonical_json(document))
+        cls.document, cls.blockers = load_precommit(path, ROOT)
 
     def test_all_budget_slots_are_enumerated_and_confirmation_is_denied(self):
         self.assertEqual([slot["budget_bytes"] for slot in self.document["candidate_budget_slots"]], list(BYTE_GRID))
