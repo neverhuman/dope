@@ -1,0 +1,9 @@
+{
+  "format": "dope-public-regression-cpu-smoke-admission-v1",
+  "candidate": "UCI Airfoil Self-Noise, dataset 291",
+  "declared_source_license": "CC-BY-4.0",
+  "use_for_e07": "not_admitted",
+  "reason": "E07 requires D02 source rights and snapshot admission; the transfer dataset manifest contains no Airfoil entry.",
+  "existing_demo_scope": "public grouped DOPE plus Ridge demonstration; it does not supply the E07 copula arm or complete composite campaign receipt",
+  "qualification": "unqualified"
+}
