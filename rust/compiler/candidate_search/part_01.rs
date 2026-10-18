@@ -444,3 +444,48 @@ fn target_parameter_bytes(target: &Target) -> usize {
         }
     }
 }
+/// Raw per-boundary train/development measurements. Utility is intentionally not
+/// smoothed: a larger packet can have lower utility than its predecessor.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PrefixMeasurement {
+    pub packet_count: usize,
+    pub charged_bytes: usize,
+    pub train_utility: f64,
+    pub development_utility: f64,
+    pub passed: bool,
+}
+
+/// Freeze candidate packet order using development utility only, with an ID tie break.
+pub fn freeze_prefix_order(candidates: &mut [(String, f64)]) {
+    candidates.sort_by(|left, right| {
+        right.1.total_cmp(&left.1).then_with(|| left.0.cmp(&right.0))
+    });
+}
+
+/// Select the largest passing prefix within allowance while preserving every raw outcome.
+pub fn select_prefix_within_allowance(
+    outcomes: &[PrefixMeasurement],
+    allowance: usize,
+) -> Option<&PrefixMeasurement> {
+    outcomes.iter()
+        .filter(|outcome| outcome.passed && outcome.charged_bytes <= allowance)
+        .max_by_key(|outcome| (outcome.packet_count, outcome.charged_bytes))
+}
+
+#[cfg(test)]
+mod progressive_prefix_tests {
+    use super::*;
+
+    #[test]
+    fn order_is_frozen_by_development_score_and_outcomes_keep_regressions() {
+        let mut order = vec![("z".into(), 0.7), ("b".into(), 0.9), ("a".into(), 0.9)];
+        freeze_prefix_order(&mut order);
+        assert_eq!(order.iter().map(|item| item.0.as_str()).collect::<Vec<_>>(), ["a", "b", "z"]);
+        let outcomes = [
+            PrefixMeasurement { packet_count: 1, charged_bytes: 80, train_utility: 0.8, development_utility: 0.8, passed: true },
+            PrefixMeasurement { packet_count: 2, charged_bytes: 140, train_utility: 0.9, development_utility: 0.6, passed: false },
+        ];
+        assert_eq!(select_prefix_within_allowance(&outcomes, 200), Some(&outcomes[0]));
+        assert_eq!(outcomes[1].development_utility, 0.6);
+    }
+}
