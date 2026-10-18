@@ -1,0 +1,112 @@
+{
+  "format": "dope-public-prior-study-v1",
+  "study_id": "R07-public-prior-pilot-v1",
+  "status": "pilot_complete_development_study_blocked",
+  "hypothesis": "A frozen grammar prior learned only from an independently versioned public source roster improves held-out transfer or reduces complete cold artifact plus closure bytes relative to no prior and a hand-coded grammar prior, without private adaptation.",
+  "estimand": "paired model selection loss and complete cold deployment bytes for each held-out source family and model family",
+  "source_model_holdouts": {
+    "pilot": {
+      "kind": "synthetic_deterministic_fixture_only",
+      "source_id": "synthetic-public-prior-fixture-v1",
+      "model_id": "sparse-linear-vs-additive-v1",
+      "seed": 470701,
+      "candidate_outcomes": [
+        {
+          "candidate": "linear",
+          "no_prior_order": 0,
+          "hand_coded_score": 1.0,
+          "synthetic_holdout_loss": 0.1
+        },
+        {
+          "candidate": "additive",
+          "no_prior_order": 1,
+          "hand_coded_score": 0.5,
+          "synthetic_holdout_loss": 0.12
+        },
+        {
+          "candidate": "interaction",
+          "no_prior_order": 2,
+          "hand_coded_score": -1.0,
+          "synthetic_holdout_loss": 0.16
+        }
+      ],
+      "qualification": "fixture_only_not_a_source_or_model_holdout"
+    },
+    "development": {
+      "status": "blocked_no_independent_public_source_roster_or_heldout_model_roster",
+      "public_source_roster_sha256": null,
+      "heldout_source_roster_sha256": null,
+      "model_roster_sha256": null
+    }
+  },
+  "candidate_set": [
+    "no_prior_stable_candidate_order",
+    "hand_coded_sparse_additive_grammar_prior",
+    "public_trained_entropy_and_grammar_prior"
+  ],
+  "independence_and_accounting": {
+    "public_training_source_roster_sha256": null,
+    "public_training_cutoff_utc": null,
+    "public_prior_payload_sha256": null,
+    "public_prior_payload_bytes": null,
+    "existing_language_calibration_is_public_prior": false,
+    "existing_language_calibration_provenance": "training_lineages_only; its checksum does not prove public origin or disjointness from heldout families",
+    "cold_closure_rule": "Charge the complete canonical cold bundle including runtime, shared prior, grammar/codebook, and exact dependency closure; no hash-only or private codebook exclusion.",
+    "private_adaptation_rule": "Charge every byte and compute operation that depends on private source rows; any private adaptation disqualifies the public-only candidate."
+  },
+  "cost_and_bytes": {
+    "pilot_cpu_seconds_cap": 300.0,
+    "development_cpu_seconds_cap": 1800.0,
+    "cold_bundle_byte_cap": 1048576,
+    "complete_cold_bundle_bytes_required": true,
+    "stop_if_roster_payload_or_cold_closure_is_unavailable": true,
+    "pilot_complete_cold_bundle_bytes": null,
+    "hand_coded_prior_incremental_payload_bytes": null
+  },
+  "seed_schedule": [
+    470701,
+    470702,
+    470703
+  ],
+  "stop_rule": "Run exactly one deterministic pilot. Admit a development study only if the pilot fixture passes, a dated and source-disjoint public roster and model/source holdouts are frozen, and complete cold closure accounting is available. Stop with an explicit blocker if any evidence is missing. No automatic campaign or retry.",
+  "admission_gates": [
+    "public training source roster is independently hashed, dated, and disjoint from every heldout source family",
+    "public prior payload and all dependencies have immutable hashes, licenses, and exact cold byte costs",
+    "no-prior and hand-coded controls use the same heldout models and resource envelope",
+    "private adaptation is absent or explicitly charged and separately reported",
+    "compatibility and validity gates pass on every heldout source/model cell"
+  ],
+  "production_wiring": "disabled_until_all_admission_gates_pass",
+  "pilot_results": {
+    "command": "CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=line-tables-only CARGO_BUILD_JOBS=2 RAYON_NUM_THREADS=2 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 cargo test --locked --lib public_prior_pilot -- --nocapture",
+    "deterministic_fixture": "passed",
+    "measured_command_cpu_seconds_including_build": 29.56,
+    "preregistered_cpu_cap_seconds": 300.0,
+    "cost_cap_passed": true,
+    "results": {
+      "no_prior": {
+        "selected_candidate": "linear",
+        "synthetic_holdout_loss": 0.1,
+        "incremental_prior_payload_bytes": 0
+      },
+      "hand_coded_grammar_prior": {
+        "selected_candidate": "linear",
+        "synthetic_holdout_loss": 0.1,
+        "difference_vs_no_prior": 0.0,
+        "incremental_payload_bytes": null,
+        "complete_compiler_cold_closure_measured": false
+      },
+      "public_trained_prior": {
+        "state": "unsupported",
+        "reason": "no frozen independent public source roster, prior payload, source-disjoint model holdouts, or payload digest"
+      }
+    },
+    "private_adaptation": {
+      "performed": false,
+      "bytes": 0,
+      "status": "not_run"
+    },
+    "development_study": "blocked_and_not_run",
+    "stop_reason": "pilot demonstrated no synthetic fixture gain from the hand-coded prior; no independently sourced public-trained prior or real source/model holdout roster is available, and complete cold closure cannot be measured from the fixture"
+  }
+}
