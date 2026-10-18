@@ -1,0 +1,80 @@
+{
+  "format": "dope-coupled-search-comparison-v1",
+  "status": "deterministic_fixture_only",
+  "preregistration": {
+    "question": "Can coupled-edit selectors improve deterministic TSTR utility over one-at-a-time selection when all methods share the same candidate pool, whole-file byte cap, and evaluation budget?",
+    "selectors": [
+      "existing_selector",
+      "greedy",
+      "beam",
+      "exchange",
+      "lookahead",
+      "independent_section_dp"
+    ],
+    "operators": [
+      "knot",
+      "edge",
+      "lowrank",
+      "ga2m",
+      "noise",
+      "precision",
+      "subexpression",
+      "category",
+      "calibration"
+    ],
+    "controls": {
+      "candidate_pool": "identical ordered edits per selector",
+      "optimization_compute": "same maximum deterministic evaluator calls per selector",
+      "size_measure": "serialized complete artifact bytes for each selected edit set; no sum of marginal byte estimates",
+      "critical_tail_gate": "reject any candidate below the preregistered critical-tail TSTR floor even when aggregate TSTR improves",
+      "tie_break": "stable edit-index order"
+    },
+    "external_campaign": {
+      "admission": "blocked",
+      "reason": "W04 and W03 native runtimes are not yet qualified; no external campaign result or selector benefit claim is admitted"
+    }
+  },
+  "deterministic_fixtures": [
+    {
+      "id": "two-edit-xor",
+      "pool": ["knot:A", "edge:B"],
+      "aggregate_tstr": {
+        "empty": 0.5,
+        "either_single_edit": 0.4,
+        "both_edits": 0.9
+      },
+      "critical_tail_tstr": 0.8,
+      "byte_cap": 256,
+      "evaluation_budget_per_selector": 32,
+      "observed": {
+        "greedy": [],
+        "beam": [0, 1],
+        "exchange": [0, 1],
+        "lookahead": [0, 1],
+        "existing_selector": [],
+        "independent_section_dp": []
+      },
+      "interpretation": "In this deterministic XOR interaction fixture, single edits score below the empty baseline. Beam, exchange, and lookahead discover the pair; one-step greedy and the independent additive section baseline do not. This is a unit fixture, not measured model performance."
+    },
+    {
+      "id": "critical-tail-stop",
+      "pool": ["knot:A", "edge:B"],
+      "critical_tail_floor": 0.5,
+      "paired_candidate": {
+        "aggregate_tstr": 0.99,
+        "critical_tail_tstr": 0.2
+      },
+      "observed": "Every searching selector rejects the paired candidate and retains the empty baseline despite its aggregate win."
+    },
+    {
+      "id": "whole-file-byte-delta",
+      "measurement": "Serialize base bytes and the complete canonically ordered edit set, then measure the resulting byte vector length.",
+      "observed": "The pair's measured byte delta differs from the sum of its two isolated deltas because shared serialization framing is counted once."
+    }
+  ],
+  "limits": [
+    "Synthetic deterministic objectives do not establish real TSTR improvement.",
+    "Native W04/W03 qualification and an externally pinned model panel remain prerequisites for campaign admission.",
+    "Empirical TSTR and critical-tail checks are not formal differential privacy or HIPAA de-identification claims."
+  ]
+}
