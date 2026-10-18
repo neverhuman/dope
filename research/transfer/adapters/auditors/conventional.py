@@ -11,11 +11,13 @@ from importlib.metadata import version
 import json
 import os
 from pathlib import Path
+import platform
+import resource
 import stat
 import time
 
 from research.transfer.adapters.base import (
-    AdapterUnavailable, LearnerAdapter, PredictionResult, ResourceUsage,
+    AdapterError, AdapterUnavailable, FeatureBatch, LearnerAdapter, PredictionResult, ResourceUsage,
     ResourceLimits, TrainingBatch, _backend_failure, _finite, _hash, _require,
 )
 from research.transfer.evidence import digest
@@ -378,3 +380,93 @@ class ConventionalAdapter(ObservedLearner):
         from threadpoolctl import threadpool_limits
         with threadpool_limits(limits=1):
             return super()._raw_predict(x)
+
+
+def cpu_smoke_lock():
+    """Repository-owned reduced panel; a lock is not foundation/GPU admission."""
+    try:
+        return json.loads((Path(__file__).resolve().parents[2] / "locks/cpu-smoke.json").read_text())
+    except Exception:
+        raise AdapterUnavailable("cpu_smoke_lock_unavailable") from None
+
+
+def _cpu_smoke_model(name, task, parameters, seed, lock):
+    from sklearn.linear_model import LogisticRegression, Ridge
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import SplineTransformer, StandardScaler
+    from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+    classification = task != "regression"
+    if name == "decision_tree":
+        cls = DecisionTreeClassifier if classification else DecisionTreeRegressor
+        return cls(**parameters, random_state=seed)
+    estimator = (LogisticRegression(**parameters, random_state=seed, n_jobs=1) if classification
+                 else Ridge(**parameters, random_state=seed))
+    stages = [SplineTransformer(**lock["spline"])] if name == "additive_spline_surrogate" else []
+    return make_pipeline(*stages, StandardScaler(), estimator)
+
+
+def cpu_smoke_predict(request):
+    """W00 native-call kernel after buffer admission, not a standalone wire ABI.
+
+    Typed training/query objects carry X_train/y_train and X_query only. D02
+    provenance/rights admission and process isolation remain executor duties.
+    """
+    try:
+        import numpy as np
+        from threadpoolctl import threadpool_limits
+        started, lock = time.monotonic(), cpu_smoke_lock()
+        fields = {"estimator", "parameters", "task", "seed", "training", "query", "counts", "lock_sha256"}
+        _require(type(request) is dict and set(request) == fields, "cpu_smoke_request_invalid")
+        request = dict(request)
+        _require(platform.system() == "Linux" and platform.python_version() == lock["python"], "cpu_smoke_runtime_mismatch")
+        _require(all(version(p) == v for p, v in lock["dependencies"].items()), "cpu_smoke_runtime_mismatch")
+        _require(request["lock_sha256"] == digest(lock), "cpu_smoke_lock_mismatch")
+        name, task, parameters = request["estimator"], request["task"], request["parameters"]
+        _require(type(name) is str and name in lock["estimators"] and type(task) is str, "cpu_smoke_estimator_unpinned")
+        grid = lock["estimators"][name]["task_grids"].get(task, [])
+        _require(type(parameters) is dict and digest(parameters) in [digest(p) for p in grid], "cpu_smoke_recipe_unpinned")
+        parameters = request["parameters"] = dict(parameters)
+        _require(type(request["seed"]) is int and request["seed"] in lock["seeds"], "cpu_smoke_seed_unpinned")
+        train, query, counts = request["training"], request["query"], request["counts"]
+        _require(type(train) is TrainingBatch and type(query) is FeatureBatch, "cpu_smoke_input_invalid")
+        n, width = len(train.targets), len(train.features.rows[0])
+        _require(type(counts) is dict and set(counts) == set(lock["count_fields"]) and
+                 all(type(v) is int and v == n for v in counts.values()), "cpu_smoke_count_mismatch")
+        counts = request["counts"] = dict(counts)
+        _require(n <= lock["max_train_rows"] and len(query.rows) <= lock["max_query_rows"] and
+                 width <= lock["max_columns"] and len(query.rows[0]) == width, "cpu_smoke_shape_invalid")
+        _require(train.features.schema_sha256 == query.schema_sha256 and
+                 not set(train.features.row_ids) & set(query.row_ids), "cpu_smoke_input_mismatch")
+        _require(all(_finite(v) for row in (*train.features.rows, *query.rows) for v in row) and
+                 all(_finite(y) for y in train.targets), "cpu_smoke_nonfinite_input")
+        x, y, q = (np.asarray(values, dtype=np.float64) for values in
+                   (train.features.rows, train.targets, query.rows))
+        classes = lock["class_order"][task]
+        if classes:
+            _require(set(y.tolist()) == set(range(len(classes))), "cpu_smoke_class_mismatch")
+        model = _cpu_smoke_model(name, task, parameters, request["seed"], lock)
+        with threadpool_limits(limits=1):
+            model.fit(x, y)
+            values = model.predict_proba(q) if classes else np.asarray(model.predict(q)).reshape(len(q), 1)
+        values = np.asarray(values, dtype=np.float64)
+        _require(values.shape == (len(q), len(classes) or 1) and bool(np.isfinite(values).all()), "cpu_smoke_output_invalid")
+        if classes:
+            codes = np.asarray(model.classes_)
+            _require(codes.tolist() == list(range(len(classes))) and bool(((values >= 0) & (values <= 1)).all()) and
+                     bool((np.abs(values.sum(axis=1) - 1) <= 1e-7).all()), "cpu_smoke_probability_invalid")
+            values = np.clip(values, lock["probability_clip"], 1 - lock["probability_clip"])
+            values /= values.sum(axis=1, keepdims=True)
+        elapsed, memory = time.monotonic() - started, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+        _require(elapsed <= lock["resources"]["wall_seconds"] and memory <= lock["resources"]["memory_bytes"], "cpu_smoke_budget_exceeded")
+        pins = {k: v for k, v in request.items() if k not in {"training", "query"}}
+        pins.update(training_sha256=train.sha256, query_sha256=query.sha256,
+                    implementation_sha256=file_sha256(__file__))
+        return {"format": "dope-cpu-smoke-response-v1", "qualification_scope": "cpu_smoke_only", "qualified": False,
+                "request_sha256": digest(pins), "counts": dict(counts), "row_ids": query.row_ids,
+                "class_order": tuple(classes), "kind": "probability" if classes else "point",
+                "values": output_rows(values, len(q), len(classes) or 1),
+                "usage": {"wall_seconds": elapsed, "memory_bytes": memory, "gpu_bytes": 0}}
+    except BaseException as error:
+        if isinstance(error, KeyboardInterrupt):
+            raise KeyboardInterrupt() from None
+        raise AdapterError("cpu_smoke_refused") from None
