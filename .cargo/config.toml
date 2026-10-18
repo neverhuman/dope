@@ -1,2 +1,1 @@
-[build]
-rustflags = ["-C", "target-cpu=native"]
+# Generic release builds use the toolchain's portable target defaults.
