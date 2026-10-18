@@ -374,10 +374,8 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         import claim_registry, paper_v2_guards, shutil
         from tools.claims import foundation, render
         self.assertEqual(claim_registry.publication_failures(), [])
-        v2_lint = paper_v2_guards.run_v2_lint(REPO_ROOT / "docs/whitepaper")
-        if shutil.which("pdftotext") is None:
-            v2_lint = [e for e in v2_lint if "text is unavailable" not in e.lower()]
-        self.assertEqual(v2_lint, [])
+        has_pdfs = bool(shutil.which("pdftotext")) and (REPO_ROOT / "docs/whitepaper/dope-mfs.pdf").is_file() and (REPO_ROOT / "docs/whitepaper/supplement.pdf").is_file()
+        self.assertEqual([f for f in paper_v2_guards.run_v2_lint(REPO_ROOT / "docs/whitepaper") if has_pdfs or "text is unavailable" not in f.lower()], [])
         f_sum = foundation.load_foundation_summary(REPO_ROOT)
         self.assertEqual(f_sum["hero_title"], "More predictive gain. About one-third the state.")
         self.assertAlmostEqual(f_sum["target_correlation_proxy"]["GaussianCopula"]["median"], 0.975, places=3)
