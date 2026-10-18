@@ -200,6 +200,21 @@ mod tests {
         assert!(decode_progressive_prefix(&oversized, 1).is_err());
     }
 
+    #[test]
+    fn later_packet_failure_preserves_prior_complete_artifact() {
+        let packet = encode_kernel(&kernel()).unwrap();
+        let build = encode_progressive_packets_preserving_prior(&[
+            Ok(packet),
+            Err(DopeError::Codec("private diagnostic omitted".into())),
+        ])
+        .unwrap();
+        assert_eq!(build.attempted_packets, 2);
+        assert_eq!(build.stopped_at_packet, Some(2));
+        assert_eq!(build.stop_reason, Some("packet_build_failed"));
+        assert_eq!(build.boundaries.len(), 1);
+        assert_eq!(decode_progressive_prefix(&build.envelope, 1).unwrap().len(), 1);
+    }
+
     proptest! {
         #[test]
         fn encoded_section_totals_and_roundtrip_hold_for_valid_parameters(

@@ -248,6 +248,15 @@ pub struct PacketBoundary {
     pub charged_bytes: usize,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ProgressivePacketBuild {
+    pub envelope: Vec<u8>,
+    pub boundaries: Vec<PacketBoundary>,
+    pub attempted_packets: usize,
+    pub stopped_at_packet: Option<usize>,
+    pub stop_reason: Option<&'static str>,
+}
+
 pub fn encode_progressive_packets(packets: &[Vec<u8>]) -> Result<(Vec<u8>, Vec<PacketBoundary>)> {
     if packets.is_empty() || packets.len() > 1024 {
         return Err(DopeError::Codec("invalid progressive packet count".into()));
@@ -271,6 +280,48 @@ pub fn encode_progressive_packets(packets: &[Vec<u8>]) -> Result<(Vec<u8>, Vec<P
         });
     }
     Ok((output, boundaries))
+}
+
+/// Build once in declared order, retaining every prior valid packet if a later
+/// build failed or produced an invalid DPK artifact. Diagnostics are static.
+pub fn encode_progressive_packets_preserving_prior(
+    packets: &[Result<Vec<u8>>],
+) -> Result<ProgressivePacketBuild> {
+    if packets.is_empty() || packets.len() > 1024 {
+        return Err(DopeError::Codec("invalid progressive packet count".into()));
+    }
+    let mut valid = Vec::with_capacity(packets.len());
+    let mut stopped_at_packet = None;
+    let mut stop_reason = None;
+    let mut attempted_packets = 0;
+    for (index, attempt) in packets.iter().enumerate() {
+        attempted_packets = index + 1;
+        let packet = match attempt {
+            Ok(packet) => packet,
+            Err(_) => {
+                stopped_at_packet = Some(index + 1);
+                stop_reason = Some("packet_build_failed");
+                break;
+            }
+        };
+        if decode_kernel(packet).is_err() {
+            stopped_at_packet = Some(index + 1);
+            stop_reason = Some("packet_invalid");
+            break;
+        }
+        valid.push(packet.clone());
+    }
+    if valid.is_empty() {
+        return Err(DopeError::Codec("no valid progressive packet available".into()));
+    }
+    let (envelope, boundaries) = encode_progressive_packets(&valid)?;
+    Ok(ProgressivePacketBuild {
+        envelope,
+        boundaries,
+        attempted_packets,
+        stopped_at_packet,
+        stop_reason,
+    })
 }
 
 /// Decode only a complete advertised packet boundary. In-flight partial packets fail closed.
