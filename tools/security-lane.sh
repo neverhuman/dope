@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.."
 source ops/ci/lib.sh
 mkdir -p target/security
 if ! command -v cargo-audit >/dev/null 2>&1; then
-  cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked
+  cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked --force
 fi
 cargo audit --json > target/security/cargo-audit.json
 ci_require_artifact target/security/cargo-audit.json
