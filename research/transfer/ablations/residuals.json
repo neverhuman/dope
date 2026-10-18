@@ -1,0 +1,76 @@
+{
+  "format": "dope-residual-calibration-prereg-v1",
+  "status": "admission_blocked_preregistered_not_run",
+  "hypothesis": "At least one calibrated non-Gaussian residual mechanism improves held-out rare-tail predictive transfer or interval calibration over the existing Gaussian baseline without reducing overall transfer/driver floors or exceeding the charged artifact cap; global MSE improvement alone is insufficient.",
+  "estimand": {
+    "primary": "paired change in lower-tail query loss and 50/80/90 percent predictive-interval coverage on the same untouched source and query rows",
+    "secondary": ["TDL transfer T", "feature-driver fidelity D", "complete charged artifact bytes", "fit and sample wall time"],
+    "overall_working_floors": {"transfer_lcb": 0.9, "driver_fidelity_lcb": 0.8},
+    "threshold_status": "aspirational_working_defaults_only; contracts/tdl-contract-v1.json remains authoritative and unfrozen"
+  },
+  "holdouts": {
+    "source": {
+      "selected_ids": [],
+      "rule": "admit two independent source families with verified rights and lineage; keep each source family, all patients/entities, and its latest time block intact in the final query holdout; no source or query row may enter fit, residual fitting, selection, or calibration",
+      "state": "blocked_no_rights-cleared_source_artifacts_or_lineage_manifest_supplied"
+    },
+    "model": {
+      "selected_checkpoints": [],
+      "required_families": ["boosted_tree", "linear_or_additive", "task_trained_neural"],
+      "held_out_family": "tabular_foundation_model",
+      "rule": "freeze exact adapter, learner, dependency, and checkpoint digests before opening source holdouts; all residual candidates score the same query rows and model identities",
+      "state": "blocked_no_qualified_native_adapter_or_checkpoint_registry_selection_supplied"
+    }
+  },
+  "candidate_set": [
+    {"id": "no_noise", "profile": "no_noise_v1", "role": "deterministic control"},
+    {"id": "gaussian_homoscedastic", "profile": "gaussian_homoscedastic_v1", "role": "single-scale Gaussian control"},
+    {"id": "gaussian_heteroscedastic", "profile": "gaussian_heteroscedastic_v1", "role": "feature-conditioned Gaussian scale"},
+    {"id": "student_t4", "profile": "student_t4_v1", "role": "finite-variance heavy-tail"},
+    {"id": "gaussian_mixture2", "profile": "gaussian_mixture2_v1", "role": "two-component residual mixture"},
+    {"id": "monotone_quantile17", "profile": "monotone_quantile17_v1", "role": "bounded empirical quantile residual"}
+  ],
+  "rare_slices": [
+    "each categorical level with fit prevalence at most 5 percent",
+    "each declared missingness state",
+    "outer-fit reference residual lower and upper deciles",
+    "target lower and upper deciles, with boundaries estimated on fit rows only"
+  ],
+  "support_and_calibration_floors": {
+    "minimum_queries_per_source_slice": 100,
+    "minimum_held_out_source_families": 2,
+    "interval_nominal_coverages": [0.5, 0.8, 0.9],
+    "maximum_absolute_coverage_error": 0.05,
+    "minimum_rare_tail_transfer_lcb": 0.8,
+    "maximum_rare_tail_loss_ratio_to_real_fit_reference": 1.1,
+    "charge_scope": "complete_sampling_artifact_bytes_including_framing_schema_and_residual_parameters",
+    "maximum_artifact_bytes": 10240
+  },
+  "study_design": {
+    "pilot": {
+      "fixture": "compiler-inline deterministic residual mechanism fixture, 96 rows, one feature, fixed seed 1729",
+      "candidate_count": 6,
+      "fits_per_candidate": 1,
+      "wall_cap_seconds_per_candidate": 60,
+      "total_wall_cap_seconds": 360,
+      "memory_cap_bytes": 1073741824,
+      "purpose": "price compatibility and deterministic mechanism construction only; not external scientific evidence"
+    },
+    "development": {
+      "source_families": 2,
+      "model_families": 3,
+      "candidate_count": 6,
+      "fit_seeds": [1729, 2718, 31415, 57721, 65537],
+      "sample_seeds": [2027, 2028, 2029],
+      "maximum_total_wall_seconds": 72000,
+      "automatic_campaign": false,
+      "admission_state": "not_admitted_until_source_rights_lineage_exact_holdout_and_native_model_pins_are_frozen"
+    },
+    "stop_rule": "Stop the study and retain the failed/unsupported receipt if any critical slice misses its support floor, interval coverage error exceeds 0.05, rare-tail transfer LCB is below 0.8, rare-tail loss exceeds 1.1 times the real-fit reference, overall transfer LCB is below 0.9, driver fidelity LCB is below 0.8, or any artifact exceeds 10240 bytes. No global MSE improvement can override a critical-tail failure. Do not retry an unchanged expensive candidate."
+  },
+  "result": {
+    "state": "not_run_no_candidate_winner",
+    "evidence": "No external source/model holdouts were opened and no candidate is admitted. The deterministic fixture checks compatibility and stop-rule behavior only.",
+    "source_artifacts": []
+  }
+}
