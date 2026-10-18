@@ -12,3 +12,6 @@ adbf9b9d3890b611f02c8ece458af04a6f261d18:crates/dope-service/src/service_tests.r
 # Same two synthetic test-token findings (C03 no-echo test, U01 service test) after PR #269 was linearized onto main 2bfee82.
 25c9e0728d7900a598c71835c66ad5cf21a2c20a:research/transfer/tests/test_drivers.py:generic-api-key:82
 be844b2e48dd6c724aaefd14f222e755b19e2bbe:crates/dope-service/src/service_tests.rs:generic-api-key:5
+# Same two synthetic test-token findings after PR #269 was rebase-merged onto main (0ac99c6).
+ba9634b9af599eba69a5062173a7e894e635e697:research/transfer/tests/test_drivers.py:generic-api-key:82
+cc2656a494f1a0c655aeb55ba81822b31ee3d0f8:crates/dope-service/src/service_tests.rs:generic-api-key:5
