@@ -81,15 +81,18 @@ import sys
 from pathlib import Path
 from research.transfer.campaign_runner import CampaignRunSpec, CampaignRunnerError, StageJournal
 spec = CampaignRunSpec.from_bytes(Path(sys.argv[2]).read_bytes())
+observed = "unexpectedly_opened"
 try:
     with StageJournal(sys.argv[1], spec, read_only=True):
-        raise SystemExit(1)
-except CampaignRunnerError:
-    pass
+        pass
+except CampaignRunnerError as error:
+    observed = str(error)
+print(observed)
 """
         result = subprocess.run([sys.executable, "-B", "-c", code, str(self.root), str(manifest)],
                                 capture_output=True, timeout=5)
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, b"unsafe_stage_journal\n")
 
     def test_direct_constructor_cannot_bypass_development_validation_at_journal(self):
         value = specification()
