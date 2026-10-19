@@ -1,0 +1,116 @@
+{
+  "schema": "dope-claude-pr285-exact-head-review-v1",
+  "generated_utc": "2026-10-19T18:59:44Z",
+  "reviewer": {
+    "reviewer_id": "1061468.dope_paper_claude:0",
+    "session": "SAME dope_paper_claude PID 379338",
+    "authored_reviewed_items": false
+  },
+  "pr": {
+    "number": 285,
+    "head": "c46b53b20b97b3a758e5698ff1df5fc9c8e79973",
+    "tree": "ab3a741d7e8808d6f682c04bb4d68529316e1dcd",
+    "parent": "f7a97db2db5a4ed125958c3324710b799c8752c1",
+    "base": "main",
+    "files": [
+      "agent/owner-map.json (+3/-1)",
+      "agent/test-map.json (+9/-1)",
+      "docs/testing.md (+31)",
+      "ops/ci/cpu.sh (+2/-1)",
+      "research/transfer/tests/test_workplan_acceptance.py (+28/-92)",
+      "research/transfer/tests/test_workplan_packet.py (+215, new)",
+      "research/transfer/workplan_packet.py (+236, new)"
+    ]
+  },
+  "evidence": {
+    "V2_terminal_failure": {
+      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v2/validation-result.json",
+      "sha256": "c6fac4563bec57410e049e9000ce29f574719a3c70923279f22f0d2fe5b349d3",
+      "expected": "c6fac4563bec57410e049e9000ce29f574719a3c70923279f22f0d2fe5b349d3",
+      "match": true
+    },
+    "V3_terminal_failure": {
+      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v3/validation-result.json",
+      "sha256": "7dceba8779e671e7bd532758777bed5c58614ccafe76ba73b1e2e91210e99c37",
+      "expected": "7dceba8779e671e7bd532758777bed5c58614ccafe76ba73b1e2e91210e99c37",
+      "match": true
+    },
+    "V4_result": {
+      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v4/validation-result.json",
+      "sha256": "da0fc186ddb21d81a93eb464dc0737320e53acb312ad3e8557d6128fe5baec55",
+      "success": true,
+      "tree_before": "ab3a741d7e8808d6f682c04bb4d68529316e1dcd",
+      "tree_after": "ab3a741d7e8808d6f682c04bb4d68529316e1dcd",
+      "unstaged_diff_empty": true,
+      " commands_rc": {
+        "actual-loaded-module-provenance": 0,
+        "refusal-and-no-disabled-case-tests": 0,
+        "unit-cli-report": 0,
+        "actual-packet-cli": 0,
+        "actual-P04-and-portability": 0,
+        "full-pinned-audit": 0,
+        "strict-audit-verifier": 0,
+        "actual-qualified-FQN-acceptance": 0,
+        "required-just-check-unit-mode": 0
+      }
+    },
+    "V4_observation": "strict-audit-verifier.log is 0 bytes although its step returned rc 0; that step's evidence is therefore weak and should be justified or re-emitted with output."
+  },
+  "content_review": {
+    "packet_module": "workplan_packet.py: unit mode returns NOT_RUN without a packet; qualify mode (DOPE_REQUIRE_PACKET=1) pins tasks.json, progress.json, validate_plan.py and the W01 binding, and checks exact 61/4 counts and blocked [E03,E04,E05,E06]. Snapshot reads are symlink-, size- and identity-checked.",
+    "pins_vs_live_packet": {
+      "tasks.json_live": "d5150648a51bb5971125dfd6fbb81711e3dba5349b3ee1801b3a6c6913d11146 (matches module pin)",
+      "progress.json_live": "a7f835d4b1c473de6741ba89cfc8f1781ffb2b0e9947e111a47205ca300cec3c (matches)",
+      "validate_plan.py_live": "82819a10280756b4c8422580f5ef01d4eee168af9e0dcf896d2631d9683e4671 (matches)",
+      "verify/main_241746ea/W01.json_live": "3b2910b10fede74882b953e3df4855d74a9891dd5f3f24753df6a7157ae1af49 (matches W01 pin)"
+    },
+    "observation": "tasks.json live hash differs from the fbf4a804 value in the 15:55Z user update. The module follows the on-disk file. Ledger owner should confirm which revision is canonical. W01.json on disk is 3b2910b1, not the 93890850 value in that update.",
+    "p04_test": "With no packet the P04 case asserts NOT_RUN and release_authorized false (honest, not silent). Count pins are enforced only in qualify mode, which CI does not set. Residual, labelled.",
+    "cpu_sh": "Packet check now runs before discovery; the direct acceptance-test line is removed but discovery still runs test_workplan_acceptance.py. No Rust file changed by this PR.",
+    "findings": [
+      {
+        "id": "F1",
+        "severity": "blocking_until_cpu_green",
+        "summary": "cpu job 118235007875 (runner xbabe3-lan-4-20261019182600-25194) fails 6 Rust custody tests in tests/vnext_custody.rs:147 with 'owner fixture endpoint did not start' (15 s socket wait). Not caused by the PR diff (no Rust change). main's cpu job 118209723442 passed on f7a97db2. Looks like runner/timing; root cause not verified here."
+      },
+      {
+        "id": "F2",
+        "severity": "low",
+        "summary": "strict-audit-verifier log is empty (see V4_observation)."
+      }
+    ]
+  },
+  "checks_at_review": [
+    {
+      "c": "success",
+      "n": "paper-clean"
+    },
+    {
+      "c": "success",
+      "n": "arm64-portability"
+    },
+    {
+      "c": "failure",
+      "n": "cpu"
+    },
+    {
+      "c": "success",
+      "n": "security"
+    },
+    {
+      "c": "success",
+      "n": "jankurai-audit"
+    }
+  ],
+  "verdict": "CONTENT_CLEAR_CPU_RED",
+  "approval_posted": false,
+  "merge_performed": false,
+  "ci_retry_by_reviewer": false,
+  "not_claimed": [
+    "no approval while cpu is red",
+    "no merge (captain sole merger)",
+    "no E04/E05/E06 clearance",
+    "no canonical task or counter change",
+    "both historical custody HOLDs and pre-seal A1 remain in place"
+  ]
+}
