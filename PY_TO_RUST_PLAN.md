@@ -17,6 +17,7 @@ Python-native ML model ecosystems, and publication plotting.
    - **`docs/whitepaper/scripts/*`, `tools/claims/{foundation,render,test_figure}.py`**: Publication figure/table rendering (`matplotlib`) and LaTeX build orchestration.
 3. **Port Candidates (`port-candidate`)**:
    - Deterministic JSON/manifest/PDF-metadata checks in `ops/ci/*` and `tools/claims/check.py` that do not require Python ML or plotting libraries.
+   - Development-only `research/transfer/campaign_runner.py` and `campaign_cli.py` stage accounting/inspection; these do not execute workers or grant access.
 
 ## 2. Phased Rust Migration Roadmap for `port-candidate` Files
 
@@ -24,6 +25,7 @@ Python-native ML model ecosystems, and publication plotting.
 | :--- | :--- | :--- | :--- |
 | **Phase 1: CI Evidence & Frozen-Ledger Guards** | `ops/ci/check-frozen-evidence.py`, `ops/ci/paper-review-outputs.py` | `ops/merge_guard` (or `dope-ci-guard` binary) | Rust subcommand verifies SHA-256 digests, frozen JSON ledgers, and clean-checkout PDF review receipts with identical exit codes; Python scripts removed. |
 | **Phase 2: Claim & Receipt Consistency Verifiers** | `tools/claims/check.py` | `rust/main.rs` (`dope verify-claims`) | Rust CLI validates benchmark claim manifests and receipt hashes directly against `validation/` and `docs/whitepaper/generated/` artifacts. |
+| **Phase 3: Development Stage Journal and CLI** | `research/transfer/campaign_runner.py`, `research/transfer/campaign_cli.py` | A native research campaign driver, separate from product certification and custody authority | Port only after immutable-byte validation, interruption charges, stage ordering, file-boundary refusals and redacted CLI parity; retain the Python regression suites until replacement coverage is verified. |
 
 The first Phase 1 parity candidate is `ops/merge_guard/frozen_evidence.rs`,
 exposed as `check-frozen-evidence`; the Python script remains the CI entrypoint
@@ -584,6 +586,8 @@ whenever tracked Python files change.
 | `research/transfer/bundle_io.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`bundle_io`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/bundle_isolation.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`bundle_isolation`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/calibration_receipt.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`calibration_receipt`)); enforce <500 LOC and deterministic test coverage. |
+| `research/transfer/campaign_cli.py` | `port-candidate` | Deterministic JSON and filesystem inspection suitable for Rust; pilot and confirmation remain refused until the actual runtime/admission bridge exists. |
+| `research/transfer/campaign_runner.py` | `port-candidate` | Deterministic manifest and filesystem accounting; migrate to Rust after crash, budget and redaction parity. Not a native executor, query-access ledger or scientific admission. |
 | `research/transfer/claims.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`claims`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/controls.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`controls`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/drivers.py` | `keep-with-reason` | Retain in `research/transfer` (Empirical ML benchmark, transfer evaluation, or baseline comparator module (`drivers`)); enforce <500 LOC and deterministic test coverage. |
@@ -638,6 +642,8 @@ whenever tracked Python files change.
 | `research/transfer/tests/test_bundle_closure.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_bundle_closure`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/tests/test_bundle_isolation.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_bundle_isolation`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/tests/test_calibration_receipt.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_calibration_receipt`)); enforce <500 LOC and deterministic test coverage. |
+| `research/transfer/tests/test_campaign_cli.py` | `keep-with-reason` | Tests the Python CLI entry point and its file-access boundaries; no vendor-model or scientific acceptance claim. |
+| `research/transfer/tests/test_campaign_runner.py` | `keep-with-reason` | Tests this experimental Python orchestration boundary and scheduler directly; retain until equivalent native migration fixtures cover the same failures. |
 | `research/transfer/tests/test_claims.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_claims`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/tests/test_controls.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_controls`)); enforce <500 LOC and deterministic test coverage. |
 | `research/transfer/tests/test_cpu_smoke_lane.py` | `keep-with-reason` | Retain in `research/transfer` (Research harness and scientific acceptance test module (`test_cpu_smoke_lane`)); enforce <500 LOC and deterministic test coverage. |
