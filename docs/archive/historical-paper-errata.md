@@ -32,11 +32,17 @@ Direct inspection of the Rust producer
 (`driver_fidelity`, lines `170` and `193–255`) establishes that the historical
 `driver_fidelity` field in the v2 and MFS-v3 validation ledgers does **not**
 compute holdout permutation-importance agreement between a real-trained and a
-synthetic-trained predictor. Instead, it computes the mean across input columns
-$j \in \{1, \dots, d\}$ of the absolute feature-target Pearson correlation
-agreement between the fit rows and the synthetic rows:
+synthetic-trained predictor. Instead, for each input column it forms the
+absolute feature-target Pearson correlation on the fit rows and on the
+synthetic rows, keeps columns with finite non-trivial real correlation, then
+combines (i) a Spearman rank correlation $\rho$ of those absolute correlations
+across columns and (ii) a Jaccard overlap of the top-$k$ columns by absolute
+correlation ($k = \min(10, \lceil d'/5 \rceil)$ where $d'$ is the paired-column
+count):
 
-$$\text{proxy}_{\text{corr}} = \frac{1}{d} \sum_{j=1}^{d} \operatorname{clamp}_{[0, 1]}\!\left(1 - \bigl|\,|\operatorname{corr}_{\text{fit}}(X_j, y)| - |\operatorname{corr}_{\text{syn}}(X_j, y)|\,\bigr|\right).$$
+$$\text{proxy}_{\text{rank+overlap}} = \tfrac{1}{2}\operatorname{clamp}_{[0,1]}\!\bigl((\rho+1)/2\bigr) + \tfrac{1}{2}\operatorname{Jaccard}(\mathrm{top}_k^{\text{fit}}, \mathrm{top}_k^{\text{syn}}).$$
+
+(See `driver_fidelity` at lines `193–255`: `rank_correlation` / `average_rank_values` for $\rho$, then `0.5 * rank + 0.5 * overlap`.)
 
 Specifically:
 
