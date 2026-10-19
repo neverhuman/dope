@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata as metadata
+import inspect
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -20,7 +22,7 @@ import time
 import traceback
 
 from research.transfer.native_qualification import (
-    QualificationError, new_result, sha256_file, verify_checkpoints,
+    MODEL_FILES, QualificationError, new_result, sha256_file, verify_checkpoints,
     verify_signed_manifest,
 )
 
@@ -44,6 +46,156 @@ def _case_inputs(case: dict, root: Path) -> tuple[dict, dict, dict]:
         if sha256_file(Path(str(base) + suffix)) != pin:
             raise QualificationError("case_input_pin_mismatch")
     return tuple(values)  # type: ignore[return-value]
+
+
+def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
+                    recipe: dict, sdk_values: Any, sdk_classes: list[str]) -> dict:
+    """Run the real offline DOPE adapter on the exact native SDK inputs."""
+    import numpy as np
+    import psutil
+    from research.transfer.adapters.base import (
+        AdapterAdmission, FeatureBatch, ModelIdentity, ResourceLimits, ResourceUsage, TrainingBatch,
+    )
+    from research.transfer.adapters.auditors.conventional import (
+        OfflineArtifacts, OfflineRuntime, file_sha256,
+    )
+    if case["model"] == "tabicl_v2":
+        from research.transfer.adapters.auditors.tabicl import TabICLAdapter, TabICLRecipe
+        adapter_file = Path(inspect.getfile(TabICLAdapter))
+        adapter_recipe = TabICLRecipe(
+            case["task"], estimators=recipe["n_estimators"], estimator_batch_size=1,
+            class_order=tuple(case["class_order"]), device="cpu",
+        )
+        adapter_cls = TabICLAdapter
+        code_license_name, weights_license_name = "tabicl_code_license.txt", "tabicl_weights_license.txt"
+        license_id = "bsd-3-clause"
+    else:
+        from research.transfer.adapters.auditors.kumo_tabular import KumoRecipe, KumoTabularAdapter
+        adapter_file = Path(inspect.getfile(KumoTabularAdapter))
+        adapter_recipe = KumoRecipe(
+            case["task"], size="large", estimators=recipe["n_estimators"],
+            estimator_batch_size=1,
+            output="quantile_grid_mean" if case["task"] == "regression" else "probability",
+            class_order=tuple(case["class_order"]), device="cpu",
+        )
+        adapter_cls = KumoTabularAdapter
+        code_license_name, weights_license_name = "kumo_code_license.txt", "kumo_weights_license.txt"
+        license_id = "openmdw-1.1"
+    closure_path = root / "w01-cert-venv-closure.json"
+    closure = json.loads(closure_path.read_text(encoding="utf-8"))
+    dependencies, dependency_paths = [], []
+    for item in closure["distributions"]:
+        dist = metadata.distribution(item["name"])
+        record = next((entry for entry in (dist.files or ()) if str(entry).endswith("RECORD")), None)
+        if (dist.version != item["version"] or record is None or
+                _hash(dist.locate_file(record).read_bytes()) != item["record_sha256"]):
+            raise QualificationError("adapter_dependency_closure_mismatch")
+        dependencies.append((item["name"], item["version"], item["record_sha256"]))
+        dependency_paths.append(Path(dist.locate_file(record)))
+    licenses_dir = root / "licenses"
+    code_license = licenses_dir / code_license_name
+    weights_license = licenses_dir / weights_license_name
+    weight_path = root / case["model"] / case["checkpoint"]
+    expected_weight_sha256 = MODEL_FILES[case["model"]]["files"][case["checkpoint"]][1]
+    if (file_sha256(code_license) != case["code_license_sha256"] or
+            file_sha256(weights_license) != case["weights_license_sha256"] or
+            file_sha256(weight_path) != expected_weight_sha256):
+        raise QualificationError("adapter_artifact_pin_mismatch")
+    identity = ModelIdentity(
+        name=case["model"], mode="frozen_context", code_revision=case["code_revision"],
+        code_sha256=file_sha256(adapter_file), weights_sha256=file_sha256(weight_path),
+        dependencies=tuple(dependencies),
+        licenses=(("code", license_id, file_sha256(code_license)),
+                  ("weights", license_id, file_sha256(weights_license))),
+        preprocessing_sha256=adapter_recipe.preprocessing_sha256,
+        recipe_sha256=adapter_recipe.sha256,
+        output_aggregation_sha256=adapter_recipe.output_sha256,
+        environment_sha256=file_sha256(closure_path), precision="float32",
+        context_cap=len(context["rows"]), context_policy="all", query_policy="batch",
+        query_batch_size=len(query["rows"]), order_sensitive=True,
+        determinism="seeded_best_effort",
+        resources=ResourceLimits(float(case["resource_caps"]["wall_seconds"]),
+                                 case["resource_caps"]["memory_bytes"],
+                                 case["resource_caps"]["gpu_bytes"]),
+    )
+    # Admission is a local identity binding for this comparison, not a registry
+    # decision. Registry promotion remains a separate reviewed gate.
+    admission = AdapterAdmission(identity.sha256, _hash(b"W01 parity eligibility"),
+                                 _hash(b"W01 parity reference"), "learner")
+    artifacts = OfflineArtifacts(adapter_file, tuple(dependency_paths),
+                                 (code_license, weights_license), weight_path)
+    process = psutil.Process()
+    runtime = OfflineRuntime(
+        artifacts,
+        lambda event: ResourceUsage(len(context["rows"]), process.memory_info().rss, 0),
+        factory=None,
+    )
+    columns = context["feature_columns"]
+    query_columns = query["feature_columns"]
+    train_rows = tuple(tuple(float(row[column]) for column in columns) for row in context["rows"])
+    train_targets = tuple(row[context["target_column"]] for row in context["rows"])
+    query_rows = tuple(tuple(float(row[column]) for column in query_columns) for row in query["rows"])
+    schema_sha = _hash(json.dumps({"feature_columns": columns}, sort_keys=True,
+                                  separators=(",", ":")).encode())
+    context_ids = tuple(_hash(f"{case['model']}:{case['task']}:context:{i}".encode())
+                        for i in range(len(train_rows)))
+    query_ids = tuple(_hash(f"{case['model']}:{case['task']}:query:{i}".encode())
+                      for i in range(len(query_rows)))
+    training = TrainingBatch(FeatureBatch(context_ids, train_rows, schema_sha),
+                             train_targets, "development_train")
+    query_batch = FeatureBatch(query_ids, query_rows, schema_sha)
+    adapter = adapter_cls(identity, admission, adapter_recipe, runtime)
+    seed = int(recipe["seed"])
+    adapter.prepare(training, seed)
+    prediction = adapter.predict(query_batch, seed)
+    adapter_values = np.asarray(prediction.values, dtype=np.float64)
+    native_values = np.asarray(sdk_values, dtype=np.float64)
+    delta = float(np.max(np.abs(adapter_values - native_values)))
+    tolerance = 1e-6
+    adapter_classes = list(prediction.class_order)
+    sdk_class_order = list(sdk_classes)
+    modules = {}
+    for label, path in (
+        ("tabicl_adapter", Path(__file__).parent / "adapters/auditors/tabicl.py"),
+        ("kumo_adapter", Path(__file__).parent / "adapters/auditors/kumo_tabular.py"),
+        ("native_qualification", Path(__file__).with_name("native_qualification.py")),
+        ("run_native_qualification", Path(__file__)),
+    ):
+        modules[label] = {"path": str(path.resolve()), "sha256": file_sha256(path)}
+    if case["model"] == "tabicl_v2":
+        import tabicl
+        modules["vendor_tabicl"] = {"path": str(Path(inspect.getfile(tabicl)).resolve()),
+                                    "sha256": file_sha256(inspect.getfile(tabicl))}
+    else:
+        import sdm
+        modules["vendor_sdm"] = {"path": str(Path(inspect.getfile(sdm)).resolve()),
+                                "sha256": file_sha256(inspect.getfile(sdm))}
+    modules["vendor_torch"] = {"path": str(Path(inspect.getfile(__import__("torch"))).resolve()),
+                              "sha256": file_sha256(inspect.getfile(__import__("torch")))}
+    return {
+        "adapter_output_parity": "established" if (
+            adapter_values.shape == native_values.shape and adapter_classes == sdk_class_order and
+            delta <= tolerance
+        ) else "mismatch",
+        "sdk_output_shape": list(native_values.shape),
+        "adapter_output_shape": list(adapter_values.shape),
+        "sdk_class_order": sdk_class_order,
+        "adapter_class_order": adapter_classes,
+        "sdk_output_sha256": _hash(np.asarray(native_values, dtype="<f8").tobytes()),
+        "adapter_output_sha256": _hash(np.asarray(adapter_values, dtype="<f8").tobytes()),
+        "sdk_output_values": native_values.tolist(),
+        "adapter_output_values": adapter_values.tolist(),
+        "adapter_vs_sdk_max_abs_delta": delta,
+        "tolerance": tolerance,
+        "recipe_sha256": case["recipe_sha256"],
+        "adapter_recipe_sha256": adapter_recipe.sha256,
+        "preprocessing_sha256": adapter_recipe.preprocessing_sha256,
+        "output_aggregation_sha256": adapter_recipe.output_sha256,
+        "seed": seed,
+        "precision": adapter_recipe.precision,
+        "class_order": list(case["class_order"]),
+        "module_origins": modules,
+    }
 
 
 def _run_native(case: dict, root: Path, repeat: bool = False) -> dict:
@@ -134,7 +286,8 @@ def _run_native(case: dict, root: Path, repeat: bool = False) -> dict:
                 raise QualificationError("native_quantile_grid_mismatch")
             if not np.all(np.diff(values, axis=1) >= 0):
                 raise QualificationError("native_quantile_order_invalid")
-            values = np.mean(values, axis=1, keepdims=True)
+            values = np.asarray([math.fsum(float(v) for v in row) / len(row)
+                                 for row in values], dtype=np.float64).reshape(-1, 1)
             classes = []
         if repeat:
             # The signed seed is replayed with a fresh, independently loaded model.
@@ -149,7 +302,8 @@ def _run_native(case: dict, root: Path, repeat: bool = False) -> dict:
                 replay_cols = tuple(replay_native.columns[Stype.numerical])
                 replay = replay_values[:, [replay_cols.index(str(i)) for i in range(len(case["class_order"]))]]
             else:
-                replay = np.mean(replay_values, axis=1, keepdims=True)
+                replay = np.asarray([math.fsum(float(v) for v in row) / len(row)
+                                     for row in replay_values], dtype=np.float64).reshape(-1, 1)
         else:
             replay = values
         perm_native = model.predict(x=qtx.flip(0))
@@ -158,7 +312,8 @@ def _run_native(case: dict, root: Path, repeat: bool = False) -> dict:
             perm_cols = tuple(perm_native.columns[Stype.numerical])
             permuted = perm_values[:, [perm_cols.index(str(i)) for i in range(len(case["class_order"]))]]
         else:
-            permuted = np.mean(perm_values, axis=1, keepdims=True)
+            permuted = np.asarray([math.fsum(float(v) for v in row) / len(row)
+                                   for row in perm_values], dtype=np.float64).reshape(-1, 1)
     else:
         raise QualificationError("unsupported_model")
     if values.shape[0] != len(qrows) or not np.isfinite(values).all():
@@ -173,13 +328,15 @@ def _run_native(case: dict, root: Path, repeat: bool = False) -> dict:
         kind = "point"
     tol = 1e-6
     replay_ok = replay.shape == values.shape and bool(np.allclose(replay, values, rtol=tol, atol=tol))
+    parity = _adapter_parity(case, root, context, query, recipe, values, classes)
     return {"output_shape": list(values.shape), "output_kind": kind,
             "output_sha256": _hash(np.asarray(values, dtype="<f8").tobytes()),
             "class_order": classes, "context_rows": len(y), "query_rows": len(qrows),
             "query_permutation_max_abs_delta": float(np.max(np.abs(values - permuted))),
             "seeded_replay_max_abs_delta": float(np.max(np.abs(values - replay))),
             "seeded_replay_passed": replay_ok, "tolerance": tol,
-            "weights_loaded_strictly": True, "network_disabled": True}
+            "weights_loaded_strictly": True, "network_disabled": True,
+            "q2_parity": parity}
 
 
 def _worker(case: dict, root: Path, output: Path) -> int:
@@ -260,6 +417,20 @@ def main(argv: list[str] | None = None) -> int:
     result["environment"] = {"python_version": platform.python_version(),
                              "venv": sys.prefix, "dependency_closure_sha256": closure_sha,
                              "network": "disabled", "gpu": "disabled"}
+    source_root = Path(__file__).resolve().parents[2]
+    result["parity_provenance"] = {
+        "harness_base_commit": subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=source_root, check=True,
+            capture_output=True, text=True).stdout.strip(),
+        "signed_source_commit_preserved": payload["source_commit"],
+        "module_source_sha256": {
+            "tabicl_adapter": sha256_file(Path(__file__).parent / "adapters/auditors/tabicl.py"),
+            "kumo_adapter": sha256_file(Path(__file__).parent / "adapters/auditors/kumo_tabular.py"),
+            "native_qualification": sha256_file(Path(__file__).with_name("native_qualification.py")),
+            "run_native_qualification": sha256_file(Path(__file__)),
+        },
+        "comparison_admission": "local identity binding only; does not alter registry status",
+    }
     result["cases"] = []
     args.out.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -270,7 +441,8 @@ def main(argv: list[str] | None = None) -> int:
     for case in payload["cases"]:
         gates = {f"Q{i}": {"status": "pending", "evidence_sha256": None} for i in range(10)}
         item = {"model": case["model"], "task": case["task"],
-                "recipe_sha256": case["recipe_sha256"], "gates": gates}
+                "recipe_sha256": case["recipe_sha256"],
+                "class_order": case["class_order"], "gates": gates}
         _evidence(gates["Q0"], {"signed_admission": True, "role": case["role"]})
         try:
             context, query, recipe = _case_inputs(case, args.checkpoint_root)
@@ -325,12 +497,14 @@ def main(argv: list[str] | None = None) -> int:
                 raise QualificationError("native_execution_failed")
             observed["peak_rss_bytes"] = max(peak_rss, observed.get("peak_rss_bytes", 0))
             observed["wall_seconds"] = wall
-            _evidence(gates["Q2"], {"native_checkpoint_loaded": observed["weights_loaded_strictly"],
-                                    "checkpoint_sha256": checkpoints[f"{case['model']}:{case['task']}"]["sha256"],
-                                    "model": case["model"]})
-            _evidence(gates["Q3"], {"output_shape": observed["output_shape"],
+            q2 = {"native_checkpoint_loaded": observed["weights_loaded_strictly"],
+                  "checkpoint_sha256": checkpoints[f"{case['model']}:{case['task']}"]["sha256"],
+                  "model": case["model"], **observed["q2_parity"]}
+            q2_passed = q2["adapter_output_parity"] == "established"
+            _evidence(gates["Q2"], q2, "passed" if q2_passed else "failed")
+            _evidence(gates["Q3"], {"output_shape": q2["adapter_output_shape"],
                                     "output_kind": observed["output_kind"],
-                                    "output_sha256": observed["output_sha256"],
+                                    "output_sha256": q2["adapter_output_sha256"],
                                     "finite_and_validated": True})
             _evidence(gates["Q5"], {"query_permutation_max_abs_delta": observed["query_permutation_max_abs_delta"],
                                     "policy": "batch_order_observed"})
@@ -365,7 +539,21 @@ def main(argv: list[str] | None = None) -> int:
                            "reason": "no_independent_review_receipt_supplied"}
         result["cases"].append(item)
         result["status"] = "incomplete"
-        result["blockers"] = ["independent_Q9_review_missing"]
+        parity_complete = len(result["cases"]) == 4 and all(
+            case_item.get("gates", {}).get("Q2", {}).get("status") == "passed" and
+            case_item.get("gates", {}).get("Q2", {}).get("observation", {}).get("adapter_output_parity") == "established"
+            for case_item in result["cases"]
+        )
+        result["qualification_scope_status"] = (
+            "q0_q8_sdk_parity_established_pending_independent_q9_review"
+            if parity_complete else "technical_smoke_or_parity_incomplete"
+        )
+        result["blockers"] = []
+        if not parity_complete:
+            result["blockers"].append("official_adapter_sdk_output_parity_incomplete")
+        if any(case_item.get("gates", {}).get("Q9", {}).get("status") != "passed"
+               for case_item in result["cases"]):
+            result["blockers"].append("independent_Q9_review_missing")
         tmp = args.out.with_name(args.out.name + ".tmp")
         tmp.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
         tmp.replace(args.out)
