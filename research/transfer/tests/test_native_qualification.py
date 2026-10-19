@@ -61,6 +61,21 @@ def sign_manifest(directory: Path, value: dict) -> tuple[Path, Path, str]:
     return envelope, public, hashlib.sha256(public.read_bytes()).hexdigest()
 
 
+def q2_parity(case):
+    order = case["class_order"]
+    digest = pin(case["model"] + case["task"] + "parity")
+    return {"native_checkpoint_loaded": True, "adapter_output_parity": "established",
+            "adapter_vs_sdk_max_abs_delta": 0.0, "tolerance": 1e-6,
+            "adapter_output_sha256": digest, "sdk_output_sha256": digest,
+            "adapter_output_shape": [4, len(order) or 1],
+            "sdk_output_shape": [4, len(order) or 1],
+            "adapter_class_order": order, "sdk_class_order": order,
+            "class_order": order, "recipe_sha256": case["recipe_sha256"],
+            "preprocessing_sha256": pin(case["model"] + "preprocessing"),
+            "output_aggregation_sha256": pin(case["model"] + "output"),
+            "seed": 42, "precision": "float32"}
+
+
 class NativeQualificationTests(unittest.TestCase):
     def test_admission_requires_exact_four_model_task_cases_and_explicit_approvals(self):
         value = payload()
@@ -133,12 +148,33 @@ class NativeQualificationTests(unittest.TestCase):
         for case in result["cases"]:
             for gate in nq.GATES:
                 case["gates"][gate] = {"status": "passed", "evidence_sha256": pin(case["model"] + gate)}
+            case["gates"]["Q2"]["observation"] = {"native_checkpoint_loaded": True}
             case["gates"]["Q9"]["independent_review"] = {
                 "reviewer_id": "eligible-reviewer", "disposition": "accepted",
                 "receipt_sha256": pin(case["model"] + "independent-review"),
             }
+        self.assertEqual(nq.assess_result(result), "technical_smoke_reviewed")
+        for case in result["cases"]:
+            case["gates"]["Q2"]["observation"] = q2_parity(case)
         self.assertEqual(nq.assess_result(result), "qualified")
+        result["cases"][0]["gates"]["Q2"]["observation"]["sdk_output_sha256"] = pin("foreign reference")
+        self.assertEqual(nq.assess_result(result), "incomplete")
+        result["cases"][0]["gates"]["Q2"]["observation"] = q2_parity(result["cases"][0])
         result["cases"][0]["gates"]["Q9"]["evidence_sha256"] = None
+        self.assertEqual(nq.assess_result(result), "incomplete")
+
+    def test_q2_requires_source_bound_output_parity_and_matching_review(self):
+        result = nq.new_result(payload())
+        for case in result["cases"]:
+            for gate in nq.GATES:
+                case["gates"][gate] = {"status": "passed", "evidence_sha256": pin(case["model"] + gate)}
+            case["gates"]["Q2"]["observation"] = q2_parity(case)
+            case["gates"]["Q9"]["independent_review"] = {
+                "reviewer_id": "eligible-reviewer", "disposition": "accepted",
+                "receipt_sha256": pin(case["model"] + "review"),
+            }
+        self.assertEqual(nq.assess_result(result), "qualified")
+        result["cases"][0]["gates"]["Q2"]["observation"]["adapter_vs_sdk_max_abs_delta"] = 1e-3
         self.assertEqual(nq.assess_result(result), "incomplete")
 
     def test_bind_independent_review_copies_only_exact_accepted_execution(self):
@@ -149,10 +185,17 @@ class NativeQualificationTests(unittest.TestCase):
             for case in source["cases"]:
                 for gate in nq.GATES[:-1]:
                     case["gates"][gate] = {"status": "passed", "evidence_sha256": pin(case["model"] + case["task"] + gate)}
+                case["gates"]["Q2"]["observation"] = {"native_checkpoint_loaded": True}
                 case["gates"]["Q9"] = {"status": "pending_independent_review", "evidence_sha256": None}
             result_path = root / "capped.json"
             result_path.write_text(json.dumps(source, sort_keys=True))
             result_sha = nq.sha256_file(result_path)
+            with self.assertRaisesRegex(nq.QualificationError, "file_unavailable"):
+                nq.bind_independent_review(
+                    result_path, root / "missing-review.json", root / "missing-qualified.json",
+                    expected_result_sha256=result_sha, expected_review_sha256=pin("missing"),
+                    expected_reviewer_id="reviewer-1",
+                )
             review = {
                 "schema": "dope.independent_cross_family_review.f65_01_w01_q9_signoff.v1",
                 "disposition": "accepted",
@@ -175,8 +218,8 @@ class NativeQualificationTests(unittest.TestCase):
                 expected_result_sha256=result_sha, expected_review_sha256=review_sha,
                 expected_reviewer_id="reviewer-1",
             )
-            self.assertEqual(qualified["status"], "qualified")
-            self.assertEqual(nq.assess_result(qualified), "qualified")
+            self.assertEqual(qualified["status"], "technical_smoke_reviewed")
+            self.assertEqual(nq.assess_result(qualified), "technical_smoke_reviewed")
             self.assertEqual(qualified["release_authorization"], "not_authorized")
             self.assertTrue(all(case["gates"]["Q9"]["evidence_sha256"] == review_sha
                                 for case in qualified["cases"]))
@@ -225,6 +268,16 @@ class NativeQualificationTests(unittest.TestCase):
             review["disposition"] = "rejected"
             review_path.write_text(json.dumps(review, sort_keys=True))
             with self.assertRaisesRegex(nq.QualificationError, "independent_review_not_accepted"):
+                nq.bind_independent_review(
+                    result_path, review_path, root / "qualified.json",
+                    expected_result_sha256=result_sha,
+                    expected_review_sha256=nq.sha256_file(review_path),
+                    expected_reviewer_id="reviewer-1",
+                )
+            review["disposition"] = "accepted"
+            review["bound_execution_artifacts"]["source_commit"] = "0" * 40
+            review_path.write_text(json.dumps(review, sort_keys=True))
+            with self.assertRaisesRegex(nq.QualificationError, "review_execution_binding_mismatch"):
                 nq.bind_independent_review(
                     result_path, review_path, root / "qualified.json",
                     expected_result_sha256=result_sha,
