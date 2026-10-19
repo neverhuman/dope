@@ -8,7 +8,7 @@ from pathlib import Path
 import stat
 
 from research.transfer.campaign_runner import (
-    CampaignRunSpec, CampaignRunnerError, MAX_SPEC_BYTES, StageJournal,
+    CampaignRunSpec, CampaignRunnerError, MAX_SPEC_BYTES, NativeDopeCommandPlan, StageJournal,
 )
 
 
@@ -17,7 +17,7 @@ class _Parser(argparse.ArgumentParser):
         raise CampaignRunnerError("invalid_cli_arguments")
 
 
-def _load(path):
+def _load(path, *, native_commands=False):
     descriptor = None
     try:
         descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
@@ -31,7 +31,8 @@ def _load(path):
                 break
             total += len(chunk)
             chunks.append(chunk)
-        return CampaignRunSpec.from_bytes(b"".join(chunks))
+        decoder = NativeDopeCommandPlan if native_commands else CampaignRunSpec
+        return decoder.from_bytes(b"".join(chunks))
     except OSError:
         raise CampaignRunnerError("run_spec_unavailable") from None
     finally:
@@ -44,13 +45,20 @@ def main(argv=None):
     parser.add_argument("command", choices=("plan", "inspect", "pilot", "confirm"))
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--evidence-dir")
+    parser.add_argument("--commands")
     try:
         args = parser.parse_args(argv)
         if args.command in {"pilot", "confirm"}:
             raise CampaignRunnerError("native_execution_admission_not_connected")
+        if args.commands is not None and args.command != "plan":
+            raise CampaignRunnerError("command_plan_requires_plan")
         spec = _load(args.manifest)
         if args.command == "plan":
             result = spec.public_summary()
+            if args.commands is not None:
+                commands = _load(args.commands, native_commands=True)
+                commands.verify_binding(spec)
+                result["native_commands"] = commands.public_summary()
         else:
             if not args.evidence_dir:
                 raise CampaignRunnerError("evidence_directory_required")
