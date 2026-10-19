@@ -261,6 +261,31 @@ class NativeExecutionTests(unittest.TestCase):
                 self.assertEqual(main([phase, "--manifest", "/SECRET/missing"]), 2)
             self.assertNotIn("SECRET", output.getvalue())
 
+    def test_process_identity_race_finishes_failed_stage_and_reaps_owned_child(self):
+        import psutil
+        children = []
+        actual_popen = subprocess.Popen
+        def start_child(*args, **kwargs):
+            child = actual_popen(*args, **kwargs)
+            children.append(child)
+            return child
+        def invoke_with_race(_argv, root, label, wall, ram):
+            # Real owned child, synthetic process-inspection failure; no kernel claim.
+            with mock.patch("research.transfer.campaign_native.subprocess.Popen", side_effect=start_child):
+                return invoke([sys.executable, "-c", "import time; time.sleep(5)"], root, label, wall, ram)
+        with mock.patch("psutil.Process", side_effect=psutil.NoSuchProcess(0)) as inspect, \
+             mock.patch.object(execution, "invoke", side_effect=invoke_with_race):
+            self.assertEqual(self.execute()["status"], "failed")
+        self.assertEqual(inspect.call_count, 1)
+        self.assertEqual(len(children), 1)
+        self.assertIsNotNone(children[0].poll())
+        with StageJournal(self.root, self.spec, read_only=True) as journal:
+            self.assertEqual(journal.charged, 10000)
+            self.assertEqual(journal.state[("5" * 64, "prepare")]["status"], "failed")
+            self.assertEqual(journal.public_summary()["pending_stages"], 0)
+        with self.assertRaises(CampaignRunnerError):
+            self.execute()
+
     def test_real_supervisor_kills_own_timeout_and_returns_observed_usage(self):
         result = invoke([sys.executable, "-c", "import time; time.sleep(5)"],
                         self.root, "timeout-fixture", 80, GIB)

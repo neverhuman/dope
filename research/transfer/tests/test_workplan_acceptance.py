@@ -152,16 +152,20 @@ class TestP04WorkplanDashboard(unittest.TestCase):
             task_doc = json.loads((PACKET_DIR / "tasks.json").read_text())
             tasks = task_doc["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
-            self.assertEqual(len(tasks), 65)
-            self.assertEqual(len({task["id"] for task in tasks}), 65)
-            counts = {state: sum(task["status"] == state for task in tasks)
-                      for state in ("done", "blocked", "todo", "backlog", "ready", "in_progress", "review")}
-            self.assertEqual(sum(counts.values()), 65)
-            for summary in (task_doc["summary_counts"], prog_doc["counts"], prog_doc["status_summary"]):
-                self.assertEqual(summary.get("total", 65), 65)
-                self.assertEqual({state: summary.get(state, 0) for state in counts}, counts)
-            self.assertEqual(sorted(prog_doc["blocked_tasks"]),
-                             sorted(task["id"] for task in tasks if task["status"] == "blocked"))
+            self.assertEqual((len(tasks), len({task["id"] for task in tasks})), (65, 65))
+            # Protected reported/provisional ledger state, not new SDK/scientific acceptance.
+            expected = {"done": 61, "blocked": 4, "in_progress": 0}
+            self.assertEqual(sorted(t["status"] for t in tasks), ["blocked"] * 4 + ["done"] * 61)
+            self.assertEqual(task_doc["summary_counts"], {**expected, "todo": 0})
+            for summary in (prog_doc["counts"], prog_doc["status_summary"]):
+                self.assertEqual(summary, {**expected, "total": 65, "backlog": 0, "ready": 0, "review": 0})
+            self.assertEqual(prog_doc["blocked_tasks"], ["E03", "E04", "E05", "E06"])
+            self.assertEqual(sorted(t["id"] for t in tasks if t["status"] == "blocked"), prog_doc["blocked_tasks"])
+            w01 = next(t for t in tasks if t["id"] == "W01")
+            pin = "3b2910b10fede74882b953e3df4855d74a9891dd5f3f24753df6a7157ae1af49"
+            self.assertEqual(w01["verification_receipt_sha256"], pin)
+            binding = PACKET_DIR / "verify/main_241746ea/W01.json"
+            self.assertEqual(hashlib.sha256(binding.read_bytes()).hexdigest(), pin)
         check_dashboard_200("/")
 
 
@@ -346,11 +350,7 @@ class TestC05RustPythonGoldenParity(unittest.TestCase):
         self.assertGreaterEqual(len(sorted((REPO_ROOT / "tests/golden/transfer").glob("v2_t90_*.json"))), 25)
         res_py = subprocess.run(
             [sys.executable, "-B", "-m", "unittest", "research.transfer.tests.test_metrics", "research.transfer.tests.test_statistics", "research.transfer.tests.test_tdl_t122_mandatory_design", "research.transfer.tests.test_tdl_t122_regressions", "research.transfer.tests.test_tdl_result_schemas", "-v"],
-            cwd=str(REPO_ROOT),
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+            cwd=str(REPO_ROOT), capture_output=True, text=True, check=True)
         self.assertEqual(res_py.returncode, 0)
 
 
