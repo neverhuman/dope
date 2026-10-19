@@ -2692,6 +2692,22 @@
     "research/transfer/tests/test_workplan_packet.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_packet -v",
       "purpose": "verify explicit packet modes, typed missing/input/race refusals, honest not_run and pinned provisional ledger checks; fixtures never qualify canonical data/science/custody"
+    },
+    "scripts/install-dope.sh": {
+      "command": "cargo test --locked --test vnext_dope_install",
+      "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
+    },
+    "scripts/uninstall-dope.sh": {
+      "command": "cargo test --locked --test vnext_dope_install",
+      "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
+    },
+    "tests/vnext_dope_install.rs": {
+      "command": "cargo test --locked --test vnext_dope_install",
+      "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
+    },
+    "docs/install.md": {
+      "command": "cargo test --locked --test vnext_dope_install",
+      "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
     }
   }
 }
