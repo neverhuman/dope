@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Durable unittest acceptance suite for P00..P04, I00, V01..V04, U02, U03, Q02, Q03, R08, F03, C05 + W01/E03..E07 CPU preflights."""
+import contextlib
 import hashlib
+import io
 import json
 import os
 import random
@@ -13,37 +15,13 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-MAIN_REPO = Path("/home/ubuntu/dope")
-_LOCAL_PKT = REPO_ROOT / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
-_MAIN_PKT = MAIN_REPO / "target/unified-spec-workplan-20261017/packet-v2-9e11fd166f5f"
-
-
-def _safe_is_dir(p: Path) -> bool:
-    try:
-        return p.is_dir()
-    except OSError:
-        return False
-
-
-def _safe_is_file(p: Path) -> bool:
-    try:
-        return p.is_file()
-    except OSError:
-        return False
-
-
-def _resolve_packet_dir(env_pkt: str | None = None) -> Path:
-    raw = os.environ.get("DOPE_PACKET_DIR") if env_pkt is None else env_pkt
-    if raw:
-        p = Path(raw)
-        if not p.is_dir() or not (p / "tasks.json").is_file():
-            raise RuntimeError(f"Explicit DOPE_PACKET_DIR is missing or incomplete: {p}")
-        return p
-    for cand in (_LOCAL_PKT, _MAIN_PKT):
-        if _safe_is_dir(cand):
-            return cand
-    return _LOCAL_PKT
-
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from research.transfer.workplan_packet import (
+    NOT_RUN, PacketError, assert_canonical_acceptance_truth, main as packet_main,
+    check_dashboard_200, resolve_packet_dir as _resolve_packet_dir,
+    run_validate_plan, _safe_is_dir, _safe_is_file,
+)
 
 PACKET_DIR = _resolve_packet_dir()
 
@@ -52,36 +30,11 @@ def find_dope_kernel_bin() -> Path:
     for cand in (
         REPO_ROOT / "target/debug/dope-kernel",
         REPO_ROOT / "target/release/dope-kernel",
-        MAIN_REPO / "target/debug/dope-kernel",
-        MAIN_REPO / "target/release/dope-kernel",
     ):
         if _safe_is_file(cand) and cand.stat().st_size > 0:
             return cand
     subprocess.run(["cargo", "build", "--locked", "--bin", "dope-kernel"], cwd=str(REPO_ROOT), check=True)
     return REPO_ROOT / "target/debug/dope-kernel"
-
-
-def run_validate_plan() -> str:
-    vp = PACKET_DIR / "validate_plan.py"
-    if os.environ.get("DOPE_PACKET_DIR"):
-        if not vp.is_file():
-            raise RuntimeError(f"Explicit DOPE_PACKET_DIR missing validate_plan.py: {vp}")
-    elif not _safe_is_file(vp):
-        return "VALID_CLEAN_CHECKOUT"
-    res = subprocess.run(["python3", str(vp)], cwd=str(PACKET_DIR), capture_output=True, text=True, check=True)
-    assert "VALID" in res.stdout.upper() or res.returncode == 0
-    return res.stdout
-
-
-def check_dashboard_200(path: str = "/") -> str:
-    if not _safe_is_dir(PACKET_DIR):
-        return "DOPE_CLEAN_CHECKOUT"
-    try:
-        with urllib.request.urlopen(f"http://127.0.0.1:18884{path}", timeout=3) as resp:
-            assert resp.status == 200, f"Expected HTTP 200, got {resp.status}"
-            return resp.read().decode("utf-8", errors="replace")
-    except Exception:
-        return "DOPE_DASHBOARD_OFFLINE_FALLBACK"
 
 
 class TestP00SourceFreeze(unittest.TestCase):
@@ -145,27 +98,19 @@ class TestP04WorkplanDashboard(unittest.TestCase):
         decisions = (REPO_ROOT / "docs/decisions.md").read_text()
         for expected in ("SC-DEC-106", "60 / 65", "5 / 65"):
             self.assertIn(expected, decisions)
+        if PACKET_DIR is None:
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(packet_main(["--mode", "unit"]), 0)
+            report = json.loads(output.getvalue())
+            self.assertEqual(report["status"], "not_run")
+            self.assertEqual(report["reason"], NOT_RUN)
+            self.assertFalse(report["release_authorized"])
+            self.assertEqual(report["scientific_qualification"], "not_established")
+            self.assertNotIn("input_hashes", report)
+            print(json.dumps(report, sort_keys=True))
+            return
         run_validate_plan()
-        if os.environ.get("DOPE_PACKET_DIR"):
-            self.assertTrue(_safe_is_dir(PACKET_DIR))
-        if _safe_is_dir(PACKET_DIR):
-            task_doc = json.loads((PACKET_DIR / "tasks.json").read_text())
-            tasks = task_doc["tasks"]
-            prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
-            self.assertEqual((len(tasks), len({task["id"] for task in tasks})), (65, 65))
-            # Protected reported/provisional ledger state, not new SDK/scientific acceptance.
-            expected = {"done": 61, "blocked": 4, "in_progress": 0}
-            self.assertEqual(sorted(t["status"] for t in tasks), ["blocked"] * 4 + ["done"] * 61)
-            self.assertEqual(task_doc["summary_counts"], {**expected, "todo": 0})
-            for summary in (prog_doc["counts"], prog_doc["status_summary"]):
-                self.assertEqual(summary, {**expected, "total": 65, "backlog": 0, "ready": 0, "review": 0})
-            self.assertEqual(prog_doc["blocked_tasks"], ["E03", "E04", "E05", "E06"])
-            self.assertEqual(sorted(t["id"] for t in tasks if t["status"] == "blocked"), prog_doc["blocked_tasks"])
-            w01 = next(t for t in tasks if t["id"] == "W01")
-            pin = "3b2910b10fede74882b953e3df4855d74a9891dd5f3f24753df6a7157ae1af49"
-            self.assertEqual(w01["verification_receipt_sha256"], pin)
-            binding = PACKET_DIR / "verify/main_241746ea/W01.json"
-            self.assertEqual(hashlib.sha256(binding.read_bytes()).hexdigest(), pin)
+        assert_canonical_acceptance_truth(PACKET_DIR)
         check_dashboard_200("/")
 
 
@@ -360,8 +305,7 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
             qa_report = PACKET_DIR / "handoff/Q02_FRESH_USER_PDF_QA_402954e_20261018.md"
             self.assertTrue(qa_report.is_file())
             self.assertGreater(len(qa_report.read_text()), 500)
-        readme_candidates = [REPO_ROOT / "README.md", MAIN_REPO / "README.md"]
-        readme_path = next((p for p in readme_candidates if _safe_is_file(p) and "dope-kernel compile-csv" in p.read_text()), REPO_ROOT / "README.md")
+        readme_path = REPO_ROOT / "README.md"
         readme_text = readme_path.read_text()
         self.assertIn("dope-kernel compile-csv", readme_text)
         self.assertNotIn("dope compile-csv", readme_text)
@@ -477,22 +421,14 @@ class TestD19AndBlockerUnblockMatrix(unittest.TestCase):
 
     def test_packet_dir_portability_and_strict_explicit_env(self):
         from unittest import mock
-        orig_is_dir = Path.is_dir
-        def fake_is_dir(p: Path) -> bool:
-            if p == _MAIN_PKT or p == Path("/inaccessible/packet"):
-                raise PermissionError("simulated cross-user chmod 700 denial")
-            if p == _LOCAL_PKT:
-                return False
-            return orig_is_dir(p)
-        with mock.patch.dict(os.environ, {}, clear=False):
+        with mock.patch.dict(os.environ, {"DOPE_PACKET_MODE": "auto", "DOPE_REQUIRE_PACKET": "0"}):
             os.environ.pop("DOPE_PACKET_DIR", None)
-            with mock.patch.object(Path, "is_dir", fake_is_dir):
-                self.assertEqual(_resolve_packet_dir(""), _LOCAL_PKT)
+            with mock.patch.object(Path, "is_dir", side_effect=PermissionError("foreign checkout denied")):
+                self.assertIsNone(_resolve_packet_dir())
+                with self.assertRaises(PacketError):
+                    _resolve_packet_dir("/inaccessible/packet")
         with self.assertRaises(RuntimeError):
-            _resolve_packet_dir(str(REPO_ROOT / "target/_nonexistent_explicit_packet_dir_"))
-        with mock.patch.object(Path, "is_dir", fake_is_dir):
-            with self.assertRaises(PermissionError):
-                _resolve_packet_dir("/inaccessible/packet")
+            _resolve_packet_dir(str(REPO_ROOT / "target/_nonexistent_explicit_packet_dir_"), mode="qualify")
 
 
 if __name__ == "__main__":

@@ -228,3 +228,34 @@ decisions, qualify a Python worker/model, or authorize a release. TypeScript
 protocol types must be schema-generated and must not implement another reducer.
 Inventory custody assets by hashes and Git identities; do not clean them as
 part of an extraction. Record local proof separately from exact-head CI.
+
+## Explicit workplan packet qualification
+
+Transfer discovery runs every source/fixture check once. A clean checkout has no
+canonical private workplan packet: the packet entry emits JSON with
+`status=not_run`, `CLEAN_CHECKOUT_PACKET_ABSENT_NOT_QUALIFIED`, and
+`release_authorized=false`. The P04 unit case asserts that explicit unqualified result and emits its report;
+source/fixture successes do not qualify the ledger. Unit refusal fixtures
+exercise missing, malformed, FIFO, symlink, changing and forged packet inputs.
+There is no automatic fallback to another checkout, binary or README.
+
+To require the actual admitted captured packet, explicitly set `DOPE_PACKET_DIR`
+to its absolute path and run `PYTHONPATH=. python3 -B -m
+research.transfer.workplan_packet --require-packet`, followed by
+`PYTHONPATH=. python3 -B -m unittest
+research.transfer.tests.test_workplan_acceptance.TestP04WorkplanDashboard -v`.
+`DOPE_PACKET_MODE=qualify` or `DOPE_REQUIRE_PACKET=1` also requires a packet;
+missing/incomplete inputs refuse with a nonzero status and a value-free reason.
+`DOPE_PACKET_MODE=unit` explicitly runs source/fixture coverage without reading
+a packet and cannot qualify one. It conflicts with `DOPE_REQUIRE_PACKET=1`.
+
+Qualification pins the exact admitted task, progress and validator bytes, the
+reported/provisional 61/65 snapshot, four blocked E03-E06 tasks and existing W01
+binding. Input-pin changes require a deliberate reviewed transition; matching
+counters alone cannot qualify substituted metadata or validator code. It does not establish model SDK
+parity, scientific acceptance, protected access, custody or release readiness.
+Actual qualification receipts must record the command, loaded module path/hash,
+packet input hashes, executed source/tree/environment and budget. Keep the actual
+packet and validator output private; do not commit or upload them to public CI.
+The required `just check` and all five remote gates remain; no test fixture is a
+substitute for the real packet or independent review.
