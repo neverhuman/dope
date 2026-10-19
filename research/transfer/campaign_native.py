@@ -82,7 +82,7 @@ def invoke(argv, root, label, wall_ms, ram_bytes):
                 "returncode": process.returncode,
                 "rss_measurement": "polled_tree_and_lifetime_child_rusage_upper_bound", "stdout_sha256": file_hash(stdout),
                 "stderr_sha256": file_hash(stderr)}
-    except (OSError, subprocess.SubprocessError):
+    except (OSError, subprocess.SubprocessError, psutil.Error):
         raise CampaignRunnerError("native_process_unavailable") from None
     finally:
         stop_owned()
