@@ -10,8 +10,8 @@ import tempfile
 import unittest
 
 from research.transfer.campaign_cli import main
-from research.transfer.campaign_runner import CampaignRunSpec, JOURNAL, StageJournal
-from research.transfer.tests.test_campaign_runner import specification
+from research.transfer.campaign_runner import CampaignRunSpec, JOURNAL, NativeDopeCommandPlan, StageJournal
+from research.transfer.tests.test_campaign_runner import native_commands, specification
 
 
 class CampaignCliTests(unittest.TestCase):
@@ -86,3 +86,60 @@ class CampaignCliTests(unittest.TestCase):
         alias.symlink_to(self.manifest)
         self.assertEqual(self.run_cli("plan", "--manifest", str(alias))[0], 2)
         self.assertFalse((self.root / "absent").exists())
+
+    def install_commands(self):
+        value = native_commands()
+        plan = NativeDopeCommandPlan.from_document(value)
+        spec = specification()
+        spec["cells"][0]["command_sha256"] = plan.sha256
+        self.manifest.write_text(json.dumps(spec))
+        commands = self.root / "SECRET_SOURCE.commands.json"
+        commands.write_text(json.dumps(value))
+        return commands
+
+    def test_plan_checks_native_command_binding_without_executing_or_creating_outputs(self):
+        commands = self.install_commands()
+        original = self.manifest.read_bytes(), commands.read_bytes()
+        code, result = self.run_cli("plan", "--manifest", str(self.manifest), "--commands", str(commands))
+        self.assertEqual(code, 0)
+        self.assertEqual(result["native_commands"]["command_count"], 2)
+        self.assertEqual(result["native_commands"]["execution_admission"], "not_connected")
+        self.assertFalse(result["native_commands"]["worker_executed"])
+        self.assertFalse(result["native_commands"]["source_free_execution_verified"])
+        self.assertEqual((self.manifest.read_bytes(), commands.read_bytes()), original)
+        self.assertFalse((self.root / JOURNAL).exists())
+
+    def test_changed_native_plan_refuses_and_inspect_does_not_consume_commands(self):
+        commands = self.install_commands()
+        changed = native_commands()
+        changed["draw_seed"] += 1
+        commands.write_text(json.dumps(changed))
+        code, result = self.run_cli("plan", "--manifest", str(self.manifest), "--commands", str(commands))
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "command_plan_binding_mismatch")
+        code, result = self.run_cli("inspect", "--manifest", "/SECRET_SOURCE/missing",
+                                    "--commands", "/SECRET_SOURCE/missing")
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "command_plan_requires_plan")
+        code, result = self.run_cli("plan", "--manifest", str(self.manifest), "--commands", "")
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "run_spec_unavailable")
+        code, result = self.run_cli("inspect", "--manifest", "/SECRET_SOURCE/missing", "--commands", "")
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "command_plan_requires_plan")
+
+    def test_native_command_fifo_refuses_and_pilot_stays_denied_before_input_reads(self):
+        self.install_commands()
+        fifo = self.root / "SECRET_SOURCE.commands.pipe"
+        os.mkfifo(fifo, 0o600)
+        result = subprocess.run([sys.executable, "-B", "-m", "research.transfer.campaign_cli",
+                                 "plan", "--manifest", str(self.manifest), "--commands", str(fifo)],
+                                capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(json.loads(result.stdout)["reason"], "run_spec_unavailable")
+        self.assertNotIn("SECRET_SOURCE", result.stdout + result.stderr)
+        for command in ("pilot", "confirm"):
+            code, output = self.run_cli(command, "--manifest", "/SECRET_SOURCE/missing",
+                                        "--commands", str(fifo))
+            self.assertEqual(code, 2)
+            self.assertEqual(output["reason"], "native_execution_admission_not_connected")

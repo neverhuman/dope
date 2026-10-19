@@ -9,7 +9,8 @@ import unittest
 from unittest import mock
 
 from research.transfer.campaign_runner import (
-    CampaignRunSpec, CampaignRunnerError, FORMAT, JOURNAL, STAGES, StageJournal,
+    CampaignRunSpec, CampaignRunnerError, COMMAND_FORMAT, FORMAT, JOURNAL,
+    NativeDopeCommandPlan, STAGES, StageJournal,
 )
 from research.transfer.evidence import canonical_json, digest
 
@@ -288,3 +289,103 @@ print(observed)
             with self.assertRaises(CampaignRunnerError):
                 journal.begin(self.cell, "prepare", 1)
         self.assertEqual((hashlib.sha256(path.read_bytes()).hexdigest(), path.stat().st_mtime_ns), before)
+
+
+def native_commands():
+    return {"format": COMMAND_FORMAT, "version": 1, "cell_id": "5" * 64,
+            "input_sha256": "6" * 64, "binary": "/runtime/dope", "binary_sha256": "8" * 64,
+            "csv": "/private/SECRET_SOURCE.csv", "schema": "/private/SECRET_SOURCE.schema",
+            "artifact": "/output/model.raw", "fit_seed": 17, "draw_seed": 29,
+            "rows": 7, "byte_budget": 4096, "deadline_seconds": 1}
+
+
+class NativeCommandPlanTests(unittest.TestCase):
+    def bound_spec(self, plan):
+        value = specification()
+        value["cells"][0]["command_sha256"] = plan.sha256
+        return CampaignRunSpec.from_document(value)
+
+    def test_native_arguments_keep_sampling_source_paths_out_and_never_launch(self):
+        with mock.patch("os.open", side_effect=AssertionError("unexpected IO")), \
+                mock.patch("subprocess.Popen", side_effect=AssertionError("unexpected launch")):
+            plan = NativeDopeCommandPlan.from_document(native_commands())
+            plan.verify_binding(self.bound_spec(plan))
+            compile_args, sample_args = plan.compile_argv(), plan.sample_argv()
+        self.assertIsInstance(compile_args, tuple)
+        self.assertEqual(compile_args[1], "compile-raw")
+        self.assertIn("--max-complete-bytes", compile_args)
+        self.assertEqual(compile_args[-2:], ("--deadline-seconds", "1"))
+        self.assertEqual(sample_args, ("/runtime/dope", "sample-raw-isolated", "--artifact",
+                                     "/output/model.raw", "--rows", "7", "--seed", "29"))
+        self.assertNotIn(native_commands()["csv"], sample_args)
+        self.assertNotIn(native_commands()["schema"], sample_args)
+        self.assertFalse(plan.public_summary()["native_binary_verified"])
+        self.assertFalse(plan.public_summary()["source_free_execution_verified"])
+
+    def test_shell_characters_in_paths_remain_literal_tokens_and_summaries_redact(self):
+        value = native_commands()
+        value["csv"] = "/private/SECRET_SOURCE;$(touch injected).csv"
+        plan = NativeDopeCommandPlan.from_document(value)
+        self.assertEqual(plan.compile_argv()[3], value["csv"])
+        self.assertNotIn("SECRET_SOURCE", str(plan.public_summary()))
+        self.assertFalse(plan.public_summary()["worker_executed"])
+
+    def test_command_source_and_limits_tampering_breaks_the_existing_cell_binding(self):
+        plan = NativeDopeCommandPlan.from_document(native_commands())
+        spec = self.bound_spec(plan)
+        for field, value in [("csv", "/private/other.csv"), ("binary_sha256", "a" * 64),
+                             ("fit_seed", 18), ("draw_seed", 30), ("rows", 8),
+                             ("byte_budget", 8192), ("input_sha256", "b" * 64)]:
+            with self.subTest(field=field):
+                changed = NativeDopeCommandPlan.from_document({**native_commands(), field: value})
+                with self.assertRaisesRegex(CampaignRunnerError, "command_plan_binding_mismatch"):
+                    changed.verify_binding(spec)
+        value = specification()
+        value["cells"][0]["command_sha256"] = plan.sha256
+        value["cells"][0]["input_sha256"] = "b" * 64
+        with self.assertRaisesRegex(CampaignRunnerError, "command_plan_binding_mismatch"):
+            plan.verify_binding(CampaignRunSpec.from_document(value))
+
+    def test_cell_and_compile_deadline_must_fit_the_exact_run_spec(self):
+        plan = NativeDopeCommandPlan.from_document(native_commands())
+        value = self.bound_spec(plan).document()
+        value["cells"][0]["cell_id"] = "a" * 64
+        with self.assertRaisesRegex(CampaignRunnerError, "command_plan_cell_mismatch"):
+            plan.verify_binding(CampaignRunSpec.from_document(value))
+        value = self.bound_spec(plan).document()
+        value["budget"]["wall_ms"] = 999
+        with self.assertRaisesRegex(CampaignRunnerError, "command_plan_budget_mismatch"):
+            plan.verify_binding(CampaignRunSpec.from_document(value))
+
+    def test_schema_paths_interpreters_and_malformed_values_refuse_without_echo(self):
+        changes = [{"argv": ["sh", "-c", "SECRET_SOURCE"]}, {"version": True},
+                   {"binary": "/bin/sh"}, {"binary": "/usr/bin/python3"},
+                   {"artifact": native_commands()["csv"]}, {"csv": "relative/SECRET_SOURCE"},
+                   {"csv": "/private/../SECRET_SOURCE"}, {"csv": "/private//SECRET_SOURCE"},
+                   {"csv": "/private/SECRET_SOURCE\nnext"}, {"csv": "/private/\ud800"},
+                   {"rows": True}, {"fit_seed": -1}, {"deadline_seconds": 61},
+                   {"byte_budget": 0}, {"binary_sha256": "SECRET_SOURCE"}]
+        for change in changes:
+            with self.subTest(field=list(change)):
+                with self.assertRaises(CampaignRunnerError) as error:
+                    NativeDopeCommandPlan.from_document({**native_commands(), **change})
+                self.assertNotIn("SECRET_SOURCE", str(error.exception))
+        for encoded in [b'{"format":1,"format":2}', b'{"rows":NaN}', b'{}']:
+            with self.assertRaises(CampaignRunnerError):
+                NativeDopeCommandPlan.from_bytes(encoded)
+
+    def test_original_objects_and_protected_specs_cannot_bypass_validation(self):
+        value = native_commands()
+        plan = NativeDopeCommandPlan.from_document(value)
+        before = plan.sha256
+        value["rows"] = 100
+        plan.document()["rows"] = 200
+        self.assertEqual(plan.sha256, before)
+        forged = NativeDopeCommandPlan(b"{}")
+        for method in [forged.compile_argv, forged.sample_argv, forged.public_summary]:
+            with self.assertRaises(CampaignRunnerError):
+                method()
+        protected = self.bound_spec(plan).document()
+        protected["phase"] = "confirmation"
+        with self.assertRaises(CampaignRunnerError):
+            plan.verify_binding(CampaignRunSpec(canonical_json(protected)))

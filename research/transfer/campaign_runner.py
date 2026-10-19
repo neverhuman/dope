@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import copy
 import fcntl
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import stat
 
@@ -109,6 +109,100 @@ class CampaignRunSpec:
                 "cells": len(self.document()["cells"]), "stages_per_cell": len(STAGES),
                 "worker_executed": False, "scientific_qualification": "unmeasured",
                 "release_authorization": "not_authorized"}
+
+
+COMMAND_FORMAT = "dope-development-native-command-plan"
+
+
+def _command_path(value):
+    """Lexical POSIX file paths only; this does not inspect or admit a file."""
+    if type(value) is not str or not value or len(value.encode()) > 4096:
+        return False
+    path = PurePosixPath(value)
+    return (path.is_absolute() and len(path.parts) > 1 and ".." not in path.parts
+            and path.as_posix() == value
+            and all(ord(char) >= 32 and ord(char) != 127 for char in value))
+
+
+@dataclass(frozen=True)
+class NativeDopeCommandPlan:
+    """Bound command construction, never executable or scientific admission.
+
+    The two argv contracts follow tdl.generators.DopeGenerator. The future
+    executor must independently admit the actual binary, inputs, rights,
+    resource lease and sampling boundary before using these arguments.
+    """
+    _encoded: bytes
+
+    @classmethod
+    def from_document(cls, document):
+        try:
+            encoded = canonical_json(document)
+            document = parse_json(encoded)
+        except (EvidenceError, UnicodeError):
+            raise CampaignRunnerError("invalid_command_plan") from None
+        fields = {"format", "version", "cell_id", "input_sha256", "binary", "binary_sha256",
+                  "csv", "schema", "artifact", "fit_seed", "draw_seed", "rows",
+                  "byte_budget", "deadline_seconds"}
+        _require(len(encoded) <= MAX_SPEC_BYTES and type(document) is dict
+                 and set(document) == fields, "invalid_command_plan")
+        _require(document["format"] == COMMAND_FORMAT and type(document["version"]) is int
+                 and document["version"] == 1, "invalid_command_plan")
+        _require(all(_hash(document[key]) for key in ("cell_id", "input_sha256", "binary_sha256")),
+                 "invalid_command_pin")
+        _require(all(_command_path(document[key]) for key in ("binary", "csv", "schema", "artifact"))
+                 and PurePosixPath(document["binary"]).name == "dope", "invalid_command_path")
+        _require(len({document[key] for key in ("binary", "csv", "schema", "artifact")}) == 4,
+                 "command_path_collision")
+        _require(all(_integer(document[key]) for key in ("fit_seed", "draw_seed"))
+                 and all(_integer(document[key], 1) for key in ("rows", "byte_budget", "deadline_seconds"))
+                 and document["deadline_seconds"] <= 60, "invalid_command_limits")
+        return cls(encoded)
+
+    @classmethod
+    def from_bytes(cls, value):
+        _require(type(value) is bytes and len(value) <= MAX_SPEC_BYTES, "invalid_command_plan")
+        try:
+            return cls.from_document(parse_json(value))
+        except EvidenceError:
+            raise CampaignRunnerError("invalid_command_plan") from None
+
+    def document(self):
+        # Revalidate even objects made with the public dataclass constructor.
+        return parse_json(NativeDopeCommandPlan.from_bytes(self._encoded)._encoded)
+
+    @property
+    def sha256(self):
+        return digest(self.document())
+
+    def verify_binding(self, spec):
+        _require(type(spec) is CampaignRunSpec, "invalid_run_spec")
+        spec = CampaignRunSpec.from_bytes(spec._encoded).document()
+        document = self.document()
+        cells = {cell["cell_id"]: cell for cell in spec["cells"]}
+        _require(document["cell_id"] in cells, "command_plan_cell_mismatch")
+        cell = cells[document["cell_id"]]
+        _require(cell["command_sha256"] == self.sha256
+                 and cell["input_sha256"] == document["input_sha256"], "command_plan_binding_mismatch")
+        _require(document["deadline_seconds"] * 1000 <= spec["budget"]["wall_ms"],
+                 "command_plan_budget_mismatch")
+
+    def compile_argv(self):
+        value = self.document()
+        return (value["binary"], "compile-raw", "--csv", value["csv"], "--schema", value["schema"],
+                "--out", value["artifact"], "--seed", str(value["fit_seed"]), "--candidate", "chow_liu",
+                "--max-complete-bytes", str(value["byte_budget"]), "--deadline-seconds",
+                str(value["deadline_seconds"]))
+
+    def sample_argv(self):
+        value = self.document()
+        return (value["binary"], "sample-raw-isolated", "--artifact", value["artifact"],
+                "--rows", str(value["rows"]), "--seed", str(value["draw_seed"]))
+
+    def public_summary(self):
+        return {"format": COMMAND_FORMAT, "command_plan_sha256": self.sha256,
+                "command_count": 2, "worker_executed": False, "native_binary_verified": False,
+                "source_free_execution_verified": False, "execution_admission": "not_connected"}
 
 
 class StageJournal:
