@@ -1,0 +1,276 @@
+{
+  "format": "dope.finish65.release-readiness-manifest.v1",
+  "version": 1,
+  "created_at_utc": "2026-10-19T03:14:30Z",
+  "source_commit": "001a8af11928e5fc03541682c30022b448488f37",
+  "source_tree": "44f4663e8bc52b2fa89b94083c5fb9aea24f7c45",
+  "canonical_denominator": 65,
+  "baseline_done": 60,
+  "baseline_blocked": 5,
+  "blocked_task_ids": [
+    "W01",
+    "E03",
+    "E04",
+    "E05",
+    "E06"
+  ],
+  "planning_manifest_not_scientific_admission": true,
+  "protocol_frozen": false,
+  "confirmation_allowed": false,
+  "release_authorized": false,
+  "candidate_contract_path": "contracts/tdl-contract-v2-candidate.json",
+  "adopted_plan": {
+    "path": "docs/plans/finish65-major-release.md",
+    "sha256": "cb908097d1ebae5b50ba3b4bba230ce81fd75fb4bea2f969d2ae99f7b87cbec0",
+    "original_handoff_plan_sha256": "505311c62c6c28dbe0f4960d9536e739aa511eba91e4bf5f00542314cb46afe4",
+    "read_first_locator_addendum_path": "/home/ubuntu/xbabe2_kicker/captains-20261017/FINISH65_READ_FIRST_LOCATOR_ADDENDUM_20261019T0340Z.json",
+    "read_first_locator_addendum_sha256": "f92ff647e324ccea9a32526bd3e52f4d7f772f937764a0a1276e89518536bd51"
+  },
+  "governing_decisions": [
+    "SC-DEC-125",
+    "SC-DEC-127",
+    "SC-DEC-128"
+  ],
+  "w01_open_license_admission": {
+    "decision_id": "SC-DEC-128",
+    "decided_at_utc": "2026-10-19T03:01:32Z",
+    "needs_jepson": [],
+    "commercial_api_dependency": false,
+    "paid_spend_authorized": false,
+    "models": {
+      "tabicl": {
+        "source_repo": "https://github.com/soda-inria/tabicl",
+        "source_revision": "10719e21fd72b8945d4a4f9ae077e350ba8650d9",
+        "package_version": "2.0.3",
+        "checkpoint_repo": "jingang/TabICL",
+        "checkpoint_revision": "4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+        "license": "BSD-3-Clause",
+        "lock_path": "research/transfer/locks/other-auditors.json",
+        "adapter_path": "research/transfer/adapters/auditors/tabicl.py",
+        "checkpoints": {
+          "classifier": {
+            "filename": "tabicl-classifier-v2-20260212.ckpt",
+            "bytes": 110368038,
+            "sha256": "bdc7dbd5e4ff21f8f0456fcf90c6b7cdf72dbea960f2d05b19bec19f9b3d4ed0"
+          },
+          "regressor": {
+            "filename": "tabicl-regressor-v2-20260212.ckpt",
+            "bytes": 114324594,
+            "sha256": "0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a"
+          }
+        },
+        "qualification_status": "admitted_for_f65_01_q0_q9_execution"
+      },
+      "kumo_tabular": {
+        "source_repo": "https://github.com/NVIDIA/structured-data-models",
+        "source_revision": "d50589692dbbbad4852eb1d9627f3b40c2673b63",
+        "checkpoint_repo": "nvidia/Kumo-Tabular",
+        "checkpoint_revision": "3520742f7f3b937a2751266cea22d7fb6686882c",
+        "license": "OpenMDW-1.1",
+        "lock_path": "research/transfer/locks/kumo-tabular.json",
+        "adapter_path": "research/transfer/adapters/auditors/kumo_tabular.py",
+        "checkpoints": {
+          "classifier": {
+            "filename": "large/classifier.pt",
+            "bytes": 854850034,
+            "sha256": "cc21484316949641cc3d65a7bb6c36cdea854cc569435755ff23b850018ec613"
+          },
+          "regressor": {
+            "filename": "large/regressor.pt",
+            "bytes": 862909259,
+            "sha256": "745e0e5d97e4256d8a24cb61c2eecbd1128da6c83938c196b7589ea6f62e7421"
+          }
+        },
+        "qualification_status": "admitted_for_f65_01_q0_q9_execution"
+      }
+    }
+  },
+  "canonical_tasks": {
+    "W01": {
+      "title": "Qualify actual Kumo and TabICL official runtimes",
+      "status": "blocked",
+      "dag_dependencies": [
+        "W00",
+        "D02",
+        "B01"
+      ],
+      "effective_dependents": [
+        "E03",
+        "E04",
+        "E05",
+        "E06"
+      ],
+      "packets": [
+        "F65-00",
+        "F65-01"
+      ]
+    },
+    "E03": {
+      "title": "Run smallest actual observational and adverse-mechanism pilot",
+      "status": "blocked",
+      "dag_dependencies": [
+        "E02",
+        "C05",
+        "B01",
+        "S01",
+        "U00",
+        "W03",
+        "E07"
+      ],
+      "effective_dependencies": [
+        "W01",
+        "E02",
+        "C05",
+        "B01",
+        "S01",
+        "U00",
+        "W03",
+        "E07"
+      ],
+      "packets": [
+        "F65-00",
+        "F65-02",
+        "F65-03"
+      ]
+    },
+    "E04": {
+      "title": "Precommit one confirmatory design after development selection",
+      "status": "blocked",
+      "dag_dependencies": [
+        "E03",
+        "M01",
+        "W03",
+        "C02",
+        "S01"
+      ],
+      "effective_dependencies": [
+        "W01",
+        "E03",
+        "M01",
+        "W03",
+        "C02",
+        "S01"
+      ],
+      "packets": [
+        "F65-00",
+        "F65-04"
+      ]
+    },
+    "E05": {
+      "title": "Execute admitted sealed confirmation without tuning",
+      "status": "blocked",
+      "dag_dependencies": [
+        "E04"
+      ],
+      "effective_dependencies": [
+        "W01",
+        "E03",
+        "E04"
+      ],
+      "packets": [
+        "F65-00",
+        "F65-02",
+        "F65-05"
+      ]
+    },
+    "E06": {
+      "title": "Obtain independent reproducibility at four distinct levels",
+      "status": "blocked",
+      "dag_dependencies": [
+        "E05",
+        "B01"
+      ],
+      "effective_dependencies": [
+        "W01",
+        "E03",
+        "E04",
+        "E05",
+        "B01"
+      ],
+      "packets": [
+        "F65-00",
+        "F65-06"
+      ]
+    }
+  },
+  "packets": [
+    {
+      "id": "F65-00",
+      "owner": "2716151.captain_dope + Root Codex",
+      "checkout": "/home/ubuntu/dope",
+      "write_paths": [
+        "docs/plans/finish65-major-release.md",
+        "docs/decisions.md",
+        "research/transfer/manifests/release-readiness-v1.json"
+      ],
+      "status": "implemented_pending_integration_review"
+    },
+    {
+      "id": "F65-01",
+      "owner": "203893.dope_fb_codex_2",
+      "checkout": "/home/ubuntu/dope/.agent/worktrees/rt-L2",
+      "write_paths": [
+        "research/transfer/native_qualification.py",
+        "research/transfer/run_native_qualification.py",
+        "research/transfer/tests/test_native_qualification.py",
+        "research/transfer/adapters/auditors/kumo_tabular.py",
+        "research/transfer/adapters/auditors/tabicl.py",
+        "research/transfer/locks/kumo-tabular.json",
+        "research/transfer/locks/other-auditors.json"
+      ],
+      "status": "admitted_in_progress"
+    },
+    {
+      "id": "F65-02",
+      "owner": "Root Codex",
+      "checkout": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance",
+      "write_paths": [
+        "research/transfer/campaign_runner.py",
+        "research/transfer/campaign_cli.py",
+        "research/transfer/tests/test_campaign_runner.py",
+        "research/transfer/tests/test_campaign_cli.py"
+      ],
+      "status": "admitted_in_progress"
+    },
+    {
+      "id": "F65-03",
+      "owner": "admitted pilot executor",
+      "status": "blocked_on_f65_01_and_f65_02"
+    },
+    {
+      "id": "F65-04",
+      "owner": "Root Codex + independent scientific reviewer",
+      "status": "preparation_ready_freeze_blocked_on_f65_03"
+    },
+    {
+      "id": "F65-05",
+      "owner": "authorized separate-principal custodian",
+      "status": "blocked_on_f65_04_signed_admission"
+    },
+    {
+      "id": "F65-06",
+      "owner": "eligible non-author independent executor",
+      "status": "harness_preparation_ready_replay_blocked_on_f65_03_to_05"
+    },
+    {
+      "id": "F65-07",
+      "owner": "runner owner + captain_dope",
+      "status": "in_progress_m001_cpu_qualification"
+    },
+    {
+      "id": "F65-08",
+      "owner": "1061468.dope_paper_claude + Root Codex",
+      "status": "templates_ready_final_numbers_blocked_on_f65_05_06"
+    },
+    {
+      "id": "F65-09",
+      "owner": "historical C2 authority + custodian + release owner",
+      "status": "blocked_on_incident_disposition_and_custody"
+    },
+    {
+      "id": "F65-10",
+      "owner": "2716151.captain_dope + independent reviewer + super_captain",
+      "status": "blocked_on_f65_01_through_f65_09"
+    }
+  ]
+}
