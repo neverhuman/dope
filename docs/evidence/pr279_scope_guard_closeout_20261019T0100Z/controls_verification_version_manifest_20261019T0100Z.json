@@ -1,0 +1,10 @@
+{
+  "schema": "dope.verification_receipt_version_relationship.v1",
+  "created_at_utc": "2026-10-19T01:00:00Z",
+  "authority": "/home/ubuntu/xbabe2_kicker/captains-20261017/CODEX_BLOCKED_dope_scope_guard_20261019T005100Z.md",
+  "artifact_name": "controls_py_inventory_verification_20261018T2358Z.json",
+  "prior_root_observed_sha256": "c844b0ba768b7756d8fba26390a58bdaefae77dc273641ea2c2d94ed89db0a4a",
+  "current_superseding_sha256": "6ca45c50655b5b2a9d94b60e68ca91a3171a5d2cc87482dbc96718bbc137c031",
+  "parsed_delta": "Added pr279_committed_head_verification containing committed PR #279 doc hashes.",
+  "custody_disposition": "Current 6ca45c50655b5b2a9d94b60e68ca91a3171a5d2cc87482dbc96718bbc137c031 is recorded as a superseding member over prior observation c844b0ba768b7756d8fba26390a58bdaefae77dc273641ea2c2d94ed89db0a4a; prior bytes are not claimed to currently survive on disk, file is not rewritten again, and actor/exact modification timestamp are not inferred."
+}
