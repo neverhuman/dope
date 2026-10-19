@@ -93,3 +93,26 @@ receipt = {
 (run / "build-receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
 PY
 printf 'native_release_smoke_ok %s\n' "$run"
+
+# The facade is a separate product identity; retain the kernel qualification above.
+env -u RUSTFLAGS -u CARGO_ENCODED_RUSTFLAGS CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}" \
+  cargo build --locked --release --offline -p dope-kernel --bin dope
+facade="$root/$run/facade-package"
+mkdir -p -- "$facade/scripts" "$root/$run/extracted-facade"
+cp -- target/release/dope "$facade/dope"
+cp -- LICENSE Cargo.lock rust-toolchain.toml "$facade/"
+cp -- scripts/install-dope.sh scripts/uninstall-dope.sh scripts/native-legal.sha256 \
+  scripts/native-third-party.NOTICE "$facade/scripts/"
+cp -- "$sbom" "$facade/sbom.spdx.json"
+(cd -- "$facade" && sha256sum -- dope LICENSE Cargo.lock rust-toolchain.toml \
+ scripts/install-dope.sh scripts/uninstall-dope.sh scripts/native-legal.sha256 \
+ scripts/native-third-party.NOTICE sbom.spdx.json > SHA256SUMS)
+tar -czf "$run/facade-package.tar.gz" -C "$facade" .
+tar -xzf "$run/facade-package.tar.gz" -C "$run/extracted-facade"
+(cd -- "$run/extracted-facade" && sha256sum --check --status -- SHA256SUMS)
+DOPE_INSTALL_TEST_BINARY="$root/$run/extracted-facade/dope" \
+ DOPE_INSTALL_TEST_RECEIPT="$root/$run/facade-install-receipt.json" \
+ cargo test --locked --test vnext_dope_install \
+ installer::installed_facade_bundle_runs_100_rows_and_preserves_unrelated_files -- --exact --nocapture
+[[ -s "$run/facade-install-receipt.json" ]] || { printf '%s\n' 'facade_install_smoke_receipt_absent' >&2; exit 1; }
+printf 'facade_install_smoke_ok %s\n' "$run/facade-install-receipt.json"

@@ -3,6 +3,7 @@ use super::io;
 use super::registry::{Cli, Command, Limits};
 use super::workflow;
 use serde_json::{Value, json};
+use sha2::Digest;
 use std::path::Path;
 
 pub fn run(cli: Cli) -> Result<()> {
@@ -49,10 +50,20 @@ pub fn run(cli: Cli) -> Result<()> {
             seed,
         } => workflow::sample(&artifact, rows, seed, &out, limits),
         Command::Doctor { out } => {
+            let executable = std::env::current_exe()
+                .map_err(|_| Failure::new(Code::Internal, "native_identity_unavailable"))?;
+            let bytes = std::fs::read(executable)
+                .map_err(|_| Failure::new(Code::Internal, "native_identity_unavailable"))?;
             io::outputs(&out.as_deref().into_iter().collect::<Vec<_>>())?;
             io::emit(
                 &json!({"name":"dope","version":env!("CARGO_PKG_VERSION"),
                 "implementation":"native_rust","offline":true,"network":"refused",
+                "executable_sha256":format!("{:x}", sha2::Sha256::digest(&bytes)),
+                "executable_bytes":bytes.len(),"os":std::env::consts::OS,
+                "architecture":std::env::consts::ARCH,
+                "build_cargo_lock_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../../../Cargo.lock"))),
+                "declared_rust_toolchain_sha256":format!("{:x}", sha2::Sha256::digest(include_bytes!("../../../rust-toolchain.toml"))),
+                "gpu_training":cfg!(feature="gpu-training"),
                 "raw_compile":"fully_observed_numeric_regression",
                 "legacy_v1_decode":"read_only_compatible",
                 "prepared_view":"unavailable","candidate_evaluation":"unavailable",

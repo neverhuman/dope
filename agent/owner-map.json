@@ -668,6 +668,10 @@
     "research/transfer/campaign_execution.py": "external-evidence",
     "research/transfer/tests/test_campaign_execution.py": "external-evidence",
     "research/transfer/workplan_packet.py": "external-evidence",
-    "research/transfer/tests/test_workplan_packet.py": "external-evidence"
+    "research/transfer/tests/test_workplan_packet.py": "external-evidence",
+    "scripts/install-dope.sh": "release-lead",
+    "scripts/uninstall-dope.sh": "release-lead",
+    "tests/vnext_dope_install.rs": "runtime-lead",
+    "docs/install.md": "release-lead"
   }
 }
