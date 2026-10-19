@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 667
-- **`keep-with-reason`**: 656 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 668
+- **`keep-with-reason`**: 657 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 11 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -106,6 +106,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `docs/whitepaper/scripts/v2_figures.py` | `docs/whitepaper/scripts` | `keep-with-reason` | Whitepaper reproducible build, LaTeX table/figure generation, and lint guard (`v2_figures`) | Requires matplotlib, Poppler/PIL image inspection, and Python research ledger readers for paper compilation. |
 | `docs/whitepaper/scripts/vnext_paper.py` | `docs/whitepaper/scripts` | `keep-with-reason` | Whitepaper reproducible build, LaTeX table/figure generation, and lint guard (`vnext_paper`) | Requires matplotlib, Poppler/PIL image inspection, and Python research ledger readers for paper compilation. |
 | `examples/healthcare-sim/demo.py` | `other` | `keep-with-reason` | Repository auxiliary script (`demo`) | Maintained in Python for tooling interoperability. |
+| `examples/public-regression/bikeshare-observational/controls.py` | `other` | `keep-with-reason` | Development-only Gaussian-copula and compressed-row-subset controls for the public Bikeshare observational smoke | Retained in the research harness: it uses NumPy/SciPy for comparator fitting and sampling, is exercised by the deterministic runner tests, and is not part of the Rust product runtime. |
 | `examples/public-regression/bikeshare-observational/run.py` | `other` | `keep-with-reason` | Repository auxiliary script (`run`) | Maintained in Python for tooling interoperability. |
 | `examples/public-regression/bikeshare-observational/test_runner.py` | `other` | `keep-with-reason` | Repository auxiliary script (`test_runner`) | Maintained in Python for tooling interoperability. |
 | `examples/public-regression/run.py` | `other` | `keep-with-reason` | Repository auxiliary script (`run`) | Maintained in Python for tooling interoperability. |
