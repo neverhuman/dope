@@ -2,7 +2,7 @@
 
 Prepare, compile, reload and isolated sampling execute real native code.
 Learners, drivers, Rust metric receipt and report stages remain separate work.
-Old v1 command plans remain read-only; their public-facade argv is not executed.
+Version 1 command plans remain read-only; their public-facade argv is not executed.
 """
 from __future__ import annotations
 
