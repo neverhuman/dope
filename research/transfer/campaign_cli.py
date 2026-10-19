@@ -1,4 +1,4 @@
-"""Redacted development planning/inspection CLI; native execution stays denied."""
+"""Redacted development CLI; signed native engineering only, no pilot/confirmation."""
 from __future__ import annotations
 
 import argparse
@@ -42,18 +42,37 @@ def _load(path, *, native_commands=False):
 
 def main(argv=None):
     parser = _Parser(description=__doc__)
-    parser.add_argument("command", choices=("plan", "inspect", "pilot", "confirm"))
+    parser.add_argument("command", choices=("plan", "inspect", "native", "pilot", "confirm"))
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--evidence-dir")
     parser.add_argument("--commands")
+    for flag in ("execution-plan", "admission", "public-key", "trusted-key-sha256"):
+        parser.add_argument("--" + flag)
     try:
         args = parser.parse_args(argv)
         if args.command in {"pilot", "confirm"}:
             raise CampaignRunnerError("native_execution_admission_not_connected")
         if args.commands is not None and args.command != "plan":
             raise CampaignRunnerError("command_plan_requires_plan")
+        native_fields = (args.execution_plan, args.admission, args.public_key, args.trusted_key_sha256)
+        if args.command == "native":
+            if not args.evidence_dir or not all(native_fields):
+                raise CampaignRunnerError("native_authorization_required")
+        elif any(native_fields):
+            raise CampaignRunnerError("native_arguments_require_native")
         spec = _load(args.manifest)
-        if args.command == "plan":
+        if args.command == "native":
+            from research.transfer.campaign_artifacts import read_regular
+            from research.transfer.campaign_execution import NativeExecutionPlan, execute_native
+            from research.transfer.evidence import EvidenceError, parse_json
+            try:
+                plan = NativeExecutionPlan.from_document(parse_json(read_regular(args.execution_plan)))
+            except EvidenceError:
+                raise CampaignRunnerError("native_plan_invalid") from None
+            result = execute_native(spec, plan, Path(args.evidence_dir), admission=args.admission,
+                                    public_key=args.public_key,
+                                    trusted_key_sha256=args.trusted_key_sha256)
+        elif args.command == "plan":
             result = spec.public_summary()
             if args.commands is not None:
                 commands = _load(args.commands, native_commands=True)
@@ -65,7 +84,7 @@ def main(argv=None):
             with StageJournal(Path(args.evidence_dir), spec, read_only=True) as journal:
                 result = journal.public_summary()
         print(json.dumps({"status": "ok", **result}, sort_keys=True))
-        return 0
+        return 0 if result.get("status", "ok") == "ok" else 2
     except CampaignRunnerError as error:
         print(json.dumps({"status": "refused", "reason": str(error)}, sort_keys=True))
         return 2
