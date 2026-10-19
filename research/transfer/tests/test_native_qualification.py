@@ -285,6 +285,51 @@ class NativeQualificationTests(unittest.TestCase):
                     expected_reviewer_id="reviewer-1",
                 )
 
+    def test_native_runner_runtime_closure_and_case_input_pin_verification(self):
+        from research.transfer import native_qualification_runtime as nqr
+        from research.transfer import run_native_qualification as rnq
+
+        self.assertEqual(rnq.RUNNER_FILE, Path(rnq.__file__).resolve())
+        self.assertEqual(nqr.RUNTIME_FILE, Path(nqr.__file__).resolve())
+        self.assertNotEqual(rnq.RUNNER_FILE, nqr.RUNTIME_FILE)
+        for mod_path in (
+            Path(nq.__file__).resolve(),
+            nqr.RUNTIME_FILE,
+            rnq.RUNNER_FILE,
+            Path(__file__).resolve(),
+        ):
+            self.assertLess(len(mod_path.read_text(encoding="utf-8").splitlines()), 500)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            inputs_dir = root / "inputs"
+            inputs_dir.mkdir(parents=True, exist_ok=True)
+            ctx_doc = {"feature_columns": ["f0"], "target_column": "y_reg", "rows": [{"f0": 1.0, "y_reg": 2.0}]}
+            qry_doc = {"feature_columns": ["f0"], "rows": [{"f0": 3.0}]}
+            rec_doc = {"allow_auto_download": False, "device": "cpu", "threads": 1, "n_estimators": 2, "seed": 42}
+            base = inputs_dir / "tabicl_v2_regression"
+            for suffix, doc in (("_context.json", ctx_doc), ("_query.json", qry_doc), ("_recipe.json", rec_doc)):
+                Path(str(base) + suffix).write_text(json.dumps(doc, sort_keys=True), encoding="utf-8")
+            case = {
+                "model": "tabicl_v2",
+                "task": "regression",
+                "context_sha256": nq.sha256_file(Path(str(base) + "_context.json")),
+                "query_sha256": nq.sha256_file(Path(str(base) + "_query.json")),
+                "recipe_sha256": nq.sha256_file(Path(str(base) + "_recipe.json")),
+            }
+            loaded_ctx, loaded_qry, loaded_rec = rnq._case_inputs(case, root)
+            self.assertEqual((loaded_ctx, loaded_qry, loaded_rec), (ctx_doc, qry_doc, rec_doc))
+            Path(str(base) + "_query.json").write_text(json.dumps({"rows": []}, sort_keys=True), encoding="utf-8")
+            with self.assertRaisesRegex(nq.QualificationError, "case_input_pin_mismatch"):
+                rnq._case_inputs(case, root)
+            worker_out = root / "worker-failed.json"
+            self.assertEqual(rnq._worker(case, root, worker_out), 1)
+            worker_receipt = json.loads(worker_out.read_text(encoding="utf-8"))
+            self.assertEqual(worker_receipt["status"], "failed")
+            self.assertEqual(worker_receipt["error_type"], "QualificationError")
+            self.assertEqual(worker_receipt["error"], "case_input_pin_mismatch")
+
 
 if __name__ == "__main__":
     unittest.main()
+
