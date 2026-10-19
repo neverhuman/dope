@@ -79,13 +79,56 @@ class HeroFigureTests(unittest.TestCase):
                 self.assertTrue(render.figure_bound_failures(self.rows, thresholds))
 
 
-    def test_interval_level_is_read_from_the_predeclaration(self):
+    def test_interval_level_is_read_from_the_predeclaration_and_refuses_label_only_changes(self):
+        from tools.claims import foundation
         predeclare = json.loads((ROOT / "research/benchmark/review_fixes/predeclare_v2.json").read_text())
         self.assertIn(f"percentile {render.interval_level()}% interval", predeclare["estimands"]["uncertainty"])
         status = json.loads((ROOT / "evidence/status.json").read_text())
-        card = render.text_outputs(self.data, status, 90)["paper/generated/readme-result-card.md"].decode()
+        for row in self.data["results"]:
+            if row.get("retention"):
+                meta = render.record_interval_metadata(row)
+                self.assertEqual(meta["level_pct"], 95)
+                self.assertEqual(meta["quantiles"], [0.025, 0.975])
+                self.assertEqual(meta["estimand"], "lineage_median_null_normalized_retention")
+        with self.assertRaisesRegex(ValueError, "interval_level_mismatch"):
+            render.text_outputs(self.data, status, 90)
+        with self.assertRaisesRegex(ValueError, "interval_level_mismatch"):
+            render.figure_outputs(self.csv, self.data["thresholds"], 90)
+
+        f95 = foundation.load_foundation_summary(ROOT, interval_level_pct=95)
+        f90 = foundation.load_foundation_summary(ROOT, interval_level_pct=90)
+        self.assertEqual(f90["interval_metadata"]["level_pct"], 90)
+        self.assertEqual(f90["interval_metadata"]["quantiles"], [0.05, 0.95])
+        self.assertEqual(f90["interval_metadata"]["method"], "nonparametric_lineage_percentile_bootstrap")
+        self.assertEqual(f90["interval_metadata"]["resampling_unit"], "lineage")
+        self.assertEqual(f90["interval_metadata"]["seed"], 20261005)
+        self.assertEqual(f90["interval_metadata"]["cohort_id"], "mfs-v3-foundation-97")
+        for aud_id in ("kumo_tabular_l", "tabicl2", "mitra_v2"):
+            m95 = f95["auditors"][aud_id]["methods"]["DOPE"]
+            m90 = f90["auditors"][aud_id]["methods"]["DOPE"]
+            self.assertEqual(m90["median"], m95["median"])
+            self.assertGreater(m90["lo"], m95["lo"])
+            self.assertLess(m90["hi"], m95["hi"])
+
+        data90 = json.loads(json.dumps(self.data))
+        for row in data90["results"]:
+            if row.get("retention"):
+                row["retention"]["interval_metadata"] = {
+                    "level_pct": 90,
+                    "quantiles": [0.05, 0.95],
+                    "method": "nested_cluster_lineage_fit_seed_bootstrap",
+                    "estimand": "lineage_median_null_normalized_retention",
+                    "resampling_unit": "cluster_lineage_fit_seed",
+                    "cohort_id": row["cohort"]["id"],
+                }
+        out90 = render.text_outputs(data90, status, 90, foundation_summary=f90)
+        card = out90["paper/generated/readme-result-card.md"].decode()
         self.assertIn("[historical 90% interval]", card)
-        svg = render.figure_outputs(self.csv, self.data["thresholds"], 90)["paper/generated/hero-frontier.svg"].decode()
+        kumo90 = f90["auditors"]["kumo_tabular_l"]["methods"]["DOPE"]
+        self.assertIn(f"[{100.0 * kumo90['lo']:.1f}%, {100.0 * kumo90['hi']:.1f}%]", card)
+        svg = render.figure_outputs(
+            out90["paper/generated/hero-frontier.csv"], data90["thresholds"], 90, foundation_summary=f90
+        )["paper/generated/hero-frontier.svg"].decode()
         self.assertIn("historical 90% interval", svg)
         self.assertNotIn("95%", (ROOT / "tools/claims/render.py").read_text(), "renderer types the interval level")
 

@@ -20,6 +20,8 @@ import statistics
 import sys
 from pathlib import Path
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[2]
 for _dir in (ROOT, ROOT / "docs/whitepaper/scripts"):
     if str(_dir) not in sys.path:
@@ -201,53 +203,100 @@ def validate_and_extract_mfs_receipt(receipt: dict) -> dict:
     }
 
 
-_FOUNDATION_SUMMARY_CACHE: dict[tuple[str, str, str], dict] = {}
+_FOUNDATION_SUMMARY_CACHE: dict[tuple[str, str, str, int], dict] = {}
 
 
-def load_foundation_summary(root: Path = ROOT) -> dict:
+def _bootstrap_interval(
+    values, *, level_pct: int = 95, salt: int = 0, estimand: str = "lineage_median_null_normalized_retention"
+) -> dict:
+    """Lineage-percentile bootstrap interval with explicit interval provenance metadata."""
+    if type(level_pct) is not int or not (50 <= level_pct <= 99):
+        raise ValueError(f"unsupported interval level_pct: {level_pct!r}")
+    tail = round((100 - level_pct) / 200.0, 6)
+    quantiles = [tail, round(1.0 - tail, 6)]
+    meta = {
+        "level_pct": level_pct,
+        "quantiles": quantiles,
+        "method": "nonparametric_lineage_percentile_bootstrap",
+        "estimand": estimand,
+        "resampling_unit": "lineage",
+        "draws": int(compute_panel.DRAWS),
+        "seed": int(compute_panel.SEED),
+        "cohort_id": "mfs-v3-foundation-97",
+    }
+    array = np.asarray(list(values), dtype=float)
+    array = np.sort(array[np.isfinite(array)])
+    n = int(array.size)
+    if n == 0:
+        return {"n": 0, "median": None, "lo": None, "hi": None, "interval_metadata": meta}
+    median = float(np.median(array))
+    if n == 1:
+        return {"n": 1, "median": median, "lo": median, "hi": median, "interval_metadata": meta}
+    local = compute_panel._generator(array, salt)
+    index = local.integers(0, n, size=(compute_panel.DRAWS, n))
+    samples = np.median(array[index], axis=1)
+    lo, hi = np.quantile(samples, quantiles)
+    return {"n": n, "median": median, "lo": float(lo), "hi": float(hi), "interval_metadata": meta}
+
+
+def load_foundation_summary(root: Path = ROOT, *, interval_level_pct: int = 95) -> dict:
     """Authenticate receipts and recompute the canonical historical foundation block."""
     receipt, mfs_sha = authenticate_source(MFS_RECEIPT_REL, root=root)
     v2_headline, v2_headline_sha = authenticate_source(V2_HEADLINE_REL, root=root)
     _, v2_panel_sha = authenticate_source(V2_PANEL_REL, root=root)
 
-    cache_key = (mfs_sha, v2_headline_sha, v2_panel_sha)
+    cache_key = (mfs_sha, v2_headline_sha, v2_panel_sha, int(interval_level_pct))
     if cache_key in _FOUNDATION_SUMMARY_CACHE:
         return copy.deepcopy(_FOUNDATION_SUMMARY_CACHE[cache_key])
 
     extracted = validate_and_extract_mfs_receipt(receipt)
     stored_summary = receipt.get("retention_summary") or {}
+    top_meta = _bootstrap_interval([0.5, 0.5], level_pct=interval_level_pct)["interval_metadata"]
 
     auditors_out: dict[str, dict] = {}
     for aud_id, aud_label in FOUNDATION_AUDITORS:
         maps = extracted["retention_maps"][aud_id]
         methods_summary: dict[str, dict] = {}
         for method in FOUNDATION_METHODS:
-            summary = compute_panel.summarize(maps[method].values())
+            summary = _bootstrap_interval(maps[method].values(), level_pct=interval_level_pct, salt=0)
             stored_m = ((stored_summary.get(aud_id) or {}).get("methods") or {}).get(method) or {}
             if stored_m.get("median") is not None and abs(float(stored_m["median"]) - summary["median"]) > 1e-9:
                 raise ValueError(f"recomputed {aud_id} {method} median disagrees with stored receipt")
+            if interval_level_pct == 95 and stored_m.get("lo") is not None:
+                if abs(float(stored_m["lo"]) - summary["lo"]) > 1e-9 or abs(float(stored_m["hi"]) - summary["hi"]) > 1e-9:
+                    raise ValueError(f"recomputed {aud_id} {method} 95% endpoints disagree with stored receipt")
             methods_summary[method] = summary
 
         pairs_summary: dict[str, dict] = {}
         for comp in FOUNDATION_COMPARATORS:
             pair = compute_panel.paired_test(maps["DOPE"], maps[comp], None, len(FOUNDATION_COMPARATORS))
+            keys = sorted(set(maps["DOPE"]) & set(maps[comp]))
+            left_b = _bootstrap_interval([maps["DOPE"][k] for k in keys], level_pct=interval_level_pct, salt=0)
+            right_b = _bootstrap_interval([maps[comp][k] for k in keys], level_pct=interval_level_pct, salt=0)
+            diff_b = _bootstrap_interval(
+                [maps["DOPE"][k] - maps[comp][k] for k in keys],
+                level_pct=interval_level_pct,
+                salt=1,
+                estimand="paired_lineage_retention_difference_median",
+            )
             stored_p = ((stored_summary.get(aud_id) or {}).get("pairs") or {}).get(comp) or {}
             if (
                 stored_p.get("median_difference") is not None
-                and abs(float(stored_p["median_difference"]) - pair["median_difference"]) > 1e-9
+                and abs(float(stored_p["median_difference"]) - diff_b["median"]) > 1e-9
             ):
                 raise ValueError(f"recomputed {aud_id} DOPE-{comp} paired difference disagrees with receipt")
             pairs_summary[comp] = {
                 "n": pair["n"],
-                "dope_median": pair["dope_median"],
-                "dope_lo": pair["dope_lo"],
-                "dope_hi": pair["dope_hi"],
-                "other_median": pair["other_median"],
-                "other_lo": pair["other_lo"],
-                "other_hi": pair["other_hi"],
-                "median_difference": pair["median_difference"],
-                "lo": pair["lo"],
-                "hi": pair["hi"],
+                "dope_median": left_b["median"],
+                "dope_lo": left_b["lo"],
+                "dope_hi": left_b["hi"],
+                "other_median": right_b["median"],
+                "other_lo": right_b["lo"],
+                "other_hi": right_b["hi"],
+                "median_difference": diff_b["median"],
+                "lo": diff_b["lo"],
+                "hi": diff_b["hi"],
+                "interval_metadata": diff_b["interval_metadata"],
                 "wins": pair["wins"],
                 "ties": pair["ties"],
                 "losses": pair["losses"],
@@ -311,6 +360,7 @@ def load_foundation_summary(root: Path = ROOT) -> dict:
         "qualification_state": "specified_unqualified",
         "pretraining_overlap_state": "unknown",
         "cross_model_driver_preservation": "unmeasured",
+        "interval_metadata": top_meta,
         "cohort": {
             "id": "mfs-v3-foundation-97",
             "n_lineages": EXPECTED_LINEAGE_COUNT,
@@ -378,6 +428,7 @@ def hero_six_bar_rows(summary: dict | None = None) -> list[dict]:
                 "retention_pct": 100.0 * float(m_stats["median"]),
                 "interval_lo_pct": 100.0 * float(m_stats["lo"]),
                 "interval_hi_pct": 100.0 * float(m_stats["hi"]),
+                "interval_metadata": copy.deepcopy(m_stats["interval_metadata"]),
                 "matched_artifact_bytes": int(round(float(b_stats["median"]))),
                 "paired_median_difference": float(pair["median_difference"]),
                 "paired_lo": float(pair["lo"]),
