@@ -105,12 +105,50 @@ def interval_level(root: Path = ROOT) -> int:
     return declared_facts.interval_level(declared_facts.read(declared_facts.PREDECLARE, root))
 
 
-def text_outputs(data: dict, status: dict, percent: int | None = None) -> dict[str, bytes]:
+def record_interval_metadata(row: dict) -> dict:
+    ret = row.get("retention")
+    if not isinstance(ret, dict):
+        return {}
+    if isinstance(ret.get("interval_metadata"), dict):
+        meta = dict(ret["interval_metadata"])
+        pct = meta.get("level_pct")
+        tail = round((100 - int(pct)) / 200.0, 6) if type(pct) is int else -1.0
+        if type(pct) is not int or meta.get("quantiles") != [tail, round(1.0 - tail, 6)]:
+            raise ValueError("interval_level_mismatch: invalid record interval_metadata quantiles")
+        return meta
+    match = re.search(r"_(\d+)_percent$", str(ret.get("interval_kind", "")))
+    if not match:
+        raise ValueError("interval_level_mismatch: missing interval_metadata or interval_kind")
+    pct = int(match.group(1))
+    tail = round((100 - pct) / 200.0, 6)
+    return {"level_pct": pct, "quantiles": [tail, round(1.0 - tail, 6)],
+            "method": "nested_cluster_lineage_fit_seed_bootstrap",
+            "estimand": "lineage_median_null_normalized_retention",
+            "resampling_unit": "cluster_lineage_fit_seed",
+            "cohort_id": (row.get("cohort") or {}).get("id")}
+
+
+def _bind_interval_level(percent: int | None, f_summary: dict, rows: list[dict] | None = None) -> int:
+    f_meta = f_summary.get("interval_metadata") or {}
+    f_pct = f_meta.get("level_pct")
+    resolved = (f_pct if type(f_pct) is int else interval_level()) if percent is None else percent
+    tail = round((100 - int(resolved)) / 200.0, 6) if type(resolved) is int else -1.0
+    if type(resolved) is not int or f_pct != resolved or f_meta.get("quantiles") != [tail, round(1.0 - tail, 6)]:
+        raise ValueError("interval_level_mismatch: label-only confidence level change without recomputed endpoints is refused")
+    for row in rows or ():
+        if row.get("retention") and record_interval_metadata(row).get("level_pct") != resolved:
+            raise ValueError("interval_level_mismatch: label-only confidence level change without recomputed endpoints is refused")
+    return resolved
+
+
+def text_outputs(
+    data: dict, status: dict, percent: int | None = None, *, foundation_summary: dict | None = None
+) -> dict[str, bytes]:
     failures = registry.validate_result_claims(data)
     if failures:
         raise ValueError("; ".join(failures))
-    percent = interval_level() if percent is None else percent
-    f_summary = foundation.load_foundation_summary()
+    f_summary = foundation.load_foundation_summary() if foundation_summary is None else foundation_summary
+    percent = _bind_interval_level(percent, f_summary, data.get("results", []))
     f_rows = foundation.foundation_table_rows(f_summary)
     table = [r"% Generated historical validation; separate cohorts; no TDL result.",
              r"\begingroup\scriptsize",
@@ -186,28 +224,17 @@ def text_outputs(data: dict, status: dict, percent: int | None = None) -> dict[s
     hero_writer.writeheader()
     for bar in foundation.hero_six_bar_rows(f_summary):
         hero_writer.writerow({
-            "id": f"{bar['auditor_id']}:{bar['method']}",
-            "auditor_id": bar["auditor_id"],
-            "auditor_display": bar["auditor_display"],
-            "method": bar["method"],
-            "method_display": bar["method_display"],
-            "artifact_bytes": bar["matched_artifact_bytes"],
-            "matched_artifact_bytes": bar["matched_artifact_bytes"],
-            "retention": f"{bar['retention']:.6f}",
-            "interval_lo": f"{bar['interval_lo']:.6f}",
-            "interval_hi": f"{bar['interval_hi']:.6f}",
-            "retention_pct": f"{bar['retention_pct']:.4f}",
-            "interval_lo_pct": f"{bar['interval_lo_pct']:.4f}",
-            "interval_hi_pct": f"{bar['interval_hi_pct']:.4f}",
-            "observed_lineages": bar["n_lineages"],
-            "prepared_lineages": bar["n_lineages"],
+            "id": f"{bar['auditor_id']}:{bar['method']}", "auditor_id": bar["auditor_id"],
+            "auditor_display": bar["auditor_display"], "method": bar["method"], "method_display": bar["method_display"],
+            "artifact_bytes": bar["matched_artifact_bytes"], "matched_artifact_bytes": bar["matched_artifact_bytes"],
+            "retention": f"{bar['retention']:.6f}", "interval_lo": f"{bar['interval_lo']:.6f}",
+            "interval_hi": f"{bar['interval_hi']:.6f}", "retention_pct": f"{bar['retention_pct']:.4f}",
+            "interval_lo_pct": f"{bar['interval_lo_pct']:.4f}", "interval_hi_pct": f"{bar['interval_hi_pct']:.4f}",
+            "observed_lineages": bar["n_lineages"], "prepared_lineages": bar["n_lineages"],
             "paired_median_difference": f"{bar['paired_median_difference']:.6f}",
-            "paired_lo": f"{bar['paired_lo']:.6f}",
-            "paired_hi": f"{bar['paired_hi']:.6f}",
-            "evidence_status": f_summary["evidence_status"],
-            "cohort_id": f_summary["cohort"]["id"],
-            "complete_budget_grid": "false",
-            "driver_gate": bar["cross_model_driver_preservation"],
+            "paired_lo": f"{bar['paired_lo']:.6f}", "paired_hi": f"{bar['paired_hi']:.6f}",
+            "evidence_status": f_summary["evidence_status"], "cohort_id": f_summary["cohort"]["id"],
+            "complete_budget_grid": "false", "driver_gate": bar["cross_model_driver_preservation"],
             "cohort_complete": "true",
         })
 
@@ -310,48 +337,31 @@ def _draw_foundation_hero(f_summary: dict, six_bars: list[dict], percent: int, *
     width_in, height_in = (5.60, 3.20) if profile == "paper" else (6.20, 3.54)
     base_pt = 9.5 if profile == "paper" else 10.3
     footer_pt = max(9.0, base_pt - 0.5)
-    matplotlib.rcParams.update({
-        "svg.hashsalt": "dope-historical-validation-v1",
-        "font.family": "DejaVu Sans",
-        "font.size": base_pt,
-    })
+    matplotlib.rcParams.update({"svg.hashsalt": "dope-historical-validation-v1", "font.family": "DejaVu Sans", "font.size": base_pt})
     figure, axis = plt.subplots(1, 1, figsize=(width_in, height_in))
     figure.subplots_adjust(left=0.19, right=0.950, top=0.76, bottom=0.28)
 
     y_positions = [5.10, 4.42, 3.10, 2.42, 1.10, 0.42]
     group_centers = [4.76, 2.76, 0.76]
     group_labels = [bar["auditor_display"] for bar in six_bars[::2]]
-    dope_bytes = six_bars[0]["matched_artifact_bytes"]
-    copula_bytes = six_bars[1]["matched_artifact_bytes"]
+    dope_bytes, copula_bytes = six_bars[0]["matched_artifact_bytes"], six_bars[1]["matched_artifact_bytes"]
 
     for y_pos, bar in zip(y_positions, six_bars):
         is_dope = bar["method"] == "DOPE"
-        color = "#2f6b25" if is_dope else "#7a7a7a"
-        hatch = "" if is_dope else "//"
-        val = bar["retention_pct"]
-        lo = bar["interval_lo_pct"]
-        hi = bar["interval_hi_pct"]
-        rect = axis.barh(
-            y_pos, val, height=0.54, color=color, edgecolor="#1a1a1a",
-            linewidth=0.85, zorder=2,
-        )[0]
+        color, hatch = ("#2f6b25", "") if is_dope else ("#7a7a7a", "//")
+        val, lo, hi = bar["retention_pct"], bar["interval_lo_pct"], bar["interval_hi_pct"]
+        rect = axis.barh(y_pos, val, height=0.54, color=color, edgecolor="#1a1a1a", linewidth=0.85, zorder=2)[0]
         if hatch:
             rect.set_hatch(hatch)
-        axis.errorbar(
-            val, y_pos, xerr=[[val - lo], [hi - val]], fmt="none",
-            ecolor="#111111", elinewidth=1.25, capsize=3.0, capthick=1.0, zorder=3,
-        )
+        axis.errorbar(val, y_pos, xerr=[[val - lo], [hi - val]], fmt="none",
+                      ecolor="#111111", elinewidth=1.25, capsize=3.0, capthick=1.0, zorder=3)
         label_text = f"{val:.1f}%"
         if hi <= 91.0:
-            axis.text(
-                hi + 1.2, y_pos, label_text, va="center", ha="left",
-                fontsize=base_pt - 0.1, fontweight="bold" if is_dope else "normal", color="#111111",
-            )
+            axis.text(hi + 1.2, y_pos, label_text, va="center", ha="left",
+                      fontsize=base_pt - 0.1, fontweight="bold" if is_dope else "normal", color="#111111")
         else:
-            axis.text(
-                max(2.0, lo - 1.2), y_pos, label_text, va="center", ha="right",
-                fontsize=base_pt - 0.1, fontweight="bold", color="#ffffff" if is_dope else "#111111",
-            )
+            axis.text(max(2.0, lo - 1.2), y_pos, label_text, va="center", ha="right",
+                      fontsize=base_pt - 0.1, fontweight="bold", color="#ffffff" if is_dope else "#111111")
 
     axis.set_xlim(0.0, 100.0)
     axis.set_xticks([0, 20, 40, 60, 80, 100])
@@ -359,42 +369,34 @@ def _draw_foundation_hero(f_summary: dict, six_bars: list[dict], percent: int, *
     axis.set_ylim(-0.15, 5.75)
     axis.set_yticks(group_centers)
     axis.set_yticklabels(group_labels, fontsize=base_pt + 0.1, fontweight="bold")
-    axis.set_xlabel(
-        f"Predictive transfer retention (0–100%, whiskers: historical {percent}% interval)",
-        fontsize=base_pt - 0.2, labelpad=4,
-    )
-    figure.suptitle(
-        f_summary["hero_title"],
-        x=0.50, y=0.958, ha="center", fontsize=base_pt + 0.8, fontweight="bold",
-    )
+    axis.set_xlabel(f"Predictive transfer retention (0–100%, whiskers: historical {percent}% interval)",
+                    fontsize=base_pt - 0.2, labelpad=4)
+    figure.suptitle(f_summary["hero_title"], x=0.50, y=0.958, ha="center", fontsize=base_pt + 0.8, fontweight="bold")
     axis.grid(axis="x", alpha=0.22, zorder=0)
     axis.spines["top"].set_visible(False)
     axis.spines["right"].set_visible(False)
 
     handles = [
-        Patch(facecolor="#2f6b25", edgecolor="#1a1a1a", linewidth=0.85,
-              label=f"DOPE ({dope_bytes:,} B)"),
-        Patch(facecolor="#7a7a7a", edgecolor="#1a1a1a", linewidth=0.85, hatch="//",
-              label=f"Gaussian copula ({copula_bytes:,} B)"),
+        Patch(facecolor="#2f6b25", edgecolor="#1a1a1a", linewidth=0.85, label=f"DOPE ({dope_bytes:,} B)"),
+        Patch(facecolor="#7a7a7a", edgecolor="#1a1a1a", linewidth=0.85, hatch="//", label=f"Gaussian copula ({copula_bytes:,} B)"),
     ]
     figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.54, 0.882), ncol=2,
                   fontsize=base_pt - 0.1, frameon=False, handlelength=1.5, columnspacing=1.6)
-    figure.text(
-        0.50, 0.018,
-        "Historical selection-exposed validation (97 lineages, 4n)\n"
-        "Cross-model feature-driver preservation: not yet measured",
-        ha="center", va="bottom", fontsize=footer_pt, color="#222222", linespacing=1.18,
-    )
+    figure.text(0.50, 0.018, "Historical selection-exposed validation (97 lineages, 4n)\n"
+                             "Cross-model feature-driver preservation: not yet measured",
+                ha="center", va="bottom", fontsize=footer_pt, color="#222222", linespacing=1.18)
     return figure, plt
 
 
-def figure_outputs(csv_bytes: bytes, thresholds: dict, percent: int | None = None) -> dict[str, bytes]:
-    percent = interval_level() if percent is None else percent
+def figure_outputs(
+    csv_bytes: bytes, thresholds: dict, percent: int | None = None, *, foundation_summary: dict | None = None
+) -> dict[str, bytes]:
+    f_summary = foundation.load_foundation_summary() if foundation_summary is None else foundation_summary
+    percent = _bind_interval_level(percent, f_summary)
     rows = list(csv.DictReader(io.StringIO(csv_bytes.decode())))
     failures = figure_bound_failures(rows, thresholds)
     if failures:
         raise ValueError("hero figure refuses out-of-axis values: " + "; ".join(failures))
-    f_summary = foundation.load_foundation_summary()
     six_bars = foundation.hero_six_bar_rows(f_summary)
     csv_failures = hero_csv_agreement_failures(rows, six_bars)
     if csv_failures:

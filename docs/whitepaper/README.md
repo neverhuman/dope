@@ -2,9 +2,14 @@
 
 **Frozen 2026-10-15 (T-111).** `dope-mfs.tex` and `supplement.tex` are the historical v2
 validation paper, *DOPE: Generative Compression of Predictive Structure*. They are kept
-reproducible and are not extended. The new manuscript is the TDL package in
-[`paper/`](../../paper/README.md). The review ledgers that used to sit here are in
-[`paper/archive/`](../../paper/archive/README.md).
+reproducible and are not extended. See the
+[**Historical Paper Errata (`WC01`)**](../archive/historical-paper-errata.md) for the
+producer-level clarification of the frozen paper's `driver_fidelity`
+(`0.905 [0.844, 0.922]` and `0.975` vs. `0.923`) as an absolute feature-target
+correlation proxy (`absolute_target_correlation`) rather than holdout
+permutation-importance agreement (`D80`, which remains `unmeasured`). The new manuscript
+is the TDL package in [`paper/`](../../paper/README.md). The review ledgers that used to
+sit here are in [`paper/archive/`](../../paper/archive/README.md).
 
 The paper reports DOPE against copula, tree, forest, neural and diffusion baselines on 100
 PMLB regression tables. The reported profile is the compact residual
@@ -32,7 +37,9 @@ an earlier, separate historical check and its scores are not pooled with v2.
 | `bash ops/ci/paper-clean.sh` | what CI runs: delete `generated/`, rebuild from committed inputs, and require a zero diff |
 
 One build writes four PDFs: `dope-mfs.pdf`, `supplement.pdf`, and the anonymous
-submission variants `dope-mfs-anonymous.pdf` and `supplement-anonymous.pdf`. Build
+submission variants `dope-mfs-anonymous.pdf` and `supplement-anonymous.pdf` (read
+with [`../archive/historical-paper-errata.md`](../archive/historical-paper-errata.md)
+for the `WC01` association-proxy erratum). Build
 evidence stays in the checkout's `target/paper-build/`.
 
 **Toolchain.**
