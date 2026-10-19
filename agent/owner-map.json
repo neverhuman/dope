@@ -672,6 +672,10 @@
     "scripts/install-dope.sh": "release-lead",
     "scripts/uninstall-dope.sh": "release-lead",
     "tests/vnext_dope_install.rs": "runtime-lead",
-    "docs/install.md": "release-lead"
+    "docs/install.md": "release-lead",
+    "research/transfer/campaign_admission.py": "external-evidence",
+    "schemas/pilot-execution-v1.schema.json": "governance",
+    "schemas/pilot-admission-v1.schema.json": "governance",
+    "research/transfer/tests/test_campaign_admission.py": "external-evidence"
   }
 }

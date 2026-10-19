@@ -1,0 +1,420 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dope.local/schemas/pilot-admission-v1.schema.json",
+  "description": "Metadata contract only; schema validity grants no execution, science, custody or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "operation",
+    "plan_sha256",
+    "pins",
+    "gates"
+  ],
+  "properties": {
+    "format": {
+      "const": "dope-pilot-admission-contract"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "operation": {
+      "const": "development_pilot"
+    },
+    "plan_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_commit",
+        "source_tree",
+        "environment_sha256",
+        "policy_sha256",
+        "schedule_sha256",
+        "operation_dag_sha256"
+      ],
+      "properties": {
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "environment_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policy_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schedule_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operation_dag_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observational_source_rights",
+        "mechanism_source_rights",
+        "model_rights_and_native_parity",
+        "source_ownership_and_collision_review",
+        "resource_budget_and_owner_admission",
+        "protected_owner_admission",
+        "modern_panel_and_scheduler_admission"
+      ],
+      "properties": {
+        "observational_source_rights": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "mechanism_source_rights": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "model_rights_and_native_parity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "source_ownership_and_collision_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "resource_budget_and_owner_admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "protected_owner_admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "modern_panel_and_scheduler_admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "accepted_for_operation",
+                "missing",
+                "rejected",
+                "scope_mismatch"
+              ]
+            },
+            "evidence_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "accepted_for_operation"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "evidence_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
