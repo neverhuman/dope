@@ -153,14 +153,15 @@ class TestP04WorkplanDashboard(unittest.TestCase):
             tasks = task_doc["tasks"]
             prog_doc = json.loads((PACKET_DIR / "progress.json").read_text())
             self.assertEqual(len(tasks), 65)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "done"), 60)
-            self.assertEqual(sum(1 for t in tasks if t["status"] == "blocked"), 5)
-            self.assertEqual(task_doc["summary_counts"]["done"], 60)
-            self.assertEqual(task_doc["summary_counts"]["blocked"], 5)
-            self.assertEqual(prog_doc["counts"]["done"], 60)
-            self.assertEqual(prog_doc["counts"]["blocked"], 5)
-            self.assertEqual(prog_doc["status_summary"]["done"], 60)
-            self.assertEqual(prog_doc["status_summary"]["blocked"], 5)
+            self.assertEqual(len({task["id"] for task in tasks}), 65)
+            counts = {state: sum(task["status"] == state for task in tasks)
+                      for state in ("done", "blocked", "todo", "backlog", "ready", "in_progress", "review")}
+            self.assertEqual(sum(counts.values()), 65)
+            for summary in (task_doc["summary_counts"], prog_doc["counts"], prog_doc["status_summary"]):
+                self.assertEqual(summary.get("total", 65), 65)
+                self.assertEqual({state: summary.get(state, 0) for state in counts}, counts)
+            self.assertEqual(sorted(prog_doc["blocked_tasks"]),
+                             sorted(task["id"] for task in tasks if task["status"] == "blocked"))
         check_dashboard_200("/")
 
 

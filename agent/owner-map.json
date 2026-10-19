@@ -662,6 +662,10 @@
     "research/transfer/campaign_runner.py": "external-evidence",
     "research/transfer/campaign_cli.py": "external-evidence",
     "research/transfer/tests/test_campaign_runner.py": "external-evidence",
-    "research/transfer/tests/test_campaign_cli.py": "external-evidence"
+    "research/transfer/tests/test_campaign_cli.py": "external-evidence",
+    "research/transfer/campaign_artifacts.py": "external-evidence",
+    "research/transfer/campaign_native.py": "external-evidence",
+    "research/transfer/campaign_execution.py": "external-evidence",
+    "research/transfer/tests/test_campaign_execution.py": "external-evidence"
   }
 }
