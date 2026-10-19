@@ -2647,7 +2647,7 @@
     },
     "research/transfer/tests/test_workplan_acceptance.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_acceptance -v",
-      "purpose": "verify durable workplan acceptance and deterministic CPU preflight gates without GPU or sealed data"
+      "purpose": "verify source/fixture coverage and CPU preflights; canonical packet qualification requires explicit admitted DOPE_PACKET_DIR, missing clean-checkout input is asserted and reported as not_run without ledger qualification"
     },
     "tools/claims/foundation.py": {
       "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
@@ -2684,6 +2684,14 @@
     "research/transfer/tests/test_campaign_execution.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_campaign_execution research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli -v",
       "purpose": "verify signed development-only native execution, pinned private snapshots, real native fixture compile/reload/isolated sample, budget reservations, refused tampering and redacted CLI; not empirical E03 or confirmation qualification"
+    },
+    "research/transfer/workplan_packet.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_packet -v",
+      "purpose": "verify explicit packet modes, typed missing/input/race refusals, honest not_run and pinned provisional ledger checks; fixtures never qualify canonical data/science/custody"
+    },
+    "research/transfer/tests/test_workplan_packet.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_workplan_packet -v",
+      "purpose": "verify explicit packet modes, typed missing/input/race refusals, honest not_run and pinned provisional ledger checks; fixtures never qualify canonical data/science/custody"
     }
   }
 }

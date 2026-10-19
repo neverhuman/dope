@@ -666,6 +666,8 @@
     "research/transfer/campaign_artifacts.py": "external-evidence",
     "research/transfer/campaign_native.py": "external-evidence",
     "research/transfer/campaign_execution.py": "external-evidence",
-    "research/transfer/tests/test_campaign_execution.py": "external-evidence"
+    "research/transfer/tests/test_campaign_execution.py": "external-evidence",
+    "research/transfer/workplan_packet.py": "external-evidence",
+    "research/transfer/tests/test_workplan_packet.py": "external-evidence"
   }
 }
