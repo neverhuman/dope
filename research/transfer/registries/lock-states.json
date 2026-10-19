@@ -63,7 +63,7 @@
     },
     {
       "path": "research/transfer/locks/kumo-tabular.json",
-      "sha256": "e3a2b6eb40849c506d36a1c3a217bb23873380376e2de5626bc97779c78d8a6b",
+      "sha256": "98a83fed35cc2c6ab67cfb0d22a1feebf0058f0a1e8b7a4aa789e2a248b16ae8",
       "legacy_format": "dope-kumo-lock-v1",
       "qualification": {
         "state": "specified",
@@ -123,7 +123,7 @@
     },
     {
       "path": "research/transfer/locks/other-auditors.json",
-      "sha256": "846bd50da0bea1743bda2ded83104d5b23bd2a91f100806c5befce67cdff616c",
+      "sha256": "8ad92b731750fe9ddcf5445c77f971fa8082e966be34c21e7a582be00b9cc006",
       "legacy_format": "dope-other-auditors-lock-v1",
       "qualification": {
         "state": "specified",
