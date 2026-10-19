@@ -230,6 +230,7 @@ def new_result(payload: dict[str, Any], checkpoint_receipt: dict[str, Any] | Non
     for case in payload["cases"]:
         cases.append({
             "model": case["model"], "task": case["task"],
+            "class_order": case["class_order"],
             "recipe_sha256": case["recipe_sha256"],
             "gates": {gate: {"status": "pending", "evidence_sha256": None} for gate in GATES},
         })
@@ -247,12 +248,13 @@ def new_result(payload: dict[str, Any], checkpoint_receipt: dict[str, Any] | Non
 
 
 def assess_result(result: dict[str, Any]) -> str:
-    """Return qualified only when all four task variants have complete Q0--Q9 evidence."""
+    """Require output parity as well as complete Q0--Q9 evidence for qualification."""
     cases = result.get("cases")
     if type(cases) is not list or len(cases) != 4:
         return "incomplete"
     expected = {(model, task) for model in MODEL_FILES for task in TASKS}
     found = set()
+    parity_all = True
     for case in cases:
         if type(case) is not dict or (case.get("model"), case.get("task")) not in expected:
             return "incomplete"
@@ -271,7 +273,39 @@ def assess_result(result: dict[str, Any]) -> str:
                         not review["reviewer_id"] or review["disposition"] != "accepted" or
                         not _SHA.fullmatch(str(review["receipt_sha256"]))):
                     return "incomplete"
-    return "qualified" if found == expected else "incomplete"
+            if gate == "Q2":
+                observation = evidence.get("observation")
+                if type(observation) is not dict or observation.get("native_checkpoint_loaded") is not True:
+                    return "incomplete"
+                parity_state = observation.get("adapter_output_parity")
+                if parity_state in (None, "not_established"):
+                    parity_all = False
+                    continue
+                if parity_state != "established":
+                    return "incomplete"
+                tolerance = observation.get("tolerance")
+                delta = observation.get("adapter_vs_sdk_max_abs_delta")
+                if (type(tolerance) not in (int, float) or tolerance < 0 or
+                        type(delta) not in (int, float) or delta < 0 or delta > tolerance or
+                        observation.get("adapter_output_sha256") != observation.get("sdk_output_sha256") or
+                        observation.get("adapter_output_shape") != observation.get("sdk_output_shape") or
+                        observation.get("adapter_class_order") != observation.get("sdk_class_order") or
+                        observation.get("class_order") != case.get("class_order") or
+                        observation.get("adapter_class_order") != case.get("class_order") or
+                        observation.get("recipe_sha256") != case.get("recipe_sha256") or
+                        not _SHA.fullmatch(str(observation.get("recipe_sha256", ""))) or
+                        not _SHA.fullmatch(str(observation.get("preprocessing_sha256", ""))) or
+                        not _SHA.fullmatch(str(observation.get("output_aggregation_sha256", ""))) or
+                        type(observation.get("seed")) is not int or
+                        observation.get("precision") != "float32"):
+                    return "incomplete"
+    if found != expected:
+        return "incomplete"
+    # A complete checkpoint-load review remains useful technical smoke evidence,
+    # but is deliberately distinct from official output parity qualification.
+    if not parity_all:
+        return "technical_smoke_reviewed"
+    return "qualified"
 
 
 def bind_independent_review(result_path: str | Path, review_path: str | Path,
@@ -353,9 +387,10 @@ def bind_independent_review(result_path: str | Path, review_path: str | Path,
         "receipt_sha256": actual_review_sha256,
     }
     result["status"] = assess_result(result)
-    if result["status"] != "qualified":
+    if result["status"] not in {"qualified", "technical_smoke_reviewed"}:
         raise QualificationError("q9_binding_incomplete")
-    result["blockers"] = []
+    result["blockers"] = ([] if result["status"] == "qualified" else
+                           ["official_adapter_sdk_output_parity_not_established"])
     # Scientific qualification and release authorization are separate gates.
     result["release_authorization"] = "not_authorized"
     output_path.parent.mkdir(parents=True, exist_ok=True)

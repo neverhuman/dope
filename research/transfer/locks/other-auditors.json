@@ -451,14 +451,20 @@
     }
   },
   "w01_native_qualification": {
-    "status": "q0_q9_qualified",
+    "status": "q0_q8_sdk_parity_established_pending_independent_q9_review",
     "capped_result_sha256": "5dc147539a19bfefb2588a629a39fde156fa98c5a2047dca4222af96dc245452",
     "q9_signoff_sha256": "5f9431b6a36199183c473bc71af58fd458ebda4979498c46fb3113e0d8bac5b3",
     "dependency_closure_sha256": "c78bd9d88a4e097ecfbcb84f2dd1560b3187cc7525212aaed5a72c03f26ca16a",
-    "qualified_result_sha256": "38e2f264d332a077ed6784d2ec07f6e1c4396bf93c49e56b9c97e4c4525937ad",
+    "parity_result_sha256": "97b4ff3e9788fab57fdca72252df4206dcf3b4af97ef470fa3a8b839e1a96a41",
+    "scope_correction_receipt_sha256": "9047b50dba383efbf1e1457f3cccd4aee0de14a43dec8b55a9bc8ecee5e1d8e8",
+    "technical_smoke_result_sha256": "676d1fe3918323aec4880496b01896713c617ef5c00d2dde7113351f9f40e577",
+    "superseded_overstated_result_sha256": "38e2f264d332a077ed6784d2ec07f6e1c4396bf93c49e56b9c97e4c4525937ad",
     "reviewer_id": "300394.dope_gemini",
+    "q9_signoff_scope": "accepted_review_of_capped_smoke_result_only; parity result review pending",
     "release_authorization": "not_authorized",
-    "q2_scope": "checkpoint_identity_and_strict_load_only; official output parity not established",
-    "adapter_output_parity": "not_established"
+    "q2_scope": "actual adapter compared with pinned direct vendor SDK on all four signed cases",
+    "adapter_output_parity": "established",
+    "all_four_max_abs_delta": 0.0,
+    "all_four_output_hashes_match": true
   }
 }
