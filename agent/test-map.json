@@ -2652,6 +2652,22 @@
     "tools/claims/foundation.py": {
       "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
       "purpose": "authenticate canonical historical foundation receipts, matched charged artifact bytes, and driver correlation proxy reducers"
+    },
+    "research/transfer/campaign_runner.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli research.transfer.tests.test_scheduler -v",
+      "purpose": "verify immutable development-run specs, exact scheduler rosters, durable charged interruptions, corruption and replay refusal, FIFO/symlink/ownership boundaries and redacted read-only CLI; no native execution or scientific qualification"
+    },
+    "research/transfer/campaign_cli.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli research.transfer.tests.test_scheduler -v",
+      "purpose": "verify immutable development-run specs, exact scheduler rosters, durable charged interruptions, corruption and replay refusal, FIFO/symlink/ownership boundaries and redacted read-only CLI; no native execution or scientific qualification"
+    },
+    "research/transfer/tests/test_campaign_runner.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli research.transfer.tests.test_scheduler -v",
+      "purpose": "verify immutable development-run specs, exact scheduler rosters, durable charged interruptions, corruption and replay refusal, FIFO/symlink/ownership boundaries and redacted read-only CLI; no native execution or scientific qualification"
+    },
+    "research/transfer/tests/test_campaign_cli.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli research.transfer.tests.test_scheduler -v",
+      "purpose": "verify immutable development-run specs, exact scheduler rosters, durable charged interruptions, corruption and replay refusal, FIFO/symlink/ownership boundaries and redacted read-only CLI; no native execution or scientific qualification"
     }
   }
 }
