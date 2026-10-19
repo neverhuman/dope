@@ -2708,6 +2708,22 @@
     "docs/install.md": {
       "command": "cargo test --locked --test vnext_dope_install",
       "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
+    },
+    "research/transfer/campaign_admission.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_admission -v",
+      "purpose": "verify immutable bounded pilot plan/admission metadata, exact source/runtime/policy/roster bindings, uint64 hex seeds, controls/stages/counts and safe refusals; accepted declarations never authenticate evidence or authorize scientific execution"
+    },
+    "schemas/pilot-execution-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_admission -v",
+      "purpose": "verify immutable bounded pilot plan/admission metadata, exact source/runtime/policy/roster bindings, uint64 hex seeds, controls/stages/counts and safe refusals; accepted declarations never authenticate evidence or authorize scientific execution"
+    },
+    "schemas/pilot-admission-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_admission -v",
+      "purpose": "verify immutable bounded pilot plan/admission metadata, exact source/runtime/policy/roster bindings, uint64 hex seeds, controls/stages/counts and safe refusals; accepted declarations never authenticate evidence or authorize scientific execution"
+    },
+    "research/transfer/tests/test_campaign_admission.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_campaign_admission -v",
+      "purpose": "verify immutable bounded pilot plan/admission metadata, exact source/runtime/policy/roster bindings, uint64 hex seeds, controls/stages/counts and safe refusals; accepted declarations never authenticate evidence or authorize scientific execution"
     }
   }
 }
