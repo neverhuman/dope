@@ -2668,6 +2668,22 @@
     "research/transfer/tests/test_campaign_cli.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_campaign_runner research.transfer.tests.test_campaign_cli research.transfer.tests.test_scheduler -v",
       "purpose": "verify immutable development-run specs, exact scheduler rosters, durable charged interruptions, corruption and replay refusal, FIFO/symlink/ownership boundaries and redacted read-only CLI; no native execution or scientific qualification"
+    },
+    "research/transfer/native_qualification.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify signed W01 admission, native SDK/adapter parity evidence accounting, independent review binding, split runtime origins and inert CLI help through full offline discovery; fixtures do not qualify native models or authorize campaigns"
+    },
+    "research/transfer/run_native_qualification.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify signed W01 admission, native SDK/adapter parity evidence accounting, independent review binding, split runtime origins and inert CLI help through full offline discovery; fixtures do not qualify native models or authorize campaigns"
+    },
+    "research/transfer/native_qualification_runtime.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify signed W01 admission, native SDK/adapter parity evidence accounting, independent review binding, split runtime origins and inert CLI help through full offline discovery; fixtures do not qualify native models or authorize campaigns"
+    },
+    "research/transfer/tests/test_native_qualification.py": {
+      "command": "python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v",
+      "purpose": "verify signed W01 admission, native SDK/adapter parity evidence accounting, independent review binding, split runtime origins and inert CLI help through full offline discovery; fixtures do not qualify native models or authorize campaigns"
     }
   }
 }

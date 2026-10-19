@@ -662,6 +662,10 @@
     "research/transfer/campaign_runner.py": "external-evidence",
     "research/transfer/campaign_cli.py": "external-evidence",
     "research/transfer/tests/test_campaign_runner.py": "external-evidence",
-    "research/transfer/tests/test_campaign_cli.py": "external-evidence"
+    "research/transfer/tests/test_campaign_cli.py": "external-evidence",
+    "research/transfer/native_qualification.py": "external-evidence",
+    "research/transfer/run_native_qualification.py": "external-evidence",
+    "research/transfer/native_qualification_runtime.py": "external-evidence",
+    "research/transfer/tests/test_native_qualification.py": "external-evidence"
   }
 }
