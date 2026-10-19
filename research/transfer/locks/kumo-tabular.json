@@ -98,5 +98,16 @@
     "api": "huggingface_hub.snapshot_download(repo_id=checkpoint.repo, revision=checkpoint.revision, local_dir=executor_cache, allow_patterns=declared_files)",
     "after_fetch": "verify all local bytes and exact license texts; record complete dependency closure and independent native parity; then immutable offline executor with network denied",
     "status": "not performed; no checkpoint or license compatibility claimed"
+  },
+  "w01_native_qualification": {
+    "status": "q0_q9_qualified",
+    "capped_result_sha256": "5dc147539a19bfefb2588a629a39fde156fa98c5a2047dca4222af96dc245452",
+    "q9_signoff_sha256": "5f9431b6a36199183c473bc71af58fd458ebda4979498c46fb3113e0d8bac5b3",
+    "dependency_closure_sha256": "c78bd9d88a4e097ecfbcb84f2dd1560b3187cc7525212aaed5a72c03f26ca16a",
+    "qualified_result_sha256": "38e2f264d332a077ed6784d2ec07f6e1c4396bf93c49e56b9c97e4c4525937ad",
+    "reviewer_id": "300394.dope_gemini",
+    "release_authorization": "not_authorized",
+    "q2_scope": "checkpoint_identity_and_strict_load_only; official output parity not established",
+    "adapter_output_parity": "not_established"
   }
 }
