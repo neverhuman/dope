@@ -7,9 +7,9 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 684
-- **`keep-with-reason`**: 665 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
-- **`port-candidate`**: 19 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
+- **Total tracked `.py` files**: 686
+- **`keep-with-reason`**: 666 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **`port-candidate`**: 20 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
 ## PR #276 (`paper/q01-figures`) Added / Modified Python Scope
@@ -604,6 +604,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/native_qualification_runtime.py` | `research/transfer` | `keep-with-reason` | Offline official SDK and DOPE auditor-adapter parity runtime | Invokes Python-native model ecosystems and NumPy/pandas under separately admitted W01 execution; execution alone grants no registry admission. |
 | `research/transfer/objectives.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`objectives`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/pilot_admission.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`pilot_admission`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
+| `research/transfer/pilot_runner.py` | `research/transfer` | `port-candidate` | Signed 8-stage pilot cell execution bridge | Orchestrates native prepare/compile/reload/sample and worker response contracts under StageJournal accounting; pipeline_complete stays false pending real control artifacts, materialized n/4n draws and bound learner/driver/metric implementations. Migrate with admission and receipt parity. |
 | `research/transfer/power.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`power`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/precommit.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`precommit`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/privacy/accountant.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`accountant`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
@@ -667,6 +668,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/tests/test_objectives.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_objectives`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_other_auditors.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_other_auditors`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_pilot_admission.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_pilot_admission`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
+| `research/transfer/tests/test_pilot_runner.py` | `research/transfer` | `keep-with-reason` | 8-stage pilot execution bridge and refusal regression tests | Tests Python 8-stage pilot orchestration and admission-gate refusals directly; synthetic fixtures are separate from scientific qualification. |
 | `research/transfer/tests/test_precommit.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_precommit`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_privacy.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_privacy`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_privacy_attacks.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_privacy_attacks`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
