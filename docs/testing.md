@@ -15,6 +15,9 @@ raw-schema, raw-workflow, artifact-only, installer, byte-allocation, native
 successor, public-demo, and frozen-geometry binding Rust integration suites.
 Hosted CPU retains full
 locked Cargo test discovery, which also executes every one of these suites.
+Local check also executes `vnext_bundle` and `vnext_bundle_isolation`, including
+real source-free workers linked to the current mixed rlib/cdylib Cargo artifact.
+It never selects a stale hashed kernel library from a reused target directory.
 Local check and hosted Cargo discovery also retain `vnext_interactions`, the
 seven development fixtures for the recovered equal-term-tariff interaction
 helper. Its 12/24/48/adaptive comparison charges term fields, not complete

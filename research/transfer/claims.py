@@ -11,7 +11,7 @@ import math
 import re
 
 from .evidence import EvidenceError, canonical_json, parse_json
-from .lineage import assert_public_provenance
+from .lineage import LineageError, assert_public_provenance
 from .statistics import interval_decision
 
 
@@ -446,10 +446,8 @@ def verify_claim_graph(document, receipts, expected):
     body["projection_sha256"] = hashlib.sha256(canonical_json(body)).hexdigest()
     try:
         assert_public_provenance(body)
-    except Exception as exc:
-        if type(exc) is ClaimError:
-            raise
-        _fail("unsafe_label")
+    except LineageError:
+        raise ClaimError("unsafe_label") from None
     return VerifiedClaimGraph(body, _TOKEN)
 
 

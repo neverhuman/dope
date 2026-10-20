@@ -87,6 +87,13 @@ fn worker() -> &'static Path {
                 .max_by_key(|p| fs::metadata(p).unwrap().modified().unwrap())
                 .unwrap()
         };
+        // Mixed rlib/cdylib builds emit this exact Cargo artifact name.
+        // A hashed rlib may be an unrelated stale build in a reused target.
+        let kernel_rlib = deps.join("libdope_kernel.rlib");
+        assert!(
+            kernel_rlib.is_file(),
+            "current Cargo kernel rlib is missing"
+        );
         let source = suite().join("worker.rs");
         fs::write(&source, WORKER).unwrap();
         let out = suite().join("worker");
@@ -98,7 +105,7 @@ fn worker() -> &'static Path {
             .arg("-L")
             .arg(format!("dependency={}", deps.display()))
             .arg("--extern")
-            .arg(format!("dope_kernel={}", find("libdope_kernel-").display()))
+            .arg(format!("dope_kernel={}", kernel_rlib.display()))
             .arg("--extern")
             .arg(format!("serde_json={}", find("libserde_json-").display()))
             .arg("--extern")

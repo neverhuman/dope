@@ -682,6 +682,7 @@
     "rust/control_isolation_ffi.rs": "rust-core",
     "research/transfer/tdl/control_boundary.py": "external-evidence",
     "research/transfer/tdl/control_isolated_worker.py": "external-evidence",
-    "research/transfer/tests/test_control_boundary.py": "external-evidence"
+    "research/transfer/tests/test_control_boundary.py": "external-evidence",
+    "tests/vnext_bundle_isolation.rs": "rust-core"
   }
 }
