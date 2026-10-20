@@ -259,3 +259,13 @@ packet input hashes, executed source/tree/environment and budget. Keep the actua
 packet and validator output private; do not commit or upload them to public CI.
 The required `just check` and all five remote gates remain; no test fixture is a
 substitute for the real packet or independent review.
+
+## Confined numeric control worker
+
+Transfer discovery retains `research.transfer.tests.test_control_boundary`. Its
+mandatory setup builds the own-checkout Rust cdylib with `cargo build --locked
+--lib`, then tests real dedicated Linux x86_64 confine/read/seal execution and
+source/FD/network/exec denial, finite exact output and redacted failure paths.
+The focused command is `PYTHONPATH=. python3 -B -m unittest
+research.transfer.tests.test_control_boundary -v`. This is public synthetic source
+proof only, separate from runtime deployment, full learner or scientific admission.

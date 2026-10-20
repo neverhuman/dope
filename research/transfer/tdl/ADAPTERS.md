@@ -86,3 +86,26 @@ sampler even when the source schema/header places the target first.
 New numeric controls require the declared CSV header and resolve its permutation
 by exact schema names before applying canonical output order. Duplicate, missing,
 extra or wrong-width columns are refused; historical literal controls are unchanged.
+
+## Dedicated confined numeric control worker
+
+The explicit research `sample_control` API starts a fresh dedicated worker with
+caller-admitted runtime pins. A versioned Rust cdylib ABI invokes the existing
+Landlock/confined-read boundary, then the existing sampling-only TSYNC filter.
+The artifact is read only inside the private bundle between those phases. The
+ABI is argument-free and refuses unsupported platforms; Linux x86_64 is required.
+This API is not automatically selected by the legacy generator/tracing interface.
+
+Runtime source and DSO snapshots, the interpreter and the cold dependency closure
+are hash-bound separately from artifact bytes. The caller must deploy and admit
+that runtime with exclusive trusted ownership; matching hashes do not defeat a
+malicious same-UID writer or grant input rights. Runtime and invocation bytes are
+charged in addition to the complete artifact. Samples stay private f64le stdout;
+only a matching finite sample stream, redacted completion and successful exit are
+accepted. Startup and execution errors are static refusal codes.
+
+Tests use actual fresh processes for both controls, repeated seeds, source-file
+removal, denied source/bundle reads after sealing, closed inherited descriptors,
+and network/exec denials. They also retain actual missing-artifact, corrupt runtime,
+symlink/FIFO/bomb, malformed output and startup redaction refusals. These fixture
+proofs do not qualify a full comparator, E03 pilot, custody, E06 or release.
