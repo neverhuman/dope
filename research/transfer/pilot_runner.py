@@ -204,7 +204,8 @@ def _record_pilot_stage(journal, cell_id, stage, wall_ms, ram_limit, fn):
         row = {"stage": stage, "status": "failed", "reason": str(error), "wall_ms": wall_ms}
         journal.finish(cell_id, stage, "failed", observed_wall_ms=wall_ms, peak_ram_bytes=0)
         return row, None, None
-    status = "completed" if outcome["status"] == "completed" else "failed"
+    status = ("completed" if outcome["status"] == "completed" else
+              "over_budget" if outcome["status"] == "over_budget" else "failed")
     if outcome["wall_ms"] > wall_ms or outcome["peak_ram_bytes"] > ram_limit:
         status = "over_budget"
     row = {
@@ -212,7 +213,7 @@ def _record_pilot_stage(journal, cell_id, stage, wall_ms, ram_limit, fn):
         "wall_ms": outcome["wall_ms"], "peak_ram_bytes": outcome["peak_ram_bytes"],
         "returncode": outcome["returncode"],
     }
-    for key in ("stdout_sha256", "stderr_sha256"):
+    for key in ("stdout_sha256", "stderr_sha256", "resource_scope"):
         if key in outcome:
             row[key] = outcome[key]
     if artifact_sha is not None:
@@ -258,9 +259,12 @@ def _stage_command(paths, plan, stage):
 def execute_pilot_cell(
     spec: CampaignRunSpec, pilot_plan: PilotExecutionPlan, admission_contract: dict,
     cell_plan: PilotCellExecutionPlan, evidence_dir: Path, *,
-    admission, public_key, trusted_key_sha256: str,
+    admission, public_key, trusted_key_sha256: str, worker_runtime=None,
 ) -> dict:
     """Execute one admitted 8-stage pilot cell with durable StageJournal reservations."""
+    if worker_runtime is not None:
+        from .pilot_worker_runtime import PilotWorkerRuntime
+        _require(type(worker_runtime) is PilotWorkerRuntime, "pilot_worker_runtime_invalid")
     root = private_root(evidence_dir)
     cell_plan.verify_binding(spec, pilot_plan, admission_contract)
     auth = _verify_pilot_authorization(
@@ -305,6 +309,11 @@ def execute_pilot_cell(
         def prepare():
             nonlocal paths
             paths = _snapshot_pilot_inputs(root, doc)
+            if worker_runtime is not None:
+                try:
+                    worker_runtime.bind(spec, cell_plan, auth, paths)
+                except (ValueError, TypeError, LookupError, RuntimeError, OSError):
+                    raise CampaignRunnerError("pilot_worker_binding_invalid") from None
             return run_step(paths["binary"], ["doctor"], "doctor")
 
         def sample_pair():
@@ -349,7 +358,15 @@ def execute_pilot_cell(
                     "wall_ms": int((time.monotonic() - start) * 1000 + 1),
                     "peak_ram_bytes": max(o["peak_ram_bytes"] for o in outcomes)}, manifest, compiled_sha
 
+        def bound_stage(stage):
+            # One runtime boundary owns validation and failure telemetry.
+            # The existing journal independently refuses undisposed operations.
+            return worker_runtime.stage(
+                stage, journal, cell_plan, paths, root, compiled_sha, draw_manifest_sha256)
+
         def learners():
+            if worker_runtime is not None:
+                return bound_stage("learners")
             def verify_inputs():
                 _require(all(file_hash(paths[key]) == doc[key + "_sha256"]
                              for key in ("csv", "schema", "selection_csv", "query_csv")),
@@ -378,15 +395,15 @@ def execute_pilot_cell(
             ("sample", sample_pair if doc["version"] == 2 else
              lambda: run_step(*_stage_command(paths, cell_plan, "sample"), "sample", compiled_sha)),
             ("learners", learners),
-            ("drivers", lambda: run_step(paths["worker"], [
+            ("drivers", lambda: bound_stage("drivers") if worker_runtime is not None else run_step(paths["worker"], [
                 "drivers", "--learners-evidence", str(paths["learners"]),
                 "--query-csv", str(paths["query_csv"]), "--driver-seed", str(doc["driver_seed"]),
             ], "drivers", compiled_sha, paths["drivers"])),
-            ("receipt", lambda: run_step(paths["worker"], [
+            ("receipt", lambda: bound_stage("receipt") if worker_runtime is not None else run_step(paths["worker"], [
                 "receipt", "--artifact", str(paths["artifact"]),
                 "--learners-evidence", str(paths["learners"]), "--drivers-evidence", str(paths["drivers"]),
             ], "receipt", compiled_sha, paths["receipt"])),
-            ("report", lambda: run_step(paths["worker"], [
+            ("report", lambda: bound_stage("report") if worker_runtime is not None else run_step(paths["worker"], [
                 "report", "--stage-receipt", str(paths["receipt"]),
             ], "report", compiled_sha, paths["report"])),
         )
@@ -415,9 +432,15 @@ def execute_pilot_cell(
         "candidate": doc["candidate"], "byte_budget": doc["byte_budget"],
         "processes_executed": processes, "stages": stage_rows, "journal": summary,
         "bridge_stages_complete": ok, "pipeline_complete": False,
+        "fixture_validation_complete": bool(ok and worker_runtime is not None and worker_runtime.kind == "fixture"),
+        "learner_driver_runtime": ("fixture" if worker_runtime.kind == "fixture" else "development")
+        if worker_runtime is not None else "external_worker_response_only",
         "pipeline_prerequisites": [p for p in PIPELINE_PREREQUISITES if not
                                    (p == "materialized_primary_and_4n_draw_handoff" and draw_manifest_sha256
-                                    and any(r["stage"] == "sample" and r["status"] == "completed" for r in stage_rows))],
+                                    and any(r["stage"] == "sample" and r["status"] == "completed" for r in stage_rows))
+                                   and not (p == "bound_learner_driver_metric_runtime_implementation"
+                                            and worker_runtime is not None and ok
+                                            and worker_runtime.development_admission_used)],
         "scientific_admission": False, "scientific_qualification": "unmeasured",
         "release_authorization": "not_authorized",
     }

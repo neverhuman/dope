@@ -289,7 +289,7 @@ automatic retry is supplied.
 
 ## Materialized development pilot draws
 
-Run `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v`. Version 2 pilot cells encode all native seeds as explicit 16-digit uint64 hex strings and bind a distinct `sample_4n` stream. The DOPE sample stage executes both native binary draws under one existing journal reservation and cumulative wall allowance, then passes the private pinned manifest to the learner worker. The real native fixture produces both streams and stops at the absent learner worker. Version 1 decoding and safe-integer Pool identities remain unchanged. Control receipt verification includes its real confined ABI and complete closure byte charge; a version 2 control cell requires further typed runtime wiring and currently refuses. These source fixtures do not qualify the full learner/control roster, eight-stage E03 results, confirmation, custody or release.
+Run `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v`. Version 2 pilot cells encode all native seeds as explicit 16-digit uint64 hex strings and bind a distinct `sample_4n` stream. The DOPE sample stage executes both native binary draws under one existing journal reservation and cumulative wall allowance, then passes the private pinned manifest to the learner worker. The compatibility native fixture produces both streams and stops when no learner worker is supplied; the trusted parent worker fixture below continues through actual fixture learner and driver calls. Version 1 decoding and safe-integer Pool identities remain unchanged. Control receipt verification includes its real confined ABI and complete closure byte charge; a version 2 control cell requires further typed runtime wiring and currently refuses. These source fixtures do not qualify the full learner/control roster, eight-stage E03 results, confirmation, custody or release.
 
 The private materialized-draws v2 manifest retains the original pinned schema bytes. Receipt columns are compared in order with the Rust public-column projection of that schema, including opaque IDs, roles, dtypes and mask states; matching column counts alone refuse. Source names/domains remain private. The focused tests also exceed the SAMPLE allowance during the second draw and persistence, assert the retained outputs and terminal over-budget journal state, and prevent learner start or replay. Earlier unmerged v1 draw manifests without schema bytes refuse this new format; historical cell plans, product artifacts and receipts are unchanged.
 
@@ -301,8 +301,70 @@ The pilot v2 private draw API currently supports DOPE only. Decode, direct const
 
 Development `LearningExecution` and direct prediction refuse without a matching live reservation. The planner covers the full learner roster and, in streaming mode, the existing permutation routine's actual baseline and perturbation keys. Every Mitra prediction prospectively reserves eight child fits and a conservative 400-update envelope (eight times the pinned 50-step cap), including all driver calls. The previously observed 329 updates are not execution evidence for a later call. Requested native attempts are retained; uninstrumented completed fit/update observations remain null. The guard checks finite call membership and wall observations; the admitted outer executor and native runtime still enforce process/resource limits. This is trusted in-process Python control flow, not an OS isolation boundary or a subprocess-worker deployment.
 
-The pilot learner argv now includes the private captured fit CSV, schema and both exact byte pins, separately from selection/query inputs. It does not supply the missing packaged full learner/driver worker or qualify typed controls, complete eight-stage E03 execution, model rights, independent reproduction, custody, confirmation or release. Existing historical stage records remain readable; all failures and cumulative reservations remain charged.
+The pilot learner argv now includes the private captured fit CSV, schema and both exact byte pins, separately from selection/query inputs. The external argv route alone does not provide a full learner/driver worker. The trusted parent capsule route below connects those libraries without transporting or reconstructing the live guard. Neither route alone qualifies typed controls, eight-stage scientific E03 execution, model rights, independent reproduction, custody, confirmation or release. Existing historical stage records remain readable; all failures and cumulative reservations remain charged.
 
 After a newly interrupted physical reservation, the trusted parent may call `record_interrupted_operations` with an actual interruption receipt and a required verifier. The existing journal fsyncs an interruption disposition: every physical outcome is **unknown**, including operations whose private child records were never durably reconciled. It retains the full reservation and permits a terminal interrupted stage after reopen, including another crash between disposition and finish. It grants no guard, retry, refund or reconstruction of old work. Unknown effects require actual owner reconciliation before re-execution. This API concerns the newly created development operation journal; historical custody HOLDs and missing records remain untouched.
 
-The physical guard is currently wired to the in-process learning API only; the external `pilot_runner` learner command does not yet consume this graph. The 400-update number is a prospective reservation, not a directly instrumented optimizer-update runtime limit. Native update observations remain null. Actual packaged-worker transport, child/update instrumentation and independently accepted resource/cost evidence remain required before claiming E03 physical execution is qualified.
+The physical guard is wired to the in-process learning API and the optional trusted parent `PilotWorkerRuntime` route. The compatibility external learner command does not consume this graph. The 400-update number is a prospective reservation, not a directly instrumented optimizer-update runtime limit. Native update observations remain null. Actual packaged-worker transport, child/update instrumentation and independently accepted resource/cost evidence remain required before claiming E03 physical execution is qualified.
+
+## Trusted parent pilot worker
+
+`PilotWorkerRuntime` connects `execute_pilot_cell(..., worker_runtime=worker)`
+to the existing learner execution, metric reducers and streamed permutation
+drivers. For this route the signed cell's `worker_binary` names a private
+configuration capsule, rather than an external executable. Write
+`worker.capsule()` before freezing/signing the cell; its SHA binds repository
+modules, the full learner/null registry, original driver stream, physical wall
+allocations and `WorkerAuthority`. The authority's source commitment is
+`identity({"source_commit": spec.source_commit, "source_tree": spec.source_tree})`;
+its input pin is the cell's input digest, which excludes the capsule and avoids
+a signature cycle. The parent checks current rights/resource bindings before
+native work. Required executor verifiers authenticate the supplied source, role,
+owner and resource evidence; constructing hashes or using fixture callbacks
+never grants development or scientific admission.
+
+Private physical membership records bind the exact fit/selection/query CSVs and
+reject overlapping units even when their row IDs differ. Contexts may supply
+exact ordered row IDs or the `dope-pilot-private-context-indices-v1` format. The
+latter pins ordered row indices before draw identities exist; it performs no
+search or selection after the draw. Actual resulting IDs and targets are kept
+only in private operation evidence. Numeric regression is the supported input
+shape; missing or nonfinite values refuse without echoing source text.
+
+The existing journal reserves learners before assembly/model entry, then
+suballocates the complete physical learning and permutation DAG. Drivers run
+while each fitted model is retained, without refits; their physical costs are
+charged to learners. The subsequent driver stage commits the retained evidence.
+Receipts distinguish parent lifetime RSS upper bounds from unmeasured child or
+GPU peaks. Native failures retain attempts, partial predictions and not-run
+slots; a response or count never grants statistical or independent acceptance.
+Capsule replay, missing role admission and insufficient parent allowance refuse.
+
+Run `PYTHONPATH=. python3 -B -m unittest
+research.transfer.tests.test_pilot_worker_runtime
+research.transfer.tests.test_pilot_worker_inputs
+research.transfer.tests.test_driver_seed_uint64 -v` (on one command line). The
+end-to-end fixture executes the real Rust compile/reload/isolated n/4n sampler
+and fixture learners across all sixty paths. It does not run vendor weights,
+qualify either control producer, open a sealed holdout, or complete E03–E06.
+
+Fixture execution keeps the development-runtime prerequisite and reports
+`fixture_validation_complete` separately. Unexpected callback/runtime exceptions
+produce static failed-stage records when the journal can durably settle. A failed
+physical settlement/fsync remains pending and charged for actual owner disposition;
+it cannot be disguised as a finished failure. Physical units may repeat within
+one partition (repeated measurements); they may never cross fit/selection/query
+roles. Row counts do not establish independent sample counts or statistical power.
+
+The trusted parent pilot worker treats contract/value, shape/type/lookup, arithmetic,
+callback/runtime and I/O failures as a single failed stage. The parent journal
+records that terminal state only after physical operations have settled; failure
+handling performs no auxiliary file write. Unclassified exceptions and interrupts
+leave the original reservation pending for owner diagnosis. They do not receive a
+retry, budget refund or successful fallback. The runtime fixtures exercise both
+publication I/O failure and this unresolved-reservation behavior.
+
+The signed parent-worker authority declares a canonical fulluint64 learner seed
+independently of the cell compiler fit seed. Both streams remain traceable in
+private assembly evidence. Development mode authenticates the existing owner
+learner stream and fixed recipe; matching an arbitrary seed hash is insufficient.

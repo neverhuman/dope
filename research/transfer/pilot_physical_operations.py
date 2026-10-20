@@ -299,7 +299,7 @@ def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, dr
                             return 0.0
                         permutation_importance(record, tuple(zip(*plan.query.rows)), dict(driver_plan.groups),
                                                learner_id=registration.role, query_population=plan.query.sha256,
-                                               seed=driver_plan.seed, repeats=driver_plan.repeats)
+                                               seed=driver_plan.native_seed, repeats=driver_plan.repeats)
                     aliases.append({"logical_key": identity({"scale": scale, "learner": learner,
                                     "context": context.name, "arm": arm}), "operations": operations})
     graph = PhysicalOperationGraph.from_document({"format": FORMAT, "learning_plan_sha256": plan.sha256,

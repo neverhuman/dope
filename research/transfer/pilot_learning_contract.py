@@ -209,13 +209,13 @@ class QueryLabels:
 class DriverPlan:
     groups: tuple  # (opaque group ID, tuple of feature indices)
     repeats: int
-    seed: int
+    seed: int | str  # legacy safe integer or canonical explicit-hex-uint64-v1
     protocol_sha256: str
 
     def __post_init__(self):
         pin(self.protocol_sha256)
         count(self.repeats, 1)
-        count(self.seed)
+        self.native_seed  # validate without replacing the historical wire representation
         require(type(self.groups) is tuple and bool(self.groups))
         require(len({name for name, _ in self.groups}) == len(self.groups))
         for name, indices in self.groups:
@@ -223,6 +223,14 @@ class DriverPlan:
             require(type(indices) is tuple and bool(indices) and len(set(indices)) == len(indices))
             for index in indices:
                 count(index)
+
+    @property
+    def native_seed(self):
+        """Decode the exact permutation stream without truncating uint64."""
+        if type(self.seed) is str:
+            from .campaign_admission import seed_uint64
+            return seed_uint64(self.seed)
+        return count(self.seed)
 
     @property
     def sha256(self):

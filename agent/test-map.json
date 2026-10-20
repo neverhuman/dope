@@ -2804,6 +2804,30 @@
     "research/transfer/tests/test_pilot_physical_operations.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_physical_operations research.transfer.tests.test_campaign_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_runner -v",
       "purpose": "verify actual 60-path fixture/streamed-driver physical DAG keys, durable existing-stage suballocation, finite calls, alias charges, crash/replay/fsync/overrun refusals and pinned fit-only worker inputs; no scientific or native vendor qualification"
+    },
+    "research/transfer/pilot_worker_inputs.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/pilot_worker_authority.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/pilot_worker_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/tests/test_pilot_worker_inputs.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/tests/test_pilot_worker_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/tests/test_driver_seed_uint64.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
     }
   }
 }
