@@ -119,7 +119,7 @@ def execute_drivers(execution, labels, plan):
                     return value
                 native = permutation_importance(loss, tuple(zip(*query.rows)), dict(plan.groups),
                                                 learner_id=registration.role, query_population=query.sha256,
-                                                seed=plan.seed, repeats=plan.repeats)
+                                                seed=plan.native_seed, repeats=plan.repeats)
                 require(len(calls) == 1 + len(plan.groups) * plan.repeats)
                 record.update(status="completed", result=native,
                               applicability={"mass": "descriptive", "rank": "descriptive",

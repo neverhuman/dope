@@ -105,7 +105,7 @@ def permutation_importance(loss, columns, groups, *, learner_id: str, query_popu
                            seed: int, repeats: int = 16) -> dict:
     if not isinstance(learner_id, str) or not learner_id or not isinstance(query_population, str) or not query_population:
         raise ValueError("driver evidence requires a learner and query population")
-    if type(seed) is not int or seed < 0 or type(repeats) is not int or repeats < 1:
+    if type(seed) is not int or not 0 <= seed < (1 << 64) or type(repeats) is not int or repeats < 1:
         raise ValueError("invalid permutation budget")
     if not isinstance(groups, dict) or not groups:
         raise ValueError("invalid logical group")
