@@ -314,7 +314,8 @@ def execute_pilot_cell(
             from .pilot_materialized_draws import DrawSpec, decode_draw, store_pair
             start = time.monotonic()
             wall = doc["stage_wall_ms"]["sample"]
-            schema = parse_json(read_regular(paths["schema"]))
+            schema_raw = read_regular(paths["schema"])
+            schema = parse_json(schema_raw)
             _require(type(schema) is dict and type(schema.get("columns")) is list,
                      "pilot_schema_invalid")
             draws, outcomes = [], []
@@ -338,7 +339,8 @@ def execute_pilot_cell(
                                      doc[key], compiled_sha, doc["schema_sha256"],
                                      cell_plan.input_sha256, doc["byte_budget"])
                 draws.append(decode_draw(read_regular(root / (label + ".stdout")),
-                                         read_regular(root / (label + ".stderr")), spec_draw))
+                                         read_regular(root / (label + ".stderr")), spec_draw,
+                                         schema_document=schema_raw))
             _require(file_hash(paths["binary"], MAX_BINARY) == doc["binary_sha256"],
                      "pilot_sample_input_modified")
             manifest = store_pair(root, *draws, artifact=paths["artifact"])
@@ -404,7 +406,8 @@ def execute_pilot_cell(
         "processes_executed": processes, "stages": stage_rows, "journal": summary,
         "bridge_stages_complete": ok, "pipeline_complete": False,
         "pipeline_prerequisites": [p for p in PIPELINE_PREREQUISITES if not
-                                   (p == "materialized_primary_and_4n_draw_handoff" and draw_manifest_sha256)],
+                                   (p == "materialized_primary_and_4n_draw_handoff" and draw_manifest_sha256
+                                    and any(r["stage"] == "sample" and r["status"] == "completed" for r in stage_rows))],
         "scientific_admission": False, "scientific_qualification": "unmeasured",
         "release_authorization": "not_authorized",
     }
