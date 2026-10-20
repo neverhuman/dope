@@ -6,6 +6,7 @@ execute workers or grant scientific/release authority.
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import os
 import re
@@ -112,6 +113,35 @@ def _atomic_write(path, document):
         os.close(descriptor)
 
 
+def _atomic_create(path, document):
+    """Create only a new ledger; preserve existing or uncertain evidence."""
+    path = Path(path)
+    payload = canonical_json(document)
+    descriptor = parent = None
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        except FileExistsError:
+            _fail("execution_ledger_exists")
+        remaining = memoryview(payload)
+        while remaining:
+            written = os.write(descriptor, remaining)
+            if written <= 0:
+                _fail("execution_ledger_write_uncertain")
+            remaining = remaining[written:]
+        os.fsync(descriptor)
+        parent = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        os.fsync(parent)
+    except OSError:
+        raise ExecutionError("execution_ledger_write_uncertain") from None
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+        if parent is not None:
+            os.close(parent)
+
+
 def _validate_attempt(attempt):
     required = {"attempt_id", "run_id", "cell_id", "parent_attempt_id", "original_failure",
                 "retry_authorized", "status", "requested_rows", "produced_rows", "provided_rows",
@@ -147,7 +177,7 @@ def _validate_attempt(attempt):
             or any(type(pins[key]) is not str or not _HEX.fullmatch(pins[key])
                    for key in ("toolchain_sha256", "command_sha256", "budget_sha256"))):
         _fail("invalid_run_pins")
-    return dict(attempt)
+    return copy.deepcopy(attempt)
 
 
 class CampaignSchedule:
@@ -161,8 +191,9 @@ class CampaignSchedule:
                                      "context_policies": context_policies}
         self.resource_caps = resource_caps or {}
         self.attempts = []
+        self._persistence_failed = False
         self._validate_caps(self.resource_caps)
-        self._write()
+        _atomic_create(self.path, self.document())
 
     @staticmethod
     def _validate_caps(caps):
@@ -179,6 +210,8 @@ class CampaignSchedule:
         _atomic_write(self.path, self.document())
 
     def append_attempt(self, attempt):
+        if getattr(self, "_persistence_failed", False):
+            _fail("ledger_write_uncertain")
         attempt = _validate_attempt(attempt)
         if attempt["cell_id"] not in {cell["cell_id"] for cell in self.roster}:
             _fail("unknown_campaign_cell")
@@ -197,18 +230,38 @@ class CampaignSchedule:
                 _fail("original_failure_changed")
         elif attempt["parent_attempt_id"] is not None or attempt["retry_authorized"]:
             _fail("retry_parent_missing")
-        self._enforce_caps(attempt)
-        self.attempts.append(attempt)
-        if not getattr(self, "_loading", False):
-            self._write()
+        loading = getattr(self, "_loading", False)
+        if not loading:
+            # A retained overrun is a terminal budget breach, including after reload.
+            for recorded in self.attempts:
+                self._enforce_caps(recorded)
+        previous = self.attempts
+        self.attempts = [*previous, attempt]
+        if not loading:
+            persisted = False
+            try:
+                self._write()
+                persisted = True
+            except OSError:
+                raise ExecutionError("ledger_write_uncertain") from None
+            finally:
+                if not persisted:
+                    # The replace/fsync outcome may be unknown. No implicit replay.
+                    self.attempts = previous
+                    self._persistence_failed = True
+            # A measured terminal outcome must be saved before signalling its overrun.
+            self._enforce_caps(attempt)
 
-    def _enforce_caps(self, attempt):
+    def _caps_exceeded(self, attempt):
         fields = {"wall_ms": "wall_ms", "cpu_ms": "cpu_ms", "gpu_ms": "gpu_ms",
                   "residency_ms": "residency_ms", "peak_ram_bytes": "peak_ram_bytes",
                   "peak_vram_bytes": "peak_vram_bytes", "disk_bytes": "disk_bytes"}
-        for cap, field in fields.items():
-            if cap in self.resource_caps and attempt[field] > self.resource_caps[cap]:
-                _fail("resource_cap_exceeded")
+        return any(cap in self.resource_caps and attempt[field] > self.resource_caps[cap]
+                   for cap, field in fields.items())
+
+    def _enforce_caps(self, attempt):
+        if self._caps_exceeded(attempt):
+            _fail("resource_cap_exceeded")
 
     def guard_live_resources(self, usage, stop_owned_job):
         """Stop the owned process immediately when a measured cap is crossed."""
@@ -229,6 +282,9 @@ class CampaignSchedule:
         return {key: item[key] for key in ("requested_rows", "produced_rows", "provided_rows", "consumed_rows")}
 
     def complete(self, accepted=None):
+        if (getattr(self, "_persistence_failed", False)
+                or any(self._caps_exceeded(item) for item in self.attempts)):
+            return False
         latest = {}
         for item in self.attempts:
             latest[item["cell_id"]] = item
@@ -251,6 +307,7 @@ class CampaignSchedule:
         schedule.path = Path(path)
         schedule.roster, schedule.policies = value["roster"], value["policies"]
         schedule.resource_caps, schedule.attempts = value["resource_caps"], []
+        schedule._persistence_failed = False
         schedule._loading = True
         cls._validate_caps(schedule.resource_caps)
         # Replay validation against an in-memory ledger; no action is reissued.
@@ -265,7 +322,7 @@ class DurableSchedule:
     def __init__(self, path, sources):
         self.path = Path(path)
         self.sources, self.attempts = self._partition(sources, [])
-        self._write()
+        _atomic_create(self.path, self.document())
 
     @staticmethod
     def _partition(sources, attempts):
