@@ -59,6 +59,7 @@ fn run(command: Command) -> Result<()> {
             artifact,
             rows,
             seed,
+            private_samples_f64le,
         } => {
             let bytes = dope_kernel::typed_data::workflow::read_raw_artifact(&artifact)?;
             let mut inspection = dope_kernel::typed_data::workflow::inspect_raw(&bytes)?;
@@ -76,15 +77,42 @@ fn run(command: Command) -> Result<()> {
             dope_kernel::typed_data::isolation::seal_sampling_process()?;
             let samples =
                 dope_kernel::typed_data::workflow::sample_raw_detailed(&bytes, rows, Some(seed))?;
+            let columns = inspection.schema.len();
+            let output_bytes = rows
+                .checked_mul(columns)
+                .filter(|count| *count == samples.values.len())
+                .and_then(|count| count.checked_mul(std::mem::size_of::<f64>()))
+                .ok_or_else(|| DopeError::Data("sampling_output_shape_invalid".into()))?;
             let encoded = samples
                 .values
                 .iter()
                 .flat_map(|v| v.to_le_bytes())
                 .collect::<Vec<_>>();
-            println!(
-                "{}",
-                serde_json::json!({"state":"sampled","isolation":"linux_x86_64_seccomp_tsync_default_deny","inherited_source_fds":"closed","filesystem_network_exec":"denied","rows":rows,"seed":seed,"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),"runtime_inventory":runtime,"inspection":inspection,"integer_rounding_repairs":samples.integer_rounding_repairs,"boolean_rounding_repairs":samples.boolean_rounding_repairs,"physical_domain_rejections":samples.physical_domain_rejections})
-            );
+            if encoded.len() != output_bytes {
+                return Err(DopeError::Data("sampling_output_shape_invalid".into()));
+            }
+            let mut receipt = serde_json::json!({"state":"sampled","isolation":"linux_x86_64_seccomp_tsync_default_deny","inherited_source_fds":"closed","filesystem_network_exec":"denied","rows":rows,"seed":seed,"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),"runtime_inventory":runtime,"inspection":inspection,"integer_rounding_repairs":samples.integer_rounding_repairs,"boolean_rounding_repairs":samples.boolean_rounding_repairs,"physical_domain_rejections":samples.physical_domain_rejections});
+            if private_samples_f64le {
+                use std::io::Write;
+                receipt["private_sample_stream"] = serde_json::json!({
+                    "format":"f64le", "layout":"row_major",
+                    "column_order":"features_then_target", "rows":rows,
+                    "columns":columns, "bytes":output_bytes
+                });
+                let mut public_bytes = serde_json::to_vec(&receipt)?;
+                public_bytes.push(b'\n');
+                let write_failed = |_| DopeError::Data("sampling_output_write_failed".into());
+                // A partial stream has no completion receipt and is never valid.
+                // Consumers must also require a successful exit, length and digest.
+                let mut private = std::io::stdout().lock();
+                private.write_all(&encoded).map_err(write_failed)?;
+                private.flush().map_err(write_failed)?;
+                let mut public = std::io::stderr().lock();
+                public.write_all(&public_bytes).map_err(write_failed)?;
+                public.flush().map_err(write_failed)?;
+            } else {
+                println!("{receipt}");
+            }
         }
         Command::InspectDevelopmentPilot {
             plan,

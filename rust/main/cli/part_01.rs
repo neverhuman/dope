@@ -124,6 +124,10 @@ enum Command {
         rows: usize,
         #[arg(long, default_value_t = 1729)]
         seed: u64,
+        /// Emit private row-major f64 little-endian bytes on stdout and the
+        /// redacted receipt on stderr. Accept only on successful process exit.
+        #[arg(long)]
+        private_samples_f64le: bool,
     },
     /// Print the immutable release identity and contract digests.
     Version {
