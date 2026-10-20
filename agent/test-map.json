@@ -2732,6 +2732,22 @@
     "research/transfer/tests/test_pilot_runner.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_pilot_runner -v",
       "purpose": "verify signed pilot bridge response contracts, shared native ABI with exact candidate, admission and scope refusals, durable reservations and redacted receipts; echoed worker success never marks the pipeline complete or qualifies science"
+    },
+    "rust/control_isolation_ffi.rs": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
+      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
+    },
+    "research/transfer/tdl/control_boundary.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
+      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
+    },
+    "research/transfer/tdl/control_isolated_worker.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
+      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
+    },
+    "research/transfer/tests/test_control_boundary.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
+      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
     }
   }
 }

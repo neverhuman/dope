@@ -9,6 +9,7 @@ build = "build.rs"
 [lib]
 name = "dope_kernel"
 path = "rust/lib.rs"
+crate-type = ["rlib", "cdylib"]
 
 [[bin]]
 name = "dope"

@@ -9,6 +9,7 @@ pub mod certification;
 pub mod codec;
 pub mod compiler;
 pub mod contract;
+pub mod control_isolation_ffi;
 pub mod corpus;
 pub mod data;
 pub mod deep_campaign;

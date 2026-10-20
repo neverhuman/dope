@@ -7,9 +7,9 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 686
-- **`keep-with-reason`**: 666 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
-- **`port-candidate`**: 20 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
+- **Total tracked `.py` files**: 689
+- **`keep-with-reason`**: 667 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **`port-candidate`**: 22 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
 ## PR #276 (`paper/q01-figures`) Added / Modified Python Scope
@@ -627,6 +627,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/tdl/aggregate.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`aggregate`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/tdl/charge.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`charge`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/tdl/common.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`common`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
+| `research/transfer/tdl/control_boundary.py` | `research/transfer` | `port-candidate` | Pinned dedicated control-worker launch and output validation | Deterministic deployment and receipt boundary; migrate launcher/validation into Rust after parity, reusing the existing Rust sandbox. |
+| `research/transfer/tdl/control_isolated_worker.py` | `research/transfer` | `port-candidate` | Fresh confined control-artifact reload and sampling worker | Reuses existing Rust isolation and Python numerical control routines; native control decoding/sampling is the eventual migration target. |
 | `research/transfer/tdl/drivers.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`drivers`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/tdl/frontier.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`frontier`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
 | `research/transfer/tdl/generators.py` | `research/transfer` | `keep-with-reason` | Empirical ML benchmark, transfer evaluation, or baseline comparator module (`generators`) | Interfaces directly with Python-only ML libraries (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN/TabICL, PyTorch) outside the Rust kernel. |
@@ -646,6 +648,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/tests/test_campaign_execution.py` | `research/transfer` | `keep-with-reason` | Signed engineering bridge and optional real native fixture tests | Tests Python orchestration directly; optional synthetic native evidence is separate from scientific qualification. |
 | `research/transfer/tests/test_campaign_runner.py` | `research/transfer` | `keep-with-reason` | Python development-journal crash, mutation, budget and file-boundary regressions | Tests this experimental Python orchestration boundary and scheduler directly; retain until equivalent native migration fixtures cover the same failures. |
 | `research/transfer/tests/test_claims.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_claims`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
+| `research/transfer/tests/test_control_boundary.py` | `research/transfer` | `keep-with-reason` | Real dedicated control-worker isolation and refusal tests | Retain direct Python harness tests until equivalent native positive/negative and error-redaction coverage is established. |
 | `research/transfer/tests/test_controls.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_controls`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_cpu_smoke_lane.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_cpu_smoke_lane`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
 | `research/transfer/tests/test_dp_accountant.py` | `research/transfer` | `keep-with-reason` | Research harness and scientific acceptance test module (`test_dp_accountant`) | Validates Python ML auditor wrappers (CatBoost, LightGBM, XGBoost, scikit-learn, TabPFN) and empirical evaluation pipelines. |
