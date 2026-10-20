@@ -63,6 +63,13 @@ class DrawSpec:
         return int(self.seed_hex, 16)
 
 
+def _require_supported(spec):
+    _require(type(spec) is DrawSpec, "invalid_draw_binding")
+    # The real control producer supplies no authenticated PublicColumn schema.
+    # Do not accept a width-only receipt or an invented optional schema field.
+    _require(spec.method == "dope", "pilot_v2_control_runtime_unavailable")
+
+
 def _native_json(raw):
     # Native receipts may contain uint64 seeds. Preserve their original bytes;
     # do not relax or feed those integers into the finite-json-v1 codec.
@@ -172,69 +179,46 @@ class MaterializedDraw:
 
 def decode_draw(raw, native_receipt, spec, *, schema_document, control_request=None):
     """Verify stream shape and its receipt; producer origin remains an owner gate."""
-    _require(type(spec) is DrawSpec, "invalid_draw_binding")
-    if control_request is not None:
-        from .tdl.control_boundary import canonical
-        _require(type(control_request) is dict, "draw_control_binding_mismatch")
-        try:
-            control_request = canonical(control_request)
-        except (ValueError, TypeError):
-            raise CampaignRunnerError("draw_control_binding_mismatch") from None
+    _require_supported(spec)
+    _require(control_request is None, "draw_receipt_mismatch")
     return MaterializedDraw(spec, raw, native_receipt, schema_document, control_request)
 
 
 def _validate_draw(result):
     spec, raw, native_receipt = result.spec, result.raw, result.native_receipt
+    _require_supported(spec)
     expected_schema = _schema_projection(result.schema_document, spec)
     report = _native_json(native_receipt)
     _require(report.get("state") == "sampled" and type(report.get("rows")) is int
              and report["rows"] == spec.rows and type(report.get("seed")) is int
              and report["seed"] == spec.seed and report.get("sample_sha256") == result.sample_sha256,
              "draw_receipt_mismatch")
-    if spec.method == "dope":
-        _require(result.control_request is None, "draw_receipt_mismatch")
-        expected = {"format": "f64le", "layout": "row_major", "column_order": "features_then_target",
-                    "rows": spec.rows, "columns": spec.columns, "bytes": len(raw)}
-        stream, inspection = report.get("private_sample_stream"), report.get("inspection")
-        _require(type(stream) is dict and stream == expected and
-                 all(type(stream[k]) is int for k in ("rows", "columns", "bytes")),
-                 "draw_receipt_mismatch")
-        _require(report.get("filesystem_network_exec") == "denied"
-                 and report.get("inherited_source_fds") == "closed"
-                 and report.get("isolation") == "linux_x86_64_seccomp_tsync_default_deny",
-                 "draw_boundary_unverified")
-        _require(type(inspection) is dict and inspection.get("schema") == expected_schema,
-                 "draw_schema_mismatch")
-        accounting = inspection.get("accounting")
-        _require(type(accounting) is dict and type(accounting.get("complete_sampling_bytes")) is int
-                 and 0 < accounting["complete_sampling_bytes"] <= spec.byte_budget,
-                 "draw_artifact_over_budget")
-    else:
-        # Reuse the real confined control worker's entire ABI/closure contract.
-        from .tdl.control_boundary import validate_output
-        control_request = _native_json(result.control_request)
-        if "schema" in report:
-            _require(report["schema"] == expected_schema, "draw_schema_mismatch")
-        _require(type(control_request) is dict and control_request.get("method") == spec.method
-                 and control_request.get("artifact_sha256") == spec.artifact_sha256
-                 and type(control_request.get("rows")) is int and control_request["rows"] == spec.rows
-                 and type(control_request.get("seed")) is int and control_request["seed"] == spec.seed,
-                 "draw_control_binding_mismatch")
-        try:
-            validate_output(0, raw, native_receipt, control_request)
-        except (ValueError, KeyError, TypeError, OSError):
-            raise CampaignRunnerError("draw_control_binding_mismatch") from None
-        _require(type(report.get("columns")) is int and report["columns"] == spec.columns
-                 and type(report.get("sampling_closure_bytes")) is int
-                 and 0 < report["sampling_closure_bytes"] <= spec.byte_budget,
-                 "draw_artifact_over_budget")
+    _require(result.control_request is None, "draw_receipt_mismatch")
+    expected = {"format": "f64le", "layout": "row_major", "column_order": "features_then_target",
+                "rows": spec.rows, "columns": spec.columns, "bytes": len(raw)}
+    stream, inspection = report.get("private_sample_stream"), report.get("inspection")
+    _require(type(stream) is dict and stream == expected and
+             all(type(stream[k]) is int for k in ("rows", "columns", "bytes")),
+             "draw_receipt_mismatch")
+    _require(report.get("filesystem_network_exec") == "denied"
+             and report.get("inherited_source_fds") == "closed"
+             and report.get("isolation") == "linux_x86_64_seccomp_tsync_default_deny",
+             "draw_boundary_unverified")
+    _require(type(inspection) is dict and inspection.get("schema") == expected_schema,
+             "draw_schema_mismatch")
+    accounting = inspection.get("accounting")
+    _require(type(accounting) is dict and type(accounting.get("complete_sampling_bytes")) is int
+             and 0 < accounting["complete_sampling_bytes"] <= spec.byte_budget,
+             "draw_artifact_over_budget")
 
 
 def store_pair(directory, primary, sensitivity, *, artifact):
     """Persist two distinct already-executed draws, once; never invoke sampling."""
-    root = private_root(directory)
     _require(type(primary) is MaterializedDraw and type(sensitivity) is MaterializedDraw,
              "invalid_materialized_draw")
+    _require_supported(primary.spec)
+    _require_supported(sensitivity.spec)
+    root = private_root(directory)
     left, right = primary.spec, sensitivity.spec
     _require((left.scale, right.scale) == SCALES and right.rows == left.rows * 4
              and left.seed_hex != right.seed_hex, "draw_pair_mismatch")
@@ -248,8 +232,7 @@ def store_pair(directory, primary, sensitivity, *, artifact):
     _validate_draw(sensitivity)
     for draw in (primary, sensitivity):
         report = _native_json(draw.native_receipt)
-        charged_artifact = (report["inspection"]["accounting"]["complete_sampling_bytes"]
-                            if draw.spec.method == "dope" else _native_json(draw.control_request)["artifact_bytes"])
+        charged_artifact = report["inspection"]["accounting"]["complete_sampling_bytes"]
         _require(type(charged_artifact) is int and charged_artifact == len(artifact_raw),
                  "draw_artifact_charge_mismatch")
     dest = root / "materialized-draws"
@@ -268,9 +251,6 @@ def store_pair(directory, primary, sensitivity, *, artifact):
         entry = {"spec": asdict(draw.spec), "sample_sha256": draw.sample_sha256,
                  "receipt_sha256": hashlib.sha256(draw.native_receipt).hexdigest(),
                  "row_ids_sha256": hashlib.sha256(ids).hexdigest()}
-        if draw.control_request is not None:
-            create_private(dest / (name + ".request.json"), draw.control_request, 0o400)
-            entry["request_sha256"] = hashlib.sha256(draw.control_request).hexdigest()
         entries.append(entry)
     _require(file_hash(artifact) == left.artifact_sha256, "draw_artifact_changed")
     manifest = {"format": FORMAT, "draws": entries, "execution_or_scientific_admission": False}
@@ -296,9 +276,8 @@ def load_pair(directory, expected_manifest_sha256, *, artifact):
             spec = DrawSpec(**entry["spec"])
         except (TypeError, KeyError):
             raise CampaignRunnerError("invalid_draw_manifest") from None
+        _require_supported(spec)
         keys = {"spec", "sample_sha256", "receipt_sha256", "row_ids_sha256"}
-        if spec.method != "dope":
-            keys.add("request_sha256")
         _require(set(entry) == keys and spec.scale == expected_scale, "invalid_draw_manifest")
         _require(file_hash(artifact) == spec.artifact_sha256, "draw_artifact_changed")
         data = read_regular(dest / (expected_scale + ".f64le"))
@@ -307,16 +286,9 @@ def load_pair(directory, expected_manifest_sha256, *, artifact):
         _require(hashlib.sha256(data).hexdigest() == entry.get("sample_sha256")
                  and hashlib.sha256(receipt).hexdigest() == entry.get("receipt_sha256")
                  and hashlib.sha256(ids).hexdigest() == entry.get("row_ids_sha256"), "draw_payload_changed")
-        request = None
-        if spec.method != "dope":
-            request_raw = read_regular(dest / (expected_scale + ".request.json"))
-            _require(hashlib.sha256(request_raw).hexdigest() == entry["request_sha256"],
-                     "draw_payload_changed")
-            request = _native_json(request_raw)
-        draw = decode_draw(data, receipt, spec, schema_document=schema_document, control_request=request)
+        draw = decode_draw(data, receipt, spec, schema_document=schema_document)
         artifact_raw = read_regular(artifact)
-        charged_artifact = (_native_json(receipt)["inspection"]["accounting"]["complete_sampling_bytes"]
-                            if spec.method == "dope" else request["artifact_bytes"])
+        charged_artifact = _native_json(receipt)["inspection"]["accounting"]["complete_sampling_bytes"]
         _require(type(charged_artifact) is int and charged_artifact == len(artifact_raw),
                  "draw_artifact_charge_mismatch")
         _require(_native_json(ids) == {"row_ids": list(draw.row_ids)}, "draw_row_identity_changed")
