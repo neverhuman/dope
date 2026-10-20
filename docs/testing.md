@@ -272,3 +272,17 @@ source/FD/network/exec denial, finite exact output and redacted failure paths.
 The focused command is `PYTHONPATH=. python3 -B -m unittest
 research.transfer.tests.test_control_boundary -v`. This is public synthetic source
 proof only, separate from runtime deployment, full learner or scientific admission.
+
+## Development pilot learner execution
+
+Transfer discovery retains `test_pilot_learning_execution` and
+`test_pilot_constant_null`. The focused command is
+`PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v`.
+It exercises the full learner coordinate roster, a separate native SDK mean-null
+reference, fit-only inputs, query-label separation, physical operation reuse,
+actual permutation calls, failure retention, private evidence and native RSS
+units. Fixture adapters and resource claims do not qualify vendor weights, full
+E03 execution, independent reproduction or confirmation. Development execution
+requires the existing stage reservation and trusted exact plan/registry/null/
+runtime/rights/resource admission; no implicit verifier, protected access or
+automatic retry is supplied.

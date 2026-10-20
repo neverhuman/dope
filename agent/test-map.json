@@ -2752,6 +2752,38 @@
     "tests/vnext_bundle_isolation.rs": {
       "command": "cargo test --locked --test vnext_bundle_isolation",
       "purpose": "verify actual source-free bundle isolation using the current mixed rlib/cdylib Cargo artifact, without stale hashed kernel libraries"
+    },
+    "research/transfer/pilot_learning_execution.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/pilot_native_seed.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/pilot_learning_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/pilot_constant_null.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/pilot_learning_reports.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/pilot_learning_contract.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/tests/test_pilot_constant_null.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
+    },
+    "research/transfer/tests/test_pilot_learning_execution.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
     }
   }
 }
