@@ -1,5 +1,7 @@
 """Fixture-only source tests; never claim native model/runtime qualification."""
 from dataclasses import dataclass, replace
+import hashlib
+from importlib.metadata import PathDistribution
 import math
 from pathlib import Path
 import tempfile
@@ -16,7 +18,7 @@ from research.transfer.pilot_learning_contract import (
 )
 from research.transfer.pilot_learning_execution import LearningExecution
 from research.transfer.pilot_learning_reports import execute_drivers, reduce_learning
-from research.transfer.pilot_learning_runtime import NAMES, OperationAdmission, Registration, registry_digest
+from research.transfer.pilot_learning_runtime import NAMES, OperationAdmission, Registration, registry_digest, verify_distribution_record
 
 from research.transfer.pilot_native_seed import NativeSeed, ORIGINAL_STREAM_HEX
 
@@ -186,7 +188,7 @@ class PilotLearningTests(unittest.TestCase):
         self.assertNotEqual(paired["comparisons"][0]["losses"], changed["comparisons"][0]["losses"])
         self.assertEqual(len(paired["comparisons"]), 20)
         for row in paired["comparisons"]:
-            self.assertEqual(row["status"], "incomplete")  # no fabricated gain confidence bound
+            self.assertEqual(row["status"], "incomplete")  # missing gain confidence bound keeps reduction incomplete
             self.assertTrue(all(len(loss) == 2 and all(math.isfinite(v) for v in loss)
                                 for loss in row["losses"].values()))
         for case in execution.cases:
@@ -281,6 +283,35 @@ class PilotLearningTests(unittest.TestCase):
             self.assertTrue(all(len(call["prediction"]["values"]) == 2 for call in record["calls"]))
             self.assertIn("perturbed_rows", record["calls"][1])
             self.assertEqual(record["applicability"]["interaction"], "not_measured")
+
+
+class DistributionRecordTests(unittest.TestCase):
+    def test_real_metadata_parser_selects_parent_record_with_vendored_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            info = root / "native_sdk-1.0.dist-info"
+            info.mkdir()
+            (info / "METADATA").write_text("Name: native-sdk\nVersion: 1.0\n")
+            record = info / "RECORD"
+            vendor = root / "native_sdk/vendor/another-2.0.dist-info/RECORD"
+            vendor.parent.mkdir(parents=True)
+            vendor.write_text("separate distribution bytes\n")
+            parent_member = "native_sdk-1.0.dist-info/RECORD,,\n"
+            vendor_member = "native_sdk/vendor/another-2.0.dist-info/RECORD,,\n"
+            record.write_text(vendor_member + parent_member)
+            dist = PathDistribution(info)
+            expected = hashlib.sha256(record.read_bytes()).hexdigest()
+            self.assertEqual(len([p for p in dist.files if str(p).endswith(".dist-info/RECORD")]), 2)
+            self.assertIsNone(verify_distribution_record(dist, "1.0", expected))
+            with self.assertRaisesRegex(ValueError, "installed_runtime_changed"):
+                verify_distribution_record(dist, "1.0", "0" * 64)
+            with self.assertRaisesRegex(ValueError, "installed_runtime_unavailable"):
+                verify_distribution_record(dist, "2.0", expected)
+            for malformed in (vendor_member, parent_member + parent_member):
+                record.write_text(malformed)
+                with self.assertRaisesRegex(ValueError, "installed_runtime_unavailable"):
+                    verify_distribution_record(PathDistribution(info), "1.0",
+                                               hashlib.sha256(record.read_bytes()).hexdigest())
 
 
 if __name__ == "__main__":

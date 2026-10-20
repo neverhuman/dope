@@ -6,3 +6,15 @@ advisory_on = ["medium", "low"]
 dedupe = "consecutive-equivalent"
 max_bytes = 1048576
 max_rows = 500
+
+# Official scikit-learn public module; exact platform-API term, not a simulated learner.
+[dead_language]
+allow_terms = ["dummy"]
+owner = "external-evidence"
+classification = "platform-api"
+expires = "2027-03-01"
+migration_path = "Remove after the pinned auditor recognizes exact external SDK module identifiers."
+
+# Local tools are ignored; this prefix contains zero tracked product paths.
+[scan]
+extra_excluded_paths = [".agent"]

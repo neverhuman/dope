@@ -46,3 +46,32 @@ literal terms describe checked lease states, explicit unsupported candidates,
 or a compatibility deserializer, with locked behavior tests. Current shape,
 build speed, and observability advisories remain visible with their own
 fingerprints and proof commands. An advisory does not override the score gate.
+
+## Native learner API identifier
+
+The `dead_language.allow_terms = ["dummy"]` entry uses the pinned auditor's
+platform API mechanism for scikit-learn's public `sklearn.dummy.DummyRegressor`.
+The constant-null adapter calls that installed SDK with `strategy="mean"`; its
+module origin remains hash-pinned. The second runtime occurrence requires the
+same exact module in the registration pins. Renaming or disguising that module
+would obscure the native dependency. This exception covers the external API word,
+is owned by external-evidence, and expires on 2027-03-01; remove it when the pinned
+auditor recognizes exact external SDK identifiers. It does not permit simulated
+learner evidence or change any conformance, privacy, source, security, score,
+required-check or protected-merge gate. The original failing PR291 audit remains
+retained. The constant-null tests and native four-case qualification distinguish
+fixture calls from actual native fit/predict execution.
+
+Local `.agent/` tools are ignored development artifacts under the repository guide.
+The full scan adds only that local prefix to its existing exclusions; native
+`git ls-files -- .agent` must remain empty. No tracked source is excluded. The
+first local audit included two ignored budget/launcher helpers and is retained as
+a failed local observation. All three boundary checks passed, including1,577
+benchmark tests, before that scanner failure. Unchanged boundary-source hashes
+and original logs may support a later full scan; that is explicit equivalence,
+not a claim that the old test command executed on a later commit.
+
+The platform-word allowance is repository-wide at the auditor's word granularity.
+Its intended use is the two external API references described above; review must
+reject unrelated uses. Its recorded expiry is a maintenance obligation, not an
+assertion that this auditor automatically enforces that field.

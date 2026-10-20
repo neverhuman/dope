@@ -17,6 +17,14 @@ NAMES = {"kumo_tabular": ("kumo_tabular", "frozen_context"),
          "null_reference": ("regression_mean_null", "scratch")}
 
 
+def verify_distribution_record(distribution, version, expected):
+    records = [entry for entry in (distribution.files or ())
+               if len(entry.parts) == 2 and entry.parts[0].endswith(".dist-info")
+               and entry.name == "RECORD"]
+    require(distribution.version == version and len(records) == 1, "installed_runtime_unavailable")
+    require(file_sha256(distribution.locate_file(records[0])) == expected, "installed_runtime_changed")
+
+
 @dataclass(frozen=True, repr=False)
 class Registration:
     role: str
@@ -63,10 +71,7 @@ class Registration:
         self.runtime.verify(self.model)
         # Verify installed exact distribution RECORD bytes, not only an archive or version string.
         for package, version, expected in self.model.dependencies:
-            dist = metadata.distribution(package)
-            records = [entry for entry in (dist.files or ()) if str(entry).endswith(".dist-info/RECORD")]
-            require(dist.version == version and len(records) == 1, "installed_runtime_unavailable")
-            require(file_sha256(dist.locate_file(records[0])) == expected, "installed_runtime_changed")
+            verify_distribution_record(metadata.distribution(package), version, expected)
         if self.role == "kumo_tabular":
             from research.transfer.adapters.auditors.kumo_tabular import KumoTabularAdapter as Adapter
         elif self.role == "tabicl":
