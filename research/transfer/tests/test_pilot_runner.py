@@ -95,7 +95,7 @@ def _admission_contract_doc(pilot_plan: PilotExecutionPlan, *, gate_status="acce
     }
 
 
-def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, comparator="dope", candidate="chow_liu"):
+def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, comparator="dope", candidate="chow_liu", version=1):
     root = Path(directory).absolute()
     binary = root / "dope-kernel"
     worker = root / "pilot-worker"
@@ -131,7 +131,11 @@ def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, com
             ],
         }),
     )
-    pilot_plan = PilotExecutionPlan.from_document(_pilot_plan_doc())
+    pilot_doc = _pilot_plan_doc()
+    if version == 2:
+        pilot_doc["seeds"]["substreams"]["sample_primary"] = "0xfffffffffffffffe"
+        pilot_doc["seeds"]["substreams"]["sample_4n"] = "0xffffffffffffffff"
+    pilot_plan = PilotExecutionPlan.from_document(pilot_doc)
     admission_contract = _admission_contract_doc(pilot_plan)
     cell_doc = {
         "format": pilot_runner.FORMAT,
@@ -170,6 +174,12 @@ def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, com
         "learner_rights_sha256": {learner: "7" * 64 for learner in pilot_runner.LEARNERS},
         "stage_wall_ms": {stage: stage_wall_ms for stage in STAGES},
     }
+    if version == 2:
+        cell_doc["version"] = 2
+        for name, stream in (("fit_seed", "fit"), ("draw_seed", "sample_primary"),
+                             ("draw_4n_seed", "sample_4n"), ("control_seed", "context"),
+                             ("driver_seed", "learner")):
+            cell_doc[name] = pilot_doc["seeds"]["substreams"][stream]
     cell_plan = pilot_runner.PilotCellExecutionPlan.from_document(cell_doc)
     spec = CampaignRunSpec.from_document({
         "format": FORMAT,
@@ -289,6 +299,8 @@ def simulated_8stage_workers(cell_plan, observed_commands=None):
                 "report_digest": "1" * 64,
             },
         }
+        if doc["version"] == 2 and label == "learners":
+            payloads[label]["materialized_draw_manifest_sha256"] = file_hash(root / "materialized-draws/manifest.json")
         create_private(root / (label + ".stdout"), canonical_json(payloads[label]))
         create_private(root / (label + ".stderr"), b"")
         return {
