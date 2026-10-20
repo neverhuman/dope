@@ -219,6 +219,7 @@ class StageJournal:
         self.create, self.read_only = create, read_only
         self.fd = None
         self.records, self.state, self.charged, self.over_budget = [], {}, 0, False
+        self._fresh_physical_issue = None
 
     def __enter__(self):
         root = None
@@ -283,50 +284,70 @@ class StageJournal:
         if not self.records:
             _require(record["type"] == "header" and value == {}, "invalid_stage_header")
         else:
-            _require(type(record["type"]) is str and record["type"] in {"begin", "finish"}
+            _require(type(record["type"]) is str and record["type"] in {"begin", "finish", "physical_reserve", "physical_settle", "physical_interrupt"}
                      and type(value) is dict,
                      "invalid_stage_transition")
-            common = {"cell_id", "stage", "attempt"}
-            extra = {"reserved_wall_ms", "retry"} if record["type"] == "begin" else {
-                "status", "observed_wall_ms", "peak_ram_bytes", "output_sha256"}
-            _require(set(value) == common | extra and _hash(value["cell_id"])
-                     and type(value["stage"]) is str and value["cell_id"] in {
-                c["cell_id"] for c in document["cells"]} and value["stage"] in STAGES,
-                "invalid_stage_transition")
-            key = (value["cell_id"], value["stage"])
-            item = state.setdefault(key, {"attempts": 0, "pending": False, "status": None})
-            if record["type"] == "begin":
-                n = STAGES.index(value["stage"])
-                _require(not over and not item["pending"] and item["status"] != "completed",
-                         "stage_not_ready")
-                _require(n == 0 or state.get((key[0], STAGES[n - 1]), {}).get("status") == "completed",
-                         "previous_stage_incomplete")
-                _require(type(value["retry"]) is bool and value["retry"] == (item["attempts"] > 0),
-                         "retry_disposition_required")
-                _require(type(value["attempt"]) is int and value["attempt"] == item["attempts"] + 1
-                         and value["attempt"] <= document["max_attempts"], "attempt_budget_exceeded")
-                _require(_integer(value["reserved_wall_ms"], 1)
-                         and charged + value["reserved_wall_ms"] <= document["budget"]["wall_ms"],
-                         "wall_budget_exceeded")
-                charged += value["reserved_wall_ms"]
-                item.update(attempts=value["attempt"], pending=True, reservation=value["reserved_wall_ms"])
+            if record["type"].startswith("physical_"):
+                from .pilot_physical_operations import accept_physical_event
+                _require(_hash(value.get("cell_id")) and value.get("stage") in ("learners", "drivers"),
+                         "physical_stage_invalid")
+                item = state.get((value["cell_id"], value["stage"]), {})
+                over = accept_physical_event(record, item) or over
             else:
-                _require(item["pending"] and type(value["attempt"]) is int
-                         and value["attempt"] == item["attempts"], "no_pending_stage")
-                _require(type(value["status"]) is str
-                         and value["status"] in {"completed", "failed", "interrupted", "timeout", "over_budget"}
-                         and all(v is None or _integer(v) for v in (
-                             value["observed_wall_ms"], value["peak_ram_bytes"]))
-                         and (value["output_sha256"] is None or _hash(value["output_sha256"])),
-                         "invalid_stage_result")
-                if value["status"] == "completed":
-                    _require(value["observed_wall_ms"] is not None and value["peak_ram_bytes"] is not None
-                             and _hash(value["output_sha256"]), "stage_observations_required")
-                exceeded = ((value["observed_wall_ms"] or 0) > item["reservation"]
-                            or (value["peak_ram_bytes"] or 0) > document["budget"]["peak_ram_bytes"])
-                _require(not exceeded or value["status"] == "over_budget", "resource_overrun_not_recorded")
-                over = over or value["status"] == "over_budget"
-                item.update(pending=False, status=value["status"])
+                common = {"cell_id", "stage", "attempt"}
+                extra = {"reserved_wall_ms", "retry"} if record["type"] == "begin" else {
+                    "status", "observed_wall_ms", "peak_ram_bytes", "output_sha256"}
+                _require(set(value) == common | extra and _hash(value["cell_id"])
+                         and type(value["stage"]) is str and value["cell_id"] in {
+                    c["cell_id"] for c in document["cells"]} and value["stage"] in STAGES,
+                    "invalid_stage_transition")
+                key = (value["cell_id"], value["stage"])
+                item = state.setdefault(key, {"attempts": 0, "pending": False, "status": None})
+                if record["type"] == "begin":
+                    n = STAGES.index(value["stage"])
+                    _require(not over and not item["pending"] and item["status"] != "completed",
+                             "stage_not_ready")
+                    _require(not item.get("physical", {}).get("interruption"),
+                             "physical_reconciliation_required")
+                    _require(n == 0 or state.get((key[0], STAGES[n - 1]), {}).get("status") == "completed",
+                             "previous_stage_incomplete")
+                    _require(type(value["retry"]) is bool and value["retry"] == (item["attempts"] > 0),
+                             "retry_disposition_required")
+                    _require(type(value["attempt"]) is int and value["attempt"] == item["attempts"] + 1
+                             and value["attempt"] <= document["max_attempts"], "attempt_budget_exceeded")
+                    _require(_integer(value["reserved_wall_ms"], 1)
+                             and charged + value["reserved_wall_ms"] <= document["budget"]["wall_ms"],
+                             "wall_budget_exceeded")
+                    charged += value["reserved_wall_ms"]
+                    item.pop("physical", None)
+                    item.update(attempts=value["attempt"], pending=True, reservation=value["reserved_wall_ms"])
+                else:
+                    _require(item["pending"] and type(value["attempt"]) is int
+                             and value["attempt"] == item["attempts"], "no_pending_stage")
+                    _require(type(value["status"]) is str
+                             and value["status"] in {"completed", "failed", "interrupted", "timeout", "over_budget"}
+                             and all(v is None or _integer(v) for v in (
+                                 value["observed_wall_ms"], value["peak_ram_bytes"]))
+                             and (value["output_sha256"] is None or _hash(value["output_sha256"])),
+                             "invalid_stage_result")
+                    physical = item.get("physical")
+                    if physical is not None:
+                        _require(physical["settled"], "physical_settlement_required")
+                        _require(not physical.get("interruption") or value["status"] == "interrupted",
+                                 "physical_interruption_status_required")
+                        _require(not physical["over_budget"] or value["status"] == "over_budget",
+                                 "physical_overrun_not_recorded")
+                        if value["status"] == "completed":
+                            _require(physical["completed"] and not physical["violation"],
+                                     "physical_operations_incomplete")
+                    if value["status"] == "completed":
+                        _require(value["observed_wall_ms"] is not None and value["peak_ram_bytes"] is not None
+                                 and _hash(value["output_sha256"]), "stage_observations_required")
+                    exceeded = ((value["observed_wall_ms"] or 0) > item["reservation"]
+                                or (value["peak_ram_bytes"] or 0) > document["budget"]["peak_ram_bytes"])
+                    _require(not exceeded or value["status"] == "over_budget", "resource_overrun_not_recorded")
+                    over = over or value["status"] == "over_budget"
+                    item.update(pending=False, status=value["status"])
         if persist:
             _require(not self.read_only and self.fd is not None, "journal_read_only")
             encoded = canonical_json(record) + b"\n"
@@ -363,8 +384,45 @@ class StageJournal:
                                 "status": status, "observed_wall_ms": observed_wall_ms,
                                 "peak_ram_bytes": peak_ram_bytes, "output_sha256": output_sha256})
 
+    def reserve_operations(self, cell_id, stage, graph):
+        """Suballocate a fresh pending stage, without charging its wall twice."""
+        from .pilot_physical_operations import PhysicalOperationGraph, issue_guard
+        _require(type(graph) is PhysicalOperationGraph, "physical_graph_required")
+        item = self.state.get((cell_id, stage), {"attempts": 0})
+        self._append("physical_reserve", {"cell_id": cell_id, "stage": stage,
+                     "attempt": item["attempts"], "graph": graph.document()})
+        self._fresh_physical_issue = self.records[-1]["sha256"]
+        return issue_guard(graph, self._fresh_physical_issue, self, cell_id, stage)
+
+    def settle_operations(self, cell_id, stage, guard):
+        from .pilot_physical_operations import PhysicalOperationGuard
+        _require(type(guard) is PhysicalOperationGuard and guard.journal is self
+                 and (guard.cell_id, guard.stage) == (cell_id, stage), "physical_guard_mismatch")
+        item = self.state.get((cell_id, stage), {"attempts": 0})
+        _require(item.get("physical", {}).get("reservation_sha256") == guard.reservation_sha256,
+                 "physical_guard_mismatch")
+        self._append("physical_settle", {"cell_id": cell_id, "stage": stage,
+                     "attempt": item["attempts"], "outcomes": guard.settlement(),
+                     "violation": guard.violation})
+
+    def record_interrupted_operations(self, cell_id, stage, receipt_sha256, verify_interruption):
+        """Record a new operation interruption, never recover/reissue prior work.
+
+        The mandatory trusted-parent callback verifies the actual interruption
+        disposition. This is not an independent custody or execution receipt.
+        Unknown effects remain charged and block retry pending reconciliation.
+        """
+        _require(self.fd is not None and not self.read_only and _hash(receipt_sha256)
+                 and callable(verify_interruption), "physical_interruption_not_admitted")
+        _require(verify_interruption(receipt_sha256) is None, "physical_interruption_not_admitted")
+        item = self.state.get((cell_id, stage), {"attempts": 0})
+        self._append("physical_interrupt", {"cell_id": cell_id, "stage": stage,
+                     "attempt": item["attempts"], "interruption_receipt_sha256": receipt_sha256})
+
     def public_summary(self):
         return {**self.spec.public_summary(), "completion_kind": "stage_bookkeeping_only",
+                "unknown_physical_operations": sum(r["status"] == "unknown" for item in self.state.values()
+                    for r in item.get("physical", {}).get("outcomes", [])),
                 "charged_wall_ms": self.charged, "pending_stages": sum(i["pending"] for i in self.state.values()),
                 "completed_stages": sum(i["status"] == "completed" for i in self.state.values()),
                 "resource_overrun": self.over_budget}

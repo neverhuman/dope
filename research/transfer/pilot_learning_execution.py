@@ -20,7 +20,8 @@ class PhysicalEvidence:
     The caller must hold the existing StageJournal stage reservation before entry.
     A fresh exclusive directory refuses replay. Each intent is durable before work.
     """
-    def __init__(self, directory):
+    def __init__(self, directory, guard=None):
+        self.guard = guard
         root = private_root(directory)
         self.root = root / "physical-operations"
         self.root.mkdir(mode=0o700)  # existing directory is an error, never resume/reissue
@@ -38,6 +39,8 @@ class PhysicalEvidence:
         return self.previous
 
     def call(self, key, kind, inputs, operation):
+        if self.guard is not None:
+            self.guard.begin(key, kind)
         self.append({"event": "intent", "key": key, "kind": kind, "inputs": inputs})
         wall, cpu = time.monotonic_ns(), time.process_time_ns()
         children = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -47,16 +50,26 @@ class PhysicalEvidence:
             status = "completed"
             return value
         finally:
+            # Settle the parent's precharged slot before allowing another call.
+            elapsed = time.monotonic_ns() - wall
+            refusal = None
+            if self.guard is not None:
+                try:
+                    self.guard.finish(key, status, elapsed, output)
+                except Exception as error:
+                    status, refusal = "over_budget", error
             # Never include backend exception strings; native messages may carry data.
             self.append({"event": "outcome", "key": key, "kind": kind, "status": status,
                          "reason": None if status == "completed" else "operation_failed",
-                         "wall_ns": time.monotonic_ns() - wall,
+                         "wall_ns": elapsed,
                          "process_cpu_ns": time.process_time_ns() - cpu,
                          "reaped_children_cpu_seconds": (resource.getrusage(resource.RUSAGE_CHILDREN).ru_utime +
                              resource.getrusage(resource.RUSAGE_CHILDREN).ru_stime - children.ru_utime - children.ru_stime),
                          "process_lifetime_peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024),
                          "resource_scope": "self_cpu_and_lifetime_rss_upper_bound_not_child_or_gpu_peak",
                          "output": output})
+            if refusal is not None:
+                raise refusal
 
 
 def validate_prediction(result, query, consumed):
@@ -98,12 +111,41 @@ class LearningExecution:
                               "native_seed_provenance": plan.native_seed.provenance,
                               "planned_path_count": 60, "planned_comparison_count": 20})
 
+    def _require_budget(self):
+        guard = self.evidence.guard
+        if guard is None:
+            require(self.fixture, "physical_reservation_required")
+            return
+        from .pilot_physical_operations import PhysicalOperationGuard
+        require(type(guard) is PhysicalOperationGuard, "physical_reservation_required")
+        graph = guard.graph.document()
+        require(graph["learning_plan_sha256"] == self.plan.sha256 and
+                graph["registry_sha256"] == registry_digest(self.registry) and
+                graph["null_reference_sha256"] == self.null_reference.sha256 and
+                graph["operation_admission_sha256"] == identity(asdict(self.admission)),
+                "physical_reservation_binding_mismatch")
+
     def registration_for(self, learner, arm):
         require(learner in LEARNERS and arm in ARMS)
         entry = self.null_reference if arm == "null" else self.registry[learner]
         if arm == "null":
             require(entry.sha256 == self.plan.null_reference_sha256, "null_reference_changed")
         return entry
+
+    def _require_allocation(self, registration, key, kind):
+        self._require_budget()
+        if self.evidence.guard is None:
+            return  # fixture-only compatibility; development already refused
+        node = self.evidence.guard.nodes.get(key)
+        require(node is not None and node["kind"] == kind, "physical_operation_not_reserved")
+        if not self.fixture:
+            require(registration.model.resources.wall_seconds * 1000 <= node["wall_ms"],
+                    "native_timeout_exceeds_physical_allocation")
+        if registration.role == "mitra" and kind == "predict":
+            require(node["reserved_child_fits"] >= 8 and node["reserved_optimizer_updates"] >= 400,
+                    "mitra_physical_allocation_incomplete")
+            if not self.fixture:
+                require(registration.recipe.bag_folds == 8, "mitra_physical_recipe_mismatch")
 
     def functional_inputs(self, registration, scale, arm, context):
         require((registration.role == "null_reference") == (arm == "null"), "arm_registration_mismatch")
@@ -125,6 +167,7 @@ class LearningExecution:
         return pool, training, inputs
 
     def predict(self, adapter, registration, query, consumed, key, *, parent, extra=None):
+        self._require_allocation(registration, key, "predict")
         def operation():
             start = len(attempts(adapter))
             try:
@@ -141,6 +184,7 @@ class LearningExecution:
                                                   "query_row_ids": query.row_ids, **(extra or {})}, operation)
 
     def execute(self, on_case=None):
+        self._require_budget()
         require(not self.cases, "execution_replay_refused")
         streaming = self.plan.model_retention == "stream_drivers_then_release"
         require(not streaming or callable(on_case), "streaming_driver_consumer_required")
@@ -174,6 +218,7 @@ class LearningExecution:
                                 reused_fit = fit_key in self.prepared
                                 if not reused_fit:
                                     def prepare():
+                                        self._require_allocation(registration, fit_key, "prepare")
                                         adapter = registration.build(self.fixture)
                                         try:
                                             adapter.prepare(training, self.plan.fit_seed)

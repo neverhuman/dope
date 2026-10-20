@@ -350,16 +350,26 @@ def execute_pilot_cell(
                     "peak_ram_bytes": max(o["peak_ram_bytes"] for o in outcomes)}, manifest, compiled_sha
 
         def learners():
+            def verify_inputs():
+                _require(all(file_hash(paths[key]) == doc[key + "_sha256"]
+                             for key in ("csv", "schema", "selection_csv", "query_csv")),
+                         "pilot_learner_input_modified")
+            verify_inputs()
             sample_args = (["--sample-stdout", str(root / "sample.stdout")] if doc["version"] == 1 else
                            ["--materialized-draw-manifest", str(root / "materialized-draws/manifest.json"),
                             "--materialized-draw-manifest-sha256", draw_manifest_sha256])
-            return run_step(paths["worker"], [
+            result = run_step(paths["worker"], [
                 "learners", "--artifact", str(paths["artifact"]), *sample_args,
+                "--fit-csv", str(paths["csv"]), "--fit-csv-sha256", doc["csv_sha256"],
+                "--schema", str(paths["schema"]), "--schema-sha256", doc["schema_sha256"],
                 "--selection-csv", str(paths["selection_csv"]), "--query-csv", str(paths["query_csv"]),
                 "--comparator", doc["comparator"], "--candidate", doc["candidate"],
                 "--rows-primary", str(doc["rows"]), "--rows-4n", str(doc["rows"] * 4),
                 "--control-seed", str(doc["control_seed"]),
             ], "learners", compiled_sha, paths["learners"])
+
+            verify_inputs()
+            return result
 
         stage_fns = (
             ("prepare", prepare),
