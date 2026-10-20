@@ -683,6 +683,14 @@
     "research/transfer/tdl/control_boundary.py": "external-evidence",
     "research/transfer/tdl/control_isolated_worker.py": "external-evidence",
     "research/transfer/tests/test_control_boundary.py": "external-evidence",
-    "tests/vnext_bundle_isolation.rs": "rust-core"
+    "tests/vnext_bundle_isolation.rs": "rust-core",
+    "research/transfer/pilot_learning_execution.py": "external-evidence",
+    "research/transfer/pilot_native_seed.py": "external-evidence",
+    "research/transfer/pilot_learning_runtime.py": "external-evidence",
+    "research/transfer/pilot_constant_null.py": "external-evidence",
+    "research/transfer/pilot_learning_reports.py": "external-evidence",
+    "research/transfer/pilot_learning_contract.py": "external-evidence",
+    "research/transfer/tests/test_pilot_constant_null.py": "external-evidence",
+    "research/transfer/tests/test_pilot_learning_execution.py": "external-evidence"
   }
 }
