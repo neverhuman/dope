@@ -286,3 +286,7 @@ E03 execution, independent reproduction or confirmation. Development execution
 requires the existing stage reservation and trusted exact plan/registry/null/
 runtime/rights/resource admission; no implicit verifier, protected access or
 automatic retry is supplied.
+
+## Materialized development pilot draws
+
+Run `PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v`. Version 2 pilot cells encode all native seeds as explicit 16-digit uint64 hex strings and bind a distinct `sample_4n` stream. The DOPE sample stage executes both native binary draws under one existing journal reservation and cumulative wall allowance, then passes the private pinned manifest to the learner worker. The real native fixture produces both streams and stops at the absent learner worker. Version 1 decoding and safe-integer Pool identities remain unchanged. Control receipt verification includes its real confined ABI and complete closure byte charge; a version 2 control cell requires further typed runtime wiring and currently refuses. These source fixtures do not qualify the full learner/control roster, eight-stage E03 results, confirmation, custody or release.

@@ -2,6 +2,7 @@
 from dataclasses import asdict, dataclass
 import json
 import math
+import re
 
 from research.transfer.adapters.base import FeatureBatch, TrainingBatch
 from research.transfer.evidence import digest
@@ -45,7 +46,7 @@ class Pool:
     artifact_sha256: str
     requested_rows: int
     produced_rows: int
-    draw_seed: int
+    draw_seed: int | str  # legacy safe integer, or explicit-hex-uint64-v1
 
     def __post_init__(self):
         require(type(self.batch) is TrainingBatch)
@@ -55,12 +56,20 @@ class Pool:
         pin(self.artifact_sha256)
         count(self.requested_rows, 1)
         require(count(self.produced_rows, 1) == len(self.batch.targets))
-        count(self.draw_seed)
+        if type(self.draw_seed) is str:
+            require(re.fullmatch(r"0x[0-9a-f]{16}", self.draw_seed) is not None,
+                    "invalid_native_draw_seed")
+        else:
+            count(self.draw_seed)
         for row in self.batch.features.rows:
             for value in row:
                 finite(value)
         for value in self.batch.targets:
             finite(value)
+
+    @property
+    def native_draw_seed(self):
+        return int(self.draw_seed, 16) if type(self.draw_seed) is str else self.draw_seed
 
     @property
     def sha256(self):
