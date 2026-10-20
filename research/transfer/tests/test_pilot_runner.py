@@ -342,9 +342,13 @@ class PilotRunnerTests(unittest.TestCase):
             self.assertEqual(copula_cmds[3][1][1], "control-sample")
 
     def test_real_dope_kernel_first_4_stages_abi_and_payload_verification(self):
-        real_binary = Path(__file__).resolve().parents[3] / "target/debug/dope-kernel"
+        checkout = Path(__file__).resolve().parents[3]
+        real_binary = checkout / "target/debug/dope-kernel"
         if not real_binary.is_file():
-            self.skipTest("this checkout's dope-kernel debug binary not built")
+            subprocess.run(
+                ["cargo", "build", "--locked", "--bin", "dope-kernel"], cwd=checkout, check=True,
+            )
+        self.assertTrue(real_binary.is_file(), "own-checkout dope-kernel build did not produce the binary")
         with tempfile.TemporaryDirectory() as real_dir:
             spec, plan, contract, cell_plan, root, auth = fixture(
                 real_dir, stage_wall_ms=30000, binary_source=real_binary,
