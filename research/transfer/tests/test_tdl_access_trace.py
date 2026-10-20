@@ -220,6 +220,27 @@ class BoundedControlTests(unittest.TestCase):
                     self.assertGreaterEqual(min(x), min(row[0] for row in training))
                     self.assertLessEqual(max(x), max(row[0] for row in training))
 
+    def test_target_first_input_keeps_feature_target_identity_across_controls(self):
+        import csv
+        from research.transfer.tdl.literal_worker import _control_document, _control_sample
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, training, classes = self.source(root)
+            doc = json.loads(schema.read_text())
+            doc["columns"] = [doc["columns"][i] for i in (2, 1, 0)]
+            schema.write_text(json.dumps(doc))
+            with source.open("w") as stream:
+                writer = csv.writer(stream)
+                writer.writerow([column["source_name"] for column in doc["columns"]])
+                writer.writerows([[row[i] for i in (2, 1, 0)] for row in training])
+            for cls in classes:
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, 42)
+                fitted = _control_document(port._payload, port.method)
+                self.assertEqual(fitted["column_order"], "features_then_target")
+                sampled = _control_sample(fitted, 64, 17)
+                self.assertTrue(all(row[0] == 7. and abs(row[2] - 2 * row[1]) < .05 for row in sampled))
+
     def test_caps_schema_types_and_fit_failure_do_not_leave_stale_artifact(self):
         import copy
         with workspace() as directory:

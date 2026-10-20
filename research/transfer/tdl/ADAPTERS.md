@@ -78,3 +78,7 @@ same isolated draw and reads its redacted completion receipt from stderr. It
 requires successful exit, exact shape/length, the measured denial markers and
 the same-byte sample digest before returning values. There is no second sampler
 call or temporary CSV. Default native public output remains redacted JSON.
+
+Control artifacts declare `features_then_target` output order. Fit preserves the
+stable input feature order and moves the target last, matching the native raw
+sampler even when the source schema/header places the target first.

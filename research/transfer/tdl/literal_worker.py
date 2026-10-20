@@ -88,10 +88,11 @@ def _control_document(content, method):
     require(len(raw) <= MAX_CONTROL_JSON and decoder.eof and not decoder.unused_data
             and not decoder.unconsumed_tail, "invalid_control_artifact")
     document = json.loads(raw, object_pairs_hook=_control_json_pairs)
-    common = {"format", "method", "fit_rows", "fit_seed", "columns"}
+    common = {"format", "method", "fit_rows", "fit_seed", "columns", "column_order"}
     extra = {"quantile_count", "quantiles", "factor", "shrinkage"} if method == "gaussian_copula" else {"rows"}
     require(type(document) is dict and set(document) == common | extra, "invalid_control_artifact")
-    require(document["format"] == "tdl-bounded-control-v1" and document["method"] == method,
+    require(document["format"] == "tdl-bounded-control-v1" and document["method"] == method
+            and document["column_order"] == "features_then_target",
             "invalid_control_artifact")
     fit_rows = count(document["fit_rows"], 1)
     require(fit_rows <= MAX_CONTROL_ROWS, "invalid_control_artifact")

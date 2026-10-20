@@ -255,8 +255,12 @@ class _BoundedControlGenerator(StandaloneGenerator):
             rows = _rows(raw.decode("utf-8"), schema)
             require(len(rows) <= MAX_CONTROL_ROWS and all(len(row) == len(columns) for row in rows),
                     "invalid_control_fit")
+            # Match the native raw sampler's stable feature order, then target.
+            order = sorted(range(len(columns)), key=lambda i: columns[i]["role"] == "target")
+            rows = [[row[i] for i in order] for row in rows]
             base = {"format": "tdl-bounded-control-v1", "method": self.method,
-                    "fit_rows": len(rows), "fit_seed": seed, "columns": len(columns)}
+                    "fit_rows": len(rows), "fit_seed": seed, "columns": len(columns),
+                    "column_order": "features_then_target"}
             selected = None
             if self.method == "gaussian_copula":
                 factor, ordered = _copula_state(rows, seed)
@@ -371,7 +375,8 @@ class _BoundedControlGenerator(StandaloneGenerator):
             raise MetricError("generator_sample_failed") from None
         return sampled, {"method": self.method, "rows": rows, "seed": seed,
                          "artifact_sha256": self._artifact_sha256, "sample_sha256": hashlib.sha256(encoded).hexdigest(),
-                         "budget_scope": "dataset_specific_artifact", **trace.accounting,
+                         "budget_scope": "dataset_specific_artifact", "column_order": document["column_order"],
+                         **trace.accounting,
                          "access_trace": receipt, "citable": False}
 
 
