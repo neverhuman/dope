@@ -68,7 +68,6 @@ def denial_worker():
     except OSError as error:
         assert error.errno == errno.EPERM
     os.write(1, b"source=EPERM bundle=EPERM fd=EBADF network=EPERM exec=EPERM\n")
-    os._exit(0)
 
 
 class ControlBoundaryTests(unittest.TestCase):

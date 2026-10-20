@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import unittest
+from unittest import mock
 
 from research.transfer.claims import (
     ClaimError,
@@ -56,6 +57,19 @@ def _graph(comparison="raw_gap_superiority"):
 
 
 class ClaimGraphTests(unittest.TestCase):
+    def test_corrupt_projection_is_refused_without_provenance_diagnostics(self):
+        fixture = synthetic_fixture("raw_gap_superiority")
+        # Corrupt the projection after valid receipt verification; use the real
+        # public provenance guard to refuse the injected private field.
+        with mock.patch("research.transfer.claims._project_claim",
+                        return_value={"header": SENTINEL}):
+            with self.assertRaises(ClaimError) as caught:
+                verify_claim_graph(fixture["document"], fixture["receipts"], fixture["expected"])
+        self.assertEqual(str(caught.exception), "unsafe_label")
+        self.assertNotIn(SENTINEL, str(caught.exception))
+        self.assertIsNone(caught.exception.__cause__)
+        self.assertTrue(caught.exception.__suppress_context__)
+
     def test_equivalence_needs_both_bounds_and_its_own_finite_margin(self):
         fixture = synthetic_fixture('equivalence')
         for field, value in (('lower', None), ('upper', None), ('equivalence_margin', None),
