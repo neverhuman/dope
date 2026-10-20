@@ -340,6 +340,17 @@ class PilotRunnerTests(unittest.TestCase):
         self.assertEqual(commands[2][1][1], "inspect-raw")
         self.assertEqual(commands[3][1][1], "sample-raw-isolated")
         self.assertNotIn("SECRET", json.dumps(receipt))
+        learner_argv = next(argv for label, argv in commands if label == "learners")
+        doc = self.cell_plan.document()
+        for flag, name, expected in (("--fit-csv", "fit.csv", "csv_sha256"),
+                                     ("--schema", "schema.json", "schema_sha256")):
+            actual = Path(learner_argv[learner_argv.index(flag) + 1])
+            self.assertEqual(actual, self.root / name)
+            self.assertEqual(file_hash(actual), doc[expected])
+            self.assertEqual(learner_argv[learner_argv.index(flag + "-sha256") + 1], doc[expected])
+            self.assertEqual(actual.stat().st_mode & 0o777, 0o400)
+        self.assertNotEqual(learner_argv[learner_argv.index("--fit-csv") + 1],
+                            learner_argv[learner_argv.index("--query-csv") + 1])
         with tempfile.TemporaryDirectory() as copula_dir:
             spec, plan, contract, cell_plan, root, auth = fixture(
                 copula_dir, comparator="gaussian_copula", candidate="gaussian_copula",
@@ -352,6 +363,24 @@ class PilotRunnerTests(unittest.TestCase):
             self.assertEqual(copula_cmds[1][1][1], "control-compile")
             self.assertEqual(copula_cmds[2][1][1], "control-reload")
             self.assertEqual(copula_cmds[3][1][1], "control-sample")
+
+    def test_modified_private_fit_input_refuses_before_learner_execution(self):
+        commands = []
+        original = simulated_8stage_workers(self.cell_plan, commands)
+        def tamper_after_sample(argv, root, label, wall, ram):
+            result = original(argv, root, label, wall, ram)
+            if label == "sample":
+                path = root / "fit.csv"
+                path.chmod(0o600)
+                path.write_bytes(b"SECRET_SUBSTITUTED_SOURCE")
+            return result
+        with mock.patch.object(pilot_runner, "invoke", side_effect=tamper_after_sample):
+            result = self.execute()
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["stages"][-1]["stage"], "learners")
+        self.assertEqual(result["stages"][-1]["status"], "failed")
+        self.assertFalse(any(label == "learners" for label, _ in commands))
+        self.assertNotIn("SECRET", json.dumps(result))
 
     def test_real_dope_kernel_first_4_stages_abi_and_payload_verification(self):
         checkout = Path(__file__).resolve().parents[3]

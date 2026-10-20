@@ -694,6 +694,8 @@
     "research/transfer/tests/test_pilot_learning_execution.py": "external-evidence",
     "research/transfer/pilot_materialized_draws.py": "external-evidence",
     "research/transfer/tests/test_pilot_materialized_draws.py": "external-evidence",
-    "research/transfer/pilot_cell_plan.py": "external-evidence"
+    "research/transfer/pilot_cell_plan.py": "external-evidence",
+    "research/transfer/pilot_physical_operations.py": "external-evidence",
+    "research/transfer/tests/test_pilot_physical_operations.py": "external-evidence"
   }
 }
