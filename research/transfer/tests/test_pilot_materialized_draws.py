@@ -173,32 +173,56 @@ class MaterializedDrawTests(unittest.TestCase):
                 store_pair(root, *draws, artifact=artifact)
             self.assertFalse((root / "materialized-draws").exists())
 
-    def test_real_control_abi_and_complete_byte_charge_are_mandatory(self):
-        from research.transfer.tdl.control_boundary import canonical
+    def test_real_control_receipt_shape_and_invented_schema_are_unavailable(self):
+        from research.transfer.tdl.control_boundary import canonical, validate_output
         for method in ("gaussian_copula", "compressed_real_rows"):
             spec, raw, _ = draw_fixture(method=method)
             request = {"method": method, "rows": spec.rows, "seed": spec.seed,
                        "artifact_sha256": spec.artifact_sha256, "library_sha256": "c" * 64,
                        "abi": 1, "source_sha256": "d" * 64, "runtime_closure_sha256": "e" * 64,
                        "artifact_bytes": 7, "runtime_bytes": 1000}
+            # Real validate_output accepts this schema-less production shape.
             report = {**request, "columns": 2, "sample_bytes": len(raw), "scientific_admission": False,
                       "citable": False, "sample_sha256": hashlib.sha256(raw).hexdigest(), "state": "sampled",
                       "format": "f64le", "layout": "row_major", "column_order": "features_then_target",
                       "isolation": "existing_rust_landlock_seccomp_tsync", "pipeline_complete": False,
                       "invocation_bytes": len(canonical(request)),
                       "sampling_closure_bytes": 1007 + len(canonical(request))}
-            report["schema"] = [dict(column) for column in PUBLIC_SCHEMA]
-            result = decode_draw(raw, native_json(report), spec, control_request=request, schema_document=SCHEMA_DOCUMENT)
-            wrong_schema = {**report, "schema": [{**PUBLIC_SCHEMA[0], "id": "c9999"}, PUBLIC_SCHEMA[1]]}
-            with self.assertRaisesRegex(CampaignRunnerError, "draw_schema_mismatch"):
-                decode_draw(raw, native_json(wrong_schema), spec, control_request=request, schema_document=SCHEMA_DOCUMENT)
-            request["seed"] = 0
-            self.assertEqual(json.loads(result.control_request)["seed"], spec.seed)
-            with self.assertRaises(CampaignRunnerError):
-                decode_draw(raw, native_json(report), spec, control_request=request, schema_document=SCHEMA_DOCUMENT)
-            with self.assertRaises(CampaignRunnerError):
-                decode_draw(raw, native_json(report), replace(spec, byte_budget=10),
-                            control_request=json.loads(result.control_request), schema_document=SCHEMA_DOCUMENT)
+            validate_output(0, raw, native_json(report), request)
+            self.assertNotIn("schema", report)
+            for receipt in (report, {**report, "schema": PUBLIC_SCHEMA},
+                            {**report, "schema": [{**PUBLIC_SCHEMA[0], "id": "c9999"}, PUBLIC_SCHEMA[1]]}):
+                with self.assertRaisesRegex(CampaignRunnerError, "pilot_v2_control_runtime_unavailable"):
+                    decode_draw(raw, native_json(receipt), spec, control_request=request,
+                                schema_document=SCHEMA_DOCUMENT)
+                with self.assertRaisesRegex(CampaignRunnerError, "pilot_v2_control_runtime_unavailable"):
+                    MaterializedDraw(spec, raw, native_json(receipt), SCHEMA_DOCUMENT, canonical(request))
+
+    def test_unsupported_control_pair_cannot_bypass_storage_or_reload(self):
+        for method in ("gaussian_copula", "compressed_real_rows"):
+            with tempfile.TemporaryDirectory() as name:
+                root = Path(name)
+                artifact = root / "artifact"
+                create_private(artifact, b"fixture")
+                draws = []
+                for scale, rows, seed in (("primary_n", 2, 5), ("sensitivity_4n", 8, 6)):
+                    spec, raw, report = draw_fixture(scale, rows, seed)
+                    draws.append(decode_draw(raw, native_json(report), spec, schema_document=SCHEMA_DOCUMENT))
+                # Storage rechecks even an object modified after construction.
+                original_spec = draws[0].spec
+                object.__setattr__(draws[0], "spec", replace(original_spec, method=method))
+                with self.assertRaisesRegex(CampaignRunnerError, "pilot_v2_control_runtime_unavailable"):
+                    store_pair(root, *draws, artifact=artifact)
+                self.assertFalse((root / "materialized-draws").exists())
+                object.__setattr__(draws[0], "spec", original_spec)
+                store_pair(root, *draws, artifact=artifact)
+                manifest_path = root / "materialized-draws/manifest.json"
+                manifest = json.loads(manifest_path.read_bytes())
+                manifest["draws"][0]["spec"]["method"] = method
+                manifest_path.chmod(0o600)
+                manifest_path.write_bytes(canonical_json(manifest))
+                with self.assertRaisesRegex(CampaignRunnerError, "pilot_v2_control_runtime_unavailable"):
+                    load_pair(root, file_hash(manifest_path), artifact=artifact)
 
 
 class PilotV2IntegrationTests(unittest.TestCase):
