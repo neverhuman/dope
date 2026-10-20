@@ -20,7 +20,7 @@ SCALES = ("primary_n", "sensitivity_4n")
 METHODS = ("dope", "gaussian_copula", "compressed_real_rows")
 SEED_HEX = re.compile(r"0x[0-9a-f]{16}\Z")
 PIN = re.compile(r"[0-9a-f]{64}\Z")
-FORMAT = "dope-private-materialized-pilot-draws-v1"
+FORMAT = "dope-private-materialized-pilot-draws-v2"
 
 
 def seed_hex(value):
@@ -48,7 +48,8 @@ class DrawSpec:
     def __post_init__(self):
         _require(self.scale in SCALES and self.method in METHODS, "invalid_draw_binding")
         _require(type(self.rows) is int and self.rows > 0 and type(self.columns) is int
-                 and self.columns >= 2 and self.rows * self.columns * 8 <= MAX_INPUT,
+                 and self.columns >= 2 and self.rows * self.columns * 8 <= MAX_INPUT
+                 and self.rows * 67 + 64 <= MAX_INPUT,  # bounded JSON ordered-ID sidecar too
                  "invalid_draw_dimensions")
         _require(type(self.seed_hex) is str and SEED_HEX.fullmatch(self.seed_hex) is not None,
                  "invalid_native_draw_seed")
@@ -91,16 +92,52 @@ def _native_json(raw):
     return value
 
 
+def _schema_projection(raw, spec):
+    """Project the pinned private schema using Rust schema::PublicColumn fields.
+
+    Source names and domains never enter the projection. Rust validates the
+    complete schema at compile time; this verifies the received column contract.
+    """
+    _require(type(raw) is bytes and hashlib.sha256(raw).hexdigest() == spec.schema_sha256,
+             "draw_schema_mismatch")
+    try:
+        value = _native_json(raw)
+        _require(value.get("format") == "dope-table-schema" and type(value.get("version")) is int
+                 and value["version"] == 1 and type(value.get("columns")) is list
+                 and len(value["columns"]) == spec.columns, "draw_schema_mismatch")
+        approved = value.get("metadata_visibility", "opaque_ids") == "approved_semantic_labels"
+        states = ("missing", "unknown_category", "structural_absence", "padding", "censored")
+        result = []
+        for column in value["columns"]:
+            _require(type(column) is dict and all(type(column.get(k)) is str for k in ("id", "role", "dtype")),
+                     "draw_schema_mismatch")
+            masks = {token["state"] for token in column.get("mask_tokens", [])}
+            if (column.get("domain") or {}).get("kind") == "categorical":
+                masks.add("unknown_category")
+            _require(masks <= set(states), "draw_schema_mismatch")
+            public = {k: column[k] for k in ("id", "role", "dtype")}
+            public["mask_states"] = [s for s in states if s in masks]
+            for private_key, public_key in (("semantic_label", "label"), ("units", "units")):
+                if approved and column.get(private_key) is not None:
+                    public[public_key] = column[private_key]
+            result.append(public)
+        return result
+    except (CampaignRunnerError, ValueError, TypeError, KeyError, AttributeError):
+        raise CampaignRunnerError("draw_schema_mismatch") from None
+
+
 @dataclass(frozen=True, repr=False)
 class MaterializedDraw:
     spec: DrawSpec
     raw: bytes
     native_receipt: bytes
+    schema_document: bytes
     control_request: bytes | None = None
 
     def __post_init__(self):
         _require(type(self.spec) is DrawSpec and type(self.raw) is bytes
-                 and type(self.native_receipt) is bytes, "invalid_materialized_draw")
+                 and type(self.native_receipt) is bytes and type(self.schema_document) is bytes,
+                 "invalid_materialized_draw")
         _require(len(self.raw) == self.spec.rows * self.spec.columns * 8,
                  "invalid_draw_dimensions")
         _require(all(math.isfinite(v) for (v,) in struct.iter_unpack("<d", self.raw)),
@@ -133,7 +170,7 @@ class MaterializedDraw:
                     self.spec.artifact_sha256, self.spec.rows, self.spec.rows, self.spec.seed_hex)
 
 
-def decode_draw(raw, native_receipt, spec, *, control_request=None):
+def decode_draw(raw, native_receipt, spec, *, schema_document, control_request=None):
     """Verify stream shape and its receipt; producer origin remains an owner gate."""
     _require(type(spec) is DrawSpec, "invalid_draw_binding")
     if control_request is not None:
@@ -143,11 +180,12 @@ def decode_draw(raw, native_receipt, spec, *, control_request=None):
             control_request = canonical(control_request)
         except (ValueError, TypeError):
             raise CampaignRunnerError("draw_control_binding_mismatch") from None
-    return MaterializedDraw(spec, raw, native_receipt, control_request)
+    return MaterializedDraw(spec, raw, native_receipt, schema_document, control_request)
 
 
 def _validate_draw(result):
     spec, raw, native_receipt = result.spec, result.raw, result.native_receipt
+    expected_schema = _schema_projection(result.schema_document, spec)
     report = _native_json(native_receipt)
     _require(report.get("state") == "sampled" and type(report.get("rows")) is int
              and report["rows"] == spec.rows and type(report.get("seed")) is int
@@ -165,8 +203,8 @@ def _validate_draw(result):
                  and report.get("inherited_source_fds") == "closed"
                  and report.get("isolation") == "linux_x86_64_seccomp_tsync_default_deny",
                  "draw_boundary_unverified")
-        _require(type(inspection) is dict and type(inspection.get("schema")) is list
-                 and len(inspection["schema"]) == spec.columns, "draw_schema_mismatch")
+        _require(type(inspection) is dict and inspection.get("schema") == expected_schema,
+                 "draw_schema_mismatch")
         accounting = inspection.get("accounting")
         _require(type(accounting) is dict and type(accounting.get("complete_sampling_bytes")) is int
                  and 0 < accounting["complete_sampling_bytes"] <= spec.byte_budget,
@@ -175,6 +213,8 @@ def _validate_draw(result):
         # Reuse the real confined control worker's entire ABI/closure contract.
         from .tdl.control_boundary import validate_output
         control_request = _native_json(result.control_request)
+        if "schema" in report:
+            _require(report["schema"] == expected_schema, "draw_schema_mismatch")
         _require(type(control_request) is dict and control_request.get("method") == spec.method
                  and control_request.get("artifact_sha256") == spec.artifact_sha256
                  and type(control_request.get("rows")) is int and control_request["rows"] == spec.rows
@@ -200,6 +240,7 @@ def store_pair(directory, primary, sensitivity, *, artifact):
              and left.seed_hex != right.seed_hex, "draw_pair_mismatch")
     fields = ("method", "columns", "artifact_sha256", "schema_sha256", "input_sha256", "byte_budget")
     _require(all(getattr(left, k) == getattr(right, k) for k in fields), "draw_pair_mismatch")
+    _require(primary.schema_document == sensitivity.schema_document, "draw_schema_mismatch")
     artifact_raw = read_regular(artifact)
     _require(hashlib.sha256(artifact_raw).hexdigest() == left.artifact_sha256,
              "draw_artifact_changed")
@@ -216,6 +257,7 @@ def store_pair(directory, primary, sensitivity, *, artifact):
         dest.mkdir(mode=0o700)
     except OSError:
         raise CampaignRunnerError("draw_replay_refused") from None
+    create_private(dest / "schema.json", primary.schema_document, 0o400)
     entries = []
     for draw in (primary, sensitivity):
         name = draw.spec.scale
@@ -247,6 +289,7 @@ def load_pair(directory, expected_manifest_sha256, *, artifact):
              and value["format"] == FORMAT and value["execution_or_scientific_admission"] is False
              and type(value["draws"]) is list and len(value["draws"]) == 2, "invalid_draw_manifest")
     result = []
+    schema_document = read_regular(dest / "schema.json")
     for expected_scale, entry in zip(SCALES, value["draws"]):
         _require(type(entry) is dict, "invalid_draw_manifest")
         try:
@@ -270,7 +313,7 @@ def load_pair(directory, expected_manifest_sha256, *, artifact):
             _require(hashlib.sha256(request_raw).hexdigest() == entry["request_sha256"],
                      "draw_payload_changed")
             request = _native_json(request_raw)
-        draw = decode_draw(data, receipt, spec, control_request=request)
+        draw = decode_draw(data, receipt, spec, schema_document=schema_document, control_request=request)
         artifact_raw = read_regular(artifact)
         charged_artifact = (_native_json(receipt)["inspection"]["accounting"]["complete_sampling_bytes"]
                             if spec.method == "dope" else request["artifact_bytes"])
