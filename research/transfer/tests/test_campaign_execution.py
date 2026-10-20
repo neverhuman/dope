@@ -101,6 +101,20 @@ def simulated_kernel(plan):
     return call
 
 
+@contextlib.contextmanager
+def simulated_execution(plan, call=None):
+    """Control-flow fixtures use only simulated worker time/RSS.
+
+    Host fsync latency and lifetime RSS from earlier tests are not measurements
+    of a simulated kernel. Real supervisor/native fixtures keep the OS clock
+    and usage accounting, and simulated overrun outcomes still exercise limits.
+    """
+    with mock.patch.object(execution, "invoke", side_effect=call or simulated_kernel(plan)), \
+         mock.patch.object(execution.time, "monotonic", return_value=0.0), \
+         mock.patch.object(execution.resource, "getrusage", return_value=mock.Mock(ru_maxrss=0)):
+        yield
+
+
 class NativeExecutionTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -154,7 +168,7 @@ class NativeExecutionTests(unittest.TestCase):
         self.assertEqual(list(self.root.iterdir()), [])
 
     def test_artifact_fsync_failure_is_not_success_or_an_automatic_retry(self):
-        with mock.patch.object(execution, "invoke", side_effect=simulated_kernel(self.plan)), \
+        with simulated_execution(self.plan), \
              mock.patch.object(execution, "sync_artifact",
                                side_effect=CampaignRunnerError("native_artifact_sync_failed")):
             self.assertEqual(self.execute()["status"], "failed")
@@ -202,7 +216,7 @@ class NativeExecutionTests(unittest.TestCase):
             if args[2] == "doctor":
                 Path(self.plan.document()["csv"]).write_bytes(b"SECRET_changed")
             return value
-        with mock.patch.object(execution, "invoke", side_effect=call):
+        with simulated_execution(self.plan, call):
             self.assertEqual(self.execute()["status"], "ok")
         self.assertEqual(file_hash(self.root / "fit.csv"), self.plan.document()["csv_sha256"])
 
@@ -212,7 +226,7 @@ class NativeExecutionTests(unittest.TestCase):
             if Path(path).name == "dope-kernel" and (self.root / "model.raw").exists():
                 (self.root / "model.raw").write_bytes(b"changed-artifact")
             return actual_hash(path, *args)
-        with mock.patch.object(execution, "invoke", side_effect=simulated_kernel(self.plan)), \
+        with simulated_execution(self.plan), \
              mock.patch.object(execution, "file_hash", side_effect=checked_hash):
             self.assertEqual(self.execute()["status"], "failed")
         receipt = json.loads((self.root / "native-execution.json").read_bytes())
@@ -220,7 +234,7 @@ class NativeExecutionTests(unittest.TestCase):
         self.assertEqual(receipt["native_processes_executed"], 2)
 
     def test_journal_write_failure_escapes_without_double_finish(self):
-        with mock.patch.object(execution, "invoke", side_effect=simulated_kernel(self.plan)), \
+        with simulated_execution(self.plan), \
              mock.patch.object(StageJournal, "finish", side_effect=CampaignRunnerError("journal_write_failed")) as finish:
             with self.assertRaisesRegex(CampaignRunnerError, "journal_write_failed"):
                 self.execute()
@@ -232,7 +246,7 @@ class NativeExecutionTests(unittest.TestCase):
     def test_budget_overrun_and_native_failure_cause_are_preserved(self):
         def call(*_args):
             return {"status": "timeout", "wall_ms": 10001, "peak_ram_bytes": 1, "returncode": -9}
-        with mock.patch.object(execution, "invoke", side_effect=call):
+        with simulated_execution(self.plan, call):
             self.assertEqual(self.execute()["status"], "failed")
         row = json.loads((self.root / "native-execution.json").read_bytes())["stages"][0]
         self.assertEqual(row["native_status"], "timeout")
@@ -248,7 +262,7 @@ class NativeExecutionTests(unittest.TestCase):
                 "--evidence-dir", str(self.root), "--admission", str(self.auth["admission"]),
                 "--public-key", str(self.auth["public_key"]),
                 "--trusted-key-sha256", self.auth["trusted_key_sha256"]]
-        with mock.patch.object(execution, "invoke", side_effect=simulated_kernel(self.plan)), \
+        with simulated_execution(self.plan), \
              contextlib.redirect_stdout(io.StringIO()) as output:
             self.assertEqual(main(argv), 0)
         self.assertNotIn("SECRET", output.getvalue())
@@ -283,6 +297,35 @@ class NativeExecutionTests(unittest.TestCase):
             self.assertEqual(journal.charged, 10000)
             self.assertEqual(journal.state[("5" * 64, "prepare")]["status"], "failed")
             self.assertEqual(journal.public_summary()["pending_stages"], 0)
+        with self.assertRaises(CampaignRunnerError):
+            self.execute()
+
+    def test_simulated_control_flow_is_independent_of_prior_host_usage(self):
+        with mock.patch.object(execution.time, "monotonic", side_effect=iter(range(0, 10000, 11)).__next__), \
+             mock.patch.object(execution.resource, "getrusage", return_value=mock.Mock(ru_maxrss=3 * (1 << 20))), \
+             simulated_execution(self.plan):
+            self.assertEqual(self.execute()["status"], "ok")
+        receipt = json.loads((self.root / "native-execution.json").read_bytes())
+        self.assertEqual([row["stage"] for row in receipt["stages"]], list(execution.NATIVE_STAGES))
+        self.assertEqual(receipt["native_processes_executed"], 4)
+        self.assertTrue(all(row["wall_ms"] == 1 for row in receipt["stages"]))
+        self.assertTrue(all(row["peak_ram_bytes"] == 1 for row in receipt["stages"]))
+
+    def test_simulated_reported_ram_overrun_still_refuses(self):
+        simulated = simulated_kernel(self.plan)
+        ram_limit = self.spec.document()["budget"]["peak_ram_bytes"]
+        def call(*args):
+            result = simulated(*args)
+            return {**result, "peak_ram_bytes": ram_limit + 1}
+        with simulated_execution(self.plan, call):
+            self.assertEqual(self.execute()["status"], "failed")
+        receipt = json.loads((self.root / "native-execution.json").read_bytes())
+        row = receipt["stages"][0]
+        self.assertEqual(row["native_status"], "completed")
+        self.assertEqual(row["status"], "over_budget")
+        self.assertEqual(row["peak_ram_bytes"], ram_limit + 1)
+        with StageJournal(self.root, self.spec, read_only=True) as journal:
+            self.assertTrue(journal.over_budget)
         with self.assertRaises(CampaignRunnerError):
             self.execute()
 
