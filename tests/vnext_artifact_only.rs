@@ -145,13 +145,15 @@ fn fresh_worker_samples_with_empty_environment_and_no_new_access() {
             String::from_utf8_lossy(&output.stderr)
         );
         let receipt: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert!(output.stderr.is_empty());
+        assert!(receipt.get("private_sample_stream").is_none());
+        assert!(receipt.get("values").is_none());
         let samples = sample_raw(&compiled.artifact, rows, Some(seed)).unwrap();
-        let expected_digest = dope_kernel::bundle::content_fingerprint(
-            &samples
-                .iter()
-                .flat_map(|v| v.to_le_bytes())
-                .collect::<Vec<_>>(),
-        );
+        let expected_bytes = samples
+            .iter()
+            .flat_map(|v| v.to_le_bytes())
+            .collect::<Vec<_>>();
+        let expected_digest = dope_kernel::bundle::content_fingerprint(&expected_bytes);
         assert_eq!(receipt["sample_sha256"], expected_digest);
         if rows == 32 && seed == 99 {
             assert_eq!(receipt["sample_sha256"], digest);
@@ -172,7 +174,83 @@ fn fresh_worker_samples_with_empty_environment_and_no_new_access() {
         );
         assert_eq!(receipt["filesystem_network_exec"], "denied");
         fs::write(root.join("receipt.json"), output.stdout).unwrap();
+
+        let private = Command::new(env!("CARGO_BIN_EXE_dope-kernel"))
+            .env_clear()
+            .current_dir(&root)
+            .args(["sample-raw-isolated", "--artifact"])
+            .arg(&artifact)
+            .args(["--rows", &rows.to_string(), "--seed", &seed.to_string()])
+            .arg("--private-samples-f64le")
+            .stdin(Stdio::null())
+            .output()
+            .unwrap();
+        assert!(private.status.success(), "{:?}", private.status);
+        assert_eq!(private.stdout, expected_bytes);
+        let receipt: serde_json::Value = serde_json::from_slice(&private.stderr).unwrap();
+        assert_eq!(receipt["sample_sha256"], expected_digest);
+        assert_eq!(receipt["state"], "sampled");
+        assert_eq!(
+            receipt["private_sample_stream"],
+            json!({
+                "format":"f64le", "layout":"row_major", "column_order":"features_then_target",
+                "rows":rows, "columns":2, "bytes":rows * 2 * 8
+            })
+        );
+        assert_eq!(receipt["filesystem_network_exec"], "denied");
+        assert_eq!(receipt["inherited_source_fds"], "closed");
+        assert!(receipt.get("values").is_none());
+        let public_text = String::from_utf8(private.stderr).unwrap();
+        assert!(!public_text.contains(root.to_str().unwrap()));
+        assert!(!public_text.contains("source_name"));
     }
+    let malformed = root.join("malformed.raw");
+    fs::write(&malformed, b"PRIVATE_MALFORMED_ARTIFACT").unwrap();
+    for (input, rows) in [
+        (&malformed, 32),
+        (&artifact, 0),
+        (&artifact, 100_001),
+        (&artifact, usize::MAX),
+    ] {
+        for private_mode in [false, true] {
+            let mut command = Command::new(env!("CARGO_BIN_EXE_dope-kernel"));
+            command
+                .env_clear()
+                .args(["sample-raw-isolated", "--artifact"])
+                .arg(input)
+                .args(["--rows", &rows.to_string()])
+                .stdin(Stdio::null());
+            if private_mode {
+                command.arg("--private-samples-f64le");
+            }
+            let output = command.output().unwrap();
+            assert!(!output.status.success());
+            assert!(output.stdout.is_empty());
+            let error = String::from_utf8(output.stderr).unwrap();
+            assert!(!error.contains("PRIVATE_MALFORMED_ARTIFACT"));
+            assert!(!error.contains(root.to_str().unwrap()));
+            assert!(!error.contains("\"state\":\"sampled\""));
+        }
+    }
+    let full = fs::OpenOptions::new()
+        .write(true)
+        .open("/dev/full")
+        .unwrap();
+    let failed_write = Command::new(env!("CARGO_BIN_EXE_dope-kernel"))
+        .env_clear()
+        .args(["sample-raw-isolated", "--artifact"])
+        .arg(&artifact)
+        .args(["--rows", "32", "--private-samples-f64le"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::from(full))
+        .stderr(Stdio::piped())
+        .output()
+        .unwrap();
+    assert!(!failed_write.status.success());
+    let error = String::from_utf8(failed_write.stderr).unwrap();
+    assert!(error.contains("sampling_output_write_failed"));
+    assert!(!error.contains("\"state\":\"sampled\""));
+    assert!(!error.contains(root.to_str().unwrap()));
 }
 
 #[test]

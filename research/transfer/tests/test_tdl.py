@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from bench.metrics.qualification import require_citable
 from research.transfer.tdl import aggregate, charge, drivers, frontier, transfer
@@ -333,7 +334,11 @@ class StandaloneGeneratorTests(unittest.TestCase):
             port.fit(FIXTURES / "toy.csv", FIXTURES / "schema.json", 1)
             artifact = root / "payload.raw"
             inventory = port.export(artifact)
-            sampled, receipt = DopeGenerator.reload(artifact, binary=binary, workdir=root / "reload").sample(12, 2)
+            with mock.patch("research.transfer.tdl.generators.subprocess.run", wraps=subprocess.run) as child:
+                sampled, receipt = DopeGenerator.reload(artifact, binary=binary, workdir=root / "reload").sample(12, 2)
+            self.assertEqual(child.call_count, 1)
+            self.assertIn("--private-samples-f64le", child.call_args.args[0])
+            self.assertFalse((root / "reload/sample.csv").exists())
             self.assertEqual(len(sampled), 12)
             self.assertEqual(receipt["payload_bytes"], inventory["payload_bytes"])
             self.assertGreater(receipt["sampling_closure_bytes"], inventory["payload_bytes"])
@@ -350,6 +355,60 @@ class StandaloneGeneratorTests(unittest.TestCase):
                 port.sample(12, 2)
             with self.assertRaisesRegex(MetricError, "generator_not_fitted"):
                 port.export(root / "stale.raw")
+
+
+    def test_bounded_control_cli_replays_real_export_and_redacts_bad_inputs(self):
+        from research.transfer.tdl.generators import CompressedRowsGenerator, GaussianCopulaGenerator
+        for cls, method in ((GaussianCopulaGenerator, "gaussian_copula"),
+                            (CompressedRowsGenerator, "compressed_real_rows")):
+            with self.subTest(method=method), workspace() as directory:
+                root = Path(directory)
+                port = cls(byte_budget=2048)
+                port.fit(FIXTURES / "toy.csv", FIXTURES / "schema.json", 1)
+                artifact, output = root / "payload", root / "sample.csv"
+                port.export(artifact)
+                argv = [sys.executable, "-B", "-m", "research.transfer.tdl.generators",
+                        "--method", method, "--artifact", str(artifact), "--rows", "12", "--seed", "2",
+                        "--byte-budget", "2048", "--output", str(output)]
+                result = subprocess.run(argv, cwd=ROOT, capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stdout)
+                receipt = json.loads(result.stdout)
+                self.assertEqual(receipt["method"], method)
+                self.assertFalse(receipt["citable"])
+                self.assertEqual(receipt["access_trace"]["status"], "passed")
+                self.assertEqual(len(output.read_text().splitlines()), 12)
+                self.assertNotIn(str(root), result.stdout)
+                artifact.write_bytes(b"SECRET_source_values")
+                bad = subprocess.run(argv, cwd=ROOT, capture_output=True, text=True)
+                self.assertEqual(bad.returncode, 1)
+                self.assertNotIn("SECRET", bad.stdout + bad.stderr)
+                self.assertNotIn(str(root), bad.stdout + bad.stderr)
+
+    def test_native_private_stream_refuses_failed_partial_changed_and_nonfinite_output(self):
+        import hashlib
+        import struct
+        binary = ROOT / "target/debug/dope-kernel"
+        with workspace() as directory:
+            root = Path(directory)
+            artifact = root / "artifact"
+            artifact.write_bytes(b"private-test-artifact")
+            port = DopeGenerator.reload(artifact, binary=binary, workdir=root / "unused")
+            raw = struct.pack("<dd", 1., 2.)
+            report = {"state": "sampled", "rows": 1, "seed": 2,
+                "isolation": "linux_x86_64_seccomp_tsync_default_deny", "inherited_source_fds": "closed",
+                "filesystem_network_exec": "denied", "sample_sha256": hashlib.sha256(raw).hexdigest(),
+                "inspection": {"schema": [{}, {}], "accounting": {"cold_sampling_closure_bytes": 32}},
+                "private_sample_stream": {"format": "f64le", "layout": "row_major",
+                    "column_order": "features_then_target", "rows": 1, "columns": 2, "bytes": 16}}
+            nonfinite = struct.pack("<dd", float("nan"), 2.)
+            for rc, data, patch in [(1, raw, {}), (0, raw[:-1], {}),
+                    (0, raw, {"sample_sha256": "0" * 64}),
+                    (0, raw, {"filesystem_network_exec": "observed_only"}),
+                    (0, nonfinite, {"sample_sha256": hashlib.sha256(nonfinite).hexdigest()})]:
+                child = subprocess.CompletedProcess([], rc, data, json.dumps({**report, **patch}).encode())
+                with mock.patch("research.transfer.tdl.generators.subprocess.run", return_value=child):
+                    with self.assertRaises(MetricError):
+                        port.sample(1, 2)
 
     def test_planned_stubs_cannot_run(self):
         for method in ("gaussian_copula", "arf"):

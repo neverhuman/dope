@@ -156,5 +156,145 @@ class AccessTraceTests(unittest.TestCase):
                 list(_calls(log))
 
 
+class BoundedControlTests(unittest.TestCase):
+    def source(self, root, size=128):
+        from research.transfer.tdl.generators import CompressedRowsGenerator, GaussianCopulaGenerator
+        import csv
+        schema = {"format": "dope-table-schema", "version": 1, "columns": [
+            {"id": "c0001", "source_name": "SECRET_x", "role": "feature", "dtype": "continuous"},
+            {"id": "c0002", "source_name": "SECRET_fixed", "role": "feature", "dtype": "continuous"},
+            {"id": "c0003", "source_name": "SECRET_y", "role": "target", "dtype": "continuous"}]}
+        rows = [[(i - size / 2) / 16, 7., (i - size / 2) / 8] for i in range(size)]
+        source, metadata = root / "SECRET_source.csv", root / "SECRET_schema.json"
+        with source.open("w") as stream:
+            writer = csv.writer(stream)
+            writer.writerow([column["source_name"] for column in schema["columns"]])
+            writer.writerows(rows)
+        metadata.write_text(json.dumps(schema))
+        return source, metadata, rows, (GaussianCopulaGenerator, CompressedRowsGenerator)
+
+    def test_real_controls_source_deleted_artifact_replay_and_complete_byte_charge(self):
+        from research.transfer.tdl.literal_worker import _control_document, _literal_payload
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, training, classes = self.source(root)
+            for cls in classes:
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, (1 << 64) - 1)
+                artifact = root / cls.__name__
+                receipt = port.export(artifact)
+                repeated = cls(byte_budget=2048)
+                repeated.fit(source, schema, (1 << 64) - 1)
+                duplicate = root / (cls.__name__ + "-copy")
+                repeated.export(duplicate)
+                self.assertEqual(artifact.read_bytes(), duplicate.read_bytes())
+                self.assertLessEqual(artifact.stat().st_size, 2048)
+                self.assertEqual(receipt["payload_bytes"], artifact.stat().st_size)
+                content = _literal_payload(artifact.read_bytes())
+                doc = _control_document(content, port.method)
+                self.assertEqual(doc["fit_rows"], len(training))
+                with self.assertRaises(MetricError):
+                    cls.reload(artifact, byte_budget=artifact.stat().st_size - 1)
+            source.unlink()
+            schema.unlink()
+            for cls in classes:
+                artifact = root / cls.__name__
+                port = cls.reload(artifact, byte_budget=2048)
+                sampled, receipt = port.sample(300, (1 << 64) - 2)
+                same, _ = cls.reload(artifact, byte_budget=2048).sample(300, (1 << 64) - 2)
+                self.assertEqual(sampled, same)
+                self.assertFalse(receipt["citable"])
+                self.assertEqual(receipt["access_trace"]["status"], "passed")
+                self.assertEqual(receipt["access_trace"]["trace_kind"], "linux_strace")
+                self.assertGreater(receipt["sampling_closure_bytes"], receipt["payload_bytes"])
+                self.assertEqual({row[1] for row in sampled}, {7.})
+                self.assertNotIn("SECRET", json.dumps(receipt))
+                if port.method == "compressed_real_rows":
+                    self.assertTrue(set(map(tuple, sampled)) <= set(map(tuple, training)))
+                else:
+                    x, y = zip(*[(row[0], row[2]) for row in sampled])
+                    mx, my = sum(x) / len(x), sum(y) / len(y)
+                    cov = sum((a - mx) * (b - my) for a, b in zip(x, y))
+                    scale = (sum((a - mx) ** 2 for a in x) * sum((b - my) ** 2 for b in y)) ** .5
+                    self.assertGreater(cov / scale, .98)
+                    self.assertGreaterEqual(min(x), min(row[0] for row in training))
+                    self.assertLessEqual(max(x), max(row[0] for row in training))
+
+    def test_caps_schema_types_and_fit_failure_do_not_leave_stale_artifact(self):
+        import copy
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, _, classes = self.source(root)
+            valid = json.loads(schema.read_text())
+            for cls in classes:
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, 0)
+                for change in ({"dtype": "nominal"}, {"role": "excluded_key"}, {"dtype": "count"}):
+                    altered = copy.deepcopy(valid)
+                    altered["columns"][0].update(change)
+                    schema.write_text(json.dumps(altered))
+                    with self.assertRaisesRegex(MetricError, "unsupported_control_schema"):
+                        port.fit(source, schema, 0)
+                    with self.assertRaisesRegex(MetricError, "generator_not_fitted"):
+                        port.export(root / "must-not-exist")
+                schema.write_text(json.dumps(valid))
+                with self.assertRaisesRegex(MetricError, "control_artifact_exceeds_cap"):
+                    cls(byte_budget=1).fit(source, schema, 0)
+                for seed in (True, -1, 1 << 64):
+                    with self.assertRaises(MetricError):
+                        port.fit(source, schema, seed)
+                schema.write_text('{"format":"invalid","format":"dope-table-schema"}')
+                with self.assertRaisesRegex(MetricError, "invalid_control_artifact"):
+                    port.fit(source, schema, 0)
+                schema.write_text(json.dumps(valid))
+
+    def test_bounded_read_rejects_symlinks_fifos_gzip_bombs_and_changed_artifacts(self):
+        import gzip
+        import os
+        from research.transfer.tdl.literal_worker import MAX_CONTROL_JSON, _control_document, _literal_payload
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, _, classes = self.source(root)
+            for cls in classes:
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, 1)
+                artifact = root / cls.__name__
+                port.export(artifact)
+                loaded = cls.reload(artifact, byte_budget=2048)
+                with self.assertRaisesRegex(MetricError, "generator_artifact_exists"):
+                    port.export(artifact)
+                link = root / (cls.__name__ + "-link")
+                link.symlink_to(artifact)
+                with self.assertRaises(MetricError):
+                    cls.reload(link, byte_budget=2048)
+                fifo = root / (cls.__name__ + "-fifo")
+                os.mkfifo(fifo)
+                with self.assertRaises(MetricError):
+                    cls.reload(fifo, byte_budget=2048)
+                content = _literal_payload(artifact.read_bytes())
+                doc = _control_document(content, loaded.method)
+                doc["fit_seed"] = 2
+                replacement = charge.canonical_container([{"name": "literal_payload", "hex":
+                    gzip.compress(json.dumps(doc).encode(), mtime=0).hex()}])
+                artifact.write_bytes(replacement)
+                with self.assertRaisesRegex(MetricError, "generator_artifact_changed"):
+                    loaded.sample(1, 1)
+                with self.assertRaises(MetricError):
+                    _control_document(gzip.compress(b"a" * (MAX_CONTROL_JSON + 1)), loaded.method)
+                with self.assertRaises(MetricError):
+                    _control_document(content + content, loaded.method)
+
+    def test_copula_ties_and_constant_columns_remain_finite_and_seeded(self):
+        from research.transfer.tdl.literal_worker import _copula_state, _control_sample
+        rows = [[float(i % 3), 9.] for i in range(30)]
+        factor, ordered = _copula_state(rows, 0)
+        document = {"method": "gaussian_copula", "columns": 2, "factor": factor,
+                    "quantile_count": 3, "quantiles": [[column[0], column[15], column[-1]] for column in ordered]}
+        a, b = _control_sample(document, 30, 7), _control_sample(document, 30, 8)
+        self.assertNotEqual(a, b)
+        self.assertEqual(a, _control_sample(document, 30, 7))
+        self.assertTrue(all(0 <= row[0] <= 2 and row[1] == 9 for row in a))
+
+
 if __name__ == "__main__":
     unittest.main()
