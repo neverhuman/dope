@@ -1,0 +1,57 @@
+% Packages and environments shared by dope1.tex, dope1-supplement.tex and dope1-venue.tex.
+% Class, fonts and page geometry are chosen by each wrapper.
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\definecolor{stageline}{gray}{0.45}
+\definecolor{stagefill}{gray}{0.975}
+\definecolor{targetfill}{RGB}{233,241,251}
+\definecolor{artfill}{RGB}{214,230,248}
+\definecolor{arrowink}{gray}{0.4}
+\newlength{\stageht}
+\setlength{\stageht}{1.55cm}
+\newlength{\stagewd}
+\setlength{\stagewd}{2.55cm}
+% A fixed-height text box for pipeline stages.
+\newcommand{\stagebox}[2][\stagewd]{\parbox[c][\stageht][c]{#1}{\raggedright #2}}
+% The venue class loads natbib itself (author-year); the preprint uses numbers.
+\ifdefined\VenueBuild\else\usepackage[numbers,sort&compress]{natbib}\fi
+\usepackage[colorlinks=true,linkcolor=linkblue,citecolor=linkblue,urlcolor=linkblue]{hyperref}
+\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
+\definecolor{pendingcolor}{RGB}{176,58,46}
+\definecolor{linkblue}{RGB}{31,86,160}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\captionsetup[table]{position=top}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+% Algorithms are plain numbered floats (no texlive-science dependency).
+\DeclareCaptionType[fileext=loa,placement=t]{algo}[Algorithm][List of Algorithms]
+\crefname{algo}{Algorithm}{Algorithms}
+
+\input{macros}
+% DOPE 1.0 engine benchmark (bench/real-world/render.py): results and source-derived settings.
+\IfFileExists{generated/dope1-macros.tex}{\input{generated/dope1-macros.tex}}{}
+\IfFileExists{generated/dope1-config.tex}{\input{generated/dope1-config.tex}}{}
+\IfFileExists{generated/dope1-throughput-macros.tex}{\input{generated/dope1-throughput-macros.tex}}{}
+% \G{Name} prints a generated value, or a visible pending marker when it is absent.
+\newcommand{\G}[1]{\ifcsname #1\endcsname\csname #1\endcsname\else\pending{#1}\fi}
+\newlength{\stagewidth}
+\setlength{\stagewidth}{0.235\linewidth}
+\newlength{\halfwidth}
+\setlength{\halfwidth}{0.5\linewidth}
+\newlength{\tallwidth}
+\setlength{\tallwidth}{0.62\linewidth}

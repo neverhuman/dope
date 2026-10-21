@@ -1,0 +1,42 @@
+% DOPE 1.0 manuscript, preprint build. The body is dope1-content.tex; Figure 1 is dope1-hero.tex.
+% Every result value is generated (paper/generated/dope1-*.tex, bench/real-world/render.py);
+% a missing input typesets a visible [pending] marker instead of a number.
+\documentclass[10pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[scaled=0.9]{helvet}
+\usepackage{courier}
+\usepackage[letterpaper,textwidth=6.1in,textheight=9in,centering]{geometry}
+\input{dope1-preamble}
+\hypersetup{pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding},
+  pdfauthor={Jepson Taylor; Alton Alexander},
+  pdfsubject={How few bytes does a table's predictive structure need?}}
+\setlength{\herowidth}{0.82\linewidth}
+
+\makeatletter
+\renewcommand{\@maketitle}{%
+  \begin{center}
+    {\LARGE\bfseries D.O.P.E.: Downstream Objective-Preserving Encoding\par}
+    \vspace{0.35em}
+    {\large How few bytes does a table's predictive structure need?\par}
+    \vspace{0.9em}
+    {\normalsize Jepson Taylor \qquad Alton Alexander\par}
+    {\small NEVERHUMAN Research\par}
+  \end{center}
+  \vspace{0.4em}
+  \begin{center}
+    \begin{minipage}{\herowidth}
+      \input{dope1-hero}
+    \end{minipage}
+  \end{center}
+  \vspace{0.2em}}
+\makeatother
+
+\begin{document}
+\maketitle
+\input{dope1-content}
+
+\bibliographystyle{plainnat}
+\bibliography{references,references-dope1}
+\end{document}

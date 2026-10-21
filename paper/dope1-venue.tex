@@ -1,0 +1,26 @@
+% Double-blind ICLR-format build of the DOPE 1.0 manuscript (same body as dope1.tex).
+% The style file (iclr2027_conference.sty) is shared with main.tex in this directory.
+\documentclass{article}
+\def\VenueBuild{}
+\usepackage{iclr2027_conference,times}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\input{dope1-preamble}
+\setlength{\herowidth}{0.9\linewidth}
+
+\title{D.O.P.E.: How Few Bytes Does a Table's Predictive Structure Need?}
+\author{Authors withheld for review}
+
+\newcommand{\AfterAbstract}{%
+  \begin{figure}[h!]
+    \centering
+    \begin{minipage}{\herowidth}\input{dope1-hero}\end{minipage}
+  \end{figure}}
+
+\begin{document}
+\maketitle
+\input{dope1-content}
+
+\bibliographystyle{iclr2027_conference}
+\bibliography{references,references-dope1}
+\end{document}
