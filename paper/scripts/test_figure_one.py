@@ -20,8 +20,12 @@ class FigureOneTests(unittest.TestCase):
         self.assertEqual(F.failures(AUX, LOG), [])
 
     def test_pending_placeholder_is_refused(self):
-        self.assertIn("generated/hero-frontier.pdf was not included; Figure 1 would be a pending placeholder",
+        self.assertIn("no generated hero figure was included; Figure 1 would be a pending placeholder",
                       F.failures(AUX, "File: macros.tex\n"))
+
+    def test_compression_frontier_counts_as_a_generated_hero(self):
+        log = LOG.replace("hero-frontier.pdf", "compression-frontier.pdf")
+        self.assertEqual(F.failures(AUX, log), [])
 
     def test_floated_or_renumbered_figure_is_refused(self):
         self.assertEqual(F.failures(AUX.replace("{{1}{1}", "{{1}{2}"), LOG), ["fig:frontier is not on page 1"])

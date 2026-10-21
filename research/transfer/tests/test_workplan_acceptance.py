@@ -313,7 +313,7 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         self.assertIn("Feature-Target Correlation Proxy", readme_text)
         self.assertIn("strongest measured comparator on this historical block", readme_text)
         self.assertIn("paper/main.tex", readme_text)
-        stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->", "", readme_text, flags=re.S)
+        stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART) -->", "", readme_text, flags=re.S)
         self.assertTrue(650 <= len(stripped.split()) <= 900)
         wp_env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}
         for mod in ("test_readme_benchmark", "test_figure_one", "test_hero_figure"):

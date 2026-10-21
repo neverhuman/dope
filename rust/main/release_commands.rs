@@ -101,7 +101,7 @@ fn run_release(command: Command) -> Result<()> {
                 } else {
                     println!("{}", serde_json::to_string_pretty(&inspection)?);
                 }
-            } else if raw_bytes.starts_with(b"DOPEMIX1") {
+            } else if raw_bytes.starts_with(b"DOPMIX01") {
                 let bytes = dope_kernel::typed_data::mixed::read_mixed_artifact(&kernel)?;
                 let inspection = dope_kernel::typed_data::mixed::inspect_mixed(&bytes)?;
                 if let Some(path) = out {

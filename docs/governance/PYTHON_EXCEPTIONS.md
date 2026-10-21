@@ -1,9 +1,9 @@
-# Python Exceptions Inventory (`PYTHON_EXCEPTIONS.md`)
+# Python Exceptions Inventory (`docs/governance/PYTHON_EXCEPTIONS.md`)
 
 This document inventories every tracked Python (`.py`) file in the repository,
 recording its concrete purpose, subsystem boundary, classification (`keep-with-reason`
 vs `port-candidate`), and justification under the Rust-first architecture
-([`docs/architecture.md`](docs/architecture.md)).
+([`docs/architecture.md`](../architecture.md)).
 
 ## Summary by Classification
 

@@ -1,4 +1,4 @@
-# Python-to-Rust Migration & Boundary Plan (`PY_TO_RUST_PLAN.md`)
+# Python-to-Rust Migration & Boundary Plan (`docs/governance/PY_TO_RUST_PLAN.md`)
 
 This plan governs the lifecycle of all tracked Python files in `dope` (cross-referenced
 with [`PYTHON_EXCEPTIONS.md`](PYTHON_EXCEPTIONS.md)) so the core synthesizer, wire
@@ -12,7 +12,7 @@ Python-native ML model ecosystems, and publication plotting.
    - Owns all DPK3.2 / v2 encoding, compilation, sampling, privacy screening, receipt signing/verification, and GitHub merge-guard state machines.
    - Zero runtime dependency on Python.
 2. **Keep-With-Reason Python (`keep-with-reason`)**:
-   - **`python/dope_v1/*`**: Frozen historical reference implementation required by [`docs/architecture.md`](docs/architecture.md) for cross-language bit/receipt parity tests. Never extended with new features.
+   - **`python/dope_v1/*`**: Frozen historical reference implementation required by [`docs/architecture.md`](../architecture.md) for cross-language bit/receipt parity tests. Never extended with new features.
    - **`research/*`**: Empirical benchmark harnesses invoking Python-native ML libraries (`catboost`, `lightgbm`, `xgboost`, `scikit-learn`, `torch`, `tabpfn`, `tabicl`).
    - **`docs/whitepaper/scripts/*`, `tools/claims/{foundation,render,test_figure}.py`**: Publication figure/table rendering (`matplotlib`) and LaTeX build orchestration.
 3. **Port Candidates (`port-candidate`)**:

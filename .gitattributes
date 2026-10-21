@@ -1,0 +1,10 @@
+# GitHub presentation only: collapse generated evidence in diffs and keep language
+# statistics about the code. No text, eol, filter or lfs attributes: pinned evidence
+# bytes must never be normalized.
+research/benchmark/results/** linguist-generated=true
+docs/whitepaper/generated/** linguist-generated=true
+paper/generated/** linguist-generated=true
+ops/vendor/** linguist-vendored=true
+docs/archive/** linguist-documentation=true
+paper/archive/** linguist-documentation=true
+docs/review-inputs/** linguist-documentation=true

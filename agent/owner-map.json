@@ -70,8 +70,8 @@
     "research/benchmark/LOCAL_CAPACITY_AMENDMENT.md": "external-evidence",
     "research/benchmark/results/campaign-local-capacity-amendment": "external-evidence",
     "AGENTS.md": "governance",
-    "PYTHON_EXCEPTIONS.md": "governance",
-    "PY_TO_RUST_PLAN.md": "governance",
+    "docs/governance/PYTHON_EXCEPTIONS.md": "governance",
+    "docs/governance/PY_TO_RUST_PLAN.md": "governance",
     "README.md": "governance",
     "CHANGELOG.md": "governance",
     "CITATION.cff": "governance",
@@ -103,7 +103,7 @@
     "research/": "external-evidence",
     "validation/requirements-v1.txt": "python-v1-compatibility",
     "validation/": "external-evidence",
-    "launch_tuner_tui.sh": "python-v1-compatibility",
+    "scripts/launch_tuner_tui.sh": "python-v1-compatibility",
     "research/benchmark/fixtures/tabddpm-native-prelaunch/": "external-evidence",
     "research/benchmark/aim_native.py": "external-evidence",
     "research/benchmark/gpu_refinement_bootstrap.py": "external-evidence",
@@ -732,6 +732,15 @@
     "research/transfer/tdl/target_last.py": "external-evidence",
     "research/transfer/tests/test_target_last.py": "external-evidence",
     "docs/data-contract.md": "external-evidence",
-    "research/transfer/native_control_prepare.py": "external-evidence"
+    "research/transfer/native_control_prepare.py": "external-evidence",
+    "examples/quickstart/": "external-evidence",
+    "docs/whitepaper/scripts/compression_frontier.py": "external-evidence",
+    "docs/whitepaper/scripts/compression_frontier_render.py": "external-evidence",
+    "docs/whitepaper/scripts/quickstart_block.py": "external-evidence",
+    "docs/whitepaper/scripts/readme_blocks.py": "governance",
+    "docs/math.md": "governance",
+    "docs/REPO_MAP.md": "governance",
+    ".gitattributes": "governance",
+    "docs/whitepaper/scripts/test_compression_frontier.py": "external-evidence"
   }
 }

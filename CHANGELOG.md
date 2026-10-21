@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- Add the compression frontier: worst-auditor retention (smallest of
+  CatBoost, linear and MLP per lineage, the `T_robust` rule) against charged
+  bytes, and retained lift per KiB, recomputed from the pinned v2 ledgers with
+  the panel's nested bootstrap. It is the README hero and Figure 1 of the TDL
+  manuscript; its README block and TeX are authenticated by the claims
+  firewall. Evidence remains selection-exposed validation.
+- Add `examples/quickstart/`: a reversible table encoder (target-ordered or
+  one-hot categoricals, robust scaling, dates, missing values) with a compact
+  charged state, transfer-in-the-loop backend selection inside the fit rows,
+  a retention helper, an end-to-end quick start on UCI Adult and a five-seed
+  ablation on UCI Adult and Abalone. Local engineering evidence only.
+- Expand `paper/main.tex` into a full manuscript with a transfer theory
+  (retention identities for squared and log loss, two corollaries, a size
+  bound) and add `docs/math.md` (theory, byte anatomy, review findings and
+  roadmap) and `docs/REPO_MAP.md`.
+- Fix `dope-kernel inspect` for mixed artifacts (`DOPMIX01` magic).
+- Move `PY_TO_RUST_PLAN.md` and `PYTHON_EXCEPTIONS.md` to `docs/governance/`
+  and `launch_tuner_tui.sh` to `scripts/`; add linguist-only `.gitattributes`.
+
 - Add native raw-unit compilation, inspection, sampling, and a restricted
   artifact-only CPU worker. The complete raw-artifact charge includes retained
   fitted transforms and schema, framing, and native payload; historical DPK

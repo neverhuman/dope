@@ -1,10 +1,15 @@
 # TDL paper package
 
-The canonical manuscript package for **Transfer Description Length for Synthetic Tables**
-(working title; the metric name awaits owner decision D-01). This is the active paper landing
-page for the manuscript in `main.tex` and supplement in `supplement.tex`. Figure 1 and Table 1
-present the authenticated historical selection-exposed foundation-model transfer comparison;
-prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
+The canonical manuscript package for **D.O.P.E.: Compiling Tables into Small Programs That
+Preserve What Models Learn** (the metric name TDL awaits owner decision D-01). This is the active
+paper landing page for the manuscript in `main.tex` and supplement in `supplement.tex`. The
+manuscript has the shape of a full conference paper: problem and metric, a short transfer theory
+(retention identities for squared and log loss, two corollaries, a size bound), the compiler, the
+protocol, results and limitations. Figure 1 pairs the compression frontier (worst-auditor
+retention against charged bytes, and retained lift per KiB) with the authenticated
+foundation-model transfer bars; Table 1 is the generated frontier table. Every number is
+historical selection-exposed validation or a labeled local demonstration; prospective TDL
+confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
 `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
 paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/dope-mfs.pdf)
 and [`docs/whitepaper/supplement.pdf`](../docs/whitepaper/supplement.pdf), with its
@@ -17,7 +22,8 @@ qualifications documented in [`docs/whitepaper/`](../docs/whitepaper/README.md).
 | `references.bib` | starts as a copy of the historical paper's DOI-checked bibliography; add only verified entries | L3 |
 | `build.sh` | checks the contract macros, then builds both PDFs into `target/paper/` and fails on unresolved references or citations | L3 |
 | `scripts/contract_macros.py` | writes `generated/contract-macros.tex`; `--check` refuses drift and any headline-threshold disagreement | L3 |
-| `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` | L2 (tools/claims) |
+| `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` (tools/claims), from the pinned v2 ledgers (`compression-*`, `docs/whitepaper/scripts/compression_frontier.py`) and from the committed quickstart run (`quickstart-macros.tex`, `docs/whitepaper/scripts/quickstart_block.py`) | L2 |
+| `related.bib` | related-work entries copied from the whitepaper's verified `related.bib`, plus Crossref-verified additions | L3 |
 | `archive/` | review ledgers and readiness notes moved out of the historical paper directory (T-111) | L3 |
 
 ## Build
@@ -52,7 +58,10 @@ do not, so a missing input can never look like a measurement:
   render it.
 - Use the neutral `article` class until a submission build exists. A venue build will be a
   separate target generated from the same sources.
-- Do not fill the abstract's result sentence before the sealed run.
+- The abstract's result sentences carry selection-exposed validation numbers through generated
+  macros, with that label stated in the same sentence. Replace them with the sealed-test numbers
+  when the sealed run exists (owner decision; this relaxes the earlier rule of an abstract without
+  results).
 
 ## Contract agreement
 

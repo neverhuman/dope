@@ -1,11 +1,11 @@
 {
   "workspace": "dope",
   "tests": {
-    "PYTHON_EXCEPTIONS.md": {
+    "docs/governance/PYTHON_EXCEPTIONS.md": {
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
     },
-    "PY_TO_RUST_PLAN.md": {
+    "docs/governance/PY_TO_RUST_PLAN.md": {
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
     },
@@ -869,8 +869,8 @@
       "command": "just check",
       "purpose": "verify validation dependencies and fixtures"
     },
-    "launch_tuner_tui.sh": {
-      "command": "bash -n launch_tuner_tui.sh",
+    "scripts/launch_tuner_tui.sh": {
+      "command": "bash -n scripts/launch_tuner_tui.sh",
       "purpose": "verify launcher syntax"
     },
     "research/benchmark/publish_dope_refinement_progress.py": {
@@ -2948,6 +2948,42 @@
     "research/transfer/native_control_prepare.py": {
       "command": "python3 -B research/transfer/native_control_prepare.py && python3 -B -m unittest research.transfer.tests.test_native_control -v",
       "purpose": "Fresh exact-source offline build and paid runtime manifest before mandatory Linux transfer discovery; missing/stale artifacts fail"
+    },
+    "examples/quickstart/": {
+      "command": "python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v",
+      "purpose": "verify the reversible table encoder, retention helper and decode round trips without the native binary"
+    },
+    "docs/whitepaper/scripts/compression_frontier.py": {
+      "command": "python3 -B docs/whitepaper/scripts/compression_frontier.py --check",
+      "purpose": "recompute the compression frontier from SHA-pinned ledgers and refuse drift in its JSON, TeX and README block"
+    },
+    "docs/whitepaper/scripts/compression_frontier_render.py": {
+      "command": "python3 -B docs/whitepaper/scripts/compression_frontier.py --check",
+      "purpose": "verify the frontier renderers reproduce every committed text output"
+    },
+    "docs/whitepaper/scripts/quickstart_block.py": {
+      "command": "python3 -B docs/whitepaper/scripts/quickstart_block.py --check",
+      "purpose": "verify the README quickstart block and paper macros render from the committed reference run and ablation"
+    },
+    "docs/whitepaper/scripts/readme_blocks.py": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "authenticate generated README blocks and generated compression TeX inside the claims firewall"
+    },
+    "docs/math.md": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "keep the technical note consistent with public claims"
+    },
+    "docs/REPO_MAP.md": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "keep the repository map consistent with public claims"
+    },
+    ".gitattributes": {
+      "command": "git check-attr linguist-generated -- paper/generated/manifest.json",
+      "purpose": "verify linguist-only attributes; no text or eol normalization"
+    },
+    "docs/whitepaper/scripts/test_compression_frontier.py": {
+      "command": "PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_compression_frontier -v",
+      "purpose": "verify committed frontier and quickstart outputs equal their renderings and the README carries them"
     }
   }
 }

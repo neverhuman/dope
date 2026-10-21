@@ -1,0 +1,67 @@
+{
+ "format": "dope-quickstart-v1",
+ "dataset": "UCI Adult (census income), CC BY 4.0, DOI 10.24432/C5XW20",
+ "task": "binary",
+ "target": "income",
+ "fit_rows": 32561,
+ "holdout_rows": 16281,
+ "synthetic_rows": 32561,
+ "backend": "sparse_gaussian_copula",
+ "selected_candidate": "sparse_gaussian_copula",
+ "selection": {
+  "portfolio": [
+   "chow_liu",
+   "compact_neural_residual_symbolic",
+   "sparse_gaussian_copula",
+   "search"
+  ],
+  "folds": 3,
+  "scores": {
+   "chow_liu": 0.7581011239826188,
+   "compact_neural_residual_symbolic": 0.7637731263932362,
+   "sparse_gaussian_copula": 0.8254903039449301,
+   "search": 0.8002276063848109
+  }
+ },
+ "encoding": {
+  "numeric": "robust",
+  "categorical": "target_ordered"
+ },
+ "bytes": {
+  "model": 1714,
+  "encoder": {
+   "transform_bytes": 249,
+   "label_bytes": 587,
+   "total_bytes": 836
+  },
+  "state": 2550,
+  "fit_csv": 3514344,
+  "fit_csv_gzip9": 396983
+ },
+ "auditors": [
+  {
+   "auditor": "catboost",
+   "null_loss": 0.5467485574653357,
+   "real_loss": 0.2765808537796329,
+   "synthetic_loss": 0.3194113961586264,
+   "retention": 0.8414668304364756
+  },
+  {
+   "auditor": "linear",
+   "null_loss": 0.5467485574653357,
+   "real_loss": 0.31753351384700124,
+   "synthetic_loss": 0.34279147346511046,
+   "retention": 0.8898067106792248
+  },
+  {
+   "auditor": "mlp",
+   "null_loss": 0.5467485574653357,
+   "real_loss": 0.3082260551135316,
+   "synthetic_loss": 0.3266941677746551,
+   "retention": 0.9225728705718327
+  }
+ ],
+ "worst_retention": 0.8414668304364756,
+ "program": "(dpk v=3 task=binary n=32561 p=14 seed=11 (schema (continuous i=0) (ordinal i=1) (continuous i=2) (ordinal i=3) (ordinal i=4) (ordinal i=5) (ordinal i=6) (ordinal i=7) (ordinal i=8) (binary i=9) (inflated i=10) (inflated i=11) (continuous i=12) (categoricalgrid i=13)) (marginals (quantile_spline i=0) (categorical_grid i=1) (quantile_spline i=2) (categorical_grid i=3) (categorical_grid i=4) (categorical_grid i=5) (categorical_grid i=6) (categorical_grid i=7) (categorical_grid i=8) (bernoulli i=9) (quantile_spline i=10) (quantile_spline i=11) (quantile_spline i=12) (categorical_grid i=13)) (dependence kind=sparse_graph) (target kind=sparse_gam) (noise kind=isotonic_calibration))",
+ "evidence_status": "local_engineering_demo"
+}
