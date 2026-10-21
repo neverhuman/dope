@@ -1,5 +1,7 @@
 """The equal-byte renderer's text outputs equal the committed files and stay digit-free where linted."""
 import sys
+import hashlib
+import json
 import unittest
 from pathlib import Path
 
@@ -24,6 +26,17 @@ class EqualBytesRenderTests(unittest.TestCase):
         start, end = readme.index(T.README_BEGIN), readme.index(T.README_END) + len(T.README_END)
         failures = claim_registry.lint_public_text(readme[:start] + readme[end:].split("<details>")[0], "README")
         self.assertEqual([f for f in failures if "hand-typed" in f], [])
+
+    def test_origin_correction_preserves_historical_membership(self):
+        origin = json.loads((T.REPO / "docs/evidence/pmlb-pollen-origin-20261021.json").read_text())
+        self.assertEqual(hashlib.sha256(origin["metadata_utf8"].encode()).hexdigest(), origin["metadata_sha256"])
+        self.assertIn("Synthetic pollen dataset", origin["metadata_utf8"])
+        summary = json.loads((T.RESULTS / "summary.json").read_text())
+        self.assertIn(origin["dataset"], {row["dataset"] for row in summary["lineages"]})
+        block = T.text_outputs()["paper/generated/readme-equal-bytes.md"]
+        self.assertIn("mixed/unknown-origin", block)
+        self.assertIn("simulated pollen", block)
+        self.assertNotIn("real-world tables that reach", block)
 
     def test_frontier_coverage_counts_failures_in_the_denominator(self):
         lineages = [[{"bytes": 500, "robust": 0.9}], [{"bytes": 500, "robust": 0.5}], []]

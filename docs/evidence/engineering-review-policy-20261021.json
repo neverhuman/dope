@@ -1,0 +1,16 @@
+{
+  "format": "primary-human-single-agent-engineering-review-authority-v1",
+  "utc": "2026-10-21T12:54:09.254086+00:00",
+  "verbatim": "Please remove the need for a second reviewer on this, I want the same agent to be able to. Please check for any pending PRs and resolve.",
+  "scope": "DOPE ordinary engineering PR review and integration",
+  "action": "Same source agent may review and merge after required automated checks; no fabricated self-approval or second Git identity",
+  "retained": [
+    "five strict GitHub Actions required checks",
+    "conversation resolution",
+    "normal PR merge without force or admin bypass",
+    "actual receiving-main checks",
+    "independent scientific reproduction and sealed principal qualifications",
+    "both historical custody HOLDs and unique asset preservation"
+  ],
+  "supersedes": "older mandatory second-agent/exact-head neverhumanbot engineering approval requirement only"
+}

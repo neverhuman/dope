@@ -15,7 +15,7 @@ both representations, which is what TDL measures.
 
 | Item | Choice |
 | --- | --- |
-| Tables | Real-world lineages of the public PMLB panel (`ops/ci/paper-inputs/pmlb-sources.json`), excluding simulated families and three content duplicates: 26 tables. `--all` adds the simulated lineages (97 unique). |
+| Tables | Historical mixed/unknown-origin remainder of the public PMLB panel (`ops/ci/paper-inputs/pmlb-sources.json`), after the original name-based exclusions and three content duplicates: 26 tables. The mask retains simulated pollen; it is not an origin classifier. `--all` adds the simulated lineages (97 unique). |
 | Split | Shuffle with seed 1729; test = 30% of rows, capped at 2,000; fit = up to 2,000 of the rest. Min-max scaling with fit-row statistics. |
 | Learners | The v2 evaluator's: OLS, one-hidden-layer MLP (32 units, early stopping), CatBoost (100 iterations, depth 6), seed 1729. |
 | DOPE arm | Ladder L1 to L5 of packed programs with the native trainer, three fit seeds (11, 23, 37), `4n` synthetic rows. L4 matches the published headline shape and is also compiled with the historical codec to record the before/after bytes. |
@@ -24,7 +24,17 @@ both representations, which is what TDL measures.
 | Charge | Both arms pay 8 bytes per column for the fit-row scaling. The historical charge (`projection.json`) is recorded beside it. |
 | Aggregation | Retention per learner against the matched reference, clipped to [0, 1]; median over seeds in both arms; worst informative learner per table; frontier = best configuration within the budget; real-row bytes to match a level interpolated in log bytes between bracketing budgets; percentile bootstrap over tables (10,000 draws, seed 1729). |
 | Scaling | Four large tables; nested fit views of 250 to 16,000 rows against a fixed 2,000-row test set; program bytes against whole-table bytes. |
-| Copula ablation | The headline rung with the exact Gaussian copula (G4) on the 26 real-world tables, paired with L4 by table. |
+| Copula ablation | The headline rung with the exact Gaussian copula (G4) on the 26 historical-cohort tables, paired with L4 by table. |
+
+## Source-origin correction
+
+The [pinned PMLB metadata](../../../docs/evidence/pmlb-pollen-origin-20261021.json)
+explicitly describes `529_pollen` as simulated. Its absence from the old name mask
+did not make it measured real-world data. The current labels are corrected without
+changing cohort membership, raw results or predeclarations. Other members are not
+automatically classified as real. `historical_remainder_entries` reproduces that
+mask; its old `real_world_entries` alias exists only for compatibility. Neither is
+a rights or origin gate for the new measured-source pilot.
 
 ## Protocol history
 
@@ -55,10 +65,10 @@ python3 -B -m research.benchmark.equal_bytes.run --binary target/release/dope-ke
 python3 -B -m research.benchmark.equal_bytes.summarize target/eb-results --out research/benchmark/equal_bytes/results/summary.json
 python3 -B -m research.benchmark.equal_bytes.scaling --binary target/release/dope-kernel --sources target/pmlb \
   --out research/benchmark/equal_bytes/results/scaling 537_houses 225_puma8NH 218_house_8L 227_cpu_small
-# Exact Gaussian copula ablation (rung G4) on the 26 real-world tables
+# Exact Gaussian copula ablation (rung G4) on the 26 historical-cohort tables
 python3 -B -m research.benchmark.equal_bytes.run --binary target/release/dope-kernel --arms dope --rungs G4 \
   --out research/benchmark/equal_bytes/results/ablations/gaussian-copula target/eb/*
-# Full panel: the 71 simulated lineages on a two-rung ladder, summarized with the 26 real-world records
+# Full panel: the 71 simulated lineages on a two-rung ladder, summarized with the 26 historical-cohort records
 python3 -B -m research.benchmark.equal_bytes.prepare --sources target/pmlb --out target/eb-all --all
 python3 -B -m research.benchmark.equal_bytes.run --binary target/release/dope-kernel --arms dope,data --rungs L2,L4 \
   --out research/benchmark/equal_bytes/results/panel $(comm -23 <(ls target/eb-all) <(ls target/eb) | sed 's|^|target/eb-all/|')
@@ -71,7 +81,7 @@ python3 docs/whitepaper/scripts/equal_bytes_render.py --check  # text outputs mu
 On two CPU cores the 26-table study takes about 40 minutes, the scaling study
 about 20 minutes and the 71 simulated panel lineages about 2.5 hours. Results
 were produced with the binary built from this branch; per-table records are in
-`results/lineages/` (26 real-world tables, full ladder) and `results/panel/`
+`results/lineages/` (26 historical-cohort tables, full ladder) and `results/panel/`
 (71 simulated lineages, rungs L2 and L4), the scaling records in
 `results/scaling/`, and the summaries in `results/summary.json` and
 `results/panel-summary.json`.

@@ -23,3 +23,198 @@ required_artifacts = []
 timeout_seconds = 300
 requires_network = false
 destructive = false
+
+[[lane]]
+name = "fast"
+command = "just fast"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.fast"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 7200
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "full"
+command = "just check"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.full"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 7200
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "audit"
+command = "just score"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.audit"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 3600
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "focus-transfer"
+command = "just focus transfer_metrics::tests"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.focus-transfer"
+kind = "validation"
+cost = 2
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 300
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "focus-runner-tests"
+command = "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.focus-runner-tests"
+kind = "validation"
+cost = 2
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 60
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "recipes"
+command = "just fast && python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v"
+purpose = "Named existing proof for owner/test-map routing; retain raw command results"
+command_id = "lane.recipes"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 7200
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "badge-tests"
+command = "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof"
+purpose = "Validate exact-head full-report badge and fail-closed states"
+command_id = "lane.badge-tests"
+kind = "validation"
+cost = 1
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 60
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "security"
+command = "just security"
+purpose = "Existing required CI lane for owner/test-map routing"
+command_id = "lane.security"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 3600
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "cpu"
+command = "bash scripts/ci-local.sh cpu"
+purpose = "Existing required CI lane for owner/test-map routing"
+command_id = "lane.cpu"
+kind = "validation"
+cost = 8
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 7200
+requires_network = true
+destructive = false
+
+[[lane]]
+name = "equal-byte-text"
+command = "python3 docs/whitepaper/scripts/equal_bytes_render.py --check"
+purpose = "Existing source-bound publication proof; no model execution"
+command_id = "lane.equal-byte-text"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 300
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "equal-byte-render-tests"
+command = "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v"
+purpose = "Existing source-bound publication proof; no model execution"
+command_id = "lane.equal-byte-render-tests"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 300
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "claim-render"
+command = "python3 tools/claims/render.py --check"
+purpose = "Existing source-bound publication proof; no model execution"
+command_id = "lane.claim-render"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 3600
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "active-paper"
+command = "bash paper/build.sh"
+purpose = "Existing source-bound publication proof; no model execution"
+command_id = "lane.active-paper"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 3600
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "equal-byte-tests"
+command = "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v"
+purpose = "Existing source-bound publication proof; no model execution"
+command_id = "lane.equal-byte-tests"
+kind = "validation"
+cost = 4
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 300
+requires_network = false
+destructive = false
+
+[[lane]]
+name = "train-export-tests"
+command = "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v"
+purpose = "Synthetic TRAIN export refusal and noninterference controls"
+command_id = "lane.train-export-tests"
+kind = "validation"
+cost = 2
+rules_covered = ["HLT-008-FALSE-GREEN-RISK"]
+required_artifacts = []
+timeout_seconds = 120
+requires_network = false
+destructive = false

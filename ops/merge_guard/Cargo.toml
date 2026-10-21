@@ -17,6 +17,10 @@ path = "main.rs"
 name = "check-frozen-evidence"
 path = "frozen_evidence.rs"
 
+[[bin]]
+name = "audit-proof"
+path = "audit_proof.rs"
+
 [dependencies]
 clap = { version = "=4.6.2", features = ["derive"] }
 libc = { version = "=0.2.186" }

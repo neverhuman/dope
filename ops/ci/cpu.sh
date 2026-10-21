@@ -18,8 +18,8 @@ bash ops/ci/prepare-merge-guard.sh
 cargo test --locked
 cargo run --locked --offline --bin dope-native-notices -- --check
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
-cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
-cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
+cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof -- -D warnings
+cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof
 /usr/bin/python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
