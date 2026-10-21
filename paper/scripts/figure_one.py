@@ -16,7 +16,9 @@ import sys
 from pathlib import Path
 
 LABEL = "fig:frontier"
-GRAPHIC = "generated/hero-frontier.pdf"
+# The transfer-per-byte frontier is the hero; the foundation-model bars remain accepted.
+GRAPHICS = ("generated/transfer-per-byte.pdf", "generated/hero-frontier.pdf")
+GRAPHIC = GRAPHICS[1]
 # TeX hard-wraps log lines at max_print_line (79 characters by default).
 LOG_WRAP = 79
 
@@ -33,7 +35,7 @@ def failures(aux: str, log: str) -> list[str]:
         if page != "1":
             found.append(f"{LABEL} is not on page 1")
     unwrapped = re.sub(r"(?m)^(.{%d})\n" % LOG_WRAP, r"\1", log)
-    if f"<use {GRAPHIC}>" not in unwrapped:
+    if not any(f"<use {graphic}>" in unwrapped for graphic in GRAPHICS):
         found.append(f"{GRAPHIC} was not included; Figure 1 would be a pending placeholder")
     return found
 

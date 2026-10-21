@@ -1,10 +1,12 @@
 # TDL paper package
 
-The canonical manuscript package for **Transfer Description Length for Synthetic Tables**
-(working title; the metric name awaits owner decision D-01). This is the active paper landing
-page for the manuscript in `main.tex` and supplement in `supplement.tex`. Figure 1 and Table 1
-present the authenticated historical selection-exposed foundation-model transfer comparison;
-prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
+The canonical manuscript package for **D.O.P.E.: How Few Bytes Carry What a Table Teaches**
+(metric name TDL; owner decision D-01). This is the active paper landing page for the
+manuscript in `main.tex` and supplement in `supplement.tex`, both in the ICLR 2027 layout
+(`iclr2027_conference.sty`, final-copy mode with the venue header removed). Figure 1 is the
+transfer-per-byte frontier (`generated/transfer-per-byte.pdf`): published generators on the
+historical panel, and the equal-byte study against real rows. Every result is labelled
+development validation and selection-exposed; prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
 `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
 paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/dope-mfs.pdf)
 and [`docs/whitepaper/supplement.pdf`](../docs/whitepaper/supplement.pdf), with its
@@ -18,6 +20,8 @@ qualifications documented in [`docs/whitepaper/`](../docs/whitepaper/README.md).
 | `build.sh` | checks the contract macros, then builds both PDFs into `target/paper/` and fails on unresolved references or citations | L3 |
 | `scripts/contract_macros.py` | writes `generated/contract-macros.tex`; `--check` refuses drift and any headline-threshold disagreement | L3 |
 | `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` | L2 (tools/claims) |
+| `generated/equal-bytes-*`, `generated/transfer-per-byte.*`, `generated/readme-equal-bytes.md` | macros, tables, figures and the README block of the equal-byte study, rendered by `docs/whitepaper/scripts/equal_bytes_render.py` and authenticated by the claims firewall | L3 |
+| `equal-bytes.bib` | entries copied from the historical bibliographies plus two with DOI or venue URL | L3 |
 | `archive/` | review ledgers and readiness notes moved out of the historical paper directory (T-111) | L3 |
 
 ## Build
@@ -50,9 +54,12 @@ do not, so a missing input can never look like a measurement:
   headline.
 - Do not type a number into the `.tex` sources. Add it to `generated/headline-results.json` and
   render it.
-- Use the neutral `article` class until a submission build exists. A venue build will be a
-  separate target generated from the same sources.
-- Do not fill the abstract's result sentence before the sealed run.
+- The manuscript uses the ICLR layout in final-copy mode; `\iclrfinalcopy` removed gives the
+  anonymous review build.
+- Abstract numbers are generated macros, each in a sentence that names its evidence status.
+  Replace them with sealed-test macros when that run exists.
+- Small integers inside mathematics come from generated constants (`\One`, `\Two`, ...) so the
+  public lint can keep refusing bare digits.
 
 ## Contract agreement
 

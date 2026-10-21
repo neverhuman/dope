@@ -10,7 +10,11 @@ argument for the generator comparison.
 | [audit.md](audit.md) | Jankurai gate and exceptions |
 | [audit-rubric.md](audit-rubric.md) | Finding severity |
 | [release.md](release.md) | Certification and publication gates |
-| [whitepaper/](whitepaper/README.md) | The paper, its supplement, and the scripts that regenerate every number |
+| [math.md](math.md) | What a program stores, why it transfers, the implementation audit, and the research plan |
+| [cli.md](cli.md) | Command reference, including the table workflow |
+| [../paper/](../paper/README.md) | The active manuscript and supplement |
+| [whitepaper/](whitepaper/README.md) | The frozen historical paper, its supplement, and the scripts that regenerate every number |
+| [internal/](internal/README.md) | Planning records, review inputs and archives kept for provenance |
 
 Every number in the paper is a macro emitted from a committed, SHA-pinned
 ledger under `research/benchmark/results/`; the analysis contract is

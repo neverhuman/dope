@@ -13,7 +13,7 @@ scripts. Each file carries an archive banner and is otherwise unchanged.
 | `RETAINED_EVIDENCE_REVIEW.md` | integration review of the retained evidence panels |
 | `DOI_CHECK.md` | DOI resolution log for the historical bibliography |
 
-Still in `docs/whitepaper/` for now: `REVIEW_GAPS.md` (the live gap ledger, updated in T-113),
+Moved to `docs/internal/whitepaper/`: `REVIEW_GAPS.md` (the live gap ledger, updated in T-113),
 `BASELINE_PROTOCOL.md` (cited by the historical supplement), `COMPREHENSION_v1.md` (routed in
 the agent maps), and `DECISIONS_PENDING.md` and `STYLE_REFERENCE.md` (being scrubbed of private
 host names by the hygiene lane; they can move once that lands).
