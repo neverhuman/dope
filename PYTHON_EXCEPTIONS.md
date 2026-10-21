@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 723
-- **`keep-with-reason`**: 698 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 724
+- **`keep-with-reason`**: 699 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 25 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -753,3 +753,5 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/tests/test_pilot_worker_inputs.py` | `research/transfer` | `keep-with-reason` | Private role capture tests; no vendor model imports or scientific qualification. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_pilot_worker_runtime.py` | `research/transfer` | `keep-with-reason` | Real native n/4n bridge with fixture learners; never empirical qualification. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_target_last.py` | `research/transfer` | `keep-with-reason` | Target-last is an intake/consumer invariant, not a positional guess. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
+
+| `tools/claims/figure_drawing.py` | `tools/claims` | `keep-with-reason` | Draw receipt-bound publication figures using matplotlib. | Figure rendering stays in Python; no product or metric implementation. |

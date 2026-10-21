@@ -1,55 +1,57 @@
-% TDL manuscript skeleton (T-110). Status: specified, not measured.
+% Research manuscript. TDL is specified, not measured; historical validation is separate.
 % Numbers enter only through paper/generated/ (see macros.tex and paper/README.md).
 % Neutral preprint class on purpose: no venue class until a submission build exists.
 \documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage[font=small,labelfont=bf]{caption}
 \usepackage{xcolor}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[hidelinks]{hyperref}
 \definecolor{pendingcolor}{RGB}{176,58,46}
-\hypersetup{pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding --- Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\hypersetup{pdftitle={D.O.P.E.: Small Programs, Useful Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
 
-\title{D.O.P.E.: Downstream Objective-Preserving Encoding\\[0.4em]
-  \large Transfer Description Length for Synthetic Tables: How Few Bytes Preserve What Models Learn?}
-\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Protocol specification and validation card --- evidence status: \ResultStatus}
+\title{D.O.P.E.: Small Programs, Useful Synthetic Tables\\[0.3em]
+  \large Measuring Predictive Structure in Bytes}
+\author{Jepson Taylor \qquad Alton Alexander\\NEVERHUMAN Research}
+\date{Research preprint --- \MetricName{}: \ResultStatus}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 % Five moves (S2 §17.2). No number appears here until the sealed run exists.
-An organization's tabular data encodes its operational experience and competitive moat, yet
-security and legal restrictions often block sharing raw tables to evaluate external learners
-or foundation models. Synthetic tables are usually judged by how much they resemble the source
-or by one downstream learner, while the size of the generator that produced them goes uncounted.
+Synthetic data is useful when models learn from it, but utility alone does not say how much
+fitted information a generator needs. D.O.P.E.\ (Downstream Objective-Preserving Encoding)
+compiles a real table into a bounded sampling program and tests learners trained only on
+its synthetic draws against untouched real rows.
 We define \MetricLong{} (\MetricName{}): the smallest tested number of dataset-specific
 bytes for which learners trained or conditioned only on generated rows recover a declared
 share of the real data's predictive gain in every required model family, rely on the same
 feature drivers, and pass copy, cleartext and byte-accounting gates, all measured on
-untouched real rows. D.O.P.E.\ (Downstream Objective-Preserving Encoding) compiles a table into
-a bounded executable sampling program whose every sampling byte is charged. The specified
-protocol holds out real rows, learner families and source families, and reports the full
-transfer-versus-bytes frontier rather than a weighted score; the sealed test split remains
-reserved until the qualified panel completes.
+untouched real rows. Every data-dependent sampling byte is charged, including transforms
+and sidecars. Historical selection-exposed validation is reported separately from the
+prospective metric: it illustrates the size--transfer tradeoff but does not establish a
+\MetricName{} result. The specified confirmation protocol holds out learner and source
+families; the sealed test remains reserved until the qualified panel and analysis plan freeze.
 \end{abstract}
 
 \begin{figure}[!b]
   \centering
-  \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 1: horizontal foundation-model transfer
-  bars comparing DOPE and Gaussian copula with charged bytes in the legend, rendered from authenticated receipts.}
-  \caption{\textbf{More predictive gain. About one-third the state.} Historical foundation-model
-  validation (selection-exposed): horizontal transfer-retention bars with matched charged artifact
-  bytes in the legend for DOPE vs.\ Gaussian copula (strongest comparator on this historical block,
-  not universal) across Kumo Large, TabICL, and Mitra; cross-model feature-driver preservation is
-  not yet measured (\ResultStatus).}
+  \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 1: charged fitted-state bytes versus
+  predictive lift and a separate foundation-model comparison, rendered from authenticated receipts.}
+  \caption{\textbf{Useful transfer at a small fitted-state cost.} Historical, selection-exposed
+  validation. A: matched classical methods, including the untuned default; intervals and cohort
+  medians describe the size--transfer tradeoff, not an optimized frontier or equivalence.
+  B: a separate foundation-model cohort. Bytes are dataset-specific state; full cold closure,
+  cross-model driver preservation and \MetricName{} remain unmeasured.}
   \label{fig:frontier}
 \end{figure}
 
@@ -105,6 +107,64 @@ point is \HeadlinePoint{} ($\tau_T = $ \TauT, $\tau_D = $ \TauD) in the \Contrac
 \ContractId; the budget grid is \ByteGrid. When no tested budget qualifies, the result is \emph{not reached in the tested
 range}; when a required cell is missing, no number is emitted.
 
+\paragraph{Why this operating point matters.}
+For a positive real-data gain, requiring $T \geq \tau_T$ bounds
+the excess loss paid for synthetic training:
+\begin{equation}
+  \Lsyn(A)-\Lreal \leq (1-\tau_T)(\Lnull-\Lreal).
+  \label{eq:excess}
+\end{equation}
+The allowed distortion is relative to what the real table teaches that learner,
+not a fixed error tolerance shared across unrelated targets. The rate is the charged
+length $b(A)$ of the fitted program. Over the finite set of tested artifacts,
+\begin{equation}
+  \operatorname{TDL} = \min_{A\in\mathcal{A}_{\rm tested}} b(A)
+  \quad\text{subject to Equation~\eqref{eq:qualify}.}
+\end{equation}
+This separates the objective from the constraints: a larger model cannot compensate for a
+failed gate by a weighted score. It also avoids a retention-per-byte ratio that can reward
+a tiny but useless generator. Testing more budgets requires a frozen multiplicity and
+selection procedure; it does not permit choosing a point on the sealed queries.
+
+\section{The DOPE sampling program}
+\label{sec:method}
+
+The historical compiler factorizes the sampling model into a feature distribution and a
+conditional target model, $p_A(x,y)=p_\phi(x)q_\theta(y\mid x)$. Quantized feature marginals
+and a compact dependence family model $p_\phi$: candidate families include independence,
+Chow--Liu, Gaussian copula, autoregressive, factor, vine and mixture structures. Marginal
+Gaussianization is an internal coordinate system, not a requirement that physical data be
+Gaussian. A screened subset of features $x_S$ enters a residual predictor,
+\begin{equation}
+  \widehat y(x)=a+\beta^{\mathsf T}x_S+
+  v^{\mathsf T}\tanh(b+Wx_S),\qquad
+  y=\widehat y(x)+\sigma(x)\varepsilon.
+  \label{eq:sampler}
+\end{equation}
+The noise scale is fitted to residual magnitude. The historical profile uses Gaussian noise
+and a bounded target path; the native raw-unit and residual successors are distinct,
+explicitly versioned profiles. Results from those profiles must not be pooled under a
+single algorithm label. Historical capacity, optimization steps and the quantized codec
+are recorded in the retained validation paper and source, rather than redefined here.
+
+\paragraph{Compile, reload, evaluate.}
+Only fit rows reach transforms, feature screening, dependence fitting and target fitting.
+Candidate structures are quantized and encoded before their complete size is compared
+with the budget. The compiler's fit-time proxy is not \MetricName{} and cannot certify
+held-out transfer. Sampling reloads retained state after fitting exits. Independent
+auditors see only draws for training or context; the evaluator alone holds real query
+targets. A predictor-only control tests whether useful transfer requires the feature
+joint distribution in addition to a stored regressor.
+
+\paragraph{Mixed types and units.}
+Numeric affine state is fitted on training rows only and inverted before raw-unit
+evaluation. Nominal categories use column-scoped one-hot features with explicit missing
+and unknown states in the bounded mixed carrier. That carrier currently has limited
+conditional category modeling; its existence is not a mixed-type benchmark result.
+Learned category maps and inverse transforms count as payload. Group derived columns
+under their original feature for attribution. Nonlinear target transforms change the
+training objective and require separate original-unit comparisons.
+
 \section{Byte accounting}
 \label{sec:bytes}
 
@@ -152,17 +212,21 @@ once through a frozen release manifest.
 \section{Current validation evidence}
 \label{sec:evidence}
 
-The only measured evidence is the historical v2 validation panel: PMLB regression tables
+The historical v2 validation panel uses PMLB regression tables
 \citep{olson2017pmlb,romano2021pmlb}, CatBoost-centered, and selection-exposed, because every
-lineage and all three auditors informed the profile choice. It reports retention beside
-charged bytes, which is not a \MetricName{} result. Rows are labeled by evidence status.
+lineage and all three task-trained auditors informed the profile choice. The separate
+historical foundation-model block has its own matched cohort, incomplete auditor
+qualification and unknown pretraining overlap. Figure~\ref{fig:frontier} keeps the cohorts
+separate. These panels report retention beside charged bytes, not a \MetricName{} result.
+Rows are labeled by evidence status, and the untuned default remains visible.
 \begin{table}[ht]
   \centering
   \GeneratedTable{result-card.tex}{Result card (T-070): rendered from
   generated/headline-results.json with one evidence label per row.}
-  \caption{Historical evidence card from the v2 panel (CatBoost auditor, synthetic size four times the
-  fit rows), rendered into generated/result-card.tex. Evidence status of every row: selection-exposed validation. No row is a sealed-test or \MetricName{} result;
-  the full status-labelled card is in the repository's STATUS file.}
+  \caption{Historical CatBoost validation, with synthetic size four times the fit rows.
+  Each row is selection-exposed validation. Smaller cohorts remain separate comparisons;
+  no row is a sealed-test or \MetricName{} result. Full source receipts and paired contrasts
+  are available with the repository's evidence card.}
   \label{tab:card}
 \end{table}
 
@@ -176,6 +240,16 @@ target and does not replace the table for other uses. Empirical attack results a
 formal differential privacy and not HIPAA de-identification. Foundation-model auditors
 drift and carry license terms that can block their use.
 
+\paragraph{Failure modes that matter.}
+Univariate screening can miss interaction-only signals; a small target predictor may
+preserve means while losing conditional tails. Marginal Gaussianization does not recover
+arbitrary dependence, and independent mask draws do not establish realistic missingness.
+Quantization can erase rare effects, while unstable real-data lift makes a retention ratio
+unreliable. Correlated substitute features can also change attribution without changing
+predictions. These are falsifiable research questions for a byte-matched ablation panel,
+not improvements inferred from a favorable aggregate. The supplement specifies the
+tests and separates them from the frozen confirmation run.
+
 \section{Claim ladder}
 \label{sec:ladder}
 
@@ -187,7 +261,8 @@ and driver-preservation statements are pending their evidence and are not made h
 Generators for tabular data range from copulas, dependence trees and synthesis by
 sequential models \citep{chow1968dependence,patki2016sdv,nowok2016synthpop} to adversarial
 \citep{xu2019ctgan}, forest-based \citep{watson2023arf} and diffusion \citep{kotelnikov2023tabddpm}
-models. Dataset distillation and model distillation compress data or models for one
+models, including latent synthesis and joint mixed-type diffusion
+\citep{zhang2024tabsyn,shi2025tabdiff}. Dataset distillation and model distillation compress data or models for one
 learner \citep{wang2018distillation,hinton2015distilling}; generative compression names learned
 media codecs \citep{santurkar2017generative}. Description-length and bottleneck ideas
 \citep{rissanen1978modeling,tishby2000bottleneck} motivate the framing but are not claimed as

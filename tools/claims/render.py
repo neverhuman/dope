@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from tools.claims.cohorts import cohort_failures, refresh_cohorts  # noqa: E402
+from tools.claims.figure_drawing import compression_rows, draw_hero
 from tools.claims import foundation, registry  # noqa: E402
 # The interval level comes from the v2 pre-declaration through the README benchmark's helper.
 if str(ROOT / "docs/whitepaper/scripts") not in sys.path:
@@ -151,8 +152,8 @@ def text_outputs(
     percent = _bind_interval_level(percent, f_summary, data.get("results", []))
     f_rows = foundation.foundation_table_rows(f_summary)
     table = [r"% Generated historical validation; separate cohorts; no TDL result.",
-             r"\begingroup\scriptsize",
-             r"\begin{tabular}{@{}p{0.20\linewidth}rrrp{0.19\linewidth}@{}}",
+             r"\begingroup\small",
+             r"\begin{tabular}{@{}p{0.27\linewidth}rrrp{0.17\linewidth}@{}}",
              r"\toprule Method & Retention [interval] & Bytes & $n$ & Evidence \\", r"\midrule"]
     def tex(value):
         return str(value).replace("_", r"\_").replace("&", r"\&").replace("%", r"\%")
@@ -326,70 +327,10 @@ def hero_csv_agreement_failures(rows: list[dict], six_bars: list[dict]) -> list[
     return failures
 
 
-def _draw_foundation_hero(f_summary: dict, six_bars: list[dict], percent: int, *, profile: str):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from matplotlib.patches import Patch
-
-    # Paper profile uses exact 5.60 in width matching \herowidth (0.86\linewidth = 5.59 in) so >=9.0pt is >=9.0pt on page 1.
-    # Web profile uses 6.20 in width at 180 dpi (1116 px) with identical proportions for crisp README & 390px mobile display.
-    width_in, height_in = (5.60, 3.20) if profile == "paper" else (6.20, 3.54)
-    base_pt = 9.5 if profile == "paper" else 10.3
-    footer_pt = max(9.0, base_pt - 0.5)
-    matplotlib.rcParams.update({"svg.hashsalt": "dope-historical-validation-v1", "font.family": "DejaVu Sans", "font.size": base_pt})
-    figure, axis = plt.subplots(1, 1, figsize=(width_in, height_in))
-    figure.subplots_adjust(left=0.19, right=0.950, top=0.76, bottom=0.28)
-
-    y_positions = [5.10, 4.42, 3.10, 2.42, 1.10, 0.42]
-    group_centers = [4.76, 2.76, 0.76]
-    group_labels = [bar["auditor_display"] for bar in six_bars[::2]]
-    dope_bytes, copula_bytes = six_bars[0]["matched_artifact_bytes"], six_bars[1]["matched_artifact_bytes"]
-
-    for y_pos, bar in zip(y_positions, six_bars):
-        is_dope = bar["method"] == "DOPE"
-        color, hatch = ("#2f6b25", "") if is_dope else ("#7a7a7a", "//")
-        val, lo, hi = bar["retention_pct"], bar["interval_lo_pct"], bar["interval_hi_pct"]
-        rect = axis.barh(y_pos, val, height=0.54, color=color, edgecolor="#1a1a1a", linewidth=0.85, zorder=2)[0]
-        if hatch:
-            rect.set_hatch(hatch)
-        axis.errorbar(val, y_pos, xerr=[[val - lo], [hi - val]], fmt="none",
-                      ecolor="#111111", elinewidth=1.25, capsize=3.0, capthick=1.0, zorder=3)
-        label_text = f"{val:.1f}%"
-        if hi <= 91.0:
-            axis.text(hi + 1.2, y_pos, label_text, va="center", ha="left",
-                      fontsize=base_pt - 0.1, fontweight="bold" if is_dope else "normal", color="#111111")
-        else:
-            axis.text(max(2.0, lo - 1.2), y_pos, label_text, va="center", ha="right",
-                      fontsize=base_pt - 0.1, fontweight="bold", color="#ffffff" if is_dope else "#111111")
-
-    axis.set_xlim(0.0, 100.0)
-    axis.set_xticks([0, 20, 40, 60, 80, 100])
-    axis.set_xticklabels(["0%", "20%", "40%", "60%", "80%", "100%"], fontsize=base_pt - 0.2)
-    axis.set_ylim(-0.15, 5.75)
-    axis.set_yticks(group_centers)
-    axis.set_yticklabels(group_labels, fontsize=base_pt + 0.1, fontweight="bold")
-    axis.set_xlabel(f"Predictive transfer retention (0–100%, whiskers: historical {percent}% interval)",
-                    fontsize=base_pt - 0.2, labelpad=4)
-    figure.suptitle(f_summary["hero_title"], x=0.50, y=0.958, ha="center", fontsize=base_pt + 0.8, fontweight="bold")
-    axis.grid(axis="x", alpha=0.22, zorder=0)
-    axis.spines["top"].set_visible(False)
-    axis.spines["right"].set_visible(False)
-
-    handles = [
-        Patch(facecolor="#2f6b25", edgecolor="#1a1a1a", linewidth=0.85, label=f"DOPE ({dope_bytes:,} B)"),
-        Patch(facecolor="#7a7a7a", edgecolor="#1a1a1a", linewidth=0.85, hatch="//", label=f"Gaussian copula ({copula_bytes:,} B)"),
-    ]
-    figure.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.54, 0.882), ncol=2,
-                  fontsize=base_pt - 0.1, frameon=False, handlelength=1.5, columnspacing=1.6)
-    figure.text(0.50, 0.018, "Historical selection-exposed validation (97 lineages, 4n)\n"
-                             "Cross-model feature-driver preservation: not yet measured",
-                ha="center", va="bottom", fontsize=footer_pt, color="#222222", linespacing=1.18)
-    return figure, plt
-
 
 def figure_outputs(
-    csv_bytes: bytes, thresholds: dict, percent: int | None = None, *, foundation_summary: dict | None = None
+    csv_bytes: bytes, thresholds: dict, percent: int | None = None, *, foundation_summary: dict | None = None,
+    classical_csv: bytes | None = None
 ) -> dict[str, bytes]:
     f_summary = foundation.load_foundation_summary() if foundation_summary is None else foundation_summary
     percent = _bind_interval_level(percent, f_summary)
@@ -402,13 +343,17 @@ def figure_outputs(
     if csv_failures:
         raise ValueError("hero figure refuses CSV disagreement with canonical foundation summary: " + "; ".join(csv_failures))
 
+    if classical_csv is None:
+        classical_csv = (ROOT / "paper/generated/legacy-v2-catboost.csv").read_bytes()
+    classical_rows = compression_rows(classical_csv)
     outputs = {}
     for ext, profile, metadata in (
         ("png", "web", {"Software": "DOPE claims renderer"}),
         ("svg", "web", {"Creator": "DOPE claims renderer", "Date": None}),
         ("pdf", "paper", {"Creator": "DOPE claims renderer", "CreationDate": None, "ModDate": None}),
     ):
-        figure, plt = _draw_foundation_hero(f_summary, six_bars, percent, profile=profile)
+        figure, plt = draw_hero(f_summary, six_bars, percent, profile=profile, classical_rows=classical_rows,
+                                classical_percent=interval_level())
         buffer = io.BytesIO()
         figure.savefig(buffer, format=ext, dpi=180, metadata=metadata)
         plt.close(figure)
@@ -428,7 +373,8 @@ def expected_outputs(root: Path = ROOT) -> dict[str, bytes]:
         raise ValueError("; ".join(failures))
     percent = interval_level(root)
     outputs = text_outputs(data, status, percent)
-    outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"], data["thresholds"], percent))
+    outputs.update(figure_outputs(outputs["paper/generated/hero-frontier.csv"], data["thresholds"], percent,
+                                  classical_csv=outputs["paper/generated/legacy-v2-catboost.csv"]))
     manifest = {"format": "dope-generated-claims-v1", "source_sha256": hashlib.sha256((root / "paper/generated/headline-results.json").read_bytes()).hexdigest(), "files": {name: hashlib.sha256(content).hexdigest() for name, content in sorted(outputs.items())}}
     outputs["paper/generated/manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
     return outputs

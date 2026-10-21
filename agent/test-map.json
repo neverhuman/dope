@@ -2948,6 +2948,26 @@
     "research/transfer/native_control_prepare.py": {
       "command": "python3 -B research/transfer/native_control_prepare.py && python3 -B -m unittest research.transfer.tests.test_native_control -v",
       "purpose": "Fresh exact-source offline build and paid runtime manifest before mandatory Linux transfer discovery; missing/stale artifacts fail"
+    },
+    "docs/getting-started.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "docs/preprocessing.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "docs/publication-upgrade.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "examples/public-regression/requirements.txt": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "tools/claims/figure_drawing.py": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py'",
+      "purpose": "Replay receipt-bound figures and reject missing, mixed-cohort and invalid historical points; visually inspect both output sizes."
     }
   }
 }

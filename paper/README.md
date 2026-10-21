@@ -1,9 +1,11 @@
 # TDL paper package
 
 The canonical manuscript package for **Transfer Description Length for Synthetic Tables**
-(working title; the metric name awaits owner decision D-01). This is the active paper landing
+(the metric name awaits owner decision D-01). This is the active paper landing
 page for the manuscript in `main.tex` and supplement in `supplement.tex`. Figure 1 and Table 1
-present the authenticated historical selection-exposed foundation-model transfer comparison;
+present authenticated historical selection-exposed validation. The front-page figure
+shows matched CatBoost transfer against charged fitted-state bytes, including the
+untuned default and large comparators, beside a separate foundation-model cohort;
 prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
 `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
 paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/dope-mfs.pdf)
@@ -27,8 +29,13 @@ python3 -B paper/scripts/contract_macros.py   # regenerate the contract macros a
 bash paper/build.sh        # check them, then write target/paper/main.pdf and target/paper/supplement.pdf
 ```
 
-Toolchain: pdfTeX from TeX Live 2023, `latexmk` 4.83 and BibTeX 0.99d, using only standard
-packages (`amsmath`, `booktabs`, `graphicx`, `xcolor`, `natbib`, `hyperref`). The PDFs are build output under `target/paper/`.
+Toolchain: pdfTeX from TeX Live 2023, `latexmk` 4.83 and BibTeX 0.99d, using standard
+packages including `microtype` and `caption`. The PDFs are build output under `target/paper/`.
+The active preprint is titled **D.O.P.E.: Small Programs, Useful Synthetic Tables**.
+It explains the compiler, the constrained rate/transfer objective and proposed method
+ablations. Unmeasured supplement sections state their evidence status directly.
+After the existing `paper-clean` CI job passes, its `dope-active-preprint` artifact
+contains both PDFs for review. No scientific training job was added.
 
 ## Generated inputs
 
@@ -39,9 +46,13 @@ do not, so a missing input can never look like a measurement:
 | --- | --- | --- |
 | `generated/contract-macros.tex` | `paper/scripts/contract_macros.py` from `contracts/tdl-contract-v1.json`: `\TauT`, `\TauD`, `\HeadlinePoint`, `\ByteGrid`, `\SeedDesign`, `\MetricName`, `\ContractId`, `\ContractState`, bootstrap plan | metric definition, protocol, supplement A and D |
 | `generated/headline-macros.tex` | `generated/headline-results.json` (T-070): `\ResultStatus` and any printed value | title block, evidence section |
-| `generated/hero-frontier.pdf` | the hero figure generator (T-072), from the same CSV as the README image | Figure 1 |
+| `generated/hero-frontier.pdf` | `tools/claims/render.py`, from `legacy-v2-catboost.csv` and `hero-frontier.csv`, authenticated against their separate sources | Figure 1 and the README image |
 | `generated/result-card.tex` | the result card, one evidence label per row | Table 1 |
-| `generated/contract-table.tex`, `byte-ledger-table.tex`, `auditor-registry-table.tex`, `generator-registry-table.tex`, `dataset-dispositions.tex` | contract, charge manifests and registries | supplement |
+
+The supplement links the current contract/registries and marks unavailable prospective
+ledgers and dataset results explicitly. It does not typeset empty placeholder figures
+as if those measurements existed. The [publication review](../docs/publication-upgrade.md)
+records remaining scientific gaps and a staged compute request.
 
 ## Rules
 

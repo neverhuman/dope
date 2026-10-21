@@ -109,11 +109,20 @@ jobs:
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep
           uv venv target/paper-python
-          uv pip install --python target/paper-python/bin/python --constraint validation/requirements-v1.txt numpy scipy pandas 'matplotlib==3.10.8'
+          uv pip install --python target/paper-python/bin/python --constraint validation/requirements-v1.txt numpy scipy pandas 'matplotlib==3.10.8' 'jsonschema==4.26.0'
       - name: Authenticate, clean rebuild, and require zero output drift
         run: |
           export PATH="$PWD/target/paper-python/bin:$PATH"
           bash ops/ci/paper-clean.sh
+      - name: Upload the active preprint for PR review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dope-active-preprint
+          path: |
+            target/paper/main.pdf
+            target/paper/supplement.pdf
+          if-no-files-found: error
+          retention-days: 14
 
   security:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository

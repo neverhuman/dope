@@ -23,10 +23,15 @@ selection-exposed CatBoost validation; it supplies no TDL result. The renderer
 emits `STATUS.md`, a README block, TeX macros, figure CSV, PNG/PDF/SVG and their
 SHA256 manifest. Every image comes from that CSV. These historical points do not
 establish an optimized budget frontier, a driver certificate or cold closure.
-The figure's threshold line and shading come from the `thresholds` field of
-`headline-results.json`. Rendering refuses any point, interval or threshold that would fall
-outside the fixed axes, so a value is never clipped silently (`test_figure.py`).
-Smaller cohorts remain separate and grey in the figure.
+The hero has two explicitly separate cohorts: the matched classical size/transfer
+panel uses `legacy-v2-catboost.csv`, while the foundation-model bars use
+`hero-frontier.csv`. Both CSVs are emitted in the same render from authenticated
+inputs. The classical panel includes the untuned default and all comparable historical
+generator configurations; smaller cohorts stay in the full evidence card. Its size ratio
+is a ratio of cohort medians, not a paired compression estimate or proof of equivalence.
+Rendering refuses points and intervals outside the fixed axes, missing/duplicate methods,
+and mixed classical cohorts (`test_figure.py`). Proposed TDL thresholds are checked
+against the contract but are not drawn as achieved gates.
 
 Place `paper/generated/readme-result-card.md` verbatim in the README, including
 its `BEGIN TDL RESULTS` / `END TDL RESULTS` markers. Include

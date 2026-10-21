@@ -1,9 +1,10 @@
-% Supplement skeleton for the TDL manuscript (T-110). Status: specified, not measured.
+% Protocol supplement. Missing measurements remain explicit.
 % Numbers enter only through paper/generated/ (see macros.tex and paper/README.md).
 \documentclass[11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
@@ -16,8 +17,8 @@
 \input{macros}
 
 \title{Supplement: Transfer Description Length for Synthetic Tables}
-\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Draft skeleton --- evidence status: \ResultStatus}
+\author{Jepson Taylor \qquad Alton Alexander\\NEVERHUMAN Research}
+\date{Protocol supplement --- \MetricName{}: \ResultStatus}
 
 \begin{document}
 \maketitle
@@ -32,7 +33,9 @@ thresholds (\HeadlinePoint{}, $\tau_T = $ \TauT, $\tau_D = $ \TauD), the byte gr
 the seed design (\SeedDesign), the multiplicity procedure, evaluator isolation, and
 \texttt{protocol\_frozen}. While any field is unresolved, \texttt{protocol\_frozen} stays
 false. The human-readable definitions are in \path{docs/metric.md}.
-\GeneratedTable{contract-table.tex}{Contract field table rendered from the contract.}
+The thresholds above are generated from the executable contract. Candidate revisions are
+separate from the current draft and do not change historical receipts. No contract in
+this manuscript authorizes a sealed run.
 
 \section{Result states and gates}
 \label{app:states}
@@ -51,8 +54,12 @@ panel is required for release certification, which is reported separately.
 
 \section{Byte ledgers}
 \label{app:bytes}
-\GeneratedTable{byte-ledger-table.tex}{Per-artifact payload, closure and section bytes from
-the charge manifests.}
+No qualified prospective per-artifact ledger is measured in this package. Each future
+ledger must reconcile framing, schema, transforms, dictionaries, model parameters and
+sampling sidecars against file length and source-free access traces. Report dataset-specific
+payload, shared decoder/runtime and cold closure separately. Historical charged artifacts
+and the native raw-complete engineering example have different charge profiles; neither
+can be relabeled as the other.
 
 \section{Statistical plan}
 \label{app:stats}
@@ -61,19 +68,56 @@ fixed generator seed (\BootstrapSeed) and shared resample indices across auditor
 one-sided \LowerBoundLevel{} lower bound is a lower order statistic of the replicates, and a
 driver component counts only when its real-versus-real ceiling reaches \StabilityFloor. These values
 are read from the \ContractState{} contract \ContractId. Golden fixtures hold the Rust core and the
-Python mirror to identical outputs. \pending{Multiplicity family, fixed when the contract freezes.}
+Python mirror to identical outputs. The multiplicity family remains unresolved and must freeze before confirmation. Preserve
+the same source-family and global fit-seed draws across methods and auditors when a seed
+acts on the whole panel. Resampling seeds independently within each dataset can omit
+shared variation. Required informative coverage, null calibration and stability floors
+must also be declared before low-signal cells can be adjudicated.
 
 \section{Auditor and generator registries}
 \label{app:registries}
-\GeneratedTable{auditor-registry-table.tex}{Auditor registry: identity, license, qualification
-state. Frontier foundation models are planned and unqualified.}
-
-\medskip
-\GeneratedTable{generator-registry-table.tex}{Generator registry and admission state.}
+The machine-readable registries live in \path{research/transfer/registries/}. Registry
+presence is not qualification: an auditor requires source, weight, environment,
+prediction-parity and resource evidence for its exact checkpoint. Foundation-model
+confirmation is pending. Historical measured transfer retains its historical provenance
+and unknown pretraining overlap; it is not a qualified prospective TDL result.
 
 \section{Per-dataset results and failure dispositions}
 \label{app:datasets}
-\GeneratedTable{dataset-dispositions.tex}{Per-dataset cells with every terminal disposition.}
+No prospective sealed-test table is available. A completed campaign must report all
+scheduled cells, including failed, incomplete, unqualified and not-reached dispositions,
+with fixed denominators. Historical validation ledgers under
+\path{research/benchmark/results/} remain separately reproducible. They include simulated
+source families and cannot supply a new real-source majority by relabeling.
+
+\section{Falsifiable method tests}
+\label{app:ablations}
+These are proposed development experiments, not measured improvements. Freeze their
+selection rule before choosing a successor; keep confirmation rows sealed.
+\begin{description}
+  \item[Feature screening.] Compare current univariate screening with the explicit
+  interaction-screen successor on interaction-only, additive and rare-effect tasks at
+  the same encoded byte cap. Count false selections and retained holdout lift.
+  \item[Residual uncertainty.] Compare no-noise, Gaussian, fixed heavy-tail, compact
+  mixture and monotone-quantile profiles using out-of-fold residuals. Evaluate original-unit
+  tail loss and conditional coverage beside average transfer. Calibrated noise need not
+  improve a squared-error learner.
+  \item[Dependence.] Hold the target model fixed and ablate independence, a tree, a copula
+  and richer families. Include a predictor-only control and conditional errors.
+  \item[Quantization.] Compare precision and component allocation after encoding,
+  including transform and dictionary state. Measure improvement in the worst development
+  learner family per added byte rather than uncharged parameter counts.
+  \item[Preprocessing.] Compare affine, support-aware invertible and quantile transforms
+  inside fit folds. Preserve original target units; nonlinear target transforms define a
+  different learner recipe. Test nominal category relabeling invariance.
+  \item[Attribution.] Permute dummy columns of an original feature together. Test
+  correlated substitutes and interaction groups against the real-versus-real ceiling;
+  prediction agreement is not causal driver recovery.
+\end{description}
+For squared error, applying the same invertible affine target map to fixed truths and
+predictions multiplies every loss by the same squared scale, which cancels in retention.
+This evaluation identity does not say that retraining is invariant to scaling. Clipping
+query targets or changing their nonlinear loss violates the comparison.
 
 \section{Historical metric mapping}
 \label{app:history}

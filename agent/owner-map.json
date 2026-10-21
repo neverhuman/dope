@@ -732,6 +732,11 @@
     "research/transfer/tdl/target_last.py": "external-evidence",
     "research/transfer/tests/test_target_last.py": "external-evidence",
     "docs/data-contract.md": "external-evidence",
-    "research/transfer/native_control_prepare.py": "external-evidence"
+    "research/transfer/native_control_prepare.py": "external-evidence",
+    "docs/getting-started.md": "governance",
+    "docs/preprocessing.md": "governance",
+    "docs/publication-upgrade.md": "governance",
+    "examples/public-regression/requirements.txt": "governance",
+    "tools/claims/figure_drawing.py": "external-evidence"
   }
 }
