@@ -22,9 +22,14 @@ pub fn decode_kernel(artifact: &[u8]) -> Result<Kernel> {
     let quantization_bits = artifact[8];
     let seed_policy = artifact[9];
     let flags = u16::from_le_bytes(artifact[10..12].try_into().unwrap());
-    if flags & !1 != 0 {
+    if flags & !(1 | PACKED_FLAG) != 0 {
         return Err(DopeError::Codec("unknown header flags".into()));
     }
+    let packed = flags & PACKED_FLAG != 0;
+    if packed && (!v3 || !QUANTIZATION_GRID_BITS.contains(&quantization_bits)) {
+        return Err(DopeError::Codec("packed values need a DPK3 quantization grid".into()));
+    }
+    let _scope = PackedScope::enter(packed.then_some(quantization_bits));
     let features = u32::from_le_bytes(artifact[12..16].try_into().unwrap());
     let rows_fitted = u64::from_le_bytes(artifact[16..24].try_into().unwrap());
     let seed = u64::from_le_bytes(artifact[24..32].try_into().unwrap());

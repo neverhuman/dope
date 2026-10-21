@@ -15,60 +15,34 @@ fn baseline() -> (Value, Value, Value) {
 }
 
 #[test]
-fn live_and_collected_definitions_reject_legacy_inventory() {
-    let (evidence, _, _) = baseline();
-    let mut definitions = evidence["workflow_definitions"].clone();
+fn live_and_collected_definitions_reject_out_of_scope_jobs() {
+    let definitions = json!({
+        ".github/workflows/ci.yml": include_str!("../../../.github/workflows/ci.yml"),
+        ".github/workflows/jankurai.yml": include_str!("../../../.github/workflows/jankurai.yml")
+    });
+    assert!(runs::validate_collected_definitions(&definitions).is_ok());
+    let mut unexpected = definitions.clone();
     let ci = runs::WORKFLOWS[0].0;
-    let source = include_str!("../../../.github/workflows/ci.yml");
-    let unfiltered_real_workflow = source
-        .replace("  push:\n    branches:\n      - main\n", "  push:\n")
-        .split("\n  arm64-portability:\n")
-        .next()
-        .unwrap()
-        .to_owned();
-    definitions[ci] = json!(unfiltered_real_workflow);
+    let source = unexpected[ci].as_str().unwrap().to_owned();
+    unexpected[ci] = json!(source + "  arm64-portability:\n    runs-on: fixture\n");
     assert_eq!(
-        runs::validate_definitions(&definitions, false).err(),
+        runs::validate_definitions(&unexpected, false).err(),
         Some(Refused("workflow_definition_invalid"))
     );
-
-    let (fixture_evidence, _, _) = baseline();
     assert_eq!(
-        runs::validate_collected_definitions(&fixture_evidence["workflow_definitions"]).err(),
+        runs::validate_collected_definitions(&unexpected).err(),
         Some(Refused("workflow_definition_invalid"))
     );
-}
-
-fn add_arm64_job(runs: &mut Value) {
-    for run in runs.as_array_mut().unwrap() {
-        if run["path"] == ".github/workflows/ci.yml" {
-            let head_sha = run["head_sha"].clone();
-            let jobs = run["jobs"].as_array_mut().unwrap();
-            if !jobs.iter().any(|j| j["name"] == "arm64-portability") {
-                jobs.push(json!({
-                    "conclusion": "success",
-                    "head_sha": head_sha,
-                    "id": 1999,
-                    "name": "arm64-portability",
-                    "status": "completed"
-                }));
-            }
-        }
-    }
 }
 
 fn main_push(evidence: &mut Value) {
     for (path, _) in runs::WORKFLOWS {
-        let mut definition = evidence["workflow_definitions"][path]
+        let definition = evidence["workflow_definitions"][path]
             .as_str()
             .unwrap()
             .replace("  push:\n", "  push:\n    branches:\n      - main\n");
-        if path == ".github/workflows/ci.yml" && !definition.contains("arm64-portability:") {
-            definition.push_str("  arm64-portability:\n    runs-on: fixture\n");
-        }
         evidence["workflow_definitions"][path] = json!(definition);
     }
-    add_arm64_job(&mut evidence["runs"]);
 }
 
 fn pr_only(evidence: &mut Value, receipt: &mut Value) {
@@ -101,13 +75,7 @@ fn main_push_profile_requires_both_source_pr_workflows_and_exact_jobs() {
     main_push(&mut original);
     pr_only(&mut original, &mut receipt);
     assert!(evidence::evaluate_preflight(&original, &pins, &receipt).is_ok());
-    for name in [
-        "arm64-portability",
-        "cpu",
-        "paper-clean",
-        "security",
-        "jankurai-audit",
-    ] {
+    for name in ["cpu", "paper-clean", "security", "jankurai-audit"] {
         for condition in ["missing", "cancelled", "wrong-source"] {
             let mut candidate = original.clone();
             for run in candidate["runs"].as_array_mut().unwrap() {
@@ -200,7 +168,6 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
     let mut receipt = prior["review_receipt"].clone();
     main_push(&mut source);
     pr_only(&mut source, &mut receipt);
-    add_arm64_job(&mut receiving["receiving_runs"]);
     prior["evidence"] = source;
     prior["review_receipt"] = receipt;
     assert_eq!(
@@ -213,26 +180,26 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
         evidence::evaluate_merge(&receiving, &prior),
         Ok("merged_verified")
     );
-    let mut missing_arm64 = receiving.clone();
-    missing_arm64["receiving_runs"][0]["jobs"]
+    let mut missing_cpu = receiving.clone();
+    missing_cpu["receiving_runs"][0]["jobs"]
         .as_array_mut()
         .unwrap()
-        .retain(|job| job["name"] != "arm64-portability");
+        .retain(|job| job["name"] != "cpu");
     assert_eq!(
-        evidence::evaluate_merge(&missing_arm64, &prior).err(),
+        evidence::evaluate_merge(&missing_cpu, &prior).err(),
         Some(Refused("missing_or_duplicate_jobs"))
     );
-    let mut foreign_arm64 = receiving.clone();
-    for job in foreign_arm64["receiving_runs"][0]["jobs"]
+    let mut foreign_cpu = receiving.clone();
+    for job in foreign_cpu["receiving_runs"][0]["jobs"]
         .as_array_mut()
         .unwrap()
     {
-        if job["name"] == "arm64-portability" {
+        if job["name"] == "cpu" {
             job["head_sha"] = json!("ffffffffffffffffffffffffffffffffffffffff");
         }
     }
     assert_eq!(
-        evidence::evaluate_merge(&foreign_arm64, &prior).err(),
+        evidence::evaluate_merge(&foreign_cpu, &prior).err(),
         Some(Refused("check_source_mismatch"))
     );
     let mut missing = receiving.clone();
@@ -260,7 +227,7 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
 }
 
 #[test]
-fn actual_workflows_use_pr_source_and_main_push_with_unchanged_job_inventory() {
+fn actual_workflows_use_pr_source_and_main_push_with_current_job_inventory() {
     let definitions = json!({
         ".github/workflows/ci.yml": include_str!("../../../.github/workflows/ci.yml"),
         ".github/workflows/jankurai.yml": include_str!("../../../.github/workflows/jankurai.yml")

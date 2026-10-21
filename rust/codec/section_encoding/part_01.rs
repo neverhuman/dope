@@ -19,7 +19,12 @@ fn append_section(payload: &mut Writer, tag: u8, raw: &[u8]) -> Result<()> {
 }
 
 pub fn encode_kernel(kernel: &Kernel) -> Result<Vec<u8>> {
+    encode_kernel_with(kernel, false)
+}
+
+fn encode_kernel_with(kernel: &Kernel, packed: bool) -> Result<Vec<u8>> {
     kernel.validate().map_err(DopeError::Codec)?;
+    let _scope = PackedScope::enter(packed.then_some(kernel.quantization_bits));
     let mut payload = Writer::default();
     append_section(&mut payload, 1, &encode_schema(kernel))?;
     append_section(&mut payload, 2, &encode_marginals(kernel))?;
@@ -70,7 +75,8 @@ pub fn encode_kernel(kernel: &Kernel) -> Result<Vec<u8>> {
         kernel.quantization_bits,
         kernel.seed_policy,
     ]);
-    artifact.extend_from_slice(&(kernel.compliant as u16).to_le_bytes());
+    let flags = kernel.compliant as u16 | if packed { PACKED_FLAG } else { 0 };
+    artifact.extend_from_slice(&flags.to_le_bytes());
     artifact.extend_from_slice(&kernel.features.to_le_bytes());
     artifact.extend_from_slice(&kernel.rows_fitted.to_le_bytes());
     artifact.extend_from_slice(&kernel.seed.to_le_bytes());
@@ -248,7 +254,7 @@ fn decode_edges(reader: &mut Reader<'_>, features: usize, bound: usize) -> Resul
             Ok(CopulaEdge {
                 parent: reader.usize(features.saturating_sub(1))? as u32,
                 child: reader.usize(features.saturating_sub(1))? as u32,
-                correlation: reader.u16()? as f32 / u16::MAX as f32 * 2.0 - 1.0,
+                correlation: reader.correlation()?,
             })
         })
         .collect()

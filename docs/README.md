@@ -16,10 +16,13 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | [testing.md](testing.md) | Commands, budgets, and repair evidence |
 | [audit.md](audit.md), [audit-rubric.md](audit-rubric.md) | Jankurai gate, exceptions and finding severity |
 | [release.md](release.md) | Certification and publication gates |
-| [governance/](governance/) | Python-to-Rust migration plan and the Python exceptions inventory |
-| [whitepaper/](whitepaper/README.md) | The **frozen** historical v2 paper, its supplement, and the scripts that regenerate every number |
-| [../paper/](../paper/README.md) | The **active** TDL manuscript |
-| [archive/](archive/) | Retired contracts and histories, kept so receipts still verify |
+| [math.md](math.md) | What a program stores, why it transfers, the implementation audit, and the research plan |
+| [cli.md](cli.md) | Command reference, including the table workflow |
+| [../paper/](../paper/README.md) | The active manuscript and supplement |
+| [whitepaper/](whitepaper/README.md) | The frozen historical paper, its supplement, and the scripts that regenerate every number |
+| [internal/](internal/README.md) | Planning records, review inputs and archives kept for provenance |
+| [governance/](governance/) | Links to the authoritative migration and exception inventory |
+| [archive/](archive/) | Retired contracts and histories |
 
 Every number in either paper is a macro emitted from a committed, SHA-pinned
 ledger under `research/benchmark/results/` or a committed run receipt; the

@@ -1,0 +1,34 @@
+"""The equal-byte renderer's text outputs equal the committed files and stay digit-free where linted."""
+import sys
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import claim_registry  # noqa: E402
+import equal_bytes_text as T  # noqa: E402
+
+
+class EqualBytesRenderTests(unittest.TestCase):
+    def test_committed_text_outputs_are_current(self):
+        for name, expected in T.text_outputs().items():
+            self.assertEqual((T.REPO / name).read_text(), expected, name)
+
+    def test_readme_carries_the_generated_block_once(self):
+        readme = (T.REPO / "README.md").read_text()
+        block = (T.REPO / "paper/generated/readme-equal-bytes.md").read_text().strip()
+        self.assertEqual(readme.count(T.README_BEGIN), 1)
+        self.assertIn(block, readme)
+
+    def test_readme_block_is_the_only_place_with_study_numbers(self):
+        readme = (T.REPO / "README.md").read_text()
+        start, end = readme.index(T.README_BEGIN), readme.index(T.README_END) + len(T.README_END)
+        failures = claim_registry.lint_public_text(readme[:start] + readme[end:].split("<details>")[0], "README")
+        self.assertEqual([f for f in failures if "hand-typed" in f], [])
+
+    def test_frontier_coverage_counts_failures_in_the_denominator(self):
+        lineages = [[{"bytes": 500, "robust": 0.9}], [{"bytes": 500, "robust": 0.5}], []]
+        self.assertEqual(T.coverage(lineages, 0.8, [100, 1000]), [0.0, 1 / 3])
+
+
+if __name__ == "__main__":
+    unittest.main()

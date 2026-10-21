@@ -1,455 +1,481 @@
-% TDL manuscript. Evidence status: historical selection-exposed validation; TDL specified, not measured.
-% Numbers enter only through paper/generated/ (see macros.tex and paper/README.md); the claims
-% firewall refuses a hand-typed number anywhere in this file.
-% Neutral preprint class on purpose: a venue build will be a separate target from these sources.
-\documentclass[11pt]{article}
-\usepackage[T1]{fontenc}
+% D.O.P.E. manuscript. Every result enters through paper/generated/ (claims firewall):
+% contract-macros.tex and headline-macros.tex (tools/claims), equal-bytes-macros.tex and the
+% equal-bytes-*.tex tables (docs/whitepaper/scripts/equal_bytes_render.py from
+% research/benchmark/equal_bytes/results). Do not type a number into this file.
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[protrusion=true,expansion=false]{microtype}
-\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage[numbers,sort&compress]{natbib}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\do\/\do\_\do\-\do\.\do\=\do\&\do\?\do\#}
+\makeatother
 \definecolor{pendingcolor}{RGB}{176,58,46}
-\definecolor{dopegreen}{RGB}{47,90,0}
-\hypersetup{pdftitle={D.O.P.E.: Small Programs, Useful Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\hypersetup{pdftitle={D.O.P.E.: How Few Bytes Carry What a Table Teaches}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
-\IfFileExists{generated/compression-macros.tex}{\input{generated/compression-macros.tex}}{}
-\IfFileExists{generated/quickstart-macros.tex}{\input{generated/quickstart-macros.tex}}{}
-
+\IfFileExists{generated/equal-bytes-macros.tex}{\input{generated/equal-bytes-macros.tex}}{}
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
 \theoremstyle{remark}
-\newtheorem*{remark}{Remark}
+\newtheorem{remark}{Remark}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\operatorname{Var}}
-\newcommand{\KL}{\operatorname{KL}}
-\newcommand{\MSE}{\operatorname{MSE}}
-\newcommand{\Ber}{\operatorname{Ber}}
-\newcommand{\dope}{\textnormal{\textsc{dope}}}
+\newcommand{\Sq}[1]{{#1}^{\Two}}
+\newcommand{\Tr}{T_{\mathrm{robust}}}
+\newlength{\pairedwidth}
+\setlength{\pairedwidth}{0.92\linewidth}
+\newlength{\halfwidth}
+\setlength{\halfwidth}{0.48\linewidth}
+\newlength{\captionwidth}
+\setlength{\captionwidth}{0.49\linewidth}
 
-\title{D.O.P.E.: Small Programs, Useful Synthetic Tables\\[0.3em]
-  \large Measuring Predictive Structure in Bytes}
-\author{Jepson Taylor \qquad Alton Alexander\\NEVERHUMAN Research}
-\date{\small Evidence status: historical selection-exposed validation; \MetricName{} \ResultStatus}
+\title{\textsc{D.O.P.E.}: How Few Bytes Carry What a Table Teaches\\[0.3em]
+\large Transfer Description Length and byte-bounded sampling programs}
+\author{Jepson Taylor \& Alton Alexander\\NEVERHUMAN Research\\\texttt{https://github.com/neverhuman/dope}}
 
+\iclrfinalcopy
 \begin{document}
 \maketitle
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
 
 \begin{abstract}
-\noindent Tabular data is often impossible to share, and a multi-megabyte generator trained on it is opaque and
-costly to audit. We ask how few bytes a sampling program needs so that learners trained only on its samples
-recover what learners trained on the real rows learn. We define \MetricLong{} (\MetricName), an operational
-rate--distortion measure that charges every byte a sampler reads and makes transfer across learner families a
-constraint, not a weighted term. At the population limit, retention is one minus the conditional-mean error
-under the real covariate law (squared loss) and normalized excess log loss relative to feature--label mutual information (log
-loss). This motivates \dope{}, a compiler of target-explicit programs: quantized marginals, a compact
-dependence model, an explicit conditional mean and a noise model. On a selection-exposed validation panel of
-\CFLineages{} PMLB regression tables, \dope{}'s median program holds \CFDopeBytes{} bytes of dataset-specific
-state, \CFByteRatio{}$\times$ fewer than TabSyn, and its worst-auditor retention across CatBoost, linear and
-MLP auditors has a paired difference from TabSyn of \CFPairHL{} [\CFPairLo{}, \CFPairHi{}].
-Across reported method-specific cohorts, its retained lift per kibibyte ranks first of \CFGenerators{}
-generators descriptively, \CFLiftRatio{}$\times$ the runner-up. The official test split is reserved for one pre-registered run.
+Organizations cannot share their tables, but would often like outside learners to learn what those tables
+teach. \emph{Transfer Description Length} (\MetricName) measures a synthetic-data method by the quantity
+that matters for that use: the fewest bytes that carry a declared share of a table's predictive value, on
+untouched real rows, to the worst of several learner families. D.O.P.E.\ compiles a table into a sampling
+program of quantized marginals, a dependence tree, a compact network and a noise model, and charges its retained table-specific state. On a published panel of \EbPublishedTables{} tables the program keeps
+\EbPublishedRobust{} of the real gain at \EbPublishedBytes{} bytes, TabSyn keeps \EbTabSynRobust{} with
+\EbTabSynFactor{} times the bytes, and no generator's frontier lies above the program's. Against the real
+rows themselves, given the best lossless codec, exact byte matching and step-matched training, the program
+wins on \EbLargeWins{} of the \EbLargeLineages{} real-world tables at the study's cap of \cFitCap{} fit rows
+(worst-learner gap \EbLargeGap{} [\EbLargeGapLo, \EbLargeGapHi]), an advantage that grows with the table's
+size. Over all \EbLineages{} tables the gap is \EbGap{} [\EbGapLo, \EbGapHi], and the program's retention
+plateaus: real rows reach the \cTau{} bar with fewer bytes on \EbTdlEightyData{} tables against
+\EbTdlEightyDope{}. All results are selection-exposed development validation.
 \end{abstract}
 
 \begin{figure}[!b]
   \centering
-  \GeneratedFigure[\frontierwidth]{compression-frontier.pdf}{Figure 1: compression frontier rendered from
-  pinned ledgers by docs/whitepaper/scripts/compression_frontier.py.}
-  \caption{\textbf{Transfer estimates at a fraction of the bytes.} (a) Worst-auditor retention (smallest of CatBoost,
-  linear and MLP per lineage) at size $4n$ against median charged bytes; only \dope{} and TabSyn sit on the
-  frontier, and \dope{} is \CFByteRatio{}$\times$ smaller. (b) Retained lift per kibibyte. Selection-exposed
-  validation, \CFLineages{} PMLB lineages.}
+  \GeneratedFigure[\linewidth]{transfer-per-byte.pdf}{Figure 1: the TDL frontier against published
+  generators and against the real rows.}
+  \caption{\textbf{The \MetricName{} frontier: the share of tables on which every learner keeps
+  \cTau{} of the real gain, against the bytes shipped.} (a)~Published generators on the historical
+  validation panel of \EbPublishedTables{} tables (median worst-learner retention per table); tables a
+  generator did not run on count as failures, as the frontier defines. (b)~This paper's study on
+  \EbLineages{} real-world tables: the packed DOPE ladder (blue; best rung within each budget) against the
+  largest set of real rows that fits each budget under the best of three lossless codecs (orange), on the
+  \EbLargeLineages{} tables with \cFitCap{} fit rows (solid) and the smaller ones (dotted). Development
+  validation; selection-exposed.}
   \label{fig:frontier}
 \end{figure}
 
 \section{Introduction}
 \label{sec:intro}
 
-A dataset is valuable because it changes what a learner can do. Security, legal and competitive constraints
-keep most tabular data inside the organization that collected it, so external methods and pretrained
-foundation models are rarely evaluated on the data that matters. Synthetic data is the usual answer, but
-two practices make it hard to trust. Generators are judged by how much their samples resemble the source,
-or by one downstream learner, while the size of the generator goes uncounted; and released generators are
-large: the neural and diffusion generators we compare against ship from hundreds of kilobytes to hundreds
-of megabytes of weights \citep{xu2019ctgan,zhang2024tabsyn,jolicoeurmartineau2024forestdiffusion}.
+A table is valuable because it changes what a learner can do. Most of the tables that would change the
+most cannot leave the organizations that hold them, so the practical question is not whether a
+synthetic table \emph{looks} like the real one but whether a learner trained on it \emph{learns} what the
+real one teaches. Train-on-synthetic, test-on-real evaluation \citep{esteban2017rcgan,jordon2018measuring}
+answers that question for one generator and one learner. It leaves out the size of the generator, which
+ranges from kilobytes for copulas \citep{patki2016sdv} to hundreds of megabytes for diffusion and forest
+models \citep{zhang2024tabsyn,jolicoeurmartineau2024forestdiffusion}.
 
-We take the downstream objective as the definition of quality and the byte as the unit of cost. A compiler
-reads the real fit rows and emits a program; a sampler reads only that program; learners from several
-families are trained on its samples and scored on real rows the compiler never saw. The question is how
-small the program can be while the learners still recover what the real rows teach them. Copying rows does
-not answer it: the bytes grow with the table and copy gates fail. Memorizing a table in a checkpoint does not
-answer it either, because every byte the sampler opens is charged.
-
-\paragraph{Insight.} Train-on-synthetic, test-on-real evaluation \citep{esteban2017rcgan,jordon2018measuring}
-depends on far less than the joint distribution. Proposition~\ref{prop:retention} shows that, at the
-population limit, retention is determined by how closely the synthetic regression function tracks the real
-one on the real covariate distribution, plus enough covariate support for a flexible learner to find it
-(Corollary~\ref{cor:support}). These oracle identities do not remove finite-learner dependence on coverage and noise. \dope{}
-stores a target model explicitly and measures whether the resulting samples transfer.
+We make the size the quantity being reduced. Copying a table needs bytes in proportion to its rows; a
+description of what learners need from it needs bytes in proportion to its structure. A program that is
+small, charged byte for byte and judged only by what learners recover from its samples therefore measures
+how much predictive structure was separated from noise \citep{rissanen1978modeling}, is cheap to audit and
+ship, and has little room to memorize rows.
 
 \paragraph{Contributions.}
-\begin{itemize}\itemsep0pt
-  \item \textbf{A metric with units.} \MetricName{} is the smallest tested dataset-specific payload at which
-  transfer clears a lower-confidence threshold in every required learner family, drivers agree, and copy,
-  cleartext and byte-accounting gates pass (Section~\ref{sec:metric}).
-  \item \textbf{A short theory of transfer.} Retention identities for squared and log loss, a corollary that
-  predicts which auditors need a dependence model, and a size bound at a fixed feature map and representation
-  (Section~\ref{sec:theory}).
-  \item \textbf{A compiler.} \dope{} emits typed, quantized, inspectable programs; a fit-only table
-  encoder and a transfer-in-the-loop backend selector bring real mixed-type tables to it
-  (Section~\ref{sec:method}).
-  \item \textbf{Evidence with receipts.} On the validation panel \dope{} is the smallest program on the
-  transfer frontier and first in retained lift per kibibyte; the predictor-only control matches the
-  pattern the theory predicts; every number here is rendered from hash-pinned ledgers
-  (Section~\ref{sec:results}).
-\end{itemize}
+\begin{enumerate}[leftmargin=1.6em,itemsep=1pt,topsep=2pt]
+  \item \textbf{A transfer-per-byte KPI.} \MetricName{} and its frontier, the share of tables that clear
+  a worst-learner transfer bar at each budget, with hard gates against empty, padded or externally
+  decoded artifacts (\cref{sec:metric}).
+  \item \textbf{Byte-bounded sampling programs.} The DOPE program and compiler, with three changes that
+  make bytes honest and the method reproducible: values stored as quantization-grid codes, the headline
+  network trained natively on a CPU, and an invertible plan that compiles raw mixed-type tables and
+  decodes samples back to the source schema (\cref{sec:method}).
+  \item \textbf{Why it works.} Retention under squared loss is the share of signal variance the program's
+  conditional mean explains, and under log loss the share of label information it delivers; a two-part
+  code argument says when a program beats the data at equal bytes (\cref{sec:theory}).
+  \item \textbf{Evidence.} A worst-learner re-reading of a published generator panel, a new equal-byte
+  study against real rows on \EbLineages{} real-world tables and all \EbPanelLineages{} panel lineages, a
+  scaling study up to \EbScaleMaxN{} rows,
+  a raw mixed-type table (UCI Adult), and ablations including a negative result for an exact Gaussian
+  copula (\cref{sec:experiments}).
+\end{enumerate}
 
-\section{Problem and metric}
+\section{Transfer Description Length}
 \label{sec:metric}
 
-A table is split into fit rows $D_{\mathrm{fit}}$ and untouched query rows. A compiler maps $D_{\mathrm{fit}}$,
-a declared target and a byte budget $B$ to an artifact $A$ with charged size $|A| \le B$; a sampler reads
-only $A$. For an auditor $m$, a learning recipe from family $f$, let $\Lnull$, $\Lreal$ and $\Lsyn(A)$ be its
-mean losses on the query rows when it learns nothing from the table, when it is trained on $D_{\mathrm{fit}}$,
-and when it is trained on samples from $A$. Retention is
+For a table $d$ split into fit rows and untouched test rows, a learner $m$ and an artifact $A$, let
+$\Lnull$, $\Lreal$ and $\Lsyn(A)$ be the test losses of $m$ when it predicts the training mean (or prior),
+when it is trained on the fit rows, and when it is trained only on samples drawn from $A$. Transfer is
 \begin{equation}
-  T_m(A) = \frac{\Lnull - \Lsyn(A)}{\Lnull - \Lreal}.
+  T_{m}(A) = \frac{\Lnull - \Lsyn(A)}{\Lnull - \Lreal},
+  \qquad \Tr(A) = \min_{f} T_f(A),
   \label{eq:transfer}
 \end{equation}
-A cell counts only when the real gain clears a declared floor; receipts keep $T$ unclipped. Within a family
-retention is averaged and across required families the worst family is kept, $\Trobust(A) = \min_f T_f(A)$,
-so adding a family can never raise it. Driver fidelity $\Drobust$ compares grouped permutation importances
-of real- and synthetic-trained instances of the same recipe on the same real rows, normalized by the
-agreement two real-trained instances reach. An artifact qualifies when
-\begin{equation}
-  \LCB\bigl(\Trobust(A)\bigr) \ge \tau_T, \qquad \Drobust(A) \ge \tau_D, \qquad G(A) = \text{pass},
-  \label{eq:qualify}
-\end{equation}
-where $G$ is the conjunction of hard gates. \MetricName{} is the charged payload of the qualifying artifact at
-the smallest tested budget, reported with its grid interval, at the operating point \HeadlinePoint{}
-($\tau_T = $ \TauT, $\tau_D = $ \TauD) of the \ContractState{} contract \ContractId{} over the grid \ByteGrid.
-The charge counts every byte whose value depends on the data and that sampling reads (schema, transforms,
-dictionaries, framing and sidecars); the runtime closure is reported beside it.
+where $T_f$ averages the learners of family $f$ and the outer $\min$ runs over the required families (boosted
+trees, neural networks, linear models). A table is informative for a learner only when its real gain
+clears a declared floor; uninformative cells are excluded, never scored. For the frontier, $T$ is clipped
+to the unit interval, so a learner that gains more from synthetic than from real rows cannot offset
+another.
 
-\paragraph{Why this operating point matters.}
-For a positive real-data gain, requiring $T \geq \tau_T$ bounds
-the excess loss paid for synthetic training:
-\begin{equation}
-  \Lsyn(A)-\Lreal \leq (1-\tau_T)(\Lnull-\Lreal).
-  \label{eq:excess}
-\end{equation}
-The allowed distortion is relative to what the real table teaches that learner,
-not a fixed error tolerance shared across unrelated targets. The rate is the charged
-length $b(A)$ of the fitted program. Over the finite set of tested artifacts,
-\begin{equation}
-  \operatorname{TDL} = \min_{A\in\mathcal{A}_{\rm tested}} b(A)
-  \quad\text{subject to Equation~\eqref{eq:qualify}.}
-\end{equation}
-This separates the objective from the constraints: a larger model cannot compensate for a
-failed gate by a weighted score. It also avoids a retention-per-byte ratio that can reward
-a tiny but useless generator. Testing more budgets requires a frozen multiplicity and
-selection procedure; it does not permit choosing a point on the sealed queries.
+\MetricName{} at threshold $\tau$ is the smallest budget $B$ on a fixed grid for which some artifact of
+at most $B$ charged bytes reaches $\Tr \geq \tau$ (with its lower confidence bound) and passes the hard
+gates: copy and near-copy checks, a cleartext scan, positive lift over predictor-only and
+independent-marginal controls, and a byte ledger that reconciles with a clean-room sampler. Charged
+bytes include every byte the sampler reads: schema, transforms, dictionaries, parameters and framing; a
+shared decoder or checkpoint is charged as sampling closure. The headline operating point is
+\HeadlinePoint{} ($\tau_T = \TauT$, $\tau_D = \TauD$), where $D$ is a driver-agreement gate. Over a
+panel, the frontier $C(B)$ is the share of tables that qualify at budget $B$; failed and missing tables
+stay in the denominator. An empty generator scores zero coverage at every budget, padding only moves an
+artifact to a larger budget, and a hidden decoder is charged, so none of them can game the frontier.
+\Cref{fig:frontier} plots $C(B)$ at $\tau = \cTau$ with the driver gate unmeasured, which we label as
+a transfer-only frontier.
 
-
-\section{Why a target-explicit program transfers}
-\label{sec:theory}
-
-Write $\Delta(A)$ for one minus the retention $T(A)$. Let $P$ be the real distribution with regression function $m_P(x) = \E_P[y \mid x]$ and covariate law $P_X$.
-A program induces a synthetic distribution $Q$ with regression function $m_Q$ and covariate law $Q_X$. Write
-$f_Q$ for the limit of an auditor trained on unboundedly many synthetic rows, $\MSE_{P_X}(f, g) =
-\E_{P_X}[(f(X) - g(X))(f(X) - g(X))]$, and $\Delta(A) = (\Lsyn(A) - \Lreal)/(\Lnull - \Lreal)$ for the
-retention deficit, so that retention is one minus $\Delta$.
-
-\begin{proposition}[Retention under squared loss]
-\label{prop:retention}
-Assume finite second moments and positive variance of $m_P(X)$, with predictions square-integrable under $P_X$. Suppose the null predicts $\E_P[y]$ and the real-trained auditor reaches the Bayes risk. Then
-\[
-  \Delta(A) = \frac{\MSE_{P_X}\!\bigl(f_Q, m_P\bigr)}{\Var_P\bigl(m_P(X)\bigr)} .
-\]
-\end{proposition}
-
-\begin{proof}
-Because $\E_P[y - m_P(X) \mid X]$ vanishes, $\E_P[(y - f(X))(y - f(X))] = \E_P[(y - m_P(X))(y - m_P(X))] +
-\MSE_{P_X}(f, m_P)$ for every $f$. Applying this to $f_Q$, to $m_P$ and to the constant $\E_P[y]$ gives
-$\Lsyn - \Lreal = \MSE_{P_X}(f_Q, m_P)$ and $\Lnull - \Lreal = \Var_P(m_P(X))$.
-\end{proof}
-
-\begin{proposition}[Retention under log loss]
-\label{prop:logloss}
-For a binary target with $p(x) = P(y \text{ positive} \mid x)$, the base-rate null and a Bayes real-trained
-auditor, with positive $I(X;Y)$, predictions strictly between zero and one, and finite expected log loss,
-\[
-  \Delta(A) = \frac{\E_{P_X}\bigl[\KL\bigl(\Ber(p(X)) \,\big\|\, \Ber(f_Q(X))\bigr)\bigr]}{I(X; Y)} .
-\]
-\end{proposition}
-
-\begin{proof}
-The excess log loss of a predictor over $p$ is the expected Kullback--Leibler divergence, and the excess of
-the base rate over $p$ is $H(Y) - H(Y \mid X) = I(X; Y)$.
-\end{proof}
-
-At this oracle limit, log-loss retention is one minus normalized excess risk, with mutual
-information as the denominator. It is not the mutual information stored in an artifact.
-Finite-sample retention uses the auditor's own real gain and is not a mutual-information
-estimator. The identities guide compression; they do not establish finite-learner or TDL
-qualification. Two consequences distinguish statistical settings.
-
-\begin{corollary}[Linear auditors see only the projection]
-\label{cor:linear}
-If $m_Q$ is linear in the features and $Q_X$ has a non-singular second-moment matrix, least squares on
-synthetic rows converges to the coefficients of $m_Q$ whatever the dependence in $Q_X$.
-\end{corollary}
-
-A predictor-only sampler, a fitted ridge regression over independently drawn features, should therefore keep
-almost all of the linear auditor's retention and lose most of what a flexible auditor gains from
-nonlinearity. Section~\ref{sec:controls} tests this prediction.
-
-\begin{corollary}[A support diagnostic from importance weighting]
-\label{cor:support}
-Suppose $P_X\ll Q_X$ and write $w=dP_X/dQ_X$. Assume its second moment under $Q_X$ is finite.
-For independent $X_i\sim Q_X$ and a bounded statistic $h$, the importance-weighted
-mean
-\[
-\widehat\mu=\frac{\sum_i w(X_i)h(X_i)}{n}
-\]
-has variance bounded by
-\[
- \Var(\widehat\mu)\le
- \frac{\lVert h\rVert_\infty\lVert h\rVert_\infty}{n}\E_{Q_X}[w(X)w(X)].
-\]
-\end{corollary}
-\begin{proof}
-Independence gives $\Var(\widehat\mu)=\Var_{Q_X}(wh)/n$.
-Bound variance by the second moment. The weight second moment equals one plus the chi-squared divergence of $P_X$ from $Q_X$.
-\end{proof}
-This standard bound motivates support matching under covariate shift
-\citep{shimodaira2000covariate}; it is not a universal learning rate for unweighted
-local auditors. A dependence model can improve coverage, but its measured transfer
-must still be evaluated, and more synthetic rows need not improve transfer.
-
-\begin{proposition}[Fixed-resolution kernel storage]
-\label{prop:size}
-Fix the feature map, category alphabets, architecture, knot and precision ladders.
-Let $p$ be the retained parameter count and $b$ the bits per parameter. Then the
-kernel encoding has a bound of the form
-$|A_{\mathrm{kernel}}|\le c_{\mathrm{frame}}+\lceil bp/8\rceil+c_{\mathrm{layout}}$ bytes,
-independent of row count at that fixed representation. The complete charge also adds
-the fitted encoder, dictionaries and every sampling sidecar; those can grow with
-cardinality or representation choices.
-\end{proposition}
-For a fixed complete representation, amortized bits per original cell decrease as
-row count increases. This is not a bound on arbitrary mixed tables with growing
-dictionaries. Section~\ref{sec:demo} reports one concrete engineering example.
-
-\begin{remark}[\MetricName{} as an operational rate--distortion function]
-Define $R(\tau) = \inf\{|A| : T(A) \ge \tau\}$ and let $\bar\tau$, one minus $\tau$, be the tolerated
-deficit. By Proposition~\ref{prop:retention}, $T(A) \ge \tau$ asks the induced regression function to lie
-within $\bar\tau \Var_P(m_P(X))$ of $m_P$ in mean square under $P_X$, so $R$ is the description cost of a regression function at a prescribed distortion, with the
-constraint that the code be a sampler. \MetricName{} estimates $R$ on a byte grid with the gates of
-Section~\ref{sec:metric}; the frontier is the whole curve. Two-part code length \citep{rissanen1978modeling}
-and the information bottleneck \citep{tishby2000bottleneck} motivate the framing but are not claimed as the
-measure.
-\end{remark}
-
-\section{\dope{}: compiling a table into a program}
+\section{Programs and the compiler}
 \label{sec:method}
 
-\paragraph{The program.} A \dope{} artifact is a small typed program with four parts. \emph{Marginals:} for
-every feature, a missing rate and either an exact grid over the observed values or a monotone quantile spline.
-\emph{Dependence:} a latent Gaussian vector with structured correlation, chosen from independence, a
-Chow--Liu tree \citep{chow1968dependence}, a triangular autoregression, a sparse Gaussian copula
-\citep{patki2016sdv}, a factor model, a truncated vine \citep{aas2009paircopula} and a two-component mixture;
-features are the inverse marginal transforms of the latent coordinates. \emph{Target:} an explicit
-conditional mean from a small family, the most expressive being the compact neural residual
-\[
-  \hat y(x) = a + \beta^{\top} x_S + v^{\top} \tanh(W x_S + b),
-\]
-on a support $S$ of at most twelve features screened by absolute rank correlation with the target.
-\emph{Noise:} homoscedastic, log-linear heteroscedastic, or a calibration for binary targets. Every parameter
-is quantized from a bit ladder, and \texttt{dope-kernel inspect} prints the program as an S-expression.
+A DOPE program factorizes the joint law as
+$Q(x,y) = c_\theta\bigl(F_{\One}(x_{\One}),\dots,F_p(x_p)\bigr)\prod_j f_j(x_j)\, q(y \mid x)$ with
+\begin{equation}
+  m(x) = c + \beta^\top x_S + v^\top \tanh\!\left(W x_S + b\right),
+  \qquad y = m(x) + \sigma(x)\,\varepsilon,
+  \label{eq:program}
+\end{equation}
+where $S$ holds the $\cScreen$ inputs with the largest absolute rank correlation with $y$, $W$ has
+$\cHidden$ hidden units, and $\log\sigma(x)$ is linear in $\cNoiseInputs$ screened inputs and clamped
+between residual deciles; binary targets use a calibrated Bernoulli head instead. The marginals $F_j$
+are quantile splines with $\cKnots$ knots and a missing rate, and $c_\theta$ is a Gaussian copula
+restricted to a tree in which each column has one parent among the previous $\cParents$. The network
+holds $\cParams$ numbers whatever the number of rows; it is where the bytes go. Every parameter is
+quantized on a grid fixed by the header bit width: unit values to $\Two^{b}-\One$ levels and unbounded
+values to steps of $\Two^{-(b-\Two)}$. \Cref{alg:dope} lists compile and sample.
 
-\paragraph{Compile and sample.} The compiler fits each candidate of a bounded tournament (dependence family,
-target family, knot and bit ladders) on the fit rows, encodes it, and charges its bytes; sampling draws the
-latent vector, maps it through the marginals, evaluates the target model and adds noise, reading nothing but
-the program. The validation panel used a fixed profile; Section~\ref{sec:demo} replaces the tournament's
-train-only proxies with \emph{transfer-in-the-loop selection}, which scores a small portfolio of backends by
-cross-validated train-on-synthetic, test-on-held-out-fit-rows retention, using fit rows only.
+\begin{algorithm}[t]
+\caption{Compile a table plan and program; sample from the program alone.}
+\label{alg:dope}
+\small
+\begin{algorithmic}
+\STATE \textbf{Plan} (raw tables): numbers to the unit interval, log-scaling columns with skewness above
+$\cSkew$; categories to one code per column, levels ordered by smoothed target mean; dates to day counts;
+missing cells kept.
+\STATE \textbf{Compile} (fit rows only): fit marginals and missing rates; fit the dependence tree on
+rank correlations; screen $S$; train \eqref{eq:program} with AdamW (rate $\cRate$, weight decay $\cDecay$,
+element-wise clipping at $\cClip$) for $\cSteps$ full-batch steps; refit $(c,\beta,v)$ in closed form;
+fit the noise model on the residuals; quantize; encode with packed values.
+\STATE \textbf{Sample}$(A, N)$: draw $z$ from the tree copula; $x_j \leftarrow F_j^{-\One}(\Phi(z_j))$;
+$y \leftarrow m(x) + \sigma(x)\varepsilon$; mask features at their missing rates; decode through the plan.
+\end{algorithmic}
+\end{algorithm}
 
-\paragraph{Real tables.} The compiler reads a numeric matrix on the unit interval with the target last. An
-encoder fitted on the fit rows maps a raw table to it: each categorical column becomes a single
-target-ordered code (levels placed by their smoothed mean target, so the code carries the main effect
-linearly and decodes exactly), with one-hot columns and a dropped reference level as an option; skewed
-non-negative columns are log-transformed, every numeric column is clipped at Tukey's far-out fences
-and rescaled; dates become numbers and missing cells stay missing. The encoder's complete reloadable JSON
-state is charged next to the program, and its inverse returns synthetic rows with the original names, labels and
-types. Numeric clipping and finite precision can lose detail; schema decoding is not lossless recovery of the original rows.
+\paragraph{Three changes in this release.} \emph{Packed values.} The historical codec wrote every unit
+value as a sixteen-bit word and every unbounded value as a scaled varint, so the header bit width changed
+precision but hardly bytes. A header flag now stores grid codes (one byte at $q\cBits$) and refuses a
+kernel whose parameters are off its grid; old artifacts are untouched. For the headline shape the decoded
+program, and so every sample, is bit-identical to the historical encoding; for shapes with copula edges or
+bit widths whose grids differ from the historical sixteen-bit grid, parameters agree only to the codec's
+tolerance, so samples can differ slightly. \emph{Native training.} Without libtorch, earlier CPU builds substituted fixed random
+hidden weights. The network now trains in Rust with the published optimizer settings
+\citep{loshchilov2019decoupled}, deterministically for a seed. \emph{Table plans.} A raw CSV compiles into
+one artifact holding a binary column plan and the program; samples decode to the source header, category
+labels, integer columns, dates and missing markers. Ordered category codes carry each level's main effect
+in one coefficient; one-hot dummies would cost bytes per level and let independently sampled dummies
+violate the one-of-$k$ constraint, so dummies are left to the downstream learner's view.
 
-\input{method}
+\section{Why samples from a program transfer}
+\label{sec:theory}
 
-\section{Experimental protocol}
-\label{sec:protocol}
+Write $m_P(x) = \E_P[y \mid x]$ and $s_P = \E_P[\Var_P(y\mid x)]$ (a variance), and define $m_Q$ for the
+program. Consider a learner that is consistent on the support of the law it is trained on, in the limit of
+many synthetic rows and many real rows, so that both estimation errors vanish; \cref{prop:scaling} keeps
+the real sample finite.
 
-The validation panel holds rights-cleared PMLB regression tables \citep{olson2017pmlb,romano2021pmlb}; the
-analyses below use the \CFLineages{} tables on which all three task-trained auditors are informative, with matched DOPE--TabSyn comparisons on their common lineages. Smaller comparator cohorts are reported
-separately; cross-cohort efficiency ranks are descriptive. Auditors are CatBoost \citep{prokhorenkova2018catboost}, ordinary least squares
-and a one-hidden-layer MLP; synthetic size is $4n$ for $n$ fit rows. Comparators are TabSyn with a scaled
-schedule \citep{zhang2024tabsyn}, author-default ARF \citep{watson2023arf}, TVAE and CTGAN
-\citep{xu2019ctgan}, a historical Forest-Flow block \citep{jolicoeurmartineau2024forestdiffusion}, and density
-baselines; controls are a predictor-only sampler and real rows resampled to $4n$, a row-count diagnostic that
-is not a generator. The worst-auditor value of a fit is the smallest of the three auditors' sample-seed
-medians, a lineage value is the median of its fits, and intervals come from a nested bootstrap over
-simulated-family clusters, lineages and fit seeds; paired comparisons report the Hodges--Lehmann estimate.
-Bytes are median charged artifact bytes, including the projection sidecar. The panel also informed
-\dope{}'s profile choice, so every number is a selection-exposed validation estimate; the official test split
-is sealed.
+\begin{proposition}[squared loss]
+\label{prop:squared}
+If the support of $Q_X$ covers that of $P_X$, then
+$T = \One - \E_P\Sq{\bigl[m_Q(X) - m_P(X)\bigr]} \big/ \Var_P\bigl(m_P(X)\bigr)$.
+\end{proposition}
+\begin{proof}
+For any predictor $g$, $\E_P\Sq{(y - g(X))} = s_P + \E_P\Sq{(m_P - g)}$. The null predicts $\E_P y$ and
+loses $s_P + \Var(m_P)$; the real learner converges to $m_P$ and the synthetic learner to $m_Q$ on the
+support of $P_X$. Substitute into \eqref{eq:transfer}.
+\end{proof}
 
-\section{Results}
-\label{sec:results}
+Retention is the share of the true signal variance that the program's conditional mean explains,
+measured under the real covariates. The joint feature model and the noise model enter only through
+support and finite-sample variance, which is why the compiler spends its bytes on $m$.
 
-\subsection{The transfer frontier}
-\label{sec:frontier}
+\begin{corollary}[linear and flexible learners]
+\label{cor:support}
+A linear learner trained on $Q$ converges to $\Sigma_Q^{-\One}\operatorname{Cov}_Q(X, m_Q)$, so it
+transfers fully whenever $Q_X$ matches the first two moments of $P_X$ and $m_Q$ matches the linear
+projection of $m_P$. For a flexible learner with error $e = f_Q - m_Q$ on $Q$, and $w = dP_X/dQ_X$,
+$\E_P\Sq{e} \le \bigl(\E_Q\Sq{w}\bigr)^{\One/\Two}\bigl(\E_Q e^{\Four}\bigr)^{\One/\Two}$
+with $\E_Q\Sq{w} = \One + \chi^{\Two}(P_X\,\|\,Q_X)$ \citep{shimodaira2000improving}.
+\end{corollary}
 
-Figure~\ref{fig:frontier} and Table~\ref{tab:frontier} place every generator by worst-auditor retention and
-charged bytes. \dope{}'s median worst-auditor retention is \CFDopeWorst{} [\CFDopeWorstLo, \CFDopeWorstHi]
-from \CFDopeBytes{} bytes; TabSyn reaches \CFTabSynWorst{} [\CFTabSynWorstLo, \CFTabSynWorstHi] from
-\CFTabSynBytes. Paired on \CFPairN{} lineages, \dope{} minus TabSyn is \CFPairHL{} [\CFPairLo, \CFPairHi], so
-the interval spans zero; this does not establish equivalence. Meanwhile, \dope{} stores \CFByteRatio{}$\times$ fewer bytes. Every other full-panel
-generator is dominated: it is larger and transfers less. In retained lift per kibibyte \dope{} is first of
-\CFGenerators{} generators with \CFDopeLift{}, \CFLiftRatio{}$\times$ the runner-up (\CFRunnerUp). The
-untuned trainer default reaches \CFDopeUntunedWorst{}, which bounds how much of the result the profile choice
-may have contributed. On this panel, whose fit views median \CFRawTableMedian{} as single-precision floats,
-\dope{} spends a median of \CFBitsPerCell{} bits per original cell, and \CFSidecarShare{}\% of its charge is
-the text projection sidecar shared by every method, an overhead a binary codec would remove.
+The corollary explains a control in the published panel: a ridge regressor sampled with independent
+marginals keeps nearly all of a linear learner's gain but far less of CatBoost's, because trees learn
+$m_Q$ only where $Q_X$ puts mass. It also says what the compiler should measure and currently does not:
+the divergence between real and synthetic covariates.
+
+\begin{proposition}[log loss]
+\label{prop:logloss}
+Under the same support condition, for a binary target, $T = \One - \E_P\,\mathrm{KL}\bigl(\mathrm{Ber}(p_P(X))\,\|\,\mathrm{Ber}(p_Q(X))\bigr)\big/ I_P(X;Y)$.
+\end{proposition}
+\begin{proof}
+$\E_P[-\log p_Q(Y\mid X)] = H(Y\mid X) + \E_P\mathrm{KL}(p_P\|p_Q)$, and
+$\Lnull - \Lreal = H(Y) - H(Y\mid X) = I(X;Y)$.
+\end{proof}
+
+\paragraph{When a program beats the data.} A two-part code describes a table as a model plus residuals
+given the model \citep{rissanen1978modeling}. Real rows ship both; a program ships the model and replaces
+the residuals with a few bytes of noise model that regenerate fresh residuals.
+
+\begin{proposition}[equal-byte scaling]
+\label{prop:scaling}
+Suppose a learner trained on $k$ real rows has excess risk $C/k$ with $C = d_{\mathrm{eff}}\, s_P$ and the
+real reference uses $n$ rows. The rows needed to match a program with retention $T$ are
+$k(T) = C\big/\bigl((\One - T)\Var(m_P) + T C/n\bigr)$, which tends to
+$\frac{s_P}{\Var(m_P)}\,\frac{d_{\mathrm{eff}}}{\One - T}$ as $n$ grows. At $b$ bits per value the
+data-equivalence ratio is $k(T)\,(p+\One)\,b \,/\, (\Eight\,|A|)$.
+\end{proposition}
+\begin{proof}
+Solve $(\Lnull - L_k)/(\Lnull - L_n) = T$ with $L_k = s_P + C/k$.
+\end{proof}
+
+A program's size is fixed by its shape, not by the rows, so the proposition predicts that the
+data-equivalence ratio grows with the rows until the whole table caps it, that it grows with the noise share
+over $\One - T$, that tiny tables are cheapest to ship whole, and that at strict thresholds the program's
+approximation error becomes the bottleneck. \Cref{sec:scaling} tests these predictions. \MetricName{} is thus an operational rate--distortion function
+with distortion $\One - \Tr$; the real rows define a second curve, the distortion of the trivial code.
+We make no claim that either estimates a Shannon rate--distortion function.
+
+\section{Experiments}
+\label{sec:experiments}
+
+\paragraph{Protocol.} Learners are the historical evaluator's: ordinary least squares, a one-hidden-layer
+MLP and CatBoost \citep{prokhorenkova2018catboost}, fixed seeds. Retention uses mean squared error on the
+target scaled by fit-row statistics (log loss for binary targets) and synthetic size $\cSynthetic$.
+\emph{Generator panel}: the frozen ledger of the published validation run on PMLB regression lineages
+\citep{olson2017pmlb,romano2021pmlb}, re-read on the worst of three learners with the charged bytes the
+ledger records. \emph{Equal-byte study}: the \EbLineages{} real-world lineages of that panel after removing
+content duplicates, shuffled with a fixed seed; a disjoint test set of \cTestShare{} of the rows, capped at
+\cFitCap{}, and up to \cFitCap{} of the remaining rows as fit rows. DOPE programs are a five-rung ladder of
+packed programs with three fit seeds each. The real-row arm ships the largest uniform subset of fit rows
+whose eight- or sixteen-bit codes, sorted and stored column-major, fit the budget under the best of LZMA2,
+bzip2 and deflate, with three subset seeds, at every grid budget and at each rung's own median size, so
+equal bytes are exact. The real-row arm's codec, byte matching and MLP protocol favor the real rows: the MLP
+keeps its better test loss of training on the subset as given or resampled to the synthetic size, early
+stopped on held-out distinct rows, since its epoch budget would otherwise starve small subsets of optimizer
+steps; the real reference's MLP gets the same treatment, and the whole table scores as the reference
+itself. The DOPE side is not neutral either: its profile was selected on this panel and its frontier takes
+the best rung. Both arms pay the same two single-precision floats per
+column for the fit-row scaling. Seeds aggregate by the median; the bytes real rows need to match a level
+interpolate the real-row frontier in log bytes. Intervals are percentile bootstraps over tables. Every number is development validation and
+selection-exposed: the published profile was chosen on validation rows of the same panel.
+
+\subsection{Against published generators}
 
 \begin{table}[t]
-  \centering
-  \caption{\textbf{Generators on the validation panel, synthetic size $4n$.} Worst-auditor retention is the
-  median over lineages of the smallest of the three auditors' retentions, with its \CFIntervalLevel{} nested
-  bootstrap interval; auditor columns use the same lineages within each method, with smaller cohorts marked; bytes are median charged artifact bytes; rank is
-  by retained lift per kibibyte, for generators with positive worst-auditor retention. $\dagger$: small
-  cohort. Controls are diagnostics, not generators. Evidence: selection-exposed validation.}
-  \label{tab:frontier}
-  \scriptsize
-  \setlength{\tabcolsep}{3.5pt}
-  \GeneratedTable{compression-table.tex}{Compression table rendered by compression_frontier.py.}
+\caption{\textbf{Generators on the historical validation panel, worst of three learners, synthetic size
+$\cSynthetic$.} Median charged bytes and median worst-learner retention over tables; the third column
+counts tables whose worst learner keeps at least $\cTau$ of the real gain. TVAE and CTGAN ran on a smaller
+cohort and Forest-Flow on a historical block. Selection-exposed validation.}
+\label{tab:generators}
+\centering
+\small
+\GeneratedTable{equal-bytes-generators.tex}{Generator table rendered from the study outputs.}
 \end{table}
 
+\Cref{tab:generators} and \cref{fig:frontier}(a) re-read the published panel on the worst learner, the
+\MetricName{} aggregation. The DOPE program keeps \EbPublishedRobust{} of the real gain at a median of
+\EbPublishedBytes{} bytes. TabSyn keeps \EbTabSynRobust{} at \EbTabSynFactor{} times the bytes; ARF and
+the copula and tree baselines keep less at more bytes; CTGAN and independent marginals never clear the
+bar. Forest-Flow keeps more, but ran only on a small block at hundreds of megabytes. Counting the tables a
+generator did not run on as failures, DOPE's frontier is the highest at every budget, and TabSyn nearly
+matches its final share only at tens of megabytes. Every generator was sampled at $\cSynthetic$ rows and
+scored against the same historical reference, so the comparison among them is like for like.
 
-Efficiency ranks compare the reported method-specific cohorts descriptively; the smaller TVAE and Forest-Flow cohorts are not matched full-panel superiority comparisons. The pointwise worst-auditor historical summary is not the proposed TDL family-aggregation and qualification procedure.
-
-\subsection{The controls illustrate the theoretical pattern}
-\label{sec:controls}
-
-Corollary~\ref{cor:linear} predicts that a predictor-only sampler keeps the linear auditor's retention and
-loses the flexible auditors'. It does: its median retention is \CFPredLinear{} under the linear auditor,
-\CFPredMlp{} under the MLP and \CFPredCatBoost{} under CatBoost. \dope{}'s nonlinear residual and dependence
-model close most of that gap, reaching \CFDopeCatBoost{} under CatBoost, \CFDopeLinear{} under the linear
-auditor and \CFDopeMlp{} under the MLP on the same lineages. Retention above one under the MLP is a
-finite-sample effect that Proposition~\ref{prop:retention} excludes only at the population limit: labels drawn
-from a smooth conditional mean are easier to learn than noisy real labels, and resampled real rows at $4n$
-reach \CFBootMlp{}, so row count explains part of it. Receipts keep such values unclipped and never let them
-offset a failure.
-
-\subsection{Tabular foundation models}
-\label{sec:foundation}
+\subsection{Against shipping the real rows}
 
 \begin{figure}[t]
   \centering
-  \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 2: matched classical size/transfer and
-  a separate foundation-model comparison rendered from authenticated receipts.}
-  \caption{\textbf{Historical transfer beside charged fitted-state bytes.}
-  A: matched CatBoost validation, showing both the untuned default and the selected
-  research profile; the paired DOPE--TabSyn comparison is inconclusive, not equivalence.
-  B: a separate foundation-model cohort, where \dope{} or Gaussian-copula samples replace
-  the real rows as in-context examples. Cohorts are not pooled. Foundation-model auditors
-  are unqualified, pretraining overlap is unknown, and cross-model feature-driver
-  preservation, cold closure and \MetricName{} remain unmeasured.}
-  \label{fig:foundation}
+  \GeneratedFigure[\pairedwidth]{equal-bytes-paired.pdf}{Figure 2: DOPE against real rows at equal bytes.}
+  \caption{\textbf{A program beats its data once the table outgrows it.} Worst-learner retention of the
+  headline-shape program minus that of the most real rows that fit in exactly its bytes, against the whole
+  table's compressed size over the program's. Filled: the real-world tables of the study; hollow: the
+  simulated lineages of the full panel. Left of the dashed line the whole table is smaller than the
+  program.}
+  \label{fig:paired}
 \end{figure}
 
-Used as in-context examples without fine-tuning on \CFFmLineages{} lineages, \dope{} samples give median
-retention \CFFmKumoDope{} [\CFFmKumoDopeLo, \CFFmKumoDopeHi] under NVIDIA Kumo, \CFFmTabiclDope{}
-[\CFFmTabiclDopeLo, \CFFmTabiclDopeHi] under TabICLv2 and \CFFmMitraDope{} [\CFFmMitraDopeLo,
-\CFFmMitraDopeHi] under Mitra-v2, against \CFFmKumoGauss, \CFFmTabiclGauss{} and \CFFmMitraGauss{} for the
-Gaussian copula at \CFGaussBytes{} (Figure~\ref{fig:foundation}). These auditors are planned and unqualified,
-their pretraining overlap is unknown, and the block is a historical diagnostic.
+\Cref{fig:frontier}(b) and \cref{fig:paired} compare a program with the data it was compiled from. Whether
+a program beats its data depends on how much larger the table is than the program. On the
+\EbLargeLineages{} tables with \cFitCap{} fit rows, the program keeps \EbLargeGap{} [\EbLargeGapLo,
+\EbLargeGapHi] more of the real gain than the most real rows that fit in exactly its bytes, for the worst
+learner (\EbLargeWins{} wins, \EbLargeLosses{} losses), and real rows need a median \EbRatioLarge{} times
+its bytes to match it. Learner by learner the median differences are \EbLargeLinearGap{} for least squares
+(\EbLargeLinearWins{} wins, \EbLargeLinearLosses{} losses), \EbLargeMlpGap{} for the MLP and
+\EbLargeCatboostGap{} for CatBoost (\EbLargeCatboostWins{} wins, \EbLargeCatboostLosses{} losses): the
+worst-learner contrast is larger because on a few dozen real rows some learner often keeps nothing. Across
+all \EbLineages{} tables the gap rises with the whole table's size over the program's (Spearman
+\EbRhoSize{}; \EbRhoSizeOutgrown{} on the \EbRhoSizeOutgrownN{} tables whose whole table is larger than the
+program, since a table that fits in the program's bytes cannot lose to it) and crosses zero where the
+compressed table is about as large as a program: tables of a few hundred rows are cheapest shipped whole,
+and on the two apnea tables the program itself fails. Over all tables the median gap is \EbGap{} [\EbGapLo,
+\EbGapHi] (\EbWins{} wins, \EbLosses{} losses).
 
-\subsection{A public mixed-type table}
-\label{sec:demo}
+Two sensitivities bound the protocol's influence. Training the real rows as given, without matching the
+MLP's optimizer steps, raises the large-table gap to \EbAsGivenLargeGap{}; leaving the MLP out of the
+worst-learner score lowers it to \EbNoMlpLargeGap{} [\EbNoMlpLargeGapLo, \EbNoMlpLargeGapHi]
+(\EbNoMlpLargeWins{} wins, \EbNoMlpLargeLosses{} losses). Part of the advantage is therefore that a flexible
+learner generalizes better from many samples of a smooth conditional mean than from a few dozen real rows.
 
-The historical quick-start prototype used the UCI Adult table: \QSFitRows{} fit rows with numeric and
-categorical columns, a binary target, and the \QSHoldoutRows{} rows of the official test file as development-exposed
-query rows. Selection chose \texttt{\QSBackend}; reported log-loss retention was \QSRetCatBoost{} for CatBoost,
-\QSRetLinear{} for logistic regression and \QSRetMlp{} for the MLP. Its \QSStateBytes{}-byte subtotal charged
-the model and a diagnostic binary dump, while decoding used a live fitted encoder. The dump omits complete
-reloadable receiver metadata, so this subtotal and its CSV/gzip ratios do not establish complete transfer size.
-The current command reloads full versioned JSON receiver state and charges its actual bytes plus the model;
-no corrected Adult total or cold-runtime measurement is reported here.
+The frontier shows the other regime. The program's retention plateaus below the bar on hard tables, while
+enough real rows clear it: on the large tables real rows overtake the program at a few kilobytes, and to
+reach $\Tr \ge \cTau$ they need fewer bytes on \EbTdlEightyData{} of \EbLineages{} tables against
+\EbTdlEightyDope{} for the program (\EbTdlNinetyData{} against \EbTdlNinetyDope{} at \cTauStrict). A
+$\cParams$-number conditional mean is a lossy channel; raising its ceiling at fixed bytes is the main open
+problem. On all \EbPanelLineages{} lineages of the panel, simulated families included, the large-table gap
+is \EbPanelLargeGap{} [\EbPanelLargeGapLo, \EbPanelLargeGapHi] (\EbPanelLargeWins{} wins,
+\EbPanelLargeLosses{} losses; supplement, \emph{Full panel and parity}).
 
-A five-seed ablation on Adult and UCI Abalone, in the supplement, informed the defaults;
-\QSAblationSummary{} No fixed backend was best on both tables. These are development-exposed local
-engineering results on two public tables. Repeated evaluation does not qualify a sealed confirmatory split,
-a complete benchmark result, or a full required-auditor family.
+\subsection{Scaling and the two-part prediction}
+\label{sec:scaling}
 
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[c]{\halfwidth}
+    \GeneratedFigure[\linewidth]{equal-bytes-scaling.pdf}{Figure 3: bytes against rows.}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{\captionwidth}
+    \caption{\textbf{Programs stay flat; data does not.} On \EbScaleDatasets{} large tables with nested fit
+    views up to \EbScaleMaxN{} rows, the headline-shape program stays between \EbScaleDopeMin{} and
+    \EbScaleDopeMax{} bytes, as its fixed shape implies, while the whole table grows to \EbScaleFullMax{}
+    bytes.}
+    \label{fig:scaling}
+  \end{minipage}
+\end{figure}
 
-\paragraph{Failure modes that matter.}
-Univariate screening can miss interaction-only signals; a small target predictor may
-preserve means while losing conditional tails. Marginal Gaussianization does not recover
-arbitrary dependence, and independent mask draws do not establish realistic missingness.
-Quantization can erase rare effects, while unstable real-data lift makes a retention ratio
-unreliable. Correlated substitute features can also change attribution without changing
-predictions. These are falsifiable research questions for a byte-matched ablation panel,
-not improvements inferred from a favorable aggregate. The supplement specifies the
-tests and separates them from the frozen confirmation run.
+\Cref{fig:scaling} shows the design property behind the comparison: a program's size is set by its shape,
+so it does not grow with the rows, while the whole table does. The equal-byte gap rising with the table's
+size over the program's (\cref{fig:paired}) is the clearest confirmation of \cref{prop:scaling}. Across tables the data-equivalence ratio
+rises with the fit rows (Spearman \EbRhoRows{} over \EbRhoRowsN{} tables with a finite ratio, and
+\EbPanelRhoRows{} over \EbPanelRhoRowsN{} panel tables), but part of that rise is mechanical: the ratio is
+bounded by the whole table's size, which grows with the rows. The proposition's proxy, the noise share over
+$\One - T$ times the row cost, ranks the ratio on the \EbRhoProxyN{} real tables with \cFitCap{} fit rows
+(Spearman \EbRhoProxy{}) and, more weakly, on the panel's \EbPanelRhoProxyN{} large tables
+(\EbPanelRhoProxy{}). About half of those are noise-free physics equations, where real-row learning curves are
+limited by the learners' approximation error rather than by the noise-driven excess risk $C/k$ the
+proposition assumes. The proxy ranks tables but does not predict the ratio's level; a proper test of
+\cref{prop:scaling} needs per-table learning curves.
 
+\subsection{A raw mixed-type table}
+
+\begin{table}[t]
+\caption{\textbf{UCI Adult through the table workflow, scored on the official test file.} Cells are
+log-loss retention / AUC. The artifact holds the column plan (names and category labels included) and the
+packed program; categories are one-hot encoded for every learner downstream.}
+\label{tab:adult}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\GeneratedTable{equal-bytes-adult.tex}{Adult table rendered from examples/adult/reference.json.}
+\end{table}
+
+\Cref{tab:adult} runs the end-to-end workflow on a census table with eight categorical columns, missing
+markers and a binary target. The \AdultBytes-byte artifact is \AdultCsvFactor{} times smaller than the
+training CSV and \AdultGzipFactor{} times smaller than its gzip file. Learners trained on its samples keep
+\AdultDopeLogistic, \AdultDopeMlp{} and \AdultDopeCatboost{} of the log-loss gain. The real rows that fit
+in the same bytes keep less, whether packed as compressed CSV (\AdultSubsetRowsCsv{} rows) or as eight-bit
+column codes with their compressed dictionary (\AdultSubsetRowsCodes{} rows).
+
+\subsection{Ablations}
+
+\begin{table}[t]
+\caption{\textbf{The DOPE ladder on the equal-byte study.} Medians over tables of charged bytes (program
+plus scaling) and worst-learner retention; the last column counts tables at or above $\cTau$. The last two
+rows are references: the untrained CPU default, and the headline-shape programs charged as the historical
+harness charged them.}
+\label{tab:ladder}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\GeneratedTable{equal-bytes-ladder.tex}{Ladder table rendered from the study outputs.}
+\end{table}
+
+\Cref{tab:ladder} separates the changes. The packed codec alone makes the headline programs
+\EbCodecFactor{} times smaller with bit-identical samples; the rest of the \EbByteFactor{}-fold drop in
+charge comes from charging the fit-row scaling as two floats per column (\EbProjection{} bytes at the
+median) instead of the historical text projection (\EbProjectionJson{} bytes). Native training matches the
+published GPU run's retention without a systematic shift (median difference in clipped CatBoost retention
+\EbParityCatboost{} over \EbParityCatboostN{} tables, tenth to ninetieth percentile \EbParityCatboostLo{} to
+\EbParityCatboostHi{}; the splits differ, so this compares distributions, not paired replays). Against the untrained CPU default it changes worst-learner retention by \EbTrainedGain{}
+[\EbTrainedGainLo, \EbTrainedGainHi], so its value is reproducing the published profile without a GPU,
+not a measured gain over the default. Below eight bits the grid begins to cost transfer, and the widest rung, with twice the
+screened inputs and more knots, buys retention for few bytes once values are packed. An exact Gaussian copula (the Cholesky
+factor of rank correlations mapped to latent correlations, with unit latent variances before quantization)
+changed worst-learner retention by a median of \EbCopulaDelta{} [\EbCopulaDeltaLo, \EbCopulaDeltaHi] over
+\EbCopulaTables{} tables (\EbCopulaWins{} wins, \EbCopulaLosses{} losses) at a median of
+\EbCopulaExtraBytes{} more bytes, consistent with \cref{prop:squared}: on these tables the joint feature
+model is not the bottleneck.
 
 \section{Related work}
 \label{sec:related}
 
-Tabular generators range from copulas, Bayesian networks and sequential trees
-\citep{chow1968dependence,patki2016sdv,nowok2016synthpop,zhang2014privbayes} to adversarial and variational
-models \citep{xu2019ctgan,park2018tablegan,zhao2021ctabgan}, diffusion and score models
-\citep{kotelnikov2023tabddpm,zhang2024tabsyn,kim2023stasy,shi2025tabdiff}, forests
-\citep{watson2023arf,jolicoeurmartineau2024forestdiffusion}, language models
-\citep{borisov2023great,solatorio2023realtabformer} and prior-fitted networks \citep{ma2023tabpfgen}; marginal
-synthesizers with formal privacy \citep{mckenna2021mst,mckenna2022aim} also fit small explicit models.
-Probabilistic-program synthesis \citep{saad2019bayesian} and CrossCat \citep{mansinghka2016crosscat} produce
-inspectable models of the joint table; \dope{} instead targets a declared downstream objective and charges
-every byte. Dataset and model distillation \citep{wang2018distillation,hinton2015distilling} compress data or
-models for one learner; generative compression names learned media codecs \citep{santurkar2017generative}.
-Utility, fidelity and privacy evaluation of synthetic data
-\citep{snoke2018utility,alaa2022faithful,qian2023synthcity,stadler2022groundhog,platzer2021holdout} and
-tabular benchmarks \citep{mcelfresh2023tabzilla,erickson2026tabarena} broaden train-on-synthetic, test-on-real
-evaluation; our additions are the byte axis, worst-family transfer and the controls.
+\textbf{Tabular generators} fit copulas and dependence trees \citep{patki2016sdv,chow1968dependence},
+sequential models \citep{nowok2016synthpop}, adversarial and variational networks \citep{xu2019ctgan},
+forests \citep{watson2023arf,jolicoeurmartineau2024forestdiffusion} and diffusion models
+\citep{kotelnikov2023tabddpm,zhang2024tabsyn}; marginal-based synthesizers add formal privacy
+\citep{zhang2014privbayes,mckenna2022aim}. They optimize a joint likelihood or a denoising objective and
+ship their weights; DOPE optimizes the conditional mean that learners need under a byte charge.
+\textbf{Compact models of tables} include probabilistic programs \citep{saad2019bayesian} and CrossCat
+\citep{mansinghka2016crosscat}, which target the joint distribution and inference rather than transfer per
+byte. \textbf{Distillation} keeps learned behavior in a few examples \citep{wang2018distillation} or a
+smaller model \citep{hinton2015distilling}; a program instead draws fresh rows, and its predictor-only
+control isolates what sampling adds. \textbf{Evaluation} of synthetic data spans utility and fidelity
+measures \citep{alaa2022faithful,qian2023synthcity} and privacy attacks \citep{stadler2022groundhog}.
+Description-length and bottleneck ideas \citep{rissanen1978modeling,tishby2000bottleneck} motivate the
+framing; \MetricName{} is an operational measure, not a code-length estimate.
 
-\section{Limitations and broader impact}
+\section{Limitations}
 \label{sec:limits}
 
-\MetricName{} is specified and not yet measured, and every result above is selection-exposed validation on
-regression tables, with one public classification table in the demonstration. The propositions describe
-population limits; finite-sample retention depends on auditor recipes and synthetic size. An artifact serves
-one declared target and does not replace the table for other uses. Copy, membership and attribute checks
-are empirical diagnostics; they are not formal differential privacy and not HIPAA de-identification, and a
-small program can still encode sensitive aggregates. Foundation-model auditors are unqualified, drift
-between versions and carry license terms. A positive impact is that organizations could evaluate external
-models without releasing rows; a risk is overconfidence in empirical privacy, which is why release
-certification is a separate, fail-closed gate.
+All results are development validation and selection-exposed; the sealed test has not been opened. Reported study sizes charge the program and plan or scaling payload; the full cold runtime closure remains unmeasured. The
+study's threshold budgets are point estimates: the driver gate is unmeasured, and neither lower confidence
+bounds nor the copy, lift and ledger gates were applied, so \cref{fig:frontier} is a transfer-only frontier.
+Packed artifacts are not yet accepted by the repository's qualification bundle, which predates the flag.
+The real-row arm picks its MLP training protocol on the test rows; that selection favors the real rows. The
+generator comparison re-reads a historical panel whose splits cannot be rebuilt, so it is not paired with
+the equal-byte study. The real-world panel is regression on PMLB tables with at most \cFitCap{} fit rows;
+classification evidence is one table. A program is conditioned on one target. Copy, membership and
+attribute checks are empirical diagnostics, not formal differential privacy and not HIPAA
+de-identification. At strict transfer thresholds enough real rows reach the bar with fewer bytes than the
+program on most tables; raising the program's ceiling at fixed bytes, for example by distilling the
+conditional mean from a strong teacher, is the main open problem.
 
 \section*{Reproducibility}
-Empirical result numbers are rendered from committed, hash-pinned ledgers by these repository scripts:
-\begin{itemize}
-\item \path{docs/whitepaper/scripts/compression_frontier.py}
-\item \path{docs/whitepaper/scripts/quickstart_block.py}
-\item \path{tools/claims/render.py}
-\end{itemize}
-The claims firewall checks the rendered surfaces. Run \path{bash paper/build.sh} to rebuild this document.
-The command \path{python3 examples/quickstart/quickstart.py} reruns the public demonstration on a laptop.
+The compiler, the study harness (\texttt{research/benchmark/equal\_bytes}), per-table results, the renderer
+of every number, table and figure in this paper, and the UCI Adult walkthrough are in the repository. The
+claims firewall refuses hand-typed numbers in this manuscript and the README and re-renders every
+generated input in continuous integration.
 
-\bibliographystyle{plainnat}
-\bibliography{references,related}
+\bibliographystyle{iclr2027_conference}
+\bibliography{references,equal-bytes}
+
 \end{document}

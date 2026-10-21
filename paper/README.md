@@ -1,14 +1,12 @@
 # TDL paper package
 
-The canonical manuscript package for **D.O.P.E.: Small Programs, Useful Synthetic Tables** (the metric name TDL awaits owner decision D-01). This is the active
-paper landing page for the manuscript in `main.tex` and supplement in `supplement.tex`. The
-manuscript has the shape of a full conference paper: problem and metric, a short transfer theory
-(retention identities for squared and log loss, two corollaries, a size bound), the compiler, the
-protocol, results and limitations. Figure 1 shows the compression frontier (worst-auditor
-retention against charged bytes, and retained lift per KiB); Figure 2 adds the matched CatBoost size/transfer panel (including the untuned default)
-beside the separate foundation-model diagnostic bars; its cohorts are never pooled. Table 1 is the generated frontier table. Every number is
-historical selection-exposed validation or a labeled local demonstration; prospective TDL
-confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
+The canonical manuscript package for **D.O.P.E.: How Few Bytes Carry What a Table Teaches**
+(metric name TDL awaits owner decision D-01). This is the active paper landing page for the
+manuscript in `main.tex` and supplement in `supplement.tex`, both in the ICLR 2027 layout
+(`iclr2027_conference.sty`, final-copy mode with the venue header removed). Figure 1 is the
+transfer-per-byte frontier (`generated/transfer-per-byte.pdf`): published generators on the
+historical panel, and the equal-byte study against real rows. Every result is labelled
+development validation and selection-exposed; prospective TDL confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
 `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
 paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/dope-mfs.pdf)
 and [`docs/whitepaper/supplement.pdf`](../docs/whitepaper/supplement.pdf), with its
@@ -21,8 +19,9 @@ qualifications documented in [`docs/whitepaper/`](../docs/whitepaper/README.md).
 | `references.bib` | starts as a copy of the historical paper's DOI-checked bibliography; add only verified entries | L3 |
 | `build.sh` | checks the contract macros, then builds both PDFs into `target/paper/` and fails on unresolved references or citations | L3 |
 | `scripts/contract_macros.py` | writes `generated/contract-macros.tex`; `--check` refuses drift and any headline-threshold disagreement | L3 |
-| `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` (tools/claims), from the pinned v2 ledgers (`compression-*`, `docs/whitepaper/scripts/compression_frontier.py`) and from the committed quickstart run (`quickstart-macros.tex`, `docs/whitepaper/scripts/quickstart_block.py`) | L2 |
-| `related.bib` | related-work entries copied from the whitepaper's verified `related.bib`, plus Crossref-verified additions | L3 |
+| `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` | L2 (tools/claims) |
+| `generated/equal-bytes-*`, `generated/transfer-per-byte.*`, `generated/readme-equal-bytes.md` | macros, tables, figures and the README block of the equal-byte study, rendered by `docs/whitepaper/scripts/equal_bytes_render.py` and authenticated by the claims firewall | L3 |
+| `equal-bytes.bib` | entries copied from the historical bibliographies plus two with DOI or venue URL | L3 |
 | `archive/` | review ledgers and readiness notes moved out of the historical paper directory (T-111) | L3 |
 
 ## Build
@@ -44,10 +43,8 @@ do not, so a missing input can never look like a measurement:
 | --- | --- | --- |
 | `generated/contract-macros.tex` | `paper/scripts/contract_macros.py` from `contracts/tdl-contract-v1.json`: `\TauT`, `\TauD`, `\HeadlinePoint`, `\ByteGrid`, `\SeedDesign`, `\MetricName`, `\ContractId`, `\ContractState`, bootstrap plan | metric definition, protocol, supplement A and D |
 | `generated/headline-macros.tex` | `generated/headline-results.json` (T-070): `\ResultStatus` and any printed value | title block, evidence section |
-| `generated/compression-frontier.pdf` | compression_frontier.py, from pinned historical ledgers with method-specific cohort counts | Figure 1 |
-| `generated/hero-frontier.pdf` | foundation-model diagnostic renderer from its authenticated CSV | Figure 2 |
-| `generated/compression-table.tex` | generated worst-auditor frontier table with per-method cohort counts | Table 1 |
-| `generated/result-card.tex` | retained historical result card and evidence labels | historical package compatibility |
+| `generated/hero-frontier.pdf` | the hero figure generator (T-072), from the same CSV as the README image | Figure 1 |
+| `generated/result-card.tex` | the result card, one evidence label per row | Table 1 |
 | `generated/contract-table.tex`, `byte-ledger-table.tex`, `auditor-registry-table.tex`, `generator-registry-table.tex`, `dataset-dispositions.tex` | contract, charge manifests and registries | supplement |
 
 ## Rules
@@ -55,15 +52,14 @@ do not, so a missing input can never look like a measurement:
 - Follow [docs/claims-policy.md](../docs/claims-policy.md): an evidence label on every table and
   figure, "smallest tested", never an optimum, no privacy claim, and no unqualified auditor in a
   headline.
-- Do not type a result number into the TeX sources. Route a reviewed, authenticated input through
-  its appropriate generator. Frozen historical inputs, including generated/headline-results.json,
-  retain their original bytes and scope; new measurements need their own admitted source.
-- Use the neutral `article` class until a submission build exists. A venue build will be a
-  separate target generated from the same sources.
-- The abstract's result sentences carry selection-exposed validation numbers through generated
-  macros, with that label stated in the same sentence. Replace them with the sealed-test numbers
-  when the sealed run exists (owner decision; this relaxes the earlier rule of an abstract without
-  results).
+- Do not type result numbers into the `.tex` sources. Route reviewed inputs through
+  the corresponding renderer; frozen headline inputs retain their original bytes and scope.
+- The manuscript uses the ICLR layout in final-copy mode; `\iclrfinalcopy` removed gives the
+  anonymous review build.
+- Abstract numbers are generated macros, each in a sentence that names its evidence status.
+  Replace them with sealed-test macros when that run exists.
+- Small integers inside mathematics come from generated constants (`\One`, `\Two`, ...) so the
+  public lint can keep refusing bare digits.
 
 ## Contract agreement
 
@@ -79,9 +75,3 @@ point (`contracts/tdl-contract-v1.json`, `headline_operating_point`):
 
 A contract change therefore requires regenerating the macros and updating the README in the same
 change.
-
-The frozen quick-start Adult/Abalone reports use incomplete prototype encoder byte accounting. Current JSON receiver reload is fixture-tested separately; do not treat those historical subtotals or ratios as complete transfer sizes or new measurements.
-
-## Publication development directions
-
-The [publication audit](../docs/publication-upgrade.md) and [preprocessing guide](../docs/preprocessing.md) record proposed ablations and controlled alternatives. These proposals are unmeasured and do not alter the frozen confirmation or historical inputs. The paper-clean CI lane retains both active PDFs as `dope-active-preprint` after a successful build.

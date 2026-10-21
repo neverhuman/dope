@@ -1,5 +1,8 @@
 fn run(command: Command) -> Result<()> {
     match command {
+        command @ (Command::FitTable { .. }
+        | Command::SampleTable { .. }
+        | Command::InspectTable { .. }) => return run_table(command),
         Command::CompileMixed {
             csv,
             schema,

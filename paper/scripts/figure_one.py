@@ -16,7 +16,9 @@ import sys
 from pathlib import Path
 
 LABEL = "fig:frontier"
-GRAPHICS = ("generated/compression-frontier.pdf", "generated/hero-frontier.pdf")
+# The transfer-per-byte frontier is the hero; the foundation-model bars remain accepted.
+GRAPHICS = ("generated/transfer-per-byte.pdf", "generated/hero-frontier.pdf", "generated/compression-frontier.pdf")
+GRAPHIC = GRAPHICS[1]
 # TeX hard-wraps log lines at max_print_line (79 characters by default).
 LOG_WRAP = 79
 

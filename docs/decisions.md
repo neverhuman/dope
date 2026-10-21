@@ -3,8 +3,8 @@
 This page is the active record: decisions in force and decisions awaiting the owner. The
 dated history, including the vNext contract boundary and the N02 narrative decision, is in
 [archive/decisions-history.md](archive/decisions-history.md). The 2026-10-15 rebuild plan is
-[TODO-2026-10-15.md](TODO-2026-10-15.md), drawn from the five specifications in
-[review-inputs/2026-10-15/](review-inputs/2026-10-15/INDEX.md).
+[TODO-2026-10-15.md](internal/TODO-2026-10-15.md), drawn from the five specifications in
+[review-inputs/2026-10-15/](internal/review-inputs/2026-10-15/INDEX.md).
 
 ## Pending owner decisions (D-01 to D-09)
 

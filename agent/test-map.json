@@ -61,14 +61,6 @@
       "command": "just fast",
       "purpose": "verify repository metadata"
     },
-    "PYTHON_EXCEPTIONS.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "PY_TO_RUST_PLAN.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
     "README.md": {
       "command": "just fast",
       "purpose": "verify onboarding guidance"
@@ -224,10 +216,6 @@
     "docs/whitepaper/BASELINE_PROTOCOL.md": {
       "command": "target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_baseline_completion -v",
       "purpose": "recount original frozen fit/job/closure bytes, separate fits from metric coverage, preserve 600-second timeout outcomes and historical costs, reproduce schemas and tables, and keep forecasts and gated scores distinct"
-    },
-    "docs/whitepaper/COMPREHENSION_v1.md": {
-      "command": "just paper-tests && just paper-check",
-      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
     },
     "docs/whitepaper/coverage-plan.json": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_retained_evidence.py' -v",
@@ -3040,6 +3028,138 @@
     "validation/requirements-v1.txt": {
       "command": "bash agent/check-python-v1-boundary.sh",
       "purpose": "verify pinned Python V1 compatibility graph"
+    },
+    "docs/internal/PYTHON_EXCEPTIONS.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "docs/internal/PY_TO_RUST_PLAN.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "docs/internal/whitepaper/COMPREHENSION_v1.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
+    },
+    "rust/table.rs": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
+    "rust/table/": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
+    "rust/codec/packed_values.rs": {
+      "command": "cargo test --locked --lib packed_value_tests",
+      "purpose": "packed values round trip, refuse off-grid kernels, and leave historical artifacts byte-identical"
+    },
+    "rust/compiler/target_fitting/native_training.rs": {
+      "command": "cargo test --locked --lib native_training_tests",
+      "purpose": "native profile parsing, deterministic training, and the exact Gaussian copula factor"
+    },
+    "research/benchmark/equal_bytes/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v",
+      "purpose": "real-row codec arm, frontier, TDL and the committed summary"
+    },
+    "docs/whitepaper/scripts/equal_bytes_render.py": {
+      "command": "python3 docs/whitepaper/scripts/equal_bytes_render.py --check",
+      "purpose": "equal-byte macros, tables and README block equal the committed files"
+    },
+    "docs/whitepaper/scripts/equal_bytes_text.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "examples/adult/": {
+      "command": "python3 examples/adult/prepare.py --out target/adult && target/release/dope-kernel fit-table --csv target/adult/train.csv --target income --out target/adult/adult.dope && target/release/dope-kernel sample-table --model target/adult/adult.dope --rows 32561 --out target/adult/synthetic.csv && python3 examples/adult/evaluate.py --dir target/adult --model target/adult/adult.dope",
+      "purpose": "README quick start on UCI Adult; reference.json is the committed evaluation"
+    },
+    "docs/internal/": {
+      "command": "just score",
+      "purpose": "internal planning records kept for provenance"
+    },
+    "docs/whitepaper/scripts/equal_bytes_common.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "docs/whitepaper/scripts/equal_bytes_sections.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "PYTHON_EXCEPTIONS.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "PY_TO_RUST_PLAN.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "research/benchmark/review_fixes/bind_privacy_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/bind_tabsyn_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/tabsyn_evaluator_replay.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/test_bind_privacy_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/test_bind_tabsyn_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/test_tabsyn_evaluator_replay.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.jsonl": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/parser-check.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json": {
+      "command": "python3 -m json.tool docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "receipts/claude_pr285_c46b53b2_independent_review_20261019.json": {
+      "command": "python3 -m json.tool receipts/claude_pr285_c46b53b2_independent_review_20261019.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/HISTORICAL_BINDER_RECOVERY.md": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "keep historical source recovery separate from numerical reproduction and release admission"
     }
   }
 }

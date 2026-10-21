@@ -14,6 +14,48 @@ enum Command {
     /// Report this native executable and supported runtime profiles without data,
     /// optional imports, network access, or automatic weight installation.
     Doctor,
+    /// Compile a headered CSV (numbers, categories, dates, missing cells) into one
+    /// table artifact: an invertible column plan plus a packed, natively trained program.
+    FitTable {
+        #[arg(long)]
+        csv: PathBuf,
+        /// Target column name (required; never inferred from column order).
+        #[arg(long)]
+        target: String,
+        #[arg(long)]
+        out: PathBuf,
+        /// Column to leave out (repeatable), for example identifiers.
+        #[arg(long)]
+        drop: Vec<String>,
+        /// auto, regression or binary.
+        #[arg(long, default_value = "auto")]
+        task: String,
+        #[arg(long, default_value_t = 1729)]
+        seed: u64,
+        #[arg(long, default_value = "compact_neural_residual_symbolic")]
+        candidate: String,
+        #[arg(long, default_value = "features12_steps2048")]
+        native_target_profile: String,
+        /// Categories seen fewer times are pooled into one rare level.
+        #[arg(long, default_value_t = 5)]
+        min_level_count: usize,
+    },
+    /// Sample rows from a table artifact with the source header, categories and units.
+    SampleTable {
+        #[arg(long, visible_alias = "artifact")]
+        model: PathBuf,
+        #[arg(long)]
+        rows: usize,
+        #[arg(long, default_value_t = 1)]
+        seed: u64,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Report a table artifact's bytes and column kinds without names or values.
+    InspectTable {
+        #[arg(long, visible_alias = "artifact")]
+        model: PathBuf,
+    },
     /// Explicit development mixed feature/mask carrier; old raw defaults stay fixed.
     CompileMixed {
         #[arg(long)]
@@ -292,6 +334,13 @@ enum Command {
         /// Development-only encoded-feedback allocation; does not certify improvement.
         #[arg(long)]
         adaptive_allocation: bool,
+        /// Train the compact neural residual in pure Rust with this profile,
+        /// for example `features12_steps2048` (the published headline shape).
+        #[arg(long)]
+        native_target_profile: Option<String>,
+        /// Store values as quantization-grid codes (packed DPK3 values).
+        #[arg(long)]
+        packed_codec: bool,
         #[arg(long, default_value = "l3")]
         tier: String,
         #[arg(long)]

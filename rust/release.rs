@@ -1,6 +1,6 @@
 use crate::certification::CertificationReport;
 use crate::codec::LoadedKernel;
-use crate::codec::{decode_kernel, encode_kernel};
+use crate::codec::decode_kernel;
 use crate::compiler::{CandidateReport, CompileOptions, CompileReport, compile_kernel_from_arrays};
 use crate::contract::{
     FormalDpConfiguration, FrozenBackend, ReleasePolicy, auditor_specs, empirical_backends,
@@ -287,7 +287,7 @@ pub fn convert_release(
         .map_err(|error| io_error(&staging, error))?;
     let kernel_path = staging.join("kernel.dpk");
     fs::write(&kernel_path, &artifact).map_err(|error| io_error(&kernel_path, error))?;
-    let canonical = encode_kernel(&decode_kernel(&artifact)?)?;
+    let canonical = crate::codec::reencode_canonical(&artifact)?;
     if canonical != artifact {
         return Err(crate::DopeError::Codec(
             "compiled Kernel V3 is not a canonical round trip".into(),

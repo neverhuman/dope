@@ -464,6 +464,16 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
             path = root / name
             if not path.is_file() or path.read_bytes() != expected:
                 failures.append(f"{name}: generated output or figure hash drift")
+    # The equal-byte study renders its own README block and paper macros from
+    # committed study outputs; every one of them must equal a fresh rendering.
+    import equal_bytes_text
+    # Public surfaces only; the renderer's own check covers its research outputs.
+    equal_outputs = {name: text for name, text in equal_bytes_text.text_outputs().items()
+                     if name.startswith("paper/")}
+    for name, expected in equal_outputs.items():
+        path = root / name
+        if not path.is_file() or path.read_text() != expected:
+            failures.append(f"{name}: equal-byte generated output drift")
     readme = (root / "README.md").read_text()
     # Existing v2 BENCHMARK is already compiled by the historical registry.
     # The L3 landing page uses the new marker. While lanes integrate, both are admitted.
@@ -494,12 +504,21 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
                     if demo != outputs["paper/generated/readme-demo-notes.md"].decode().strip():
                         failures.append("README: generated historical demo notes drift")
                     prose = prose.replace(demo, "")
+            begin, end = equal_bytes_text.README_BEGIN, equal_bytes_text.README_END
+            if begin in prose:
+                if prose.count(begin) != 1 or prose.count(end) != 1 or prose.index(begin) > prose.index(end):
+                    failures.append("README: equal-byte markers must be unique and ordered")
+                else:
+                    block = prose[prose.index(begin):prose.index(end) + len(end)]
+                    if block != equal_outputs["paper/generated/readme-equal-bytes.md"].strip():
+                        failures.append("README: generated equal-byte block drift")
+                    prose = prose.replace(block, "")
             failures.extend(lint_public_text(prose, "README"))
     elif "<!-- BEGIN BENCHMARK -->" not in readme:
         failures.append("README: generated result card markers are missing")
     elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
         failures.append("README: changed prose must adopt the generated TDL result card")
-    verified_outputs = set(outputs)
+    verified_outputs = set(outputs) | {name for name in equal_outputs if name.endswith(".tex")}
     compression_tex, compression_failures = readme_blocks.verified_tex(root)
     verified_outputs |= compression_tex
     failures.extend(compression_failures)

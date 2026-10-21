@@ -1,5 +1,7 @@
 """Fail-closed W01 admission and evidence-accounting tests."""
 import base64
+import contextlib
+import io
 import hashlib
 import json
 from pathlib import Path
@@ -292,6 +294,7 @@ class NativeQualificationTests(unittest.TestCase):
         self.assertEqual(rnq.RUNNER_FILE, Path(rnq.__file__).resolve())
         self.assertEqual(nqr.RUNTIME_FILE, Path(nqr.__file__).resolve())
         self.assertNotEqual(rnq.RUNNER_FILE, nqr.RUNTIME_FILE)
+        self.assertNotEqual(nq.sha256_file(rnq.RUNNER_FILE), nq.sha256_file(nqr.RUNTIME_FILE))
         for mod_path in (
             Path(nq.__file__).resolve(),
             nqr.RUNTIME_FILE,
@@ -328,6 +331,19 @@ class NativeQualificationTests(unittest.TestCase):
             self.assertEqual(worker_receipt["status"], "failed")
             self.assertEqual(worker_receipt["error_type"], "QualificationError")
             self.assertEqual(worker_receipt["error"], "case_input_pin_mismatch")
+
+    def test_entry_help_cannot_start_worker_or_open_manifest(self):
+            from research.transfer import run_native_qualification as runner
+
+            output = io.StringIO()
+            with patch.object(runner, "_worker", side_effect=AssertionError("worker started")), \
+                    patch.object(runner, "verify_signed_manifest", side_effect=AssertionError("manifest read")), \
+                    contextlib.redirect_stdout(output):
+                with self.assertRaises(SystemExit) as stopped:
+                    runner.main(["--help"])
+            self.assertEqual(stopped.exception.code, 0)
+            self.assertIn("--checkpoint-root", output.getvalue())
+            self.assertIn("--worker", output.getvalue())
 
 
 

@@ -19,6 +19,10 @@ class FigureOneTests(unittest.TestCase):
     def test_generated_hero_on_page_one_passes(self):
         self.assertEqual(F.failures(AUX, LOG), [])
 
+    def test_transfer_per_byte_hero_passes(self):
+        log = LOG.replace("hero-frontier.pdf", "transfer-per-byte.pdf")
+        self.assertEqual(F.failures(AUX, log), [])
+
     def test_pending_placeholder_is_refused(self):
         self.assertIn("no generated hero figure was included; Figure 1 would be a pending placeholder",
                       F.failures(AUX, "File: macros.tex\n"))
