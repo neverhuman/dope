@@ -22,7 +22,11 @@ class EqualBytesRenderTests(unittest.TestCase):
         self.assertIn(block, readme)
 
     def test_readme_block_is_the_only_place_with_study_numbers(self):
-        readme = (T.REPO / "README.md").read_text()
+        # The DOPE 1.0 engine's generated blocks are authenticated by tools/claims/dope1.py.
+        if str(T.REPO) not in sys.path:
+            sys.path.insert(0, str(T.REPO))
+        from tools.claims import dope1
+        readme = dope1.strip((T.REPO / "README.md").read_text())
         start, end = readme.index(T.README_BEGIN), readme.index(T.README_END) + len(T.README_END)
         failures = claim_registry.lint_public_text(readme[:start] + readme[end:].split("<details>")[0], "README")
         self.assertEqual([f for f in failures if "hand-typed" in f], [])
