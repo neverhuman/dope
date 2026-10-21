@@ -39,6 +39,24 @@ class HeroFigureTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unresolved internal reference"):
             canonical_svg(b'<svg><use xlink:href="#absent"/></svg>')
 
+    def test_png_encoding_is_stable_without_losing_a_single_rgba_bit(self):
+        from PIL import Image
+        from tools.claims.figure_drawing import canonical_png
+        image = Image.new("RGBA", (2, 2))
+        image.putdata([(0, 0, 0, 0), (255, 2, 3, 255),
+                       (4, 5, 6, 128), (255, 255, 255, 255)])
+        def encoded(level):
+            stream = io.BytesIO()
+            image.save(stream, format="PNG", compress_level=level)
+            return stream.getvalue()
+        first = canonical_png(encoded(0))
+        self.assertEqual(first, canonical_png(encoded(9)))
+        with Image.open(io.BytesIO(first)) as decoded:
+            self.assertEqual(decoded.size, image.size)
+            self.assertEqual(decoded.tobytes(), image.tobytes())
+        image.putpixel((1, 0), (254, 2, 3, 255))
+        self.assertNotEqual(first, canonical_png(encoded(9)))
+
     def test_committed_points_and_threshold_fit_the_axes(self):
         self.assertEqual(render.figure_bound_failures(self.rows, self.data["thresholds"]), [])
         self.assertEqual(render.threshold_label(self.data["thresholds"]), "Proposed T90; driver gate unmeasured")
