@@ -454,3 +454,41 @@ current GNU libc 2.39 static math archive and admitted FMA/AVX features. Other
 platforms explicitly mark this native route unsupported while retaining their
 required product portability gates. The complete runtime, artifact and invocation
 are charged at each control draw.
+
+
+### Funded adapter lifetime fixtures
+
+`python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v`
+reproduces the old cumulative-timeout failure with synthetic clocks. It also
+checks actual fixture calls through the streamed physical DAG. These tests do
+not execute or qualify official model weights or a protected campaign.
+
+The default V1 adapter/graph/worker vocabulary remains unchanged. A trusted
+parent may explicitly select `adapter_lifetime_policy="funded_per_fit_v1"` in
+`PilotWorkerRuntime`; that choice is bound into its V2 configuration capsule and
+the V2 operation graph before the existing StageJournal reserves the graph.
+The per-prepared-model lifetime is the sum of that fit's already funded unique
+prepare/predict nodes. Logical aliases add no calls or budget. One actual adapter
+binds to each fit, and each physical node permits one backend attempt. Failures
+retain elapsed cost. Reprepare, node replay, a closed or expired guard, mutated
+funding, and an unreserved call refuse; none issues a fresh lifetime or refund.
+
+`ModelIdentity`, `ResourceLimits`, and `AdapterAdmission` retain their V1 hashes.
+In particular, Mitra's native `time_limit` remains the qualified identity's
+600-second setting; the new lifetime does not change its training recipe. Every
+node must still fund at least the native call limit, and the original parent
+stage/job deadline and external process containment remain mandatory. This
+trusted in-process graph is not isolation against arbitrary same-user code.
+Fixture validation does not authorize a full pilot, sealed access, or release.
+
+In V1, `ResourceLimits.wall_seconds` is the cumulative adapter cap. In the
+explicit `funded_per_fit_v1` route it is the unchanged **native per-call cap**;
+it must not be read alone as the prepared model's lifetime. Read the V2 adapter
+receipt's `native_call_wall_seconds` together with `physical_budget.wall_ms`,
+its graph/reservation hashes and operation keys. This semantic distinction is
+part of the signed V2 capsule/graph opt-in. The standalone V1 route stays V1.
+
+The trusted parent calls a guard sequentially. A guard and its adapter are not
+an API for concurrent callers. Parallel cells must use separate processes,
+private output directories and separately reserved journals; they may not share
+or reconstruct one live guard. Internal SDK threads do not issue parent calls.

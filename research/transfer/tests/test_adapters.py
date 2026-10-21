@@ -356,8 +356,21 @@ class AdapterTests(unittest.TestCase):
             port.prepare(self.train, 7)
             self.assertEqual(port.predict(self.query, 8).values, ((70.,), (90.,)))
         tree = ast.parse((ROOT / "research/transfer/adapters/base.py").read_text())
+        # Default offline execution above must not acquire process/network access.
+        # The separately admitted funded-parent entry has one lazy typed-guard
+        # import; permit it only inside that explicit opt-in method.
+        opt_in = next(node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+                      and node.name == "bind_physical_budget")
+        optional_imports = {node for node in ast.walk(opt_in)
+                            if isinstance(node, (ast.Import, ast.ImportFrom))}
+        self.assertEqual({node.module for node in optional_imports
+                          if isinstance(node, ast.ImportFrom)},
+                         {"research.transfer.pilot_physical_operations"})
+        self.assertEqual(len(optional_imports), 1)
         imports = set()
         for node in ast.walk(tree):
+            if node in optional_imports:
+                continue
             if isinstance(node, ast.Import):
                 imports.update(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom):
