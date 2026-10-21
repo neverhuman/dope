@@ -91,3 +91,17 @@ Its offline build/provenance entrypoints live in
 non-product transfer research boundary. They prepare measured ML-control evidence;
 they do not implement product routes, release certification or database truth.
 The recipient sampler stays the paid Rust ELF; no Python is added to that closure.
+
+## Additive Rust tensor deployment
+
+`deploy/` is a standalone, locked Rust inference workspace. Its `native` package
+builds the canonical modules through `rust/runtime_lib.rs`, excluding compiler,
+campaign, training and service modules. It uses Candle for explicit TVAE tensor execution.
+Its SafeTensors carrier binds the native graph to typed decoder weights and charges
+the complete file. It does not replace raw/mixed artifact readers or any frozen
+contract. CPU fallback preserves the native historical profile; the training-consistent
+`tanh-v2` activation is an explicit successor. CUDA is optional and needs actual
+hardware qualification. `rust/neural/deployment.rs` supplies native latent and output
+semantics, while the shared sampling APIs own row seeds and marginal decoding.
+No Python or libtorch enters this deployment graph. See `deploy/README.md` for exact
+supported graphs, byte overhead, runtime dependencies and promotion requirements.

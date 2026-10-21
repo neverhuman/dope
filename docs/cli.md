@@ -24,6 +24,27 @@ Use `dope-kernel --help` for that full compatibility interface.
 | `demo` | `--out FILE [--report FILE] [--seed U64]` | Compile a built-in 16-row synthetic engineering fixture. The receipt says `fixture_only=true`, `qualified=false`, `certified=false`. |
 | `version` | `[--json]` | Print the Cargo package version. |
 
+## Table workflow (`dope-kernel`)
+
+| Command | Inputs and outputs | Behavior |
+| --- | --- | --- |
+| `fit-table` | `--csv FILE --target NAME --out FILE [--drop COL]... [--task auto\|regression\|binary] [--seed U64] [--candidate ID] [--native-target-profile NAME\|none] [--min-level-count K]` | Infer each column's type from a headered CSV and store an invertible plan: numbers to the unit interval (log-scaled first when \|skewness\| > 2), categories to one code ordered by smoothed target mean (two or more rare levels pooled, missing markers kept as levels; numeric binary labels are compared by value), dates to day counts (calendar-validated; bounds kept to the second), missing numeric cells kept missing. Identifier-like and all-missing columns are dropped and reported. Compiles the plan's matrix with the native trainer and packed values; refuses an existing output before fitting. Prints a report with byte accounting and column kinds. |
+| `sample-table` | `--model FILE --rows N --out FILE [--seed U64]` | Write a headered CSV in the source header order, category labels, integer and date formats. |
+| `inspect-table` | `--model FILE` | Byte accounting (program, plan, dictionary, framing) and column kinds, without names, labels or extrema. |
+
+The table artifact (`DOPETAB1`) contains the column names and category labels
+needed to decode samples; treat it as private as the schema. A binary target
+must have two levels; multiclass targets are refused.
+
+`dope-kernel compile` accepts two development options: `--native-target-profile
+NAME` trains the compact neural residual in Rust (profile names follow the GPU
+research profiles, for example `features12_steps2048`), and `--packed-codec`
+writes values as quantization-grid codes (DPK3 header flag bit 1). Neither
+changes a default, so historical artifacts and receipts are reproduced as before.
+Candidates can also be named as `symbolic_k{knots}_d{dependence}_t{target}_q{bits}`
+(indices into the compiler's ladders); dependence family 7 is an exact dense
+Gaussian copula of normal scores, available only by explicit request.
+
 An intake receipt records input/schema hashes, row/column counts and
 `state=input_validated`, `fit_transform_state=not_fitted`,
 `prepared_view=unavailable`, `qualified=false`. `prepare` does not persist fitted

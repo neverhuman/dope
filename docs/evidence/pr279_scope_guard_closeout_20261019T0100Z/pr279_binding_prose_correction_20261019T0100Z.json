@@ -1,0 +1,21 @@
+{
+  "schema": "dope.pr279_binding_prose_correction.v1",
+  "created_at_utc": "2026-10-19T01:00:00Z",
+  "authority": "/home/ubuntu/xbabe2_kicker/captains-20261017/CODEX_BLOCKED_dope_scope_guard_20261019T005100Z.md",
+  "target_receipt": "controls_py_inventory_pr279_binding_20261019T0026Z.json",
+  "target_receipt_sha256": "c3bd71292393c177b93bae3706dbed881f2b9858b0e559107955d374db9999ef",
+  "pr_number": 279,
+  "pr_head_sha": "396bdae0343dd37e0ab60beea3d0aa345383c594",
+  "pr_tree_sha": "44f4663e8bc52b2fa89b94083c5fb9aea24f7c45",
+  "committed_files": {
+    "PYTHON_EXCEPTIONS.md": {
+      "sha256": "fd8db8fc385e4055963982d33a8c724d7cda89767b035bb23b98e3c6bf00666b",
+      "bytes": 216298
+    },
+    "PY_TO_RUST_PLAN.md": {
+      "sha256": "00ae43689895433e7ee20f3d90ec3a16eca3c9a1b1efb799c8030acfc4177506",
+      "bytes": 169556
+    }
+  },
+  "prose_correction_note": "Structured fields in c3bd71292393c177b93bae3706dbed881f2b9858b0e559107955d374db9999ef match committed PR #279 head 396bdae0343dd37e0ab60beea3d0aa345383c594 (fd8db8fc.../216298B and 00ae4368.../169556B); embedded prose references to 9490801c.../2b0637dd... and c844b0ba... referred to pre-commit working-tree state and prior observation."
+}

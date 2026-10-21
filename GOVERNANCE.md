@@ -13,7 +13,7 @@ release tag, sealed evaluation, or model admission is implied by a refactor.
 
 The pending decisions and working defaults are recorded in
 [docs/decisions.md](docs/decisions.md) and the
-[rebuild TODO](docs/TODO-2026-10-15.md). Working defaults support implementation;
+[rebuild TODO](docs/internal/TODO-2026-10-15.md). Working defaults support implementation;
 they do not freeze the scientific protocol. [STATUS.md](STATUS.md) records the
 current evidence labels. All new headline claims must pass the claims registry,
 registry qualification, cohort and byte-accounting gates.

@@ -35,7 +35,12 @@
 \newlength{\pendingwidth}
 \setlength{\pendingwidth}{0.9\linewidth}
 \newlength{\herowidth}
-\setlength{\herowidth}{0.86\linewidth}
+\setlength{\herowidth}{\linewidth}
+% Figure 1 (compression frontier) and the foundation-model figure in the main text.
+\newlength{\frontierwidth}
+\setlength{\frontierwidth}{0.9\linewidth}
+\newlength{\foundationwidth}
+\setlength{\foundationwidth}{0.62\linewidth}
 \newcommand{\GeneratedFigure}[3][\linewidth]{%
   \IfFileExists{generated/#2}{\includegraphics[width=#1]{generated/#2}}{%
     \fbox{\parbox{\pendingwidth}{\centering\vspace{2em}\pending{#3}\vspace{2em}}}}}

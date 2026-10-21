@@ -364,3 +364,4 @@ fn rans_decode(encoded: &[u8], raw_length: usize) -> Result<Vec<u8>> {
 
 include!("section_encoding.rs");
 include!("decoding.rs");
+include!("packed_values.rs");

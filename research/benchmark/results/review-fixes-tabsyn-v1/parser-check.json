@@ -1,0 +1,9 @@
+{
+  "dataset": "02a45777900441ce",
+  "expected_retention": 0.8093061664340723,
+  "match": true,
+  "official_tests_opened": false,
+  "row_multiplier": 4,
+  "sample_seed": 101,
+  "scored_retention": 0.8093061664340723
+}

@@ -1,0 +1,75 @@
+{
+ "dataset": "537_houses",
+ "n_fit": 2000,
+ "n_test": 2000,
+ "d": 8,
+ "rows_available": 20640,
+ "projection_bytes": 72,
+ "projection_json_bytes": 1630,
+ "null": 0.05786581321357725,
+ "full_table_bytes": {
+  "8": 13435,
+  "16": 28917
+ },
+ "real": {
+  "linear": 0.02279951281599677,
+  "mlp": 0.0219530931301647,
+  "catboost": 0.01863951106176706
+ },
+ "real_matched": {
+  "linear": 0.02279951281599677,
+  "mlp": 0.019772119491305064,
+  "catboost": 0.01863951106176706
+ },
+ "protocol": "equal-bytes-v2",
+ "dope": [
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 11,
+   "artifact_bytes": 679,
+   "compile_seconds": 1.9667103290557861,
+   "is_packed": true,
+   "bytes": 751,
+   "loss": {
+    "linear": 0.023598188197782703,
+    "mlp": 0.02093762007665672,
+    "catboost": 0.024576959339182827
+   }
+  },
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 23,
+   "artifact_bytes": 672,
+   "compile_seconds": 1.894695520401001,
+   "is_packed": true,
+   "bytes": 744,
+   "loss": {
+    "linear": 0.024472297481707143,
+    "mlp": 0.02353494343316443,
+    "catboost": 0.02677010514161737
+   }
+  },
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 37,
+   "artifact_bytes": 672,
+   "compile_seconds": 2.476769208908081,
+   "is_packed": true,
+   "bytes": 744,
+   "loss": {
+    "linear": 0.023650419062596767,
+    "mlp": 0.02197705907042855,
+    "catboost": 0.02496138481343602
+   }
+  }
+ ]
+}

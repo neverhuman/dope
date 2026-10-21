@@ -313,7 +313,7 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         self.assertIn("Feature-Target Correlation Proxy", readme_text)
         self.assertIn("strongest measured comparator on this historical block", readme_text)
         self.assertIn("paper/main.tex", readme_text)
-        stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS) -->", "", readme_text, flags=re.S)
+        stripped = re.sub(r"<!-- BEGIN (?:BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART|EQUAL BYTES) -->.*?<!-- END (?:BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART|EQUAL BYTES) -->", "", readme_text, flags=re.S)
         self.assertTrue(650 <= len(stripped.split()) <= 900)
         wp_env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}
         for mod in ("test_readme_benchmark", "test_figure_one", "test_hero_figure"):
@@ -406,6 +406,17 @@ class TestE07CpuPreflight(unittest.TestCase):
         self.assertEqual(proto["selection"]["rows_consumed_for_selection"], 0)
         res = subprocess.run([sys.executable, "-B", str(obs_dir / "test_runner.py")], cwd=str(obs_dir), capture_output=True, text=True, check=True)
         self.assertEqual(res.returncode, 0)
+        runner_output = res.stdout + res.stderr
+        self.assertRegex(runner_output, r"Ran [1-9]\d* tests? in ")
+        self.assertIn("OK", runner_output)
+
+    def test_zero_test_output_cannot_satisfy_e07_runner_acceptance(self):
+        from unittest import mock
+        empty = subprocess.CompletedProcess([], 0, "", "Ran 0 tests in 0.000s\nOK")
+        with mock.patch.object(subprocess, "run", return_value=empty) as run:
+            with self.assertRaises(AssertionError):
+                self.test_e07_sealed_test_guard_and_observational_protocol_preflight()
+        run.assert_called_once()
 
 
 class TestD19AndBlockerUnblockMatrix(unittest.TestCase):

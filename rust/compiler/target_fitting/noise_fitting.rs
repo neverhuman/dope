@@ -17,6 +17,34 @@ fn fit_noise_bounded(
     support: usize,
     capacity: Option<CapacityRefinement>,
 ) -> (Noise, &'static str) {
+    fit_noise_residuals(table, completed, target, task, support, capacity, true)
+}
+
+/// Noise for a head whose residuals must come from the fitted model itself.
+fn fit_noise_in_sample(
+    table: &Table,
+    completed: &[Vec<f32>],
+    target: &Target,
+    task: Task,
+) -> (Noise, &'static str) {
+    let (noise, rule) = fit_noise_residuals(table, completed, target, task, 4, None, false);
+    let rule = if task == Task::Regression {
+        "full_fit_native_trained_in_sample_unqualified"
+    } else {
+        rule
+    };
+    (noise, rule)
+}
+
+fn fit_noise_residuals(
+    table: &Table,
+    completed: &[Vec<f32>],
+    target: &Target,
+    task: Task,
+    support: usize,
+    capacity: Option<CapacityRefinement>,
+    allow_oof: bool,
+) -> (Noise, &'static str) {
     let mut linear = Vec::with_capacity(table.rows);
     let mut probabilities = Vec::with_capacity(table.rows);
     for row in 0..table.rows {
@@ -69,7 +97,11 @@ fn fit_noise_bounded(
             "full_fit_binary_calibration_unqualified",
         );
     }
-    let oof = oof_residual_view_capacity(table, completed, target, capacity);
+    let oof = if allow_oof {
+        oof_residual_view_capacity(table, completed, target, capacity)
+    } else {
+        None
+    };
     let fitting_rule = residual_rule(target, table.rows, oof.is_some());
     let (residual_table, residuals) = oof.unwrap_or_else(|| {
         (

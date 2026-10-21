@@ -30,9 +30,10 @@ fast: native-guard-check
     PYTHONPATH=src python3 -m pytest -q tests
     python3 -B research/transfer/native_control_prepare.py
     python3 -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
-    python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
+    python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo research.benchmark.tests.test_equal_bytes -q
     python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -q
     PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -q
+    python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v
 
 focus filter:
     cargo check -p dope-kernel --locked
@@ -54,10 +55,17 @@ check: fast
     cargo test --locked --test rust_cli
     cargo test --locked --test vnext_bundle --test vnext_bundle_isolation
     cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo --test vnext_geometry_binding --test vnext_interactions
+    bash ops/ci/deployment.sh check
+    bash ops/ci/deployment.sh audit
     git diff --check
+
+deployment-check:
+    bash ops/ci/deployment.sh check
+    bash ops/ci/deployment.sh audit
 
 security:
     bash ops/ci/security.sh
+    bash ops/ci/deployment.sh audit
 
 contract-drift:
     bash ops/ci/check-contracts.sh

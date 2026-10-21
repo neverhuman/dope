@@ -31,6 +31,26 @@
     "docs/whitepaper/generated/figure-one.svg": {
       "sha256": "b768d0b183de9abdea2d6065c18d60bda2c2d8a99ca4edfa8c7109747aa7c56d",
       "reason": "Q01 protocol-only Figure 1 generated output"
+    },
+    "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.meta.json": {
+      "sha256": "6ad848a3aeb40a4d95724cdf3aab3a24a973a9d600f9894fd67167f6a72d595a",
+      "reason": "Byte-identical historical loose-branch recovery from 0dae88be6ab574bbc8fe022a5f6f0ed23b968c54; exact original record and source identities reviewed. Retained for provenance only; no new execution, scientific acceptance, custody clearance or current release qualification."
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.jsonl": {
+      "sha256": "ed6f8412fc8bb680c693587dd1b6e58d25b1a90f9312450b70ad889b2f6a59c8",
+      "reason": "Byte-identical historical loose-branch recovery from 0dae88be6ab574bbc8fe022a5f6f0ed23b968c54; exact original record and source identities reviewed. Retained for provenance only; no new execution, scientific acceptance, custody clearance or current release qualification."
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.meta.json": {
+      "sha256": "2751e669693643e2d6313bdacd5a5743fec28096ef7c003e9c6c843b9e8748c1",
+      "reason": "Byte-identical historical loose-branch recovery from 0dae88be6ab574bbc8fe022a5f6f0ed23b968c54; exact original record and source identities reviewed. Retained for provenance only; no new execution, scientific acceptance, custody clearance or current release qualification."
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/parser-check.json": {
+      "sha256": "30322b1853f678ca5703e167865655d8649791d1809c53c87ab3b4f563003175",
+      "reason": "Byte-identical historical loose-branch recovery from 0dae88be6ab574bbc8fe022a5f6f0ed23b968c54; exact original record and source identities reviewed. Retained for provenance only; no new execution, scientific acceptance, custody clearance or current release qualification."
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.meta.json": {
+      "sha256": "a4fd3ea2374348a846c6226cdcaebd9e680b95011178f8fbb0cc6d4f16204f0f",
+      "reason": "Byte-identical historical loose-branch recovery from 0dae88be6ab574bbc8fe022a5f6f0ed23b968c54; exact original record and source identities reviewed. Retained for provenance only; no new execution, scientific acceptance, custody clearance or current release qualification."
     }
   },
   "baseline_commit": "b8340ec41799ccfe18d7aeee25bc6a23c2e0a093",

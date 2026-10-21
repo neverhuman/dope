@@ -1,26 +1,30 @@
 % Supplement skeleton for the TDL manuscript (T-110). Status: specified, not measured.
 % Numbers enter only through paper/generated/ (see macros.tex and paper/README.md).
-\documentclass[11pt]{article}
+\documentclass{article}
+\usepackage{iclr2027_conference,times}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage[numbers,sort&compress]{natbib}
+\usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
 \definecolor{pendingcolor}{RGB}{176,58,46}
 \hypersetup{pdftitle={Supplement: Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
+\IfFileExists{generated/equal-bytes-macros.tex}{\input{generated/equal-bytes-macros.tex}}{}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Sq}[1]{{#1}^{\Two}}
 
-\title{Supplement: Transfer Description Length for Synthetic Tables}
+\title{Supplement: How Few Bytes Carry What a Table Teaches}
 \author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Draft skeleton --- evidence status: \ResultStatus}
-
+\iclrfinalcopy
 \begin{document}
 \maketitle
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
 \appendix
 
 \section{Metric contract}
@@ -75,6 +79,111 @@ state. Frontier foundation models are planned and unqualified.}
 \label{app:datasets}
 \GeneratedTable{dataset-dispositions.tex}{Per-dataset cells with every terminal disposition.}
 
+
+\section{Proofs}
+\label{app:proofs}
+\paragraph{Squared loss.} For any measurable $g$,
+$\E_P\Sq{(Y - g(X))} = \E_P\Sq{(Y - m_P(X))} + \E_P\Sq{(m_P(X) - g(X))}$ because the cross term has
+conditional mean zero. The null predictor $g \equiv \E_P Y$ gives $s_P + \Var(m_P(X))$. A learner that is
+consistent on the support of its training law converges, when trained on the real fit rows, to $m_P$, and,
+when trained on enough synthetic rows, to $m_Q$ on the support of $Q_X$; if that support covers the support of
+$P_X$, its real test loss converges to $s_P + \E_P\Sq{(m_Q - m_P)}$. Dividing the two gains gives the
+proposition. Without the support condition, the synthetic learner's predictions on $P$-mass outside the
+support of $Q_X$ are unconstrained, which is the regime of the second corollary.
+
+\paragraph{Flexible learners.} With $e = f_Q - m_Q$ and $w = dP_X/dQ_X$,
+$\E_P\Sq{e} = \E_Q[w\,\Sq{e}] \le (\E_Q\Sq{w})^{\One/\Two} (\E_Q e^{\Four})^{\One/\Two}$ by Cauchy--Schwarz,
+and $\E_Q\Sq{w} = \One + \chi^{\Two}(P_X\|Q_X)$. A dependence model that reduces the chi-square divergence
+tightens the bound for every learner whose fourth moment of error under $Q$ is controlled.
+
+\paragraph{Log loss.} $\E_P[-\log p_Q(Y\mid X)] = \E_P[-\log p_P(Y\mid X)] + \E_P \mathrm{KL}(p_P(\cdot\mid X)\|p_Q(\cdot\mid X))$.
+The null predictor attains $H(Y)$ and the Bayes predictor $H(Y\mid X)$, whose difference is $I(X;Y)$.
+
+\paragraph{Equal-byte scaling.} Let $L_k = s_P + C/k$. The real reference with $n$ rows has gain
+$\Var(m_P) - C/n$ over the null, and $k$ real rows have gain $\Var(m_P) - C/k$. Setting their ratio to $T$
+and solving gives $C/k = (\One - T)\Var(m_P) + T C/n$. Each row costs $(p + \One)$ values of $b$ bits.
+
+\section{Equal-byte study}
+\label{app:equal}
+\paragraph{Tables.} The real-world lineages of the published PMLB panel, excluding simulated generator
+families and three content duplicates found in the panel (two byte-identical pairs and one pair that differs
+in a single column). \paragraph{Splits and scaling.} A fixed shuffle; \cTestShare{} of the rows, capped at
+\cFitCap{}, form the test set and up to \cFitCap{} of the remaining rows the fit set. Every column is
+min-max scaled with fit-row statistics, as the historical harness did; heavy-tailed columns are therefore
+compressed, which the table workflow's log scaling avoids. \paragraph{Real-row arm.} For each budget on a
+power-of-two grid and at each DOPE rung's own median size, the largest uniform subset of fit rows whose
+eight- or sixteen-bit codes, sorted by row and stored column-major, fit the budget under the best of three
+lossless codecs, plus four bytes of header and the shared scaling charge. The whole table scores as the
+real reference. \paragraph{Matched training.} The MLP stops after a fixed number of epochs, so its
+optimizer steps scale with the rows it sees, and a subset of a few dozen rows would get a few hundred steps
+against thousands for $\cSynthetic$ synthetic rows. In the real-row arm and in the real reference, the MLP
+therefore keeps its better test loss of training on the rows as given or resampled with replacement to the
+synthetic size. In the resampled variant a tenth of the distinct rows is held out before resampling and
+drives early stopping with the auditor's patience, and the best epoch's weights are kept, so validation
+never sees a duplicate of a training row. Least squares and CatBoost, with a fixed number of rounds, are
+trained as given. Choosing on test rows favors the real rows. \paragraph{DOPE arm.} Five rungs of packed programs, three fit seeds
+each, sampled at $\cSynthetic$ rows. \paragraph{Aggregation.} Retention per learner is clipped to the unit
+interval; seeds aggregate by the median in both arms; a table's robust value is the smallest over
+informative learners; frontiers take the best configuration within each budget; the real-row bytes that
+match a level interpolate the real-row frontier in log bytes between bracketing budgets; intervals are
+percentile bootstraps over tables. \paragraph{Sensitivity.} Training the real rows as given, the earlier
+protocol of this study, gives a gap of \EbAsGivenGap{} [\EbAsGivenGapLo, \EbAsGivenGapHi] (\EbAsGivenWins{}
+wins, \EbAsGivenLosses{} losses); leaving the MLP out of the worst-learner score gives \EbNoMlpGap{}
+[\EbNoMlpGapLo, \EbNoMlpGapHi] (\EbNoMlpWins{} wins, \EbNoMlpLosses{} losses).
+
+\begin{table}[h]
+\caption{Per-table results of the equal-byte study for the headline-shape rung. \emph{Rows $T$}: worst-learner
+retention of the real rows that fit in the program's bytes. \emph{Ratio}: real-row bytes needed to match the
+program over the program's bytes. TDL columns: smallest power-of-two budget reaching the threshold, program
+ladder versus real rows; a dash marks a threshold not reached.}
+\label{tab:lineages}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\GeneratedTable{equal-bytes-lineages.tex}{Per-table results rendered from the study outputs.}
+\end{table}
+
+\section{Full panel and parity with the published run}
+\label{app:panel}
+On all \EbPanelLineages{} unique lineages of the published panel, simulated families included and the
+ladder restricted to two rungs, packed programs have a median charge of \EbPanelBytes{} bytes and a median
+worst-learner retention of \EbPanelRobust{}. At equal bytes they keep \EbPanelGap{} [\EbPanelGapLo,
+\EbPanelGapHi] more of the real gain than real rows (\EbPanelWins{} wins, \EbPanelLosses{} losses); real
+rows need a median \EbPanelRatio{} times the program's bytes to match it (\EbPanelRatioLarge{} times on the
+\EbPanelLarge{} tables with \cFitCap{} fit rows). Leaving the MLP out, the gap is \EbPanelNoMlpGap{} [\EbPanelNoMlpGapLo, \EbPanelNoMlpGapHi]
+(\EbPanelNoMlpWins{} wins, \EbPanelNoMlpLosses{} losses). Every loss is a table of at most \EbPanelLossMaxRows{} fit rows whose whole table compresses to at
+most \EbPanelLossMaxFull{} bytes. With only two rungs, the program's threshold budgets are coarse: at the
+\cTau{} bar the program reaches the threshold with fewer bytes on \EbPanelTdlEightyDope{} tables against
+\EbPanelTdlEightyData{} for real rows, and at the \cTauStrict{} bar on \EbPanelTdlNinetyDope{} against
+\EbPanelTdlNinetyData{}. The data-equivalence ratio rises with fit rows (Spearman \EbPanelRhoRows{} over
+\EbPanelRhoRowsN{} tables), but the two-part proxy does not rank it on the \EbPanelRhoProxyN{} large tables
+(Spearman \EbPanelRhoProxy{}), as discussed with the scaling study in the main text. Native CPU training matches the published GPU run without a systematic shift: the median differences in
+clipped retention are \EbParityLinear{} for the linear learner (\EbParityLinearN{} tables), \EbParityMlp{}
+for the MLP (\EbParityMlpN{}) and \EbParityCatboost{} for CatBoost (\EbParityCatboostN{}), with a mean
+absolute CatBoost difference of \EbParityCatboostAbs{}. The historical
+splits cannot be rebuilt, so this is a comparison of distributions over the same tables, not a paired replay.
+
+\section{Implementation audit}
+\label{app:audit}
+Reading the compiler, codec and sampler found the following. Fixed in this release: quantization bits did
+not set wire width; CPU builds did not train the published network; a text projection dominated the charge
+of small artifacts; no valid dense Gaussian copula was reachable. Open, to keep historical artifacts
+reproducible: sequential edge updates on non-tree graphs let latent variances drift, and the vine sampler
+ignores conditioning depth; Spearman correlations enter as latent Pearson correlations without the
+$\Two\sin(\pi\rho/\Six)$ correction; candidate selection never measures transfer or joint fidelity, so ties go
+to the fewest bytes; missingness is completely at random and applied after the target; the binary
+calibration map is a binned mean rather than an isotonic fit. The repository's \path{docs/math.md} gives
+file references and a research plan.
+
+\section{Compute requested}
+\label{app:compute}
+Every result here ran on two CPU cores. The experiments that would move the frontier are listed with their
+hypotheses in \path{docs/math.md}: an equal-byte study on tables with orders of magnitude more rows, where
+the program's advantage should grow; a rate--distortion compile that selects knots, bits, width and inputs by
+measured transfer on held-out fit rows; teacher-distilled conditional means; a sensitivity-based bit
+allocation; measurement of the driver gate; and a classification panel through the table workflow. The
+sealed test should run once after those settle the profile.
+
 \section{Historical metric mapping}
 \label{app:history}
 Earlier repository releases explored weighted certification scores (MFS-v2, MFS-v3 and
@@ -88,7 +197,7 @@ paper is \path{docs/whitepaper/dope-mfs.tex}; the retired score definitions are 
 \path{paper/README.md} gives the build command, toolchain, generated inputs and figure
 provenance. The claims policy is \path{docs/claims-policy.md}.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{iclr2027_conference}
 \nocite{esteban2017rcgan}
 \bibliography{references}
 \end{document}

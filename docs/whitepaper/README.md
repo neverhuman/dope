@@ -21,9 +21,9 @@ evidence label is `selection_exposed_validation` (see the
 [claims policy](../claims-policy.md)).
 
 The current active manuscript is [`paper/`](../../paper/README.md). For its future
-first-page review, [`COMPREHENSION_v2.md`](COMPREHENSION_v2.md) preregisters five
+first-page review, [`COMPREHENSION_v2.md`](../internal/whitepaper/COMPREHENSION_v2.md) preregisters five
 unaffiliated technically literate reviewers, the questions, and the pass threshold.
-No reviews have been collected. [`COMPREHENSION_v1.md`](COMPREHENSION_v1.md) remains
+No reviews have been collected. [`COMPREHENSION_v1.md`](../internal/whitepaper/COMPREHENSION_v1.md) remains
 an earlier, separate historical check and its scores are not pooled with v2.
 
 ## Build
@@ -100,4 +100,4 @@ The release package is the four committed PDFs from one build. The scored DOPE
 artifacts, the fit and validation partitions and the synthetic-row bundle are not
 published. The committed ledgers reproduce every reduction; publishing the artifacts
 themselves is Stage 4 work, confirmed by the owner (see
-[REVIEW_GAPS.md](REVIEW_GAPS.md)).
+[REVIEW_GAPS.md](../internal/whitepaper/REVIEW_GAPS.md)).

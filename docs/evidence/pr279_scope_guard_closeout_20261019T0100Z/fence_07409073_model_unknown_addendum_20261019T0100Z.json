@@ -1,0 +1,10 @@
+{
+  "schema": "dope.fence_reviewer_model_correction_addendum.v1",
+  "created_at_utc": "2026-10-19T01:00:00Z",
+  "authority": "/home/ubuntu/xbabe2_kicker/captains-20261017/CODEX_BLOCKED_dope_scope_guard_20261019T005100Z.md",
+  "fence_addendum_sha256": "074090737caeb5ba676955f0843895ebc44ed8426c459b161ad411b86328455c",
+  "original_review_receipt_sha256": "6b11237abe4e7712e41aa2102d69b55712621f9caf755f891607498db725fb3b",
+  "supported_attribution": "captain_dope_review_assist",
+  "recorded_reviewer_model_in_original_receipt": "UNKNOWN",
+  "correction_note": "Original review receipt 6b11237abe4e7712e41aa2102d69b55712621f9caf755f891607498db725fb3b does not contain a reviewer_model field; captain_dope_review_assist attribution is retained and model/identity detail is recorded as UNKNOWN without modifying 074090737caeb5ba676955f0843895ebc44ed8426c459b161ad411b86328455c."
+}

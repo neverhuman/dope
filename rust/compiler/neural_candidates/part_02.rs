@@ -96,7 +96,14 @@ fn compile_symbolic_table(
     let dataset_descriptor = describe_table(table, task);
     let mut specs: Vec<CandidateSpec> = Vec::new();
     for (knot_index, &knots) in KNOT_LADDER.iter().enumerate() {
-        for dependence_family in 0..7 {
+        // The exact Gaussian copula (family 7) is reachable only by an explicit
+        // profile, so the default tournament grid is unchanged.
+        let families = if restricted_profile.is_some_and(|p| p.1 == GAUSSIAN_COPULA_FAMILY) {
+            0..GAUSSIAN_COPULA_FAMILY + 1
+        } else {
+            0..GAUSSIAN_COPULA_FAMILY
+        };
+        for dependence_family in families.clone() {
             for (target_index, (target_name, target_model, _)) in target_models.iter().enumerate() {
                 for &bits in &options.quantization_profiles {
                     if restricted_profile.is_some_and(|profile| {
@@ -319,7 +326,7 @@ fn compile_symbolic_table(
         // Promotion and ranking consume the same decoded bytes as the shipped
         // sampler. In-memory quantized coefficients are not the final object.
         kernel.compliant = false;
-        let artifact = encode_kernel(&kernel)?;
+        let artifact = crate::codec::encode_kernel_with_codec(&kernel, options.packed_codec)?;
         let decoded = crate::codec::decode_kernel(&artifact)?;
         let utility = quantized_target_utility(&decoded, table, &completed);
         let driver_agreement = quantized_driver_agreement(&decoded, &screen);

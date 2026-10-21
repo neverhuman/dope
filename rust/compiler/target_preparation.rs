@@ -92,14 +92,21 @@ fn prepare_symbolic_targets(
             (None, options.development_residual),
         )?,
     ));
-    let compact_neural = if restricted_profile.is_some_and(|profile| profile.2 != 5) {
+    let native_profile = options
+        .native_target_profile
+        .filter(|_| restricted_profile.is_none_or(|profile| profile.2 == 5));
+    let compact_neural = if let Some(profile) = native_profile {
+        fit_compact_neural_target_trained(table, completed, screen, seed, task, profile)
+    } else if restricted_profile.is_some_and(|profile| profile.2 != 5) {
         target_model.clone()
     } else {
         fit_compact_neural_target(table, completed, screen, seed, task)?
     };
-    target_models.push((
-        "compact_neural_residual",
-        compact_neural.clone(),
+    // A natively trained head keeps in-sample residuals, as the GPU headline
+    // profile does: refitting it per fold would swap in a different model.
+    let compact_noise = if native_profile.is_some() && options.development_residual.is_none() {
+        fit_noise_in_sample(table, completed, &compact_neural, task)
+    } else {
         selected_noise(
             table,
             completed,
@@ -107,7 +114,8 @@ fn prepare_symbolic_targets(
             &compact_neural,
             task,
             (None, options.development_residual),
-        )?,
-    ));
+        )?
+    };
+    target_models.push(("compact_neural_residual", compact_neural.clone(), compact_noise));
     Ok(target_models)
 }

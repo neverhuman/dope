@@ -1,18 +1,30 @@
 # Documentation
 
-Product rules live in the Markdown notes. The white paper is the readable
-argument for the generator comparison.
+Start with the [repository map](REPO_MAP.md) if you are new, and with
+[the math](math.md) if you want to know why DOPE works and what to build next.
 
 | Path | What it is |
 | --- | --- |
+| [REPO_MAP.md](REPO_MAP.md) | Every top-level directory, the three paper trees, and the cleanup plan |
+| [math.md](math.md) | The program, the metric, the transfer theory, where the bytes go, and the research roadmap |
+| [metric.md](metric.md) | Transfer Description Length (TDL): definitions, gates, result states |
+| [claims-policy.md](claims-policy.md) | What the public surface may claim, evidence labels, banned phrases |
+| [decisions.md](decisions.md) | Decisions in force and pending owner decisions |
 | [architecture.md](architecture.md) | Rust product, V1 boundary, contract inputs |
+| [cli.md](cli.md) | Native command reference |
+| [data-contract.md](data-contract.md) | The mandatory target-last table contract |
 | [testing.md](testing.md) | Commands, budgets, and repair evidence |
-| [audit.md](audit.md) | Jankurai gate and exceptions |
-| [audit-rubric.md](audit-rubric.md) | Finding severity |
+| [audit.md](audit.md), [audit-rubric.md](audit-rubric.md) | Jankurai gate, exceptions and finding severity |
 | [release.md](release.md) | Certification and publication gates |
-| [whitepaper/](whitepaper/README.md) | The paper, its supplement, and the scripts that regenerate every number |
+| [math.md](math.md) | What a program stores, why it transfers, the implementation audit, and the research plan |
+| [cli.md](cli.md) | Command reference, including the table workflow |
+| [../paper/](../paper/README.md) | The active manuscript and supplement |
+| [whitepaper/](whitepaper/README.md) | The frozen historical paper, its supplement, and the scripts that regenerate every number |
+| [internal/](internal/README.md) | Planning records, review inputs and archives kept for provenance |
+| [governance/](governance/) | Links to the authoritative migration and exception inventory |
+| [archive/](archive/) | Retired contracts and histories |
 
-Every number in the paper is a macro emitted from a committed, SHA-pinned
-ledger under `research/benchmark/results/`; the analysis contract is
-`research/benchmark/review_fixes/predeclare_v2.json`. A null release score
-is printed as null.
+Every number in either paper is a macro emitted from a committed, SHA-pinned
+ledger under `research/benchmark/results/` or a committed run receipt; the
+analysis contract is `research/benchmark/review_fixes/predeclare_v2.json`. A
+null release score is printed as null.

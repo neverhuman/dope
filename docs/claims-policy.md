@@ -6,7 +6,7 @@ banned phrases in section 3 are machine-checked by the claims linter (`tools/cla
 T-010 and T-071). This file and `docs/archive/` quote them on purpose and are exempt.
 
 Sources: S5 §18, S2 §21 (stop-ship conditions 1–17), S3 §66, S4 §15.8 and §29 in
-[`docs/review-inputs/2026-10-15/`](review-inputs/2026-10-15/INDEX.md).
+[`docs/internal/review-inputs/2026-10-15/`](internal/review-inputs/2026-10-15/INDEX.md).
 
 ## 1. Evidence status labels
 

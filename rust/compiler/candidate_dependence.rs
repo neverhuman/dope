@@ -67,6 +67,11 @@ fn candidate_dependence(
             "two_component_copula_mixture",
             0.99,
         ),
+        7 => (
+            gaussian_copula_dependence(correlation, edges, width),
+            "gaussian_copula",
+            0.995,
+        ),
         _ => unreachable!("bounded dependence family"),
     }
 }
@@ -101,4 +106,80 @@ mod public_prior_pilot {
         assert_eq!(lock["production_wiring"], "disabled_until_all_admission_gates_pass");
         eprintln!("R07 pilot: no-prior loss={}, hand-coded loss={}, difference=0; public-trained unsupported (no disjoint roster/payload); complete cold bundle bytes unavailable; private adaptation not run", loss(no_prior), loss(hand_coded));
     }
+}
+
+/// Dependence family index of the exact normal-score Gaussian copula.
+const GAUSSIAN_COPULA_FAMILY: u8 = 7;
+/// Widest table stored as a dense Cholesky factor; wider tables keep the
+/// Chow-Liu tree so the factor's p^2 bytes stay bounded.
+const GAUSSIAN_COPULA_MAX_WIDTH: usize = 32;
+
+/// Exact Gaussian copula of normal scores. Spearman correlations of the fit
+/// columns are mapped to latent Pearson correlations with r = 2 sin(pi rho / 6)
+/// (exact for a Gaussian copula), shrunk toward the identity only as far as a
+/// Cholesky factorization needs, and stored as a dense lower-triangular factor.
+/// Unlike the sequential edge updates of families 3 to 6, sampling L z keeps
+/// every latent variance at one and reproduces all pairwise correlations.
+fn gaussian_copula_dependence(
+    correlation: Option<&Vec<f32>>,
+    edges: &[CopulaEdge],
+    width: usize,
+) -> Dependence {
+    let tree = || Dependence::ChowLiu {
+        root: 0,
+        edges: edges.to_vec(),
+    };
+    let Some(matrix) = correlation.filter(|_| (2..=GAUSSIAN_COPULA_MAX_WIDTH).contains(&width))
+    else {
+        return tree();
+    };
+    let latent = (0..width * width)
+        .map(|index| {
+            if index / width == index % width {
+                1.0
+            } else {
+                2.0 * (std::f64::consts::PI * f64::from(matrix[index]) / 6.0).sin()
+            }
+        })
+        .collect::<Vec<f64>>();
+    for shrinkage in [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5] {
+        let shrunk = latent
+            .iter()
+            .enumerate()
+            .map(|(index, value)| {
+                if index / width == index % width {
+                    1.0
+                } else {
+                    (1.0 - shrinkage) * value
+                }
+            })
+            .collect::<Vec<_>>();
+        if let Some(factor) = cholesky_lower(&shrunk, width) {
+            return Dependence::GaussianCopula {
+                cholesky: factor.into_iter().map(|value| value.clamp(-1.0, 1.0) as f32).collect(),
+            };
+        }
+    }
+    tree()
+}
+
+fn cholesky_lower(matrix: &[f64], width: usize) -> Option<Vec<f64>> {
+    let mut factor = vec![0.0; width * width];
+    for row in 0..width {
+        for column in 0..=row {
+            let mut sum = matrix[row * width + column];
+            for inner in 0..column {
+                sum -= factor[row * width + inner] * factor[column * width + inner];
+            }
+            if row == column {
+                if sum <= 1e-6 {
+                    return None;
+                }
+                factor[row * width + column] = sum.sqrt();
+            } else {
+                factor[row * width + column] = sum / factor[column * width + column];
+            }
+        }
+    }
+    Some(factor)
 }

@@ -33,7 +33,10 @@ class HeroFigureTests(unittest.TestCase):
         moved = dict(self.data["thresholds"], transfer=0.95)
         self.assertEqual(render.threshold_label(moved), "Proposed T95; driver gate unmeasured")
         svg = render.figure_outputs(self.csv, moved)["paper/generated/hero-frontier.svg"].decode()
-        self.assertIn("More predictive gain. About one-third the state.", svg)
+        self.assertIn("Preserve predictive lift. Charge every byte.", svg)
+        for text in ("DOPE default", "DOPE research", "TabSyn", "ARF default", "ARF selected",
+                     "Copula", "Chow-Liu", "Independent", "separate 97-lineage cohort", "TDL and cold closure unmeasured"):
+            self.assertIn(text, svg)
         self.assertIn("DOPE (1,844 B)", svg)
         self.assertIn("Gaussian copula (5,464 B)", svg)
         for pct in ("86.3%", "74.7%", "87.1%", "75.4%", "85.8%", "71.3%"):
@@ -131,6 +134,26 @@ class HeroFigureTests(unittest.TestCase):
         )["paper/generated/hero-frontier.svg"].decode()
         self.assertIn("historical 90% interval", svg)
         self.assertNotIn("95%", (ROOT / "tools/claims/render.py").read_text(), "renderer types the interval level")
+
+    def test_compression_panel_keeps_defaults_and_refuses_mixed_cohorts(self):
+        source = (ROOT / "paper/generated/legacy-v2-catboost.csv").read_bytes()
+        rows = list(csv.DictReader(io.StringIO(source.decode())))
+        selected = render.compression_rows(source)
+        self.assertEqual({row["id"] for row in selected},
+                         {"Dope", "DopeDef", "TabSyn", "Arf", "ArfNat", "Gauss", "Chow", "Ind"})
+        for mutation in ("cohort", "duplicate", "missing", "nonfinite"):
+            with self.subTest(mutation=mutation):
+                bad = [dict(row) for row in rows]
+                if mutation == "cohort":
+                    bad[0]["cohort_id"] = "legacy-v2-catboost-6"
+                elif mutation == "duplicate":
+                    bad.append(dict(bad[0]))
+                elif mutation == "missing":
+                    bad = [row for row in bad if row["id"] != "DopeDef"]
+                else:
+                    bad[0]["retention"] = "nan"
+                with self.assertRaises(ValueError):
+                    render.compression_rows(rows_to_csv(bad))
 
 
 if __name__ == "__main__":

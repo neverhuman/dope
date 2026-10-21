@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+- Add the compression frontier: worst-auditor retention (smallest of
+  CatBoost, linear and MLP per lineage; a historical diagnostic) against charged
+  bytes, and retained lift per KiB, recomputed from the pinned v2 ledgers with
+  the panel's nested bootstrap. It is the README hero and Figure 1 of the TDL
+  manuscript; its README block and TeX are authenticated by the claims
+  firewall. Evidence remains selection-exposed validation.
+- Add `examples/quickstart/`: a fit-only table encoder with lossy numeric preprocessing (target-ordered or
+  one-hot categoricals, robust scaling, dates, missing values) with a compact
+  charged state, transfer-in-the-loop backend selection inside the fit rows,
+  a retention helper, an end-to-end quick start on UCI Adult and a five-seed
+  ablation on UCI Adult and Abalone. Local engineering evidence only.
+- Expand `paper/main.tex` into a full manuscript with a transfer theory
+  (retention identities for squared and log loss, two corollaries, a size
+  bound) and add `docs/math.md` (theory, byte anatomy, review findings and
+  roadmap) and `docs/REPO_MAP.md`.
+- Fix `dope-kernel inspect` for mixed artifacts (`DOPMIX01` magic).
+- Retain root Python governance authorities and add navigation forwards in
+  docs/governance; move the launcher to scripts and add linguist-only attributes.
+- Transfer per byte, made measurable. A packed DPK3 value codec (header flag
+  bit 1) stores quantization-grid codes, so bits set bytes: programs of the
+  headline shape are about half the size and sample bit-identically (shapes with
+  copula edges agree to the codec's parameter tolerance). Packed artifacts are
+  not yet accepted by the TDL1 qualification bundle. The headline compact
+  residual now trains natively in Rust (`--native-target-profile`), matching the
+  published GPU profile's retention distribution without libtorch. `fit-table`, `sample-table` and `inspect-table` compile raw
+  mixed-type CSVs with an invertible plan (log-scaled skewed numbers, target-
+  ordered category codes, dates, missing cells) and decode samples to the
+  source schema. An opt-in exact Gaussian copula (dependence family 7) is
+  available for research. Defaults and historical artifacts are unchanged.
+- Add the equal-byte study (`research/benchmark/equal_bytes`): DOPE programs
+  against the most real rows that fit exactly the same bytes (best of three
+  lossless codecs, MLP trained on step-matched rows) on the 26 real-world PMLB
+  lineages and the full 97-lineage panel, protocol sensitivities, an exact
+  Gaussian copula ablation, a scaling study, and a renderer for the new
+  first-page figure, paper tables and the README block, authenticated by the
+  claims firewall.
+- Rewrite the README around transfer per byte with a UCI Adult quick start;
+  rewrite `paper/main.tex` as a full manuscript in the ICLR layout with
+  propositions and proofs; add `docs/math.md`; move internal planning records
+  under `docs/internal/`.
+
 - Add native raw-unit compilation, inspection, sampling, and a restricted
   artifact-only CPU worker. The complete raw-artifact charge includes retained
   fitted transforms and schema, framing, and native payload; historical DPK

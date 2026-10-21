@@ -226,3 +226,54 @@ fn compile_csv_cli_infers_schema_and_preserves_opaque_ids() {
     let sample_text = fs::read_to_string(&samples).unwrap();
     assert_eq!(sample_text.lines().count(), 32);
 }
+
+#[test]
+fn inspect_reads_mixed_artifacts_written_by_compile_csv() {
+    // Regression: `dope-kernel inspect` once matched the wrong magic (DOPEMIX1),
+    // so every mixed artifact fell through to the DPK decoder and was refused.
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target/compile-csv-mixed-inspect")
+        .join(std::process::id().to_string());
+    fs::create_dir_all(&root).unwrap();
+    let csv = root.join("headered_mixed.csv");
+    let artifact = root.join("model.dpk");
+    let mut rows = String::from("secret_load,secret_plan,secret_cost\n");
+    for row in 0..64 {
+        let load = (row as f64) * 0.5;
+        let plan = ["basic", "pro", "team"][row % 3];
+        let cost = 10.0 + 0.3 * load + if plan == "pro" { 4.0 } else { 0.0 };
+        rows.push_str(&format!("{load:.2},{plan},{cost:.3}\n"));
+    }
+    fs::write(&csv, rows).unwrap();
+    let binary = env!("CARGO_BIN_EXE_dope-kernel");
+    let compiled = Command::new(binary)
+        .args(["compile-csv", "--target", "secret_cost", "--csv"])
+        .arg(&csv)
+        .arg("--out")
+        .arg(&artifact)
+        .output()
+        .unwrap();
+    assert!(
+        compiled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compiled.stderr)
+    );
+    assert!(fs::read(&artifact).unwrap().starts_with(b"DOPMIX01"));
+    let inspected = Command::new(binary)
+        .arg("inspect")
+        .arg("--kernel")
+        .arg(&artifact)
+        .output()
+        .unwrap();
+    assert!(
+        inspected.status.success(),
+        "{}",
+        String::from_utf8_lossy(&inspected.stderr)
+    );
+    let public = String::from_utf8(inspected.stdout).unwrap();
+    for secret in ["secret_load", "secret_plan", "secret_cost", "basic", "team"] {
+        assert!(!public.contains(secret), "inspect leaked {secret}");
+    }
+    let parsed: serde_json::Value = serde_json::from_str(&public).unwrap();
+    assert_eq!(parsed["format"], "dope-mixed-sampling-artifact");
+}

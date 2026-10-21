@@ -2,7 +2,7 @@
 
 > **Ledger count (2026-10-15):** 44 historical rows (40 closed, 4 open: CM-09, PR-07, PR-08, PR-11) plus 14 spec-derived rows
 > (S-01 to S-14) from the 2026-10-15 rebuild, all open. The historical rows belong to the frozen v2 paper; the S rows track
-> the TDL rebuild in [docs/TODO-2026-10-15.md](../TODO-2026-10-15.md).
+> the TDL rebuild in [docs/internal/TODO-2026-10-15.md](../TODO-2026-10-15.md).
 
 An external adversarial review of `dope-mfs.pdf` at b774807 found the gaps below, and the
 later grades and audits added G-01 to G-08. Each row closes with
@@ -90,7 +90,7 @@ against this tree:
 
 The five specifications in `docs/review-inputs/2026-10-15/` found the gaps below in the project
 as a whole rather than in the historical paper. Task IDs refer to
-[docs/TODO-2026-10-15.md](../TODO-2026-10-15.md); `FOLLOW-*` items need compute, licenses or owner
+[docs/internal/TODO-2026-10-15.md](../TODO-2026-10-15.md); `FOLLOW-*` items need compute, licenses or owner
 decisions and are not done in the rebuild PR.
 
 | ID | Gap | Fix / acceptance | Status |

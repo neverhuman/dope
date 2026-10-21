@@ -1,0 +1,53 @@
+name: Rust deployment conformance
+
+on:
+  push:
+    branches: [main]
+    paths: ['deploy/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
+  pull_request:
+    paths: ['deploy/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployment-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deployment-conformance:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on:
+      group: neverhuman-lan
+      labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
+    timeout-minutes: 20
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_TARGET_DIR: target/deployment
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Provision bounded CPU tools
+        run: bash ops/ci/deployment.sh provision
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            target/deployment
+          key: dope-deployment-cpu-v1-${{ hashFiles('deploy/Cargo.lock', 'Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Verify carrier, numerical profiles, bounds and inference graph
+        run: bash ops/ci/deployment.sh check
+
+      - name: Audit the standalone deployment dependency lock
+        run: bash ops/ci/deployment.sh audit
+
+      - name: Upload standalone deployment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rust-deployment-evidence
+          path: target/deployment-evidence
+          if-no-files-found: error

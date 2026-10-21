@@ -55,10 +55,16 @@ fn run_release(command: Command) -> Result<()> {
             neural_target_weight,
             neural_structural_penalty,
             adaptive_allocation,
+            native_target_profile,
+            packed_codec,
             tier,
             max_artifact_bytes,
             require_formal_dp,
         } => {
+            let native_target_profile = native_target_profile
+                .as_deref()
+                .map(dope_kernel::compiler::NativeTargetProfile::parse)
+                .transpose()?;
             let options = CompileOptions {
                 release_policy: parse_policy(&tier, max_artifact_bytes, require_formal_dp)?,
                 seed,
@@ -68,6 +74,8 @@ fn run_release(command: Command) -> Result<()> {
                 neural_target_weight,
                 neural_structural_penalty,
                 adaptive_allocation,
+                native_target_profile,
+                packed_codec,
                 ..Default::default()
             };
             let result = compile_kernel_from_dir(&dataset_dir, parse_task(&task)?, &options)?;
@@ -101,7 +109,7 @@ fn run_release(command: Command) -> Result<()> {
                 } else {
                     println!("{}", serde_json::to_string_pretty(&inspection)?);
                 }
-            } else if raw_bytes.starts_with(b"DOPEMIX1") {
+            } else if raw_bytes.starts_with(b"DOPMIX01") {
                 let bytes = dope_kernel::typed_data::mixed::read_mixed_artifact(&kernel)?;
                 let inspection = dope_kernel::typed_data::mixed::inspect_mixed(&bytes)?;
                 if let Some(path) = out {

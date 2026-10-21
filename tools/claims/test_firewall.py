@@ -36,7 +36,9 @@ class FirewallTests(unittest.TestCase):
             inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
                       'contracts/tdl-contract-v1.json', 'docs/vnext/CLAIMS.md',
                       'evidence/status.json', C.REGISTRY['sources']['headline'],
-                      'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl'}
+                      'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl',
+                      'examples/quickstart/results/adult-reference.json',
+                      'examples/quickstart/results/ablation.json'}
             inputs.update(pin['path'] for pin in self.data['demo_notes']['pins'])
             for name in inputs:
                 path = root / name
