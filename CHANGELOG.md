@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Clarify the TDL value proposition, native quick start and public Airfoil
+  walkthrough; show payload bytes on an explicit axis in the active paper's
+  first-page figure. Add the compiler factorization, a predictive-moment bound
+  with its assumptions, preprocessing guidance and a ranked research plan.
+- Add a separate locked Rust inference workspace over the shared native codec
+  and sampler, SafeTensors carrier validation, CPU conformance and optional
+  batched Candle CUDA TVAE heads. The full carrier is charged; hardware
+  qualification and production promotion remain pending.
+- Preserve historical neural activation behavior and add an explicit
+  training-consistent `tanh-v2` TVAE deployment profile. Its scalar and tensor
+  fixtures are engineering evidence; transfer requires new measurements.
+
 - Add native raw-unit compilation, inspection, sampling, and a restricted
   artifact-only CPU worker. The complete raw-artifact charge includes retained
   fitted transforms and schema, framing, and native payload; historical DPK

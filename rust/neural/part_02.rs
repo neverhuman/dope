@@ -53,6 +53,16 @@ pub fn sample_joint(
             (ranks, missing)
         }
     };
+    restore_joint_order(generator, features, ordered_ranks, ordered_missing)
+}
+
+fn restore_joint_order(
+    generator: &JointGenerator,
+    features: usize,
+    ordered_ranks: Vec<f32>,
+    ordered_missing: Vec<bool>,
+) -> Result<(Vec<f32>, Vec<bool>)> {
+    let tokens = features + 1;
     if ordered_ranks.len() != tokens || ordered_missing.len() != tokens {
         return Err(DopeError::Codec(
             "neural sampler returned the wrong width".into(),

@@ -245,6 +245,8 @@ pub fn candidate_implementation_hash(id: &str) -> String {
         hasher.update(include_bytes!("../neural/part_01.rs"));
         hasher.update(include_bytes!("../neural/part_02.rs"));
         hasher.update(include_bytes!("../neural/part_03.rs"));
+        hasher.update(include_bytes!("../neural/deployment.rs"));
+        hasher.update(include_bytes!("../sample/part_02.rs"));
         hasher.update(include_bytes!("../neural_train/gpu/part_01.rs"));
         hasher.update(include_bytes!("../neural_train/gpu/part_02.rs"));
         hasher.update(include_bytes!("../neural_train/gpu_diffusion/part_01.rs"));

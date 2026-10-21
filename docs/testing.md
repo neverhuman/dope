@@ -1,5 +1,14 @@
 # Testing, evidence, and budgets
 
+`just deployment-check` verifies the separate locked `deploy/` CPU graph, typed
+SafeTensors inventory, nonzero TVAE heads, legacy draw replay, explicit corrected
+activation, allocation bounds and unavailable-device refusals. `just check` includes
+this gate; the dedicated deployment CI lane runs it with a 20-minute cap. The graph
+check refuses Python/libtorch bindings. GPU execution, arbitrary checkpoint export,
+raw/mixed envelope export and downstream transfer remain separately unmeasured.
+The active manuscript build (`just paper-tdl`) still checks that the authenticated
+hero is Figure 1 on page 1; inspect rendered pages after visual changes.
+
 `just fast` runs formatting, locked Rust unit tests, and V1 Python tests.
 `just focus codec::tests` runs a reusable narrow Rust check and test filter
 while editing; it never replaces the full CPU PR lane.

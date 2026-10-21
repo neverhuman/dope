@@ -4,6 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
@@ -17,7 +18,7 @@
 
 \title{Supplement: Transfer Description Length for Synthetic Tables}
 \author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Draft skeleton --- evidence status: \ResultStatus}
+\date{Protocol and mathematical details --- evidence status: \ResultStatus}
 
 \begin{document}
 \maketitle
@@ -83,11 +84,52 @@ contracts and scorers stay executable so existing receipts verify. The historica
 paper is \path{docs/whitepaper/dope-mfs.tex}; the retired score definitions are in
 \path{docs/archive/mfs-history.md}.
 
+\section{Predictive-moment perturbation argument}
+\label{app:moments}
+Assume $P$ and $Q$ have finite second feature moments and finite feature--target moments,
+and apply the same fixed feature map. All coefficients, including an intercept if present,
+are regularized by $\lambda I$ with strictly positive $\lambda$. Define $w_P$ and $w_Q$ by the ridge
+normal equations. Subtracting them gives
+\[
+ (\Sigma_Q+\lambda I)(w_Q-w_P)
+ = (c_Q-c_P)-(\Sigma_Q-\Sigma_P)w_P.
+\]
+Since $\Sigma_Q$ is positive semidefinite,
+the inverse operator has norm at most the reciprocal of $\lambda$.
+Taking norms proves Equation~(\ref{app:momentbound}):
+\begin{equation}
+\lVert w_Q-w_P\rVert_2 \leq
+\frac{\lVert c_Q-c_P\rVert_2+
+\lVert\Sigma_Q-\Sigma_P\rVert_2\lVert w_P\rVert_2}{\lambda}.
+\label{app:momentbound}
+\end{equation}
+For a fixed query distribution with second moment $\Sigma_*$, the mean squared
+prediction discrepancy is
+$(w_Q-w_P)^\top\Sigma_*(w_Q-w_P)$, at most
+the product of $\lVert\Sigma_*\rVert_2$ and the squared Euclidean norm of $w_Q-w_P$.
+This bounds prediction disagreement, not directly an arbitrary query excess risk;
+that risk also contains the cross term with the real model's query residual.
+Unregularized intercepts, changing encoders, feature scaling and finite-sample moment
+estimation require their own analysis. No distribution-free multi-model result follows.
+
+\section{Numerical deployment profiles}
+The historical native activation uses twice the reciprocal square root of pi inside the tanh approximation;
+the training implementation uses the conventional square root of two over pi. The difference is
+preserved for old artifacts. The additive \texttt{tanh-v2} carrier uses the training
+coefficient explicitly. An activation correction changes a sampler's distribution;
+it must be evaluated as a new numerical profile and cannot relabel historical results.
+CPU fixtures check nonzero decoder heads and original random streams. GPU parity and
+transfer are unmeasured here. The initial SafeTensors carrier stores native DPK plus typed
+TVAE tensors; the duplicate state and header are charged in full. Transport conformance
+is not a compression improvement.
+
 \section{Reproduction}
 \label{app:repro}
 \path{paper/README.md} gives the build command, toolchain, generated inputs and figure
 provenance. The claims policy is \path{docs/claims-policy.md}.
 
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{2pt}
 \bibliographystyle{plainnat}
 \nocite{esteban2017rcgan}
 \bibliography{references}

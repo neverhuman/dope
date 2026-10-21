@@ -5,6 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
@@ -16,42 +17,42 @@
 \hypersetup{pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding --- Transfer Description Length for Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
 
-\title{D.O.P.E.: Downstream Objective-Preserving Encoding\\[0.4em]
-  \large Transfer Description Length for Synthetic Tables: How Few Bytes Preserve What Models Learn?}
-\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
-\date{Protocol specification and validation card --- evidence status: \ResultStatus}
+\title{D.O.P.E.: Downstream Objective-Preserving Encoding\\[0.3em]
+  \large How Few Bytes Preserve What Models Learn?}
+\author{Jepson Taylor \quad Alton Alexander\\NEVERHUMAN Research}
+\date{Preprint: historical validation; TDL confirmation pending}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 % Five moves (S2 §17.2). No number appears here until the sealed run exists.
-An organization's tabular data encodes its operational experience and competitive moat, yet
-security and legal restrictions often block sharing raw tables to evaluate external learners
-or foundation models. Synthetic tables are usually judged by how much they resemble the source
-or by one downstream learner, while the size of the generator that produced them goes uncounted.
+How small can a sampling program become while retaining the predictive value of a real table?
+Synthetic tables are usually judged by resemblance or one downstream learner, while the
+generator's fitted state goes uncounted.
 We define \MetricLong{} (\MetricName{}): the smallest tested number of dataset-specific
 bytes for which learners trained or conditioned only on generated rows recover a declared
 share of the real data's predictive gain in every required model family, rely on the same
 feature drivers, and pass copy, cleartext and byte-accounting gates, all measured on
-untouched real rows. D.O.P.E.\ (Downstream Objective-Preserving Encoding) compiles a table into
-a bounded executable sampling program whose every sampling byte is charged. The specified
-protocol holds out real rows, learner families and source families, and reports the full
-transfer-versus-bytes frontier rather than a weighted score; the sealed test split remains
-reserved until the qualified panel completes.
+untouched real rows. D.O.P.E.\ compiles fitting rows into a bounded sampling program containing
+marginals, dependence, a target program and residual noise. We distinguish dataset-specific
+payload from the complete cold sampling closure, and historical validation from qualified
+confirmation. The proposed benchmark holds out real rows, learner families and source families.
+TDL confirmation remains unmeasured; the official test split is reserved.
 \end{abstract}
 
-\begin{figure}[!b]
+\begin{figure}[!ht]
   \centering
   \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 1: horizontal foundation-model transfer
   bars comparing DOPE and Gaussian copula with charged bytes in the legend, rendered from authenticated receipts.}
-  \caption{\textbf{More predictive gain. About one-third the state.} Historical foundation-model
-  validation (selection-exposed): horizontal transfer-retention bars with matched charged artifact
-  bytes in the legend for DOPE vs.\ Gaussian copula (strongest comparator on this historical block,
-  not universal) across Kumo Large, TabICL, and Mitra; cross-model feature-driver preservation is
-  not yet measured (\ResultStatus).}
+  \caption{\textbf{Predictive transfer beside its byte cost.} Matched historical,
+  selection-exposed validation on mixed and simulated lineages across three foundation-model auditors. Gaussian copula is the
+  strongest measured comparator in this block. Payload bytes exclude unmeasured cold closure;
+  cross-model drivers and TDL confirmation are unmeasured.}
   \label{fig:frontier}
 \end{figure}
+
+\clearpage
 
 \section{Introduction}
 \label{sec:intro}
@@ -73,6 +74,8 @@ and hard gates;
 controls, and held-out learner and source families;
 (4)~executable evidence: charge manifests, golden metric parity between the Rust core and
 its Python mirror, and generated tables and figures.
+
+\input{method}
 
 \section{Transfer Description Length}
 \label{sec:metric}
@@ -152,17 +155,21 @@ once through a frozen release manifest.
 \section{Current validation evidence}
 \label{sec:evidence}
 
-The only measured evidence is the historical v2 validation panel: PMLB regression tables
-\citep{olson2017pmlb,romano2021pmlb}, CatBoost-centered, and selection-exposed, because every
-lineage and all three auditors informed the profile choice. It reports retention beside
-charged bytes, which is not a \MetricName{} result. Rows are labeled by evidence status.
+The historical classical panel uses PMLB regression tables
+\citep{olson2017pmlb,romano2021pmlb}; its CatBoost, linear and neural auditors all informed
+profile selection. Figure~\ref{fig:frontier} shows a separate matched historical
+foundation-model cohort. Both are selection-exposed. Neither measures the proposed driver
+gate, qualified TDL, or sealed-test superiority. TabSyn leads the classical CatBoost
+point estimate; the full-panel paired interval includes zero. Smaller comparator cohorts
+remain separate comparisons. Rows retain their evidence labels.
 \begin{table}[ht]
   \centering
   \GeneratedTable{result-card.tex}{Result card (T-070): rendered from
-  generated/headline-results.json with one evidence label per row.}
+  generated/headline-results.json; all rows carry the caption's evidence label.}
   \caption{Historical evidence card from the v2 panel (CatBoost auditor, synthetic size four times the
   fit rows), rendered into generated/result-card.tex. Evidence status of every row: selection-exposed validation. No row is a sealed-test or \MetricName{} result;
-  the full status-labelled card is in the repository's STATUS file.}
+  charges are rounded decimal units; exact bytes and the full status-labelled card
+  are in the repository. Cohort sizes differ and remain separate comparisons.}
   \label{tab:card}
 \end{table}
 
@@ -187,13 +194,16 @@ and driver-preservation statements are pending their evidence and are not made h
 Generators for tabular data range from copulas, dependence trees and synthesis by
 sequential models \citep{chow1968dependence,patki2016sdv,nowok2016synthpop} to adversarial
 \citep{xu2019ctgan}, forest-based \citep{watson2023arf} and diffusion \citep{kotelnikov2023tabddpm}
-models. Dataset distillation and model distillation compress data or models for one
+models, including latent-space diffusion \citep{zhang2024tabsyn} and joint mixed-type
+diffusion \citep{shi2025tabdiff}. Dataset distillation and model distillation compress data or models for one
 learner \citep{wang2018distillation,hinton2015distilling}; generative compression names learned
 media codecs \citep{santurkar2017generative}. Description-length and bottleneck ideas
 \citep{rissanen1978modeling,tishby2000bottleneck} motivate the framing but are not claimed as
 the measure. Privacy evaluation of synthetic data is discussed by
 \citet{stadler2022groundhog} and \citet{platzer2021holdout}.
 
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{2pt}
 \bibliographystyle{plainnat}
 \bibliography{references}
 \end{document}

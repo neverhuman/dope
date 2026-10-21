@@ -2948,6 +2948,18 @@
     "research/transfer/native_control_prepare.py": {
       "command": "python3 -B research/transfer/native_control_prepare.py && python3 -B -m unittest research.transfer.tests.test_native_control -v",
       "purpose": "Fresh exact-source offline build and paid runtime manifest before mandatory Linux transfer discovery; missing/stale artifacts fail"
+    },
+    "deploy/": {
+      "command": "bash deploy/check.sh",
+      "purpose": "Verify standalone locked Rust inference graph, typed SafeTensors inventory, nonzero TVAE parity, legacy CPU replay, explicit corrected activation and bounded unavailable-device errors; no GPU or scientific qualification"
+    },
+    "rust/neural/deployment.rs": {
+      "command": "cargo test --locked --lib neural && bash deploy/check.sh",
+      "purpose": "Check training-formula scalar goldens, shared native row streams, decoder heads and marginal/support replay without changing historical artifacts"
+    },
+    "paper/method.tex": {
+      "command": "bash paper/build.sh",
+      "purpose": "Build active method and supplement proof, require resolved references and generated Figure 1 on page 1"
     }
   }
 }
