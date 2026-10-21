@@ -7,6 +7,32 @@ from __future__ import annotations
 
 import csv
 import io
+import re
+
+
+def canonical_svg(raw: bytes) -> bytes:
+    """Name SVG references by document order, without altering drawn content.
+
+    Matplotlib hashes unrounded internal clipping bounds into SVG IDs. Their
+    float representations can vary across architectures even when every emitted
+    coordinate, style and glyph is identical. Keep strict byte comparison by
+    canonicalizing IDs and their references; never round or strip geometry.
+    """
+    raw = b"\n".join(line.rstrip(b" ") for line in raw.splitlines()) + b"\n"
+    identifiers = re.findall(rb'\bid="([^"]+)"', raw)
+    if len(set(identifiers)) != len(identifiers):
+        raise ValueError("hero SVG: duplicate identifier")
+    names = {old: ("dope-figure-%04d" % index).encode()
+             for index, old in enumerate(identifiers)}
+
+    def replace(match):
+        before, name, after = match.groups()
+        if name not in names:
+            raise ValueError("hero SVG: unresolved internal reference")
+        return before + names[name] + after
+
+    return re.sub(rb'(\bid="|(?:xlink:)?href="#|url\(#)([-.\w:]+)("|\))', replace, raw)
+
 
 def compression_rows(csv_bytes: bytes) -> list[dict]:
     """Keep the declared, comparable classical cohort; never pool smaller panels.
