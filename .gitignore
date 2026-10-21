@@ -17,3 +17,6 @@ __pycache__/
 /examples/readme-regression/toy.dpk.report.json
 /examples/readme-regression/toy.dpk.pareto.json
 /examples/readme-regression/synth.csv
+/engine/target/
+examples/adult/data/
+examples/adult/*.dope
