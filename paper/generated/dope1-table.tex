@@ -1,0 +1,21 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & Bytes & Robust retention [95\% CI] & Linear & CatBoost & MLP & $\geq 0.9$ \\
+\midrule
+DOPE, 2 KiB & 2.0~KiB & 0.905 [0.81, 0.94] & 0.94 & 0.93 & 0.94 & 8/16 \\
+\textbf{DOPE, 4 KiB (default)} & 3.8~KiB & 0.909 [0.84, 0.93] & 0.96 & 0.94 & 0.93 & 9/16 \\
+DOPE, 16 KiB & 5.7~KiB & 0.933 [0.87, 0.97] & 0.96 & 0.95 & 0.95 & 10/16 \\
+DOPE, 64 KiB & 9.6~KiB & 0.930 [0.88, 0.96] & 0.96 & 0.95 & 0.97 & 11/16 \\
+DOPE research kernel & 1.1~KiB & 0.677 [0.48, 0.84] & 0.95 & 0.79 & 0.82 & 3/16 \\
+\midrule
+Real rows (xz), 4 KiB & 4.0~KiB & 0.340 [\ensuremath{-}4.01, 0.92] & 0.94 & 0.87 & 0.38 & 5/16 \\
+Real rows (xz), 64 KiB & 50.8~KiB & 0.983 [0.95, 1.00] & 1.00 & 1.00 & 0.98 & 12/16 \\
+Real rows (xz), all & 52.2~KiB & 0.999 [1.00, 1.00] & 1.00 & 1.00 & 1.00 & 16/16 \\
+\midrule
+Gaussian copula (SDV) & 82.0~KiB & 0.282 [0.09, 0.45] & 0.76 & 0.40 & 0.29 & 1/16 \\
+ARF & 673.1~KiB & 0.705 [0.00, 0.86] & 0.94 & 0.85 & 0.85 & 3/16 \\
+TVAE (SDV)$^{7}$ & 247.7~KiB & \ensuremath{-}0.460 [\ensuremath{-}1.36, 0.61] & 0.73 & 0.40 & \ensuremath{-}0.53 & 0/7 \\
+CTGAN (SDV)$^{7}$ & 712.9~KiB & \ensuremath{-}1.897 [\ensuremath{-}3.06, \ensuremath{-}0.47] & \ensuremath{-}0.18 & \ensuremath{-}0.39 & \ensuremath{-}2.33 & 0/7 \\
+Real rows, resampled & 52.1~KiB & 0.929 [0.67, 0.99] & 1.00 & 0.97 & 0.96 & 9/16 \\
+\bottomrule
+\end{tabular}

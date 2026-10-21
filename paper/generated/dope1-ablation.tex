@@ -1,0 +1,13 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+Variant (4 KiB, seed 0) & Bytes & Robust retention [95\% CI] & Linear & CatBoost & MLP & Better/tied/worse \\
+\midrule
+DOPE (default) & 3.8~KiB & 0.919 [0.83, 0.95] & 0.95 & 0.95 & 0.96 & -- \\
+independent features, one regime & 3.3~KiB & 0.798 [0.54, 0.89] & 0.85 & 0.89 & 0.92 & 4/0/12 \\
+one regime (plain Gaussian copula) & 3.4~KiB & 0.835 [0.76, 0.93] & 0.91 & 0.92 & 0.93 & 4/1/11 \\
+network only, no trees & 1.6~KiB & 0.862 [0.77, 0.94] & 0.98 & 0.88 & 0.93 & 1/0/15 \\
+linear target model, no trees & 1.0~KiB & 0.593 [0.37, 0.80] & 0.96 & 0.62 & 0.77 & 3/0/13 \\
+fixed byte split, no self-audit & 3.8~KiB & 0.919 [0.83, 0.95] & 0.95 & 0.95 & 0.96 & 1/14/1 \\
+four times as many synthetic rows & 3.8~KiB & 0.944 [0.81, 0.95] & 0.96 & 0.97 & 0.97 & 11/0/5 \\
+\bottomrule
+\end{tabular}

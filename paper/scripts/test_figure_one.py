@@ -23,6 +23,10 @@ class FigureOneTests(unittest.TestCase):
         log = LOG.replace("hero-frontier.pdf", "transfer-per-byte.pdf")
         self.assertEqual(F.failures(AUX, log), [])
 
+    def test_dope1_hero_passes(self):
+        log = LOG.replace("hero-frontier.pdf", "dope1-hero.pdf")
+        self.assertEqual(F.failures(AUX, log), [])
+
     def test_pending_placeholder_is_refused(self):
         self.assertIn("no generated hero figure was included; Figure 1 would be a pending placeholder",
                       F.failures(AUX, "File: macros.tex\n"))
@@ -56,6 +60,11 @@ class FigureOneTests(unittest.TestCase):
             self.assertEqual(F.main([str(out)]), 0)
             (out / "main.log").write_text("File: macros.tex\n")
             self.assertEqual(F.main([str(out)]), 1)
+            # A named document is checked from its own auxiliary file and log.
+            self.assertEqual(F.main([str(out), "dope1"]), 1)
+            (out / "dope1.aux").write_text(AUX)
+            (out / "dope1.log").write_text(LOG.replace("hero-frontier.pdf", "dope1-hero.pdf"))
+            self.assertEqual(F.main([str(out), "dope1"]), 0)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,287 @@
+% Supplement to the DOPE 1.0 manuscript (dope1.tex). Numbers come only from paper/generated/
+\documentclass[10pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[scaled=0.9]{helvet}
+\usepackage{courier}
+\usepackage[letterpaper,textwidth=6.1in,textheight=9in,centering]{geometry}
+\usepackage{xr-hyper}
+\input{dope1-preamble}
+% Labels of the main text, read from its build (paper/build.sh builds main.tex first).
+\externaldocument[M-]{../target/paper/dope1}
+\hypersetup{pdftitle={Supplement: D.O.P.E.: Downstream Objective-Preserving Encoding},
+  pdfauthor={Jepson Taylor; Alton Alexander}}
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thetheorem}{\thesection.\arabic{theorem}}
+
+\title{\textbf{Supplement to D.O.P.E.: Downstream Objective-Preserving Encoding}}
+\author{Jepson Taylor \and Alton Alexander\\[0.2em]\small NEVERHUMAN Research}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Proofs}
+\label{app:proofs}
+
+Throughout, $P$ is the data law, $Q=Q_A$ the program's law, $f^\star$ and $f_A$ their regression
+functions, $V=\operatorname{Var}_P f^\star(X)>0$, $D_A=\lVert f_A-f^\star\rVert^2_{L^2(P_X)}$, and
+$w=\mathrm{d}P_X/\mathrm{d}Q_X$ with $\lVert w\rVert_\infty<\infty$. For any $g$,
+$\lVert g\rVert^2_{L^2(P_X)}=\int g^2 w\,\mathrm{d}Q_X\le\lVert w\rVert_\infty\lVert g\rVert^2_{L^2(Q_X)}$,
+which is the only place the covariate law enters.
+
+\begin{lemma}[Excess-risk decompositions]
+\label{lem:decomp}
+For squared loss, $L_P(h)=\mathbb{E}_P\operatorname{Var}(Y\mid X)+\lVert h-f^\star\rVert^2_{L^2(P_X)}$ and the best
+constant attains $\mathbb{E}_P\operatorname{Var}(Y\mid X)+V$. For log-loss with conditional class probabilities
+$q(\cdot\mid x)$, $L_P(q)=H_P(Y\mid X)+\mathbb{E}_{P_X}\mathrm{KL}(p^\star(\cdot\mid X)\Vert q(\cdot\mid X))$ and the
+best constant, the class prior, attains $H_P(Y)$.
+\end{lemma}
+
+\begin{proof}
+Expand $(Y-h)^2=(Y-f^\star)^2+2(Y-f^\star)(f^\star-h)+(f^\star-h)^2$ and take expectations; the cross
+term vanishes by the tower property. A constant $c$ gives $\mathbb{E}\operatorname{Var}(Y\mid X)+\lVert f^\star-c\rVert^2$,
+smallest at $c=\mathbb{E}Y$, where the second term is $V$. For log-loss,
+$-\log q=-\log p^\star+\log(p^\star/q)$; take conditional expectations. A constant distribution $\pi$ gives
+the cross-entropy $H(Y)+\mathrm{KL}(p_Y\Vert\pi)$, smallest at the prior.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{M-thm:limit}]
+\emph{Squared loss.} By \cref{lem:decomp}, $L_{\mathrm{null}}-L_P(h)=V-\lVert h-f^\star\rVert^2_{L^2(P_X)}$ for
+every $h$. Consistency on $P$ gives $\lVert\hat h_{P,n}-f^\star\rVert_{L^2(P_X)}\to 0$, so the denominator of
+retention tends to $V$. Consistency on $Q$ gives $\lVert\hat h_{Q,N}-f_A\rVert_{L^2(Q_X)}\to0$, hence
+$\lVert\hat h_{Q,N}-f_A\rVert_{L^2(P_X)}\to0$ by the density bound, and by the triangle inequality
+$\lVert\hat h_{Q,N}-f^\star\rVert_{L^2(P_X)}\to\sqrt{D_A}$. The numerator tends to $V-D_A$.
+
+\emph{Log-loss.} Assume in addition that predicted and program probabilities lie in $[c,1]$ for some
+$c>0$ (DOPE's tempered softmax satisfies this on the bounded score range). By \cref{lem:decomp} the
+denominator tends to $H(Y)-H(Y\mid X)=I_P(X;Y)$. For the numerator,
+$\bigl|\mathbb{E}_P[-\log\hat q]-\mathbb{E}_P[-\log q_A]\bigr|\le c^{-1}\,\mathbb{E}_{P_X}\lVert\hat q(\cdot\mid X)-q_A(\cdot\mid X)\rVert_1
+\le c^{-1}\lVert w\rVert_\infty\,\mathbb{E}_{Q_X}\lVert\hat q-q_A\rVert_1\to0$, since $\log$ is $c^{-1}$-Lipschitz on
+$[c,1]$ and the learner is consistent on $Q$. Hence $L_{\mathrm{syn}}\to H(Y\mid X)+\mathbb{E}_{P_X}\mathrm{KL}(p^\star\Vert q_A)$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{M-prop:finite}]
+Write $Z=\lVert\hat h_{Q,N}-f_A\rVert_{L^2(Q_X)}$, a random variable over the synthetic sample and training
+randomness, with $\mathbb{E}Z^2=e_Q(N)$. By the triangle inequality and the density bound,
+$\lVert\hat h_{Q,N}-f^\star\rVert_{L^2(P_X)}\le\sqrt{D_A}+\sqrt{\lVert w\rVert_\infty}\,Z$. Squaring, taking
+expectations and using $\mathbb{E}Z\le\sqrt{\mathbb{E}Z^2}$,
+$\mathbb{E}\lVert\hat h_{Q,N}-f^\star\rVert^2\le\bigl(\sqrt{D_A}+\sqrt{\lVert w\rVert_\infty e_Q(N)}\bigr)^2$. With
+retention defined on expected losses and the null at its population value, \cref{lem:decomp} gives the
+numerator $V-\mathbb{E}\lVert\hat h_{Q,N}-f^\star\rVert^2$ and the denominator $V-e_P(n)$.
+\end{proof}
+
+\begin{proposition}[Misspecified auditors]
+\label{prop:misspec}
+Let the auditor minimize empirical squared loss over a closed convex class $\mathcal{H}$, and let
+$\Pi_\mu$ denote $L^2(\mu)$ projection onto $\mathcal{H}$. In the large-sample limit,
+\[
+R\;\to\;\frac{V-\lVert\Pi_{Q_X}f_A-f^\star\rVert^2_{L^2(P_X)}}{V-\lVert\Pi_{P_X}f^\star-f^\star\rVert^2_{L^2(P_X)}} .
+\]
+\end{proposition}
+
+\begin{proof}
+The empirical risk minimizer over $\mathcal{H}$ on $Q$ converges to the minimizer of
+$\mathbb{E}_Q(Y-h)^2=\mathrm{const}+\lVert h-f_A\rVert^2_{L^2(Q_X)}$, which is $\Pi_{Q_X}f_A$; likewise on $P$. Apply
+\cref{lem:decomp}.
+\end{proof}
+
+For a linear class, $\Pi_{Q_X}f_A$ is determined by the second moments of $Q_X$ and the cross moments of
+$X$ and $f_A(X)$ under $Q$, so it changes at first order with the covariate correlations even when
+$f_A=f^\star$. This is why the dependence model matters for linear and tree auditors although it does not
+enter (\ref{M-eq:limit}) for consistent learners.
+
+\begin{lemma}[Exact marginals under the regime mixture]
+\label{lem:marginals}
+Let $u=M\varepsilon$ with $\varepsilon\sim\mathcal{N}(0,I)$ and $\operatorname{diag}(MM^\top)=\mathbf{1}$, let
+$k\sim\mathrm{Cat}(\pi)$ independently, and $z=\mu_k+\sigma_k\odot u$ with $\sigma_k>0$. Then
+$F_j(t)=\sum_k\pi_k\Phi((t-\mu_{kj})/\sigma_{kj})$ is the distribution function of $z_j$, $F_j(z_j)$ is
+uniform on $(0,1)$, and $x_j=Q_j(F_j(z_j))$ has quantile function $Q_j$, for every choice of
+$(\pi,\mu,\sigma,M)$.
+\end{lemma}
+
+\begin{proof}
+Given $k$, $u_j\sim\mathcal{N}(0,(MM^\top)_{jj})=\mathcal{N}(0,1)$, so $z_j\mid k\sim\mathcal{N}(\mu_{kj},\sigma_{kj}^2)$ and
+$z_j$ has distribution function $F_j$, which is continuous and strictly increasing. The probability
+integral transform gives uniformity, and $Q_j$ of a uniform variable has quantile function $Q_j$. For a
+discrete column, $\Pr(F_j(z_j)\le F_{j,\ell})=F_{j,\ell}$ reproduces the stored cumulative probabilities.
+\end{proof}
+
+In the engine, $\Phi^{-1}\circ F_j$ is tabulated at \CfgScoreTable{} points and interpolated linearly, so
+marginals are exact up to that interpolation; every dependence family stores a correlation with unit
+diagonal, so the hypothesis on $M$ holds by construction.
+
+\begin{remark}[A sampling-free retention estimate]
+Replacing $f^\star$ in (\ref{M-eq:limit}) by a strong real-trained predictor $\hat g$ evaluated on held-out
+rows gives $\hat R=1-\frac{\sum_i(f_A(x_i)-\hat g(x_i))^2}{\sum_i(\hat g(x_i)-\bar g)^2}$ under squared loss and
+$\hat R=1-\frac{\sum_i\mathrm{KL}(\hat g(\cdot\mid x_i)\Vert q_A(\cdot\mid x_i))}{\sum_i\mathrm{KL}(\hat g(\cdot\mid x_i)\Vert\bar g)}$ under
+log-loss, where $\bar g$ averages the predictions. Both are computed from the program's own conditional model
+(\texttt{dope predict}) without sampling or retraining, and estimate the consistent-learner limit; they
+are a fast screen, not a substitute for measured retention.
+\end{remark}
+
+\begin{remark}[Greedy bit allocation]
+If the added loss were separable across tensors and convex in each tensor's bit depth, and bytes linear
+in bits, the greedy step of Algorithm~\ref{M-alg:bits} (most bytes saved per unit of added loss) would visit only
+points on the lower convex hull of the achievable rate--distortion set, by the classical marginal-analysis
+argument. The readout re-solve couples tensors, so the engine measures every candidate step rather than
+predicting it.
+\end{remark}
+
+\section{The program and its artifact}
+\label{app:artifact}
+
+\begin{table}[h]
+\centering
+\caption{\textbf{Sections of a DOPE program.} Shapes use $d$ features, $c$ continuous features, $m$ knots,
+$K$ regimes, $r$ factors, $s$ screened inputs, $h$ hidden units, $o$ outputs, and $T$ trees of depth $D$. The
+artifact is a safetensors file with one \texttt{U8} tensor, \texttt{dope}: a brotli stream that inflates to a
+four-byte length, the metadata JSON (column names, kinds, levels, transforms, structure, bit widths and the
+section list) and the sections below in list order. Every stored byte is counted.}
+\label{tab:tensors}
+\small
+\begin{tabular}{lll}
+\toprule
+Section & Type & Contents\\
+\midrule
+\texttt{schema.affine} & F32 & per numeric column: scale and offset of the robust unit map\\
+\texttt{features.missing} & U8 & missing share per feature, square-root coded\\
+\texttt{marginal.range}, \texttt{marginal.knots} & F16, U8 & per continuous column: range and $m$ knot codes\\
+\texttt{marginal.atoms} & F16 & atom value, mass and score interval\\
+\texttt{discrete.cum}, \texttt{discrete.values} & U16, F32 & cumulative probabilities and values\\
+\texttt{copula.corr} / \texttt{copula.loadings} & I8 & full correlation, or $d\times r$ factor loadings\\
+\texttt{copula.parent}, \texttt{copula.rho} & U16, I8 & Chow--Liu tree: parent index and edge correlation\\
+\texttt{regime.weights}, \texttt{.means}, \texttt{.scales} & U8, I8, U8 & $K$ weights; $K\times d$ locations and log-scales\\
+\texttt{net.codes} & U8 & bit-packed codes for $W$, $b$, $\beta$, $v$\\
+\texttt{net.params} & F32 & per-tensor scales and output intercepts\\
+\texttt{forest} & U8 & $T\times D$ feature indices and threshold codes, $T$ half-precision scales,\\
+ & & bit-packed $T\times 2^D\times o$ leaf codes\\
+\texttt{noise} & F16 & log-scale coefficients and residual quantiles, or a temperature\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{\textbf{Settings}, read from the engine and harness sources when this document is built.}
+\label{tab:settings}
+\small
+\begin{tabular}{lr@{\qquad}lr}
+\toprule
+Default budget (KiB) & \CfgBudget & Training steps (maximum) & \CfgSteps\\
+Normal-score grid half-width & \CfgZGrid & Learning rate (AdamW) & \CfgLearningRate\\
+Distinct values for a discrete column & \CfgMaxDiscrete & Weight decay & \CfgWeightDecay\\
+Atom share (\%) & \CfgAtomShare & Batch size & \CfgBatch\\
+Rows per kept level & \CfgMinLevel & Validation interval (steps) & \CfgEvalEvery\\
+Levels kept per column (cap) & \CfgMaxLevels & Early-stopping patience (steps) & \CfgPatience\\
+Regimes (ladder) & \CfgRegimeLadder & Readout solve rows & \CfgReadoutRows\\
+Residual quantiles & \CfgResidualKnots & Quantization tolerance (\% of gain) & \CfgTolerance\\
+Capacity plans & \CfgPlans & Score-table points & \CfgScoreTable\\
+Trees (cap) & \CfgMaxTrees & Leaf code bits & \CfgLeafBits\\
+Input code levels & \CfgLevels & Dependence reserve shares (\%) & \CfgShares\\
+Self-audit rows & \CfgAuditRows & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Determinism and devices.} Random inputs are a counter-based function of the seed, a stream
+index and the global row index (splitmix64 mixing, inversion by AS241 \citep{wichura1988as241}), so any
+row can be generated independently and in any order, and a seed gives the same rows on every device up to
+floating-point rounding. The CPU sampler evaluates rows in parallel with no shared state; the CUDA and
+Metal paths evaluate the same draw as candle tensors. Training uses a hand-vectorized single-precision
+trainer on CPU and candle on accelerators, held in agreement by a test.
+
+\paragraph{Throughput.} \Cref{tab:throughput} reports the in-memory CPU sampler (\texttt{dope throughput},
+fastest of three runs of one million rows, no output written) on an otherwise idle machine
+(\G{OneThroughputDevice}): from \G{OneThroughputMin} to \G{OneThroughputMax} rows per second.
+
+\begin{table}[h]
+\centering
+\caption{\textbf{Sampling throughput} of programs compiled from four confirmation tables. Bytes is the
+file; inflated is the program container before compression, of which metadata is the schema and
+structure.}
+\label{tab:throughput}
+\small
+\IfFileExists{generated/dope1-throughput.tex}{\input{generated/dope1-throughput.tex}}{\pending{throughput table}}
+\end{table}
+
+\paragraph{Cost.} Compilation is dominated by training at most a few small networks, boosting one
+forest per network (histograms over byte codes, rows subsampled for split search), the
+rate--distortion search, and one self-audit per reserve share; each is linear in the number of rows.
+A draw costs $O(dm+Kd+sh+TD)$ per row, all inside a working set of a few kilobytes.
+
+\section{Benchmark details}
+\label{app:bench}
+
+\paragraph{Tables.} \Cref{tab:pertable} lists the confirmation tables and per-table results. Archives
+are downloaded from their public sources and pinned by digest; targets are declared per table, never
+inferred from column order; the bank-marketing call duration is dropped because it is known only after
+the outcome. Splits are stratified for classification and fixed by seed.
+
+\begin{table}[h]
+\centering
+\caption{\textbf{Per-table results} at the default budget: robust retention (median over seeds) of DOPE,
+of the research kernel, of real rows xz-compressed to the same budget, and of the generators at default
+size, with DOPE's TDL at
+$\tau=\CfgTau$ (n.r.: not reached on the tested grid).}
+\label{tab:pertable}
+\small
+\IfFileExists{generated/dope1-pertable.tex}{\resizebox{\linewidth}{!}{\input{generated/dope1-pertable.tex}}}{\pending{per-table results}}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\GeneratedFigure[\halfwidth]{dope1-audit.pdf}{self-audit scatter}
+\caption{\textbf{Self-audit against measured retention.} Each point is one fitted DOPE program (every
+table, budget and seed): the robust retention the compiler estimates from its own validation rows,
+against the robust retention measured with the benchmark's auditors on held-out test rows. The dotted
+line is equality.}
+\label{fig:audit}
+\end{figure}
+
+\paragraph{Auditors.} Ridge and logistic regression with standardized one-hot inputs; CatBoost with
+\CfgCatIters{} trees of depth \CfgCatDepth{} and default learning rate; an MLP with two hidden layers,
+Adam with early stopping on larger tables and L-BFGS with stronger weight decay on tables with fewer than a
+few thousand rows. Each auditor fits its own encoders on its own training rows, so a method cannot
+benefit from seeing the real table's encodings.
+
+\paragraph{Comparators.} SDV's Gaussian copula, CTGAN and TVAE use the library's detected metadata and
+default hyperparameters; ARF uses arfpy defaults. Their bytes are the xz-compressed pickle of the fitted
+object, which is smaller than what a deployment would ship. The research kernel runs
+\texttt{dope-kernel fit-table} and \texttt{sample-table} at their defaults with the cell's seed; its bytes
+are its artifact file. Every fit-and-sample call, DOPE's included,
+runs under a wall-clock limit of \CfgTimeoutMin{} minutes; a call that exceeds it is recorded as a failed
+cell, as are the remaining seeds of that method on that table. The compressed-rows control samples rows
+without replacement and binary-searches the largest subset whose CSV fits the budget after
+\texttt{xz -9e}; auditors train on those real rows.
+
+\paragraph{Statistics.} Across tables we report medians with percentile bootstrap intervals
+(\CfgDraws{} draws, tables resampled) and paired differences as Hodges--Lehmann estimates with
+\CfgPairedDraws{} bootstrap draws. A table counts for a family when the real data improve on the null by at
+least one percent. A fit that fails or exceeds the limit counts as robust retention zero, since a learner
+given no rows can only predict the null, and stays in every denominator; per-family medians and byte
+medians are taken over successful fits.
+
+\paragraph{Compute.} Every number was produced on a two-core CPU virtual machine without accelerators.
+Large neural generators and foundation-model auditors are deferred to a GPU run (Section~\ref{M-sec:limits} of the main text).
+
+\section{Reproduction}
+\label{app:repro}
+
+\begin{verbatim}
+cargo build --release --manifest-path engine/Cargo.toml
+python3 bench/real-world/datasets.py --panel confirm --out target/bench-data
+python3 bench/real-world/run.py --data target/bench-data --panel confirm \
+        --out bench/real-world/results/confirm
+python3 bench/real-world/report.py --results bench/real-world/results/confirm
+python3 bench/real-world/render.py --results bench/real-world/results/confirm
+bash paper/build.sh
+\end{verbatim}
+\noindent
+\texttt{run.py} appends one JSON record per cell and resumes where it stopped; \texttt{render.py --check}
+fails if any generated table, macro or README block differs from what the records imply.
+
+\bibliographystyle{plainnat}
+\bibliography{references,references-dope1}
+\end{document}

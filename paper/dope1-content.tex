@@ -1,0 +1,559 @@
+% Body of the DOPE 1.0 manuscript, shared by dope1.tex (preprint) and dope1-venue.tex (venue build).
+% Every result value is a generated macro (\G{...}, paper/generated/dope1-macros.tex);
+% every setting is read from the engine source (\Cfg..., paper/generated/dope1-config.tex).
+
+\begin{abstract}
+A table is valuable for what models can learn from it, yet the predictive structure of a
+private table usually cannot leave the silo that holds it. We ask how few bytes that
+structure needs. \emph{Downstream Objective-Preserving Encoding} (DOPE) compiles a table into
+a small generative program, a safetensors file of a few kilobytes that stores no rows, and is
+judged by \emph{retention}: the share of a real-trained model's gain over a null that the same
+model recovers when trained only on the program's samples and tested on held-out real rows.
+We show that for learners that converge on the synthetic distribution, retention equals the
+fraction of the predictive information $I(X;Y)$ (log-loss) or of the explainable variance
+(squared loss) that the program preserves, and that covariate errors enter only through the
+learner's own estimation error; bytes should therefore go to the conditional model first. The
+resulting program combines exact marginals, a regime mixture of Gaussian copulas, a residual
+network trained by variable projection, boosted oblivious trees quantized with error feedback, and
+rate--distortion bit allocation; the compiler chooses its byte split by auditing its own samples on
+held-out training rows, and a draw is one matrix product and a few gathers on CPU or GPU. Across \G{OneTables} public tables and three
+model families, DOPE's default program (median \G{OneDopeCBytes}) reaches a median worst-family
+retention of \G{OneDopeCRet} [\G{OneDopeCLo}, \G{OneDopeCHi}], and \G{OneDopeBRet} at half that
+budget, where it beats real rows compressed with xz to the same bytes (wins, ties and losses
+\G{OneEqBWtl}) and the repository's earlier engine (\G{OneKernelVsBWtl}); the default budget spent on
+compressed rows reaches \G{OneRowsCRet}, and SDV's Gaussian copula and ARF reach \G{OneCopulaRet} and
+\G{OneArfRet} at \G{OneCopulaBytes} and \G{OneArfBytes}. We define
+\emph{Transfer Description Length} (TDL), the smallest artifact reaching a target retention, as
+the quantity to minimise, and release the engine and every record.
+\end{abstract}
+% The venue build places Figure 1 here; the preprint has it in the title block.
+\providecommand{\AfterAbstract}{}\AfterAbstract
+
+
+\section{Introduction}
+\label{sec:intro}
+
+Most of an organization's experience is stored in tables, and most of those tables are locked
+behind security, privacy and legal boundaries. External researchers, benchmarks and foundation
+models cannot learn from them. Synthetic data is the usual answer, but it is judged mostly by how
+closely it resembles the source or by the accuracy of one downstream model, and the size of the
+generator that produced it goes uncounted. A multi-megabyte neural generator can memorize much of a
+table; it is expensive to audit, to ship and to reason about.
+
+We pose a sharper question: \emph{how few bytes does a table's predictive structure need?} We
+compile the training rows into a program, sample from the program, train independent learners on
+the samples, test them on untouched real rows, and count every byte the sampler reads. A program
+that is small and still trains good models must have captured what generalizes rather than what
+identifies rows: compressing the predictive regularities of a table is a test of modelling that
+copying rows cannot pass \citep{rissanen1978modeling,tishby2000bottleneck}.
+
+\paragraph{Contributions.}
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
+\item \textbf{A theory of retention} (\cref{sec:theory}). For learners that converge on the
+  synthetic distribution, retention equals the preserved share of $I(X;Y)$ under log-loss and of
+  $\operatorname{Var}\,\mathbb{E}[Y\mid X]$ under squared loss; a finite-sample bound shows that
+  covariate errors are multiplied by the learner's own estimation error, which more samples
+  remove. The bound explains retention above one and prescribes target-first byte allocation.
+\item \textbf{DOPE, a byte-budgeted generative program} (\cref{sec:method}): an ML-ready intake that
+  one-hot encodes categories and scales numeric columns robustly; marginals on a normal-score grid;
+  a regime mixture of Gaussian copulas that keeps every marginal exactly; a conditional model that
+  adds byte-coded oblivious trees to a residual tanh network trained by variable projection;
+  calibrated noise; measured rate--distortion bit allocation with error feedback; and a compile-time
+  self-audit that reports the retention of fast auditors on held-out training rows and uses it to pick
+  the byte split between dependence and target. The artifact is a standard safetensors file whose one
+  tensor is a brotli stream of the schema and every quantized section; one tensor program samples it on
+  CPU, CUDA or Metal.
+\item \textbf{An equal-byte evaluation} (\cref{sec:experiments}) on \G{OneTables} public tables with
+  three auditor families, against the real rows themselves compressed to the same budget, against
+  generators at their default sizes, and with ablations of every component.
+\item \textbf{Transfer Description Length} (\cref{sec:metric}), a single quantity to minimise, and an
+  open, pure-Rust engine with resumable benchmark records.
+\end{enumerate}
+
+\section{Retention and Transfer Description Length}
+\label{sec:metric}
+
+Let $P$ be the joint law of features $X$ and target $Y$, $D_{\mathrm{fit}}$ the training rows and
+$D_{\mathrm{test}}$ held-out rows that no step of compilation sees. A compiler maps $D_{\mathrm{fit}}$ and a
+byte budget $B$ to an artifact $A$ with $|A|\le B$, where $|A|$ counts every byte that sampling
+reads: tensors, schema, category labels, transforms and container header. The artifact defines a
+distribution $Q_A$ that we sample to obtain $N$ synthetic rows. An auditor $m$ (a learning
+algorithm) is trained once on the real rows and once on the synthetic rows; both predictors are
+scored on $D_{\mathrm{test}}$ with loss $L$ (squared error in original units, or log-loss).
+\emph{Retention} is
+\begin{equation}
+  R_m(A) \;=\; \frac{L_{\mathrm{null}} - L_{\mathrm{syn}}(A)}{L_{\mathrm{null}} - L_{\mathrm{real}}},
+  \label{eq:retention}
+\end{equation}
+where $L_{\mathrm{null}}$ is the loss of the best constant (the training mean or class prior). A
+family counts for a table when the real data improves on the null by at least one percent of the
+null loss. \emph{Robust retention} $R(A)=\min_m R_m(A)$ keeps the worst counted family, so a program
+cannot be tuned to one learner. The \emph{Transfer Description Length} at threshold $\tau$ is the
+smallest tested artifact that reaches it,
+\begin{equation}
+  \mathrm{TDL}_\tau \;=\; \min\{\,|A| : R(A) \ge \tau\,\},
+  \label{eq:tdl}
+\end{equation}
+reported as \emph{not reached} when no tested budget qualifies; we report $\tau=\CfgTau$
+and, for coverage, $\tau=\CfgTauLow$. The repository's contract adds a
+driver-agreement gate and lower confidence bounds (\texttt{KiB@T90/D80}); this paper measures the
+transfer gate with point estimates per table and intervals across tables.
+
+\section{Why a small program can keep predictive structure}
+\label{sec:theory}
+
+Write $f^\star(x)=\mathbb{E}_P[Y\mid X=x]$ and $f_A(x)=\mathbb{E}_{Q_A}[Y\mid X=x]$ for the regression
+functions of the data and the program, $V=\operatorname{Var}_P f^\star(X)$, and
+$D_A=\lVert f_A-f^\star\rVert^2_{L^2(P_X)}$ for the program's \emph{conditional-mean distortion}. A
+learner is \emph{consistent on} a distribution $Q$ if, trained on $N$ samples of $Q$, its predictor
+converges in $L^2(Q_X)$ to the $Q$-optimal predictor as $N\to\infty$.
+
+\begin{theorem}[Retention in the large-sample limit]
+\label{thm:limit}
+Suppose the auditor is consistent on $P$ and on $Q_A$, $P_X$ has a bounded density
+$w=\mathrm{d}P_X/\mathrm{d}Q_{A,X}$ with respect to the program's covariate law, and, under
+log-loss, predicted class probabilities stay bounded away from zero. As the real and synthetic
+sample sizes grow,
+\begin{equation}
+  R \;\to\; 1-\frac{D_A}{V} \quad\text{(squared loss)},\qquad
+  R \;\to\; 1-\frac{\mathbb{E}_{P_X}\,\mathrm{KL}\!\left(p^\star(\cdot\mid X)\,\Vert\,q_A(\cdot\mid X)\right)}{I_P(X;Y)}
+  \quad\text{(log-loss)}.
+  \label{eq:limit}
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Under squared loss, $L(h)=\mathbb{E}\operatorname{Var}(Y\mid X)+\lVert h-f^\star\rVert^2_{L^2(P_X)}$. The null
+attains $\operatorname{Var}Y=\mathbb{E}\operatorname{Var}(Y\mid X)+V$, the real-trained predictor tends to
+$f^\star$, and the synthetic-trained one to $f_A$ in $L^2(Q_X)$, hence in $L^2(P_X)$ because $w$ is
+bounded. Substituting in \eqref{eq:retention} gives the first limit. Under log-loss,
+$L(q)=H(Y\mid X)+\mathbb{E}\,\mathrm{KL}(p^\star\Vert q)$, the null attains $H(Y)$, and
+$H(Y)-H(Y\mid X)=I(X;Y)$ \citep{cover2006elements}. The full proof is in the supplement.
+\end{proof}
+
+\Cref{thm:limit} gives retention an information-theoretic meaning: under log-loss it is exactly the
+fraction of the predictive information that the program preserves, and $\mathrm{TDL}_\tau$ is an
+operational rate at which a $\tau$ fraction of $I(X;Y)$ survives, in the spirit of rate--distortion
+theory with a downstream distortion \citep{shannon1959coding}. It also says what does \emph{not}
+matter in the limit: the covariate law $Q_X$ enters only through its support. Finite samples change
+that, but only multiplicatively.
+
+\begin{proposition}[Finite samples and covariate error]
+\label{prop:finite}
+Under squared loss, let $e_P(n)=\mathbb{E}\lVert \hat h_{P,n}-f^\star\rVert^2_{L^2(P_X)}$ be the auditor's
+excess risk with $n$ real rows and $e_Q(N)=\mathbb{E}\lVert \hat h_{Q,N}-f_A\rVert^2_{L^2(Q_X)}$ its
+estimation error on $N$ synthetic rows. Then, whenever $V>e_P(n)$,
+\begin{equation}
+  R \;\ge\; \frac{V-\left(\sqrt{D_A}+\sqrt{\lVert w\rVert_\infty\, e_Q(N)}\right)^{2}}{V-e_P(n)} .
+  \label{eq:finite}
+\end{equation}
+\end{proposition}
+
+Three consequences shape DOPE. First, the conditional-mean distortion $D_A$ enters directly, while
+the covariate mismatch $\lVert w\rVert_\infty$ only multiplies the learner's estimation error on the
+program, which vanishes as $N$ grows; since sampling is free, bytes buy the most retention when
+they go to the conditional model first (\emph{target-first allocation}). Second, retention can
+exceed one: when $f_A$ is smooth and $N\gg n$, the right side of \eqref{eq:finite} exceeds one as
+soon as $\sqrt{D_A}+\sqrt{\lVert w\rVert_\infty e_Q(N)}<\sqrt{e_P(n)}$, the program acting as a
+regularizing teacher \citep{hinton2015distilling}. Third, for a misspecified auditor such as a linear
+model, the limit is the $L^2(Q_X)$ projection of $f_A$, which depends on $Q_X$ at first order; joint
+covariate structure therefore still matters (supplement), which motivates the dependence model below. Replacing
+$f^\star$ by a strong real-trained predictor turns the first limit into a sampling-free estimate of
+retention (supplement).
+
+\section{DOPE}
+\label{sec:method}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize, node distance=0.42cm,
+  stage/.style={draw=stageline, rounded corners=2pt, fill=#1, inner sep=4pt},
+  stage/.default=stagefill,
+  io/.style={align=center, text width=1.5cm, inner sep=2pt},
+  arr/.style={-{Latex[length=1.6mm]}, draw=arrowink, line width=0.6pt}]
+  \node[io] (csv) {\textbf{CSV}\\ training rows};
+  \node[stage, right=of csv] (intake) {\stagebox{\textbf{Intake}\\ types; levels ordered by target, rare levels pooled; robust $[0,1]$ scaling}};
+  \node[stage, right=of intake] (cov) {\stagebox{\textbf{Covariates}\\ marginals on a normal-score grid; regime mixture of Gaussian copulas}};
+  \node[stage=targetfill, right=of cov] (tgt) {\stagebox{\textbf{Target}\\ residual network $+$ byte-coded oblivious trees; calibrated noise}};
+  \node[stage, right=of tgt] (bytes) {\stagebox{\textbf{Bytes}\\ rate--distortion bits with error feedback; self-audited split}};
+  \node[stage=artfill, below=0.5cm of bytes, align=center, text width=\stagewd] (art)
+    {\textbf{model.dope}\\ safetensors, a few KiB};
+  \node[stage, left=of art, align=left, text width=4.2cm] (smp)
+    {\textbf{Sampler} (CPU, CUDA, Metal)\\ one GEMM, gathers, a small network, tree lookups};
+  \node[io, left=of smp, text width=3.3cm] (out) {\textbf{rows} in original units, or ML-ready: one-hot and $[0,1]$};
+  \draw[arr] (csv) -- (intake);
+  \draw[arr] (intake) -- (cov);
+  \draw[arr] (cov) -- (tgt);
+  \draw[arr] (tgt) -- (bytes);
+  \draw[arr] (bytes) -- (art);
+  \draw[arr] (art) -- (smp);
+  \draw[arr] (smp) -- (out);
+\end{tikzpicture}
+\caption{\textbf{A DOPE program, compiled and sampled.} Compilation reads the training rows once; the
+artifact stores no rows; sampling reads only the artifact.}
+\label{fig:pipeline}
+\end{figure}
+
+\paragraph{Intake and ML-ready encoding.}
+Column types are inferred from the CSV. A categorical column keeps the levels with at least
+\CfgMinLevel{} rows (at most \CfgMaxLevels{}) and pools the rest into an \texttt{\_\_other\_\_} level,
+so no singleton label is stored; levels are ordered by their shrunken association with the target
+and coded on $[0,1]$, which makes one scalar per categorical column informative for both the copula
+and the network. Numeric columns that are non-negative and strongly right-skewed are passed through
+$\log(1+x)$, and every numeric column is mapped affinely so that its central ninety-nine percent
+spans $[0,1]$; tails are kept inside the program. The same maps produce the ML-ready output that
+users request at sampling time: one-hot categorical columns, numeric columns clipped to $[0,1]$ (or
+transformed by their own distribution function), and missingness indicators.
+
+\paragraph{Marginals on a normal-score grid.}
+Each continuous column stores its quantile function as knots at normal scores $z_k$ evenly spaced
+on $[-\CfgZGrid,\CfgZGrid]$, so that $x=Q(\Phi(z))$ is a piecewise-linear function of the latent
+score and sampling needs one multiply and one gather per cell. Values repeated in at least
+\CfgAtomShare\% of rows are stored as atoms with their score intervals. Columns with at most
+\CfgMaxDiscrete{} distinct values, and all categorical columns, are discrete: a draw is the number of
+stored thresholds $\Phi^{-1}(F_k)$ that the latent score exceeds.
+
+\paragraph{A regime mixture of Gaussian copulas.}
+Dependence lives in normal-score space \citep{sklar1959,nelsen2006copulas}. Scores are van der Waerden
+ranks for continuous columns and conditional means $\mathbb{E}[Z\mid\text{level}]$ for discrete ones, whose
+correlations are divided by the product of the score standard deviations, a first-order polychoric
+correction \citep{olsson1979polychoric}. On top of an independent, Chow--Liu tree
+\citep{chow1968dependence}, factor or full correlation model, DOPE fits up to \CfgMaxRegimes{}
+\emph{regimes} that share the correlation $R$ but differ in location and scale:
+\begin{equation}
+  k\sim\mathrm{Cat}(\pi),\qquad z=\mu_k+\sigma_k\odot(M\varepsilon),\qquad x_j=Q_j\!\left(F_j(z_j)\right),
+  \qquad F_j(t)=\sum_k \pi_k\,\Phi\!\left(\frac{t-\mu_{kj}}{\sigma_{kj}}\right),
+  \label{eq:regimes}
+\end{equation}
+where $MM^\top=R$ and $\varepsilon\sim\mathcal{N}(0,I)$. Because $F_j(z_j)$ is uniform, every marginal
+is reproduced exactly whatever the regimes (supplement); they only shape dependence. A single Gaussian
+copula is elliptical in score space, so a table whose rows come from distinct operating modes, with
+several columns high together or zero together, is smeared into one ellipse; regimes restore such modes
+for about $2d$ bytes each. Regimes are fitted by diagonal
+Gaussian-mixture EM \citep{dempster1977em} on the scores, the shared correlation from
+within-regime residuals, and the number of regimes (from $\{\CfgRegimeLadder\}$) and the family by
+held-out likelihood within the budget. Every family compiles to one mixing matrix $M$, so a draw is
+a single matrix product on any device.
+
+\paragraph{The conditional model: a network and a forest.}
+The target model has two parts with complementary inductive biases. The first is a residual network
+on the $s$ inputs most associated with the target, ranked by the larger of the absolute Spearman
+correlation and Chatterjee's $\xi$, which detects non-monotone dependence \citep{chatterjee2021xi}:
+\begin{equation}
+  \hat y(x)=a+\beta^\top x_c+v^\top\tanh(Wx_c+b),\qquad x_c=x_S-\tfrac12 .
+  \label{eq:net}
+\end{equation}
+For classification the output is a vector of logits. Training uses AdamW
+\citep{loshchilov2019adamw} with a cosine schedule while the readout $(a,\beta,v)$, which is linear in a
+fixed basis, is periodically replaced by its closed-form ridge or Newton solution
+\citep[variable projection;][]{golub1973varpro}; early stopping on an internal validation split picks the
+number of steps, so no external data are consulted. Regression noise is a heteroscedastic scale,
+log-linear in the leading inputs, times a draw from the stored quantiles of standardized held-out
+residuals; class labels are sampled from a softmax whose temperature maximises held-out likelihood
+\citep{guo2017calibration}, which by \cref{thm:limit} is the quantity that matters under log-loss.
+
+The network captures smooth and low-order structure in a few hundred bytes. What it misses,
+thresholds and interactions among categorical levels, is what tree learners exploit first, and by
+\cref{prop:finite} that conditional-mean error enters retention directly. The second part is
+therefore a forest of $T$ \emph{oblivious} trees of depth $D$ \citep{prokhorenkova2018catboost} over
+all $d$ features, each split being one feature index and one byte:
+\begin{equation}
+  f_A(x)=\hat y(x)+\sum_{t=1}^{T}\ell_t\Bigl[\textstyle\sum_{l=1}^{D}2^{l-1}\,
+  \mathbb{I}\{c(x_{j_{tl}})>\theta_{tl}\}\Bigr],\qquad
+  c(x)=\min\bigl(L-1,\max(0,\lfloor(L-1)x+\tfrac12\rfloor)\bigr),
+  \label{eq:forest}
+\end{equation}
+with $L=\CfgLevels$ code levels. Trees are boosted by Newton steps on the loss of the
+\emph{quantized} network. Each tree is quantized as soon as it is fitted, to \CfgLeafBits-bit leaf
+codes with one half-precision scale, and the next tree is fitted to the gradient of the quantized
+ensemble, so rounding errors are corrected by later trees. Depth grows from four to six with the
+budget, and the forest kept is the prefix with the lowest validation loss among those that fit the
+bytes left; larger budgets therefore buy more trees, and retention keeps rising with bytes instead of
+saturating at the network's capacity.
+
+\paragraph{Rate--distortion bit allocation.}
+Weights are stored as $b$-bit symmetric integer codes, bit-packed, with one scale per tensor.
+\Cref{alg:bits} lowers precision greedily, taking at each step the one-bit reduction with the most
+bytes saved per unit of held-out loss, as long as the quantized model keeps all but
+$\epsilon=\CfgTolerance\%$ of the stored gain over the null; for distortions that are separable and
+convex in the bit depth this greedy path traces the lower convex hull of the rate--distortion curve.
+After the hidden layer is quantized, the readout is re-solved on the quantized basis, cancelling most
+of the rounding error \citep[an exact form of error feedback;][]{frantar2023gptq}. Marginal knots are eight-bit codes within a half-precision range,
+correlations and loadings eight-bit, regime parameters eight-bit on fixed ranges.
+
+\paragraph{Budget search and the self-audit.}
+\Cref{alg:compile} spends the budget target-first, as \cref{prop:finite} prescribes: a dependence
+model is reserved, the network is sized on a ladder of \CfgPlans{} capacities from \CfgPlanRich{}
+to \CfgPlanLean{} (knots, screened inputs, hidden units), the forest takes the bytes left, and any
+remainder upgrades the dependence model to the most likely one that fits. One decision is left open
+by the theory: how large the reserve should be. \Cref{prop:finite} ranks conditional-mean error first,
+but the misspecification remark of \cref{sec:theory} shows that linear and tree auditors also need
+covariate structure. DOPE
+settles it empirically, without touching test data. For each reserve share in
+$\{\CfgShares\}\%$ of the budget it compiles a complete candidate, draws \CfgAuditRows{} rows, trains
+fast linear and boosted-tree auditors on them, and keeps the candidate with the highest robust
+retention on the compiler's own validation rows. This \emph{self-audit} optimizes the deployment
+metric directly, and its value is reported with every artifact. The artifact is a safetensors file with a
+single \texttt{U8} tensor: one brotli stream \citep{alakuijala2016brotli} holding the schema, the
+structure and every quantized section (supplement); decoding it reproduces exactly the program
+evaluated during compilation. Every byte is charged, including the schema, and compressing the schema
+together with the codes matters at this scale: inflated, the metadata with column names and category
+labels is a median \G{OneMetaShare}\% of a \CfgBudget{} KiB program on the tables of the throughput
+study, and the stored stream is a median \G{OneStoredShare}\% of the inflated bytes
+(\texttt{--anonymize} replaces names and labels by codes). The default budget is \CfgBudget{} KiB.
+
+\begin{algo}[t]
+\caption{\textsc{Compile}$(D_{\mathrm{fit}}, B)$: target-first program search within $B$ bytes.}
+\label{alg:compile}
+\small
+\begin{enumerate}[leftmargin=2em,itemsep=1pt,topsep=3pt,label=\arabic*:]
+\item Infer the schema; order and pool category levels; scale numeric columns; hold out validation rows.
+\item Fit marginals on the normal-score grid; compute latent scores and their corrected correlation $R$.
+\item Fit regimes $K\in\{\CfgRegimeLadder\}$ and every dependence family; rank each pair by held-out likelihood.
+\item Rank inputs by $\max\{|\rho_{\mathrm{S}}|,\xi\}$ with the target.
+\item \textbf{for} each reserve share $\sigma$ \textbf{do}
+\item \hspace{1.2em}reserve the most likely dependence model costing at most $\sigma B$;
+\item \hspace{1.2em}\textbf{for} up to three capacities $(m,s,h)$ spread down the ladder that fit \textbf{do}
+\item \hspace{2.4em}train \eqref{eq:net} with closed-form readouts; allocate bits by \cref{alg:bits};
+\item \hspace{2.4em}boost trees \eqref{eq:forest} on the quantized network; keep the best prefix that fits $B$;
+\item \hspace{1.2em}keep the smallest capacity unless a larger one lowers held-out loss by a clear margin;
+\item \hspace{1.2em}upgrade dependence to the most likely model that fits; self-audit the candidate.
+\item Return the candidate with the highest self-audited robust retention, decoded from its artifact.
+\end{enumerate}
+\end{algo}
+
+\begin{algo}[t]
+\caption{Rate--distortion bit allocation with error feedback.}
+\label{alg:bits}
+\small
+\begin{enumerate}[leftmargin=2em,itemsep=1pt,topsep=3pt,label=\arabic*:]
+\item Start every weight tensor at eight bits; let $G$ be the stored gain over the null on validation rows.
+\item \textbf{repeat}: for each tensor, quantize it one bit coarser, re-solve the readout on the quantized basis,
+  and measure the validation loss;
+\item \hspace{1.2em}take the step with the most bytes saved per unit of added loss, provided the total added loss stays within $\epsilon G$;
+\item \textbf{until} no step qualifies. Return the codes and per-tensor scales.
+\end{enumerate}
+\end{algo}
+
+\paragraph{Sampling.}
+A draw is a short tensor program: counter-based normal and uniform inputs (so a seed gives the same
+rows on every device), $z=M\varepsilon$, a regime gather, per-column gathers on the knot grids, a
+missingness mask, the network \eqref{eq:net}, one comparison per tree level and one leaf gather per
+tree \eqref{eq:forest}, and the noise. Its cost is $O(N(dm+Kd+sh+TD))$ time and $O(|A|)$ memory; the program is small enough to stay in a core's L1 cache. On CPU the same draw is
+evaluated row by row in parallel; on CUDA and Metal it runs as candle tensors.
+
+\section{Experiments}
+\label{sec:experiments}
+
+\paragraph{Tables and protocol.}
+We use \G{OneTables} public tables from UCI \citep{kelly2023uci} and PMLB \citep{olson2017pmlb}: classification
+(adult, bank marketing, credit default, German credit, car evaluation, mushroom, covertype) and
+regression (California housing, abalone, wine quality, bike sharing, concrete, airfoil, energy,
+student performance, online news), mixed numeric and categorical, with missing values where the
+source has them. Each table is split into training and test rows (stratified for classification),
+capped at \CfgMaxTrain{} training and \CfgMaxTest{} test rows. Every method sees only the training
+rows. Synthetic tables have as many rows as the real training split. Auditors are ridge or logistic
+regression, CatBoost \citep{prokhorenkova2018catboost} with \CfgCatIters{} trees of depth \CfgCatDepth{},
+and a two-layer MLP \citep{pedregosa2011sklearn}, each fitted with its own one-hot encoding and scaling.
+A fit that fails, for instance because a table's schema alone exceeds the budget, or that exceeds the
+wall-clock limit counts as robust retention zero, the null fallback. Per table we take the median over
+seeds; across tables we report medians with percentile bootstrap
+intervals (\CfgDraws{} draws over tables) and paired differences as Hodges--Lehmann estimates.
+
+\paragraph{Comparators.}
+The \emph{information-compression control} answers the question a skeptic should ask first: why not
+ship the data? For each budget it keeps the largest random subset of real training rows whose CSV,
+compressed with xz at its strongest preset, fits the budget; auditors train on those real rows as
+they are. We also run the SDV Gaussian copula \citep{patki2016sdv}, ARF \citep{watson2023arf}, and on the
+tables with at most a few thousand training rows CTGAN and TVAE \citep{xu2019ctgan}, all at their
+defaults; their bytes are the xz-compressed pickles of the fitted objects, which favours them. The
+repository's \emph{research kernel}, an earlier DOPE engine with a fixed program shape
+(\texttt{dope-kernel fit-table} at its defaults), is run on every table; it accepts regression and
+binary targets only, so it refuses one multiclass table and fits the other's class codes as a
+regression, and both count as measured. Real rows resampled with replacement are a row-count control,
+not a generator and not a ceiling.
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Main results.} Median over tables of robust retention with its \CfgConf\% bootstrap
+interval, the median retention of each auditor family, and the number of tables whose robust retention
+reaches $\tau$. Bytes are medians of everything sampling reads (DOPE and the kernel: the artifact file;
+real rows: the xz stream; generators: xz-compressed pickles). A superscript gives the table count when a method
+covers fewer tables.}
+\label{tab:main}
+\small
+\IfFileExists{generated/dope1-table.tex}{\resizebox{\linewidth}{!}{\input{generated/dope1-table.tex}}}{\pending{main table}}
+\end{table}
+
+\paragraph{Predictive structure per byte.}
+\Cref{fig:frontier,tab:main} give the main result. At its default budget DOPE's program has a median
+size of \G{OneDopeCBytes} and a median robust retention of \G{OneDopeCRet}
+[\G{OneDopeCLo}, \G{OneDopeCHi}], with \G{OneDopeCReach} of \G{OneDopeCN} tables at or above $\tau$.
+Spending the same budget on real rows gives \G{OneRowsCRet}: a few dozen real rows are too few for a
+boosted tree or a network to learn from, whereas the program generates as many rows as wanted from
+the structure it stores. \Cref{fig:tables} shows every table and \cref{tab:equal} pairs the two at every
+budget. Half the default budget already suffices: there DOPE reaches \G{OneDopeBRet}
+[\G{OneDopeBLo}, \G{OneDopeBHi}] and beats compressed rows with wins, ties and losses \G{OneEqBWtl}
+(sign test $p=\G{OneEqBP}$). Wherever DOPE fits the budget, it wins \G{OneEqWins} and loses
+\G{OneEqLosses} of \G{OneEqCells} paired comparisons; it does not fit within the smallest budget on
+\G{OneDopeFailedA} tables, whose schema with its column names and category labels and the leanest
+program already exceed it. Compressed rows overtake
+DOPE once the budget holds a large share of a table: they need \G{OneRowsFBytes} to reach
+\G{OneRowsFRet}, and the whole table (\G{OneRowsFullBytes}) to reach \G{OneRowsFullRet}.
+The generators sit far to the right: the Gaussian copula reaches \G{OneCopulaRet} at
+\G{OneCopulaBytes} and ARF \G{OneArfRet} at \G{OneArfBytes}.
+
+\paragraph{Against the research kernel.}
+The repository's earlier engine compiles programs of one fixed shape, a median \G{OneKernelBytes},
+and reaches \G{OneKernelRet} [\G{OneKernelLo}, \G{OneKernelHi}]. Its linear auditors keep
+\G{OneKernelLin} but CatBoost only \G{OneKernelCb}: without trees its program misses the thresholds
+and interactions that tree auditors exploit, as the no-trees ablation below shows for DOPE. On the
+\G{OneKernelSupported} regression and binary tables it supports, DOPE at the smallest budget, about the
+kernel's size, is level with it (wins, ties and losses \G{OneKernelVsAWtl}; Hodges--Lehmann difference
+\G{OneKernelVsAHl} [\G{OneKernelVsALo}, \G{OneKernelVsAHi}]); at half the default budget it is ahead
+(\G{OneKernelVsBWtl}; \G{OneKernelVsBHl} [\G{OneKernelVsBLo}, \G{OneKernelVsBHi}]), and at the
+default budget \G{OneKernelVsCWtl}.
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Equal bytes.} Median robust retention of DOPE and of real training rows compressed with
+xz to the same budget, over the tables where both ran and DOPE fitted within the budget, with paired
+wins, ties and losses, an exact sign test, and the number of tables on which DOPE did not fit.}
+\label{tab:equal}
+\small
+\IfFileExists{generated/dope1-equalbytes.tex}{\input{generated/dope1-equalbytes.tex}}{\pending{equal-bytes table}}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \GeneratedFigure[\tallwidth]{dope1-tables.pdf}{per-table equal-bytes comparison}
+  \caption{\textbf{Every table at the default budget.} Robust retention of DOPE (blue) and of real
+  training rows compressed with xz to the same bytes (orange; a triangle marks a value below the axis).
+  The dotted line is $\tau$.}
+  \label{fig:tables}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \GeneratedFigure[\herowidth]{dope1-coverage.pdf}{TDL coverage curves}
+  \caption{\textbf{Transfer Description Length.} Share of tables whose robust retention reaches $\tau$
+  (solid) or a lower threshold (dashed) within a given number of bytes, for DOPE and for xz-compressed
+  real rows. Each step is one table's TDL.}
+  \label{fig:coverage}
+\end{figure}
+
+\paragraph{TDL.}
+\Cref{fig:coverage} turns the frontier into the KPI. DOPE reaches $\tau$ on \G{OneTdlDopeN} of
+\G{OneTables} tables, at a median TDL of \G{OneTdlDopeMedian}; compressed real rows reach it on
+\G{OneTdlRowsN}, at a median of \G{OneTdlRowsMedian}, by keeping a large part of the table. At the
+lower threshold the counts are \G{OneTdlDopeEightyN} and \G{OneTdlRowsEightyN}. The supplement lists
+every table; the ones DOPE does not bring to $\tau$ within the tested budgets are those whose
+retention keeps rising for compressed rows but saturates for the program, so they mark where a richer
+conditional model, rather than more bytes of the same model, is needed.
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Ablations at the default budget and seed.} Each row removes or changes one component
+of DOPE; the last column counts the tables on which the variant beats, ties or trails the full program.}
+\label{tab:ablation}
+\small
+\IfFileExists{generated/dope1-ablation.tex}{\resizebox{\linewidth}{!}{\input{generated/dope1-ablation.tex}}}{\pending{ablation table}}
+\end{table}
+
+\paragraph{What each component buys.}
+\Cref{tab:ablation} removes one component at a time at the default budget and seed, where the full
+program reaches \G{OneDopeSeedZeroRet}; the last column counts the tables on which the variant is better,
+tied or worse. Without trees, the network alone reaches \G{OneDopeNoTreesRet} (better, tied or worse on
+\G{OneAblDopeNoTreesWtl} tables), and a linear target
+model without trees \G{OneDopeLinearRet}: the forest carries the thresholds and interactions that tree
+auditors exploit. Sampling features independently, while keeping the conditional model, gives
+\G{OneDopeIndepRet}: linear and tree auditors need the joint covariate structure, as the
+misspecification remark in \cref{sec:theory} predicts. A single regime gives \G{OneDopeOneRegimeRet}.
+A fixed byte split without the self-audit gives \G{OneDopeNoAuditRet} (better, tied or worse on
+\G{OneAblDopeNoAuditWtl} tables): the self-audit rarely changes which program is kept, and its main
+value is the retention estimate it reports with every artifact. Drawing four times as many rows
+from the same program gives \G{OneDopeFourRet}, the free-sample effect of \cref{prop:finite}; part of
+it is confounded with the MLP auditor switching solver on larger training sets.
+
+\paragraph{Compute.}
+Compilation, including the self-audit, takes a median of \G{OneDopeCFit} per table at the default
+budget on a two-core machine, against \G{OneCopulaFit} for the Gaussian copula and \G{OneArfFit}
+for ARF. Writing synthetic rows to CSV, end to end, runs at a median of \G{OneDopeCRate} rows per
+second; the in-memory sampler is measured separately with \texttt{dope throughput} (supplement).
+A draw touches only a few kilobytes of parameters, but its cost grows with the number of trees, so
+the largest programs sample several times more slowly than the default one; sampling scales with
+cores or, through the tensor path, with a GPU.
+
+\paragraph{The self-audit predicts retention.}
+Over all \G{OneAuditN} fitted DOPE programs, the self-audited retention that the compiler reports,
+computed only from the training rows, ranks programs like the measured robust retention on held-out
+test rows (Spearman \G{OneAuditRho}), with a median absolute difference of \G{OneAuditMae} and a
+median bias of \G{OneAuditBias} (supplement). A user therefore learns at compile time, without
+test data, roughly how much predictive structure a program keeps.
+
+\paragraph{Per family.}
+DOPE's median retention is \G{OneDopeCLin} for linear auditors, \G{OneDopeCCb} for CatBoost and
+\G{OneDopeCMlp} for MLPs, so boosted trees, which exploit the finest interactions, usually set its
+robust score. For compressed real rows at the same budget the limiting family is the MLP
+(\G{OneRowsCMlp}, against \G{OneRowsCCb} for CatBoost): a network trained on a few dozen rows
+overfits, and its log-loss on test rows can be far worse than the null.
+
+\section{Related work}
+\label{sec:related}
+
+\paragraph{Generators.} Copulas and Bayesian networks \citep{patki2016sdv,chow1968dependence,aas2009paircopula,zhang2014privbayes}
+fit explicit, often small, joint models; adversarial and variational models \citep{xu2019ctgan},
+diffusion models \citep{kotelnikov2023tabddpm,zhang2024tabsyn,shi2025tabdiff}, forests
+\citep{watson2023arf,jolicoeurmartineau2024forestdiffusion}, language models \citep{borisov2023great} and
+prior-fitted networks \citep{hollmann2025tabpfn} model the joint table with many parameters
+\citep{borisov2024survey}. DOPE targets the conditional model explicitly, keeps the covariate model
+small, and is charged for every byte.
+
+\paragraph{Evaluation.} Train-on-synthetic, test-on-real evaluation goes back to \citet{esteban2017rcgan};
+\citet{jordon2018measuring} ask whether synthetic data preserve the ranking of learners, and utility and
+fidelity measures and suites broaden the picture \citep{snoke2018utility,alaa2022faithful,qian2023synthcity,erickson2026tabarena}.
+Retention is a null-normalized TSTR/TRTR ratio; what is new here is its information-theoretic reading,
+the worst case over model families, and the byte axis with an equal-byte real-row control.
+
+\paragraph{Compression and distillation.} Dataset distillation keeps a few training examples and model
+distillation keeps a model's behaviour \citep{wang2018distillation,hinton2015distilling}; generative
+compression names learned media codecs \citep{santurkar2017generative}; description-length and
+bottleneck ideas \citep{rissanen1978modeling,blumer1987occam,tishby2000bottleneck} motivate the framing.
+DOPE ships a program that draws fresh rows, and TDL charges it in bytes against a downstream
+distortion.
+
+\paragraph{Privacy.} Membership and attribute attacks on synthetic data
+\citep{shokri2017membership,stadler2022groundhog,vanbreugel2023domias} and holdout-referenced distances
+\citep{platzer2021holdout} are empirical; formal differential privacy \citep{dwork2014foundations} requires
+a mechanism. DOPE stores no rows and few parameters, which makes a mechanism cheap to add, but this paper
+makes no privacy claim.
+
+\section{Limitations}
+\label{sec:limits}
+
+The panel is public, and its tables are smaller and better curated than many private ones. The
+retention gate is measured with point estimates per table; the contract's lower confidence bound and
+the driver-agreement gate are not measured here, and foundation-model auditors are not yet included.
+Large neural generators (TabSyn, TabDDPM, TabDiff) were not run on CPU, CTGAN and TVAE only on the
+smaller tables, and fits over the wall-clock limit count as failures; an earlier engine was compared
+with them on a separate regression panel, recorded in the repository. A development panel of other
+tables guided most engineering choices, but the evaluation is not sealed: the forest and the self-audit
+were added after an earlier engine had been scored on three of the confirmation tables (adult, airfoil
+and abalone), and their held-out retention informed that design, so results on those tables are
+selection-exposed. The compact container, which stores the schema and the codes as one compressed
+stream, and the regrowth of trees into the compressed slack were added after a first full run of the
+panel showed that plain header text took most of a default artifact; they change how a program is
+stored and how many trees fit a budget, not how anything is fitted, every DOPE cell was re-run, and
+the superseded records are kept in the repository. Each program serves one declared target. Columns that are exact functions of one
+another, such as an education level and its numeric code, are kept only as strongly dependent, not as
+identical. DOPE is not a formal differential-privacy
+mechanism, and empirical attack results are not formal DP and not HIPAA de-identification.
+
+\section{Conclusion}
+
+A few kilobytes of the right structure train models nearly as well as the table they came from, and
+far better than the same few kilobytes spent on the rows themselves. Retention measures how much of a table's
+predictive information survives, TDL measures what that costs in bytes, and DOPE is a program that
+spends its bytes where the theory says they count. The engine, the benchmark records and the scripts
+that regenerate every number in this paper are open.
