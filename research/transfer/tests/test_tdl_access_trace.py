@@ -354,5 +354,64 @@ class BoundedControlTests(unittest.TestCase):
         self.assertTrue(all(0 <= row[0] <= 2 and row[1] == 9 for row in a))
 
 
+    def test_ambient_bytecode_mutation_does_not_change_charged_source_sampling(self):
+        from research.transfer.tdl import generators
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, _, classes = self.source(root)
+            ambient = root / "ambient.cpython-312.pyc"
+            original_paths = generators.python_runtime_paths
+            original_inventory = generators.closure_inventory
+            observed = []
+            def paths(**options):
+                result = set(original_paths(**options))
+                if options.get("include_bytecode", True):
+                    result.add(ambient)
+                return result
+            def capture_then_mutate(files):
+                result = original_inventory(files)
+                observed.append({p for p in files if p.suffix in {".pyc", ".pyo"}})
+                ambient.write_bytes(b"changed unused ambient bytecode")
+                return result
+            for cls in classes:
+                ambient.write_bytes(b"original unused ambient bytecode")
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, (1 << 64) - 1)
+                port.export(root / cls.__name__)
+                expected, _ = port.sample(300, (1 << 64) - 2)
+                with patch.object(generators, "python_runtime_paths", side_effect=paths), \
+                     patch.object(generators, "closure_inventory", side_effect=capture_then_mutate):
+                    actual, receipt = port.sample(300, (1 << 64) - 2)
+                self.assertEqual(actual, expected)
+                self.assertEqual(observed[-1], set())
+                self.assertEqual(receipt["access_trace"]["status"], "passed")
+                self.assertEqual(receipt["access_trace"]["coverage"], "all_threads_and_native_file_opens")
+                self.assertGreater(receipt["sampling_closure_bytes"], receipt["payload_bytes"])
+
+    def test_source_only_sampling_still_refuses_changed_charged_source(self):
+        from research.transfer.tdl import generators
+        with workspace() as directory:
+            root = Path(directory)
+            source, schema, _, classes = self.source(root)
+            fixed = root / "fixed-runtime.py"
+            original_paths = generators.python_runtime_paths
+            original_inventory = generators.closure_inventory
+            def paths(**options):
+                return set(original_paths(**options)) | {fixed}
+            def capture_then_mutate(files):
+                result = original_inventory(files)
+                fixed.write_bytes(b"changed charged runtime source")
+                return result
+            for cls in classes:
+                fixed.write_bytes(b"original charged runtime source")
+                port = cls(byte_budget=2048)
+                port.fit(source, schema, 42)
+                port.export(root / cls.__name__)
+                with patch.object(generators, "python_runtime_paths", side_effect=paths), \
+                     patch.object(generators, "closure_inventory", side_effect=capture_then_mutate):
+                    with self.assertRaisesRegex(MetricError, "charge_inventory_mismatch"):
+                        port.sample(16, 17)
+
+
 if __name__ == "__main__":
     unittest.main()

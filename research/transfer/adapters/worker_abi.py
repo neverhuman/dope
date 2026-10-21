@@ -278,3 +278,42 @@ def validate_response(response, buffers, request, request_buffers, expected_pins
         return {"request_sha256": request["request_sha256"], "qualified": False,
                 "qualification": "fixture_only", "response_sha256": digest(response)}
     return _guard(validate)
+
+
+MODES = frozenset({"scratch", "frozen_context", "fine_tuning", "pretraining"})
+
+
+def _choice(value, choices):
+    return type(value) is str and value in choices
+
+
+def _validate_model_identity(identity):
+    _require(type(identity.name) is str and re.fullmatch(r"[a-z0-9_]+", identity.name), "invalid_name")
+    _require(_choice(identity.mode, MODES), "invalid_mode")
+    _require(type(identity.code_revision) is str and re.fullmatch(r"[a-f0-9]{40}|[a-f0-9]{64}", identity.code_revision), "invalid_revision")
+    for pin in (identity.code_sha256, identity.preprocessing_sha256, identity.recipe_sha256,
+                identity.output_aggregation_sha256, identity.environment_sha256):
+        _hash(pin)
+    if identity.weights_sha256 is not None:
+        _hash(identity.weights_sha256)
+    _require(identity.mode not in {"frozen_context", "fine_tuning"} or identity.weights_sha256 is not None, "missing_weights")
+    _require(identity.mode != "scratch" or identity.weights_sha256 is None, "scratch_has_weights")
+    for pins in (identity.dependencies, identity.licenses):
+        _require(type(pins) is tuple and bool(pins), "missing_dependency_or_license")
+        for pin in pins:
+            _require(type(pin) is tuple and len(pin) == 3, "invalid_dependency_or_license")
+            _require(all(type(v) is str and bool(v) for v in pin), "invalid_dependency_or_license")
+            _hash(pin[2])
+        _require(len({p[0] for p in pins}) == len(pins), "duplicate_pin")
+    _require(all(not re.search(r"[<>=*!~^\s]", p[1]) for p in identity.dependencies), "unpinned_dependency")
+    scopes = {p[0] for p in identity.licenses}
+    _require(scopes == ({"code", "weights"} if identity.weights_sha256 else {"code"}), "missing_license")
+    _require(_choice(identity.precision, {"float32", "float64", "bfloat16"}), "invalid_precision")
+    _count(identity.context_cap, 1)
+    _count(identity.query_batch_size, 1)
+    _require(_choice(identity.context_policy, {"all", "head"}), "invalid_context_policy")
+    _require(_choice(identity.query_policy, {"rowwise", "batch", "transductive"}), "invalid_query_policy")
+    _require(identity.query_policy != "rowwise" or identity.query_batch_size == 1, "invalid_query_policy")
+    _require(type(identity.order_sensitive) is bool, "invalid_order_policy")
+    _require(_choice(identity.determinism, {"deterministic", "seeded_best_effort"}), "invalid_determinism")
+    _require(type(identity.resources) is ResourceLimits, "invalid_budget")

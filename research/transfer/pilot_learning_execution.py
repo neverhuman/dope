@@ -220,6 +220,9 @@ class LearningExecution:
                                     def prepare():
                                         self._require_allocation(registration, fit_key, "prepare")
                                         adapter = registration.build(self.fixture)
+                                        guard = self.evidence.guard
+                                        if guard is not None and "adapter_lifetime_policy" in guard.graph.document():
+                                            adapter.bind_physical_budget(guard, fit_key)
                                         try:
                                             adapter.prepare(training, self.plan.fit_seed)
                                         finally:

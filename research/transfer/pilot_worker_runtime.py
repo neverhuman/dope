@@ -35,13 +35,17 @@ MODULES = ("pilot_worker_runtime.py", "pilot_worker_authority.py", "pilot_worker
 
 class PilotWorkerRuntime:
     def __init__(self, authority, registry, null_reference, driver_plan, wall_by_role, *,
-                 verify_assembly, verify_operation, kind="development", control_runtime=None):
+                 verify_assembly, verify_operation, kind="development", control_runtime=None,
+                 adapter_lifetime_policy=None):
         require(type(authority) is WorkerAuthority and type(driver_plan) is DriverPlan
                 and kind in ("fixture", "development")
                 and callable(verify_assembly) and callable(verify_operation), "worker_authority_required")
         if control_runtime is not None:
             from .pilot_control_runtime import PilotControlRuntime
             require(type(control_runtime) is PilotControlRuntime, "worker_control_runtime_invalid")
+        from .pilot_physical_operations import LIFETIME_POLICY
+        require(adapter_lifetime_policy in (None, LIFETIME_POLICY), "physical_lifetime_policy_invalid")
+        self.adapter_lifetime_policy = adapter_lifetime_policy
         self.control_runtime = control_runtime
         authority.verify_learner_seed(kind)
         self.authority, self.registry, self.null_reference = authority, dict(registry), null_reference
@@ -61,6 +65,9 @@ class PilotWorkerRuntime:
                             "protocol_sha256": self.driver_plan.protocol_sha256},
             "wall_by_role": self.wall_by_role,
             "repository_modules": {name: file_hash(root / name) for name in MODULES}}
+        if self.adapter_lifetime_policy is not None:
+            capsule.update(format="dope-trusted-parent-pilot-worker-v2",
+                           adapter_lifetime_policy=self.adapter_lifetime_policy)
         if self.control_runtime is not None:
             from .pilot_control_runtime import MODULES as CONTROL_MODULES
             capsule["control_runtime"] = self.control_runtime.capsule()
@@ -108,7 +115,8 @@ class PilotWorkerRuntime:
                                       self.verify_operation, root)
         self._execution = execution
         guard = reserve_learning_operations(execution, journal, doc["cell_id"], self.wall_by_role,
-                                             driver_plan=self.driver_plan, labels=labels)
+                                             driver_plan=self.driver_plan, labels=labels,
+                                             adapter_lifetime_policy=self.adapter_lifetime_policy)
         try:
             execution, drivers = execute_streamed(execution, labels, self.driver_plan)
             paired = reduce_learning(execution, labels, {})  # no invented inference/ceiling

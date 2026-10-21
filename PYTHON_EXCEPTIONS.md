@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 724
-- **`keep-with-reason`**: 699 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 725
+- **`keep-with-reason`**: 700 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 25 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -750,6 +750,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/tests/test_pilot_learning_execution.py` | `research/transfer` | `keep-with-reason` | Fixture-only source tests; never claim native model/runtime qualification. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_pilot_materialized_draws.py` | `research/transfer` | `keep-with-reason` | Binary handoff fixtures and real native DOPE n/4n integration; no science grant. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_pilot_physical_operations.py` | `research/transfer` | `keep-with-reason` | Actual fixture execution and durable refusal paths, never scientific proof. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
+| `research/transfer/tests/test_funded_adapter_lifetime.py` | `research/transfer` | `keep-with-reason` | Synthetic-clock and streamed fixture tests for funded finite adapter lifetimes. | Direct tests of research-only Python ML execution and resource accounting; no product or scientific qualification. |
 | `research/transfer/tests/test_pilot_worker_inputs.py` | `research/transfer` | `keep-with-reason` | Private role capture tests; no vendor model imports or scientific qualification. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_pilot_worker_runtime.py` | `research/transfer` | `keep-with-reason` | Real native n/4n bridge with fixture learners; never empirical qualification. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |
 | `research/transfer/tests/test_target_last.py` | `research/transfer` | `keep-with-reason` | Target-last is an intake/consumer invariant, not a positional guess. | Direct offline advanced-data research/control implementation or tests; no product route, certification decision, or database ownership. |

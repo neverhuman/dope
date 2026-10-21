@@ -107,11 +107,12 @@ class LiteralGenerator(StandaloneGenerator):
         require(self._artifact is not None, "generator_not_loaded")
         try:
             content = _literal_payload(self._artifact.read_bytes())
-            closure, paths = closure_inventory(python_runtime_paths())
+            # Audit source execution rather than optional, concurrently mutable caches.
+            closure, paths = closure_inventory(python_runtime_paths(include_bytecode=False))
             manifest = {"sections": [{"name": "literal_payload", "hex": content.hex()}], "closure_files": closure}
             trace = AccessTrace.from_manifest(self._artifact, manifest, paths)
             worker = str(Path(__file__).with_name("literal_worker.py"))
-            stdout, receipt = trace.run([sys.executable, "-S", "-B", worker, str(self._artifact),
+            stdout, receipt = trace.run([sys.executable, "-S", "-B", "-X", "pycache_prefix=" + os.devnull, worker, str(self._artifact),
                                          self.method, str(rows), str(seed)])
             sampled = json.loads(stdout)
         except (OSError, ValueError, KeyError, TypeError):
@@ -380,11 +381,12 @@ class _BoundedControlGenerator(StandaloneGenerator):
             raw, document = _read_control(self._artifact, self.byte_budget, self.method)
             require(hashlib.sha256(raw).hexdigest() == self._artifact_sha256, "generator_artifact_changed")
             content = _literal_payload(raw)
-            closure, paths = closure_inventory(python_runtime_paths())
+            # Audit source execution rather than optional, concurrently mutable caches.
+            closure, paths = closure_inventory(python_runtime_paths(include_bytecode=False))
             manifest = {"sections": [{"name": "literal_payload", "hex": content.hex()}], "closure_files": closure}
             trace = AccessTrace.from_manifest(self._artifact, manifest, paths)
             worker = str(Path(__file__).with_name("literal_worker.py"))
-            stdout, receipt = trace.run([sys.executable, "-S", "-B", worker, str(self._artifact),
+            stdout, receipt = trace.run([sys.executable, "-S", "-B", "-X", "pycache_prefix=" + os.devnull, worker, str(self._artifact),
                                         self.method, str(rows), str(seed)])
             sampled = json.loads(stdout)
             require(type(sampled) is list and len(sampled) == rows
