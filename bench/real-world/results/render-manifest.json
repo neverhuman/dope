@@ -1,0 +1,24 @@
+{
+ "summary_sha256": "aa91a7048a47220afa12d291d5f84d3a90fe3f4a003c7447ca4e58fbd0187f16",
+ "files": {
+  "bench/real-world/figures/audit.png": "202e1ea88057ba5373a9ab5348c6cd366b4bc7c6091f828e131a2d6de0f27e3c",
+  "bench/real-world/figures/coverage.png": "9918c6051341030ae7f40d7224431d2fb5bd56100d779e7a29905a36995b25f5",
+  "bench/real-world/figures/families.png": "e7e257e44a82168f7c55378f29ca861939987843a1b82662b50e4cd4b2a4034f",
+  "bench/real-world/figures/hero.png": "98a58388745e2db1226cc2966d3b2c824e8f1a775a2b286a8bde5d9c5cc21709",
+  "bench/real-world/figures/tables.png": "4dc69eca3754ab60e969692a6cd51a198af26c411f5b4ee894110277ed993dd6",
+  "bench/real-world/results/readme-block.md": "ca161b51da7f83ad63ffd6e25a78b14832aadf9f7c35625173e2d6b75a233abc",
+  "paper/generated/dope1-ablation.tex": "e823fec762b795c70f1fece29885caf1a579d6c0e643e1703ac4adddfa4b39a4",
+  "paper/generated/dope1-audit.pdf": "95128451d858ced1d709c08ff3ef900636d90771322e01935a04d0edbfa37b12",
+  "paper/generated/dope1-config.tex": "6baa69207a91366e0f9f06b44055a9e5a56020fe8e87c92505917535bd986762",
+  "paper/generated/dope1-coverage.pdf": "7ad0c20df938bb6b8a8b9e6d0a766f9836cb7a99c8c4835ab03b19eed5d774d9",
+  "paper/generated/dope1-equalbytes.tex": "bd6a79cc5a124fbb7846f23663099b957d4e47ec429bec3b6b747cd1e6a66b17",
+  "paper/generated/dope1-families.pdf": "23760539d6b84cffd3b85e9e6581452d835c9083942e7213f83bfea2ce5e968d",
+  "paper/generated/dope1-hero.pdf": "ec48f8c00613ef34002ec032c727ce594f1c32dc5c270cebb086a75d48bd9b1e",
+  "paper/generated/dope1-macros.tex": "037f1ae1815d62f589ac065cd0ae08af49dd7a2ad43704f5db6b9599e5d31428",
+  "paper/generated/dope1-pertable.tex": "297a42d82646b6bd118017944f441f9694f73a284055557160d3e82f62184833",
+  "paper/generated/dope1-table.tex": "807123ce0f835ae5c9b9c26290b0a527a8b57217f3e3d7f92e17218aca919a79",
+  "paper/generated/dope1-tables.pdf": "ed4918f45c3358b02d3422c75f001617a64a3eb398b05586d7ef7b7ba53a41e3",
+  "paper/generated/dope1-throughput-macros.tex": "5b457eab88bf2cf7479420d45189e9a0cef22d42af33bec285bec3b837eaa9f8",
+  "paper/generated/dope1-throughput.tex": "2264b28358d1b7384528c0822ba36c1df64bef00374c256328c4c3bd7ee9f56b"
+ }
+}
