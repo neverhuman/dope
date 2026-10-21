@@ -31,14 +31,16 @@ class FirewallTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=local_tmp) as directory:
             root = Path(directory)
             for name in ('paper', 'schemas', 'research/transfer/registries',
-                         'research/transfer/locks', 'research/transfer/manifests'):
+                         'research/transfer/locks', 'research/transfer/manifests',
+                         'bench/real-world/results', 'bench/real-world/figures'):
                 shutil.copytree(ROOT / name, root / name)
             inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
                       'contracts/tdl-contract-v1.json', 'docs/vnext/CLAIMS.md',
                       'evidence/status.json', C.REGISTRY['sources']['headline'],
                       'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl',
                       'examples/quickstart/results/adult-reference.json',
-                      'examples/quickstart/results/ablation.json'}
+                      'examples/quickstart/results/ablation.json',
+                      'examples/adult/TRANSCRIPT.md'}
             inputs.update(pin['path'] for pin in self.data['demo_notes']['pins'])
             for name in inputs:
                 path = root / name
@@ -334,12 +336,15 @@ class FirewallTests(unittest.TestCase):
         with self.public_fixture() as root:
             readme = (root / 'README.md').read_text()
             self.assertEqual(C.readme_hero_failures(readme), [])
-            hero = next(line for line in readme.splitlines() if 'paper/generated/hero-frontier.png' in line)
+            # The landing hero is the first admitted generated figure (others may follow below sections).
+            hero = next(line for line in readme.splitlines()
+                        if line.startswith('![') and any(path in line for path in C.README_HEROES))
+            path = next(path for path in C.README_HEROES if path in hero)
             without = readme.replace(hero + '\n', '', 1)
             heading_end = without.index('\n', without.index('\n## ') + 1)
             moved = without[:heading_end + 1] + hero + '\n' + without[heading_end + 1:]
             for label, text in (('moved below a section', moved), ('removed', without),
-                                ('without alt text', readme.replace(hero, '![](paper/generated/hero-frontier.png)'))):
+                                ('without alt text', readme.replace(hero, f'![]({path})'))):
                 with self.subTest(label=label):
                     (root / 'README.md').write_text(text)
                     self.assertIn('README: the generated hero figure must appear above the first section',

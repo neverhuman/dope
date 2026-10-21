@@ -294,9 +294,21 @@ DEMO_NATIVE_PIN = "docs/whitepaper/receipts/native-byte-conformance-v1.json"
 COUNT_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve")
 
 
+# Math segments: $...$, \(...\), \[...\] and display environments.
+MATH = re.compile(r"\$\$.*?\$\$|(?<!\\)\$.*?(?<!\\)\$|\\\(.*?\\\)|\\\[.*?\\\]|"
+                  r"\\begin\{(equation|align|gather|multline)\*?\}.*?\\end\{\1\*?\}", re.S)
+
+
+def _structural_math(segment: str) -> str:
+    """Inside math, a lone digit is structure (1 - R, x^2, k = 1), not a result.
+    Decimals and multi-digit numbers in math still require generated macros."""
+    return re.sub(r"(?<![\d.])\d(?![\d.])", "", segment)
+
+
 def public_prose(text: str, tex: bool = False) -> str:
     if tex:
         text = re.sub(r"(?m)(?<!\\)%.*$", "", text)
+        text = MATH.sub(lambda m: _structural_math(m.group(0)), text)
     text = re.sub(r"```(?:bash|sh|shell)\n.*?```", "", text, flags=re.S)
     text = re.sub(r"`([^`]*)`", lambda m: m.group(1) if re.match(r"^[+-]?(?:\d|\.\d)", m.group(1)) else "", text)
     text = re.sub(r"https?://[^\s)>}]+", "", text)
@@ -348,11 +360,17 @@ def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> lis
     return failures
 
 
+# Generated hero figures admitted on the README: the historical TDL card's
+# figure and the DOPE engine benchmark figure (authenticated by tools/claims/dope1.py).
+README_HEROES = ("paper/generated/hero-frontier.png", "bench/real-world/figures/hero.png")
+
+
 def readme_hero_failures(readme: str) -> list[str]:
-    """The generated hero figure is a README image above the first section heading."""
+    """A generated hero figure is a README image above the first section heading."""
     first_section = re.search(r"(?m)^## ", readme)
     head = readme[:first_section.start()] if first_section else readme
-    if not re.search(r"(?m)^!\[[^\]\n]+\]\(paper/generated/hero-frontier\.png\)", head):
+    heroes = "|".join(re.escape(path) for path in README_HEROES)
+    if not re.search(r"(?m)^!\[[^\]\n]+\]\((?:" + heroes + r")\)", head):
         return ["README: the generated hero figure must appear above the first section"]
     return []
 
@@ -513,6 +531,10 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
                     if block != equal_outputs["paper/generated/readme-equal-bytes.md"].strip():
                         failures.append("README: generated equal-byte block drift")
                     prose = prose.replace(block, "")
+            if "<!-- BEGIN DOPE1 " in prose:
+                from tools.claims import dope1
+                failures.extend(dope1.failures(readme, root))
+                prose = dope1.strip(prose)
             failures.extend(lint_public_text(prose, "README"))
     elif "<!-- BEGIN BENCHMARK -->" not in readme:
         failures.append("README: generated result card markers are missing")
@@ -522,6 +544,18 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     compression_tex, compression_failures = readme_blocks.verified_tex(root)
     verified_outputs |= compression_tex
     failures.extend(compression_failures)
+    # DOPE engine benchmark tables and macros are authenticated by their render manifest.
+    try:
+        bench = json.loads((root / "bench/real-world/results/render-manifest.json").read_text())["files"]
+    except (OSError, KeyError, ValueError):
+        bench = {}
+    for name, digest in bench.items():
+        if name.startswith("paper/generated/dope1-") and name.endswith(".tex"):
+            path = root / name
+            if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest:
+                verified_outputs.add(name)
+            else:
+                failures.append(f"{name}: generated benchmark output drift")
     contract_generator = root / "paper/scripts/contract_macros.py"
     if contract_generator.is_file():
         import runpy
