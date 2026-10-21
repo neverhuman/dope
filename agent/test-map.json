@@ -1522,7 +1522,7 @@
       "purpose": "verify local external-feedback planning packets remain untracked and outside committed product evidence; this route certifies no planning claims"
     },
     "research/transfer/adapters/base.py": {
-      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
+      "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v && python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
       "purpose": "verify offline portable adapter admission, original-unit alignment, context counts, complete cache pins and feature-only query boundaries without vendor qualification"
     },
     "research/transfer/registries/models.json": {
@@ -2754,7 +2754,7 @@
       "purpose": "verify actual source-free bundle isolation using the current mixed rlib/cdylib Cargo artifact, without stale hashed kernel libraries"
     },
     "research/transfer/pilot_learning_execution.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v",
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_constant_null -v && python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
       "purpose": "verify learner/null bindings, native constant null, physical operation and driver reuse, failures, explicit admission, redacted evidence and native RSS units; fixtures never qualify science"
     },
     "research/transfer/pilot_native_seed.py": {
@@ -2798,7 +2798,7 @@
       "purpose": "verify signed pilot bridge response contracts, shared native ABI with exact candidate, admission and scope refusals, durable reservations and redacted receipts; echoed worker success never marks the pipeline complete or qualifies science"
     },
     "research/transfer/pilot_physical_operations.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_physical_operations research.transfer.tests.test_campaign_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_runner -v",
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_physical_operations research.transfer.tests.test_campaign_runner research.transfer.tests.test_pilot_learning_execution research.transfer.tests.test_pilot_runner -v && python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
       "purpose": "verify actual 60-path fixture/streamed-driver physical DAG keys, durable existing-stage suballocation, finite calls, alias charges, crash/replay/fsync/overrun refusals and pinned fit-only worker inputs; no scientific or native vendor qualification"
     },
     "research/transfer/tests/test_pilot_physical_operations.py": {
@@ -2814,7 +2814,7 @@
       "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
     },
     "research/transfer/pilot_worker_runtime.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v && python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
       "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
     },
     "research/transfer/tests/test_pilot_worker_inputs.py": {
@@ -2948,6 +2948,10 @@
     "research/transfer/native_control_prepare.py": {
       "command": "python3 -B research/transfer/native_control_prepare.py && python3 -B -m unittest research.transfer.tests.test_native_control -v",
       "purpose": "Fresh exact-source offline build and paid runtime manifest before mandatory Linux transfer discovery; missing/stale artifacts fail"
+    },
+    "research/transfer/tests/test_funded_adapter_lifetime.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
+      "purpose": "Reproduce the cumulative timeout with synthetic clocks; verify explicitly funded per-fit lifetimes, unchanged native-call limits and identity hashes, unique physical attempts, no resets/refunds, durable live-guard and V1 compatibility. Fixtures do not qualify vendor or scientific execution."
     }
   }
 }

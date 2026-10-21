@@ -28,18 +28,24 @@ def native_runtime_paths(executables):
         raise MetricError("runtime_inventory_unavailable") from None
 
 
-def python_runtime_paths():
+def python_runtime_paths(*, include_bytecode=True):
+    # Only an explicitly source-only child may omit ambient bytecode. -B alone
+    # prevents writes but still reads existing caches; the caller must also
+    # force pycache_prefix to a non-directory before interpreter startup.
     # A conservative paid stdlib inventory permits lazy imports and native
     # extension loads without treating the interpreter as an uncharged oracle.
+    require(type(include_bytecode) is bool, "invalid_runtime_inventory_mode")
     stdlib = Path(sysconfig.get_path("stdlib"))
     files = set()
     for directory, children, names in os.walk(stdlib):
-        children[:] = [name for name in children if name not in {"site-packages", "dist-packages"}]
-        files.update(path.resolve() for name in names if (path := Path(directory) / name).is_file())
+        children[:] = [name for name in children if name not in {"site-packages", "dist-packages"}
+                       and (include_bytecode or name != "__pycache__")]
+        files.update(path.resolve() for name in names if (path := Path(directory) / name).is_file()
+                     and (include_bytecode or path.suffix not in {".pyc", ".pyo"}))
     runtime = Path(__file__).resolve().parent
     files.update(runtime / name for name in ("literal_worker.py", "common.py"))
     cache = runtime / "__pycache__"
-    if cache.is_dir():
+    if include_bytecode and cache.is_dir():
         files.update(path.resolve() for path in cache.iterdir()
                      if path.name.startswith(("literal_worker.", "common.")) and path.is_file())
     files.update(native_runtime_paths([sys.executable, *(path for path in files if path.suffix == ".so")]))

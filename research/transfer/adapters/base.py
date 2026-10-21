@@ -11,9 +11,9 @@ import time
 from research.transfer.evidence import digest
 from research.transfer.adapters.worker_abi import (
     AdapterError, ResourceLimits, _require, _hash, _count, _finite, _cells, build_request,
+    MODES, _choice, _validate_model_identity,
 )
 
-MODES = frozenset({"scratch", "frozen_context", "fine_tuning", "pretraining"})
 REFUSED_ENCODERS = frozenset({
     "context2048", "foundation", "hyperion_v6all", "hyperion_v7", "tabdpt13",
     "tabpfn35", "ta_dope_v2", "ta_hyperion_v8", "ta_hyperion_v8braw", "target",
@@ -24,8 +24,6 @@ class AdapterUnavailable(AdapterError):
     """A model, license, or required offline dependency is unavailable."""
 
 
-def _choice(value, choices):
-    return type(value) is str and value in choices
 
 
 def _backend_failure(error):
@@ -59,35 +57,7 @@ class ModelIdentity:
     resources: ResourceLimits
 
     def __post_init__(self):
-        _require(type(self.name) is str and re.fullmatch(r"[a-z0-9_]+", self.name), "invalid_name")
-        _require(_choice(self.mode, MODES), "invalid_mode")
-        _require(type(self.code_revision) is str and re.fullmatch(r"[a-f0-9]{40}|[a-f0-9]{64}", self.code_revision), "invalid_revision")
-        for pin in (self.code_sha256, self.preprocessing_sha256, self.recipe_sha256,
-                    self.output_aggregation_sha256, self.environment_sha256):
-            _hash(pin)
-        if self.weights_sha256 is not None:
-            _hash(self.weights_sha256)
-        _require(self.mode not in {"frozen_context", "fine_tuning"} or self.weights_sha256 is not None, "missing_weights")
-        _require(self.mode != "scratch" or self.weights_sha256 is None, "scratch_has_weights")
-        for pins in (self.dependencies, self.licenses):
-            _require(type(pins) is tuple and bool(pins), "missing_dependency_or_license")
-            for pin in pins:
-                _require(type(pin) is tuple and len(pin) == 3, "invalid_dependency_or_license")
-                _require(all(type(v) is str and bool(v) for v in pin), "invalid_dependency_or_license")
-                _hash(pin[2])
-            _require(len({p[0] for p in pins}) == len(pins), "duplicate_pin")
-        _require(all(not re.search(r"[<>=*!~^\s]", p[1]) for p in self.dependencies), "unpinned_dependency")
-        scopes = {p[0] for p in self.licenses}
-        _require(scopes == ({"code", "weights"} if self.weights_sha256 else {"code"}), "missing_license")
-        _require(_choice(self.precision, {"float32", "float64", "bfloat16"}), "invalid_precision")
-        _count(self.context_cap, 1)
-        _count(self.query_batch_size, 1)
-        _require(_choice(self.context_policy, {"all", "head"}), "invalid_context_policy")
-        _require(_choice(self.query_policy, {"rowwise", "batch", "transductive"}), "invalid_query_policy")
-        _require(self.query_policy != "rowwise" or self.query_batch_size == 1, "invalid_query_policy")
-        _require(type(self.order_sensitive) is bool, "invalid_order_policy")
-        _require(_choice(self.determinism, {"deterministic", "seeded_best_effort"}), "invalid_determinism")
-        _require(type(self.resources) is ResourceLimits, "invalid_budget")
+        _validate_model_identity(self)
 
     @property
     def sha256(self):
@@ -278,6 +248,19 @@ class _Adapter(ABC):
         self._provided_rows = 0
         self._fit_seed = None
         self._wall_seconds = 0.0
+        self._physical_guard = None
+        self._physical_budget = None
+        self._physical_prepare_started = False
+
+    def bind_physical_budget(self, guard, fit_key):
+        """Opt in once to the trusted parent's already funded per-fit lifetime."""
+        from research.transfer.pilot_physical_operations import PhysicalOperationGuard
+        _require(self._kind == "learner" and type(guard) is PhysicalOperationGuard
+                 and self._physical_budget is None and self._training is None
+                 and self._wall_seconds == 0 and guard.active == fit_key,
+                 "funded_adapter_lifetime_required")
+        budget = guard.bind_adapter(self, fit_key)
+        self._physical_guard, self._physical_budget = guard, budget
 
     @property
     def identity(self):
@@ -295,8 +278,14 @@ class _Adapter(ABC):
         return TrainingBatch(FeatureBatch(training.features.row_ids[:n], training.features.rows[:n],
                                           training.features.schema_sha256), training.targets[:n], training.role)
 
-    def _call(self, operation, *args):
-        _require(self._wall_seconds < self.identity.resources.wall_seconds, "wall_budget_exceeded")
+    def _call(self, operation, *args, budget_kind=None):
+        lifetime = self.identity.resources.wall_seconds
+        if self._physical_budget is not None:
+            allocated_ms = self._physical_guard.adapter_call(self._physical_budget, budget_kind, self)
+            lifetime = self._physical_budget["wall_ms"] / 1000
+            _require(allocated_ms / 1000 >= self.identity.resources.wall_seconds,
+                     "native_timeout_exceeds_physical_allocation")
+        _require(self._wall_seconds < lifetime, "wall_budget_exceeded")
         started = time.monotonic()
         try:
             result = operation(*args)
@@ -307,8 +296,11 @@ class _Adapter(ABC):
                 raise KeyboardInterrupt() from None
             raise _backend_failure(error) from None
         finally:
-            self._wall_seconds += time.monotonic() - started
-        _require(self._wall_seconds <= self.identity.resources.wall_seconds, "wall_budget_exceeded")
+            elapsed = time.monotonic() - started
+            self._wall_seconds += elapsed
+        _require(self._wall_seconds <= lifetime, "wall_budget_exceeded")
+        if self._physical_budget is not None:
+            _require(elapsed <= self.identity.resources.wall_seconds, "wall_budget_exceeded")
         return result
 
     def _prepare(self, training, seed, operation):
@@ -316,9 +308,13 @@ class _Adapter(ABC):
         self._training = None
         self._provided_training = None
         self._provided_sha256 = None
-        self._wall_seconds = 0.0
+        if self._physical_budget is None:
+            self._wall_seconds = 0.0
+        else:
+            _require(not self._physical_prepare_started, "funded_adapter_prepare_replay")
+            self._physical_prepare_started = True
         context = self._context(training, seed)
-        usage = self._call(operation, context, seed, self.identity.mode)
+        usage = self._call(operation, context, seed, self.identity.mode, budget_kind="prepare")
         _require(type(usage) is ResourceUsage, "invalid_resource_usage")
         self._usage(usage, len(context.targets))
         self._training = context
@@ -352,13 +348,18 @@ class _Adapter(ABC):
     def receipt(self):
         """Portable execution metadata only; independent qualification is required."""
         self._ready()
-        return {"format": "dope-adapter-execution-v1", "kind": self._kind,
+        result = {"format": "dope-adapter-execution-v1", "kind": self._kind,
                 "identity_sha256": self.identity.sha256,
                 "provided_sha256": self._provided_sha256,
                 "context_sha256": self._training.sha256,
                 "fit_seed": self._fit_seed, "provided_rows": self._provided_rows,
                 "consumed_rows": len(self._training.targets),
                 "wall_seconds": self._wall_seconds, "citable": False}
+        if self._physical_budget is not None:
+            result.update(format="dope-adapter-execution-v2",
+                          physical_budget=dict(self._physical_budget),
+                          native_call_wall_seconds=self.identity.resources.wall_seconds)
+        return result
 
     def worker_request(self, pins, resources, *, seed, primary_n, query=None,
                        sample_multiplier=1, predict_time_fit=False, subsampling="none", output=None):
@@ -418,7 +419,7 @@ class LearnerAdapter(_Adapter):
         train = self._training.features
         _require(query.schema_sha256 == train.schema_sha256 and len(query.rows[0]) == len(train.rows[0]), "schema_mismatch")
         _require(not set(query.row_ids).intersection(self._provided_ids), "query_context_overlap")
-        result = self._call(self._predict_backend, query, seed)
+        result = self._call(self._predict_backend, query, seed, budget_kind="predict")
         _require(type(result) is PredictionResult, "invalid_prediction_result")
         _require(result.row_ids == query.row_ids, "prediction_alignment")
         self._usage(result, len(self._training.targets))

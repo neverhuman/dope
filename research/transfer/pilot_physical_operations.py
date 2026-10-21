@@ -7,11 +7,14 @@ Native fits/updates below are conservative reservations, not observed counts.
 """
 from dataclasses import dataclass
 import time
+import weakref
 
 from .campaign_runner import CampaignRunnerError, _hash, _integer, _require
 from .evidence import canonical_json, digest, parse_json
 
 FORMAT = "dope-pilot-physical-operation-graph-v1"
+LIFETIME_FORMAT = "dope-pilot-physical-operation-graph-v2"
+LIFETIME_POLICY = "funded_per_fit_v1"
 MAX_NODES = 16384
 
 
@@ -26,12 +29,18 @@ class PhysicalOperationGraph:
             value = parse_json(encoded)
         except (ValueError, TypeError):
             raise CampaignRunnerError("physical_graph_invalid") from None
-        _require(type(value) is dict and set(value) == {
+        _require(type(value) is dict, "physical_graph_invalid")
+        version2 = value.get("format") == LIFETIME_FORMAT
+        keys = {
             "format", "learning_plan_sha256", "registry_sha256", "null_reference_sha256",
             "driver_plan_sha256", "campaign_plan_sha256", "cell_id", "operation_admission_sha256",
-            "nodes", "aliases"}, "physical_graph_invalid")
-        _require(value["format"] == FORMAT and len(encoded) <= 8 * 1024 * 1024,
+            "nodes", "aliases"}
+        _require(set(value) == keys | ({"adapter_lifetime_policy"} if version2 else set()),
                  "physical_graph_invalid")
+        _require((value["format"] == FORMAT or version2) and len(encoded) <= 8 * 1024 * 1024,
+                 "physical_graph_invalid")
+        _require(not version2 or value["adapter_lifetime_policy"] == LIFETIME_POLICY,
+                 "physical_lifetime_policy_invalid")
         for name in ("learning_plan_sha256", "registry_sha256", "null_reference_sha256",
                      "campaign_plan_sha256", "cell_id", "operation_admission_sha256"):
             _require(_hash(value[name]), "physical_graph_invalid")
@@ -52,6 +61,17 @@ class PhysicalOperationGraph:
                      and _integer(node["reserved_child_fits"])
                      and _integer(node["reserved_optimizer_updates"]), "physical_graph_invalid")
             seen.add(node["key"])
+        if version2:
+            fits = {}
+            for node in nodes:
+                if node["kind"] == "prepare":
+                    _require(not node["parents"], "physical_lifetime_parent_invalid")
+                    fits[node["key"]] = node["key"]
+                else:
+                    roots = {fits[p] for p in node["parents"]}
+                    _require(len(roots) == 1 and next(iter(roots)) in node["parents"],
+                             "physical_lifetime_parent_invalid")
+                    fits[node["key"]] = next(iter(roots))
         aliases = value["aliases"]
         _require(type(aliases) is list and 0 < len(aliases) <= MAX_NODES,
                  "physical_alias_invalid")
@@ -161,12 +181,13 @@ class PhysicalOperationGuard:
         self.journal, self.cell_id, self.stage = journal, cell_id, stage
         self.nodes = {n["key"]: n for n in self.graph.document()["nodes"]}
         self.outcomes, self.active = {}, None
+        self._bound_adapters, self._adapter_identities, self._adapter_calls = {}, {}, set()
         self.start_ns = time.monotonic_ns()
         self.wall_ns = sum(n["wall_ms"] for n in self.nodes.values()) * 1000000
         self.violation = False
         self.refusals = []  # Private opaque keys/static reasons; never native exception text.
 
-    def begin(self, key, kind):
+    def _live(self):
         item = self.journal.state.get((self.cell_id, self.stage), {})
         physical = item.get("physical", {})
         live = (self.journal.fd is not None and not self.journal.read_only and item.get("pending")
@@ -174,6 +195,45 @@ class PhysicalOperationGuard:
                 and physical.get("reservation_sha256") == self.reservation_sha256
                 and digest(physical["graph"]) == self.graph.sha256
                 and self.nodes == {n["key"]: n for n in physical["graph"]["nodes"]})
+        return bool(live)
+
+    def bind_adapter(self, adapter, fit_key):
+        _require(self.active == fit_key and fit_key not in self._bound_adapters,
+                 "funded_adapter_already_bound")
+        self.adapter_lifetime(fit_key)
+        _require(fit_key not in self.outcomes and fit_key not in self._adapter_calls,
+                 "funded_adapter_already_bound")
+        self._bound_adapters[fit_key] = weakref.ref(adapter)
+        self._adapter_identities[fit_key] = adapter.identity.sha256
+        return self.adapter_lifetime(fit_key)
+
+    def adapter_lifetime(self, fit_key):
+        """Read the parent's funded per-fit lifetime, without a new grant or refund."""
+        _require(self.graph.document()["format"] == LIFETIME_FORMAT and self._live()
+                 and not self.violation and fit_key in self.nodes
+                 and self.nodes[fit_key]["kind"] == "prepare", "funded_adapter_lifetime_required")
+        nodes = [n for n in self.nodes.values() if n["key"] == fit_key or fit_key in n["parents"]]
+        return {"format": "dope-funded-adapter-lifetime-v1", "graph_sha256": self.graph.sha256,
+                "reservation_sha256": self.reservation_sha256, "fit_key": fit_key,
+                "model_identity_sha256": self._adapter_identities.get(fit_key),
+                "wall_ms": sum(n["wall_ms"] for n in nodes),
+                "operation_keys": [n["key"] for n in nodes]}
+
+    def adapter_call(self, budget, kind, adapter):
+        fit = budget["fit_key"]
+        _require(budget == self.adapter_lifetime(fit)
+                 and fit in self._bound_adapters and self._bound_adapters[fit]() is adapter
+                 and adapter.identity.sha256 == budget["model_identity_sha256"]
+                 and self.active in budget["operation_keys"]
+                 and self.active not in self.outcomes and self.active not in self._adapter_calls
+                 and self.nodes[self.active]["kind"] == kind
+                 and time.monotonic_ns() - self.start_ns < self.wall_ns,
+                 "funded_adapter_call_not_active")
+        self._adapter_calls.add(self.active)  # an attempted failure also consumes its only call
+        return self.nodes[self.active]["wall_ms"]
+
+    def begin(self, key, kind):
+        live = self._live()
         ready = (live and not self.violation and self.active is None and key in self.nodes
                  and key not in self.outcomes and self.nodes[key]["kind"] == kind
                  and all(self.outcomes.get(p, {}).get("status") == "completed"
@@ -228,7 +288,8 @@ def issue_guard(graph, reservation_sha256, journal, cell_id, stage):
     return PhysicalOperationGuard(graph, reservation_sha256, journal, cell_id, stage, _fresh_issue=_ISSUE)
 
 
-def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, driver_plan=None, labels=None):
+def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, driver_plan=None, labels=None,
+                                adapter_lifetime_policy=None):
     """Build exact functional keys without importing/calling a native model.
 
     Optional streamed permutation keys reuse the existing permutation routine.
@@ -258,6 +319,7 @@ def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, dr
     require(driver_plan is None or (labels is not None and
             labels.row_ids == execution.plan.query.row_ids and
             execution.plan.model_retention == "stream_drivers_then_release"))
+    require(adapter_lifetime_policy in (None, LIFETIME_POLICY), "physical_lifetime_policy_invalid")
     nodes, aliases, seen = [], [], {}
     def add(key, kind, parents, registration):
         mitra_predict = registration.role == "mitra" and kind == "predict"
@@ -304,12 +366,15 @@ def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, dr
                                                seed=driver_plan.native_seed, repeats=driver_plan.repeats)
                     aliases.append({"logical_key": identity({"scale": scale, "learner": learner,
                                     "context": context.name, "arm": arm}), "operations": operations})
-    graph = PhysicalOperationGraph.from_document({"format": FORMAT, "learning_plan_sha256": plan.sha256,
+    document = {"format": FORMAT, "learning_plan_sha256": plan.sha256,
         "registry_sha256": registry_digest(execution.registry), "null_reference_sha256": execution.null_reference.sha256,
         "campaign_plan_sha256": journal.spec.sha256, "cell_id": cell_id,
         "operation_admission_sha256": identity(asdict(execution.admission)),
         "driver_plan_sha256": None if driver_plan is None else driver_plan.sha256,
-        "nodes": nodes, "aliases": aliases})
+        "nodes": nodes, "aliases": aliases}
+    if adapter_lifetime_policy is not None:
+        document.update(format=LIFETIME_FORMAT, adapter_lifetime_policy=adapter_lifetime_policy)
+    graph = PhysicalOperationGraph.from_document(document)
     guard = journal.reserve_operations(cell_id, "learners", graph)
     execution.evidence.guard = guard
     return guard
