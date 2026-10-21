@@ -1,11 +1,11 @@
 {
   "workspace": "dope",
   "tests": {
-    "PYTHON_EXCEPTIONS.md": {
+    "docs/internal/PYTHON_EXCEPTIONS.md": {
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
     },
-    "PY_TO_RUST_PLAN.md": {
+    "docs/internal/PY_TO_RUST_PLAN.md": {
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
     },
@@ -1277,10 +1277,6 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_declared_facts.py -v",
       "purpose": "keep figure scripts on the declared interval level, release byte cap and full-panel floor"
     },
-    "docs/readme/retention-bars.png": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
-      "purpose": "keep the README CatBoost table and retention figure on the committed density table"
-    },
     "examples/readme-regression/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
@@ -1829,7 +1825,7 @@
       "command": "just paper-tests && just paper-check",
       "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
     },
-    "docs/whitepaper/COMPREHENSION_v1.md": {
+    "docs/internal/whitepaper/COMPREHENSION_v1.md": {
       "command": "just paper-tests && just paper-check",
       "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
     },
@@ -2952,6 +2948,54 @@
     "research/transfer/tests/test_funded_adapter_lifetime.py": {
       "command": "python3 -B -m unittest research.transfer.tests.test_funded_adapter_lifetime -v",
       "purpose": "Reproduce the cumulative timeout with synthetic clocks; verify explicitly funded per-fit lifetimes, unchanged native-call limits and identity hashes, unique physical attempts, no resets/refunds, durable live-guard and V1 compatibility. Fixtures do not qualify vendor or scientific execution."
+    },
+    "rust/table.rs": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
+    "rust/table/": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
+    "rust/codec/packed_values.rs": {
+      "command": "cargo test --locked --lib packed_value_tests",
+      "purpose": "packed values round trip, refuse off-grid kernels, and leave historical artifacts byte-identical"
+    },
+    "rust/compiler/target_fitting/native_training.rs": {
+      "command": "cargo test --locked --lib native_training_tests",
+      "purpose": "native profile parsing, deterministic training, and the exact Gaussian copula factor"
+    },
+    "research/benchmark/equal_bytes/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v",
+      "purpose": "real-row codec arm, frontier, TDL and the committed summary"
+    },
+    "docs/whitepaper/scripts/equal_bytes_render.py": {
+      "command": "python3 docs/whitepaper/scripts/equal_bytes_render.py --check",
+      "purpose": "equal-byte macros, tables and README block equal the committed files"
+    },
+    "docs/whitepaper/scripts/equal_bytes_text.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "examples/adult/": {
+      "command": "python3 examples/adult/prepare.py --out target/adult && target/release/dope-kernel fit-table --csv target/adult/train.csv --target income --out target/adult/adult.dope && target/release/dope-kernel sample-table --model target/adult/adult.dope --rows 32561 --out target/adult/synthetic.csv && python3 examples/adult/evaluate.py --dir target/adult --model target/adult/adult.dope",
+      "purpose": "README quick start on UCI Adult; reference.json is the committed evaluation"
+    },
+    "docs/internal/": {
+      "command": "just score",
+      "purpose": "internal planning records kept for provenance"
+    },
+    "docs/math.md": {
+      "command": "just score",
+      "purpose": "mathematics, implementation audit and research plan"
+    },
+    "docs/whitepaper/scripts/equal_bytes_common.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "docs/whitepaper/scripts/equal_bytes_sections.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
     }
   }
 }
