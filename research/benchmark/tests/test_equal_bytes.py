@@ -1,6 +1,7 @@
 """Equal-byte study: real-row codec arm, frontier, TDL and summary logic."""
 import json
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import numpy as np
@@ -44,11 +45,14 @@ class CodecArmTests(unittest.TestCase):
         y = x @ np.array([1.0, -2.0, 0.5]) + 0.05 * rng.standard_normal(40)
         x_test = rng.random((200, 3))
         y_test = x_test @ np.array([1.0, -2.0, 0.5])
-        best, plain = run.matched_losses(x, y, x_test, y_test, 400, 0)
-        self.assertEqual(best["linear"], plain["linear"])
-        self.assertEqual(best["catboost"], plain["catboost"])
-        self.assertLessEqual(best["mlp"], plain["mlp"])
-        self.assertEqual(run.matched_losses(x, y, x_test, y_test, 40, 0)[0], plain)
+        # CatBoost is installed later in CI than this test runs; the rule is the same for every non-MLP learner.
+        with mock.patch.object(run, "AUDITORS", ("linear", "mlp")):
+            best, plain = run.matched_losses(x, y, x_test, y_test, 400, 0)
+            self.assertEqual(best["linear"], plain["linear"])
+            self.assertLessEqual(best["mlp"], plain["mlp"])
+            self.assertEqual(run.matched_losses(x, y, x_test, y_test, 40, 0)[0], plain)
+            reused = run.matched_losses(x, y, x_test, y_test, 400, 0, plain={"linear": 9.0, "mlp": 9.0})[1]
+            self.assertEqual(reused, {"linear": 9.0, "mlp": 9.0})
 
     def test_ladder_names_are_unique_and_the_headline_is_present(self):
         names = [rung[0] for rung in run.LADDER + run.ABLATIONS]
