@@ -48,7 +48,14 @@ For a CUDA build on a provisioned CUDA host:
 
 ```sh
 cargo build --manifest-path deploy/Cargo.toml --locked --release --features cuda
+cargo test --manifest-path deploy/Cargo.toml --locked --features cuda \
+  cuda_execution_matches_cpu_for_both_numerical_profiles -- --nocapture
 ```
+
+The hardware-only test requires actual CUDA execution for both numerical profiles
+and refuses to qualify a CPU fallback. It compares 259 nonzero synthetic-fixture
+draws across the batch boundary at a predeclared absolute tolerance of `1e-5`.
+It is not a trained-model or benchmark qualification and was not run locally.
 
 The dedicated lock includes the deployment dependency graph; it does not modify
 the existing product lock, frozen contracts or default dependency notices.

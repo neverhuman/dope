@@ -15,6 +15,36 @@ fn corrected_activation_uses_independent_training_formula_goldens() {
     }
 }
 
+/// This test deliberately fails without a real working CUDA device. Enabling
+/// the feature and passing CPU fixtures alone must never qualify GPU execution.
+#[cfg(feature = "cuda")]
+#[test]
+fn cuda_execution_matches_cpu_for_both_numerical_profiles() {
+    let native = dope_kernel::encode_kernel(&fixture()).unwrap();
+    let options = SampleOptions {
+        rows: 259,
+        seed: Some(u64::MAX),
+    };
+    for activation in [Activation::LegacyV1, Activation::TanhV2] {
+        let carrier = Carrier::load(&pack(&native, activation).unwrap()).unwrap();
+        let (reference, _) = carrier.sample(options, DeviceRequest::Cpu).unwrap();
+        let (actual, used) = carrier.sample(options, DeviceRequest::Cuda).unwrap();
+        assert_eq!(used, "cuda-candle");
+        assert_eq!(actual.len(), reference.len());
+        assert!(actual.iter().all(|v| v.is_finite()));
+        let error = actual
+            .iter()
+            .zip(reference)
+            .map(|(a, b)| (a - b).abs())
+            .fold(0.0_f32, f32::max);
+        eprintln!("activation={activation:?} max_abs_error={error:e}");
+        assert!(
+            error <= 1e-5,
+            "CUDA synthetic-fixture parity exceeded declared tolerance"
+        );
+    }
+}
+
 fn linear(input: usize, output: usize, phase: i32) -> QuantizedLinear {
     QuantizedLinear {
         input_dim: input as u32,
