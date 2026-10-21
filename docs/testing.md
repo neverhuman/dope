@@ -9,6 +9,16 @@ raw/mixed envelope export and downstream transfer remain separately unmeasured.
 The active manuscript build (`just paper-tdl`) still checks that the authenticated
 hero is Figure 1 on page 1; inspect rendered pages after visual changes.
 
+The required ARM64 portability lane runs native aarch64 product computation:
+all Rust library tests (including numerical goldens and historical decoders),
+plus codec, CLI, target-last raw intake, artifact-only, bundle isolation and
+frozen-geometry integration fixtures. It uses pinned Rust 1.88.0, the locked
+default CPU graph and two build/test threads in the existing four-vCPU guest.
+Its 20-minute job quota is unchanged. The real-entry readiness fixture checks
+missing-tool and wrong-architecture refusals without pretending to execute ARM.
+Paper, README and figure verification belongs to the x64 paper/CPU lanes;
+image hashes or raster differences between x64 and ARM do not gate ARM compute.
+
 `just fast` runs formatting, locked Rust unit tests, and V1 Python tests.
 `just focus codec::tests` runs a reusable narrow Rust check and test filter
 while editing; it never replaces the full CPU PR lane.

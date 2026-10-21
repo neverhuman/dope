@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from tools.claims.cohorts import cohort_failures, refresh_cohorts  # noqa: E402
-from tools.claims.figure_drawing import canonical_png, canonical_svg, compression_rows, draw_hero  # noqa: E402
+from tools.claims.figure_drawing import compression_rows, draw_hero  # noqa: E402
 from tools.claims import foundation, registry  # noqa: E402
 # The interval level comes from the v2 pre-declaration through the README benchmark's helper.
 if str(ROOT / "docs/whitepaper/scripts") not in sys.path:
@@ -362,9 +362,7 @@ def figure_outputs(
         plt.close(figure)
         raw = buffer.getvalue()
         if ext == "svg":
-            raw = canonical_svg(raw)
-        elif ext == "png":
-            raw = canonical_png(raw)
+            raw = b"\n".join(line.rstrip(b" ") for line in raw.splitlines()) + b"\n"
         outputs[f"paper/generated/hero-frontier.{ext}"] = raw
     return outputs
 

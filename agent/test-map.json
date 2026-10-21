@@ -141,6 +141,10 @@
       "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
       "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
     },
+    "docs/getting-started.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
     "docs/governance/PYTHON_EXCEPTIONS.md": {
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
@@ -173,9 +177,17 @@
       "command": "cargo test --locked --lib typed_data:: && cargo test --locked --test vnext_raw_schema",
       "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
     },
+    "docs/preprocessing.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
     "docs/privacy.md": {
       "command": "cargo test --locked --lib release:: && PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_privacy -v",
       "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "docs/publication-upgrade.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
     },
     "docs/readme/retention-bars.png": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
@@ -445,6 +457,10 @@
       "command": "python3 -B examples/public-regression/bikeshare-observational/test_runner.py",
       "purpose": "verify public regression CPU smoke admission manifest and runner contract"
     },
+    "examples/public-regression/requirements.txt": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
     "examples/public-regression/run.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -v",
       "purpose": "verify all15 mocked fresh-spawn checkpoint/interface and preserved public-demo cases: exact eligibility/reference pins, fit labels/query features only, shared preparation/failure budget and CPU/address-space/RSS caps; defaults unchanged, no actual checkpoint/vendor/scientific admission"
@@ -461,9 +477,17 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
     },
+    "launch_tuner_tui.sh": {
+      "command": "bash -n launch_tuner_tui.sh",
+      "purpose": "verify launcher syntax"
+    },
     "ops/": {
       "command": "bash scripts/ci-local.sh cpu",
       "purpose": "verify CI execution scripts"
+    },
+    "ops/ci/arm64-core.sh": {
+      "command": "bash -n ops/ci/arm64-core.sh && bash ops/ci/test-arm64-core-readiness.sh",
+      "purpose": "Verify ARM product entry tool/architecture refusals and compute command routing; actual ARM execution separately required in native CI"
     },
     "ops/ci/check-review-fixes.sh": {
       "command": "bash ops/ci/check-review-fixes.sh",
@@ -512,6 +536,10 @@
     "ops/ci/public-smoke.sh": {
       "command": "actionlint .github/workflows/*.yml",
       "purpose": "verify thin public fork smoke script and workflow wiring"
+    },
+    "ops/ci/test-arm64-core-readiness.sh": {
+      "command": "bash -n ops/ci/arm64-core.sh && bash ops/ci/test-arm64-core-readiness.sh",
+      "purpose": "Verify ARM product entry tool/architecture refusals and compute command routing; actual ARM execution separately required in native CI"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -2997,6 +3025,10 @@
       "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
       "purpose": "verify single-source claims rendering, banned-phrase firewall, and registry checks"
     },
+    "tools/claims/figure_drawing.py": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py'",
+      "purpose": "Replay receipt-bound figures and reject missing, mixed-cohort and invalid historical points; visually inspect both output sizes."
+    },
     "tools/claims/foundation.py": {
       "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py' -v",
       "purpose": "authenticate canonical historical foundation receipts, matched charged artifact bytes, and driver correlation proxy reducers"
@@ -3016,30 +3048,6 @@
     "validation/requirements-v1.txt": {
       "command": "bash agent/check-python-v1-boundary.sh",
       "purpose": "verify pinned Python V1 compatibility graph"
-    },
-    "launch_tuner_tui.sh": {
-      "command": "bash -n launch_tuner_tui.sh",
-      "purpose": "verify launcher syntax"
-    },
-    "docs/getting-started.md": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
-      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
-    },
-    "docs/preprocessing.md": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
-      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
-    },
-    "docs/publication-upgrade.md": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
-      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
-    },
-    "examples/public-regression/requirements.txt": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
-      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
-    },
-    "tools/claims/figure_drawing.py": {
-      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py'",
-      "purpose": "Replay receipt-bound figures and reject missing, mixed-cohort and invalid historical points; visually inspect both output sizes."
     }
   }
 }

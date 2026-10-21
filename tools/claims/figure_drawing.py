@@ -7,66 +7,6 @@ from __future__ import annotations
 
 import csv
 import io
-import re
-
-
-def canonical_svg(raw: bytes) -> bytes:
-    """Name SVG references by document order, without altering drawn content.
-
-    Matplotlib hashes unrounded internal clipping bounds into SVG IDs. Their
-    float representations can vary across architectures even when every emitted
-    coordinate, style and glyph is identical. Keep strict byte comparison by
-    canonicalizing IDs and their references; never round or strip geometry.
-    """
-    raw = b"\n".join(line.rstrip(b" ") for line in raw.splitlines()) + b"\n"
-    identifiers = re.findall(rb'\bid="([^"]+)"', raw)
-    if len(set(identifiers)) != len(identifiers):
-        raise ValueError("hero SVG: duplicate identifier")
-    names = {old: ("dope-figure-%04d" % index).encode()
-             for index, old in enumerate(identifiers)}
-
-    def replace(match):
-        before, name, after = match.groups()
-        if name not in names:
-            raise ValueError("hero SVG: unresolved internal reference")
-        return before + names[name] + after
-
-    return re.sub(rb'(\bid="|(?:xlink:)?href="#|url\(#)([-.\w:]+)("|\))', replace, raw)
-
-
-def canonical_png(raw: bytes) -> bytes:
-    """Preserve every RGBA pixel with a fixed PNG filter and encoding profile.
-
-    Pillow/libpng filter heuristics and bundled zlib versions can encode the
-    same pixels differently. Use filter zero, fixed Huffman compression, stable
-    metadata and a single IDAT chunk; never quantize the rendered pixels.
-    """
-    import struct
-    import zlib
-    from PIL import Image
-
-    with Image.open(io.BytesIO(raw)) as image:
-        width, height = image.size
-        if image.format != "PNG" or not (0 < width * height <= 4_000_000):
-            raise ValueError("hero PNG: unsupported image")
-        pixels = image.convert("RGBA").tobytes()
-    stride = width * 4
-    scanlines = b"".join(b"\0" + pixels[start:start + stride]
-                         for start in range(0, len(pixels), stride))
-    encoder = zlib.compressobj(9, zlib.DEFLATED, 15, 9, zlib.Z_FIXED)
-    encoded = encoder.compress(scanlines) + encoder.flush()
-
-    def chunk(kind, data):
-        payload = kind + data
-        return (struct.pack(">I", len(data)) + payload
-                + struct.pack(">I", zlib.crc32(payload)))
-
-    return (b"\x89PNG\r\n\x1a\n"
-            + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
-            + chunk(b"pHYs", struct.pack(">IIB", 7087, 7087, 1))
-            + chunk(b"tEXt", b"Software\0DOPE claims renderer")
-            + chunk(b"IDAT", encoded) + chunk(b"IEND", b""))
-
 
 def compression_rows(csv_bytes: bytes) -> list[dict]:
     """Keep the declared, comparable classical cohort; never pool smaller panels.
@@ -137,8 +77,7 @@ def draw_hero(f_summary: dict, six_bars: list[dict], percent: int, *, profile: s
         label, offset = labels[key]
         rate_axis.annotate(label, (size, val), xytext=offset, textcoords="offset points",
                            fontsize=base_pt - 0.5, weight="bold" if key == "Dope" else "normal",
-                           arrowprops={"arrowstyle": "-", "lw": 0.5, "color": color,
-                                       "antialiased": profile == "paper"})
+                           arrowprops={"arrowstyle": "-", "lw": 0.5, "color": color})
     rate_axis.set_xscale("log")
     rate_axis.set_xlim(900, 1e8)
     rate_axis.set_xticks([1e3, 1e4, 1e5, 1e6, 1e7, 1e8])

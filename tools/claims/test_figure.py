@@ -25,38 +25,6 @@ class HeroFigureTests(unittest.TestCase):
         self.csv = (ROOT / "paper/generated/hero-frontier.csv").read_bytes()
         self.rows = list(csv.DictReader(io.StringIO(self.csv.decode())))
 
-    def test_svg_internal_names_are_portable_but_geometry_remains_authenticated(self):
-        from tools.claims.figure_drawing import canonical_svg
-        original = (b'<svg><defs><clipPath id="p123"><rect width="12.000001"/></clipPath>'
-                    b'<path id="m123" d="M 1 2 L 3 4"/></defs><g clip-path="url(#p123)">'
-                    b'<use xlink:href="#m123"/></g></svg>')
-        renamed = original.replace(b"p123", b"p456").replace(b"m123", b"m456")
-        self.assertEqual(canonical_svg(original), canonical_svg(renamed))
-        changed_geometry = renamed.replace(b"12.000001", b"12.000002")
-        self.assertNotEqual(canonical_svg(original), canonical_svg(changed_geometry))
-        with self.assertRaisesRegex(ValueError, "duplicate identifier"):
-            canonical_svg(b'<svg><g id="a"/><g id="a"/></svg>')
-        with self.assertRaisesRegex(ValueError, "unresolved internal reference"):
-            canonical_svg(b'<svg><use xlink:href="#absent"/></svg>')
-
-    def test_png_encoding_is_stable_without_losing_a_single_rgba_bit(self):
-        from PIL import Image
-        from tools.claims.figure_drawing import canonical_png
-        image = Image.new("RGBA", (2, 2))
-        image.putdata([(0, 0, 0, 0), (255, 2, 3, 255),
-                       (4, 5, 6, 128), (255, 255, 255, 255)])
-        def encoded(level):
-            stream = io.BytesIO()
-            image.save(stream, format="PNG", compress_level=level)
-            return stream.getvalue()
-        first = canonical_png(encoded(0))
-        self.assertEqual(first, canonical_png(encoded(9)))
-        with Image.open(io.BytesIO(first)) as decoded:
-            self.assertEqual(decoded.size, image.size)
-            self.assertEqual(decoded.tobytes(), image.tobytes())
-        image.putpixel((1, 0), (254, 2, 3, 255))
-        self.assertNotEqual(first, canonical_png(encoded(9)))
-
     def test_committed_points_and_threshold_fit_the_axes(self):
         self.assertEqual(render.figure_bound_failures(self.rows, self.data["thresholds"]), [])
         self.assertEqual(render.threshold_label(self.data["thresholds"]), "Proposed T90; driver gate unmeasured")
