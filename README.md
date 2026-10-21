@@ -1,58 +1,115 @@
 # D.O.P.E.: Downstream Objective-Preserving Encoding
 
-### Generative Compression of Predictive Structure Across Tabular Foundation and Classical Models
-
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Tabular data is an organization's accumulated operational experience, yet security, compliance, and legal barriers routinely lock tables inside silos where external researchers, benchmarks, and foundation models cannot access them.**
+DOPE compiles a private table into a small **sampling program** (marginals, a dependence graph, an explicit target model and a noise model, with every byte counted), then asks the only question that matters downstream: *do models trained on its samples still work on real rows the compiler never saw?*
 
-Copying raw rows is unsafe, while shipping multi-megabyte neural generators is bloated, opaque, and prone to memorization. **D.O.P.E. (`Downstream Objective-Preserving Encoding`)** compiles a private table into a small **sampling program** under a strict byte budget, then measures how much predictive lift and feature-driver structure survive when downstream learners train only on synthetic draws and evaluate on untouched real rows.
+<!-- BEGIN COMPRESSION -->
+<p align="center"><img src="paper/generated/compression-frontier.png" width="100%" alt="Transfer versus charged bytes for every generator on the v2 panel, and retained predictive lift per KiB ranked; DOPE is the smallest point on the frontier."></p>
 
-- **Compact encoding budget:** Quantizes feature marginals, a structural dependence graph, a screened target residual, and heteroscedastic noise into a self-contained binary artifact where every byte read at sample time is charged.
-- **Multi-model and foundation-model transfer:** Evaluates synthetic draws across zero-shot tabular foundation models (**NVIDIA Kumo Tabular Large**, **TabICLv2**, **AutoGluon Mitra-v2**), **neural networks (MLP)**, **linear models**, and **gradient-boosted trees (CatBoost)**.
-- **Active paper:** [Guide](paper/README.md), [manuscript](paper/main.tex), [supplement](paper/supplement.tex); build with `bash paper/build.sh` (`target/paper/main.pdf`, `target/paper/supplement.pdf`). Frozen PDFs: [paper](docs/whitepaper/dope-mfs.pdf) and [supplement](docs/whitepaper/supplement.pdf).
+- **Smallest program on the transfer frontier.** DOPE's median program is 1,895 bytes (1.85 KiB) of dataset-specific state, 22,301× fewer bytes than TabSyn (42.3 MB). DOPE minus TabSyn in worst-auditor retention is +0.014 [-0.028, +0.114] over 86 lineages, so the paired interval contains zero.
+- **Rank 1 of 7 reported positive-lift generator estimates on retained lift per KiB** (0.487 per KiB), 3.5× the runner-up (Gaussian copula); this is a descriptive ranking across the reported method-specific cohorts.
+- **Every auditor family counts.** Worst of CatBoost, linear and MLP retention per lineage: median 0.901 [0.811, 0.966] at synthetic size 4n on 86 PMLB regression lineages.
 
-![Horizontal foundation-model transfer bars for DOPE vs. Gaussian copula (charged bytes in legend; selection-exposed validation across Kumo-L, TabICLv2, Mitra-v2; cross-model feature-driver preservation: not yet measured).](paper/generated/hero-frontier.png)
+<details><summary>Every generator, every auditor (generated table)</summary>
 
----
+| Rank (lift/KiB) | Generator | Worst-auditor retention (4n) | CatBoost | Linear | MLP | Median charged bytes | Retained lift per KiB |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | **DOPE (ours)** | 0.901 [0.811, 0.966] | 0.913 | 0.991 | 1.143 | 1.9 KB | 0.487 |
+| 2 | Gaussian copula | 0.750 [0.398, 0.898] | 0.764 | 0.991 | 0.981 | 5.5 KB | 0.140 |
+| 3 | Chow-Liu tree | 0.573 [0.246, 0.654] | 0.605 | 0.672 | 0.682 | 29.9 KB | 0.020 |
+| 4 | TVAE (20 lineages) | 0.655 [0.405, 0.784] | 0.663 | 0.765 | 0.812 | 308.6 KB | 2.2e-3 |
+| 5 | ARF | 0.833 [0.692, 0.896] | 0.850 | 0.950 | 0.991 | 1.4 MB | 5.9e-4 |
+| 6 | TabSyn | 0.911 [0.746, 0.963] | 0.944 | 0.959 | 1.015 | 42.3 MB | 2.2e-5 |
+| 7 | Forest-Flow (5 lineages) | 0.985 [0.864, 1.001] | 1.021 | 0.985 | 1.080 | 325.8 MB | 3.1e-6 |
+| — | CTGAN (20 lineages) | -0.152 [-1.113, 0.162] | -0.052 | -0.005 | 0.033 | 731.0 KB | no lift |
+| — | Independent marginals | -0.078 [-0.169, -0.042] | -0.012 | 0.002 | -0.046 | 2.5 KB | no lift |
+| — | Predictor-only control *(control, not a generator)* | 0.681 | 0.681 | 0.986 | 0.951 | none | — |
+| — | Real rows resampled 4n *(control, not a generator)* | 0.997 | 1.013 | 0.999 | 1.174 | none | — |
 
-## Quick Start: Compile, Inspect, and Sample
+Auditor columns are paired within each method's reported cohort; smaller cohorts remain separate comparisons. Efficiency ranks are descriptive across available cohorts. Controls are diagnostics, not generators.
+</details>
 
-Build the native Rust CLI binaries and run the four-step simulated healthcare workflow (`dope-kernel compile-csv` and `sample-mixed` on a headered CSV table with patient-disjoint and later-time evaluation; source column names never enter the compiled artifact):
+<sub>Historical selection-exposed validation: the panel also informed DOPE's profile choice, and the official test split is sealed. Generated by <code>docs/whitepaper/scripts/compression_frontier.py</code> from SHA-256-pinned ledgers; 95% nested cluster bootstrap intervals.</sub>
+<!-- END COMPRESSION -->
+
+![Zero-shot tabular foundation models conditioned on DOPE samples and on Gaussian-copula samples, with charged bytes in the legend; cross-model feature-driver preservation: not yet measured.](paper/generated/hero-frontier.png)
+
+The same samples also serve as in-context examples for three tabular foundation models (NVIDIA Kumo, TabICLv2, Mitra-v2). Pretraining overlap is unknown and these auditors are not yet qualified, so this is a historical diagnostic.
+
+## Why it matters
+
+- **Share structure, not rows.** Security and legal rules keep tabular data in silos. A program that carries its predictive structure lets outside teams and models be evaluated while the rows stay home.
+- **One honest unit.** DOPE's target metric, **Transfer Description Length** (TDL), is a size, not a weighted blend: the smallest tested payload, written `KiB@T90/D80`, at which learners trained on synthetic rows recover nine-tenths of the real gain over a null at the lower confidence bound in every model family (T90) and four-fifths of real driver agreement (D80), while passing copy, cleartext and byte-accounting gates. Copying rows cannot win.
+- **Compression that learns.** Generic generators spend megabytes modeling everything. Retention depends only on how closely the synthetic regression function tracks the real one on real covariates ([the math](docs/math.md)), so DOPE stores that function explicitly and keeps the rest compact.
+
+TDL is specified, not yet measured; the figures above are historical validation estimates.
+
+## Quick start
 
 ```bash
-# 1. Build the native release binaries
-cargo build --locked --release --bin dope-kernel --bin dope
+# Needs a Rust toolchain (rustup) and Python 3.10+ with numpy, pandas, scikit-learn; catboost is optional.
+git clone https://github.com/neverhuman/dope && cd dope
+cargo build --release --bin dope-kernel
+pip install numpy pandas scikit-learn catboost
 
-# 2. Prepare a headered CSV table and compile a compact .dpk sampling program
-python3 -B examples/healthcare-sim/demo.py prepare --out target/healthcare-sim
-target/release/dope-kernel compile-csv --csv target/healthcare-sim/fit.csv \
-  --target event_30d --candidate chow_liu --seed 1729 --deadline-seconds 60 \
-  --out target/healthcare-sim/model.dpk
-
-# 3. Sample synthetic draws and evaluate holdout transfer
-target/release/dope-kernel sample-mixed --artifact target/healthcare-sim/model.dpk \
-  --rows 640 --seed 1729 --out target/healthcare-sim/sampled.json
-python3 -B examples/healthcare-sim/demo.py evaluate \
-  --out target/healthcare-sim --sampled target/healthcare-sim/sampled.json
+python3 examples/quickstart/quickstart.py --dataset adult           # UCI Adult, downloaded once, SHA-256 checked
+python3 examples/quickstart/quickstart.py --csv my.csv --target y   # your own table
 ```
 
-This simulation demo makes no clinical or real-patient claim, no HIPAA-de-identification claim, no formal-DP claim, and no observational-confirmation claim; see [docs/cli.md](docs/cli.md) and [examples/healthcare-sim/](examples/healthcare-sim/).
+<!-- BEGIN QUICKSTART -->
+Reference run on UCI Adult (census income), CC BY 4.0, DOI 10.24432/C5XW20: 32,561 fit rows, a binary target `income`, and 16,281 untouched holdout rows (the official test file).
 
-For pre-projected unit-interval benchmark directories (`train.csv` without headers), invoke `dope compile`, `inspect`, and `sample`:
+| Step | What happens | Result |
+| --- | --- | --- |
+| encode | every column mapped into the unit interval from the fit rows alone | `encoder.bin` 836 bytes (249 transforms + 587 compressed names and labels) |
+| select | backends scored inside the fit rows | `sparse_gaussian_copula` (3-fold transfer on the fit rows: sparse_gaussian_copula 0.825, search 0.800, compact_neural_residual_symbolic 0.764, chow_liu 0.758) |
+| compile | `dope-kernel compile` reads only the encoded fit rows | `model.dpk` 1,714 bytes |
+| sample | rows drawn from the artifact alone, decoded to the original schema | 32,561 synthetic rows |
+| evaluate | learners trained on real vs. synthetic rows, scored on the holdout | retention catboost 0.841 · linear 0.890 · mlp 0.923 |
 
-```bash
-target/release/dope compile --dataset-dir examples/readme-regression --task regression --out examples/readme-regression/toy.dpk
-target/release/dope inspect --kernel examples/readme-regression/toy.dpk
-target/release/dope sample --kernel examples/readme-regression/toy.dpk --rows 200 --out examples/readme-regression/synth.csv
+Dataset-specific state: **2,550 bytes**. The fit table is 3.51 MB as CSV (1,378× larger) and 397 KB with `gzip -9` (156× larger). The compiled program:
+
+```text
+(dpk v=3 task=binary n=32561 p=14 seed=11
+  (schema (continuous i=0) (ordinal i=1) (continuous i=2) (ordinal i=3) (ordinal i=4) (ordinal i=5) (ordinal i=6) (ordinal i=7) (ordinal i=8) (binary i=9) (inflated i=10) (inflated i=11) (continuous i=12) (categoricalgrid i=13))
+  (marginals (quantile_spline i=0) (categorical_grid i=1) (quantile_spline i=2) (categorical_grid i=3) (categorical_grid i=4) (categorical_grid i=5) (categorical_grid i=6) (categorical_grid i=7) (categorical_grid i=8) (bernoulli i=9) (quantile_spline i=10) (quantile_spline i=11) (quantile_spline i=12) (categorical_grid i=13))
+  (dependence kind=sparse_graph)
+  (target kind=sparse_gam)
+  (noise kind=isotonic_calibration))
 ```
 
----
+<sub>Local engineering demonstration on one public table and one split, with the auditors in <code>examples/quickstart/dope_eval.py</code>; not the paper benchmark and no privacy claim. Rendered from <code>examples/quickstart/results/adult-reference.json</code>.</sub>
+<!-- END QUICKSTART -->
 
-## Benchmark: Multi-Model Transfer, Tabular Foundation Models, and Artifact Bytes
+## How it works
 
-The benchmark block and figures below are generated from the SHA-pinned ledgers (`docs/whitepaper/generated/v2-headline.json`, `research/benchmark/results/review-fixes-v2/panel.json`, and `research/benchmark/results/mfs-v3-density-panel.json`) that build [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf).
+```text
+real table ─encode─▶ unit-interval matrix ─compile─▶ DOPE program ─sample─▶ synthetic rows ─decode─▶ original schema
+```
+
+1. **Encode.** [`dope_tables.py`](examples/quickstart/dope_tables.py) maps every column into the unit interval using fit rows only: each categorical becomes one target-ordered code (one-hot columns like `pandas.get_dummies` are an option); log, Tukey-fence clipping and rescaling for skewed numbers; dates become numbers; missing cells stay missing. Decoding restores schema and retained labels; clipping and rare-level grouping are lossy. See the development [ablation](examples/quickstart/results/ablation.md).
+2. **Compile.** The Rust compiler fits quantized marginals, a dependence model (Chow–Liu tree, copula, factor, vine, mixture and more), a target model and a noise model. The quick start picks among backends by K-fold transfer inside the fit rows.
+3. **Sample and decode.** Sampling reads only the program; `dope-kernel inspect` prints it as an S-expression.
+4. **Evaluate.** Retention is the share of a real-trained learner's gain over a null that a synthetic-trained learner keeps on untouched rows ([dope_eval.py](examples/quickstart/dope_eval.py)).
+
+`dope-kernel compile-csv` compiles a headered CSV natively instead; see [docs/cli.md](docs/cli.md).
+
+## Use it from Python
+
+Use [`TableEncoder`](examples/quickstart/README.md) around the native binary. Fit transformations on fitting rows only; canonical matrices place the declared target last.
+
+## Native Rust deployment
+
+The compiler and default sampler need no Python or libtorch. [The deployment package](deploy/README.md) adds a charged SafeTensors carrier and optional Candle CUDA TVAE inference. Native DPK remains the compact carrier; other architectures retain CPU sampling. CUDA execution and `tanh-v2` transfer remain unmeasured.
+
+## Benchmarks
+
+The full generated ledger (multi-model retention, paired differences, the foundation-model block, the TDL evidence card and one native artifact) is collapsed below. Every number is rendered from SHA-pinned receipts; the official test split stays sealed.
+
+<details>
+<summary><b>Full generated evidence ledger</b></summary>
 
 <!-- BEGIN BENCHMARK -->
 ![Multi-model retention at synthetic size 4n against median charged artifact bytes on a log axis, and cross-architecture transfer across zero-shot tabular foundation models (NVIDIA Kumo-L, TabICLv2, Mitra-v2), classical learners, and historical feature-target correlation proxy (cross-model feature-driver preservation: not yet measured). DOPE's median artifact is 1.9 KB; the other generators' medians run from 2.5 KB to 325.8 MB.](docs/readme/pareto.png)
@@ -94,21 +151,6 @@ In the paired chart the axis runs from -0.3 to 0.7: an interval end beyond it is
 The strongest full-panel comparator is TabSyn (scaled schedule). These are validation estimates on a training-derived cut; the official test split is reserved for one pre-registered run. Resampled real rows are a row-count diagnostic, neither a generator nor an upper bound. The release score (MFS-v3) is null for every method because its prerequisites and cleartext scan are unmeasured, and measured copy, membership, and attribute gates already fail on some cells. DOPE's median artifact is 1.9 KB, and 490 of 500 individual DOPE fits are within the 10,240-byte release cap; the paper names the lineages above it.
 <!-- END BENCHMARK -->
 
----
-
-## The Ultimate Synthetic KPI: Transfer Description Length (`TDL`)
-
-Copying raw rows takes no modeling insight; compressing predictive structure into a small byte program tests genuine generalization. **Transfer Description Length (`TDL`)** is the smallest tested payload (`KiB@T90/D80`) where synthetic-trained learners satisfy two holdout gates on untouched real rows:
-
-- **Multi-Model Transfer (T90):** Recover at least nine-tenths of real-trained predictive lift over a null model at the lower confidence bound across diverse learner families.
-- **Feature Driver Fidelity (D80):** Recover at least four-fifths of real-trained holdout permutation attribution agreement.
-
-Artifacts must also pass exact-copy, near-copy, cleartext-absence, positive control-lift, and byte-accounting gates; unreached budgets are reported as unreached rather than zero ([docs/metric.md](docs/metric.md), [docs/decisions.md](docs/decisions.md) `D-01` to `D-09`).
-
-### Historical Validation Card & Evidence Status
-
-> **Evidence discipline.** Every public figure is generated from a hash-pinned receipt under [docs/claims-policy.md](docs/claims-policy.md). The active validation panel is selection-exposed; the official test split remains sealed.
-
 <!-- BEGIN TDL RESULTS -->
 <!-- Generated by tools/claims/render.py; edit headline-results.json. -->
 Historical validation; selection-exposed. TDL and cross-model feature-driver preservation (`D80`) are unmeasured.
@@ -144,19 +186,6 @@ Bytes are historical charged artifacts; cold sampling closure and cross-model fe
 Smaller cohorts are separate comparisons. These points do not establish a TDL frontier.
 <!-- END TDL RESULTS -->
 
----
-
-## What the Artifact Stores (and What Is Counted)
-
-| Component | Stored Representation |
-| --- | --- |
-| **Marginals** | Quantized marginals, monotone unit-interval transforms, and missingness rates per feature |
-| **Dependence** | Seven candidate dependence families (independence, Chow–Liu tree, triangular autoregression, sparse Gaussian copula, factor model, truncated vine, or two-component mixture) |
-| **Target residual** | Screened nonlinear residual network over at most twelve input features |
-| **Noise model** | Heteroscedastic residual scale fitted on up to four screened features |
-
-Sampling reads **only** the compiled artifact—never training rows—and [docs/metric.md](docs/metric.md#5-byte-scopes) tracks both dataset-specific payload bytes and cold sampling closure bytes.
-
 ### One measured native artifact
 
 <!-- BEGIN PINNED DEMOS -->
@@ -169,32 +198,30 @@ The installed public demo in [examples/public-regression](examples/public-regres
 
 <!-- END PINNED DEMOS -->
 
----
+</details>
 
-## Scope, Governance, and Honest Boundaries
+## Honest scope
 
-- **Selection-exposed validation:** Active benchmark splits also informed profile selection; the official test split remains sealed.
-- **Empirical privacy vs. formal certificates:** Copy, membership, and attribute checks are empirical diagnostics on sampled rows—not formal differential privacy and not HIPAA de-identification.
-- **Fail-closed release gate:** `MFS-v3` returns null whenever a prerequisite (such as the cleartext scan) is unmeasured or a measured gate fails.
-- **Target-conditioned program:** Each artifact targets a declared task (`regression` or `classification`).
+- **Selection-exposed validation.** Historical panels and the published Adult/Abalone ablations informed development choices; these results are not independent confirmation.
+- **No privacy claim.** Copy, membership and attribute checks are empirical diagnostics, not formal differential privacy and not HIPAA de-identification.
+- **Target-conditioned.** Each program serves one declared regression or binary target.
+- **Dataset-specific bytes.** Sizes count the dataset-specific state; the runtime closure is reported separately.
 
----
+## Repository map
 
-## Reproduce Everything From Scratch
+| Path | What lives there |
+| --- | --- |
+| `rust/` | compiler, codec, sampler, metrics, release gates |
+| `examples/quickstart/` | encoder, evaluation, backend selection, ablation |
+| `paper/` | the active manuscript [paper/main.tex](paper/main.tex) and generated inputs |
+| `docs/` | [math](docs/math.md), [metric](docs/metric.md), [claims policy](docs/claims-policy.md), [repo map](docs/REPO_MAP.md), and the frozen [historical paper](docs/whitepaper/dope-mfs.pdf) |
+| `research/` | benchmark adapters and frozen, hash-pinned ledgers |
+| `tests/`, `ops/`, `agent/` | tests, CI, audit configuration ([AGENTS.md](AGENTS.md)) |
 
 ```bash
-just setup          # Create the Python environment
-just paper          # Regenerate paper macros, figures, README blocks, and PDFs
-just paper-check    # Verify macros, figure hashes, claim-firewall rules, and LaTeX logs
-just fast           # Run fast Rust + Python verification gates
-just check          # Run the full pre-commit verification suite
+just setup && just fast     # environment, then the fast Rust and Python gates
+just paper && just check    # regenerate every paper number and figure, then the full suite
 ```
-
-## Documentation Map
-
-- **Whitepaper & supplement:** [docs/whitepaper/dope-mfs.pdf](docs/whitepaper/dope-mfs.pdf), [docs/whitepaper/supplement.pdf](docs/whitepaper/supplement.pdf)
-- **Metric, benchmark, & claims:** [docs/metric.md](docs/metric.md), [docs/benchmark.md](docs/benchmark.md), [STATUS.md](STATUS.md), [docs/claims-policy.md](docs/claims-policy.md), [docs/vnext/CLAIMS.md](docs/vnext/CLAIMS.md)
-- **Engineering & audit:** [AGENTS.md](AGENTS.md), [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), [docs/release.md](docs/release.md), [docs/audit.md](docs/audit.md), [docs/archive/mfs-history.md](docs/archive/mfs-history.md)
 
 ## Citation
 
@@ -208,4 +235,3 @@ just check          # Run the full pre-commit verification suite
 ```
 
 See [CITATION.cff](CITATION.cff). Licensed under [MIT](LICENSE).
-

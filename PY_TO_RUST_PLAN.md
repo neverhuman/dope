@@ -728,3 +728,7 @@ whenever tracked Python files change.
 | `validation/external/external_learners.py` | `keep-with-reason` | Retain in `other` (Repository auxiliary script (`external_learners`)); enforce <500 LOC and deterministic test coverage. |
 | `validation/external/run.py` | `keep-with-reason` | Retain in `other` (Repository auxiliary script (`run`)); enforce <500 LOC and deterministic test coverage. |
 | `validation/external/tests/test_external.py` | `keep-with-reason` | Retain in `other` (Repository auxiliary script (`test_external`)); enforce <500 LOC and deterministic test coverage. |
+
+## Reconciled publication and real-table examples
+
+The optional `examples/quickstart/` Python boundary uses pandas and external ML learners for local development encoding, selection and evaluation. It is not the deployed Rust compiler or sampler; clipping and rare-level grouping can lose information. The deterministic `docs/whitepaper/scripts/readme_blocks.py` consistency checker is a governance port candidate. All eleven new paths are inventoried in the root authority; the root compatibility paths remain maintained.

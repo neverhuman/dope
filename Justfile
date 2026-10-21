@@ -54,10 +54,17 @@ check: fast
     cargo test --locked --test rust_cli
     cargo test --locked --test vnext_bundle --test vnext_bundle_isolation
     cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo --test vnext_geometry_binding --test vnext_interactions
+    bash ops/ci/deployment.sh check
+    bash ops/ci/deployment.sh audit
     git diff --check
+
+deployment-check:
+    bash ops/ci/deployment.sh check
+    bash ops/ci/deployment.sh audit
 
 security:
     bash ops/ci/security.sh
+    bash ops/ci/deployment.sh audit
 
 contract-drift:
     bash ops/ci/check-contracts.sh

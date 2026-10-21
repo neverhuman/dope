@@ -254,6 +254,21 @@ fn sample_neural(
     options: SampleOptions,
 ) -> Result<Vec<f32>> {
     let width = kernel.features as usize;
+    let seeds = joint_row_seeds(kernel, options)?;
+    let rows = seeds
+        .into_par_iter()
+        .map(|row_seed| crate::neural::sample_joint(generator, width, row_seed))
+        .collect::<Result<Vec<_>>>()?;
+    sample_joint_ranks(kernel, &rows)
+}
+
+/// Stable row seeds shared with batched Rust tensor backends. This does not
+/// change the historical stream or grant a backend any qualification.
+pub fn joint_row_seeds(kernel: &Kernel, options: SampleOptions) -> Result<Vec<u64>> {
+    kernel.validate().map_err(DopeError::Codec)?;
+    let KernelProgram::NeuralJoint(generator) = &kernel.program else {
+        return Err(DopeError::Unsupported("joint_program_required".into()));
+    };
     let generation_seed = options.seed.unwrap_or(kernel.seed);
     let mut lineage_seed = blake3::Hasher::new();
     lineage_seed.update(b"neural-joint-generation-v1");
@@ -266,12 +281,34 @@ fn sample_neural(
             .try_into()
             .expect("eight hash bytes"),
     );
-    let rows = (0..options.rows)
-        .into_par_iter()
+    Ok((0..options.rows)
         .map(|row_index| {
-            let row_seed =
-                splitmix64(seed ^ (row_index as u64).wrapping_mul(0xd6e8_feb8_6659_fd93));
-            let (ranks, missing) = crate::neural::sample_joint(generator, width, row_seed)?;
+            splitmix64(seed ^ (row_index as u64).wrapping_mul(0xd6e8_feb8_6659_fd93))
+        })
+        .collect())
+}
+
+/// Apply the native marginal/support rules to natural-order joint rank draws.
+/// External tensor backends never implement a second marginal decoder.
+pub fn sample_joint_ranks(
+    kernel: &Kernel,
+    draws: &[(Vec<f32>, Vec<bool>)],
+) -> Result<Vec<f32>> {
+    kernel.validate().map_err(DopeError::Codec)?;
+    let KernelProgram::NeuralJoint(generator) = &kernel.program else {
+        return Err(DopeError::Unsupported("joint_program_required".into()));
+    };
+    let width = kernel.features as usize;
+    let rows = draws
+        .into_par_iter()
+        .map(|(ranks, missing)| {
+            if ranks.len() != width + 1
+                || missing.len() != width + 1
+                || ranks.iter().any(|x| !x.is_finite())
+                || missing[width]
+            {
+                return Err(DopeError::Codec("joint_rank_draw_invalid".into()));
+            }
             let mut row = Vec::with_capacity(width + 1);
             for feature in 0..width {
                 let probability = crate::neural::normal_cdf(ranks[feature]).clamp(1e-7, 1.0 - 1e-7);

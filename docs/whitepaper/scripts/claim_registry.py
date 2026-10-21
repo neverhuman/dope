@@ -412,6 +412,7 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     from tools.claims.cohorts import cohort_failures
     from tools.claims.registry import validate as validate_registries
     from tools.claims.version import failures as version_failures
+    import readme_blocks
 
     data_path = root / "paper/generated/headline-results.json"
     if not data_path.is_file():
@@ -483,6 +484,8 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
                 if historical != readme_benchmark.expected_readme_block(original):
                     failures.append("README: historical generated benchmark drift")
                 prose = prose.replace(historical, "")
+            failures.extend(readme_blocks.block_failures(readme, root))
+            prose = readme_blocks.strip_blocks(prose)
             if render.DEMO_BEGIN in prose:
                 if prose.count(render.DEMO_BEGIN) != 1 or prose.count(render.DEMO_END) != 1 or prose.index(render.DEMO_BEGIN) > prose.index(render.DEMO_END):
                     failures.append("README: demo markers must be unique and ordered")
@@ -497,6 +500,9 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
     elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
         failures.append("README: changed prose must adopt the generated TDL result card")
     verified_outputs = set(outputs)
+    compression_tex, compression_failures = readme_blocks.verified_tex(root)
+    verified_outputs |= compression_tex
+    failures.extend(compression_failures)
     contract_generator = root / "paper/scripts/contract_macros.py"
     if contract_generator.is_file():
         import runpy

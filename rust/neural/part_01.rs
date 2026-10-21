@@ -190,6 +190,15 @@ fn decode_rank_values(
     seed: u64,
 ) -> Result<(Vec<f32>, Vec<bool>)> {
     let (parameters, missing_logits) = decoder_forward(decoder, latent)?;
+    decode_rank_parameters(decoder.variance_floor, &parameters, &missing_logits, seed)
+}
+
+fn decode_rank_parameters(
+    variance_floor: f32,
+    parameters: &[f32],
+    missing_logits: &[f32],
+    seed: u64,
+) -> Result<(Vec<f32>, Vec<bool>)> {
     let tokens = missing_logits.len();
     if parameters.len() != tokens * 2 {
         return Err(DopeError::Codec(
@@ -202,7 +211,7 @@ fn decode_rank_values(
             let scale = parameters[token * 2 + 1]
                 .clamp(-8.0, 2.0)
                 .exp()
-                .max(decoder.variance_floor);
+                .max(variance_floor);
             location + scale * normal(seed, token, 0x31c3_84d2)
         })
         .collect();

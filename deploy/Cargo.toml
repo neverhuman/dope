@@ -1,0 +1,31 @@
+[package]
+name = "dope-runtime"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "MIT"
+description = "Offline Rust sampling with SafeTensors carriers and optional CUDA"
+
+[workspace]
+members = ["native"]
+
+[dependencies]
+dope-kernel = { package = "dope-inference-core", path = "native" }
+# Exact published-0.11.0 backport of upstream Candle #4041; see docs/upgrade-validation.md.
+candle-core = { version = "=0.11.0", git = "https://github.com/eveselove/planly-candle", rev = "b76d808ad646c479b9f61b9e0c59503143543f12", default-features = false }
+safetensors = "=0.8.0"
+serde_json = "1.0.149"
+clap = { version = "4.6.1", features = ["derive"] }
+sha2 = "0.10.8"
+libc = "0.2.180"
+
+[features]
+default = []
+cuda = ["candle-core/cuda"]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+strip = "symbols"
+panic = "abort"

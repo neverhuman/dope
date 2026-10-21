@@ -1,0 +1,58 @@
+\subsection{Native contracts and a finite ridge-auditor bound}
+\label{sec:native-contracts}
+
+\paragraph{Representation.}
+For the native mixed profile, a declared schema fixes the target, feature roles, original units and category semantics.
+Fitting rows alone determine transforms and dictionaries. Numeric affine maps retain their
+inverse; native nominal levels are column-scoped indicators rather than ordered numbers; the optional Python example uses a separately declared target-ordered or one-hot map. Grouped
+driver tests recombine indicators and masks into their original semantic features. The
+current native mixed profile is explicitly bounded; its capability is not evidence of
+general mixed-table transfer.
+
+\paragraph{Factorization.}
+The symbolic program separates feature synthesis from conditional response:
+\begin{equation}
+  X\sim Q_{\theta}(X),\qquad
+  Y=g_{\beta}(X)+\sigma_{\gamma}(X)\varepsilon,
+  \quad \varepsilon\sim R_{\eta}.
+  \label{eq:compiler}
+\end{equation}
+Quantized marginals and dependence operators represent $Q_{\theta}$; a bounded target
+program represents $g_{\beta}$. The retained noise law is needed because a predictor alone
+does not specify a joint distribution. Development residual profiles use out-of-fold
+residuals to reduce the collapse caused by fitting noise to an interpolating predictor.
+The default bounded-range feature sampler cannot establish unbounded tail fidelity.
+
+\paragraph{Search and serialization.}
+The native compiler tests dependence and target candidates, quantization precisions and
+marginal resolutions. Candidate selection uses fitting-side heuristics, not the final
+cross-model transfer measurement. An encoded candidate must fit its byte cap, including
+the state required by its selected carrier. A proxy score is therefore an engineering
+search objective, never a certificate that the downstream objective was preserved.
+Native raw-unit, historical rank-space and SafeTensors carriers have separate charge
+profiles; comparing their unadjusted sizes would change the estimand.
+
+\paragraph{Why predictive moments matter.}
+There is a precise special case behind the objective. Let $P$ and $Q$ denote real and
+synthetic training distributions on the same frozen feature map. For ridge regression
+with finite second moments and strictly positive regularization $\lambda$, write
+$\Sigma_P=\mathbb{E}_P[xx^\top]$, $c_P=\mathbb{E}_P[xy]$, and
+$w_P=\operatorname{inv}(\Sigma_P+\lambda I)c_P$, with analogous synthetic quantities. Then
+\begin{equation}
+ \lVert w_Q-w_P\rVert_2\leq
+ \frac{\lVert c_Q-c_P\rVert_2+
+       \lVert\Sigma_Q-\Sigma_P\rVert_2\lVert w_P\rVert_2}{\lambda}.
+ \label{eq:ridge}
+\end{equation}
+Thus preserving the feature covariance and feature--target moments controls this
+learner's parameter error even when a generic resemblance score is imperfect. This
+standard perturbation argument (proof in the supplement) motivates moment diagnostics.
+No corresponding result for trees, neural models, or arbitrary targets follows. For finite learners or other losses, preserving only
+$\mathbb{E}[Y\mid X]$ can still lose rare support, conditional variance and interactions.
+
+\paragraph{Runtime boundary.}
+The native product compiles and samples in Rust. The additive SafeTensors runtime uses
+the same native random streams and marginal decoder, with optional batched Candle
+inference for TVAE decoder heads. Historical activation behavior is preserved; an
+explicit corrected activation profile matches the training formula. Accelerator execution,
+cross-device parity and resulting transfer require separate hardware measurements.

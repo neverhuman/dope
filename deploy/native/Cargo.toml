@@ -1,0 +1,27 @@
+[package]
+name = "dope-inference-core"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "MIT"
+description = "Inference-only build of DOPE's canonical Rust codec and sampler"
+
+[lib]
+name = "dope_kernel"
+path = "../../rust/runtime_lib.rs"
+# Canonical module unit tests include compiler fixtures and run in the root
+# package. This graph is exercised by deploy's end-to-end numerical tests.
+test = false
+doctest = false
+
+[dependencies]
+blake3 = "1.8.2"
+csv = "1.4.0"
+rayon = "1.11.0"
+rusqlite = { version = "0.32.1", features = ["bundled"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+sha2 = "0.10.8"
+statrs = "0.18.0"
+thiserror = "2.0.17"
+zstd = "0.13.3"
