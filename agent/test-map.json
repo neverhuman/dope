@@ -690,7 +690,7 @@
     },
     "paper/": {
       "command": "bash paper/build.sh",
-      "purpose": "build the TDL manuscript and supplement from generated macros and verify zero undefined references"
+      "purpose": "build the TDL manuscript and supplement and the DOPE 1.0 manuscript (preprint, venue, supplement) from generated macros; verify zero undefined references and that Figure 1 is a generated hero on page 1"
     },
     "paper/generated/": {
       "command": "python3 tools/claims/render.py --check",
@@ -1466,15 +1466,15 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
@@ -3219,6 +3219,30 @@
     "validation/requirements-v1.txt": {
       "command": "bash agent/check-python-v1-boundary.sh",
       "purpose": "verify pinned Python V1 compatibility graph"
+    },
+    "engine/": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify the pure-Rust DOPE 1.0 engine: formatting, clippy with warnings as errors, unit, end-to-end (byte budget, safetensors round trip, forest parity between native and tensor samplers) and CLI tests"
+    },
+    "bench/real-world/": {
+      "command": "python3 bench/real-world/render.py --check && python3 tools/claims/dope1.py --check",
+      "purpose": "verify that the README block, figures and paper macros are exactly what the committed benchmark records imply"
+    },
+    "examples/adult/walkthrough.py": {
+      "command": "python3 tools/claims/dope1.py --check",
+      "purpose": "verify the README walkthrough transcript is the generated one"
+    },
+    "examples/adult/TRANSCRIPT.md": {
+      "command": "python3 tools/claims/dope1.py --check",
+      "purpose": "verify the README walkthrough transcript is the generated one"
+    },
+    "tools/claims/dope1.py": {
+      "command": "python3 tools/claims/dope1.py --check",
+      "purpose": "verify authenticated DOPE1 README blocks and hero figure"
+    },
+    "ops/ci/engine.sh": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "run the engine gate used by CI"
     }
   },
   "workspace": "dope"

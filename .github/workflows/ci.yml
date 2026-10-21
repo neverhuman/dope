@@ -40,7 +40,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: rust-cpu-lan-ubuntu24-x86-64-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock') }}
+            engine/target
+          key: rust-cpu-lan-ubuntu24-x86-64-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'engine/Cargo.lock') }}
       - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
         with:
           version: v0.16.0
@@ -122,6 +123,9 @@ jobs:
           path: |
             target/paper/main.pdf
             target/paper/supplement.pdf
+            target/paper/dope1.pdf
+            target/paper/dope1-supplement.pdf
+            target/paper/dope1-venue.pdf
           if-no-files-found: error
           retention-days: 14
 
