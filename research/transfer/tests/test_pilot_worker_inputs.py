@@ -43,8 +43,13 @@ class PrivateInputCaptureTests(unittest.TestCase):
     def parse(self, raw, expected=2):
         return _partition(raw, expected, self.membership, self.layout, self.doc["schema_sha256"])
 
-    def test_private_header_reordering_preserves_feature_and_target_roles(self):
-        value = self.parse(b"private_target,private_feature\n4,1\n5,2\n")
+    def test_noncanonical_header_refuses_until_explicit_intake_normalization(self):
+        from research.transfer.target_last import normalize_csv
+        raw = b"private_target,private_feature\n4,1\n5,2\n"
+        with self.assertRaisesRegex(ValueError,"assembly_header_mismatch"):
+            self.parse(raw)
+        normalized = normalize_csv(raw,encoded(self.schema),target="private_target")
+        value = self.parse(normalized.csv)
         self.assertEqual(value.features.rows, ((1.0,), (2.0,)))
         self.assertEqual(value.targets, (4.0, 5.0))
         self.assertEqual(value.features.row_ids, self.membership[0])
@@ -171,3 +176,69 @@ class ExplicitLearnerSeedBindingTests(unittest.TestCase):
                             owner_recipe_decision_sha256=digest("different-owner-recipe"))
         with self.assertRaisesRegex(ValueError, "worker_owner_learner_stream_mismatch"):
             authority.verify_learner_seed("development")
+
+
+class FrozenPerPoolContextTests(unittest.TestCase):
+    def pools(self):
+        from research.transfer.adapters.base import FeatureBatch, TrainingBatch
+        from research.transfer.pilot_learning_contract import Pool, SCALES
+        schema = digest("context-schema")
+        def pool(role, size, reverse=False):
+            ids = tuple(digest(role+str(i)) for i in range(size))
+            targets = tuple(float(size-i-1 if reverse else i) for i in range(size))
+            batch = TrainingBatch(FeatureBatch(ids, tuple((float(i),) for i in range(size)), schema),
+                                  targets, "synthetic_train" if role=="synthetic_draw" else "development_train")
+            return Pool(batch, role, digest(role+"source"), digest(role+"artifact"), size, size, 0)
+        real = pool("fit_real", 384)
+        null = Pool(real.batch, "fit_null", real.source_sha256, real.artifact_sha256, 384, 384, 0)
+        values = {}
+        for scale in SCALES:
+            values[scale,"real"] = real
+            values[scale,"null"] = null
+            values[scale,"synthetic"] = pool("synthetic_draw", 128 if scale=="primary_n" else 512, True)
+        return values
+
+    def policy(self):
+        from research.transfer.pilot_worker_inputs import pool_context_policy_sha256, POOL_CONTEXT_FORMAT
+        rows = []
+        for name, n, rule in (("standard",128,"first_rows"),
+                              ("stratified_anchor",64,"fit_target_stratified")):
+            seed = "0x000d0beef2026104"
+            rows.append(dict(name=name, rows=n, seed=seed, selection_policy=rule,
+                             policy_sha256=pool_context_policy_sha256(name,n,seed,rule)))
+        return {"format":POOL_CONTEXT_FORMAT,"contexts":rows}
+
+    def test_real_anchor_indices_are_not_reused_on_smaller_synthetic_pools(self):
+        from research.transfer.pilot_worker_inputs import _contexts
+        pools = self.pools()
+        contexts, evidence = _contexts(self.policy(),pools)
+        anchor = contexts[1]
+        chosen = {(s,a):ids for s,a,ids in anchor.selections}
+        real_ids = pools["primary_n","real"].batch.features.row_ids
+        synthetic_ids = pools["primary_n","synthetic"].batch.features.row_ids
+        self.assertEqual(chosen["primary_n","real"],tuple(real_ids[6*j] for j in range(64)))
+        self.assertEqual(chosen["primary_n","synthetic"],tuple(synthetic_ids[127-2*j] for j in range(64)))
+        self.assertEqual(chosen["primary_n","real"],chosen["primary_n","null"])
+        self.assertEqual(len(evidence),12)
+        self.assertEqual(_contexts(self.policy(),pools)[0],contexts)
+        self.assertEqual(anchor.seed,int("0x000d0beef2026104",16))
+
+    def test_mutated_rule_query_label_injection_and_rounded_seed_are_refused(self):
+        from research.transfer.pilot_worker_inputs import _contexts
+        for fault in ("rule","query","seed"):
+            policy = self.policy()
+            if fault=="rule": policy["contexts"][1]["selection_policy"]="first_rows"
+            elif fault=="query": policy["query_labels"]=["PRIVATE_SENTINEL"]
+            else: policy["contexts"][0]["seed"]=float(0xffffffffffffffff)
+            with self.assertRaises(ValueError) as caught:
+                _contexts(policy,self.pools())
+            self.assertNotIn("PRIVATE_SENTINEL",str(caught.exception))
+
+    def test_insufficient_pool_refuses_instead_of_shrinking_a_context(self):
+        from research.transfer.pilot_worker_inputs import _contexts,pool_context_policy_sha256
+        policy = self.policy()
+        item = policy["contexts"][0]
+        item["rows"]=129
+        item["policy_sha256"]=pool_context_policy_sha256(item["name"],129,item["seed"],item["selection_policy"])
+        with self.assertRaisesRegex(ValueError,"assembly_context_pool_too_small"):
+            _contexts(policy,self.pools())

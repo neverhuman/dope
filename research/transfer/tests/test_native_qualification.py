@@ -330,6 +330,55 @@ class NativeQualificationTests(unittest.TestCase):
             self.assertEqual(worker_receipt["error"], "case_input_pin_mismatch")
 
 
+
+
+class NativeRuntimeMetadataPinTests(unittest.TestCase):
+    def test_vendored_record_cannot_replace_the_installed_distribution_record(self):
+        from pathlib import PurePosixPath
+        from types import SimpleNamespace
+        from research.transfer import native_qualification_runtime as runtime
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installed = PurePosixPath("installed-1.dist-info/RECORD")
+            vendor = PurePosixPath("pkg/_vendor/foreign-2.dist-info/RECORD")
+            for name, raw in ((installed, b"installed-record"), (vendor, b"vendor-record")):
+                path = root / str(name)
+                path.parent.mkdir(parents=True)
+                path.write_bytes(raw)
+            dist = SimpleNamespace(version="1", files=[vendor, installed],
+                                   locate_file=lambda item: root / str(item))
+            self.assertEqual(runtime._installed_record(dist, "1", pin("installed-record")),
+                             root / str(installed))
+            with self.assertRaises(nq.QualificationError):
+                runtime._installed_record(dist, "1", pin("vendor-record"))
+            with self.assertRaises(nq.QualificationError):
+                runtime._installed_record(dist, "2", pin("installed-record"))
+
+    def test_missing_or_ambiguous_installed_records_refuse_before_model_execution(self):
+        from pathlib import PurePosixPath
+        from types import SimpleNamespace
+        from research.transfer import native_qualification_runtime as runtime
+        for files in (None, [], [PurePosixPath("pkg/vendor/other.dist-info/RECORD")],
+                      [PurePosixPath("a.dist-info/RECORD"), PurePosixPath("b.dist-info/RECORD")]):
+            dist = SimpleNamespace(version="1", files=files,
+                                   locate_file=lambda _: self.fail("must refuse ambiguous inventory first"))
+            with self.assertRaises(nq.QualificationError):
+                runtime._installed_record(dist, "1", pin("unused"))
+
+    def test_component_license_labels_bind_the_reviewed_source_and_keep_weights_distinct(self):
+        from research.transfer import native_qualification_runtime as runtime
+        for model, expected in (("kumo_tabular", ("apache-2.0", "openmdw-1.1")),
+                                ("tabicl_v2", ("bsd-3-clause", "bsd-3-clause"))):
+            case = dict(zip(("code_repo", "code_revision", "checkpoint_repo", "checkpoint_revision"),
+                            nq.MODEL_SOURCES[model]), model=model)
+            self.assertEqual(runtime._component_license_ids(case), expected)
+            for key in ("code_revision", "checkpoint_revision"):
+                with self.assertRaises(nq.QualificationError):
+                    runtime._component_license_ids({**case, key: "0" * 40})
+        with self.assertRaises(nq.QualificationError):
+            runtime._component_license_ids({"model": "unknown"})
+
+
 if __name__ == "__main__":
     unittest.main()
 

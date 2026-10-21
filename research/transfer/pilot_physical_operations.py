@@ -234,8 +234,10 @@ def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, dr
     Optional streamed permutation keys reuse the existing permutation routine.
     Wall allocations come from the actual admitted parent, not a new default.
     The pinned Mitra route reserves8 children and400 steps (8x50 cap) for EVERY
-    prediction, including driver baseline/permutations. Prior329 observed updates
-    are not transferred to a new call. Other routes reserve at most one prepare.
+    new physical prediction. Exact-query driver baselines and repeated inputs
+    alias the same fit/query/predict-seed key; they create no extra model call.
+    Prior329 observed updates are not transferred to a new call. Other routes
+    reserve at most one prepare.
     """
     from .pilot_learning_contract import ARMS, LEARNERS, SCALES, identity, require
     from .pilot_learning_runtime import registry_digest
@@ -287,15 +289,15 @@ def reserve_learning_operations(execution, journal, cell_id, wall_by_role, *, dr
                                   "predict", [fit], registration)
                     operations = [fit, predict]
                     if driver_plan is not None:
-                        driver = identity({"fit": fit, "query": plan.query.sha256,
-                                           "labels": labels.sha256, "driver_plan": asdict(driver_plan)})
                         def record(columns):
                             features = FeatureBatch(plan.query.row_ids, tuple(tuple(r) for r in zip(*columns)),
                                                     plan.query.schema_sha256)
-                            number = len(operations) - 2
-                            key = identity({"driver": driver, "invocation": number,
-                                            "features": features.sha256})
-                            operations.append(add(key, "predict", [fit, predict], registration))
+                            key = identity({"operation": "predict", "fit_key": fit,
+                                            "query": features.sha256, "seed": plan.predict_seed})
+                            if key != predict:
+                                add(key, "predict", [fit, predict], registration)
+                            if key not in operations:
+                                operations.append(key)
                             return 0.0
                         permutation_importance(record, tuple(zip(*plan.query.rows)), dict(driver_plan.groups),
                                                learner_id=registration.role, query_population=plan.query.sha256,

@@ -30,15 +30,19 @@ MODULES = ("pilot_worker_runtime.py", "pilot_worker_authority.py", "pilot_worker
            "pilot_learning_runtime.py", "pilot_learning_reports.py", "pilot_physical_operations.py",
            "campaign_runner.py", "campaign_artifacts.py", "campaign_native.py", "evidence.py",
            "drivers.py", "adapters/base.py", "adapters/auditors/conventional.py",
-           "pilot_constant_null.py", "tdl/transfer.py", "tdl/drivers.py")
+           "pilot_constant_null.py", "tdl/target_last.py", "tdl/transfer.py", "tdl/drivers.py")
 
 
 class PilotWorkerRuntime:
     def __init__(self, authority, registry, null_reference, driver_plan, wall_by_role, *,
-                 verify_assembly, verify_operation, kind="development"):
+                 verify_assembly, verify_operation, kind="development", control_runtime=None):
         require(type(authority) is WorkerAuthority and type(driver_plan) is DriverPlan
                 and kind in ("fixture", "development")
                 and callable(verify_assembly) and callable(verify_operation), "worker_authority_required")
+        if control_runtime is not None:
+            from .pilot_control_runtime import PilotControlRuntime
+            require(type(control_runtime) is PilotControlRuntime, "worker_control_runtime_invalid")
+        self.control_runtime = control_runtime
         authority.verify_learner_seed(kind)
         self.authority, self.registry, self.null_reference = authority, dict(registry), null_reference
         self.driver_plan, self.wall_by_role, self.kind = driver_plan, wall_by_role, kind
@@ -49,14 +53,19 @@ class PilotWorkerRuntime:
 
     def capsule(self):
         root = Path(__file__).parent
-        return canonical_json({"format": "dope-trusted-parent-pilot-worker-v1", "kind": self.kind,
+        capsule = {"format": "dope-trusted-parent-pilot-worker-v1", "kind": self.kind,
             "authority": asdict(self.authority), "registry_sha256": registry_digest(self.registry),
             "null_reference_sha256": self.null_reference.sha256,
             "driver_plan": {"groups": [[n, list(v)] for n, v in self.driver_plan.groups],
                             "seed": self.driver_plan.seed, "repeats": self.driver_plan.repeats,
                             "protocol_sha256": self.driver_plan.protocol_sha256},
             "wall_by_role": self.wall_by_role,
-            "repository_modules": {name: file_hash(root / name) for name in MODULES}})
+            "repository_modules": {name: file_hash(root / name) for name in MODULES}}
+        if self.control_runtime is not None:
+            from .pilot_control_runtime import MODULES as CONTROL_MODULES
+            capsule["control_runtime"] = self.control_runtime.capsule()
+            capsule["repository_modules"].update({name: file_hash(root / name) for name in CONTROL_MODULES})
+        return canonical_json(capsule)
 
     @property
     def development_admission_used(self):
@@ -76,6 +85,11 @@ class PilotWorkerRuntime:
         require(all(self.registry[role].admission.eligibility_sha256 ==
                     doc["learner_rights_sha256"][role] for role in LEARNERS),
                 "worker_learner_rights_mismatch")
+        if doc["comparator"] == "dope":
+            require(self.control_runtime is None, "worker_control_runtime_mismatch")
+        else:
+            require(self.control_runtime is not None, "worker_control_runtime_required")
+            self.control_runtime.bind(spec, cell_plan, auth, paths)
         self._bound = True
 
     def _learners(self, journal, cell_plan, paths, root, manifest_sha256):
@@ -85,7 +99,8 @@ class PilotWorkerRuntime:
         captured = {key: paths[key] for key in ("csv", "selection_csv", "query_csv", "schema", "artifact")}
         captured.update(roles=Path(authority.roles_path), contexts=Path(authority.contexts_path), evidence=root)
         plan, labels, assembly = assemble(cell_plan, authority.binding(cell_plan.sha256, manifest_sha256),
-            NativeSeed(authority.learner_seed), captured, manifest_sha256, self.verify_assembly)
+            NativeSeed(authority.learner_seed), captured, manifest_sha256, self.verify_assembly,
+            control_runtime=self.control_runtime)
         admission = OperationAdmission(self.kind, plan.sha256, registry_digest(self.registry),
             authority.owner_receipt_sha256, authority.resource_receipt_sha256, LEARNERS,
             self.null_reference.sha256)

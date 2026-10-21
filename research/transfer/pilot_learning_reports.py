@@ -67,6 +67,14 @@ def reduce_learning(execution, labels, inference):
 def execute_drivers(execution, labels, plan):
     from research.transfer.drivers import permutation_importance
     require(type(plan) is DriverPlan and type(labels) is QueryLabels)
+    from .pilot_learning_runtime import registry_digest
+    execution._require_budget()
+    require(execution.plan.sha256 == execution._plan_sha256
+            and registry_digest(execution.registry) == execution._registry_sha256,
+            "driver_admitted_inputs_changed")
+    if execution.evidence.guard is not None:
+        require(execution.evidence.guard.graph.document()["driver_plan_sha256"] == plan.sha256,
+                "driver_plan_not_reserved")
     query = execution.plan.query
     require(labels.row_ids == query.row_ids)
     require(all(index < len(query.rows[0]) for _, group in plan.groups for index in group))
@@ -105,14 +113,31 @@ def execute_drivers(execution, labels, plan):
                     repeat = None if number == 0 else (number - 1) % plan.repeats
                     perturbed = FeatureBatch(query.row_ids, tuple(tuple(row) for row in zip(*columns)),
                                              query.schema_sha256)
-                    call_key = identity({"driver": key, "invocation": number, "features": perturbed.sha256})
-                    call = {"key": call_key, "group": group, "repetition": repeat,
+                    logical_key = identity({"driver": key, "invocation": number,
+                                            "features": perturbed.sha256})
+                    call_key = identity({"operation": "predict", "fit_key": case["fit_key"],
+                                         "query": perturbed.sha256, "seed": execution.plan.predict_seed})
+                    call = {"key": call_key, "logical_key": logical_key,
+                            "group": group, "repetition": repeat,
                             "permutation_seed": plan.seed, "perturbed_rows": perturbed.rows,
                             "perturbed_row_ids": perturbed.row_ids, "query_sha256": perturbed.sha256,
                             "status": "started"}
                     calls.append(call)
-                    result = execution.predict(adapter, registration, perturbed, case["consumed_rows"],
-                                               call_key, parent=case["fit_key"], extra=call)
+                    require(call_key not in execution.failed, "prior_physical_failure_no_retry")
+                    reused_prediction = call_key in execution.predictions
+                    call.update(reused_prediction=reused_prediction, costs_charged_at=call_key)
+                    if reused_prediction:
+                        result = execution.predictions[call_key]
+                        require(result["query_sha256"] == perturbed.sha256
+                                and result["predict_seed"] == execution.plan.predict_seed,
+                                "cached_prediction_binding_changed")
+                        execution.evidence.append({"event": "driver_prediction_alias",
+                            "logical_key": logical_key, "physical_key": call_key,
+                            "query_sha256": perturbed.sha256, "predict_seed": execution.plan.predict_seed})
+                    else:
+                        result = execution.predict(adapter, registration, perturbed, case["consumed_rows"],
+                                                   call_key, parent=case["fit_key"], extra=call)
+                        execution.predictions[call_key] = result
                     paired = losses(result, labels)
                     value = finite(sum(paired) / len(paired))
                     call.update(status="completed", losses=paired, loss=value, prediction=result)
@@ -126,6 +151,8 @@ def execute_drivers(execution, labels, plan):
                                              "sign": "not_measured", "interaction": "not_measured",
                                              "causal": "not_qualified"})
             except Exception:
+                if calls and calls[-1]["key"] not in execution.predictions:
+                    execution.failed[calls[-1]["key"]] = True  # no repeated physical failure
                 record["reason"] = "driver_operation_failed"
             execution.evidence.append({"event": "driver_outcome", "key": key, "private_evidence": record})
         link = {**coordinate, "key": key, "status": records[key]["status"],

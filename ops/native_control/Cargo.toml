@@ -1,0 +1,24 @@
+[package]
+name = "dope-native-control"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+
+# Isolated offline package: never links the product DSO or its build script.
+[workspace]
+
+[dependencies]
+libm = { version = "=0.2.16", default-features = false }
+
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
+overflow-checks = true
+
+[[bin]]
+name = "dope-native-control-runtime"
+path = "src/loader.rs"

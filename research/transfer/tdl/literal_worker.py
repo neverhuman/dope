@@ -80,6 +80,29 @@ def _control_json_pairs(pairs):
     return result
 
 
+def _control_binary_document(raw):
+    require(type(raw) is bytes and len(raw) >= 40, "invalid_control_artifact")
+    magic, method, columns, fit_rows, seed, count, stored = struct.unpack_from("<8sIIQQII", raw)
+    require(magic == b"DNCB2\0\0\0" and method in (1, 2) and 0 < columns <= 64
+            and 0 < fit_rows <= 4096, "invalid_control_artifact")
+    require((method == 1 and 0 < stored <= fit_rows and count == 0)
+            or (method == 2 and stored == 0 and count in (257,129,65,33,17,9,5,3)),
+            "invalid_control_artifact")
+    values = stored * columns if method == 1 else 1 + columns * count + columns * (columns + 1) // 2
+    require(len(raw) == 40 + 8 * values, "invalid_control_artifact")
+    it = iter(value[0] for value in struct.iter_unpack("<d", raw[40:]))
+    result = {"format":"tdl-bounded-control-v1", "method":{1:"compressed_real_rows",2:"gaussian_copula"}[method],
+              "columns":columns,"fit_rows":fit_rows,"fit_seed":seed,"column_order":"features_then_target"}
+    if method == 1:
+        result["rows"] = [[next(it) for _ in range(columns)] for _ in range(stored)]
+    else:
+        result["shrinkage"] = next(it)
+        result["quantile_count"] = count
+        result["quantiles"] = [[next(it) for _ in range(count)] for _ in range(columns)]
+        result["factor"] = [[next(it) for _ in range(i+1)] for i in range(columns)]
+    return result
+
+
 def _control_document(content, method):
     """Strict bounded decoder; private state is never a source-file locator."""
     require(method in CONTROL_METHODS and len(content) <= MAX_CONTROL_JSON, "invalid_control_artifact")
@@ -87,7 +110,10 @@ def _control_document(content, method):
     raw = decoder.decompress(content, MAX_CONTROL_JSON + 1)
     require(len(raw) <= MAX_CONTROL_JSON and decoder.eof and not decoder.unused_data
             and not decoder.unconsumed_tail, "invalid_control_artifact")
-    document = json.loads(raw, object_pairs_hook=_control_json_pairs)
+    if raw.startswith(b"DNCB2\0\0\0"):
+        document = _control_binary_document(raw)
+    else:
+        document = json.loads(raw, object_pairs_hook=_control_json_pairs)
     common = {"format", "method", "fit_rows", "fit_seed", "columns", "column_order"}
     extra = {"quantile_count", "quantiles", "factor", "shrinkage"} if method == "gaussian_copula" else {"rows"}
     require(type(document) is dict and set(document) == common | extra, "invalid_control_artifact")

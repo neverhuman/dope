@@ -233,6 +233,14 @@ class BoundedControlTests(unittest.TestCase):
                 writer = csv.writer(stream)
                 writer.writerow([column["source_name"] for column in doc["columns"]])
                 writer.writerows([[row[i] for i in (2, 1, 0)] for row in training])
+            from research.transfer.target_last import normalize_files
+            original_source, original_schema = source.read_bytes(), schema.read_bytes()
+            for cls in classes:
+                with self.assertRaises(MetricError):
+                    cls(byte_budget=2048).fit(source, schema, 42)
+            normalize_files(source, schema, root / "canonical", target="SECRET_y")
+            self.assertEqual((source.read_bytes(), schema.read_bytes()), (original_source, original_schema))
+            source, schema = root / "canonical/table.csv", root / "canonical/schema.json"
             for cls in classes:
                 port = cls(byte_budget=2048)
                 port.fit(source, schema, 42)
@@ -251,6 +259,14 @@ class BoundedControlTests(unittest.TestCase):
                 writer = csv.writer(stream)
                 writer.writerow(["SECRET_y", "SECRET_x", "SECRET_fixed"])
                 writer.writerows([[row[2], row[0], row[1]] for row in training])
+            from research.transfer.target_last import normalize_files
+            original_source, original_schema = source.read_bytes(), schema.read_bytes()
+            for cls in classes:
+                with self.assertRaises(MetricError):
+                    cls(byte_budget=2048).fit(source, schema, 42)
+            normalize_files(source, schema, root / "canonical", target="SECRET_y")
+            self.assertEqual((source.read_bytes(), schema.read_bytes()), (original_source, original_schema))
+            source, schema = root / "canonical/table.csv", root / "canonical/schema.json"
             for cls in classes:
                 port = cls(byte_budget=2048)
                 port.fit(source, schema, 42)

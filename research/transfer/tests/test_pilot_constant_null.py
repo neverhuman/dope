@@ -132,7 +132,12 @@ class ConstantNullTests(unittest.TestCase):
         before = FixtureLearner.predictions
         drivers = execute_drivers(execution, self.labels(), plan)
         self.assertEqual(len(drivers["records"]), len({c["fit_key"] for c in execution.cases}))
-        self.assertEqual(FixtureLearner.predictions - before, len(drivers["records"]) * 3)
+        logical_calls = [call for record in drivers["records"].values() for call in record["calls"]]
+        baseline_keys = {case["prediction_key"] for case in execution.cases}
+        new_physical = {call["key"] for call in logical_calls} - baseline_keys
+        self.assertGreater(len(new_physical), 0)
+        self.assertEqual(FixtureLearner.predictions - before, len(new_physical))
+        self.assertEqual(sum(not call["reused_prediction"] for call in logical_calls), len(new_physical))
         null_links = [link for link in drivers["links"] if link["arm"] == "null"]
         self.assertEqual(len({link["key"] for link in null_links}), 2)
         for key in {link["key"] for link in null_links}:

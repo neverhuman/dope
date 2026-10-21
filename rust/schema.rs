@@ -251,9 +251,12 @@ impl TableSchemaV1 {
         if bytes.len() > MAX_SCHEMA_BYTES {
             return Err(SchemaError::new("schema_bytes_exceeded", None, None));
         }
-        let schema: Self = serde_json::from_slice(bytes)
+        let mut schema: Self = serde_json::from_slice(bytes)
             .map_err(|_| SchemaError::new("invalid_schema_json", None, None))?;
         schema.validate_with_field_limit(max_field_bytes)?;
+        schema
+            .columns
+            .sort_by_key(|column| column.role == ColumnRole::Target);
         Ok(schema)
     }
 
@@ -354,6 +357,8 @@ impl TableSchemaV1 {
         Ok(self
             .columns
             .iter()
+            .filter(|c| c.role != ColumnRole::Target)
+            .chain(self.columns.iter().filter(|c| c.role == ColumnRole::Target))
             .map(|c| PublicColumn {
                 id: c.id.clone(),
                 role: c.role,

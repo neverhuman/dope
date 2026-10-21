@@ -84,3 +84,10 @@ The existing `rust/` route covers the included fitting section as `rust-core`
 with `just check`; the historical frontier paths already have exact test routes.
 Custody worktrees and ignored evidence are inventoried read-only under `target/`.
 Extraction never implies permission to clean, relocate or discard those assets.
+
+The native research-control sampler is built as Rust under `ops/native_control`.
+Its offline build/provenance entrypoints live in
+`research/transfer/native_control_{build,manifest,prepare}.py` with the existing
+non-product transfer research boundary. They prepare measured ML-control evidence;
+they do not implement product routes, release certification or database truth.
+The recipient sampler stays the paid Rust ELF; no Python is added to that closure.

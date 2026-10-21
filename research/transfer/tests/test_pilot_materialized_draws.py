@@ -74,6 +74,34 @@ class MaterializedDrawTests(unittest.TestCase):
         with self.assertRaisesRegex(CampaignRunnerError, "draw_row_identity_collision"):
             draw.pool(forbidden_row_ids=draw.row_ids)
 
+    def test_historical_target_first_draw_decodes_but_cannot_train_or_store(self):
+        schema = json.loads(SCHEMA_DOCUMENT)
+        schema["columns"].reverse()
+        legacy_raw_schema = canonical_json(schema)
+        s, raw, report = draw_fixture()
+        spec = replace(s, schema_sha256=hashlib.sha256(legacy_raw_schema).hexdigest())
+        report["inspection"]["schema"] = list(reversed(PUBLIC_SCHEMA))
+        native = native_json(report)
+        old = decode_draw(raw, native, spec, schema_document=legacy_raw_schema)
+        self.assertEqual((old.raw, old.native_receipt, old.schema_document), (raw, native, legacy_raw_schema))
+        self.assertEqual(old.sample_sha256, hashlib.sha256(raw).hexdigest())
+        expected = tuple(digest({"spec": asdict(spec), "sample_sha256": old.sample_sha256, "row": i})
+                         for i in range(spec.rows))
+        self.assertEqual(old.row_ids, expected)
+        with self.assertRaisesRegex(CampaignRunnerError, "draw_target_must_be_last"):
+            old.pool()
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            artifact = root / "artifact"
+            create_private(artifact, b"fixture")
+            s4, raw4, report4 = draw_fixture("sensitivity_4n", 8, (1 << 64) - 1)
+            spec4 = replace(s4, schema_sha256=spec.schema_sha256)
+            report4["inspection"]["schema"] = list(reversed(PUBLIC_SCHEMA))
+            old4 = decode_draw(raw4, native_json(report4), spec4, schema_document=legacy_raw_schema)
+            with self.assertRaisesRegex(CampaignRunnerError, "draw_target_must_be_last"):
+                store_pair(root, old, old4, artifact=artifact)
+            self.assertFalse((root / "materialized-draws").exists())
+
     def test_constructor_itself_cannot_bypass_receipt_validation(self):
         spec, raw, report = draw_fixture()
         report["seed"] -= 1

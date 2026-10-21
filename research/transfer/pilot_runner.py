@@ -140,11 +140,14 @@ def _verify_stage_payload(label, payload, doc, artifact_sha, artifact_size, draw
             )
     elif label == "reload":
         accounting = payload.get("accounting")
-        _require(
-            type(accounting) is dict and accounting.get("complete_sampling_bytes") == artifact_size
-            and 0 < artifact_size <= doc["byte_budget"],
-            "pilot_stage_output_invalid",
-        )
+        if doc["version"] == 2 and doc["comparator"] != "dope":
+            _require(type(accounting) is dict and accounting.get("artifact_bytes") == artifact_size
+                     and accounting.get("scope") == "full_framed_artifact_only"
+                     and accounting.get("sampling_charge_pending") is True
+                     and 0 < artifact_size <= doc["byte_budget"], "pilot_stage_output_invalid")
+        else:
+            _require(type(accounting) is dict and accounting.get("complete_sampling_bytes") == artifact_size
+                     and 0 < artifact_size <= doc["byte_budget"], "pilot_stage_output_invalid")
         if doc["comparator"] != "dope":
             _require(payload.get("comparator") == doc["comparator"], "pilot_stage_output_invalid")
     elif label == "sample":
@@ -272,6 +275,9 @@ def execute_pilot_cell(
     )
     _require(not (root / "pilot-execution.json").exists(), "pilot_replay_refused")
     doc = cell_plan.document()
+    typed_control = doc["version"] == 2 and doc["comparator"] != "dope"
+    _require(not typed_control or (worker_runtime is not None and worker_runtime.control_runtime is not None),
+             "pilot_v2_control_runtime_unavailable")
     cell_id, ram_limit = doc["cell_id"], spec.document()["budget"]["peak_ram_bytes"]
     stage_rows, processes, paths, compiled_sha = [], 0, None, None
     draw_manifest_sha256 = None
@@ -358,6 +364,21 @@ def execute_pilot_cell(
                     "wall_ms": int((time.monotonic() - start) * 1000 + 1),
                     "peak_ram_bytes": max(o["peak_ram_bytes"] for o in outcomes)}, manifest, compiled_sha
 
+        def control_stage(stage):
+            nonlocal processes, draw_manifest_sha256
+            control = worker_runtime.control_runtime
+            before = control.processes
+            try:
+                _require(worker_runtime.capsule() == worker_runtime._capsule
+                         and file_hash(paths["worker"], MAX_BINARY) == doc["worker_binary_sha256"],
+                         "pilot_worker_modified")
+                result = control.stage(stage, journal, cell_plan, paths, root)
+                if stage == "sample" and result[0]["status"] == "completed":
+                    draw_manifest_sha256 = result[1]["materialized_draw_manifest_sha256"]
+                return result
+            finally:
+                processes += control.processes - before
+
         def bound_stage(stage):
             # One runtime boundary owns validation and failure telemetry.
             # The existing journal independently refuses undisposed operations.
@@ -390,9 +411,9 @@ def execute_pilot_cell(
 
         stage_fns = (
             ("prepare", prepare),
-            ("compile", lambda: run_step(*_stage_command(paths, cell_plan, "compile"), "compile")),
-            ("reload", lambda: run_step(*_stage_command(paths, cell_plan, "reload"), "reload", compiled_sha)),
-            ("sample", sample_pair if doc["version"] == 2 else
+            ("compile", lambda: control_stage("compile") if typed_control else run_step(*_stage_command(paths, cell_plan, "compile"), "compile")),
+            ("reload", lambda: control_stage("reload") if typed_control else run_step(*_stage_command(paths, cell_plan, "reload"), "reload", compiled_sha)),
+            ("sample", (lambda: control_stage("sample")) if typed_control else sample_pair if doc["version"] == 2 else
              lambda: run_step(*_stage_command(paths, cell_plan, "sample"), "sample", compiled_sha)),
             ("learners", learners),
             ("drivers", lambda: bound_stage("drivers") if worker_runtime is not None else run_step(paths["worker"], [

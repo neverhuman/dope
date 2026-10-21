@@ -133,6 +133,19 @@ def _schema_projection(raw, spec):
         raise CampaignRunnerError("draw_schema_mismatch") from None
 
 
+def _require_canonical_schema(raw):
+    """New model pools and persisted handoffs require canonical target-last.
+
+    Retained historical draw decoding separately preserves its original schema
+    projection, native receipt and physical identities; it grants no model use.
+    """
+    from .tdl.target_last import TargetLastError, schema_columns, schema_document
+    try:
+        schema_columns(schema_document(raw))
+    except TargetLastError:
+        raise CampaignRunnerError("draw_target_must_be_last") from None
+
+
 @dataclass(frozen=True, repr=False)
 class MaterializedDraw:
     spec: DrawSpec
@@ -163,6 +176,7 @@ class MaterializedDraw:
         return tuple(digest({**binding, "row": i}) for i in range(self.spec.rows))
 
     def pool(self, *, forbidden_row_ids=()):
+        _require_canonical_schema(self.schema_document)
         from .adapters.base import FeatureBatch, TrainingBatch
         from .pilot_learning_contract import Pool
 
@@ -178,7 +192,11 @@ class MaterializedDraw:
 
 
 def decode_draw(raw, native_receipt, spec, *, schema_document, control_request=None):
-    """Verify stream shape and its receipt; producer origin remains an owner gate."""
+    """Reverify original retained stream/receipt bytes, without granting model use.
+
+    Historical schema order stays intact. pool() and new store_pair() enforce
+    mandatory target-last before any new training pool or persisted handoff.
+    """
     _require_supported(spec)
     _require(control_request is None, "draw_receipt_mismatch")
     return MaterializedDraw(spec, raw, native_receipt, schema_document, control_request)
@@ -218,6 +236,8 @@ def store_pair(directory, primary, sensitivity, *, artifact):
              "invalid_materialized_draw")
     _require_supported(primary.spec)
     _require_supported(sensitivity.spec)
+    _require_canonical_schema(primary.schema_document)
+    _require_canonical_schema(sensitivity.schema_document)
     root = private_root(directory)
     left, right = primary.spec, sensitivity.spec
     _require((left.scale, right.scale) == SCALES and right.rows == left.rows * 4
@@ -258,8 +278,17 @@ def store_pair(directory, primary, sensitivity, *, artifact):
     return manifest
 
 
-def load_pair(directory, expected_manifest_sha256, *, artifact):
+def load_pair(directory, expected_manifest_sha256, *, artifact, comparator="dope", control_runtime=None):
     """Reverify retained bytes, exact artifact and pinned manifest; no admission grant."""
+    if comparator != "dope":
+        from .pilot_control_runtime import PilotControlRuntime
+        _require(comparator in ("gaussian_copula", "compressed_real_rows")
+                 and type(control_runtime) is PilotControlRuntime,
+                 "pilot_v2_control_runtime_unavailable")
+        draws = control_runtime.load_pair(directory, expected_manifest_sha256, artifact=artifact)
+        _require(all(d.spec.method == comparator for d in draws), "draw_pair_mismatch")
+        return draws
+    _require(control_runtime is None, "draw_runtime_mismatch")
     dest = private_root(Path(directory) / "materialized-draws")
     _pin(expected_manifest_sha256)
     raw = read_regular(dest / "manifest.json")

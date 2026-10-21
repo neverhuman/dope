@@ -1,7 +1,8 @@
 """Private captured worker inputs; exact pins require trusted executor admission.
 
-Contexts are owner-supplied row IDs or precommitted index selections. Query
-targets remain metric-side. This module performs no context selection or inference.
+Contexts use owner-supplied row IDs/indices or a signed, precommitted per-pool
+training-only policy. Query targets remain metric-side; they are never context
+selection inputs. Policy-derived indices are recorded after exact draws exist.
 """
 from dataclasses import asdict, dataclass
 import csv
@@ -17,6 +18,7 @@ from research.transfer.pilot_learning_contract import (
     Context, LearningPlan, Pool, QueryLabels, SCALES, count, identity, pin, require,
 )
 from research.transfer.pilot_materialized_draws import load_pair
+from research.transfer.tdl.target_last import schema_columns
 from research.transfer.pilot_native_seed import NativeSeed
 
 ROLES = ("fit", "selection", "query")
@@ -116,6 +118,7 @@ def _layout(raw):
             and type(schema.get("version")) is int and schema["version"] == 1
             and type(schema.get("columns")) is list and bool(schema["columns"]),
             "assembly_schema_invalid")
+    schema_columns(schema)  # reject noncanonical schemas before reading labels
     columns = schema["columns"]
     require(all(type(c) is dict and c.get("role") in ("feature", "target")
                 and c.get("dtype") == "continuous" and type(c.get("source_name")) is str
@@ -135,7 +138,7 @@ def _partition(raw, expected_rows, membership, layout, schema_sha256):
     try:
         reader = csv.reader(io.StringIO(raw.decode("utf-8"), newline=""), strict=True)
         header = next(reader)
-        require(len(header) == len(set(header)) and set(header) == set(names),
+        require(len(header) == len(set(header)) and header == names and header[-1] == target,
                 "assembly_header_mismatch")
         feature_indices, target_index = [header.index(n) for n in features], header.index(target)
         rows, targets = [], []
@@ -156,7 +159,85 @@ def _partition(raw, expected_rows, membership, layout, schema_sha256):
                      membership[1], hashlib.sha256(raw).hexdigest())
 
 
-def assemble(cell_plan, binding, native_seed, paths, manifest_sha256, verify_assembly):
+POOL_CONTEXT_FORMAT = "dope-pilot-private-pool-context-policy-v2"
+POOL_POLICY_FORMAT = "dope-pilot-frozen-pool-context-policy-v1"
+
+
+def pool_context_policy_sha256(name, rows, seed, selection_policy):
+    """Identity of a rule frozen before any draws; not an admission decision."""
+    require((name, selection_policy) in (("standard", "first_rows"),
+                ("stratified_anchor", "fit_target_stratified")), "assembly_context_policy_invalid")
+    count(rows, 1)
+    require(type(seed) is str and len(seed) == 18 and seed.startswith("0x")
+            and all(c in "0123456789abcdef" for c in seed[2:]), "assembly_context_seed_invalid")
+    return identity({"format": POOL_POLICY_FORMAT, "name": name, "rows": rows,
+                     "seed": seed, "selection_policy": selection_policy,
+                     "seed_semantics": "identity_only_no_prng_target_rank_then_input_index"})
+
+
+def _contexts(context_doc, pool_map):
+    """Resolve fixed rules on each actual TRAINING pool, never real indices on synthetic rows.
+
+    V1 explicit selections remain supported. V2 rule bytes and owner authority
+    are frozen before generation; only their deterministic indices are resolved
+    after the pool exists. Target ranks use training labels only. No query or
+    selection labels are passed to this function.
+    """
+    if context_doc["format"] != POOL_CONTEXT_FORMAT:
+        contexts = []
+        indexed = context_doc["format"] == "dope-pilot-private-context-indices-v1"
+        source_key = "indices" if indexed else "row_ids"
+        for item in context_doc["contexts"]:
+            require(type(item) is dict and set(item) == {"name", "rows", "seed", "policy_sha256", "selections"}
+                    and type(item["selections"]) is list, "assembly_contexts_invalid")
+            selections = []
+            for selection in item["selections"]:
+                require(type(selection) is dict and set(selection) == {"scale", "arm", source_key}
+                        and type(selection[source_key]) is list, "assembly_contexts_invalid")
+                values = selection[source_key]
+                if indexed:
+                    require((selection["scale"], selection["arm"]) in pool_map,
+                            "assembly_contexts_invalid")
+                    ids = pool_map[selection["scale"], selection["arm"]].batch.features.row_ids
+                    require(all(type(i) is int and 0 <= i < len(ids) for i in values),
+                            "assembly_context_index_invalid")
+                    values = [ids[i] for i in values]
+                selections.append((selection["scale"], selection["arm"], tuple(values)))
+            contexts.append(Context(item["name"], item["rows"], item["seed"], item["policy_sha256"], tuple(selections)))
+        return contexts, []
+    contexts, evidence = [], []
+    require(set(context_doc) == {"format", "contexts"} and type(context_doc["contexts"]) is list,
+            "assembly_contexts_invalid")
+    for item in context_doc["contexts"]:
+        require(type(item) is dict and set(item) == {
+            "name", "rows", "seed", "policy_sha256", "selection_policy"}, "assembly_contexts_invalid")
+        expected = pool_context_policy_sha256(item["name"], item["rows"], item["seed"],
+                                                item["selection_policy"])
+        require(item["policy_sha256"] == expected, "assembly_context_policy_mismatch")
+        selections = []
+        for (scale, arm), pool in pool_map.items():
+            batch = pool.batch
+            ids, targets = batch.features.row_ids, batch.targets
+            require(item["rows"] <= len(ids) == len(targets), "assembly_context_pool_too_small")
+            require(all(type(v) in (int, float) and math.isfinite(v) for v in targets),
+                    "assembly_context_target_invalid")
+            if item["selection_policy"] == "first_rows":
+                indices = list(range(item["rows"]))
+            else:
+                order = sorted(range(len(ids)), key=lambda i: (targets[i], i))
+                indices = [order[(j * len(ids)) // item["rows"]] for j in range(item["rows"])]
+            chosen = tuple(ids[i] for i in indices)
+            selections.append((scale, arm, chosen))
+            evidence.append({"context": item["name"], "scale": scale, "arm": arm,
+                "policy_sha256": expected, "training_pool_sha256": identity(asdict(batch)),
+                "selected_indices_sha256": identity(indices), "selected_row_ids_sha256": identity(chosen),
+                "rows": len(chosen)})
+        contexts.append(Context(item["name"], item["rows"], int(item["seed"], 16),
+                                expected, tuple(selections)))
+    return contexts, evidence
+
+
+def assemble(cell_plan, binding, native_seed, paths, manifest_sha256, verify_assembly, *, control_runtime=None):
     """Capture exact fit/select/query roles; construct the existing typed plan.
 
     `paths` names private snapshots, plus exact owner-supplied membership/context
@@ -194,9 +275,11 @@ def assemble(cell_plan, binding, native_seed, paths, manifest_sha256, verify_ass
     context_doc = parse_json(raw_contexts)
     require(type(context_doc) is dict and set(context_doc) == {"format", "contexts"}
             and context_doc["format"] in ("dope-pilot-private-contexts-v1",
-                                          "dope-pilot-private-context-indices-v1")
+                                          "dope-pilot-private-context-indices-v1",
+                                          "dope-pilot-private-pool-context-policy-v2")
             and type(context_doc["contexts"]) is list, "assembly_contexts_invalid")
-    draws = load_pair(paths["evidence"], manifest_sha256, artifact=paths["artifact"])
+    draws = load_pair(paths["evidence"], manifest_sha256, artifact=paths["artifact"],
+                      comparator=doc["comparator"], control_runtime=control_runtime)
     forbidden = tuple(row for role in ROLES for row in tables[role].features.row_ids)
     fit = tables["fit"]
     training = TrainingBatch(fit.features, fit.targets, "development_train")
@@ -212,29 +295,7 @@ def assemble(cell_plan, binding, native_seed, paths, manifest_sha256, verify_ass
                 and draw.schema_document == schema_raw, "assembly_draw_binding_mismatch")
         pools.extend(((scale, "real", real), (scale, "null", null),
                       (scale, "synthetic", draw.pool(forbidden_row_ids=forbidden))))
-    # Index recipes can be signed before artifact/draw identities exist. They
-    # only address captured rows; no post-draw search or selector is performed.
-    contexts = []
-    indexed = context_doc["format"] == "dope-pilot-private-context-indices-v1"
-    source_key = "indices" if indexed else "row_ids"
-    pool_map = {(scale, arm): pool for scale, arm, pool in pools}
-    for item in context_doc["contexts"]:
-        require(type(item) is dict and set(item) == {"name", "rows", "seed", "policy_sha256", "selections"}
-                and type(item["selections"]) is list, "assembly_contexts_invalid")
-        selections = []
-        for selection in item["selections"]:
-            require(type(selection) is dict and set(selection) == {"scale", "arm", source_key}
-                    and type(selection[source_key]) is list, "assembly_contexts_invalid")
-            values = selection[source_key]
-            if indexed:
-                require((selection["scale"], selection["arm"]) in pool_map,
-                        "assembly_contexts_invalid")
-                ids = pool_map[selection["scale"], selection["arm"]].batch.features.row_ids
-                require(all(type(i) is int and 0 <= i < len(ids) for i in values),
-                        "assembly_context_index_invalid")
-                values = [ids[i] for i in values]
-            selections.append((selection["scale"], selection["arm"], tuple(values)))
-        contexts.append(Context(item["name"], item["rows"], item["seed"], item["policy_sha256"], tuple(selections)))
+    contexts, context_evidence = _contexts(context_doc, {(scale, arm): pool for scale, arm, pool in pools})
     query = tables["query"]
     plan = LearningPlan(doc["task_id"], doc["comparator"], doc["candidate"], draws[0].spec.artifact_sha256,
                         cell_plan.input_sha256, binding.source_sha256, binding.environment_sha256,
@@ -250,5 +311,6 @@ def assemble(cell_plan, binding, native_seed, paths, manifest_sha256, verify_ass
                 "partition_rows": {r: len(tables[r].targets) for r in ROLES},
                 "selection_row_ids_sha256": identity(list(tables["selection"].features.row_ids)),
                 "query_labels_sha256": labels.sha256, "learning_plan_sha256": plan.sha256,
+                "context_format": context_doc["format"], "context_policy_derivations": context_evidence,
                 "scientific_admission": False, "pipeline_complete": False}
     return plan, labels, evidence

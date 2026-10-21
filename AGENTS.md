@@ -19,3 +19,10 @@ Preserve historical DPK3.2 and v1 receipt decoding. New tier claims require
 measured certification; an empirical privacy result is never formal DP or HIPAA
 de-identification. Errors and public sidecars must not echo source values,
 headers, or extrema.
+
+All new canonical training and evaluation tables must follow
+[the mandatory target-last contract](docs/data-contract.md). Resolve the target
+from its explicit dataset declaration, normalize external CSVs once with the shared
+intake, and reject downstream schema/header drift. Never infer the target merely
+from the last source column. Keep query targets out of features and context
+selection, and preserve original sources and physical row identities.

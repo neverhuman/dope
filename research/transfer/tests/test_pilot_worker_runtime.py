@@ -40,10 +40,12 @@ class BoundWorkerTests(unittest.TestCase):
         FixtureLearner.prepares = FixtureLearner.predictions = 0
 
     def prepare(self, *, budget=60000, wrong_rights=False, bad_index=False, verifier=None,
-                learner_seed="0x00000000000006c1"):
+                learner_seed="0x00000000000006c1", comparator="dope",
+                control_runtime=None, byte_budget=32768, pool_policy=False):
         # Fixture default explicitly equals its compiler seed; production has no default.
         spec, pilot, contract, cell, root, auth = fixture(
-            self.directory, stage_wall_ms=10000000, binary_source=self.binary, version=2)
+            self.directory, stage_wall_ms=10000000, binary_source=self.binary, version=2, comparator=comparator,
+            candidate="chow_liu" if comparator == "dope" else comparator, byte_budget=byte_budget)
         doc = cell.document()
         registry, null = make_registry(), make_null()
         def adapt(entry):
@@ -62,11 +64,20 @@ class BoundWorkerTests(unittest.TestCase):
         contexts = self.directory / "private-context-indices.json"
         create_private(roles, canonical_json({"format": "dope-pilot-private-physical-membership-v1",
             "schema_sha256": doc["schema_sha256"], "partitions": parts}))
-        create_private(contexts, canonical_json({"format": "dope-pilot-private-context-indices-v1",
-            "contexts": [{"name": name, "rows": 16, "seed": 11, "policy_sha256": PIN,
-                "selections": [{"scale": scale, "arm": arm,
-                    "indices": list(range(16)) if not bad_index else [999] + list(range(1, 16))}
-                    for scale in SCALES for arm in ARMS]} for name in CONTEXTS]}))
+        if pool_policy:
+            from research.transfer.pilot_worker_inputs import pool_context_policy_sha256, POOL_CONTEXT_FORMAT
+            items = []
+            for name, rule in (("standard", "first_rows"), ("stratified_anchor", "fit_target_stratified")):
+                seed = "0x000000000000000b"
+                items.append({"name": name, "rows": 16, "seed": seed, "selection_policy": rule,
+                              "policy_sha256": pool_context_policy_sha256(name,16,seed,rule)})
+            create_private(contexts, canonical_json({"format":POOL_CONTEXT_FORMAT,"contexts":items}))
+        else:
+            create_private(contexts, canonical_json({"format": "dope-pilot-private-context-indices-v1",
+                "contexts": [{"name": name, "rows": 16, "seed": 11, "policy_sha256": PIN,
+                    "selections": [{"scale": scale, "arm": arm,
+                        "indices": list(range(16)) if not bad_index else [999] + list(range(1, 16))}
+                        for scale in SCALES for arm in ARMS]} for name in CONTEXTS]}))
         source = spec.document()
         authority = WorkerAuthority(cell.input_sha256, str(roles), str(contexts), file_hash(roles),
             file_hash(contexts), identity({"source_commit": source["source_commit"], "source_tree": source["source_tree"]}),
@@ -76,7 +87,7 @@ class BoundWorkerTests(unittest.TestCase):
         worker = PilotWorkerRuntime(authority, registry, null, driver,
             {name: {"prepare": budget, "predict": budget} for name in (*LEARNERS, "null_reference")},
             verify_assembly=(lambda binding: None) if verifier is None else verifier,
-            verify_operation=lambda admission: None, kind="fixture")
+            verify_operation=lambda admission: None, kind="fixture", control_runtime=control_runtime)
         doc["worker_binary"] = str(self.directory / "bound-worker-capsule.json")
         create_private(Path(doc["worker_binary"]), worker.capsule(), 0o400)
         doc["worker_binary_sha256"] = file_hash(Path(doc["worker_binary"]))
@@ -100,6 +111,12 @@ class BoundWorkerTests(unittest.TestCase):
     def run_bound(self, prepared):
         spec, pilot, contract, cell, root, auth, worker = prepared
         return execute_pilot_cell(spec, pilot, contract, cell, root, worker_runtime=worker, **auth)
+
+    def test_frozen_per_pool_policy_runs_actual_native_eight_stages(self):
+        receipt = self.run_bound(self.prepare(pool_policy=True))
+        self.assertEqual(receipt["status"], "ok")
+        self.assertEqual(len(receipt["stages"]), 8)
+        self.assertGreater(FixtureLearner.prepares, 0)
 
     def test_actual_native_draws_reach_sixty_fixture_paths_under_one_live_journal(self):
         prepared = self.prepare()
@@ -181,7 +198,9 @@ class BoundWorkerTests(unittest.TestCase):
         self.assertEqual(FixtureLearner.prepares, 0)
 
     def test_insufficient_parent_physical_budget_refuses_all_model_calls(self):
-        receipt = self.run_bound(self.prepare(budget=100000))
+        # One operation exceeds the entire 10,000,000 ms fixture stage.
+        # This remains a refusal even when identical predictions are reused.
+        receipt = self.run_bound(self.prepare(budget=10_000_001))
         self.assertEqual(receipt["stages"][-1]["stage"], "learners")
         self.assertEqual(receipt["status"], "failed")
         self.assertEqual(FixtureLearner.prepares, 0)
