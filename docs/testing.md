@@ -16,7 +16,7 @@ The CPU workflow pins sccache and preserves the lane's Cargo target cache to
 shorten repeated locked checks. Local builds reuse their worktree target.
 CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
 early package transaction, retaining the 300-second package-lock wait and
-60-minute job quota. `cpu.sh` checks all required tools before tests and never
+120-minute CPU job quota. `cpu.sh` checks all required tools before tests and never
 starts a late package transaction. `test-cpu-tool-readiness.sh` exercises each
 missing-tool refusal against the real CPU entry, before any build or replay.
 `just check` adds Clippy with warnings denied, the Rust CLI fixtures, and the
@@ -128,8 +128,8 @@ A local receipt may report `status=passed` with `cold_budget=unmeasured`.
 CPU CI still has two independent full replays: the committed-input unit test
 and its standalone authenticated PDF entry. Broader unit coverage and stronger
 snapshot admission may affect that lane's cost. Canonical-driver fixture proof
-does not qualify either full CPU or paper job under the current 60-minute
-quota; setup, unit tests, compilation and drift need separately admitted measured
+does not qualify the full CPU or paper job under their respective 120-minute
+and 60-minute quotas; setup, unit tests, compilation and drift need separately admitted measured
 job proof. The historical cancellation remains failed, without unchanged retry.
 
 The CPU PR lane is required. The scheduled GPU lane uses CUDA 12.8, libtorch
@@ -147,8 +147,8 @@ do not change Rust certification.
 
 ## Cost and time budgets
 
-The CPU, paper-clean, security, and full-audit jobs each have a 60-minute
-quota. The ARM64 portability job has a 20-minute quota. Disposable guest package installs
+The full CPU job has a finite 120-minute quota. Paper-clean, security and
+full-audit each retain a 60-minute quota. The ARM64 portability job has a 20-minute quota. Disposable guest package installs
 wait at most 300 seconds for an existing dpkg lock, within those job quotas, then
 fail if it remains held.
 The GPU compute spend cap is one scheduled 120-minute job per
@@ -160,7 +160,7 @@ operator kill switch is cancellation of the GitHub job or interruption of the
 local `ops/ci/gpu.sh` process. Do not retry a paid GPU job without recording
 the previous failure and an explicit repair in the campaign ledger.
 The stop condition is any exceeded timer, memory cap, or missing sealed input.
-`agent/cost-budget.toml` is the machine-readable budget; `just check` and the
+`agent/cost-budget.toml` records separate `cpu_pr_minutes` and `paper_clean_minutes` allowances. CPU job 119248919772 exhausted its former hour near the final test groups; only that job allowance was increased. This does not change scientific fit/query budgets or renew a cumulative local admission. The manifest is the machine-readable budget; `just check` and the
 CPU CI lane run `ops/ci/check-budgets.sh` to compare it with workflow timeouts,
 the 600-second compiler cap, GPU memory admission, and required sealed inputs.
 

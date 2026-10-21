@@ -18,7 +18,7 @@
 \IfFileExists{generated/quickstart-macros.tex}{\input{generated/quickstart-macros.tex}}{}
 
 \title{Supplement: Transfer Description Length for Synthetic Tables}
-\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
+\author{Jepson Taylor \qquad Alton Alexander\\NEVERHUMAN Research}
 \date{Protocol and mathematical details --- evidence status: \ResultStatus}
 
 \begin{document}
@@ -53,6 +53,9 @@ panel is required for release certification, which is reported separately.
 
 \section{Byte ledgers}
 \label{app:bytes}
+No qualified prospective per-artifact ledger is measured in this package. Payload,
+shared runtime and cold closure are separate scopes; historical and raw-complete
+engineering profiles cannot be relabeled as one another.
 \GeneratedTable{byte-ledger-table.tex}{Per-artifact payload, closure and section bytes from
 the charge manifests.}
 
@@ -104,6 +107,36 @@ local engineering ablation on two public tables.
   \scriptsize
   \GeneratedTable{quickstart-ablation.tex}{Ablation table rendered by quickstart\_block.py.}
 \end{table}
+
+\section{Falsifiable method tests}
+\label{app:ablations}
+These are proposed development experiments, not measured improvements. Freeze their
+selection rule before choosing a successor; keep confirmation rows sealed.
+\begin{description}
+  \item[Feature screening.] Compare current univariate screening with the explicit
+  interaction-screen successor on interaction-only, additive and rare-effect tasks at
+  the same encoded byte cap. Count false selections and retained holdout lift.
+  \item[Residual uncertainty.] Compare no-noise, Gaussian, fixed heavy-tail, compact
+  mixture and monotone-quantile profiles using out-of-fold residuals. Evaluate original-unit
+  tail loss and conditional coverage beside average transfer. Calibrated noise need not
+  improve a squared-error learner.
+  \item[Dependence.] Hold the target model fixed and ablate independence, a tree, a copula
+  and richer families. Include a predictor-only control and conditional errors.
+  \item[Quantization.] Compare precision and component allocation after encoding,
+  including transform and dictionary state. Measure improvement in the worst development
+  learner family per added byte rather than uncharged parameter counts.
+  \item[Preprocessing.] Compare affine, support-aware invertible and quantile transforms
+  inside fit folds. Preserve original target units; nonlinear target transforms define a
+  different learner recipe. Test nominal category relabeling invariance.
+  \item[Attribution.] Permute dummy columns of an original feature together. Test
+  correlated substitutes and interaction groups against the real-versus-real ceiling;
+  prediction agreement is not causal driver recovery.
+\end{description}
+For squared error, applying the same invertible affine target map to fixed truths and
+predictions multiplies every loss by the same squared scale, which cancels in retention.
+This evaluation identity does not say that retraining is invariant to scaling. Clipping
+query targets or changing their nonlinear loss violates the comparison.
+
 
 \section{Historical metric mapping}
 \label{app:history}

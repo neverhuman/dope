@@ -1,13 +1,12 @@
 # TDL paper package
 
-The canonical manuscript package for **D.O.P.E.: Compiling Tables into Small Programs That
-Preserve What Models Learn** (the metric name TDL awaits owner decision D-01). This is the active
+The canonical manuscript package for **D.O.P.E.: Small Programs, Useful Synthetic Tables** (the metric name TDL awaits owner decision D-01). This is the active
 paper landing page for the manuscript in `main.tex` and supplement in `supplement.tex`. The
 manuscript has the shape of a full conference paper: problem and metric, a short transfer theory
 (retention identities for squared and log loss, two corollaries, a size bound), the compiler, the
 protocol, results and limitations. Figure 1 shows the compression frontier (worst-auditor
-retention against charged bytes, and retained lift per KiB); Figure 2 contains the authenticated
-foundation-model diagnostic bars. Table 1 is the generated frontier table. Every number is
+retention against charged bytes, and retained lift per KiB); Figure 2 adds the matched CatBoost size/transfer panel (including the untuned default)
+beside the separate foundation-model diagnostic bars; its cohorts are never pooled. Table 1 is the generated frontier table. Every number is
 historical selection-exposed validation or a labeled local demonstration; prospective TDL
 confirmation remains gated on E05. Build with `bash paper/build.sh`; it writes
 `target/paper/main.pdf` and `target/paper/supplement.pdf`. The frozen historical v2 validation
@@ -82,3 +81,7 @@ A contract change therefore requires regenerating the macros and updating the RE
 change.
 
 The frozen quick-start Adult/Abalone reports use incomplete prototype encoder byte accounting. Current JSON receiver reload is fixture-tested separately; do not treat those historical subtotals or ratios as complete transfer sizes or new measurements.
+
+## Publication development directions
+
+The [publication audit](../docs/publication-upgrade.md) and [preprocessing guide](../docs/preprocessing.md) record proposed ablations and controlled alternatives. These proposals are unmeasured and do not alter the frozen confirmation or historical inputs. The paper-clean CI lane retains both active PDFs as `dope-active-preprint` after a successful build.

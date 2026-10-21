@@ -747,6 +747,12 @@
     "tools/claims/": "governance",
     "validation/": "external-evidence",
     "validation/external/": "external-evidence",
-    "validation/requirements-v1.txt": "python-v1-compatibility"
+    "validation/requirements-v1.txt": "python-v1-compatibility",
+    "launch_tuner_tui.sh": "python-v1-compatibility",
+    "docs/getting-started.md": "governance",
+    "docs/preprocessing.md": "governance",
+    "docs/publication-upgrade.md": "governance",
+    "examples/public-regression/requirements.txt": "governance",
+    "tools/claims/figure_drawing.py": "external-evidence"
   }
 }

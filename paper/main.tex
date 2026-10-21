@@ -16,7 +16,7 @@
 \usepackage[hidelinks]{hyperref}
 \definecolor{pendingcolor}{RGB}{176,58,46}
 \definecolor{dopegreen}{RGB}{47,90,0}
-\hypersetup{pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding --- Compiling Tables into Small Programs That Preserve What Models Learn}, pdfauthor={Jepson Taylor; Alton Alexander}}
+\hypersetup{pdftitle={D.O.P.E.: Small Programs, Useful Synthetic Tables}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
 \IfFileExists{generated/compression-macros.tex}{\input{generated/compression-macros.tex}}{}
 \IfFileExists{generated/quickstart-macros.tex}{\input{generated/quickstart-macros.tex}}{}
@@ -32,9 +32,9 @@
 \newcommand{\Ber}{\operatorname{Ber}}
 \newcommand{\dope}{\textnormal{\textsc{dope}}}
 
-\title{D.O.P.E.: Downstream Objective-Preserving Encoding\\[0.4em]
-  \large Compiling Tables into Small Programs That Preserve What Models Learn}
-\author{Jepson Taylor \and Alton Alexander\\NEVERHUMAN Research}
+\title{D.O.P.E.: Small Programs, Useful Synthetic Tables\\[0.3em]
+  \large Measuring Predictive Structure in Bytes}
+\author{Jepson Taylor \qquad Alton Alexander\\NEVERHUMAN Research}
 \date{\small Evidence status: historical selection-exposed validation; \MetricName{} \ResultStatus}
 
 \begin{document}
@@ -46,7 +46,7 @@ costly to audit. We ask how few bytes a sampling program needs so that learners 
 recover what learners trained on the real rows learn. We define \MetricLong{} (\MetricName), an operational
 rate--distortion measure that charges every byte a sampler reads and makes transfer across learner families a
 constraint, not a weighted term. At the population limit, retention is one minus the conditional-mean error
-under the real covariate law (squared loss) and the delivered share of feature--label mutual information (log
+under the real covariate law (squared loss) and normalized excess log loss relative to feature--label mutual information (log
 loss). This motivates \dope{}, a compiler of target-explicit programs: quantized marginals, a compact
 dependence model, an explicit conditional mean and a noise model. On a selection-exposed validation panel of
 \CFLineages{} PMLB regression tables, \dope{}'s median program holds \CFDopeBytes{} bytes of dataset-specific
@@ -135,6 +135,26 @@ the smallest tested budget, reported with its grid interval, at the operating po
 ($\tau_T = $ \TauT, $\tau_D = $ \TauD) of the \ContractState{} contract \ContractId{} over the grid \ByteGrid.
 The charge counts every byte whose value depends on the data and that sampling reads (schema, transforms,
 dictionaries, framing and sidecars); the runtime closure is reported beside it.
+
+\paragraph{Why this operating point matters.}
+For a positive real-data gain, requiring $T \geq \tau_T$ bounds
+the excess loss paid for synthetic training:
+\begin{equation}
+  \Lsyn(A)-\Lreal \leq (1-\tau_T)(\Lnull-\Lreal).
+  \label{eq:excess}
+\end{equation}
+The allowed distortion is relative to what the real table teaches that learner,
+not a fixed error tolerance shared across unrelated targets. The rate is the charged
+length $b(A)$ of the fitted program. Over the finite set of tested artifacts,
+\begin{equation}
+  \operatorname{TDL} = \min_{A\in\mathcal{A}_{\rm tested}} b(A)
+  \quad\text{subject to Equation~\eqref{eq:qualify}.}
+\end{equation}
+This separates the objective from the constraints: a larger model cannot compensate for a
+failed gate by a weighted score. It also avoids a retention-per-byte ratio that can reward
+a tiny but useless generator. Testing more budgets requires a frozen multiplicity and
+selection procedure; it does not permit choosing a point on the sealed queries.
+
 
 \section{Why a target-explicit program transfers}
 \label{sec:theory}
@@ -265,8 +285,8 @@ encoder fitted on the fit rows maps a raw table to it: each categorical column b
 target-ordered code (levels placed by their smoothed mean target, so the code carries the main effect
 linearly and decodes exactly), with one-hot columns and a dropped reference level as an option; skewed
 non-negative columns are log-transformed, every numeric column is clipped at Tukey's far-out fences
-and rescaled; dates become numbers and missing cells stay missing. The encoder's state is a compact binary
-blob charged next to the program, and its inverse returns synthetic rows with the original names, labels and
+and rescaled; dates become numbers and missing cells stay missing. The encoder's complete reloadable JSON
+state is charged next to the program, and its inverse returns synthetic rows with the original names, labels and
 types. Numeric clipping and finite precision can lose detail; schema decoding is not lossless recovery of the original rows.
 
 \input{method}
@@ -340,12 +360,15 @@ offset a failure.
 
 \begin{figure}[t]
   \centering
-  \GeneratedFigure[\foundationwidth]{hero-frontier.pdf}{Figure 2: foundation-model transfer bars rendered
-  from authenticated receipts.}
-  \caption{\textbf{Tabular foundation models conditioned on synthetic rows.} Retention when \dope{} or
-  Gaussian-copula samples replace the real rows as in-context examples, with charged bytes in the legend.
-  Historical diagnostic: the auditors are unqualified, pretraining overlap is unknown, and cross-model
-  feature-driver preservation is not yet measured.}
+  \GeneratedFigure[\herowidth]{hero-frontier.pdf}{Figure 2: matched classical size/transfer and
+  a separate foundation-model comparison rendered from authenticated receipts.}
+  \caption{\textbf{Historical transfer beside charged fitted-state bytes.}
+  A: matched CatBoost validation, showing both the untuned default and the selected
+  research profile; the paired DOPE--TabSyn comparison is inconclusive, not equivalence.
+  B: a separate foundation-model cohort, where \dope{} or Gaussian-copula samples replace
+  the real rows as in-context examples. Cohorts are not pooled. Foundation-model auditors
+  are unqualified, pretraining overlap is unknown, and cross-model feature-driver
+  preservation, cold closure and \MetricName{} remain unmeasured.}
   \label{fig:foundation}
 \end{figure}
 
@@ -372,6 +395,17 @@ A five-seed ablation on Adult and UCI Abalone, in the supplement, informed the d
 \QSAblationSummary{} No fixed backend was best on both tables. These are development-exposed local
 engineering results on two public tables. Repeated evaluation does not qualify a sealed confirmatory split,
 a complete benchmark result, or a full required-auditor family.
+
+
+\paragraph{Failure modes that matter.}
+Univariate screening can miss interaction-only signals; a small target predictor may
+preserve means while losing conditional tails. Marginal Gaussianization does not recover
+arbitrary dependence, and independent mask draws do not establish realistic missingness.
+Quantization can erase rare effects, while unstable real-data lift makes a retention ratio
+unreliable. Correlated substitute features can also change attribution without changing
+predictions. These are falsifiable research questions for a byte-matched ablation panel,
+not improvements inferred from a favorable aggregate. The supplement specifies the
+tests and separates them from the frozen confirmation run.
 
 
 \section{Related work}

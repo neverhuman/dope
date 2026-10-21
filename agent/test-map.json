@@ -3016,6 +3016,30 @@
     "validation/requirements-v1.txt": {
       "command": "bash agent/check-python-v1-boundary.sh",
       "purpose": "verify pinned Python V1 compatibility graph"
+    },
+    "launch_tuner_tui.sh": {
+      "command": "bash -n launch_tuner_tui.sh",
+      "purpose": "verify launcher syntax"
+    },
+    "docs/getting-started.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "docs/preprocessing.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "docs/publication-upgrade.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "examples/public-regression/requirements.txt": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
+      "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
+    },
+    "tools/claims/figure_drawing.py": {
+      "command": "python3 -B -m unittest discover -s tools/claims -p 'test_*.py'",
+      "purpose": "Replay receipt-bound figures and reject missing, mixed-cohort and invalid historical points; visually inspect both output sizes."
     }
   }
 }

@@ -1,5 +1,6 @@
 version = 1
-cpu_pr_minutes = 60
+cpu_pr_minutes = 120
+paper_clean_minutes = 60
 security_minutes = 60
 audit_minutes = 60
 arm64_portability_minutes = 20
