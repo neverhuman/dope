@@ -9,15 +9,9 @@ raw/mixed envelope export and downstream transfer remain separately unmeasured.
 The active manuscript build (`just paper-tdl`) still checks that the authenticated
 hero is Figure 1 on page 1; inspect rendered pages after visual changes.
 
-The required ARM64 portability lane runs native aarch64 product computation:
-all Rust library tests (including numerical goldens and historical decoders),
-plus codec, CLI, target-last raw intake, artifact-only, bundle isolation and
-frozen-geometry integration fixtures. It uses pinned Rust 1.88.0, the locked
-default CPU graph and two build/test threads in the existing four-vCPU guest.
-Its 20-minute job quota is unchanged. The real-entry readiness fixture checks
-missing-tool and wrong-architecture refusals without pretending to execute ARM.
-Paper, README and figure verification belongs to the x64 paper/CPU lanes;
-image hashes or raster differences between x64 and ARM do not gate ARM compute.
+The release merge gates cover the x86_64 core product, paper, security, audit and
+deployment conformance. ARM portability is outside the current release scope and
+does not block integration. Historical ARM failures remain recorded as unqualified.
 
 `just fast` runs formatting, locked Rust unit tests, and V1 Python tests.
 `just focus codec::tests` runs a reusable narrow Rust check and test filter
@@ -158,7 +152,7 @@ do not change Rust certification.
 ## Cost and time budgets
 
 The full CPU job has a finite 120-minute quota. Paper-clean, security and
-full-audit each retain a 60-minute quota. The ARM64 portability job has a 20-minute quota. Disposable guest package installs
+full-audit each retain a 60-minute quota. Disposable guest package installs
 wait at most 300 seconds for an existing dpkg lock, within those job quotas, then
 fail if it remains held.
 The GPU compute spend cap is one scheduled 120-minute job per

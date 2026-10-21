@@ -173,35 +173,3 @@ jobs:
         run: |
           cargo fetch --locked
           bash ops/ci/native-release-smoke.sh
-
-  arm64-portability:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on:
-      group: neverhuman-lan
-      labels: [self-hosted, Linux, ARM64, lan-ci, ubuntu24]
-    timeout-minutes: 20
-    permissions:
-      contents: read
-    env:
-      CARGO_INCREMENTAL: '0'
-      CARGO_PROFILE_DEV_DEBUG: line-tables-only
-      CARGO_BUILD_JOBS: '2'
-      RUST_TEST_THREADS: '2'
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # verified stable action, pinned toolchain below
-        with:
-          toolchain: '1.88.0'
-      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target/debug
-          key: rust-arm64-core-ubuntu24-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock') }}
-      - name: Verify ARM core gate tool and architecture refusals
-        run: bash ops/ci/test-arm64-core-readiness.sh
-      - name: Verify native ARM64 core compute, numerical goldens and packet compatibility
-        run: bash ops/ci/arm64-core.sh

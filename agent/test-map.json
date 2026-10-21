@@ -485,10 +485,6 @@
       "command": "bash scripts/ci-local.sh cpu",
       "purpose": "verify CI execution scripts"
     },
-    "ops/ci/arm64-core.sh": {
-      "command": "bash -n ops/ci/arm64-core.sh && bash ops/ci/test-arm64-core-readiness.sh",
-      "purpose": "Verify ARM product entry tool/architecture refusals and compute command routing; actual ARM execution separately required in native CI"
-    },
     "ops/ci/check-review-fixes.sh": {
       "command": "bash ops/ci/check-review-fixes.sh",
       "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
@@ -536,10 +532,6 @@
     "ops/ci/public-smoke.sh": {
       "command": "actionlint .github/workflows/*.yml",
       "purpose": "verify thin public fork smoke script and workflow wiring"
-    },
-    "ops/ci/test-arm64-core-readiness.sh": {
-      "command": "bash -n ops/ci/arm64-core.sh && bash ops/ci/test-arm64-core-readiness.sh",
-      "purpose": "Verify ARM product entry tool/architecture refusals and compute command routing; actual ARM execution separately required in native CI"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",

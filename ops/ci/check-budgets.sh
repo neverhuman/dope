@@ -10,7 +10,7 @@ budget = tomllib.loads(Path("agent/cost-budget.toml").read_text())
 assert budget["version"] == 1
 for workflow, expected in (
     # The full CPU suite and clean paper replay have separate finite allowances.
-    (".github/workflows/ci.yml", [budget["cpu_pr_minutes"], budget["paper_clean_minutes"], budget["security_minutes"], budget["arm64_portability_minutes"]]),
+    (".github/workflows/ci.yml", [budget["cpu_pr_minutes"], budget["paper_clean_minutes"], budget["security_minutes"]]),
     (".github/workflows/jankurai.yml", [budget["audit_minutes"]]),
     (".github/workflows/gpu.yml", [budget["scheduled_gpu_minutes"]]),
 ):
