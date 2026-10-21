@@ -12,11 +12,11 @@ python3 examples/quickstart/quickstart.py --dataset adult
 
 The UCI Adult table (CC BY 4.0, DOI 10.24432/C5XW20) is downloaded once into
 `target/quickstart/cache/` and its SHA-256 is checked. Outputs land in
-`target/quickstart/adult/`: `train.csv` (the encoded fit rows), `encoder.bin`,
+`target/quickstart/adult/`: `train.csv` (the encoded fit rows), complete `encoder.json`,
 `model.dpk`, `inspect.json`, `samples.csv`, `synthetic.csv` (decoded rows) and
 `report.json`. The committed reference run is
 [`results/adult-reference.json`](results/adult-reference.json); the README's quick-start
-table is rendered from it.
+table preserves that historical prototype run. Its byte subtotal omits complete receiver metadata and does not measure full transfer size. Current v2 reports charge actual encoder.json plus model.dpk; no corrected reference total is asserted.
 
 Your own table:
 
@@ -33,7 +33,7 @@ python3 examples/quickstart/quickstart.py --csv train.csv --holdout test.csv --t
 | select | `dope_select.select_backend` | 3-fold transfer inside the fit rows over `chow_liu`, `compact_neural_residual_symbolic`, `sparse_gaussian_copula` and the built-in tournament (`--backend auto`, the default) |
 | compile | `dope-kernel compile --dataset-dir` | reads only the encoded fit rows |
 | inspect | `dope-kernel inspect` | prints the program as an S-expression |
-| sample | `dope-kernel sample` | reads only the artifact; `TableEncoder.inverse_transform` decodes |
+| sample | `dope-kernel sample` | native sampling reads the artifact; a fresh receiver loaded from encoder.json decodes |
 | evaluate | `dope_eval.retention_report` | CatBoost (or sklearn GBDT), logistic/ridge regression and an MLP, trained on real and on synthetic rows, scored on the holdout |
 
 ## Encoding choices
@@ -51,8 +51,7 @@ python3 examples/quickstart/quickstart.py --csv train.csv --holdout test.csv --t
   map are available. Integer columns decode to integers and dates decode to dates.
 - **Target.** A regression target is min-max scaled (an affine map, so retention is
   unchanged); a two-class target becomes 0/1. Multi-class targets are refused.
-- **State.** `to_bytes()` writes everything the decoder needs as a compact binary blob
-  (`DOPEENC1`), with names and labels zlib-compressed; `labels=False` drops them.
+- **State.** Versioned encoder.json preserves binary64 transforms, typed target classes, boolean flags, schema and labels. encoder_state.load_encoder reloads it without source rows. The consumed dataset-specific byte total is its actual file size plus model.dpk; shared installed runtime bytes are outside that ledger and cold start is unmeasured. to_bytes() / DOPEENC1 remain an incomplete historical sizing diagnostic with no reload claim; writing that optional dump requires diagnostic_binary=True. Current execution never depends on its lossy numeric range.
 
 The defaults come from [`ablation.py`](ablation.py), five seeds on UCI Adult and UCI
 Abalone (CC BY 4.0, DOI 10.24432/C55C7W); results are in
@@ -75,12 +74,14 @@ The following is a local development workflow. Encoding fits only the supplied f
 ```python
 import pandas as pd
 from dope_tables import TableEncoder, read_dope_samples
+from encoder_state import load_encoder
 
 table = pd.read_csv("my.csv")
 encoder = TableEncoder(target="y").fit(table)
-encoder.write_dataset_dir(table, "work")   # train.csv and encoder.bin
+encoder.write_dataset_dir(table, "work")   # private train.csv and complete encoder.json
 # compile and sample (below), then decode:
-synthetic = encoder.inverse_transform(read_dope_samples("work/samples.csv"))
+receiver = load_encoder("work/encoder.json")
+synthetic = receiver.inverse_transform(read_dope_samples("work/samples.csv"))
 ```
 
 ```bash

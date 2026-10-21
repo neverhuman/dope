@@ -145,7 +145,7 @@ class EncoderTests(unittest.TestCase):
         table = mixed_table()
         encoder = TableEncoder("y").fit(table)
         with tempfile.TemporaryDirectory() as tmp:
-            out = encoder.write_dataset_dir(table, tmp)
+            out = encoder.write_dataset_dir(table, tmp, diagnostic_binary=True)
             lines = (out / "train.csv").read_text().splitlines()
             self.assertEqual(len(lines), len(table))
             self.assertEqual(len(lines[0].split(",")), len(encoder.encoded_columns))
@@ -241,6 +241,12 @@ class RetentionTests(unittest.TestCase):
             self.assertEqual(summary["retention_aggregation"], "minimum_over_informative_local_auditors")
             self.assertFalse(summary["tdl_qualified"])
             self.assertEqual(out.stat().st_mode & 0o777, 0o700)
+            self.assertEqual(summary["format"], "dope-quickstart-v2")
+            self.assertTrue(summary["receiver"]["persisted_state_reloaded"])
+            self.assertEqual(summary["bytes"]["consumed_files"], ["model.dpk", "encoder.json"])
+            self.assertEqual(summary["bytes"]["state"],
+                             (out / "model.dpk").stat().st_size + (out / "encoder.json").stat().st_size)
+            self.assertEqual(summary["bytes"]["encoder"]["total_bytes"], (out / "encoder.json").stat().st_size)
 
     def test_real_rows_as_synthetic_give_retention_one(self):
         table = mixed_table(800).drop(columns=["signup"])
@@ -248,6 +254,104 @@ class RetentionTests(unittest.TestCase):
         results = retention_report(fit, holdout, fit, "y", "regression", auditors=["linear"])
         self.assertAlmostEqual(results[0].retention, 1.0, places=9)
 
+
+class ReceiverStateTests(unittest.TestCase):
+    def test_source_free_fresh_process_reload_preserves_schema_precision_and_types(self):
+        import json
+        import os
+        import subprocess
+        for mode, classes in [("robust", [False, True]), ("quantile", [7, 19]),
+                              ("minmax", ["no", "yes"])]:
+            table = mixed_table(80)
+            table["flag"] = table["age"] > 40
+            table["label"] = [classes[i % 2] for i in range(len(table))]
+            table = table[["label"] + [c for c in table if c != "label"]]
+            encoder = TableEncoder("label", drop=["y"], numeric=mode, categorical="onehot").fit(table)
+            matrix = encoder.transform(table)
+            with tempfile.TemporaryDirectory() as tmp:
+                out = encoder.write_dataset_dir(table, tmp)
+                sample = out / "sample.csv"
+                np.savetxt(sample, matrix, delimiter=",", fmt="%.17g")
+                expected = encoder.inverse_transform(read_dope_samples(sample))
+                for name in ("train.csv", "encoder.json"):
+                    self.assertEqual((out / name).stat().st_mode & 0o777, 0o600)
+                (out / "train.csv").unlink()
+                code = (
+                    "import json,sys; from encoder_state import load_encoder; "
+                    "from dope_tables import read_dope_samples; "
+                    "e=load_encoder(sys.argv[1]);d=e.inverse_transform(read_dope_samples(sys.argv[2]));"
+                    "print(json.dumps({'state':e.to_json(),'columns':list(d.columns),"
+                    "'data':d.astype(str).values.tolist(),"
+                    "'class_types':[type(v).__name__ for v in e.classes]}))")
+                env = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parent))
+                result = subprocess.run([sys.executable, "-B", "-c", code,
+                    str(out / "encoder.json"), str(sample)], cwd=tmp, env=env,
+                    text=True, capture_output=True, timeout=30, check=True)
+                decoded = json.loads(result.stdout)
+                self.assertEqual(decoded["state"], encoder.to_json())
+                self.assertEqual(decoded["data"], expected.astype(str).values.tolist())
+                self.assertEqual(decoded["columns"][-1], "label")
+                self.assertEqual(decoded["class_types"], [type(c).__name__ for c in encoder.classes])
+
+    def test_receiver_rejects_malformed_state_without_exposing_contents(self):
+        import copy
+        import json
+        import os
+        from encoder_state import load_encoder, restore_state, MAX_STATE_BYTES
+        state = TableEncoder("y").fit(mixed_table(40)).to_json()
+        changes = [
+            lambda d: d.update(format="CANARY_PRIVATE_STATE"),
+            lambda d: d.update(extra=True),
+            lambda d: d.update(classes=["x", "y"]),
+            lambda d: d.update(target_range=[0, float("inf")]),
+            lambda d: d["options"].update(max_levels=True),
+            lambda d: d["options"].update(min_level_share=-1),
+            lambda d: d["columns"][0].update(boolean=1),
+            lambda d: d["columns"][0].update(codes=[float("nan")]),
+            lambda d: d["columns"].append(d["columns"][0]),
+            lambda d: d["encoded_columns"].reverse(),
+        ]
+        for change in changes:
+            bad = copy.deepcopy(state)
+            change(bad)
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, "^encoder_state_invalid$"):
+                restore_state(bad)
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "state.json"
+            for raw in ['{"format":"CANARY","format":"duplicate"}', '{"a":NaN}', "not json",
+                        json.dumps(state).replace('"target_range": [', '"target_range": [1e999, '),
+                        " " * (MAX_STATE_BYTES + 1)]:
+                p.write_text(raw)
+                with self.assertRaisesRegex(ValueError, "^encoder_state_invalid$"):
+                    load_encoder(p)
+            p.write_text(json.dumps(state))
+            alias = Path(tmp) / "alias"
+            alias.symlink_to(p)
+            with self.assertRaisesRegex(ValueError, "^encoder_state_invalid$"):
+                load_encoder(alias)
+            fifo = Path(tmp) / "fifo"
+            os.mkfifo(fifo)
+            with self.assertRaisesRegex(ValueError, "^encoder_state_invalid$"):
+                load_encoder(fifo)
+
+    def test_current_state_does_not_depend_on_lossy_binary_range(self):
+        from encoder_state import load_encoder
+        table = pd.DataFrame({"x": [1e100, 2e100, 3e100], "y": [3e100, 4e100, 5e100]})
+        encoder = TableEncoder("y", numeric="minmax", task="regression").fit(table)
+        with tempfile.TemporaryDirectory() as tmp:
+            out = encoder.write_dataset_dir(table, tmp)
+            self.assertFalse((out / "encoder.bin").exists())
+            receiver = load_encoder(out / "encoder.json")
+            np.testing.assert_array_equal(receiver.transform(table), encoder.transform(table))
+
+    def test_regression_receiver_roundtrip_and_target_last(self):
+        from encoder_state import restore_state
+        table = mixed_table(80)
+        encoder = TableEncoder("y", numeric="quantile").fit(table)
+        receiver = restore_state(encoder.to_json())
+        pd.testing.assert_frame_equal(receiver.inverse_transform(encoder.transform(table)),
+                                      encoder.inverse_transform(encoder.transform(table)))
+        np.testing.assert_array_equal(receiver.transform(table), encoder.transform(table))
 
 if __name__ == "__main__":
     unittest.main()

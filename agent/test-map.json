@@ -453,6 +453,10 @@
       "command": "python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v",
       "purpose": "verify the reversible table encoder, retention helper and decode round trips without the native binary"
     },
+    "examples/quickstart/encoder_state.py": {
+      "command": "python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v",
+      "purpose": "source-free receiver reload, actual consumed byte accounting, malformed/private state refusal"
+    },
     "examples/readme-regression/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"

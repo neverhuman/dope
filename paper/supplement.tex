@@ -81,7 +81,7 @@ state. Frontier foundation models are planned and unqualified.}
 \label{app:encoding}
 The compiler reads a numeric matrix on the unit interval with the target last; the quick start's
 encoder (\path{examples/quickstart/dope_tables.py}) maps a raw table to it from the fit rows only and
-inverts it exactly for categorical codes. A categorical column with few levels becomes one-hot
+decodes retained categorical codes; rare-level pooling, clipping and finite precision can lose detail. A categorical column with few levels becomes one-hot
 columns with the most frequent level as the dropped reference, because a full set of dummies sums
 to one and is collinear with the intercept of the compiler's closed-form read-out. Any larger categorical column becomes one
 target-ordered code, its levels placed by smoothed mean target with a small rank term that keeps
@@ -98,8 +98,8 @@ local engineering ablation on two public tables.
 \begin{table}[ht]
   \centering
   \caption{\textbf{Quick-start ablation.} Mean and standard deviation over seeds of the worst-auditor
-  retention (CatBoost, logistic or ridge regression, MLP), and mean dataset-specific state bytes
-  (program plus encoder).}
+  retention (CatBoost, logistic or ridge regression, MLP), and historical prototype byte subtotals.
+  These charge program plus diagnostic dump and omit complete reloadable receiver state; they are not complete transfer sizes.}
   \label{tab:ablation}
   \scriptsize
   \GeneratedTable{quickstart-ablation.tex}{Ablation table rendered by quickstart\_block.py.}

@@ -33,6 +33,7 @@ fast: native-guard-check
     python3 -B -m unittest research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo -q
     python3 -B -m unittest research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -q
     PYTHONPATH=docs/whitepaper/scripts python3 -B -m unittest test_rust_closure -q
+    python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v
 
 focus filter:
     cargo check -p dope-kernel --locked

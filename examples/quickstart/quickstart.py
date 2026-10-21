@@ -42,6 +42,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 
+from encoder_state import FORMAT as ENCODER_FORMAT, load_encoder  # noqa: E402
 from dope_eval import default_auditors, local_summary, retention_report, worst_retention  # noqa: E402
 from dope_select import PORTFOLIO, select_backend  # noqa: E402
 from dope_tables import TableEncoder, read_dope_samples  # noqa: E402
@@ -194,13 +195,12 @@ def main(argv=None) -> int:
     encoder = TableEncoder(target, numeric=args.numeric, categorical=args.categorical,
                            drop=args.drop, positive=positive).fit(fit)
     encoder.write_dataset_dir(fit, out)
-    enc_bytes = encoder.byte_breakdown()
+    enc_bytes = {"format": ENCODER_FORMAT, "total_bytes": (out / "encoder.json").stat().st_size}
     kinds = {}
     for spec in encoder.columns:
         kinds[spec.kind] = kinds.get(spec.kind, 0) + 1
     say("1 encode", f"{len(encoder.columns)} features ({', '.join(f'{v} {k}' for k, v in sorted(kinds.items()))}) "
-        f"+ {encoder.task} target → [0,1]  ·  encoder.bin {enc_bytes['total_bytes']:,} B "
-        f"({enc_bytes['transform_bytes']} B transforms + {enc_bytes['label_bytes']} B names/labels)  "
+        f"+ {encoder.task} target → [0,1]  ·  complete encoder.json {enc_bytes['total_bytes']:,} B "
         f"[{time.perf_counter() - timer:.1f}s]")
 
     # 2. Compile: the native compiler reads only train.csv and writes the artifact.
@@ -239,9 +239,10 @@ def main(argv=None) -> int:
     timer = time.perf_counter()
     run([kernel, "sample", "--kernel", str(out / "model.dpk"), "--rows", str(rows),
          "--out", str(out / "samples.csv"), "--seed", "101"])
-    synthetic = encoder.inverse_transform(read_dope_samples(out / "samples.csv"), seed=args.seed)
+    receiver = load_encoder(out / "encoder.json")
+    synthetic = receiver.inverse_transform(read_dope_samples(out / "samples.csv"), seed=args.seed)
     synthetic.to_csv(out / "synthetic.csv", index=False)
-    say("5 sample", f"{rows:,} rows from the artifact alone → synthetic.csv (original columns and labels)  "
+    say("5 sample", f"{rows:,} rows from model.dpk + reloaded encoder.json → synthetic.csv (original columns and labels)  "
         f"[{time.perf_counter() - timer:.1f}s]")
 
     # 6. Evaluate: train on real vs synthetic rows, score both on the untouched holdout.
@@ -265,14 +266,19 @@ def main(argv=None) -> int:
           f"  ·  fit table as CSV {human(len(raw_csv))} ({len(raw_csv) / state:,.0f}× larger), "
           f"gzip -9 {human(gz)} ({gz / state:,.0f}× larger)")
     summary = {
-        "format": "dope-quickstart-v1", "dataset": title, "task": encoder.task, "target": target,
+        "format": "dope-quickstart-v2", "dataset": title, "task": encoder.task, "target": target,
         "fit_rows": len(fit), "holdout_rows": len(holdout), "synthetic_rows": rows,
         "backend": args.backend, "selected_candidate": report.get("selected_candidate"),
         "selection": None if selection is None else {"portfolio": list(PORTFOLIO), "folds": 3,
                                                        "scores": selection.scores},
         "encoding": {"numeric": args.numeric, "categorical": args.categorical},
         "bytes": {"model": model_bytes, "encoder": enc_bytes, "state": state,
-                  "fit_csv": len(raw_csv), "fit_csv_gzip9": gz},
+                  "fit_csv": len(raw_csv), "fit_csv_gzip9": gz,
+                  "basis": "model.dpk_plus_consumed_encoder.json",
+                  "consumed_files": ["model.dpk", "encoder.json"],
+                  "unconsumed_diagnostic_encoder_bin": None},
+        "receiver": {"format": ENCODER_FORMAT, "persisted_state_reloaded": True,
+                     "source_table_required_for_decode": False, "cold_runtime_measured": False},
         "auditors": [{"auditor": r.auditor, "null_loss": r.null_loss, "real_loss": r.real_loss,
                       "synthetic_loss": r.synthetic_loss, "retention": r.retention} for r in results],
         **local_summary(results), "program": inspection.get("sexpr"),

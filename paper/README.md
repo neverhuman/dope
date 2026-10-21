@@ -80,3 +80,5 @@ point (`contracts/tdl-contract-v1.json`, `headline_operating_point`):
 
 A contract change therefore requires regenerating the macros and updating the README in the same
 change.
+
+The frozen quick-start Adult/Abalone reports use incomplete prototype encoder byte accounting. Current JSON receiver reload is fixture-tested separately; do not treat those historical subtotals or ratios as complete transfer sizes or new measurements.

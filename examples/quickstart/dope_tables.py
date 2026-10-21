@@ -10,8 +10,8 @@ bridges the two in both directions:
 * ``transform(df)`` maps rows into the unit-interval matrix DOPE compiles;
 * ``inverse_transform(matrix)`` maps DOPE's samples back to the original schema,
   with original column names, category labels, integer types and dates;
-* ``to_bytes()`` writes the transform state as a compact binary blob, so the bytes
-  the decoder needs can be charged next to the compiled artifact.
+* ``to_json()`` persists complete versioned receiver state for reload and byte charging;
+* ``to_bytes()`` retains only the historical binary diagnostic prototype.
 
 Default encodings, chosen by measurement (see examples/quickstart/README.md):
 
@@ -134,6 +134,8 @@ class TableEncoder:
     # ------------------------------------------------------------------ fitting
 
     def fit(self, df: pd.DataFrame) -> "TableEncoder":
+        if not all(isinstance(c, str) and c and "\0" not in c for c in df.columns):
+            raise ValueError("column_declaration_invalid")
         if not df.columns.is_unique:
             raise ValueError("duplicate_column_declaration")
         if self.target not in df.columns:
@@ -400,13 +402,10 @@ class TableEncoder:
     # ------------------------------------------------------------------ state
 
     def to_bytes(self, *, labels: bool = True) -> bytes:
-        """Compact binary state: everything ``inverse_transform`` needs.
+        """Historical sizing prototype, NOT a complete reloadable receiver format.
 
-        Layout: magic, task byte, target bounds (2 x float32), column count, then per
-        column a kind byte, flags and float32 parameters, or a level count and
-        uint16 codes. Names and category labels follow as one zlib-compressed,
-        NUL-separated block; ``labels=False`` omits them (decoded labels then
-        become ``level_<i>`` and columns ``x<i>``).
+        DOPEENC1 rounds numeric parameters and omits typed class/boolean metadata.
+        Use to_json() and encoder_state.load_encoder for receiver execution.
         """
         self._require_fit()
         head = bytearray(ENCODER_MAGIC)
@@ -437,23 +436,10 @@ class TableEncoder:
         return {"transform_bytes": bare, "label_bytes": full - bare, "total_bytes": full}
 
     def to_json(self) -> dict:
-        self._require_fit()
-        return {
-            "format": "dope-table-encoder-v1",
-            "target": self.target, "task": self.task, "classes": [str(c) for c in self.classes],
-            "target_range": [self.target_lo, self.target_hi] if self.task == "regression" else None,
-            "options": {"numeric": self.numeric, "categorical": self.categorical,
-                        "onehot_max_levels": self.onehot_max_levels,
-                        "clip_quantile": self.clip_quantile, "skew_threshold": self.skew_threshold,
-                        "smoothing": self.smoothing, "max_levels": self.max_levels},
-            "columns": [
-                {k: v for k, v in spec.__dict__.items() if v not in ([], None) and not (k in ("knots", "boolean") and not v)}
-                for spec in self.columns
-            ],
-            "encoded_columns": self.encoded_columns,
-        }
+        from encoder_state import dump_state
+        return dump_state(self)
 
-    def write_dataset_dir(self, df: pd.DataFrame, out_dir: str | Path) -> Path:
+    def write_dataset_dir(self, df: pd.DataFrame, out_dir: str | Path, *, diagnostic_binary: bool = False) -> Path:
         """Write ``train.csv`` (headerless, target last, blanks for missing) plus the encoder state."""
         out = Path(out_dir)
         if out.is_symlink() or (out.exists() and (out.stat().st_uid != os.geteuid() or any(out.iterdir()))):
@@ -462,12 +448,16 @@ class TableEncoder:
         out.chmod(0o700)
         matrix = self.transform(df)
         with (out / "train.csv").open("x") as stream:
+            os.fchmod(stream.fileno(), 0o600)
             for row in matrix:
                 stream.write(",".join("" if not np.isfinite(v) else f"{v:.9g}" for v in row) + "\n")
-        with (out / "encoder.bin").open("xb") as stream:
-            stream.write(self.to_bytes())
+        if diagnostic_binary:
+            with (out / "encoder.bin").open("xb") as stream:
+                os.fchmod(stream.fileno(), 0o600)
+                stream.write(self.to_bytes())
         with (out / "encoder.json").open("x") as stream:
-            stream.write(json.dumps(self.to_json(), indent=1, default=str) + "\n")
+            os.fchmod(stream.fileno(), 0o600)
+            stream.write(json.dumps(self.to_json(), indent=1, allow_nan=False) + "\n")
         return out
 
     def _require_fit(self) -> None:

@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 735
-- **`keep-with-reason`**: 709 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 736
+- **`keep-with-reason`**: 710 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -762,6 +762,7 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `examples/quickstart/ablation.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |
 | `examples/quickstart/dope_eval.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |
 | `examples/quickstart/dope_select.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |
+| `examples/quickstart/encoder_state.py` | `examples/quickstart` | `keep-with-reason` | Bounded complete receiver JSON for optional pandas table example | Python external table boundary; never used by deployed Rust sampler. |
 | `examples/quickstart/dope_tables.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |
 | `examples/quickstart/quickstart.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |
 | `examples/quickstart/test_dope_tables.py` | `external-learner-example` | `keep-with-reason` | Fit-only external-learner encoder/selection/evaluation or direct offline fixture tests; not the deployed product or a scientific qualification. | Optional publication/external-ML boundary; the product compiler and sampler remain Rust. |

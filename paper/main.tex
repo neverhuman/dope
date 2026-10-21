@@ -359,15 +359,20 @@ their pretraining overlap is unknown, and the block is a historical diagnostic.
 \subsection{A public mixed-type table}
 \label{sec:demo}
 
-The quick start runs the whole pipeline on the UCI Adult table: \QSFitRows{} fit rows with numeric and
+The historical quick-start prototype used the UCI Adult table: \QSFitRows{} fit rows with numeric and
 categorical columns, a binary target, and the \QSHoldoutRows{} rows of the official test file as development-exposed
-query rows. Transfer-in-the-loop selection chose \texttt{\QSBackend}; the program and the encoder state take
-\QSStateBytes{} bytes, \QSCsvRatio{}$\times$ smaller than the fit table as CSV and \QSGzipRatio{}$\times$ smaller
-than its \texttt{gzip} archive, and retention under log loss is \QSRetCatBoost{} for CatBoost, \QSRetLinear{}
-for logistic regression and \QSRetMlp{} for the MLP. A five-seed ablation on Adult and UCI Abalone, reported in full in the
-supplement, chose the defaults; \QSAblationSummary{} No fixed backend is best on both tables, which is the
-case for selecting by transfer. This is a development-exposed local engineering demonstration on two public tables.
-Its repeated evaluation does not qualify a sealed confirmatory split or a benchmark result.
+query rows. Selection chose \texttt{\QSBackend}; reported log-loss retention was \QSRetCatBoost{} for CatBoost,
+\QSRetLinear{} for logistic regression and \QSRetMlp{} for the MLP. Its \QSStateBytes{}-byte subtotal charged
+the model and a diagnostic binary dump, while decoding used a live fitted encoder. The dump omits complete
+reloadable receiver metadata, so this subtotal and its CSV/gzip ratios do not establish complete transfer size.
+The current command reloads full versioned JSON receiver state and charges its actual bytes plus the model;
+no corrected Adult total or cold-runtime measurement is reported here.
+
+A five-seed ablation on Adult and UCI Abalone, in the supplement, informed the defaults;
+\QSAblationSummary{} No fixed backend was best on both tables. These are development-exposed local
+engineering results on two public tables. Repeated evaluation does not qualify a sealed confirmatory split,
+a complete benchmark result, or a full required-auditor family.
+
 
 \section{Related work}
 \label{sec:related}

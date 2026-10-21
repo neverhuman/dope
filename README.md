@@ -59,17 +59,17 @@ python3 examples/quickstart/quickstart.py --csv my.csv --target y   # your own t
 ```
 
 <!-- BEGIN QUICKSTART -->
-Reference run on UCI Adult (census income), CC BY 4.0, DOI 10.24432/C5XW20: 32,561 fit rows, a binary target `income`, and 16,281 untouched holdout rows (the official test file).
+Historical prototype run on UCI Adult (census income), CC BY 4.0, DOI 10.24432/C5XW20: 32,561 fit rows, a binary target `income`, and 16,281 development query rows (the official test file).
 
 | Step | What happens | Result |
 | --- | --- | --- |
-| encode | every column mapped into the unit interval from the fit rows alone | `encoder.bin` 836 bytes (249 transforms + 587 compressed names and labels) |
+| encode | fit-row transform; incomplete prototype size only | `encoder.bin` 836 bytes (249 transforms + 587 compressed names and labels) |
 | select | backends scored inside the fit rows | `sparse_gaussian_copula` (3-fold transfer on the fit rows: sparse_gaussian_copula 0.825, search 0.800, compact_neural_residual_symbolic 0.764, chow_liu 0.758) |
 | compile | `dope-kernel compile` reads only the encoded fit rows | `model.dpk` 1,714 bytes |
-| sample | rows drawn from the artifact alone, decoded to the original schema | 32,561 synthetic rows |
+| sample | native draws decoded with a live fitted Python encoder | 32,561 synthetic rows |
 | evaluate | learners trained on real vs. synthetic rows, scored on the holdout | retention catboost 0.841 · linear 0.890 · mlp 0.923 |
 
-Dataset-specific state: **2,550 bytes**. The fit table is 3.51 MB as CSV (1,378× larger) and 397 KB with `gzip -9` (156× larger). The compiled program:
+Historical prototype subtotal: **2,550 bytes** (model plus diagnostic binary dump). This omits complete reloadable encoder state: its CSV/gzip ratios are not complete transfer ratios. The current command reloads and charges the full encoder.json plus model.dpk; no corrected Adult total or speed has been measured. Historical compiled program:
 
 ```text
 (dpk v=3 task=binary n=32561 p=14 seed=11

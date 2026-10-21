@@ -104,6 +104,7 @@
     "examples/public-regression/cpu-smoke-admission.json": "external-evidence",
     "examples/public-regression/run.py": "external-evidence",
     "examples/quickstart/": "external-evidence",
+    "examples/quickstart/encoder_state.py": "external-evidence",
     "examples/readme-regression/": "governance",
     "ops/": "governance",
     "ops/ci/check-review-fixes.sh": "governance",

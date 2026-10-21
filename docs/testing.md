@@ -501,3 +501,7 @@ The trusted parent calls a guard sequentially. A guard and its adapter are not
 an API for concurrent callers. Parallel cells must use separate processes,
 private output directories and separately reserved journals; they may not share
 or reconstruct one live guard. Internal SDK threads do not issue parent calls.
+
+## Ordinary engineering PR review
+
+The owner may implement, review the final diff, and merge an ordinary engineering PR using the same agent. External approval and last-push second-person approval are optional under the primary human decision of 21 October 2026. All five strict GitHub Actions checks, conversation resolution and normal PR merge remain required; a self-review must never be fabricated as another identity. Verify actual receiving-main checks separately. This changes engineering review policy only: independent scientific acceptance, sealed-custodian separation, rights and custody evidence retain their own requirements.

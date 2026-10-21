@@ -731,4 +731,6 @@ whenever tracked Python files change.
 
 ## Reconciled publication and real-table examples
 
-The optional `examples/quickstart/` Python boundary uses pandas and external ML learners for local development encoding, selection and evaluation. It is not the deployed Rust compiler or sampler; clipping and rare-level grouping can lose information. The deterministic `docs/whitepaper/scripts/readme_blocks.py` consistency checker is a governance port candidate. All eleven new paths are inventoried in the root authority; the root compatibility paths remain maintained.
+The optional `examples/quickstart/` Python boundary uses pandas and external ML learners for local development encoding, selection and evaluation. It is not the deployed Rust compiler or sampler; clipping and rare-level grouping can lose information. The deterministic `docs/whitepaper/scripts/readme_blocks.py` consistency checker is a governance port candidate. All twelve new paths are inventoried in the root authority; the root compatibility paths remain maintained.
+
+| `examples/quickstart/encoder_state.py` | `keep-with-reason` | Optional pandas receiver serialization/reload boundary; no Rust product dependency. |
