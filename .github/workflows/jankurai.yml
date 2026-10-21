@@ -75,6 +75,13 @@ jobs:
       - name: Emit repair queue and hash-only report attestation
         if: always()
         run: bash agent/emit-audit-receipts.sh
+      - name: Verify badge generator fixtures
+        run: cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof
+      - name: Generate exact-head full-audit badge and check committed snapshot
+        if: always()
+        run: |
+          cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof
+          target/debug/audit-proof badge --report target/jankurai/repo-score.json --expected-head "$(git rev-parse HEAD)" --check docs/readme/jankurai.svg
       - name: Upload pinned action report even on failure
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -89,6 +96,8 @@ jobs:
           name: jankurai-v1.7.1
           path: |
             target/jankurai/repo-score.json
+            target/jankurai/score.svg
+            target/jankurai/score.json
             target/jankurai/repo-score.md
             target/jankurai/summary.md
             target/jankurai/repair-queue.jsonl

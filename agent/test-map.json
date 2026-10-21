@@ -1,5 +1,4 @@
 {
-  "workspace": "dope",
   "tests": {
     ".cargo/": {
       "command": "just check",
@@ -61,6 +60,14 @@
       "command": "just fast",
       "purpose": "verify repository metadata"
     },
+    "PYTHON_EXCEPTIONS.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "PY_TO_RUST_PLAN.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
     "README.md": {
       "command": "just fast",
       "purpose": "verify onboarding guidance"
@@ -121,6 +128,10 @@
       "command": "python3 tools/claims/check.py",
       "purpose": "keep the repository map consistent with public claims"
     },
+    "docs/audit-remediation-20261021.md": {
+      "command": "just score",
+      "purpose": "source-bound nonempty focused proof and preserved engineering authority; no scientific qualification"
+    },
     "docs/compiler-development.md": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install",
       "purpose": "verify raw-state constraints and complete cap accounting, source-free reload/sample isolation, historical schema corruption refusal, and atomic checksum installation/uninstallation without changing V1"
@@ -132,6 +143,26 @@
     "docs/decisions/tdl-v1.md": {
       "command": "cargo test --locked --lib metrics::tests::candidate_ && python3 -B -m unittest research.transfer.tests.test_tdl_result_schemas -v",
       "purpose": "verify unfrozen candidate identities, seven independent state axes, canonical hash goldens, strict schema admission, explicit legacy replay and immutable historical parent; reject missing fields, unknown enums, duplicate IDs, nonfinite values, inconsistent bindings and premature freeze without echoing source inputs"
+    },
+    "docs/evidence/engineering-review-policy-20261021.json": {
+      "command": "just score",
+      "purpose": "source-bound nonempty focused proof and preserved engineering authority; no scientific qualification"
+    },
+    "docs/evidence/pmlb-pollen-origin-20261021.json": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "authenticate retained source-origin metadata and prevent measured-only relabel of the historical cohort"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json": {
+      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
     },
     "docs/getting-started.md": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
@@ -148,6 +179,22 @@
     "docs/install.md": {
       "command": "cargo test --locked --test vnext_dope_install",
       "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
+    },
+    "docs/internal/": {
+      "command": "just score",
+      "purpose": "internal planning records kept for provenance"
+    },
+    "docs/internal/PYTHON_EXCEPTIONS.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "docs/internal/PY_TO_RUST_PLAN.md": {
+      "command": "just fast",
+      "purpose": "verify Python exception inventory and Rust port plan"
+    },
+    "docs/internal/whitepaper/COMPREHENSION_v1.md": {
+      "command": "just paper-tests && just paper-check",
+      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
     },
     "docs/math.md": {
       "command": "python3 tools/claims/check.py",
@@ -181,6 +228,10 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
       "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
     },
+    "docs/readme/jankurai.svg": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "refuse partial/stale/malformed reports and render actual full audit status without privileged publication"
+    },
     "docs/readme/retention-bars.png": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "keep the README CatBoost table and retention figure on the committed density table"
@@ -188,6 +239,10 @@
     "docs/release.md": {
       "command": "cargo test --locked --test vnext_custody",
       "purpose": "verify frozen development selection, separate-principal protected custody, durable first access, immutable batch identity, terminal failed audits and charged infrastructure retries using synthetic owner-process fixtures"
+    },
+    "docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json": {
+      "command": "python3 -m json.tool docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
     },
     "docs/vnext/ADAPTERS.md": {
       "command": "python3 -B -m unittest research.transfer.tests.test_adapters -v",
@@ -284,6 +339,22 @@
     "docs/whitepaper/scripts/declared_facts.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_declared_facts.py -v",
       "purpose": "keep figure scripts on the declared interval level, release byte cap and full-panel floor"
+    },
+    "docs/whitepaper/scripts/equal_bytes_common.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "docs/whitepaper/scripts/equal_bytes_render.py": {
+      "command": "python3 docs/whitepaper/scripts/equal_bytes_render.py --check",
+      "purpose": "equal-byte macros, tables and README block equal the committed files"
+    },
+    "docs/whitepaper/scripts/equal_bytes_sections.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
+    },
+    "docs/whitepaper/scripts/equal_bytes_text.py": {
+      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
+      "purpose": "equal-byte text outputs and README lint"
     },
     "docs/whitepaper/scripts/figure_spec.py": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_figure_spec.py -v",
@@ -429,6 +500,10 @@
       "command": "python3 tools/claims/check.py",
       "purpose": "verify repository evidence status and tracked-tree scrub manifest"
     },
+    "examples/adult/": {
+      "command": "python3 examples/adult/prepare.py --out target/adult && target/release/dope-kernel fit-table --csv target/adult/train.csv --target income --out target/adult/adult.dope && target/release/dope-kernel sample-table --model target/adult/adult.dope --rows 32561 --out target/adult/synthetic.csv && python3 examples/adult/evaluate.py --dir target/adult --model target/adult/adult.dope",
+      "purpose": "README quick start on UCI Adult; reference.json is the committed evaluation"
+    },
     "examples/healthcare-sim/": {
       "command": "python3 examples/healthcare-sim/demo.py prepare --out target/v00/healthcare-sim && python3 examples/healthcare-sim/demo.py verify --out target/v00/healthcare-sim",
       "purpose": "Verify deterministic simulation splits and future-label leakage refusal"
@@ -534,8 +609,24 @@
       "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
     },
     "ops/merge_guard/Cargo.toml": {
-      "command": "just native-guard-check",
-      "purpose": "verify isolated locked native tool dependency graph, format, clippy and complete scenario proofs"
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "native focused-proof and badge fail-closed controls"
+    },
+    "ops/merge_guard/audit_proof.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "native focused-proof and badge fail-closed controls"
+    },
+    "ops/merge_guard/audit_proof/badge.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "native focused-proof and badge fail-closed controls"
+    },
+    "ops/merge_guard/audit_proof/focus.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "native focused-proof and badge fail-closed controls"
+    },
+    "ops/merge_guard/audit_proof/tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
+      "purpose": "native focused-proof and badge fail-closed controls"
     },
     "ops/merge_guard/tests/workflow_events.rs": {
       "command": "just native-guard-check",
@@ -629,6 +720,10 @@
       "command": "PYTHONPATH=src python3 -m pytest -q tests",
       "purpose": "verify V1 package compatibility"
     },
+    "receipts/claude_pr285_c46b53b2_independent_review_20261019.json": {
+      "command": "python3 -m json.tool receipts/claude_pr285_c46b53b2_independent_review_20261019.json >/dev/null",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
     "research/": {
       "command": "python3 -m unittest discover -s research/benchmark/tests -v",
       "purpose": "verify offline benchmark manifest, gate, run, and analysis contracts"
@@ -676,6 +771,18 @@
     "research/benchmark/arf_runtime_guard.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_arf_contract -v",
       "purpose": "verify owned isolated ARF runtime and exact file/directory inventories before dependency initializers, sealed input rejection, fit cap, canonical seeds, CPU thread allocations within affinity, verified factor buffers and projection-inclusive artifact charges; local synthetic author FORGE replay is separate from real benchmark claims"
+    },
+    "research/benchmark/beyondarena_train_export.README.md": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v",
+      "purpose": "trusted TRAIN export refuses mixed optimizer access and metadata/source/role drift; synthetic Parquet controls only"
+    },
+    "research/benchmark/beyondarena_train_export.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v",
+      "purpose": "trusted TRAIN export refuses mixed optimizer access and metadata/source/role drift; synthetic Parquet controls only"
+    },
+    "research/benchmark/beyondarena_train_export_io.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v",
+      "purpose": "trusted TRAIN export refuses mixed optimizer access and metadata/source/role drift; synthetic Parquet controls only"
     },
     "research/benchmark/beyondarena_train_screen.README.md": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",
@@ -836,6 +943,10 @@
     "research/benchmark/dpctgan-source.audit": {
       "command": "python3 -B -m unittest discover -s research/benchmark/tests -v",
       "purpose": "verify source-only method inventory and fail-closed admission; validate DP-CTGAN schema, selected source hashes, author objectives, source privacy ordering and artifact gaps locally"
+    },
+    "research/benchmark/equal_bytes/": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v",
+      "purpose": "real-row codec arm, frontier, TDL and the committed summary"
     },
     "research/benchmark/expanded-validation-metrics.NOTICE": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
@@ -1257,6 +1368,26 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_retained_comparison -v",
       "purpose": "verify frozen physical receipt and native/default alias joins, reused diagnostics with auditor seed1729, complete100-lineage panels, matched-eight splits, empirical/null claims, schemas and reproducible KPI/JSONL/SVG outputs"
     },
+    "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.jsonl": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/parser-check.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.meta.json": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
     "research/benchmark/results/sdv-matched-population-validation": {
       "command": "python3 -B -m unittest discover -s research/benchmark/tests -p 'test_sdv_matched*.py' -v",
       "purpose": "verify complete existing-sample neural/DOPE paired accounting, immutable publication buffers, native winner preservation and unavailable cutoff exclusion; locally regenerate schemas/tables/figures from sealed receipts without fitting"
@@ -1373,9 +1504,33 @@
       "command": "bash ops/ci/check-review-fixes.sh",
       "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
     },
+    "research/benchmark/review_fixes/HISTORICAL_BINDER_RECOVERY.md": {
+      "command": "python3 tools/claims/check.py",
+      "purpose": "keep historical source recovery separate from numerical reproduction and release admission"
+    },
+    "research/benchmark/review_fixes/bind_privacy_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/bind_tabsyn_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
     "research/benchmark/review_fixes/display_names.py": {
       "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
       "purpose": "verify exact reader-facing identifier mapping, distinct printed labels, unchanged unknown values and TeX escaping after mapping; required by hosted CPU review-fix entry"
+    },
+    "research/benchmark/review_fixes/tabsyn_evaluator_replay.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/test_bind_privacy_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
+    },
+    "research/benchmark/review_fixes/test_bind_tabsyn_cells.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
     },
     "research/benchmark/review_fixes/test_display_names.py": {
       "command": "python3 -B -m unittest research.benchmark.review_fixes.test_display_names -v",
@@ -1384,6 +1539,10 @@
     "research/benchmark/review_fixes/test_receipt_unknown_method.py": {
       "command": "python3 -B -m unittest research.benchmark.review_fixes.test_receipt_unknown_method -v",
       "purpose": "verify unknown ledger/request methods and duplicate scientific identities fail instead of being silently skipped; required hosted CPU review-fix entry"
+    },
+    "research/benchmark/review_fixes/test_tabsyn_evaluator_replay.py": {
+      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
+      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
     },
     "research/benchmark/sdv_cpu_reuse.py": {
       "command": "python3 -B -m unittest discover -s research/benchmark/tests -p test_sdv_cpu_reuse.py -v",
@@ -1521,6 +1680,10 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_panel -v",
       "purpose": "verify the 73-family BeyondArena lock excludes the PMLB 100 and that retention rows stay not measured until a receipt is accepted without a median"
     },
+    "research/benchmark/tests/test_beyondarena_train_export.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v",
+      "purpose": "trusted TRAIN export refuses mixed optimizer access and metadata/source/role drift; synthetic Parquet controls only"
+    },
     "research/benchmark/tests/test_beyondarena_train_screen.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_screen -v",
       "purpose": "verify prospective training-only selection of at most12 complete raw inputs within the unchanged2000feature cap, protected target and raw-row groups, authenticated overlap receipts and finite catalog choices without fits or official TEST access"
@@ -1548,6 +1711,10 @@
     "research/benchmark/tests/test_dope_refinement_progress.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_dope_refinement_progress -v",
       "purpose": "verify immutable progress receipt/source inventories, canonical identity and exact rights-safe tables; locally regenerate complete closed batch and validate schemas/figures without claiming discovery completion"
+    },
+    "research/benchmark/tests/test_equal_bytes.py": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v",
+      "purpose": "historical cohort mask, raw outcome preservation and codec/summary fixtures; no new learner run"
     },
     "research/benchmark/tests/test_expanded_validation_metrics.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_expanded_validation_metrics -v",
@@ -1692,6 +1859,10 @@
     "research/benchmark/tests/test_work_order_b_costs.py": {
       "command": "python3 -B -m unittest research.benchmark.tests.test_work_order_b_costs -v",
       "purpose": "verify original hash-bound receipt cost attribution and physical alias accounting, keep scheduling cutoffs separate from method failures, bind source/run/host/prior costs, reproduce all six missing-component and hard-gate identities, null scalar gates and byte-identical rights-safe tables/schemas"
+    },
+    "research/benchmark/train-export-requirements.txt": {
+      "command": "python3 -B -m unittest research.benchmark.tests.test_beyondarena_train_export -v",
+      "purpose": "trusted TRAIN export refuses mixed optimizer access and metadata/source/role drift; synthetic Parquet controls only"
     },
     "research/benchmark/tvinesynth-source.audit": {
       "command": "python3 -m unittest discover -s research/benchmark/tests -v",
@@ -2309,6 +2480,10 @@
       "command": "cargo test --locked --lib --test rust_cli",
       "purpose": "verify full library169 and CLI7: empty importance union remains null, driver qualification refuses unavailable values, stored_target_fit reads historical utility_retention alias and refuses duplicate aliases, exact duplicate columns produce no redundant semantic interaction pairs; four-table budget and historical V1/DPK decoding retained"
     },
+    "rust/codec/packed_values.rs": {
+      "command": "cargo test --locked --lib packed_value_tests",
+      "purpose": "packed values round trip, refuse off-grid kernels, and leave historical artifacts byte-identical"
+    },
     "rust/compiler.rs": {
       "command": "cargo test --locked --lib",
       "purpose": "verify forced baselines remain inside the requested beam, fair family allocations, actual encoded promotion accounting, declared task noise semantics, cross-fit interaction proposals, and truthful OOF fitting/fallback diagnostics"
@@ -2376,6 +2551,10 @@
     "rust/compiler/target_fitting/compact_neural_training.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
       "purpose": "verify bounded adaptive encoded-byte allocation, development-only authenticated learner/calibration successors, integer producer/reader compatibility and public-demo failure accounting; required local check and hosted full Cargo discovery, preserving existing native suites"
+    },
+    "rust/compiler/target_fitting/native_training.rs": {
+      "command": "cargo test --locked --lib native_training_tests",
+      "purpose": "native profile parsing, deterministic training, and the exact Gaussian copula factor"
     },
     "rust/compiler/target_fitting/noise_fitting.rs": {
       "command": "cargo test --locked --test vnext_raw_schema --test vnext_raw_workflow --test vnext_artifact_only --test vnext_native_install --test vnext_byte_allocation --test vnext_native_successors --test vnext_public_demo",
@@ -2525,8 +2704,16 @@
       "command": "cargo test --locked --test vnext_raw_schema",
       "purpose": "verify named raw-table parsing, original-unit affine transforms, source-free reload and metadata redaction"
     },
+    "rust/table.rs": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
+    "rust/table/": {
+      "command": "cargo test --locked --lib table::",
+      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
+    },
     "rust/transfer_metrics.rs": {
-      "command": "cargo test --locked --lib transfer_metrics::tests",
+      "command": "just focus transfer_metrics::tests",
       "purpose": "run original-unit metric golden tests through the registered Rust library"
     },
     "rust/transfer_metrics/mfs_v4.rs": {
@@ -2536,6 +2723,10 @@
     "rust/transfer_metrics/tdl.rs": {
       "command": "cargo test --locked --lib transfer_metrics::tests && just golden-parity",
       "purpose": "Verify Wave-1 typed boundary, historical compatibility and fail-closed fixture behavior"
+    },
+    "rust/transfer_metrics/tests.rs": {
+      "command": "just focus transfer_metrics::tests",
+      "purpose": "source-bound nonempty focused proof and preserved engineering authority; no scientific qualification"
     },
     "rust/typed_data.rs": {
       "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
@@ -3028,138 +3219,7 @@
     "validation/requirements-v1.txt": {
       "command": "bash agent/check-python-v1-boundary.sh",
       "purpose": "verify pinned Python V1 compatibility graph"
-    },
-    "docs/internal/PYTHON_EXCEPTIONS.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "docs/internal/PY_TO_RUST_PLAN.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "docs/internal/whitepaper/COMPREHENSION_v1.md": {
-      "command": "just paper-tests && just paper-check",
-      "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
-    },
-    "rust/table.rs": {
-      "command": "cargo test --locked --lib table::",
-      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
-    },
-    "rust/table/": {
-      "command": "cargo test --locked --lib table::",
-      "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
-    },
-    "rust/codec/packed_values.rs": {
-      "command": "cargo test --locked --lib packed_value_tests",
-      "purpose": "packed values round trip, refuse off-grid kernels, and leave historical artifacts byte-identical"
-    },
-    "rust/compiler/target_fitting/native_training.rs": {
-      "command": "cargo test --locked --lib native_training_tests",
-      "purpose": "native profile parsing, deterministic training, and the exact Gaussian copula factor"
-    },
-    "research/benchmark/equal_bytes/": {
-      "command": "python3 -B -m unittest research.benchmark.tests.test_equal_bytes -v",
-      "purpose": "real-row codec arm, frontier, TDL and the committed summary"
-    },
-    "docs/whitepaper/scripts/equal_bytes_render.py": {
-      "command": "python3 docs/whitepaper/scripts/equal_bytes_render.py --check",
-      "purpose": "equal-byte macros, tables and README block equal the committed files"
-    },
-    "docs/whitepaper/scripts/equal_bytes_text.py": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
-      "purpose": "equal-byte text outputs and README lint"
-    },
-    "examples/adult/": {
-      "command": "python3 examples/adult/prepare.py --out target/adult && target/release/dope-kernel fit-table --csv target/adult/train.csv --target income --out target/adult/adult.dope && target/release/dope-kernel sample-table --model target/adult/adult.dope --rows 32561 --out target/adult/synthetic.csv && python3 examples/adult/evaluate.py --dir target/adult --model target/adult/adult.dope",
-      "purpose": "README quick start on UCI Adult; reference.json is the committed evaluation"
-    },
-    "docs/internal/": {
-      "command": "just score",
-      "purpose": "internal planning records kept for provenance"
-    },
-    "docs/whitepaper/scripts/equal_bytes_common.py": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
-      "purpose": "equal-byte text outputs and README lint"
-    },
-    "docs/whitepaper/scripts/equal_bytes_sections.py": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_equal_bytes_render.py -v",
-      "purpose": "equal-byte text outputs and README lint"
-    },
-    "PYTHON_EXCEPTIONS.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "PY_TO_RUST_PLAN.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "research/benchmark/review_fixes/bind_privacy_cells.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/bind_tabsyn_cells.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/tabsyn_evaluator_replay.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/test_bind_privacy_cells.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/test_bind_tabsyn_cells.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/test_tabsyn_evaluator_replay.py": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/results/review-fixes-privacy-v1/scalar-cells.meta.json": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.jsonl": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/results/review-fixes-tabsyn-v1/evaluator-replay.meta.json": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/results/review-fixes-tabsyn-v1/parser-check.json": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/results/review-fixes-tabsyn-v1/scalar-cells.meta.json": {
-      "command": "python3 -B -m unittest research.benchmark.review_fixes.test_bind_privacy_cells research.benchmark.review_fixes.test_bind_tabsyn_cells research.benchmark.review_fixes.test_tabsyn_evaluator_replay -v",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json": {
-      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/controls_verification_version_manifest_20261019T0100Z.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json": {
-      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/fence_07409073_model_unknown_addendum_20261019T0100Z.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json": {
-      "command": "python3 -m json.tool docs/evidence/pr279_scope_guard_closeout_20261019T0100Z/pr279_binding_prose_correction_20261019T0100Z.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json": {
-      "command": "python3 -m json.tool docs/verify_receipts/m001_and_readiness_addenda_manifest_20261019T0244Z.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "receipts/claude_pr285_c46b53b2_independent_review_20261019.json": {
-      "command": "python3 -m json.tool receipts/claude_pr285_c46b53b2_independent_review_20261019.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
-    },
-    "research/benchmark/review_fixes/HISTORICAL_BINDER_RECOVERY.md": {
-      "command": "python3 tools/claims/check.py",
-      "purpose": "keep historical source recovery separate from numerical reproduction and release admission"
     }
-  }
+  },
+  "workspace": "dope"
 }

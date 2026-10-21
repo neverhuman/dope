@@ -14,8 +14,10 @@ deployment conformance. ARM portability is outside the current release scope and
 does not block integration. Historical ARM failures remain recorded as unqualified.
 
 `just fast` runs formatting, locked Rust unit tests, and V1 Python tests.
-`just focus codec::tests` runs a reusable narrow Rust check and test filter
-while editing; it never replaces the full CPU PR lane.
+`just focus codec::tests` lists and runs a nonempty Rust library test filter
+while editing, using the existing Cargo target and inherited compiler cache.
+It refuses zero executed tests and records raw logs, command exits and source
+hashes under `target/focus/`. It never replaces the full CPU PR lane.
 The CPU workflow pins sccache and preserves the lane's Cargo target cache to
 shorten repeated locked checks. Local builds reuse their worktree target.
 CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
@@ -508,4 +510,21 @@ or reconstruct one live guard. Internal SDK threads do not issue parent calls.
 
 ## Ordinary engineering PR review
 
-The owner may implement, review the final diff, and merge an ordinary engineering PR using the same agent. External approval and last-push second-person approval are optional under the primary human decision of 21 October 2026. All five strict GitHub Actions checks, conversation resolution and normal PR merge remain required; a self-review must never be fabricated as another identity. Verify actual receiving-main checks separately. This changes engineering review policy only: independent scientific acceptance, sealed-custodian separation, rights and custody evidence retain their own requirements.
+The owner may implement, inspect the final diff, and merge an ordinary engineering
+PR using the same agent under the [primary human decision](evidence/engineering-review-policy-20261021.json)
+of 21 October 2026. This is a policy grant, not a claim that any PR was reviewed
+or passed. Record the actual actor and exact head; do not attribute their work
+to another identity. External approval and last-push second-person approval are
+optional. The current release gates are CPU, paper-clean, security, Jankurai
+and deployment; ARM is outside release scope. Conversation resolution, ordinary
+protected rebase merge and fresh receiving-main checks remain required.
+
+For each PR retain its exact source head/tree, local command logs and exit codes,
+final diff disposition, and native Actions run/job identities with terminal
+conclusions. Reproduce the local proof with `just check` and `just score`;
+retrieve the corresponding raw CI log with `gh run view RUN_ID --log` and its
+audit artifact with `gh run download RUN_ID -n jankurai-v1.7.1`. Bind the downloaded
+bytes to the server artifact digest. Never transfer a previous head's result.
+[The remediation record](audit-remediation-20261021.md) pins one actual historical
+main audit and distinguishes it from new validation. Scientific acceptance,
+sealed-custodian separation, rights and custody keep their independent gates.

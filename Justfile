@@ -16,8 +16,8 @@ setup:
 native-guard-check:
     bash ops/ci/prepare-merge-guard.sh
     cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
-    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard -- -D warnings
-    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof
 
 fast: native-guard-check
     bash ops/ci/test-cpu-tool-readiness.sh
@@ -36,8 +36,8 @@ fast: native-guard-check
     python3 -B -m unittest discover -s examples/quickstart -p 'test_*.py' -v
 
 focus filter:
-    cargo check -p dope-kernel --locked
-    cargo test -p dope-kernel --locked --lib {{filter}}
+    cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof
+    target/debug/audit-proof focus {{quote(filter)}}
 
 release-local-native:
     RUSTFLAGS="-C target-cpu=native" cargo build --locked --release --offline -p dope-kernel --bin dope

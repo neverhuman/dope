@@ -54,7 +54,7 @@ else
 fi
 "$auditor" proof . --changed-from "$comparison_base" \
   --out target/jankurai/proof-plan.json --md target/jankurai/proof-plan.md
-"$auditor" copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md
+"$auditor" copy-code . --max-findings 10000 --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md
 "$auditor" rust witness build . --out target/jankurai/rust/witness-graph.json
 ci_require_artifact target/jankurai/proof-plan.json
 ci_require_artifact target/jankurai/copy-code.json

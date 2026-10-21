@@ -15,7 +15,8 @@ assert json.load(open("research/benchmark/sdv-runtime.lock.json"))["catboost"] =
 PY
     ci_require_command uv
     uv pip install --python target/ci-python/bin/python \
-      --constraint validation/requirements-v1.txt 'catboost==1.2.10' 'jsonschema==4.26.0'
+      --constraint validation/requirements-v1.txt 'catboost==1.2.10' 'jsonschema==4.26.0' \
+      --requirement research/benchmark/train-export-requirements.txt
     bash agent/check-benchmark-boundary.sh
     ;;
   verify)

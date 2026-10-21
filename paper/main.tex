@@ -60,7 +60,7 @@ program of quantized marginals, a dependence tree, a compact network and a noise
 \EbPublishedRobust{} of the real gain at \EbPublishedBytes{} bytes, TabSyn keeps \EbTabSynRobust{} with
 \EbTabSynFactor{} times the bytes, and no generator's frontier lies above the program's. Against the real
 rows themselves, given the best lossless codec, exact byte matching and step-matched training, the program
-wins on \EbLargeWins{} of the \EbLargeLineages{} real-world tables at the study's cap of \cFitCap{} fit rows
+wins on \EbLargeWins{} of the \EbLargeLineages{} historical-cohort tables at the study's cap of \cFitCap{} fit rows
 (worst-learner gap \EbLargeGap{} [\EbLargeGapLo, \EbLargeGapHi]), an advantage that grows with the table's
 size. Over all \EbLineages{} tables the gap is \EbGap{} [\EbGapLo, \EbGapHi], and the program's retention
 plateaus: real rows reach the \cTau{} bar with fewer bytes on \EbTdlEightyData{} tables against
@@ -75,7 +75,7 @@ plateaus: real rows reach the \cTau{} bar with fewer bytes on \EbTdlEightyData{}
   \cTau{} of the real gain, against the bytes shipped.} (a)~Published generators on the historical
   validation panel of \EbPublishedTables{} tables (median worst-learner retention per table); tables a
   generator did not run on count as failures, as the frontier defines. (b)~This paper's study on
-  \EbLineages{} real-world tables: the packed DOPE ladder (blue; best rung within each budget) against the
+  \EbLineages{} historical-cohort tables: the packed DOPE ladder (blue; best rung within each budget) against the
   largest set of real rows that fits each budget under the best of three lossless codecs (orange), on the
   \EbLargeLineages{} tables with \cFitCap{} fit rows (solid) and the smaller ones (dotted). Development
   validation; selection-exposed.}
@@ -112,7 +112,7 @@ ship, and has little room to memorize rows.
   conditional mean explains, and under log loss the share of label information it delivers; a two-part
   code argument says when a program beats the data at equal bytes (\cref{sec:theory}).
   \item \textbf{Evidence.} A worst-learner re-reading of a published generator panel, a new equal-byte
-  study against real rows on \EbLineages{} real-world tables and all \EbPanelLineages{} panel lineages, a
+  study against real rows on \EbLineages{} historical-cohort tables and all \EbPanelLineages{} panel lineages, a
   scaling study up to \EbScaleMaxN{} rows,
   a raw mixed-type table (UCI Adult), and ablations including a negative result for an exact Gaussian
   copula (\cref{sec:experiments}).
@@ -277,7 +277,10 @@ MLP and CatBoost \citep{prokhorenkova2018catboost}, fixed seeds. Retention uses 
 target scaled by fit-row statistics (log loss for binary targets) and synthetic size $\cSynthetic$.
 \emph{Generator panel}: the frozen ledger of the published validation run on PMLB regression lineages
 \citep{olson2017pmlb,romano2021pmlb}, re-read on the worst of three learners with the charged bytes the
-ledger records. \emph{Equal-byte study}: the \EbLineages{} real-world lineages of that panel after removing
+ledger records. The equal-byte cohort is a historical name-filtered remainder, not a measured-only
+real-world population: it retains simulated pollen, and other source origins are not all verified.
+``Real-row arm'' means original table rows, including rows of simulated tables.
+\emph{Equal-byte study}: the \EbLineages{} historical-cohort lineages of that panel after removing
 content duplicates, shuffled with a fixed seed; a disjoint test set of \cTestShare{} of the rows, capped at
 \cFitCap{}, and up to \cFitCap{} of the remaining rows as fit rows. DOPE programs are a five-rung ladder of
 packed programs with three fit seeds each. The real-row arm ships the largest uniform subset of fit rows
@@ -322,7 +325,7 @@ scored against the same historical reference, so the comparison among them is li
   \GeneratedFigure[\pairedwidth]{equal-bytes-paired.pdf}{Figure 2: DOPE against real rows at equal bytes.}
   \caption{\textbf{A program beats its data once the table outgrows it.} Worst-learner retention of the
   headline-shape program minus that of the most real rows that fit in exactly its bytes, against the whole
-  table's compressed size over the program's. Filled: the real-world tables of the study; hollow: the
+  table's compressed size over the program's. Filled: the historical-cohort tables of the study; hollow: the
   simulated lineages of the full panel. Left of the dashed line the whole table is smaller than the
   program.}
   \label{fig:paired}
@@ -382,7 +385,7 @@ size over the program's (\cref{fig:paired}) is the clearest confirmation of \cre
 rises with the fit rows (Spearman \EbRhoRows{} over \EbRhoRowsN{} tables with a finite ratio, and
 \EbPanelRhoRows{} over \EbPanelRhoRowsN{} panel tables), but part of that rise is mechanical: the ratio is
 bounded by the whole table's size, which grows with the rows. The proposition's proxy, the noise share over
-$\One - T$ times the row cost, ranks the ratio on the \EbRhoProxyN{} real tables with \cFitCap{} fit rows
+$\One - T$ times the row cost, ranks the ratio on the \EbRhoProxyN{} cohort tables with \cFitCap{} fit rows
 (Spearman \EbRhoProxy{}) and, more weakly, on the panel's \EbPanelRhoProxyN{} large tables
 (\EbPanelRhoProxy{}). About half of those are noise-free physics equations, where real-row learning curves are
 limited by the learners' approximation error rather than by the noise-driven excess risk $C/k$ the
@@ -466,7 +469,7 @@ bounds nor the copy, lift and ledger gates were applied, so \cref{fig:frontier} 
 Packed artifacts are not yet accepted by the repository's qualification bundle, which predates the flag.
 The real-row arm picks its MLP training protocol on the test rows; that selection favors the real rows. The
 generator comparison re-reads a historical panel whose splits cannot be rebuilt, so it is not paired with
-the equal-byte study. The real-world panel is regression on PMLB tables with at most \cFitCap{} fit rows;
+the equal-byte study. The mixed-origin cohort is regression on PMLB tables with at most \cFitCap{} fit rows;
 classification evidence is one table. A program is conditioned on one target. Copy, membership and
 attribute checks are empirical diagnostics, not formal differential privacy and not HIPAA
 de-identification. At strict transfer thresholds enough real rows reach the bar with fewer bytes than the

@@ -1,4 +1,7 @@
-"""Fetch and split the real-world lineages of the public PMLB panel.
+"""Reproduce the historical PMLB remainder cohort (mixed/unknown source origins).
+
+The name-based historical mask is not measured-source or rights admission.
+It retains simulated pollen; new pilots require a separately frozen origin manifest.
 
 Each lineage is shuffled with seed 1729; up to 2,000 rows (and at least 30%)
 become untouched test rows and up to 2,000 of the rest become fit rows. Every
@@ -29,21 +32,26 @@ DUPLICATES = {"562_cpu_small": "227_cpu_small", "573_cpu_act": "197_cpu_act",
 FIT_CAP, TEST_CAP, SPLIT_SEED = 2000, 2000, 1729
 
 
-def is_simulated(name: str) -> bool:
+def historical_simulated_mask(name: str) -> bool:
     return name.startswith(SIMULATED_PREFIXES) or any(marker in name for marker in SIMULATED_MARKERS)
 
 
-def real_world_entries(include_simulated: bool = False) -> list[dict]:
+def historical_remainder_entries(include_simulated: bool = False) -> list[dict]:
     entries = json.loads(MANIFEST.read_text())["entries"]
     keep = []
     for entry in entries:
         name = entry["pmlb_id"]
-        if is_simulated(name) and not include_simulated:
+        if historical_simulated_mask(name) and not include_simulated:
             continue
         if name in DUPLICATES:
             continue
         keep.append(entry)
     return keep
+
+
+# Historical API aliases only, never source-origin attestations.
+is_simulated = historical_simulated_mask
+real_world_entries = historical_remainder_entries
 
 
 def fetch(entry: dict, sources: Path) -> Path:
@@ -83,7 +91,7 @@ def main() -> None:
     parser.add_argument("--all", action="store_true", help="include the simulated lineages of the panel")
     args = parser.parse_args()
     args.sources.mkdir(parents=True, exist_ok=True)
-    for entry in real_world_entries(include_simulated=args.all):
+    for entry in historical_remainder_entries(include_simulated=args.all):
         print(json.dumps(split(fetch(entry, args.sources), args.out / entry["pmlb_id"])))
 
 

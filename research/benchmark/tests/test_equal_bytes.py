@@ -128,8 +128,10 @@ class SummaryTests(unittest.TestCase):
 
 
 class PrepareTests(unittest.TestCase):
-    def test_real_world_selection_drops_simulated_and_duplicate_lineages(self):
-        names = {entry["pmlb_id"] for entry in prepare.real_world_entries()}
+    def test_historical_mask_preserves_cohort_without_claiming_measured_origin(self):
+        names = {entry["pmlb_id"] for entry in prepare.historical_remainder_entries()}
+        self.assertIn("529_pollen", names)
+        self.assertIs(prepare.real_world_entries, prepare.historical_remainder_entries)
         self.assertEqual(len(names), 26)
         self.assertFalse(any(prepare.is_simulated(name) for name in names))
         self.assertFalse(set(prepare.DUPLICATES) & names)

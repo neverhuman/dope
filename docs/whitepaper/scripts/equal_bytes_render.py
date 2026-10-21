@@ -71,7 +71,7 @@ def hero(summary: dict, generators: list[dict]) -> None:
                  [[{"bytes": p["bytes"], "robust": p["robust"]} for p in x["data"]] for x in members])):
             right.step(budgets, coverage(points, TAU, budgets), where="post", color=color, linestyle=dash,
                        linewidth=width, label=f"{label}, {group} ({len(members)})")
-    right.set_title(f"(b) Against shipping the real rows ({len(lineages)} real tables)", fontsize=8.5,
+    right.set_title(f"(b) Versus rows ({len(lineages)} mixed-origin tables)", fontsize=8.5,
                     loc="left", color=INK)
     for ax in (left, right):
         ax.set_xscale("log")
@@ -102,13 +102,13 @@ def paired(summary: dict, panel: dict | None) -> None:
         gap = [x["headline"]["robust"] - (x["headline"]["data_at_equal_bytes"] or 0.0) for x in own]
         if simulated:
             ax.scatter(size, gap, s=16, facecolor="white", edgecolor=GRAY, linewidth=0.9,
-                       label=f"Simulated panel lineages ({len(own)})", zorder=2)
+                       label=f"Other panel lineages ({len(own)})", zorder=2)
         else:
             large = [x["n_fit"] >= 2000 for x in own]
             ax.scatter([v for v, big in zip(size, large) if big], [g for g, big in zip(gap, large) if big], s=26,
-                       color=BLUE, label=f"Real tables, 2,000 fit rows ({sum(large)})", zorder=3)
+                       color=BLUE, label=f"Historical cohort, 2,000 fit rows ({sum(large)})", zorder=3)
             ax.scatter([v for v, big in zip(size, large) if not big], [g for g, big in zip(gap, large) if not big],
-                       s=26, color=ORANGE, label=f"Real tables, fewer rows ({len(large) - sum(large)})", zorder=3)
+                       s=26, color=ORANGE, label=f"Historical cohort, fewer rows ({len(large) - sum(large)})", zorder=3)
     ax.axhline(0.0, color=MUTED, linewidth=0.8)
     ax.axvline(1.0, color="#d4d3cf", linewidth=0.8, linestyle="--")
     ax.set_xscale("log")
