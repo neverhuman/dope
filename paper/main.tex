@@ -12,8 +12,6 @@
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{enumitem}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 \usepackage[hidelinks]{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{url}
@@ -24,6 +22,10 @@
 \hypersetup{pdftitle={D.O.P.E.: How Few Bytes Carry What a Table Teaches}, pdfauthor={Jepson Taylor; Alton Alexander}}
 \input{macros}
 \IfFileExists{generated/equal-bytes-macros.tex}{\input{generated/equal-bytes-macros.tex}}{}
+% Algorithm box without the algorithms bundle, which the CI TeX installation does not carry.
+\newcounter{algo}
+\crefname{algo}{Algorithm}{Algorithms}
+\Crefname{algo}{Algorithm}{Algorithms}
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
 \theoremstyle{remark}
@@ -166,22 +168,24 @@ holds $\cParams$ numbers whatever the number of rows; it is where the bytes go. 
 quantized on a grid fixed by the header bit width: unit values to $\Two^{b}-\One$ levels and unbounded
 values to steps of $\Two^{-(b-\Two)}$. \Cref{alg:dope} lists compile and sample.
 
-\begin{algorithm}[t]
-\caption{Compile a table plan and program; sample from the program alone.}
-\label{alg:dope}
+\begin{figure}[t]
 \small
-\begin{algorithmic}
-\STATE \textbf{Plan} (raw tables): numbers to the unit interval, log-scaling columns with skewness above
+\fbox{\begin{minipage}{\dimexpr\linewidth-\Two\fboxsep-\Two\fboxrule\relax}
+\refstepcounter{algo}\label{alg:dope}
+\textbf{Algorithm~\thealgo.} Compile a table plan and program; sample from the program alone.
+\begin{itemize}[leftmargin=1.2em,itemsep=2pt,topsep=3pt]
+\item \textbf{Plan} (raw tables): numbers to the unit interval, log-scaling columns with skewness above
 $\cSkew$; categories to one code per column, levels ordered by smoothed target mean; dates to day counts;
 missing cells kept.
-\STATE \textbf{Compile} (fit rows only): fit marginals and missing rates; fit the dependence tree on
+\item \textbf{Compile} (fit rows only): fit marginals and missing rates; fit the dependence tree on
 rank correlations; screen $S$; train \eqref{eq:program} with AdamW (rate $\cRate$, weight decay $\cDecay$,
 element-wise clipping at $\cClip$) for $\cSteps$ full-batch steps; refit $(c,\beta,v)$ in closed form;
 fit the noise model on the residuals; quantize; encode with packed values.
-\STATE \textbf{Sample}$(A, N)$: draw $z$ from the tree copula; $x_j \leftarrow F_j^{-\One}(\Phi(z_j))$;
+\item \textbf{Sample}$(A, N)$: draw $z$ from the tree copula; $x_j \leftarrow F_j^{-\One}(\Phi(z_j))$;
 $y \leftarrow m(x) + \sigma(x)\varepsilon$; mask features at their missing rates; decode through the plan.
-\end{algorithmic}
-\end{algorithm}
+\end{itemize}
+\end{minipage}}
+\end{figure}
 
 \paragraph{Three changes in this release.} \emph{Packed values.} The historical codec wrote every unit
 value as a sixteen-bit word and every unbounded value as a scaled varint, so the header bit width changed
