@@ -87,3 +87,11 @@ strip = "symbols"
 [profile.bench]
 inherits = "release"
 debug = true
+
+# Additive metadata only; standalone package has its own workspace and lock.
+# Do not make the product workspace depend on this experimental sampler.
+[package.metadata.dope-native-control]
+manifest = "ops/native_control/Cargo.toml"
+build = "python3 -B ops/native_control/build.py --out target/native-control-build"
+platform = "linux-x86_64"
+abi = 2

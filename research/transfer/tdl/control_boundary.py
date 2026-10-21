@@ -104,17 +104,19 @@ def private_file(path, raw):
         os.fsync(stream.fileno())
 
 
-def bounded_child(argv, cwd, wall_seconds, output_limit):
+def bounded_child(argv, cwd, wall_seconds, output_limit, *, on_started=None, pass_fds=(), on_interrupted=None):
     """Bound private pipes and terminate only this newly created child session."""
+    deadline = time.monotonic() + wall_seconds
     with subprocess.Popen(argv, cwd=cwd, env={"LC_ALL": "C", "PYTHONHASHSEED": "0"},
                           stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                          start_new_session=True, close_fds=True) as child:
+                          start_new_session=True, close_fds=True, pass_fds=pass_fds) as child:
         streams = {child.stdout: bytearray(), child.stderr: bytearray()}
         try:
+            if on_started is not None:
+                on_started(child.pid)
             with selectors.DefaultSelector() as poll:
                 for stream in streams:
                     poll.register(stream, selectors.EVENT_READ)
-                deadline = time.monotonic() + wall_seconds
                 while poll.get_map():
                     remaining = deadline - time.monotonic()
                     require(remaining > 0)
@@ -128,6 +130,14 @@ def bounded_child(argv, cwd, wall_seconds, output_limit):
                             require(len(streams[key.fileobj]) <= cap)
                 code = child.wait(timeout=max(0.001, deadline - time.monotonic()))
             return code, bytes(streams[child.stdout]), bytes(streams[child.stderr])
+        except BaseException:
+            if child.poll() is None:
+                import signal
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait()
+            if on_interrupted is not None:
+                on_interrupted(child.returncode, bytes(streams[child.stdout]), bytes(streams[child.stderr]))
+            raise
         finally:
             if child.poll() is None:
                 import signal
@@ -149,16 +159,24 @@ def validate_output(code, raw, public, request):
     require(receipt["sample_sha256"] == digest(raw) and receipt["state"] == "sampled"
             and receipt["format"] == "f64le" and receipt["layout"] == "row_major"
             and receipt["column_order"] == "features_then_target"
-            and receipt["isolation"] == "existing_rust_landlock_seccomp_tsync"
+            and receipt["isolation"] == ("standalone_native_landlock_seccomp_tsync_v2"
+                if request["abi"] == 2 else "existing_rust_landlock_seccomp_tsync")
             and receipt["pipeline_complete"] is False)
-    require(receipt["invocation_bytes"] == len(canonical(request)))
+    require(type(request["abi"]) is int and request["abi"] in (ABI, 2))
+    if request["abi"] == 2:
+        from .control_native import attest, invocation_bytes
+        require(attest(raw, bytes.fromhex(receipt["native_attestation_hex"]), request) == columns)
+        expected_invocation = invocation_bytes(request)
+    else:
+        expected_invocation = len(canonical(request))
+    require(receipt["invocation_bytes"] == expected_invocation)
     require(receipt["sampling_closure_bytes"] == request["artifact_bytes"] +
             request["runtime_bytes"] + receipt["invocation_bytes"])
     return raw, receipt
 
 
 def sample_control(artifact, artifact_sha256, method, rows, seed, *, trusted_runtime,
-                   workdir, wall_seconds):
+                   workdir, wall_seconds, capture_result=None, capture_started=None, byte_budget=None):
     """Caller grants trusted-runtime scope separately; never derive it from artifact bytes.
 
     trusted_runtime: scope, abi, library, library_sha256, python, source_dir,
@@ -166,12 +184,20 @@ def sample_control(artifact, artifact_sha256, method, rows, seed, *, trusted_run
     workdir must be a fresh private child directory. External job admission owns RAM/CPU.
     """
     try:
+        if trusted_runtime.get("scope") == "standalone-native-control-v2":
+            from .control_native import sample
+            return sample(artifact, artifact_sha256, method, rows, seed,
+                trusted_runtime=trusted_runtime, workdir=workdir, wall_seconds=wall_seconds,
+                byte_budget=byte_budget, capture_result=capture_result, capture_started=capture_started)
         require(trusted_runtime["scope"] == SCOPE and type(trusted_runtime["abi"]) is int
                 and trusted_runtime["abi"] == ABI)
         require(method in ("gaussian_copula", "compressed_real_rows"))
         require(type(rows) is int and 0 < rows <= MAX_VALUES // 64)
         require(type(seed) is int and 0 <= seed < 1 << 64)
         require(type(wall_seconds) in (int, float) and 0 < wall_seconds < float("inf"))
+        require((capture_result is None or callable(capture_result))
+                and (capture_started is None or callable(capture_started)))
+        deadline = time.monotonic() + wall_seconds
         rt = trusted_runtime
         require(set(rt["source_pins"]) == set(SOURCES))
         library = regular_bytes(rt["library"])
@@ -206,8 +232,13 @@ def sample_control(artifact, artifact_sha256, method, rows, seed, *, trusted_run
                    "source_pins": rt["source_pins"], "runtime_closure_sha256": digest(canonical(closure)),
                    "runtime_bytes": sum(entry["bytes"] for entry in closure), "closure_pins": pins}
         private_file(runtime / "request.json", canonical(request))
+        remaining = deadline - time.monotonic()
+        require(remaining > 0)
         result = bounded_child([rt["python"], "-I", "-S", "-B", str(runtime / "control_isolated_worker.py")],
-                               bundle, wall_seconds, rows * 64 * 8)
+                               bundle, remaining, rows * 64 * 8,
+                               **({"on_started": capture_started} if capture_started is not None else {}))
+        if capture_result is not None:
+            capture_result(*result)  # retain exact stdout/stderr/exit before validation
         # Detect persistent changes around the child; trusted runtime is not a hostile-writer sandbox.
         require(all(digest(regular_bytes(p)) == h for p, h in pins.items()))
         require(all(digest(regular_bytes(runtime / n)) == rt["source_pins"][n] for n in SOURCES))

@@ -368,3 +368,89 @@ The signed parent-worker authority declares a canonical fulluint64 learner seed
 independently of the cell compiler fit seed. Both streams remain traceable in
 private assembly evidence. Development mode authenticates the existing owner
 learner stream and fixed recipe; matching an arbitrary seed hash is insufficient.
+
+## Combined typed-control and functional-driver successor fixtures
+
+The combined 17-file control/driver source candidate adds the authenticated
+`PilotControlRuntime` route beside the bare DOPE materialized-draw API described
+above. It connects actual framed copula/compressed-row compile/reload and confined
+n/4n draws to the existing learner/driver journal, with exact schema/order and
+separate CSV/aggregate-input witnesses, distinct compiler/learner uint64 streams,
+and the full artifact/runtime/invocation byte cap. A real cap negative must stop
+before sampling or learning. Functional driver reuse retains every metric while
+sharing only identical fit/query/predict-seed keys under the reserved DriverPlan;
+each new Mitra prediction still reserves eight child fits and 400 updates.
+
+Focused modules are `research.transfer.tests.test_pilot_control_materialized_draws`,
+`research.transfer.tests.test_pilot_control_runtime`,
+`research.transfer.tests.test_pilot_materialized_draws`,
+`research.transfer.tests.test_pilot_runner`,
+`research.transfer.tests.test_pilot_worker_runtime`,
+`research.transfer.tests.test_pilot_worker_inputs`,
+`research.transfer.tests.test_pilot_physical_operations`,
+`research.transfer.tests.test_pilot_driver_prediction_aliases`, and
+`research.transfer.tests.test_control_boundary`. Run them with `python3 -B -m
+unittest` under the admitted local validation scope. A source-only export harness
+may substitute an explicitly recorded, hash-verified prebuilt-library setup for
+the boundary fixture's Cargo build; it must record actual module paths/hashes,
+base commit/tree, candidate patch, interpreter/toolchain and native artifact pins.
+Such an export is generated test input, has no Git identity, and is not execution
+on the base commit or receiving main. Preserve private fixture provenance,
+original failures, finite resource admission and one-shot output paths. Authored
+source, AST checks, prior disjoint prototype results and fixture passes are not
+full local gates, native SDK qualification, E03 completion or scientific evidence.
+
+The native qualification runtime verifies the installed distribution's unique top-level
+`.dist-info/RECORD`, ignoring vendored records and refusing ambiguity. Its pinned
+component labels distinguish NVIDIA code (Apache-2.0) from Kumo weights
+(OpenMDW-1.1); complete pinned license documents and rights admission remain
+separate checks. The helper reports its actual loaded file. Focused protocol and
+metadata regressions run with `PYTHONPATH=. python3 -B -m unittest
+research.transfer.tests.test_native_qualification -v`; these tests run no SDK models.
+
+Private pool-context v2 freezes a training-only rule before generation. Standard
+uses the first requested rows of each pool; stratified_anchor selects equally
+spaced training-target ranks with original input-index tie order in that same
+pool. Real-data indices are never copied onto synthetic rows. Signed context
+bytes and actual selected row/position hashes remain bound to the captured draws;
+query and selection labels are absent from the selector. Legacy explicit row-ID
+and index contexts retain their behavior.
+
+Standalone control ABI2 qualification (Root candidate; not yet qualified)
+
+Linux x86_64 requires the actual standalone binary and build receipt. Missing
+binary/receipt is an error, not a skipped positive test. Other architectures
+are explicitly unsupported for this route; the product v1 route remains intact.
+Root must admit finite CPU/RAM/disk/wall resources before these commands:
+
+```sh
+python3 -B research/transfer/native_control_build.py --out target/native-control-build
+python3 -B research/transfer/native_control_manifest.py --binary target/x86_64-unknown-linux-gnu/release/dope-native-control-runtime --build-receipt target/native-control-build/RESULT.json --out target/native-control-runtime.json
+python3 -B -m unittest research.transfer.tests.test_native_control -v
+```
+
+The output directory is exclusive; reusing it refuses rather than resetting an
+attempt. Reuse the lane's target directory for compilation. The typed-parent
+fixtures also need the existing product kernel fixture; their existing setup
+may build that kernel if missing. Account for this in Root's admitted validation.
+Tests require exact f64 bytes against the existing literal sampler, including
+copula libm rounding, and actual child denials. No tolerance relaxation or fake
+binary is allowed. Synthetic fixture ceilings are not the original pilot caps.
+Every actual draw pays full ELF + artifact + canonical request + 104-byte wire.
+A measured failure at 4096 or 32768 is retained as a cost negative. No size,
+parity, confinement or scientific success is established by parsing this source.
+
+Mandatory target-last intake and consumers follow `docs/data-contract.md`. Run
+`python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v`
+for normalization, declared-target disagreement, strict consumer refusals, query-label
+exclusion, unchanged source bytes and row identity. Native intake also runs
+`cargo test --locked --lib typed_data::tests`; historical decoding stays unchanged.
+
+Linux x86_64 local fast/check and hosted CPU build the standalone native control
+runtime with `python3 -B research/transfer/native_control_prepare.py` before transfer discovery.
+The build is offline and locked, preserves per-attempt source/build evidence, and
+publishes a verified manifest. Missing or stale binaries fail; this requires the
+current GNU libc 2.39 static math archive and admitted FMA/AVX features. Other
+platforms explicitly mark this native route unsupported while retaining their
+required product portability gates. The complete runtime, artifact and invocation
+are charged at each control draw.

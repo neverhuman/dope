@@ -265,7 +265,9 @@ class PilotLearningTests(unittest.TestCase):
         execution = LearningExecution(plan, self.registry, self.null, admission, lambda _: None, self.root)
         _, drivers = execute_streamed(execution, self.labels(), DriverPlan(((row_id(700), (0,)),), 2, 23, PIN))
         self.assertEqual(FixtureLearner.prepares, 32)
-        self.assertEqual(FixtureLearner.predictions, 128)
+        physical_keys = {call["key"] for record in drivers["records"].values() for call in record["calls"]}
+        self.assertEqual(FixtureLearner.predictions, len(physical_keys))
+        self.assertEqual(FixtureLearner.predictions, 64)
         self.assertTrue(all(adapter is None for adapter in execution.prepared.values()))
         self.assertEqual(len(drivers["links"]), 60)
 
@@ -274,7 +276,12 @@ class PilotLearningTests(unittest.TestCase):
         before = FixtureLearner.predictions
         driver_plan = DriverPlan(((row_id(700), (0,)),), 2, 23, PIN)
         drivers = execute_drivers(execution, self.labels(), driver_plan)
-        self.assertEqual(FixtureLearner.predictions - before, len(drivers["records"]) * 3)
+        logical_calls = [call for record in drivers["records"].values() for call in record["calls"]]
+        baseline_keys = {case["prediction_key"] for case in execution.cases}
+        new_physical = {call["key"] for call in logical_calls} - baseline_keys
+        self.assertGreater(len(new_physical), 0)
+        self.assertEqual(FixtureLearner.predictions - before, len(new_physical))
+        self.assertEqual(sum(not call["reused_prediction"] for call in logical_calls), len(new_physical))
         self.assertEqual(len(drivers["links"]), 60)
         self.assertTrue(all(link["status"] == "completed" for link in drivers["links"]))
         self.assertEqual(sum(link["reused"] for link in drivers["links"]), 28)

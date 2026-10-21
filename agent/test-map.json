@@ -2738,8 +2738,8 @@
       "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
     },
     "research/transfer/tdl/control_boundary.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
-      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification"
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v && python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Build own-checkout Rust boundary ABI and execute confined control reload/sample, actual source/FD/network/exec denials, runtime pins and redacted malformed-output refusals; no scientific qualification; After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
     },
     "research/transfer/tdl/control_isolated_worker.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_control_boundary -v",
@@ -2806,8 +2806,8 @@
       "purpose": "verify actual 60-path fixture/streamed-driver physical DAG keys, durable existing-stage suballocation, finite calls, alias charges, crash/replay/fsync/overrun refusals and pinned fit-only worker inputs; no scientific or native vendor qualification"
     },
     "research/transfer/pilot_worker_inputs.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
-      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_worker_runtime -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science. Frozen per-pool context v2, real384/synthetic128 anchor mismatch, uint64 identity, tamper/size/query-label refusal and actual eight-stage native fixture; no scientific acceptance."
     },
     "research/transfer/pilot_worker_authority.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
@@ -2818,8 +2818,8 @@
       "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
     },
     "research/transfer/tests/test_pilot_worker_inputs.py": {
-      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
-      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_worker_runtime -v",
+      "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science. Frozen per-pool context v2, real384/synthetic128 anchor mismatch, uint64 identity, tamper/size/query-label refusal and actual eight-stage native fixture; no scientific acceptance."
     },
     "research/transfer/tests/test_pilot_worker_runtime.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
@@ -2828,6 +2828,126 @@
     "research/transfer/tests/test_driver_seed_uint64.py": {
       "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_driver_seed_uint64 research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
       "purpose": "Run real native n/4n draw handoff through signed parent worker capsule, captured disjoint private roles and precommitted indices, actual fixture learner/driver calls under a single durable journal; reject rights, context, budget and failed-call substitutions. Fixture execution never qualifies science."
+    },
+    "research/transfer/pilot_control_draw_io.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_control_materialized_draws research.transfer.tests.test_pilot_control_runtime research.transfer.tests.test_control_boundary research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Actual framed copula/compressed control compile and reload, confined n/4n output and exact full-closure cost refusal, authenticated captured schema/CSV/aggregate input witnesses, same live journal and fixture learners/drivers, distinct compiler/learner uint64 streams; no scientific qualification."
+    },
+    "research/transfer/pilot_control_materialized_draws.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_control_materialized_draws research.transfer.tests.test_pilot_control_runtime research.transfer.tests.test_control_boundary research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v && python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Actual framed copula/compressed control compile and reload, confined n/4n output and exact full-closure cost refusal, authenticated captured schema/CSV/aggregate input witnesses, same live journal and fixture learners/drivers, distinct compiler/learner uint64 streams; no scientific qualification.; After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/pilot_control_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_control_materialized_draws research.transfer.tests.test_pilot_control_runtime research.transfer.tests.test_control_boundary research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v && python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Actual framed copula/compressed control compile and reload, confined n/4n output and exact full-closure cost refusal, authenticated captured schema/CSV/aggregate input witnesses, same live journal and fixture learners/drivers, distinct compiler/learner uint64 streams; no scientific qualification.; After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/tests/test_pilot_control_materialized_draws.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_control_materialized_draws research.transfer.tests.test_pilot_control_runtime research.transfer.tests.test_control_boundary research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Actual framed copula/compressed control compile and reload, confined n/4n output and exact full-closure cost refusal, authenticated captured schema/CSV/aggregate input witnesses, same live journal and fixture learners/drivers, distinct compiler/learner uint64 streams; no scientific qualification."
+    },
+    "research/transfer/tests/test_pilot_control_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_control_materialized_draws research.transfer.tests.test_pilot_control_runtime research.transfer.tests.test_control_boundary research.transfer.tests.test_pilot_worker_runtime research.transfer.tests.test_pilot_worker_inputs research.transfer.tests.test_pilot_materialized_draws research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Actual framed copula/compressed control compile and reload, confined n/4n output and exact full-closure cost refusal, authenticated captured schema/CSV/aggregate input witnesses, same live journal and fixture learners/drivers, distinct compiler/learner uint64 streams; no scientific qualification."
+    },
+    "research/transfer/tests/test_pilot_driver_prediction_aliases.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_pilot_driver_prediction_aliases research.transfer.tests.test_pilot_physical_operations -v",
+      "purpose": "Exact reserved DriverPlan and functional fit/query/predict-seed reuse, full metric parity against uncached fixture predictions, changed-plan/cache refusal and unique physical cost nodes; fixture only, no SDK/science qualification."
+    },
+    "research/transfer/native_qualification_runtime.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_native_qualification -v",
+      "purpose": "Signed native qualification protocol plus installed top-level distribution RECORD disambiguation, exact source-pinned distinct code/weight license labels; no rights or model admission inferred."
+    },
+    "research/transfer/tests/test_native_qualification.py": {
+      "command": "PYTHONPATH=. python3 -B -m unittest research.transfer.tests.test_native_qualification -v",
+      "purpose": "Signed native qualification protocol plus installed top-level distribution RECORD disambiguation, exact source-pinned distinct code/weight license labels; no rights or model admission inferred."
+    },
+    "ops/native_control/Cargo.lock": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/Cargo.toml": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/build-offline.sh": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/native_control_build.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/native_control_manifest.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/src/decode.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/src/hash.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/src/main.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/src/sample.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "ops/native_control/src/sys.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/tdl/control_native.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/tests/test_native_control.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "After admitted offline build: real standalone ELF byte parity, full uint64 seeds, bounded frame refusal, actual syscall denials, paid caps and typed n/4n handoff; no scientific acceptance"
+    },
+    "research/transfer/tdl/control_codec.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_controls research.transfer.tests.test_native_control -v",
+      "purpose": "Retain v1 JSON reader and verify lossless explicit ABI2 numeric-state framing, exact seeds, finite states, charged control export and real native sampler"
+    },
+    "ops/native_control/linker.ld": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Build pins freestanding abort-only ELF, no unwind tables, packed read-only RX versus RW/NXstack, all complete bytes remain charged"
+    },
+    "ops/native_control/src/host_math.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Require exact native-versus-host Python numeric bytes; static GLIBC mathbuildinput pinned and all emittedbytes charged; observed FMA/AVX OSfeatures mandatory"
+    },
+    "ops/native_control/src/loader.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Verify bounded lossless embedded fullELF decoder, staticW^Xmapping, nofiles/network/exec code loading, wholeencodedruntime charged, actual original sampler parity and denial"
+    },
+    "ops/native_control/src/inflate.rs": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Verify bounded lossless embedded fullELF decoder, staticW^Xmapping, nofiles/network/exec code loading, wholeencodedruntime charged, actual original sampler parity and denial"
+    },
+    "research/transfer/target_last.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v",
+      "purpose": "Mandatory explicit target-last intake and strict consumers; source/normalized hashes, lossless column permutation, query-label exclusion, original physical row identity and no overwrite"
+    },
+    "research/transfer/tdl/target_last.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v",
+      "purpose": "Mandatory explicit target-last intake and strict consumers; source/normalized hashes, lossless column permutation, query-label exclusion, original physical row identity and no overwrite"
+    },
+    "research/transfer/tests/test_target_last.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v",
+      "purpose": "Mandatory explicit target-last intake and strict consumers; source/normalized hashes, lossless column permutation, query-label exclusion, original physical row identity and no overwrite"
+    },
+    "docs/data-contract.md": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v",
+      "purpose": "Mandatory explicit target-last intake and strict consumers; source/normalized hashes, lossless column permutation, query-label exclusion, original physical row identity and no overwrite"
+    },
+    "research/transfer/native_control_prepare.py": {
+      "command": "python3 -B research/transfer/native_control_prepare.py && python3 -B -m unittest research.transfer.tests.test_native_control -v",
+      "purpose": "Fresh exact-source offline build and paid runtime manifest before mandatory Linux transfer discovery; missing/stale artifacts fail"
     }
   }
 }

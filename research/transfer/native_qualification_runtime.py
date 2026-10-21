@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from research.transfer.native_qualification import (
-    MODEL_FILES, QualificationError, sha256_file,
+    MODEL_FILES, MODEL_SOURCES, QualificationError, sha256_file,
 )
 
 RUNTIME_FILE = Path(__file__).resolve()
@@ -36,6 +36,36 @@ def _case_inputs(case: dict, root: Path) -> tuple[dict, dict, dict]:
     return tuple(values)  # type: ignore[return-value]
 
 
+def _installed_record(distribution: Any, version: str, expected_sha256: str) -> Path:
+    """Select the installed distribution record, excluding vendored records."""
+    records = [entry for entry in (distribution.files or ())
+               if len(entry.parts) == 2 and entry.parts[0].endswith(".dist-info")
+               and entry.name == "RECORD"]
+    if distribution.version != version or len(records) != 1:
+        raise QualificationError("adapter_dependency_closure_mismatch")
+    path = Path(distribution.locate_file(records[0]))
+    if sha256_file(path) != expected_sha256:
+        raise QualificationError("adapter_dependency_closure_mismatch")
+    return path
+
+
+def _component_license_ids(case: dict) -> tuple[str, str]:
+    """Labels for the pinned components; byte/rights checks remain separate.
+
+    NVIDIA's pinned code LICENSE is Apache-2.0, while its weight card declares
+    OpenMDW-1.1. TabICL's top-level code/weight labels are BSD-3-Clause; the
+    complete pinned code license retains its separate Apache forecast notice.
+    A new source revision needs a fresh component-label review.
+    """
+    model = case.get("model")
+    sources = MODEL_SOURCES.get(model)
+    if sources is None or tuple(case.get(k) for k in (
+            "code_repo", "code_revision", "checkpoint_repo", "checkpoint_revision")) != sources:
+        raise QualificationError("component_license_source_mismatch")
+    return {"tabicl_v2": ("bsd-3-clause", "bsd-3-clause"),
+            "kumo_tabular": ("apache-2.0", "openmdw-1.1")}[model]
+
+
 def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
                     recipe: dict, sdk_values: Any, sdk_classes: list[str],
                     *, runner_file: Path | str | None = None) -> dict:
@@ -48,6 +78,7 @@ def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
     from research.transfer.adapters.auditors.conventional import (
         OfflineArtifacts, OfflineRuntime, file_sha256,
     )
+    code_license_id, weights_license_id = _component_license_ids(case)
     if case["model"] == "tabicl_v2":
         from research.transfer.adapters.auditors.tabicl import TabICLAdapter, TabICLRecipe
         adapter_file = Path(inspect.getfile(TabICLAdapter))
@@ -57,7 +88,6 @@ def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
         )
         adapter_cls = TabICLAdapter
         code_license_name, weights_license_name = "tabicl_code_license.txt", "tabicl_weights_license.txt"
-        license_id = "bsd-3-clause"
     else:
         from research.transfer.adapters.auditors.kumo_tabular import KumoRecipe, KumoTabularAdapter
         adapter_file = Path(inspect.getfile(KumoTabularAdapter))
@@ -69,18 +99,14 @@ def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
         )
         adapter_cls = KumoTabularAdapter
         code_license_name, weights_license_name = "kumo_code_license.txt", "kumo_weights_license.txt"
-        license_id = "openmdw-1.1"
     closure_path = root / "w01-cert-venv-closure.json"
     closure = json.loads(closure_path.read_text(encoding="utf-8"))
     dependencies, dependency_paths = [], []
     for item in closure["distributions"]:
         dist = metadata.distribution(item["name"])
-        record = next((entry for entry in (dist.files or ()) if str(entry).endswith("RECORD")), None)
-        if (dist.version != item["version"] or record is None or
-                _hash(dist.locate_file(record).read_bytes()) != item["record_sha256"]):
-            raise QualificationError("adapter_dependency_closure_mismatch")
+        record_path = _installed_record(dist, item["version"], item["record_sha256"])
         dependencies.append((item["name"], item["version"], item["record_sha256"]))
-        dependency_paths.append(Path(dist.locate_file(record)))
+        dependency_paths.append(record_path)
     licenses_dir = root / "licenses"
     code_license = licenses_dir / code_license_name
     weights_license = licenses_dir / weights_license_name
@@ -94,8 +120,8 @@ def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
         name=case["model"], mode="frozen_context", code_revision=case["code_revision"],
         code_sha256=file_sha256(adapter_file), weights_sha256=file_sha256(weight_path),
         dependencies=tuple(dependencies),
-        licenses=(("code", license_id, file_sha256(code_license)),
-                  ("weights", license_id, file_sha256(weights_license))),
+        licenses=(("code", code_license_id, file_sha256(code_license)),
+                  ("weights", weights_license_id, file_sha256(weights_license))),
         preprocessing_sha256=adapter_recipe.preprocessing_sha256,
         recipe_sha256=adapter_recipe.sha256,
         output_aggregation_sha256=adapter_recipe.output_sha256,
@@ -153,7 +179,7 @@ def _adapter_parity(case: dict, root: Path, context: dict, query: dict,
         ("tabicl_adapter", RUNTIME_FILE.parent / "adapters/auditors/tabicl.py"),
         ("kumo_adapter", RUNTIME_FILE.parent / "adapters/auditors/kumo_tabular.py"),
         ("native_qualification", RUNTIME_FILE.with_name("native_qualification.py")),
-        ("native_qualification_runtime", RUNTIME_FILE),
+        ("native_qualification_runtime", Path(__file__).resolve()),
         ("run_native_qualification", entry_file),
     ):
         modules[label] = {"path": str(path.resolve()), "sha256": file_sha256(path)}

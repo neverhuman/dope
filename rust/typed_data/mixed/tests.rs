@@ -278,7 +278,12 @@ fn affine_units_and_constant_target_survive_mixed_reload() {
         assert_eq!(a[1..4], b[1..4]);
     }
     let mut constant = fixture("held", 1.0);
-    constant.columns[4].fill(Cell::Number(300.0));
+    assert_eq!(constant.schema.columns.last().unwrap().id, "c0005");
+    constant
+        .columns
+        .last_mut()
+        .unwrap()
+        .fill(Cell::Number(300.0));
     let result = compile_mixed(
         &constant,
         &rows,
@@ -357,7 +362,8 @@ fn malformed_state_unknown_categories_caps_and_unavailable_are_static() {
         )
         .is_ok()
     );
-    table.columns[4][0] = Cell::Mask(MaskState::Missing);
+    assert_eq!(table.schema.columns.last().unwrap().id, "c0005");
+    table.columns.last_mut().unwrap()[0] = Cell::Mask(MaskState::Missing);
     assert!(
         compile_mixed(
             &table,

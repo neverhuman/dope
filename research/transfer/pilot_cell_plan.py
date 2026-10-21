@@ -1,4 +1,6 @@
 """Versioned immutable pilot cell plans; declarations do not grant execution."""
+import hashlib
+
 from research.transfer.campaign_admission import (
     GATES, PilotContractError, PilotExecutionPlan, _identifier, inspect_admission_contract, seed_uint64,
 )
@@ -27,6 +29,21 @@ def _seed(doc, key):
     return seed_uint64(doc[key]) if doc["version"] == 2 else doc[key]
 
 
+# Exact Root development decision; legacy documents retain their original
+# learner/driver alias. This optional v2 field is part of the signed input hash.
+FROZEN_DRIVER_POLICY_SHA256 = "54dd604ed8094bbce2678bcd6240fe4775fae9d414edc3b74e07707e47185208"
+
+
+def _driver_seed_bound(doc, streams, master):
+    if "driver_policy_sha256" not in doc:
+        return seed_uint64(streams["learner"]) == _seed(doc, "driver_seed")
+    if doc["version"] != 2 or doc["driver_policy_sha256"] != FROZEN_DRIVER_POLICY_SHA256:
+        return False
+    raw = b"dope-e03-development-driver-stream-v1\0" + seed_uint64(master).to_bytes(8, "little")
+    expected = int.from_bytes(hashlib.sha256(raw).digest()[:8], "little")
+    return _seed(doc, "driver_seed") == expected and expected != seed_uint64(streams["learner"])
+
+
 class PilotCellExecutionPlan:
     """Immutable 8-stage cell execution plan bound to PilotExecutionPlan and CampaignRunSpec."""
 
@@ -40,6 +57,8 @@ class PilotCellExecutionPlan:
         )
         if document["version"] == 2:
             keys += ("draw_4n_seed",)
+        if "driver_policy_sha256" in document:
+            keys += ("driver_policy_sha256",)
         self.input_sha256 = digest({
             "format": FORMAT + "-input", "version": document["version"], **{k: document[k] for k in keys},
             "training_scales": list(document["training_scales"]),
@@ -51,6 +70,9 @@ class PilotCellExecutionPlan:
         _require(type(value) is dict and type(value.get("version")) is int
                  and value["version"] in (1, 2), "pilot_cell_plan_invalid")
         extra = {"draw_4n_seed"} if value["version"] == 2 else set()
+        if value["version"] == 2 and "driver_policy_sha256" in value:
+            _require(value["driver_policy_sha256"] == FROZEN_DRIVER_POLICY_SHA256, "pilot_driver_policy_invalid")
+            extra.add("driver_policy_sha256")
         _require(
             type(value) is dict and set(value) == {
                 "format", "version", "cell_id", "task_id", "task_role", "comparator",
@@ -65,10 +87,8 @@ class PilotCellExecutionPlan:
             "pilot_cell_plan_invalid",
         )
         _require(value["format"] == FORMAT, "pilot_cell_plan_invalid")
-        # The real confined control route needs a separate typed runtime binding.
-        # Preserve v1 decoding, but never imply its worker response is that route.
-        _require(value["version"] == 1 or value["comparator"] == "dope",
-                 "pilot_v2_control_runtime_unavailable")
+        # A v2 control document is data, not runtime authority. The parent
+        # requires the signed typed runtime before opening the stage journal.
         for key in (
             "cell_id", "task_id", "binary_sha256", "worker_binary_sha256",
             "csv_sha256", "selection_csv_sha256", "query_csv_sha256", "schema_sha256",
@@ -83,7 +103,7 @@ class PilotCellExecutionPlan:
         for key in path_keys:
             _require(_command_path(value[key]), "pilot_cell_plan_invalid")
         _require(len({value[k] for k in path_keys}) == len(path_keys), "pilot_cell_plan_invalid")
-        for key in ("fit_seed", "draw_seed", "control_seed", "driver_seed", *extra):
+        for key in ("fit_seed", "draw_seed", "control_seed", "driver_seed", *(extra - {"driver_policy_sha256"})):
             if value["version"] == 2:
                 try:
                     seed_uint64(value[key])
@@ -160,7 +180,7 @@ class PilotCellExecutionPlan:
             and seed_uint64(streams["fit"]) == _seed(self._document, "fit_seed")
             and seed_uint64(streams["sample_primary"]) == _seed(self._document, "draw_seed")
             and seed_uint64(streams["context"]) == _seed(self._document, "control_seed")
-            and seed_uint64(streams["learner"]) == _seed(self._document, "driver_seed"),
+            and _driver_seed_bound(self._document, streams, plan_doc["seeds"]["master"]),
             "pilot_binding_mismatch",
         )
         if self._document["version"] == 2:

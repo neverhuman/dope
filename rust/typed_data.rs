@@ -84,7 +84,14 @@ impl fmt::Debug for TypedTable {
 }
 
 impl TypedTable {
-    pub fn read_csv(reader: impl Read, schema: TableSchemaV1, limits: InputLimits) -> Result<Self> {
+    /// Normalize explicit-role external input exactly once. The internal schema,
+    /// columns and every subsequent training/sampling view are target-last;
+    /// input_positions retains the original source mapping for provenance/errors.
+    pub fn read_csv(
+        reader: impl Read,
+        mut schema: TableSchemaV1,
+        limits: InputLimits,
+    ) -> Result<Self> {
         if limits.max_bytes == 0
             || limits.max_rows == 0
             || limits.max_cells == 0
@@ -93,6 +100,11 @@ impl TypedTable {
             return Err(SchemaError::new("invalid_input_limits", None, None));
         }
         schema.validate_with_field_limit(limits.max_field_bytes)?;
+        // Validation establishes exactly one declared target. Stable ordering
+        // preserves feature identities and never guesses a target from values.
+        schema
+            .columns
+            .sort_by_key(|column| column.role == ColumnRole::Target);
         let cap = limits
             .max_bytes
             .checked_add(1)
@@ -340,6 +352,32 @@ include!("typed_data/transforms.rs");
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn intake_forces_target_last_without_reinterpreting_source_values() {
+        let source = "private_y,private_a,private_b\n9,1,2\n8,3,4\n";
+        let declaration = serde_json::json!({"format":"dope-table-schema","version":1,
+        "columns":[
+            {"id":"c0003","source_name":"private_y","role":"target","dtype":"continuous"},
+            {"id":"c0001","source_name":"private_a","role":"feature","dtype":"continuous"},
+            {"id":"c0002","source_name":"private_b","role":"feature","dtype":"continuous"}
+        ]});
+        let schema =
+            TableSchemaV1::from_private_json(&serde_json::to_vec(&declaration).unwrap()).unwrap();
+        assert_eq!(schema.columns.last().unwrap().role, ColumnRole::Target);
+        assert_eq!(
+            schema.public_projection().unwrap().last().unwrap().role,
+            ColumnRole::Target
+        );
+        let data = TypedTable::read_csv(source.as_bytes(), schema, InputLimits::default()).unwrap();
+        assert_eq!(data.schema.columns.last().unwrap().role, ColumnRole::Target);
+        assert_eq!(data.input_positions, vec![1, 2, 0]);
+        assert_eq!(data.target_id().unwrap(), "c0003");
+        assert_eq!(data.cell(0, "c0001").unwrap(), &Cell::Number(1.0));
+        assert_eq!(data.cell(0, "c0002").unwrap(), &Cell::Number(2.0));
+        assert_eq!(data.cell(0, "c0003").unwrap(), &Cell::Number(9.0));
+        assert_eq!(source, "private_y,private_a,private_b\n9,1,2\n8,3,4\n");
+    }
 
     // This internal-corruption guard formerly lived in the path-imported raw
     // schema integration test. Keep the same negative coverage while integration

@@ -41,6 +41,7 @@ uv pip install --python target/ci-python/bin/python --constraint validation/requ
 mkdir -p target/transfer-test-tmp
 # Explicit packet qualification or structured not_run; full transfer discovery runs once.
 PYTHONPATH=. target/ci-python/bin/python -B -m research.transfer.workplan_packet
+target/ci-python/bin/python -B research/transfer/native_control_prepare.py
 TMPDIR="$PWD/target/transfer-test-tmp" PYTHONPATH=. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 target/ci-python/bin/python -B -m unittest discover -s research/transfer/tests -p 'test_*.py' -v
 target/ci-python/bin/python docs/whitepaper/scripts/retained_evidence.py
 target/ci-python/bin/python docs/whitepaper/scripts/compute_panel.py

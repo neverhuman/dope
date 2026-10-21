@@ -95,7 +95,7 @@ def _admission_contract_doc(pilot_plan: PilotExecutionPlan, *, gate_status="acce
     }
 
 
-def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, comparator="dope", candidate="chow_liu", version=1):
+def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, comparator="dope", candidate="chow_liu", version=1, byte_budget=32768):
     root = Path(directory).absolute()
     binary = root / "dope-kernel"
     worker = root / "pilot-worker"
@@ -131,7 +131,17 @@ def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, com
             ],
         }),
     )
+    # Preserve the deliberate external target-first source, then use the shared
+    # declared-target intake before constructing any canonical pilot binding.
+    from research.transfer.target_last import normalize_csv
+    original_schema = schema.read_bytes()
+    for partition in (csv, sel_csv, qry_csv):
+        normalized = normalize_csv(partition.read_bytes(), original_schema, target="SECRET_y")
+        partition.write_bytes(normalized.csv)
+    schema.write_bytes(normalized.schema)
     pilot_doc = _pilot_plan_doc()
+    if byte_budget not in pilot_doc["byte_caps"]:
+        pilot_doc["byte_caps"] = sorted([32768, byte_budget])
     if version == 2:
         pilot_doc["seeds"]["substreams"]["sample_primary"] = "0xfffffffffffffffe"
         pilot_doc["seeds"]["substreams"]["sample_4n"] = "0xffffffffffffffff"
@@ -165,7 +175,7 @@ def fixture(directory, stage_wall_ms=10000, csv_rows=64, binary_source=None, com
         "selection_rows": 16,
         "query_rows": 16,
         "rows": 16,
-        "byte_budget": 32768,
+        "byte_budget": byte_budget,
         "deadline_seconds": 1,
         "training_scales": list(pilot_runner.SCALES),
         "learners": list(pilot_runner.LEARNERS),
@@ -447,6 +457,39 @@ class PilotRunnerTests(unittest.TestCase):
                 worker.assert_not_called()
             self.assertEqual(receipt["status"], "failed")
             self.assertEqual(receipt["stages"][0]["reason"], "pilot_input_rows_insufficient")
+
+
+class FrozenDriverPolicyTests(unittest.TestCase):
+    def test_distinct_stream_requires_policy_and_preserves_legacy(self):
+        import hashlib
+        from research.transfer.pilot_cell_plan import _driver_seed_bound, FROZEN_DRIVER_POLICY_SHA256
+        streams = {"learner": "0x000d0beef2026105"}
+        master = "0x000d0beef2026100"
+        derived = int.from_bytes(hashlib.sha256(
+            b"dope-e03-development-driver-stream-v1\0" + int(master, 16).to_bytes(8, "little")
+        ).digest()[:8], "little")
+        seed = f"0x{derived:016x}"
+        legacy = {"version": 2, "driver_seed": streams["learner"]}
+        self.assertTrue(_driver_seed_bound(legacy, streams, master))
+        self.assertNotEqual(seed, streams["learner"])
+        self.assertFalse(_driver_seed_bound(legacy | {"driver_seed": seed}, streams, master))
+        successor = legacy | {"driver_seed": seed, "driver_policy_sha256": FROZEN_DRIVER_POLICY_SHA256}
+        self.assertTrue(_driver_seed_bound(successor, streams, master))
+        self.assertFalse(_driver_seed_bound(successor | {"driver_policy_sha256": "0" * 64}, streams, master))
+        self.assertFalse(_driver_seed_bound(successor | {"driver_seed": streams["learner"]}, streams, master))
+        self.assertFalse(_driver_seed_bound(successor | {"version": 1}, streams, master))
+
+    def test_policy_is_part_of_signed_cell_input_and_rejects_invalid_scope(self):
+        from research.transfer.pilot_cell_plan import FROZEN_DRIVER_POLICY_SHA256
+        with tempfile.TemporaryDirectory() as td:
+            _, _, _, old, _, _ = fixture(td, version=2)
+            doc = old.document()
+            updated = pilot_runner.PilotCellExecutionPlan.from_document(
+                doc | {"driver_policy_sha256": FROZEN_DRIVER_POLICY_SHA256})
+            self.assertNotEqual(old.input_sha256, updated.input_sha256)
+            self.assertNotEqual(old.sha256, updated.sha256)
+            with self.assertRaisesRegex(CampaignRunnerError, "pilot_driver_policy_invalid"):
+                pilot_runner.PilotCellExecutionPlan.from_document(doc | {"driver_policy_sha256": "0" * 64})
 
 
 if __name__ == "__main__":

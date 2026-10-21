@@ -205,8 +205,15 @@ class DopeGenerator(StandaloneGenerator):
                          "citable": False}
 
 
-def _pack_control(document):
-    content = bytearray(gzip.compress(_json(document), compresslevel=9, mtime=0))
+def _pack_control(document, *, artifact_abi=1):
+    require(type(artifact_abi) is int and artifact_abi in (1, 2), "invalid_runtime")
+    raw = _json(document)
+    if artifact_abi == 2:
+        from .control_codec import encode
+        # Retain the v1 strict semantic validator before converting numeric state.
+        _control_document(gzip.compress(raw, mtime=0), document["method"])
+        raw = encode(document)
+    content = bytearray(gzip.compress(raw, compresslevel=9, mtime=0))
     content[9] = 255  # Freeze the gzip OS marker across supported Python versions.
     content = bytes(content)
     return content, canonical_container([{"name": "literal_payload", "hex": content.hex()}])
@@ -219,7 +226,9 @@ def _read_control(artifact, byte_budget, method):
 
 class _BoundedControlGenerator(StandaloneGenerator):
     """Numeric research controls; implementation success is not qualification."""
-    def __init__(self, method, byte_budget=32768):
+    def __init__(self, method, byte_budget=32768, *, artifact_abi=1):
+        require(type(artifact_abi) is int and artifact_abi in (1, 2), "invalid_runtime")
+        self.artifact_abi = artifact_abi
         require(method in CONTROL_METHODS, "unsupported_generator")
         self._method, self.byte_budget = method, count(byte_budget, 1)
         require(self.byte_budget <= MAX_CONTROL_JSON, "invalid_count")
@@ -252,8 +261,13 @@ class _BoundedControlGenerator(StandaloneGenerator):
             ids = [column["id"] for column in columns]
             require(all(type(value) is str and value for value in ids) and len(set(ids)) == len(ids),
                     "invalid_control_schema")
+            from .target_last import TargetLastError, schema_columns
+            try:
+                canonical_names, canonical_target = schema_columns(schema)
+            except TargetLastError:
+                raise MetricError("noncanonical_control_schema") from None
             table = list(csv.reader(io.StringIO(raw.decode("utf-8"))))
-            require(table and len(table[0]) == len(headers) and set(table[0]) == set(headers),
+            require(table and table[0] == canonical_names and table[0][-1] == canonical_target,
                     "invalid_control_header")
             positions = [table[0].index(name) for name in headers]
             require(all(len(row) == len(headers) for row in table[1:]), "invalid_control_fit")
@@ -276,11 +290,16 @@ class _BoundedControlGenerator(StandaloneGenerator):
                             position = index * (len(column) - 1) / (size - 1)
                             lower, upper = int(position), min(int(position) + 1, len(column) - 1)
                             weight = position - lower
-                            marginal.append(number((1 - weight) * column[lower] + weight * column[upper]))
+                            left, right = column[lower], column[upper]
+                            # Equal empirical quantiles are exact plateaus. The
+                            # weighted expression can round a negative plateau
+                            # in opposite directions and make it nonmonotone.
+                            value = left if left == right else (1 - weight) * left + weight * right
+                            marginal.append(number(min(right, max(left, value))))
                         quantiles.append(marginal)
                     document = {**base, "factor": factor, "quantiles": quantiles,
                                 "quantile_count": size, "shrinkage": 1e-6}
-                    content, artifact = _pack_control(document)
+                    content, artifact = _pack_control(document, artifact_abi=self.artifact_abi)
                     if len(artifact) <= self.byte_budget:
                         selected = content
                         break
@@ -293,7 +312,7 @@ class _BoundedControlGenerator(StandaloneGenerator):
                 # no maximal-retention claim; every accepted full frame is measured.
                 retained = len(rows)
                 while retained:
-                    content, artifact = _pack_control({**base, "rows": [rows[i] for i in order[:retained]]})
+                    content, artifact = _pack_control({**base, "rows": [rows[i] for i in order[:retained]]}, artifact_abi=self.artifact_abi)
                     if len(artifact) <= self.byte_budget:
                         selected = content
                         break
@@ -385,13 +404,13 @@ class _BoundedControlGenerator(StandaloneGenerator):
 
 
 class GaussianCopulaGenerator(_BoundedControlGenerator):
-    def __init__(self, byte_budget=32768):
-        super().__init__("gaussian_copula", byte_budget)
+    def __init__(self, byte_budget=32768, *, artifact_abi=1):
+        super().__init__("gaussian_copula", byte_budget, artifact_abi=artifact_abi)
 
 
 class CompressedRowsGenerator(_BoundedControlGenerator):
-    def __init__(self, byte_budget=32768):
-        super().__init__("compressed_real_rows", byte_budget)
+    def __init__(self, byte_budget=32768, *, artifact_abi=1):
+        super().__init__("compressed_real_rows", byte_budget, artifact_abi=artifact_abi)
 
 
 class SpecifiedGenerator(StandaloneGenerator):
