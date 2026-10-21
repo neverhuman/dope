@@ -794,7 +794,13 @@
     "tools/claims/figure_drawing.py": "external-evidence",
     "validation/": "external-evidence",
     "validation/external/": "external-evidence",
-    "validation/requirements-v1.txt": "python-v1-compatibility"
+    "validation/requirements-v1.txt": "python-v1-compatibility",
+    "engine/": "rust-core",
+    "bench/real-world/": "external-evidence",
+    "examples/adult/walkthrough.py": "external-evidence",
+    "examples/adult/TRANSCRIPT.md": "external-evidence",
+    "tools/claims/dope1.py": "governance",
+    "ops/ci/engine.sh": "release"
   },
   "workspace": "dope"
 }

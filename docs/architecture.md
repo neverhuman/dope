@@ -1,5 +1,19 @@
 # Architecture and ownership
 
+## DOPE engine (`engine/`)
+
+`engine/` is the deployable product: a standalone pure-Rust workspace with its own
+lockfile. `dope-core` compiles a CSV into a byte-budgeted program and stores it as a
+safetensors file; `dope-cli` is the `dope` command. Intake and ML-ready encoding live in
+`schema.rs` and `encode.rs`; covariates in `marginal.rs`, `copula.rs` and `regimes.rs`; the
+conditional model in `target.rs`, `train*.rs`, `forest.rs` and `noise.rs`; bytes in
+`quant.rs` and `artifact.rs`; the search and its self-audit in `compile.rs` and `eval/`;
+sampling in `sample.rs` (candle tensors on CPU, CUDA or Metal) and `sample_cpu.rs` (native
+row-parallel CPU path). Python is used only by the benchmark harness in
+`bench/real-world/`, never by fitting or sampling. `ops/ci/engine.sh` is its CI gate.
+
+## Research kernel (`rust/`, `dope-kernel`)
+
 `rust/main.rs` owns CLI argument parsing. `rust/data.rs` validates input before
 fitting. `rust/contract.rs` freezes tiers, candidate identities, and auditors.
 `rust/compiler.rs` fits candidates; `rust/codec.rs` is the canonical DPK

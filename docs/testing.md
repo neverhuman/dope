@@ -1,5 +1,18 @@
 # Testing, evidence, and budgets
 
+## DOPE engine and benchmark surfaces
+
+`just engine` (`ops/ci/engine.sh`, also run by `cpu.sh`) formats, lints with warnings denied and
+tests the standalone `engine/` workspace: unit tests, end-to-end tests (byte budget, exact
+safetensors round trip, native versus tensor sampler parity with trees, trees buying held-out
+gain) and CLI tests. Engine errors carry a `repair_hint` and a `docs_url`, and the CLI prints
+both, so a failed command says how to rerun it. `just bench-check` re-renders the benchmark
+surfaces in memory and fails if the README block, figures or paper macros differ from what
+`bench/real-world/results/confirm/records.jsonl` implies. A benchmark cell that fails, times out
+or crashes is recorded as such and stays in every denominator.
+
+## Repository and research-kernel gates
+
 `just deployment-check` verifies the separate locked `deploy/` CPU graph, typed
 SafeTensors inventory, nonzero TVAE heads, legacy draw replay, explicit corrected
 activation, allocation bounds and unavailable-device refusals. `just check` includes

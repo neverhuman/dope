@@ -42,6 +42,34 @@
   rewrite `paper/main.tex` as a full manuscript in the ICLR layout with
   propositions and proofs; add `docs/math.md`; move internal planning records
   under `docs/internal/`.
+- **DOPE engine 1.0 (`engine/`).** A standalone pure-Rust workspace (`dope-core`, `dope`
+  CLI) that compiles a CSV into a byte-budgeted program stored as a standard safetensors
+  file and samples it on CPU, CUDA or Metal (candle), with a native row-parallel CPU
+  sampler. The program: an ML-ready intake (target-ordered levels, rare-level pooling,
+  `log1p` for skewed counts, robust unit scaling; one-hot and `[0, 1]` output on request);
+  marginals on a normal-score grid; a regime mixture of Gaussian copulas that keeps every
+  marginal exactly; a residual tanh network trained with closed-form readouts plus boosted,
+  byte-coded oblivious trees quantized with error feedback; calibrated noise; measured
+  rate–distortion bit allocation; and a compile-time self-audit that chooses the byte split
+  between dependence and target by retention on held-out training rows. The artifact is a
+  standard safetensors file whose one tensor is a brotli stream of the schema and every quantized
+  section, so column names, category labels and the tensor table no longer dominate a
+  few-kilobyte file. Built-in auditors
+  (`dope eval`, `dope frontier`) measure retention and TDL. Python is not needed to fit or
+  sample. CI gate: `ops/ci/engine.sh`.
+- **Real-world benchmark (`bench/real-world/`).** Sixteen public UCI and PMLB tables, three
+  auditor families, the information-compression control (real rows `xz`-compressed to the
+  same bytes), SDV and ARF generators, ablations, resumable records, a wall-clock limit per
+  fit, and generated README, figures and paper macros authenticated by
+  `tools/claims/dope1.py`. The research kernel (`dope-kernel fit-table`) is run on the same panel
+  as a comparator.
+- **DOPE 1.0 manuscript.** `paper/dope1.tex` (preprint), `paper/dope1-venue.tex` (double-blind
+  ICLR layout) and `paper/dope1-supplement.tex` describe the engine and benchmark (theory of
+  retention, method, results; every number a generated macro, every setting read from the Rust
+  source). `paper/main.tex` and `paper/supplement.tex` stay the TDL manuscript.
+- **README.** The landing page leads with the DOPE 1.0 engine (generated hero figure, results
+  table, `dope` quick start and a UCI Adult walkthrough); the research kernel's equal-byte study,
+  its `dope-kernel` quick start and every historical block are kept verbatim below.
 
 - Add native raw-unit compilation, inspection, sampling, and a restricted
   artifact-only CPU worker. The complete raw-artifact charge includes retained

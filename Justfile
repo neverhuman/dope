@@ -48,6 +48,15 @@ native-release-smoke:
 fast-audit:
     bash agent/run-jankurai-fast.sh
 
+# The DOPE engine: fmt, clippy -D warnings, tests (CPU).
+engine:
+    bash ops/ci/engine.sh
+
+# The real-world benchmark surfaces (README block, figures, paper macros) match the records.
+bench-check:
+    python3 bench/real-world/render.py --check
+    python3 tools/claims/dope1.py --check
+
 check: fast
     bash ops/ci/check-budgets.sh
     bash ops/ci/check-contracts.sh

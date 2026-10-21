@@ -16,6 +16,7 @@ cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 bash ops/ci/prepare-merge-guard.sh
 cargo test --locked
+bash ops/ci/engine.sh
 cargo run --locked --offline --bin dope-native-notices -- --check
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
 cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof -- -D warnings
