@@ -61,8 +61,28 @@ fn backend_profile(id: &str) -> Option<(usize, u8, usize, u8)> {
         "per_dataset_adapter" => (3, 4, 1, 10),
         "symbolic_latent_diffusion_residual" => (4, 3, 5, 12),
         "symbolic_autoregressive_residual" => (2, 2, 5, 10),
-        _ => return None,
+        "compact_neural_gaussian_copula" => (2, 7, 5, 8),
+        _ => return parse_symbolic_profile(id),
     })
+}
+
+/// `symbolic_k{knot index}_d{dependence family}_t{target family}_q{bits}`
+/// names one point of the symbolic grid explicitly, for byte-budget sweeps.
+fn parse_symbolic_profile(id: &str) -> Option<(usize, u8, usize, u8)> {
+    let rest = id.strip_prefix("symbolic_")?;
+    let fields = rest.split('_').collect::<Vec<_>>();
+    let [knots, dependence, target, bits] = fields.as_slice() else {
+        return None;
+    };
+    let knots = knots.strip_prefix('k')?.parse::<usize>().ok()?;
+    let dependence = dependence.strip_prefix('d')?.parse::<u8>().ok()?;
+    let target = target.strip_prefix('t')?.parse::<usize>().ok()?;
+    let bits = bits.strip_prefix('q')?.parse::<u8>().ok()?;
+    (knots < KNOT_LADDER.len()
+        && dependence <= GAUSSIAN_COPULA_FAMILY
+        && target <= 5
+        && QUANTIZATION_LADDER.contains(&bits))
+    .then_some((knots, dependence, target, bits))
 }
 
 fn dependence_name(family: u8) -> &'static str {
@@ -74,6 +94,7 @@ fn dependence_name(family: u8) -> &'static str {
         4 => "poet_factor",
         5 => "truncated_c_vine",
         6 => "two_component_copula_mixture",
+        7 => "gaussian_copula",
         _ => unreachable!("bounded dependence family"),
     }
 }

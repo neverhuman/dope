@@ -108,6 +108,8 @@ mod tests {
             neural_structural_penalty: 0.0,
             adaptive_allocation: false,
             development_residual: None,
+            native_target_profile: None,
+            packed_codec: false,
             release_policy: ReleasePolicy::new(AnonymizationTier::L0, None, false).unwrap(),
         };
         let result =

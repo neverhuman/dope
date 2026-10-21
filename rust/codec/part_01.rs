@@ -127,11 +127,24 @@ impl Writer {
     }
 
     fn fixed(&mut self, value: f32) {
+        if let Some(bits) = packed_bits() {
+            return self.packed_fixed(value, bits);
+        }
         self.signed((value as f64 * FIXED_SCALE).round() as i64);
     }
 
     fn unit(&mut self, value: f32) {
+        if let Some(bits) = packed_bits() {
+            return self.packed_unit(value, bits);
+        }
         self.u16((value.clamp(0.0, 1.0) * u16::MAX as f32).round() as u16);
+    }
+
+    fn correlation(&mut self, value: f32) {
+        if packed_bits().is_some() {
+            return self.fixed(value.clamp(-0.995, 0.995));
+        }
+        self.u16(((value.clamp(-0.995, 0.995) + 1.0) * 0.5 * u16::MAX as f32).round() as u16);
     }
 }
 
@@ -216,11 +229,24 @@ impl<'a> Reader<'a> {
     }
 
     fn fixed(&mut self) -> Result<f32> {
+        if let Some(bits) = packed_bits() {
+            return self.packed_fixed(bits);
+        }
         Ok((self.signed()? as f64 / FIXED_SCALE) as f32)
     }
 
     fn unit(&mut self) -> Result<f32> {
+        if let Some(bits) = packed_bits() {
+            return self.packed_unit(bits);
+        }
         Ok(self.u16()? as f32 / u16::MAX as f32)
+    }
+
+    fn correlation(&mut self) -> Result<f32> {
+        if packed_bits().is_some() {
+            return Ok(self.fixed()?.clamp(-0.995, 0.995));
+        }
+        Ok(self.u16()? as f32 / u16::MAX as f32 * 2.0 - 1.0)
     }
 
     fn finished(&self) -> Result<()> {
@@ -357,9 +383,7 @@ fn encode_edges(writer: &mut Writer, edges: &[CopulaEdge]) {
     for edge in edges {
         writer.varint(u64::from(edge.parent));
         writer.varint(u64::from(edge.child));
-        writer.u16(
-            ((edge.correlation.clamp(-0.995, 0.995) + 1.0) * 0.5 * u16::MAX as f32).round() as u16,
-        );
+        writer.correlation(edge.correlation);
     }
 }
 

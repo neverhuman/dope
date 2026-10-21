@@ -42,6 +42,13 @@ pub struct CompileOptions {
     pub adaptive_allocation: bool,
     /// Explicit unqualified residual-v1 comparison; never changes a frozen backend.
     pub development_residual: Option<ResidualProfile>,
+    /// Train the compact neural residual natively (pure Rust AdamW) with this
+    /// profile instead of the default random-feature readout. `None` keeps
+    /// historical artifacts byte-for-byte reproducible.
+    pub native_target_profile: Option<NativeTargetProfile>,
+    /// Write symbolic candidates with the packed value codec (header flag bit
+    /// 1), so the quantization grid sets the wire width. Off by default.
+    pub packed_codec: bool,
 }
 
 impl Default for CompileOptions {
@@ -59,6 +66,8 @@ impl Default for CompileOptions {
             neural_structural_penalty: 0.0,
             adaptive_allocation: false,
             development_residual: None,
+            native_target_profile: None,
+            packed_codec: false,
         }
     }
 }

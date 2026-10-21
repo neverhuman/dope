@@ -13,7 +13,7 @@ use sha2::{Digest, Sha256};
 
 use crate::access::{deny_evaluator_network, effective_uid, peer_uid, read_regular};
 use crate::certification::{CertificationReport, certify_frozen_tables};
-use crate::codec::{decode_kernel, encode_kernel};
+use crate::codec::decode_kernel;
 use crate::compiler::{CompileOptions, CompileResult, compile_kernel_from_arrays};
 use crate::contract::ReleasePolicy;
 use crate::data::Table;
@@ -166,7 +166,7 @@ impl FrozenSelection {
             ]
             .iter()
             .any(|v| !digest_valid(v))
-            || encode_kernel(&decode_kernel(&self.artifact)?)? != self.artifact
+            || crate::codec::reencode_canonical(&self.artifact)? != self.artifact
         {
             return Err(denied());
         }
