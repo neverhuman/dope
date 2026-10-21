@@ -1,0 +1,75 @@
+{
+ "dataset": "4544_GeographicalOriginalofMusic",
+ "n_fit": 741,
+ "n_test": 318,
+ "d": 117,
+ "rows_available": 1059,
+ "projection_bytes": 944,
+ "projection_json_bytes": 18953,
+ "null": 0.016383656553870515,
+ "full_table_bytes": {
+  "8": 48048,
+  "16": 105183
+ },
+ "real": {
+  "linear": 0.004141014923962354,
+  "mlp": 0.004901358883158781,
+  "catboost": 0.005776017278652331
+ },
+ "real_matched": {
+  "linear": 0.004141014923962354,
+  "mlp": 0.004901358883158781,
+  "catboost": 0.005776017278652331
+ },
+ "protocol": "equal-bytes-v2",
+ "dope": [
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 11,
+   "artifact_bytes": 3612,
+   "compile_seconds": 1.4795572757720947,
+   "is_packed": true,
+   "bytes": 4556,
+   "loss": {
+    "linear": 0.0060098730639161395,
+    "mlp": 0.006074815771695901,
+    "catboost": 0.006085174128962588
+   }
+  },
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 23,
+   "artifact_bytes": 3612,
+   "compile_seconds": 1.1009414196014404,
+   "is_packed": true,
+   "bytes": 4556,
+   "loss": {
+    "linear": 0.006360930750180778,
+    "mlp": 0.006608577625232735,
+    "catboost": 0.006058090085567478
+   }
+  },
+  {
+   "rung": "G4",
+   "candidate": "symbolic_k2_d7_t5_q8",
+   "profile": "features12_steps2048",
+   "packed": true,
+   "fit_seed": 37,
+   "artifact_bytes": 3611,
+   "compile_seconds": 1.0435214042663574,
+   "is_packed": true,
+   "bytes": 4555,
+   "loss": {
+    "linear": 0.006504420150394864,
+    "mlp": 0.006884561832550556,
+    "catboost": 0.0065736109127012875
+   }
+  }
+ ]
+}
