@@ -24,6 +24,7 @@ fast: native-guard-check
     sha256sum --check --status scripts/native-legal.sha256
     cargo fmt --all -- --check
     cargo check -p dope-kernel --locked
+    cargo build --locked --bin dope-kernel
     cargo test --locked --lib
     cargo test --locked --bin dope-native-notices
     cargo run --locked --offline --bin dope-native-notices -- --check
