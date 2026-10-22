@@ -126,3 +126,15 @@ fn impossible_caps_and_forced_architectures_never_escape_limits() {
         ));
     }
 }
+
+#[test]
+fn a_too_small_byte_budget_names_the_size_it_needs() {
+    let options = FitOptions {
+        budget: Some(64),
+        ..opts()
+    };
+    let Err(err) = fit(&table(false), 3, &options) else {
+        panic!("a 64-byte budget fitted");
+    };
+    assert!(err.to_string().contains("at least"), "{err}");
+}

@@ -146,6 +146,7 @@ fn size_parameter_caps_and_tier_catalog() {
         serde_json::from_slice(&std::fs::read(dir.join("zoo/catalog.json")).unwrap()).unwrap();
     assert_eq!(manifest["kind"], "per-dataset-pretrained-generators");
     assert_eq!(manifest["release_authorized"], false);
+    assert_eq!(manifest["anonymized"], false);
     assert_eq!(manifest["target_index"], 2);
     for item in manifest["artifacts"].as_array().unwrap() {
         let file = dir.join("zoo").join(item["file"].as_str().unwrap());
@@ -180,5 +181,30 @@ fn size_parameter_caps_and_tier_catalog() {
         .unwrap();
     assert!(!out.status.success());
     assert!(String::from_utf8_lossy(&out.stderr).contains("already exists"));
+    dope(
+        &dir,
+        &[
+            "fit-tiers",
+            "train.csv",
+            "-t",
+            "score",
+            "-o",
+            "zoo-anon",
+            "--dataset-id",
+            "test-fixture",
+            "--source",
+            "fixture",
+            "--data-license",
+            "MIT",
+            "--device",
+            "cpu",
+            "--anonymize",
+        ],
+    );
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(dir.join("zoo-anon/catalog.json")).unwrap()).unwrap();
+    assert_eq!(manifest["anonymized"], true);
+    let p = dope_core::decode(&std::fs::read(dir.join("zoo-anon/small.dope")).unwrap()).unwrap();
+    assert_ne!(p.schema.target.name, "score");
     std::fs::remove_dir_all(dir).ok();
 }
