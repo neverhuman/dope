@@ -84,89 +84,10 @@ dope frontier --train train.csv --test test.csv -t income   # bytes vs retention
 `--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
 with positional codes; `--device cuda` runs on a GPU.
 
-Choose `--size small|medium|large` for **2 / 4 / 16 KiB** caps, or set an exact
-`--budget 12KiB --max-parameters 4000` to constrain both whole-file bytes and the
-complete generator's scalar state. `--budget` overrides a preset; a larger cap offers
-capacity, and lift is measured by evaluation. `dope inspect --json` reports both counts.
-
-`dope fit-tiers train.csv -t income --dataset-id adult-v1 --source SOURCE_URL
---data-license CC-BY-4.0 --out target/adult-v1` trains all three sizes and writes
-portable artifacts, checksums, a catalog and a model card for review before release.
-Recipients can sample these **dataset-specific** pretrained generators immediately.
-See [model sizes, pretrained releases and the large-scale study](docs/model-sizes-and-elo.md).
-
-## Command-line recipes
-
-The deployed `dope` application is **Rust end to end**: fitting, sampling, prediction,
-encoding and built-in evaluation need no Python interpreter or libtorch. Python research
-training and benchmark harnesses stay outside the deployment package.
-
-```bash
-# Bound both deployment size and complete-generator state; cap CPU parallelism.
-dope --threads 8 fit train.csv --target price --task regression \
-  --size large --budget 12KiB --max-parameters 4000 --seed 42 \
-  --device cpu --out prices.dope --report fit.json
-
-# One JSON object on stdout for shell scripts, services and agents.
-dope --threads 4 fit train.csv -t price --size medium --json -o prices.dope
-# Diagnostics identify the Rust runtime, backends, worker count and executable hash.
-dope --threads 4 doctor --json
-
-# Generate original-unit rows, or one-hot features and numbers on [0,1].
-dope --threads 8 sample prices.dope -n 100000 --seed 42 --device cpu -o synthetic.csv
-dope sample prices.dope -n 100000 --space ml --scaling unit -o ml-ready.csv
-# Inference CSVs may contain just the input features; no target values are required.
-dope predict prices.dope unlabelled.csv -o predictions.csv
-dope encode real.csv --model prices.dope --scaling quantile -o encoded.csv
-
-# Evaluate on held-out real rows and save a machine-readable receipt.
-dope eval -m prices.dope --train train.csv --test test.csv \
-  --auditors linear,gbdt,mlp --factor 4 --seed 42 --json evaluation.json
-dope frontier --train train.csv --test test.csv -t price \
-  --budgets 2KiB,4KiB,8KiB,16KiB --tau 0.9 --json frontier.json
-dope --threads 8 throughput prices.dope -n 1000000 --repeats 3 --device cpu
-```
-
-| Control | Meaning |
-|---|---|
-| `--target`, `--task` | Explicit target name/index; optional regression/classification override |
-| `--size`, `--budget` | 2/4/16 KiB preset or exact whole-file cap; explicit budget wins |
-| `--max-parameters` | Additional hard cap on the full generator's versioned scalar count |
-| `--threads` | Global CPU worker limit, 1–1024; accepted before or after a subcommand |
-| `--device`, `--seed` | Compute backend and reproducible random seed |
-| `fit --json`, `fit --report` | JSON stdout and/or a saved report; `--quiet` suppresses human output |
-| `sample --space`, `--scaling` | Original-unit or ML-ready rows; unit or quantile scaling |
-
-Use `dope --help` and `dope fit --help` for all parameters. The signed CPU release
-supports `--device cpu` and `auto`; GPU variants require separate builds and qualification.
-
-## Signed Rust deployment
-
-The release workflow builds a **Linux x86-64 CPU binary**, tests every customer command
-with an empty tool `PATH`, checks the Rust dependency closure, collects upstream notices,
-and signs provenance for the exact binary and package hashes using GitHub/Sigstore.
-Only versioned engine tags already on main can enter that signing job. Users
-verify the expected repository, workflow, tag and source commit before executing the binary.
-
-The workflow is introduced in this PR; these commands are a template for an engine release
-once its signed draft has been reviewed and published:
-
-```bash
-release_tag=dope-engine-v1.0.0
-gh release download "$release_tag" --repo neverhuman/dope --dir release
-release_commit=$(gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha)
-# Run from this source checkout; verification fails if either signature is absent.
-bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
-install -Dm755 release/dope-linux-x86_64 "$HOME/.local/bin/dope"
-install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
-install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
-"$HOME/.local/bin/dope" --threads 4 doctor --json
-```
-
-Signature verification uses GitHub CLI during installation; the installed application
-needs only its binary and the chosen `.dope` model data. Source builds remain available
-with `cargo install --locked --path engine/dope-cli`; a local build is unsigned until
-it goes through the release signing workflow. [Release, verification and Python training boundaries](docs/signed-engine-release.md).
+`--size small|medium|large` picks a preset cap; `--max-parameters N` caps stored values;
+`dope fit-tiers` builds all three sizes ([details, Elo ranking](docs/model-sizes-and-elo.md)).
+Scripting flags and signed Linux binaries: [engine/README.md](engine/README.md#recipes),
+[docs/signed-engine-release.md](docs/signed-engine-release.md).
 
 ## Walkthrough: UCI Adult census income
 
@@ -302,27 +223,6 @@ under log-loss *is* the share of the predictive information `I(X;Y)` the program
 (under squared loss, the share of `Var E[Y|X]`). TDL then estimates, on a grid of tested budgets,
 how many bytes a table's predictive information needs, and DOPE spends its bytes on the
 target model first.
-
-### Relative rankings across datasets
-
-**Budgeted Transfer Retention (BTR-AUC)** scores robust retention across a fixed
-log-byte grid. Elo then summarizes paired dataset wins, with a one-point BTR-AUC tie
-margin and dataset bootstrap intervals. This is a diagnostic companion to TDL;
-the current report uses a selection-exposed envelope of tested configurations.
-
-![Budgeted transfer Elo with paired dataset intervals](bench/real-world/results/elo/elo.svg)
-
-**Compressed original training rows** (formerly “Real rows (xz)”) is the storage
-baseline: keep as many randomly selected original training rows as fit in an
-xz-compressed CSV at each byte budget. xz is ordinary lossless compression. The
-retained rows train the same downstream models, evaluated on held-out real data;
-a larger budget may fit the entire training table.
-
-The [all-method report](bench/real-world/results/elo/elo.md) includes seven common
-datasets; the [broader CPU-method report](bench/real-world/results/elo-cpu/elo.md)
-includes sixteen. Each contains local Elo and KPI scores for every dataset and
-alternative, with missing measurements explicit. The point estimates do not establish
-a decisive lead where intervals overlap. [Protocol and reproduction](docs/model-sizes-and-elo.md#master-kpi-budgeted-transfer-retention-auc-version-1).
 
 ## Use a DOPE artifact from Python
 
