@@ -18,6 +18,7 @@ from .pilot_learning_execution import LearningExecution
 from .pilot_learning_reports import execute_streamed, publish_private, reduce_learning
 from .pilot_learning_runtime import OperationAdmission, registry_digest
 from .pilot_native_seed import NativeSeed
+from .pilot_native_receipt import NativeReceiptBridge
 from .pilot_physical_operations import reserve_learning_operations
 from .pilot_worker_authority import WorkerAuthority
 from .pilot_worker_inputs import assemble
@@ -25,7 +26,7 @@ from .pilot_worker_inputs import assemble
 # The signed capsule captures this repository closure. SDK distributions, weights
 # and actual adapter modules additionally use Registration's existing verification.
 MODULES = ("pilot_worker_runtime.py", "pilot_worker_authority.py", "pilot_worker_inputs.py",
-           "pilot_runner.py", "pilot_cell_plan.py", "pilot_materialized_draws.py",
+           "pilot_runner.py", "pilot_native_receipt.py", "pilot_cell_plan.py", "pilot_materialized_draws.py",
            "pilot_native_seed.py", "pilot_learning_contract.py", "pilot_learning_execution.py",
            "pilot_learning_runtime.py", "pilot_learning_reports.py", "pilot_physical_operations.py",
            "campaign_runner.py", "campaign_artifacts.py", "campaign_native.py", "evidence.py",
@@ -36,7 +37,7 @@ MODULES = ("pilot_worker_runtime.py", "pilot_worker_authority.py", "pilot_worker
 class PilotWorkerRuntime:
     def __init__(self, authority, registry, null_reference, driver_plan, wall_by_role, *,
                  verify_assembly, verify_operation, kind="development", control_runtime=None,
-                 adapter_lifetime_policy=None):
+                 adapter_lifetime_policy=None, native_receipt=None):
         require(type(authority) is WorkerAuthority and type(driver_plan) is DriverPlan
                 and kind in ("fixture", "development")
                 and callable(verify_assembly) and callable(verify_operation), "worker_authority_required")
@@ -48,6 +49,10 @@ class PilotWorkerRuntime:
         self.adapter_lifetime_policy = adapter_lifetime_policy
         self.control_runtime = control_runtime
         authority.verify_learner_seed(kind)
+        require(native_receipt is None or type(native_receipt) is NativeReceiptBridge,
+                "native_receipt_bridge_invalid")
+        require(kind == "fixture" or native_receipt is not None, "native_receipt_bridge_required")
+        self.native_receipt, self.native_result = native_receipt, None
         self.authority, self.registry, self.null_reference = authority, dict(registry), null_reference
         self.driver_plan, self.wall_by_role, self.kind = driver_plan, wall_by_role, kind
         self.verify_assembly, self.verify_operation = verify_assembly, verify_operation
@@ -65,6 +70,8 @@ class PilotWorkerRuntime:
                             "protocol_sha256": self.driver_plan.protocol_sha256},
             "wall_by_role": self.wall_by_role,
             "repository_modules": {name: file_hash(root / name) for name in MODULES}}
+        if self.native_receipt is not None:
+            capsule["native_receipt"] = self.native_receipt.capsule()
         if self.adapter_lifetime_policy is not None:
             capsule.update(format="dope-trusted-parent-pilot-worker-v2",
                            adapter_lifetime_policy=self.adapter_lifetime_policy)
@@ -97,6 +104,8 @@ class PilotWorkerRuntime:
         else:
             require(self.control_runtime is not None, "worker_control_runtime_required")
             self.control_runtime.bind(spec, cell_plan, auth, paths)
+        if self.native_receipt is not None:
+            self.native_receipt.bind(self.authority, cell_plan)
         self._bound = True
 
     def _learners(self, journal, cell_plan, paths, root, manifest_sha256):
@@ -155,20 +164,37 @@ class PilotWorkerRuntime:
                 require(payload["status"] == "executed_unqualified", "worker_drivers_incomplete")
                 output_sha256 = file_hash(paths["drivers"])
             elif stage == "receipt":
+                if self.native_receipt is not None:
+                    self.native_result = self.native_receipt.verify(
+                        self._execution, journal, cell_plan, paths, root)
+                require(self.kind == "fixture" or self.native_result is not None,
+                        "native_receipt_verification_required")
                 payload = {"artifact_sha256": artifact_sha256, "comparator": doc["comparator"],
                            "byte_budget": doc["byte_budget"],
                            "learner_evidence_sha256": file_hash(paths["learners"]),
                            "driver_evidence_sha256": file_hash(paths["drivers"]),
                            "physical_cost_stage": "learners", "fixture": self.kind == "fixture",
                            "scientific_admission": False, "pipeline_complete": False}
+                payload["native_receipt"] = self.native_result
+                payload["native_receipt_verified"] = self.native_result is not None
                 payload["receipt_digest"] = identity(payload)
                 create_private(paths["receipt"], canonical_json(payload), 0o400)
                 output_sha256 = file_hash(paths["receipt"])
+                self._receipt_file_sha256 = output_sha256
             elif stage == "report":
+                from .evidence import parse_json
+                require(file_hash(paths["receipt"]) == self._receipt_file_sha256,
+                        "native_receipt_report_binding_changed")
+                prior = parse_json(read_regular(paths["receipt"]))
+                require(prior["native_receipt"] == self.native_result
+                        and (self.kind == "fixture" or self.native_result is not None),
+                        "native_receipt_report_binding_changed")
                 payload = {"redacted": True, "sealed_holdout_opened": False,
                            "scientific_qualification": "unmeasured", "release_authorization": "not_authorized",
                            "stage_receipt_sha256": file_hash(paths["receipt"]),
                            "fixture": self.kind == "fixture", "pipeline_complete": False}
+                payload["native_receipt"] = self.native_result
+                payload["native_receipt_verified"] = self.native_result is not None
                 payload["report_digest"] = identity(payload)
                 create_private(paths["report"], canonical_json(payload), 0o400)
                 output_sha256 = file_hash(paths["report"])
@@ -192,6 +218,8 @@ class PilotWorkerRuntime:
                 and self._execution.evidence.guard.violation:
             status = "over_budget"
         peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if sys.platform == "darwin" else 1024)
+        if stage == "receipt" and self.native_receipt is not None and self.native_receipt.outcome is not None:
+            peak = max(peak, self.native_receipt.outcome["peak_ram_bytes"])
         outcome = {"status": status, "returncode": 0 if status == "completed" else 1,
                    "wall_ms": max(1, (time.monotonic_ns() - start + 999999) // 1000000),
                    "peak_ram_bytes": peak,

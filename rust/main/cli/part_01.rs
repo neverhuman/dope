@@ -14,6 +14,21 @@ enum Command {
     /// Report this native executable and supported runtime profiles without data,
     /// optional imports, network access, or automatic weight installation.
     Doctor,
+    /// Verify private development pilot receipts against separately trusted executor pins.
+    VerifyPilotReceipts {
+        #[arg(long)]
+        root: PathBuf,
+        #[arg(long)]
+        bundle: String,
+        #[arg(long)]
+        policy: String,
+        #[arg(long)]
+        expected_bundle_sha256: String,
+        #[arg(long)]
+        expected_policy_sha256: String,
+        #[arg(long)]
+        expected_executable_sha256: String,
+    },
     /// Compile a headered CSV (numbers, categories, dates, missing cells) into one
     /// table artifact: an invertible column plan plus a packed, natively trained program.
     FitTable {

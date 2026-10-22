@@ -382,8 +382,14 @@ def execute_pilot_cell(
         def bound_stage(stage):
             # One runtime boundary owns validation and failure telemetry.
             # The existing journal independently refuses undisposed operations.
-            return worker_runtime.stage(
-                stage, journal, cell_plan, paths, root, compiled_sha, draw_manifest_sha256)
+            nonlocal processes
+            bridge = worker_runtime.native_receipt
+            before = bridge.processes if bridge is not None else 0
+            try:
+                return worker_runtime.stage(
+                    stage, journal, cell_plan, paths, root, compiled_sha, draw_manifest_sha256)
+            finally:
+                processes += bridge.processes - before if bridge is not None else 0
 
         def learners():
             if worker_runtime is not None:
@@ -467,5 +473,8 @@ def execute_pilot_cell(
     }
     if doc["version"] == 2:
         receipt["materialized_draw_manifest_sha256"] = draw_manifest_sha256
+    if worker_runtime is not None:
+        receipt["native_receipt"] = worker_runtime.native_result
+        receipt["native_receipt_verified"] = worker_runtime.native_result is not None
     create_private(root / "pilot-execution.json", canonical_json(receipt), 0o400)
     return receipt
