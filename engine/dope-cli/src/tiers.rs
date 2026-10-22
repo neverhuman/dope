@@ -44,6 +44,7 @@ pub(crate) fn fit_tiers(args: TierArgs) -> Result<(), String> {
                 size: Some(size),
                 seed: args.seed,
                 task,
+                anonymize: args.anonymize,
                 device: dev.clone(),
                 ..Default::default()
             },
@@ -65,7 +66,7 @@ pub(crate) fn fit_tiers(args: TierArgs) -> Result<(), String> {
         "schema_version": 1, "kind": "per-dataset-pretrained-generators",
         "dataset_id": args.dataset_id, "source": args.source, "data_license": args.data_license,
         "training_csv_sha256": sha256(&raw), "seed": args.seed,
-        "target_index": target, "requested_task": args.task,
+        "target_index": target, "requested_task": args.task, "anonymized": args.anonymize,
         "engine_version": env!("CARGO_PKG_VERSION"), "engine_binary_sha256": sha256(&executable),
         "device": dope_core::device::describe(&dev),
         "qualification": "training-self-audit-only", "release_authorized": false,

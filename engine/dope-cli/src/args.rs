@@ -130,6 +130,9 @@ pub(crate) struct TierArgs {
     pub(crate) task: Option<String>,
     #[arg(long, default_value = "auto")]
     pub(crate) device: String,
+    /// Replace column names and labels with positional codes.
+    #[arg(long)]
+    pub(crate) anonymize: bool,
 }
 
 #[derive(Args)]

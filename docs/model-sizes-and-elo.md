@@ -98,7 +98,8 @@ dope sample target/public-house-prices-v1/small.dope -n 10000 -o synthetic.csv
 `fit-tiers` produces `small.dope`, `medium.dope`, `large.dope`, `MODEL_CARD.md`, and a
 `catalog.json` completion marker. It refuses existing output directories, fits all three
 before creating output, and records the training CSV SHA-256, binary SHA-256, seed,
-backend, engine version, target index, requested/inferred task, data source and license, artifact SHA-256, actual bytes, scalar
+backend, engine version, target index, requested/inferred task, whether `--anonymize`
+was used, data source and license, artifact SHA-256, actual bytes, scalar
 breakdown, and self-audit. Failed writes leave no valid completed catalog. Exact replay
 requires the recorded binary, input bytes and backend; floats need not be identical
 across hardware. Hashes establish integrity, not authenticity or release authorization.
@@ -111,7 +112,8 @@ The catalog explicitly says `qualification=training-self-audit-only` and
 2. Split by physical entity/time where appropriate. Train/select only on training and
    validation; evaluate once on untouched real test rows with the three auditor families.
 3. Review data redistribution and artifact licensing separately. Artifacts contain
-   category labels, quantiles and names; `fit-tiers` is not a privacy release mechanism.
+   category labels, quantiles and names unless `--anonymize` replaced the names and
+   labels with positional codes; `fit-tiers` is not a privacy release mechanism.
 4. Publish the model card, test receipts, checksums, source/build provenance and approved
    artifact license in an immutable versioned release. Test source-free sampling.
 
@@ -194,8 +196,9 @@ python3 -m unittest discover -s bench/real-world -p 'test_*.py' -v
 
 Outputs: `elo.json` (full protocol, input/reducer hashes, curves, rankings), `elo.md`,
 `datasets.csv` (each alternative on each dataset), and deterministic `elo.svg` with
-intervals plus `datasets.svg` with local ratings. The all-method panel has seven common complete datasets; the five-method
-CPU panel has sixteen. Neither is thousands of datasets or a sealed result.
+intervals plus `datasets.svg` with local ratings. The
+[all-method panel](../bench/real-world/results/elo/elo.md) has seven common complete datasets; the
+[five-method CPU panel](../bench/real-world/results/elo-cpu/elo.md) has sixteen. Neither is thousands of datasets or a sealed result.
 
 ## The study over thousands of datasets
 
