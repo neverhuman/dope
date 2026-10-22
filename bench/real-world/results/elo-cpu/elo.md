@@ -9,12 +9,14 @@ Common complete cohort: 16/16 datasets. Tie margin: 1 BTR-AUC points. 95% interv
 | Alternative | Elo [95% interval] | Mean BTR-AUC | W / T / L |
 |---|---:|---:|---:|
 | DOPE | 1833 [1784, 1910] | 87.1 | 56 / 3 / 5 |
-| Real rows (xz) | 1701 [1615, 1805] | 78.5 | 47 / 2 / 15 |
+| Compressed original training rows | 1701 [1615, 1805] | 78.5 | 47 / 2 / 15 |
 | DOPE research kernel | 1533 [1458, 1614] | 60.2 | 32 / 5 / 27 |
 | Gaussian copula | 1245 [1149, 1336] | 20.1 | 10 / 4 / 50 |
 | ARF | 1188 [1111, 1240] | 15.9 | 6 / 4 / 54 |
 
 ![Elo ratings and paired dataset intervals](elo.svg)
+
+**Compressed original training rows** (method ID `rows`; previously “Real rows (xz)”) is a storage baseline: a seeded random subset of the original training table, stored as an xz-compressed CSV. It keeps as many rows as fit each byte budget; larger budgets may hold the full training table. The downstream models train on those retained original rows and are scored on held-out real rows. xz is lossless compression, not a learned model.
 
 ## Individual dataset rankings
 
@@ -24,83 +26,83 @@ Local Elo uses only the alternatives complete on that dataset. Its 1500 center i
 
 | Dataset | Alternative | BTR-AUC | Local Elo | Status |
 |---|---|---:|---:|---|
-| abalone | dope | 97.9 | 1669 | complete |
-| abalone | kernel | 94.5 | 1582 | complete |
-| abalone | rows | 79.1 | 1500 | complete |
-| abalone | copula | 57.5 | 1418 | complete |
-| abalone | arf | 31.9 | 1331 | complete |
-| adult | dope | 88.7 | 1669 | complete |
-| adult | kernel | 82.4 | 1582 | complete |
-| adult | rows | 75.9 | 1500 | complete |
-| adult | arf | 18.9 | 1418 | complete |
-| adult | copula | 11.6 | 1331 | complete |
-| airfoil | dope | 95.8 | 1625 | complete |
-| airfoil | rows | 95.4 | 1625 | complete |
-| airfoil | kernel | 76.4 | 1500 | complete |
-| airfoil | arf | 35.2 | 1418 | complete |
-| airfoil | copula | 8.4 | 1332 | complete |
-| bank | dope | 84.7 | 1669 | complete |
-| bank | rows | 64.1 | 1582 | complete |
-| bank | kernel | 60.9 | 1500 | complete |
-| bank | arf | 17.4 | 1418 | complete |
-| bank | copula | 5.0 | 1331 | complete |
-| bike | dope | 93.8 | 1669 | complete |
-| bike | rows | 81.6 | 1582 | complete |
-| bike | kernel | 46.9 | 1500 | complete |
-| bike | copula | 19.2 | 1418 | complete |
-| bike | arf | 15.4 | 1331 | complete |
-| california | dope | 93.2 | 1669 | complete |
-| california | kernel | 82.4 | 1582 | complete |
-| california | rows | 77.0 | 1500 | complete |
-| california | copula | 47.9 | 1418 | complete |
-| california | arf | 18.7 | 1331 | complete |
-| car | rows | 97.7 | 1666 | complete |
-| car | dope | 96.3 | 1581 | complete |
-| car | arf | 0.0 | 1418 | complete |
-| car | copula | 0.0 | 1418 | complete |
-| car | kernel | 0.0 | 1418 | complete |
-| concrete | rows | 92.0 | 1669 | complete |
-| concrete | dope | 87.0 | 1582 | complete |
-| concrete | kernel | 45.2 | 1500 | complete |
-| concrete | arf | 4.8 | 1418 | complete |
-| concrete | copula | 0.0 | 1331 | complete |
-| covertype | rows | 61.6 | 1666 | complete |
-| covertype | dope | 26.6 | 1581 | complete |
-| covertype | arf | 0.0 | 1418 | complete |
-| covertype | copula | 0.0 | 1418 | complete |
-| covertype | kernel | 0.0 | 1418 | complete |
-| credit | dope | 90.1 | 1669 | complete |
-| credit | kernel | 81.7 | 1582 | complete |
-| credit | rows | 61.3 | 1500 | complete |
-| credit | copula | 12.8 | 1418 | complete |
-| credit | arf | 0.0 | 1331 | complete |
-| energy | dope | 99.1 | 1625 | complete |
-| energy | rows | 99.9 | 1625 | complete |
-| energy | kernel | 53.6 | 1500 | complete |
-| energy | arf | 48.4 | 1418 | complete |
-| energy | copula | 27.5 | 1332 | complete |
-| german | rows | 86.5 | 1669 | complete |
-| german | dope | 77.1 | 1582 | complete |
-| german | kernel | 70.3 | 1500 | complete |
-| german | copula | 23.2 | 1418 | complete |
-| german | arf | 0.0 | 1331 | complete |
-| mushroom | rows | 98.3 | 1669 | complete |
-| mushroom | dope | 94.8 | 1582 | complete |
-| mushroom | kernel | 93.2 | 1500 | complete |
-| mushroom | arf | 40.2 | 1418 | complete |
-| mushroom | copula | 23.4 | 1331 | complete |
-| news | dope | 95.5 | 1669 | complete |
-| news | copula | 46.9 | 1582 | complete |
-| news | rows | 28.1 | 1500 | complete |
-| news | kernel | 24.0 | 1418 | complete |
-| news | arf | 0.0 | 1331 | complete |
-| student | dope | 96.9 | 1625 | complete |
-| student | kernel | 96.9 | 1625 | complete |
-| student | rows | 92.6 | 1500 | complete |
-| student | copula | 5.0 | 1418 | complete |
-| student | arf | 3.6 | 1332 | complete |
-| wine | dope | 75.7 | 1669 | complete |
-| wine | rows | 65.0 | 1582 | complete |
-| wine | kernel | 54.3 | 1500 | complete |
-| wine | copula | 33.9 | 1418 | complete |
-| wine | arf | 19.8 | 1331 | complete |
+| abalone | DOPE | 97.9 | 1669 | complete |
+| abalone | DOPE research kernel | 94.5 | 1582 | complete |
+| abalone | Compressed original training rows | 79.1 | 1500 | complete |
+| abalone | Gaussian copula | 57.5 | 1418 | complete |
+| abalone | ARF | 31.9 | 1331 | complete |
+| adult | DOPE | 88.7 | 1669 | complete |
+| adult | DOPE research kernel | 82.4 | 1582 | complete |
+| adult | Compressed original training rows | 75.9 | 1500 | complete |
+| adult | ARF | 18.9 | 1418 | complete |
+| adult | Gaussian copula | 11.6 | 1331 | complete |
+| airfoil | DOPE | 95.8 | 1625 | complete |
+| airfoil | Compressed original training rows | 95.4 | 1625 | complete |
+| airfoil | DOPE research kernel | 76.4 | 1500 | complete |
+| airfoil | ARF | 35.2 | 1418 | complete |
+| airfoil | Gaussian copula | 8.4 | 1332 | complete |
+| bank | DOPE | 84.7 | 1669 | complete |
+| bank | Compressed original training rows | 64.1 | 1582 | complete |
+| bank | DOPE research kernel | 60.9 | 1500 | complete |
+| bank | ARF | 17.4 | 1418 | complete |
+| bank | Gaussian copula | 5.0 | 1331 | complete |
+| bike | DOPE | 93.8 | 1669 | complete |
+| bike | Compressed original training rows | 81.6 | 1582 | complete |
+| bike | DOPE research kernel | 46.9 | 1500 | complete |
+| bike | Gaussian copula | 19.2 | 1418 | complete |
+| bike | ARF | 15.4 | 1331 | complete |
+| california | DOPE | 93.2 | 1669 | complete |
+| california | DOPE research kernel | 82.4 | 1582 | complete |
+| california | Compressed original training rows | 77.0 | 1500 | complete |
+| california | Gaussian copula | 47.9 | 1418 | complete |
+| california | ARF | 18.7 | 1331 | complete |
+| car | Compressed original training rows | 97.7 | 1666 | complete |
+| car | DOPE | 96.3 | 1581 | complete |
+| car | ARF | 0.0 | 1418 | complete |
+| car | Gaussian copula | 0.0 | 1418 | complete |
+| car | DOPE research kernel | 0.0 | 1418 | complete |
+| concrete | Compressed original training rows | 92.0 | 1669 | complete |
+| concrete | DOPE | 87.0 | 1582 | complete |
+| concrete | DOPE research kernel | 45.2 | 1500 | complete |
+| concrete | ARF | 4.8 | 1418 | complete |
+| concrete | Gaussian copula | 0.0 | 1331 | complete |
+| covertype | Compressed original training rows | 61.6 | 1666 | complete |
+| covertype | DOPE | 26.6 | 1581 | complete |
+| covertype | ARF | 0.0 | 1418 | complete |
+| covertype | Gaussian copula | 0.0 | 1418 | complete |
+| covertype | DOPE research kernel | 0.0 | 1418 | complete |
+| credit | DOPE | 90.1 | 1669 | complete |
+| credit | DOPE research kernel | 81.7 | 1582 | complete |
+| credit | Compressed original training rows | 61.3 | 1500 | complete |
+| credit | Gaussian copula | 12.8 | 1418 | complete |
+| credit | ARF | 0.0 | 1331 | complete |
+| energy | DOPE | 99.1 | 1625 | complete |
+| energy | Compressed original training rows | 99.9 | 1625 | complete |
+| energy | DOPE research kernel | 53.6 | 1500 | complete |
+| energy | ARF | 48.4 | 1418 | complete |
+| energy | Gaussian copula | 27.5 | 1332 | complete |
+| german | Compressed original training rows | 86.5 | 1669 | complete |
+| german | DOPE | 77.1 | 1582 | complete |
+| german | DOPE research kernel | 70.3 | 1500 | complete |
+| german | Gaussian copula | 23.2 | 1418 | complete |
+| german | ARF | 0.0 | 1331 | complete |
+| mushroom | Compressed original training rows | 98.3 | 1669 | complete |
+| mushroom | DOPE | 94.8 | 1582 | complete |
+| mushroom | DOPE research kernel | 93.2 | 1500 | complete |
+| mushroom | ARF | 40.2 | 1418 | complete |
+| mushroom | Gaussian copula | 23.4 | 1331 | complete |
+| news | DOPE | 95.5 | 1669 | complete |
+| news | Gaussian copula | 46.9 | 1582 | complete |
+| news | Compressed original training rows | 28.1 | 1500 | complete |
+| news | DOPE research kernel | 24.0 | 1418 | complete |
+| news | ARF | 0.0 | 1331 | complete |
+| student | DOPE | 96.9 | 1625 | complete |
+| student | DOPE research kernel | 96.9 | 1625 | complete |
+| student | Compressed original training rows | 92.6 | 1500 | complete |
+| student | Gaussian copula | 5.0 | 1418 | complete |
+| student | ARF | 3.6 | 1332 | complete |
+| wine | DOPE | 75.7 | 1669 | complete |
+| wine | Compressed original training rows | 65.0 | 1582 | complete |
+| wine | DOPE research kernel | 54.3 | 1500 | complete |
+| wine | Gaussian copula | 33.9 | 1418 | complete |
+| wine | ARF | 19.8 | 1331 | complete |

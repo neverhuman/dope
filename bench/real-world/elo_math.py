@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 
 BASE, SCALE, PRIOR = 1500.0, 400.0 / np.log(10.0), 1.0
-LABELS = {"dope": "DOPE", "rows": "Real rows (xz)", "kernel": "DOPE research kernel",
+LABELS = {"dope": "DOPE", "rows": "Compressed original training rows", "kernel": "DOPE research kernel",
           "copula": "Gaussian copula", "arf": "ARF", "tvae": "TVAE", "ctgan": "CTGAN"}
 
 

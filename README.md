@@ -95,6 +95,79 @@ portable artifacts, checksums, a catalog and a model card for review before rele
 Recipients can sample these **dataset-specific** pretrained generators immediately.
 See [model sizes, pretrained releases and the large-scale study](docs/model-sizes-and-elo.md).
 
+## Command-line recipes
+
+The deployed `dope` application is **Rust end to end**: fitting, sampling, prediction,
+encoding and built-in evaluation need no Python interpreter or libtorch. Python research
+training and benchmark harnesses stay outside the deployment package.
+
+```bash
+# Bound both deployment size and complete-generator state; cap CPU parallelism.
+dope --threads 8 fit train.csv --target price --task regression \
+  --size large --budget 12KiB --max-parameters 4000 --seed 42 \
+  --device cpu --out prices.dope --report fit.json
+
+# One JSON object on stdout for shell scripts, services and agents.
+dope --threads 4 fit train.csv -t price --size medium --json -o prices.dope
+# Diagnostics identify the Rust runtime, backends, worker count and executable hash.
+dope --threads 4 doctor --json
+
+# Generate original-unit rows, or one-hot features and numbers on [0,1].
+dope --threads 8 sample prices.dope -n 100000 --seed 42 --device cpu -o synthetic.csv
+dope sample prices.dope -n 100000 --space ml --scaling unit -o ml-ready.csv
+# Inference CSVs may contain just the input features; no target values are required.
+dope predict prices.dope unlabelled.csv -o predictions.csv
+dope encode real.csv --model prices.dope --scaling quantile -o encoded.csv
+
+# Evaluate on held-out real rows and save a machine-readable receipt.
+dope eval -m prices.dope --train train.csv --test test.csv \
+  --auditors linear,gbdt,mlp --factor 4 --seed 42 --json evaluation.json
+dope frontier --train train.csv --test test.csv -t price \
+  --budgets 2KiB,4KiB,8KiB,16KiB --tau 0.9 --json frontier.json
+dope --threads 8 throughput prices.dope -n 1000000 --repeats 3 --device cpu
+```
+
+| Control | Meaning |
+|---|---|
+| `--target`, `--task` | Explicit target name/index; optional regression/classification override |
+| `--size`, `--budget` | 2/4/16 KiB preset or exact whole-file cap; explicit budget wins |
+| `--max-parameters` | Additional hard cap on the full generator's versioned scalar count |
+| `--threads` | Global CPU worker limit, 1–1024; accepted before or after a subcommand |
+| `--device`, `--seed` | Compute backend and reproducible random seed |
+| `fit --json`, `fit --report` | JSON stdout and/or a saved report; `--quiet` suppresses human output |
+| `sample --space`, `--scaling` | Original-unit or ML-ready rows; unit or quantile scaling |
+
+Use `dope --help` and `dope fit --help` for all parameters. The signed CPU release
+supports `--device cpu` and `auto`; GPU variants require separate builds and qualification.
+
+## Signed Rust deployment
+
+The release workflow builds a **Linux x86-64 CPU binary**, tests every customer command
+with an empty tool `PATH`, checks the Rust dependency closure, collects upstream notices,
+and signs provenance for the exact binary and package hashes using GitHub/Sigstore.
+Only versioned engine tags already on main can enter that signing job. Users
+verify the expected repository, workflow, tag and source commit before executing the binary.
+
+The workflow is introduced in this PR; these commands are a template for an engine release
+once its signed draft has been reviewed and published:
+
+```bash
+release_tag=dope-engine-v1.0.0
+gh release download "$release_tag" --repo neverhuman/dope --dir release
+release_commit=$(gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha)
+# Run from this source checkout; verification fails if either signature is absent.
+bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
+install -Dm755 release/dope-linux-x86_64 "$HOME/.local/bin/dope"
+install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
+install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
+"$HOME/.local/bin/dope" --threads 4 doctor --json
+```
+
+Signature verification uses GitHub CLI during installation; the installed application
+needs only its binary and the chosen `.dope` model data. Source builds remain available
+with `cargo install --locked --path engine/dope-cli`; a local build is unsigned until
+it goes through the release signing workflow. [Release, verification and Python training boundaries](docs/signed-engine-release.md).
+
 ## Walkthrough: UCI Adult census income
 
 A real public table (UCI Adult, `CC-BY-4.0`) with eight categorical columns and a binary
@@ -238,6 +311,12 @@ margin and dataset bootstrap intervals. This is a diagnostic companion to TDL;
 the current report uses a selection-exposed envelope of tested configurations.
 
 ![Budgeted transfer Elo with paired dataset intervals](bench/real-world/results/elo/elo.svg)
+
+**Compressed original training rows** (formerly “Real rows (xz)”) is the storage
+baseline: keep as many randomly selected original training rows as fit in an
+xz-compressed CSV at each byte budget. xz is ordinary lossless compression. The
+retained rows train the same downstream models, evaluated on held-out real data;
+a larger budget may fit the entire training table.
 
 The [all-method report](bench/real-world/results/elo/elo.md) includes seven common
 datasets; the [broader CPU-method report](bench/real-world/results/elo-cpu/elo.md)

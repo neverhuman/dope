@@ -24,7 +24,10 @@ def svg(result: dict) -> str:
                 f'<text x="{x(tick):.2f}" y="{h-30}" text-anchor="middle" font-size="13">{tick}</text>']
     for i, r in enumerate(rows):
         y, color = 128 + 58 * i, "#2a78d6" if r["method"] == "dope" else "#777770"
-        out += [f'<text x="215" y="{y+5}" text-anchor="end" font-size="17">{escape(LABELS.get(r["method"], r["method"]))}</text>',
+        label = ('<tspan x="215" dy="-9">Compressed original</tspan>'
+                 '<tspan x="215" dy="18">training rows</tspan>' if r["method"] == "rows"
+                 else escape(LABELS.get(r["method"], r["method"])))
+        out += [f'<text x="215" y="{y+5}" text-anchor="end" font-size="17">{label}</text>',
                 f'<line x1="{x(r["lo"]):.2f}" x2="{x(r["hi"]):.2f}" y1="{y}" y2="{y}" stroke="{color}" stroke-width="5" stroke-linecap="round"/>',
                 f'<circle cx="{x(r["elo"]):.2f}" cy="{y}" r="7" fill="{color}" stroke="#fcfcfb" stroke-width="2"/>',
                 f'<text x="920" y="{y+5}" font-size="15">{r["elo"]:.0f} [{r["lo"]:.0f}, {r["hi"]:.0f}]</text>']
@@ -38,13 +41,13 @@ def dataset_svg(result: dict) -> str:
     w, h = 220 + 105 * len(methods), 145 + 34 * len(datasets)
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-labelledby="title desc">',
            '<title id="title">Local Elo by dataset</title>',
-           '<desc id="desc">Compare methods within each dataset row. Missing alternatives are not rated.</desc>',
+           '<desc id="desc">Compare methods within each dataset row. Missing alternatives are not rated. Original rows are training examples stored with lossless xz compression.</desc>',
            '<rect width="100%" height="100%" fill="#fcfcfb"/>',
            '<g font-family="DejaVu Sans, sans-serif" fill="#242424">',
            '<text x="25" y="30" font-size="23" font-weight="bold">Local Elo by dataset</text>',
            '<text x="25" y="54" font-size="13">Compare within rows · 1500 = local center · — = incomplete / unqualified</text>']
     for j, m in enumerate(methods):
-        label = {"dope": "DOPE", "rows": "Rows (xz)", "kernel": "Kernel", "copula": "Copula"}.get(m, m.upper())
+        label = {"dope": "DOPE", "rows": "Original rows", "kernel": "Kernel", "copula": "Copula"}.get(m, m.upper())
         out.append(f'<text x="{242+105*j}" y="85" font-size="14" text-anchor="middle">{escape(label)}</text>')
     for i, (ds, cells) in enumerate(datasets.items()):
         y = 98 + 34 * i

@@ -1,5 +1,11 @@
 # Release procedure
 
+The engine's customer CLI has a separate [signed Rust binary workflow](signed-engine-release.md):
+an admitted `dope-engine-v<version>` tag builds the CPU application, signs its exact
+binary and inventory with GitHub/Sigstore, verifies the expected identity and stages a
+draft release. Python research tools do not enter that application closure. Cryptographic
+build provenance does not substitute for the scientific certification gates below.
+
 The version source is `Cargo.toml`; ordinary research-kernel binaries remain
 `0.3.0-alpha.1`. This procedure governs a certified release, which has not been
 made. The DOPE 1.0 engine (`engine/Cargo.toml`) is versioned separately, and
