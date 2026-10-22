@@ -1,13 +1,13 @@
 //! Decoding: rebuild the exact program from artifact bytes.
 
-use super::FORMAT_VERSION;
+use super::{limits, FORMAT_VERSION};
 use crate::copula::{clamp_rows, Dependence};
 use crate::error::{DopeError, Result};
 use crate::forest::Forest;
 use crate::marginal::{Atom, Marginal};
 use crate::noise::{Noise, RESIDUAL_KNOTS};
 use crate::program::Program;
-use crate::quant::{packed_len, unit_value, QTensor};
+use crate::quant::{unit_value, QTensor};
 use crate::regimes::{Regimes, MEAN_RANGE, SCALE_MAX, SCALE_MIN};
 use crate::schema::{CategoricalSpec, ColumnSpec, Kind, NumericSpec, Schema, Task};
 use crate::target::{Head, Net, QuantNet};
@@ -67,6 +67,7 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
     if meta["v"].as_u64() != Some(FORMAT_VERSION) {
         return Err(bad("unsupported format version"));
     }
+    limits::validate(&parts)?;
     let tensor = |name: &str| parts.sections.get(name).map(Vec::as_slice);
     let affine = tensor("schema.affine").map(read_f32).unwrap_or_default();
     let mut aff = affine.iter();
@@ -85,9 +86,14 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
         .as_array()
         .map(|a| {
             a.iter()
-                .filter_map(|v| v.as_str().map(str::to_string))
-                .collect()
+                .map(|v| {
+                    v.as_str()
+                        .map(str::to_string)
+                        .ok_or_else(|| bad("dropped columns"))
+                })
+                .collect::<Result<Vec<_>>>()
         })
+        .transpose()?
         .unwrap_or_default();
     let schema = Schema {
         task,
@@ -96,7 +102,7 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
         dropped,
     };
     let d = schema.features.len();
-    let knots = meta["k"].as_u64().ok_or_else(|| bad("knots"))? as usize;
+    let knots = limits::integer(&meta["k"])?;
     let missing = match tensor("features.missing") {
         Some(b) => b.iter().map(|c| (*c as f64 / 255.0).powi(2)).collect(),
         None => vec![0.0; d],
@@ -119,13 +125,17 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
         let is_cont = is_continuous(j, meta, d);
         if is_cont {
             let (lo, hi) = (
-                *ranges.get(2 * ci).ok_or_else(|| bad("ranges"))?,
-                *ranges.get(2 * ci + 1).ok_or_else(|| bad("ranges"))?,
+                *ranges
+                    .get(limits::mul(2, ci)?)
+                    .ok_or_else(|| bad("ranges"))?,
+                *ranges
+                    .get(limits::add(limits::mul(2, ci)?, 1)?)
+                    .ok_or_else(|| bad("ranges"))?,
             );
             let mut k = vec![lo];
             for m in 0..knots.saturating_sub(2) {
                 let code = *codes
-                    .get(ci * (knots - 2) + m)
+                    .get(limits::add(limits::mul(ci, knots - 2)?, m)?)
                     .ok_or_else(|| bad("knots"))?;
                 k.push(unit_value(code as u32, lo, hi, 8));
             }
@@ -156,10 +166,10 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
                 Kind::Categorical(s) => (0..levels).map(|k| s.code(k)).collect(),
                 Kind::Numeric(_) => {
                     let v = dvalues
-                        .get(dv..dv + levels)
+                        .get(dv..limits::add(dv, levels)?)
                         .ok_or_else(|| bad("discrete values"))?
                         .to_vec();
-                    dv += levels;
+                    dv = limits::add(dv, levels)?;
                     v
                 }
             };
@@ -170,14 +180,14 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
     let dep = meta["dep"].as_str().unwrap_or("independent");
     let dependence = if dep == "full" {
         let upper = tensor("copula.corr").ok_or_else(|| bad("copula"))?;
-        let mut corr = vec![0.0; d * d];
+        let mut corr = vec![0.0; limits::mul(d, d)?];
         let mut it = upper.iter();
         for i in 0..d {
-            corr[i * d + i] = 1.0;
+            corr[limits::add(limits::mul(i, d)?, i)?] = 1.0;
             for j in i + 1..d {
                 let v = i8v(*it.next().ok_or_else(|| bad("copula"))?);
-                corr[i * d + j] = v;
-                corr[j * d + i] = v;
+                corr[limits::add(limits::mul(i, d)?, j)?] = v;
+                corr[limits::add(limits::mul(j, d)?, i)?] = v;
             }
         }
         Dependence::Full { corr }
@@ -212,7 +222,7 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
             let k = w.len();
             let means = tensor("regime.means").ok_or_else(|| bad("regimes"))?;
             let scales = tensor("regime.scales").ok_or_else(|| bad("regimes"))?;
-            if means.len() != k * d || scales.len() != k * d {
+            if means.len() != limits::mul(k, d)? || scales.len() != limits::mul(k, d)? {
                 return Err(bad("regimes"));
             }
             let total: f64 = w.iter().map(|c| *c as f64).sum();
@@ -230,20 +240,8 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
             }
         }
     };
-    let screened: Vec<usize> = meta["s"]
-        .as_array()
-        .ok_or_else(|| bad("screen"))?
-        .iter()
-        .filter_map(Value::as_u64)
-        .map(|v| v as usize)
-        .collect();
-    let dims: Vec<usize> = meta["net"]
-        .as_array()
-        .ok_or_else(|| bad("net"))?
-        .iter()
-        .filter_map(Value::as_u64)
-        .map(|v| v as usize)
-        .collect();
+    let screened = limits::integers(&meta["s"])?;
+    let dims = limits::integers(&meta["net"])?;
     if dims.len() != 7 || dims[0] != screened.len() || screened.iter().any(|&f| f >= d) {
         return Err(bad("net dimensions"));
     }
@@ -254,24 +252,23 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
     let codes = tensor("net.codes").unwrap_or(&[]);
     let mut offset = 0;
     let mut group = |n: usize, bits: usize, scale: f64| -> Result<QTensor> {
-        let len = packed_len(n, bits as u8);
-        let slice = codes
-            .get(offset..offset + len)
-            .ok_or_else(|| bad("net codes"))?;
-        offset += len;
+        let len = limits::packed(n, bits)?;
+        let end = limits::add(offset, len)?;
+        let slice = codes.get(offset..end).ok_or_else(|| bad("net codes"))?;
+        offset = end;
         Ok(QTensor::unpack(slice, n, bits as u8, scale as f32))
     };
-    if floats.len() != 4 + o {
+    if floats.len() != limits::add(4, o)? {
         return Err(bad("net params"));
     }
     let q = QuantNet {
         inputs: s,
         hidden: h,
         outputs: o,
-        w: group(h * s, dims[3], floats[0])?,
+        w: group(limits::mul(h, s)?, dims[3], floats[0])?,
         b: group(h, dims[4], floats[1])?,
-        beta: group(o * s, dims[5], floats[2])?,
-        v: group(o * h, dims[6], floats[3])?,
+        beta: group(limits::mul(o, s)?, dims[5], floats[2])?,
+        v: group(limits::mul(o, h)?, dims[6], floats[3])?,
         a: floats[4..].iter().map(|v| *v as f32).collect(),
     };
     let net: Net = q.net();
@@ -279,14 +276,10 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
     let forest = match meta["forest"].as_array() {
         None => Forest::empty(o),
         Some(a) => {
-            let v: Vec<usize> = a
-                .iter()
-                .filter_map(Value::as_u64)
-                .map(|v| v as usize)
-                .collect();
+            let v = limits::integers(&Value::Array(a.clone()))?;
             let blob = tensor("forest").ok_or_else(|| bad("forest"))?;
             match v[..] {
-                [trees, depth, bits] if (1..=8).contains(&depth) && bits <= 8 => {
+                [trees, depth, bits] if (1..=8).contains(&depth) && (2..=8).contains(&bits) => {
                     Forest::from_bytes(blob, d, trees, depth, o, bits as u8)
                         .ok_or_else(|| bad("forest"))?
                 }
@@ -297,14 +290,17 @@ pub fn decode(bytes: &[u8]) -> Result<Program> {
     let nv = tensor("noise").map(read_f16).ok_or_else(|| bad("noise"))?;
     let (noise, target_range) = match head {
         Head::Regression => {
-            let t = meta["t"].as_u64().unwrap_or(0) as usize;
-            if nv.len() != 1 + t + 2 + RESIDUAL_KNOTS + 2 {
+            let t = limits::integer(&meta["t"])?;
+            let coef_end = limits::add(1, t)?;
+            let knots_start = limits::add(coef_end, 2)?;
+            let knots_end = limits::add(knots_start, RESIDUAL_KNOTS)?;
+            if nv.len() != limits::add(knots_end, 2)? {
                 return Err(bad("noise"));
             }
-            let coef = nv[..1 + t].to_vec();
-            let (lo, hi) = (nv[1 + t], nv[2 + t]);
-            let knots_e = nv[3 + t..3 + t + RESIDUAL_KNOTS].to_vec();
-            let r = (nv[3 + t + RESIDUAL_KNOTS], nv[4 + t + RESIDUAL_KNOTS]);
+            let coef = nv[..coef_end].to_vec();
+            let (lo, hi) = (nv[coef_end], nv[limits::add(coef_end, 1)?]);
+            let knots_e = nv[knots_start..knots_end].to_vec();
+            let r = (nv[knots_end], nv[limits::add(knots_end, 1)?]);
             (
                 Noise::Gaussianish {
                     coef,
@@ -344,9 +340,5 @@ fn is_continuous(j: usize, meta: &Value, _d: usize) -> bool {
 }
 
 fn discrete_levels(j: usize, meta: &Value) -> Result<usize> {
-    meta["disc"][j.to_string()]
-        .as_u64()
-        .map(|v| v as usize)
-        .filter(|v| *v >= 1)
-        .ok_or_else(|| DopeError::Artifact("discrete level count".into()))
+    limits::integer(&meta["disc"][j.to_string()])
 }

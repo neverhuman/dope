@@ -24,6 +24,7 @@ pub const FORMAT_VERSION: u64 = 1;
 
 pub mod container;
 mod decode;
+mod limits;
 pub use container::{unpack, Parts};
 pub use decode::decode;
 

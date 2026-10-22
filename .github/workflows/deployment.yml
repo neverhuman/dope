@@ -3,9 +3,9 @@ name: Rust deployment conformance
 on:
   push:
     branches: [main]
-    paths: ['deploy/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
+    paths: ['deploy/**', 'engine/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
   pull_request:
-    paths: ['deploy/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
+    paths: ['deploy/**', 'engine/**', 'rust/**', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'rust-toolchain.toml', 'ops/ci/deployment.sh', 'ops/ci/lib.sh', '.github/workflows/deployment.yml']
 
 permissions:
   contents: read
