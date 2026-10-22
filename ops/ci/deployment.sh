@@ -23,6 +23,7 @@ ensure_auditor() {
 }
 case "${1:-check}" in
   provision)
+    sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
     sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
     sudo apt-get update
     sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install -y --no-install-recommends rustup build-essential pkg-config ripgrep
