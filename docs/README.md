@@ -13,6 +13,7 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | [architecture.md](architecture.md) | Rust product, V1 boundary, contract inputs |
 | [cli.md](cli.md) | Native command reference |
 | [data-contract.md](data-contract.md) | The mandatory target-last table contract |
+| [plans/multilevel-implementation.md](plans/multilevel-implementation.md) | Consolidated plan for progressive generators, controlled release, learned dataset encodings and transfer/driver evaluation |
 | [testing.md](testing.md) | Commands, budgets, and repair evidence |
 | [audit.md](audit.md), [audit-rubric.md](audit-rubric.md) | Jankurai gate, exceptions and finding severity |
 | [release.md](release.md) | Certification and publication gates |
