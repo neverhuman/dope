@@ -8,6 +8,7 @@
 //! names, category labels and the tensor table cheap: they would otherwise be
 //! most of a few-kilobyte file.
 
+use super::limits::{MAX_METADATA, MAX_SECTIONS};
 use crate::error::{DopeError, Result};
 use safetensors::{Dtype, SafeTensors, View};
 use serde_json::{json, Value};
@@ -104,6 +105,11 @@ pub struct Parts {
 /// Read a safetensors file and inflate its program container.
 pub fn unpack(bytes: &[u8]) -> Result<Parts> {
     let bad = |what: &str| DopeError::Artifact(format!("not a DOPE artifact ({what})"));
+    let header_len = bytes.get(..8).ok_or_else(|| bad("header length"))?;
+    let header_len = u64::from_le_bytes(header_len.try_into().map_err(|_| bad("header length"))?);
+    if header_len > MAX_METADATA as u64 || bytes.len() > MAX_INFLATED + MAX_METADATA + 8 {
+        return Err(bad("stored artifact limit"));
+    }
     let (n, header) = SafeTensors::read_metadata(bytes).map_err(|_| bad("safetensors header"))?;
     match header.metadata().as_ref().and_then(|m| m.get("dope")) {
         Some(v) if v == FORMAT => {}
@@ -111,7 +117,18 @@ pub fn unpack(bytes: &[u8]) -> Result<Parts> {
         None => return Err(bad("missing dope metadata")),
     }
     let st = SafeTensors::deserialize(bytes).map_err(|_| bad("tensor table"))?;
-    let z = st.tensor(TENSOR).map_err(|_| bad("program tensor"))?.data();
+    if st.len() != 1 {
+        return Err(bad("one program tensor required"));
+    }
+    let tensor = st.tensor(TENSOR).map_err(|_| bad("program tensor"))?;
+    let z = tensor.data();
+    if z.len() > MAX_INFLATED || tensor.dtype() != Dtype::U8 || tensor.shape() != [z.len()] {
+        return Err(bad("program tensor shape or dtype"));
+    }
+    let header_bytes = n.checked_add(8).ok_or_else(|| bad("header length"))?;
+    if header_bytes.checked_add(z.len()) != Some(bytes.len()) {
+        return Err(bad("unaccounted artifact bytes"));
+    }
     let mut plain = Vec::new();
     brotli::Decompressor::new(z, 4096)
         .take(MAX_INFLATED as u64 + 1)
@@ -124,16 +141,29 @@ pub fn unpack(bytes: &[u8]) -> Result<Parts> {
         .get(..4)
         .map(|b| u32::from_le_bytes([b[0], b[1], b[2], b[3]]) as usize)
         .ok_or_else(|| bad("container length"))?;
+    if m > MAX_METADATA {
+        return Err(bad("metadata limit"));
+    }
+    let metadata_end = m.checked_add(4).ok_or_else(|| bad("metadata length"))?;
     let text = plain
-        .get(4..4 + m)
+        .get(4..metadata_end)
         .ok_or_else(|| bad("container metadata"))?;
     let meta: Value = serde_json::from_slice(text).map_err(|_| bad("container metadata"))?;
     let list = meta["sec"].as_array().ok_or_else(|| bad("section list"))?;
-    let mut at = 4 + m;
+    if list.len() > MAX_SECTIONS {
+        return Err(bad("section count limit"));
+    }
+    let mut at = metadata_end;
     let mut sections = BTreeMap::new();
     for s in list {
+        if s.as_array().is_none_or(|a| a.len() != 2) {
+            return Err(bad("section list"));
+        }
         let (name, len) = match (s[0].as_str(), s[1].as_u64()) {
-            (Some(name), Some(len)) => (name.to_string(), len as usize),
+            (Some(name), Some(len)) if name.len() <= 128 => (
+                name.to_string(),
+                usize::try_from(len).map_err(|_| bad("section length"))?,
+            ),
             _ => return Err(bad("section list")),
         };
         let end = at.checked_add(len).ok_or_else(|| bad("section length"))?;
@@ -149,7 +179,7 @@ pub fn unpack(bytes: &[u8]) -> Result<Parts> {
     Ok(Parts {
         meta,
         sections,
-        header: 8 + n,
+        header: header_bytes,
         stored: z.len(),
         meta_bytes: m,
     })
@@ -210,6 +240,17 @@ mod tests {
         let mut dup = p.meta.clone();
         dup["sec"][1][0] = json!("a");
         assert!(unpack(&container(&dup, &body)).is_err());
+        for entry in [
+            json!(["a", u64::MAX]),
+            json!(["a", -1]),
+            json!(["a", "3"]),
+            json!(["a", 3, 0]),
+            json!({"0":"a", "1":3}),
+        ] {
+            let mut malformed = p.meta.clone();
+            malformed["sec"][0] = entry;
+            assert!(unpack(&container(&malformed, &body)).is_err());
+        }
     }
 
     #[test]

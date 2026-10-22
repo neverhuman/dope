@@ -61,6 +61,18 @@ scale: stored as plain header JSON they were most of a 4 KiB file. Decoding refu
 inconsistent or oversized (decompression-bomb) input, and the compiler measures the
 compressed size of every candidate, so the budget holds exactly.
 
+The decoder admits exactly one rank-one `U8` tensor, with every stored byte
+accounted for. Stored payloads and inflation are capped at 64 MiB each; the
+safetensors header and inflated JSON metadata are each capped at 1 MiB, with
+at most 64 sections and 4096 features. Before materializing model arrays it
+validates integer fields, schema/output agreement, 2–8-bit net/forest widths,
+checked dimensions, exact section lengths, and acyclic in-range tree parents.
+A separate 64 MiB conservative materialization charge covers metadata/schema
+copies, section expansion, and coexisting numeric arrays and unpack temporaries;
+this is not a whole-process RSS or sampling-output quota. Malformed or over-limit
+artifacts return an artifact error before model allocation. These admission
+limits do not change format version 1 or the bytes emitted by the encoder.
+
 ```python
 import json, brotli                      # pip install brotli safetensors
 from safetensors.numpy import load_file
