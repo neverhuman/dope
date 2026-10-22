@@ -117,7 +117,7 @@ Replacing $f^\star$ in (\ref{M-eq:limit}) by a strong real-trained predictor $\h
 rows gives $\hat R=1-\frac{\sum_i(f_A(x_i)-\hat g(x_i))^2}{\sum_i(\hat g(x_i)-\bar g)^2}$ under squared loss and
 $\hat R=1-\frac{\sum_i\mathrm{KL}(\hat g(\cdot\mid x_i)\Vert q_A(\cdot\mid x_i))}{\sum_i\mathrm{KL}(\hat g(\cdot\mid x_i)\Vert\bar g)}$ under
 log-loss, where $\bar g$ averages the predictions. Both are computed from the program's own conditional model
-(\texttt{dope predict}) without sampling or retraining, and estimate the consistent-learner limit; they
+(the engine CLI's \texttt{predict} command) without sampling or retraining, and estimate the consistent-learner limit; they
 are a fast screen, not a substitute for measured retention.
 \end{remark}
 
@@ -187,12 +187,11 @@ Self-audit rows & \CfgAuditRows & & \\
 
 \paragraph{Determinism and devices.} Random inputs are a counter-based function of the seed, a stream
 index and the global row index (splitmix64 mixing, inversion by AS241 \citep{wichura1988as241}), so any
-row can be generated independently and in any order, and a seed gives the same rows on every device up to
-floating-point rounding. The CPU sampler evaluates rows in parallel with no shared state; the CUDA and
-Metal paths evaluate the same draw as candle tensors. Training uses a hand-vectorized single-precision
-trainer on CPU and candle on accelerators, held in agreement by a test.
+row can be generated independently and in any order. The CPU sampler evaluates rows in parallel with no
+shared state. The CUDA and Metal builds evaluate the same draw as candle tensors and train with candle,
+but they are not tested here; every result in the paper is from the CPU path.
 
-\paragraph{Throughput.} \Cref{tab:throughput} reports the in-memory CPU sampler (\texttt{dope throughput},
+\paragraph{Throughput.} \Cref{tab:throughput} reports the in-memory CPU sampler (the engine CLI's \texttt{throughput} command,
 fastest of three runs of one million rows, no output written) on an otherwise idle machine
 (\G{OneThroughputDevice}): from \G{OneThroughputMin} to \G{OneThroughputMax} rows per second.
 
@@ -209,7 +208,7 @@ structure.}
 \paragraph{Cost.} Compilation is dominated by training at most a few small networks, boosting one
 forest per network (histograms over byte codes, rows subsampled for split search), the
 rate--distortion search, and one self-audit per reserve share; each is linear in the number of rows.
-A draw costs $O(dm+Kd+sh+TD)$ per row, all inside a working set of a few kilobytes.
+A draw costs $O(dm+Kd+sh+TD)$ per row; at the default budget its working set is a few kilobytes.
 
 \section{Benchmark details}
 \label{app:bench}
@@ -242,8 +241,8 @@ line is equality.}
 
 \paragraph{Auditors.} Ridge and logistic regression with standardized one-hot inputs; CatBoost with
 \CfgCatIters{} trees of depth \CfgCatDepth{} and default learning rate; an MLP with two hidden layers,
-Adam with early stopping on larger tables and L-BFGS with stronger weight decay on tables with fewer than a
-few thousand rows. Each auditor fits its own encoders on its own training rows, so a method cannot
+Adam with early stopping on larger tables and L-BFGS with stronger weight decay on small tables (the row threshold is set in
+\texttt{bench/real-world/auditors.py}). Each auditor fits its own encoders on its own training rows, so a method cannot
 benefit from seeing the real table's encodings.
 
 \paragraph{Comparators.} SDV's Gaussian copula, CTGAN and TVAE use the library's detected metadata and
