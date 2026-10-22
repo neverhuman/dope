@@ -2,8 +2,8 @@
 
 The deployable DOPE implementation: a pure-Rust library (`dope-core`) and command-line
 tool (`dope`). It compiles a CSV into a byte-budgeted generative program stored as a
-safetensors file, samples from it on CPU, CUDA or Metal, and measures retention with
-built-in auditors. Python is not needed to fit, sample or evaluate.
+safetensors file, samples from it on CPU, CUDA or Metal (CI tests the CPU paths only),
+and measures retention with built-in auditors. Python is not needed to fit, sample or evaluate.
 
 ```bash
 cargo build --release --manifest-path engine/Cargo.toml          # CPU

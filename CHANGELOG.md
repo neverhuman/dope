@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 1.0.0 - 2026-10-22 (uncertified research release)
+
+This release publishes the DOPE 1.0 engine (`engine/`, version 1.0.0), its
+sixteen-table benchmark and its manuscript, together with every research-kernel
+change listed below. It is an uncertified research release: it claims no tier
+certification, sealed-holdout result, formal differential privacy, HIPAA
+de-identification or other privacy guarantee. The research kernel (root crate,
+`dope-kernel`) keeps version 0.3.0-alpha.1, and its `1.0.0-rc.1` identity stays
+reserved for a gate-passing `build-rc`. Canonical tasks E03-E06 (development
+pilot, signed precommit, sealed confirmation and independent reproduction)
+remain open and gate a future certified release.
+
+- Bound engine artifact decoding. Before allocating model arrays, the decoder
+  enforces admission limits (64 MiB stored and inflated, a 1 MiB header and
+  metadata, at most 64 sections and 4096 features). It checks every size with
+  overflow-safe arithmetic and refuses cyclic copula trees. Format version 1
+  and the encoder's bytes are unchanged.
 - Add the compression frontier: worst-auditor retention (smallest of
   CatBoost, linear and MLP per lineage; a historical diagnostic) against charged
   bytes, and retained lift per KiB, recomputed from the pinned v2 ledgers with

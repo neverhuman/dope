@@ -26,7 +26,8 @@ what the same model learns from the real table. The program stores no rows.
 - **ML-ready output.** Categorical strings become one-hot columns and numeric columns land
   on `[0, 1]` with outlier-robust scaling, or rows come back in original units and labels.
 - **Pure Rust, CPU or GPU.** Fitting and sampling run on CPU, CUDA or Metal through
-  [candle](https://github.com/huggingface/candle); the artifact loads anywhere safetensors does.
+  [candle](https://github.com/huggingface/candle) (CI tests the CPU paths only); the artifact
+  loads anywhere safetensors does.
 
 ## Results
 

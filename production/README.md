@@ -61,7 +61,9 @@ production/embed-real-regression-cluster.sh
 Inference in this workflow is CPU-only; `DOPE_EMBEDDING_JOBS` controls worker
 parallelism on each host.
 
-Ordinary binaries identify as `0.3.0-alpha.1`. The `1.0.0-rc.1` identity is
+Ordinary research-kernel binaries identify as `0.3.0-alpha.1`; the separate
+DOPE 1.0 engine (`engine/`) has its own version and never writes this identity.
+The `1.0.0-rc.1` identity is
 written only by `build-rc`, after coverage, KPI, auditor, candidate, router,
 receipt, disk, signature, and file-hash gates all pass. `campaign status
 --json` uses `null` for router regret and PTF-v1 until frozen evidence exists;

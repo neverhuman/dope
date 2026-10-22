@@ -609,8 +609,8 @@
       "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
     },
     "ops/merge_guard/Cargo.toml": {
-      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
-      "purpose": "native focused-proof and badge fail-closed controls"
+      "command": "just native-guard-check",
+      "purpose": "merge-guard and audit-proof manifest: format, Clippy and both native tools' fail-closed tests"
     },
     "ops/merge_guard/audit_proof.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
