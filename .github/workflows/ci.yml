@@ -27,6 +27,7 @@ jobs:
           persist-credentials: false
       - name: Provision CPU tools before tests in the disposable guest
         run: |
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep strace
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -108,6 +109,7 @@ jobs:
           version: 0.11.28
       - name: Install paper toolchain in the disposable guest
         run: |
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep
           uv venv target/paper-python
@@ -143,7 +145,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Install Rust toolchain manager in the disposable guest
-        run: sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup strace ripgrep
+        run: sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true; sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup strace ripgrep
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: |
