@@ -6,25 +6,23 @@
 A table is valuable for what models can learn from it, yet the predictive structure of a
 private table usually cannot leave the silo that holds it. We ask how few bytes that
 structure needs. \emph{Downstream Objective-Preserving Encoding} (DOPE) compiles a table into
-a small generative program, a safetensors file of a few kilobytes that stores no rows, and is
-judged by \emph{retention}: the share of a real-trained model's gain over a null that the same
-model recovers when trained only on the program's samples and tested on held-out real rows.
-We show that for learners that converge on the synthetic distribution, retention equals the
-fraction of the predictive information $I(X;Y)$ (log-loss) or of the explainable variance
-(squared loss) that the program preserves, and that covariate errors enter only through the
-learner's own estimation error; bytes should therefore go to the conditional model first. The
-resulting program combines exact marginals, a regime mixture of Gaussian copulas, a residual
-network trained by variable projection, boosted oblivious trees quantized with error feedback, and
-rate--distortion bit allocation; the compiler chooses its byte split by auditing its own samples on
-held-out training rows, and a draw is one matrix product and a few gathers on CPU or GPU. Across \G{OneTables} public tables and three
-model families, DOPE's default program (median \G{OneDopeCBytes}) reaches a median worst-family
-retention of \G{OneDopeCRet} [\G{OneDopeCLo}, \G{OneDopeCHi}], and \G{OneDopeBRet} at half that
-budget, where it beats real rows compressed with xz to the same bytes (wins, ties and losses
-\G{OneEqBWtl}) and the repository's earlier engine (\G{OneKernelVsBWtl}); the default budget spent on
-compressed rows reaches \G{OneRowsCRet}, and SDV's Gaussian copula and ARF reach \G{OneCopulaRet} and
-\G{OneArfRet} at \G{OneCopulaBytes} and \G{OneArfBytes}. We define
-\emph{Transfer Description Length} (TDL), the smallest artifact reaching a target retention, as
-the quantity to minimise, and release the engine and every record.
+a small generative program, a safetensors file of a few kilobytes that stores no rows. We judge it
+by \emph{retention}: the share of a real-trained model's gain over a null that the same model
+recovers when it is trained only on the program's samples and tested on held-out real rows.
+For learners that converge on the synthetic distribution, retention equals the fraction of the
+predictive information $I(X;Y)$ (log-loss) or of the explainable variance (squared loss) that the
+program preserves, and covariate errors enter only through the learner's own estimation error, so
+bytes should go to the conditional model first. The program combines exact marginals, a regime
+mixture of Gaussian copulas, a residual network, boosted oblivious trees and rate--distortion bit
+allocation, and the compiler chooses its byte split by auditing its own samples on held-out training
+rows. On \G{OneTables} public tables, DOPE's default program (median \G{OneDopeCBytes}) keeps a median
+\G{OneDopeCRet} [\G{OneDopeCLo}, \G{OneDopeCHi}] of the real-trained gain for the worst of three model
+families. At half that budget it keeps \G{OneDopeBRet} and beats real rows compressed with xz to the
+same bytes on most tables (wins, ties and losses \G{OneEqBWtl}). SDV's Gaussian copula and ARF keep
+\G{OneCopulaRet} and \G{OneArfRet} at \G{OneCopulaBytes} and \G{OneArfBytes}. We define
+\emph{Transfer Description Length} (TDL), the smallest tested artifact that reaches a target
+retention, as the quantity to minimise, and release the engine and every record. All results are
+selection-exposed validation on public tables, measured on CPU.
 \end{abstract}
 % The venue build places Figure 1 here; the preprint has it in the title block.
 \providecommand{\AfterAbstract}{}\AfterAbstract
@@ -42,10 +40,10 @@ table; it is expensive to audit, to ship and to reason about.
 
 We pose a sharper question: \emph{how few bytes does a table's predictive structure need?} We
 compile the training rows into a program, sample from the program, train independent learners on
-the samples, test them on untouched real rows, and count every byte the sampler reads. A program
-that is small and still trains good models must have captured what generalizes rather than what
-identifies rows: compressing the predictive regularities of a table is a test of modelling that
-copying rows cannot pass \citep{rissanen1978modeling,tishby2000bottleneck}.
+the samples, test them on untouched real rows, and count every byte the sampler reads. A small
+program that still trains good models has captured regularities that generalize: compressing the
+predictive regularities of a table is a test of modelling that copying rows cannot pass
+\citep{rissanen1978modeling,tishby2000bottleneck}. By itself it says nothing about privacy.
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
@@ -62,7 +60,7 @@ copying rows cannot pass \citep{rissanen1978modeling,tishby2000bottleneck}.
   self-audit that reports the retention of fast auditors on held-out training rows and uses it to pick
   the byte split between dependence and target. The artifact is a standard safetensors file whose one
   tensor is a brotli stream of the schema and every quantized section; one tensor program samples it on
-  CPU, CUDA or Metal.
+  CPU (CUDA and Metal builds exist but are not tested here).
 \item \textbf{An equal-byte evaluation} (\cref{sec:experiments}) on \G{OneTables} public tables with
   three auditor families, against the real rows themselves compressed to the same budget, against
   generators at their default sizes, and with ablations of every component.
@@ -75,8 +73,9 @@ copying rows cannot pass \citep{rissanen1978modeling,tishby2000bottleneck}.
 
 Let $P$ be the joint law of features $X$ and target $Y$, $D_{\mathrm{fit}}$ the training rows and
 $D_{\mathrm{test}}$ held-out rows that no step of compilation sees. A compiler maps $D_{\mathrm{fit}}$ and a
-byte budget $B$ to an artifact $A$ with $|A|\le B$, where $|A|$ counts every byte that sampling
-reads: tensors, schema, category labels, transforms and container header. The artifact defines a
+byte budget $B$ to an artifact $A$ with $|A|\le B$, where $|A|$ counts every byte of the artifact
+file: tensors, schema, category labels, transforms and container header (the engine binary is not
+counted). The artifact defines a
 distribution $Q_A$ that we sample to obtain $N$ synthetic rows. An auditor $m$ (a learning
 algorithm) is trained once on the real rows and once on the synthetic rows; both predictors are
 scored on $D_{\mathrm{test}}$ with loss $L$ (squared error in original units, or log-loss).
@@ -95,9 +94,9 @@ smallest tested artifact that reaches it,
   \label{eq:tdl}
 \end{equation}
 reported as \emph{not reached} when no tested budget qualifies; we report $\tau=\CfgTau$
-and, for coverage, $\tau=\CfgTauLow$. The repository's contract adds a
-driver-agreement gate and lower confidence bounds (\texttt{KiB@T90/D80}); this paper measures the
-transfer gate with point estimates per table and intervals across tables.
+and, for coverage, $\tau=\CfgTauLow$. We report point estimates per table and
+intervals across tables; the repository's TDL contract also defines confidence-bound and
+driver-agreement gates, which this paper does not apply.
 
 \section{Why a small program can keep predictive structure}
 \label{sec:theory}
@@ -180,7 +179,7 @@ retention (supplement).
   \node[stage=artfill, below=0.5cm of bytes, align=center, text width=\stagewd] (art)
     {\textbf{model.dope}\\ safetensors, a few KiB};
   \node[stage, left=of art, align=left, text width=4.2cm] (smp)
-    {\textbf{Sampler} (CPU, CUDA, Metal)\\ one GEMM, gathers, a small network, tree lookups};
+    {\textbf{Sampler}\\ one GEMM, gathers, a small network, tree lookups};
   \node[io, left=of smp, text width=3.3cm] (out) {\textbf{rows} in original units, or ML-ready: one-hot and $[0,1]$};
   \draw[arr] (csv) -- (intake);
   \draw[arr] (intake) -- (cov);
@@ -337,11 +336,11 @@ study, and the stored stream is a median \G{OneStoredShare}\% of the inflated by
 \end{algo}
 
 \paragraph{Sampling.}
-A draw is a short tensor program: counter-based normal and uniform inputs (so a seed gives the same
-rows on every device), $z=M\varepsilon$, a regime gather, per-column gathers on the knot grids, a
+A draw is a short tensor program: counter-based normal and uniform inputs (so a seed fixes the rows), $z=M\varepsilon$, a regime gather, per-column gathers on the knot grids, a
 missingness mask, the network \eqref{eq:net}, one comparison per tree level and one leaf gather per
-tree \eqref{eq:forest}, and the noise. Its cost is $O(N(dm+Kd+sh+TD))$ time and $O(|A|)$ memory; the program is small enough to stay in a core's L1 cache. On CPU the same draw is
-evaluated row by row in parallel; on CUDA and Metal it runs as candle tensors.
+tree \eqref{eq:forest}, and the noise. Its cost is $O(N(dm+Kd+sh+TD))$ time and $O(|A|)$ memory; at the default budget the program is small enough to stay in a core's L1 cache.
+On CPU the draw is evaluated row by row in parallel; the CUDA and Metal builds run it as candle tensors
+but are not tested in this paper.
 
 \section{Experiments}
 \label{sec:experiments}
@@ -358,7 +357,8 @@ regression, CatBoost \citep{prokhorenkova2018catboost} with \CfgCatIters{} trees
 and a two-layer MLP \citep{pedregosa2011sklearn}, each fitted with its own one-hot encoding and scaling.
 A fit that fails, for instance because a table's schema alone exceeds the budget, or that exceeds the
 wall-clock limit counts as robust retention zero, the null fallback. Per table we take the median over
-seeds; across tables we report medians with percentile bootstrap
+three seeds for DOPE and compressed rows at the default budget, the research kernel, the Gaussian
+copula and ARF; every other cell, including the other budgets and the ablations, has one seed. Across tables we report medians with percentile bootstrap
 intervals (\CfgDraws{} draws over tables) and paired differences as Hodges--Lehmann estimates.
 
 \paragraph{Comparators.}
@@ -390,9 +390,10 @@ covers fewer tables.}
 \Cref{fig:frontier,tab:main} give the main result. At its default budget DOPE's program has a median
 size of \G{OneDopeCBytes} and a median robust retention of \G{OneDopeCRet}
 [\G{OneDopeCLo}, \G{OneDopeCHi}], with \G{OneDopeCReach} of \G{OneDopeCN} tables at or above $\tau$.
-Spending the same budget on real rows gives \G{OneRowsCRet}: a few dozen real rows are too few for a
-boosted tree or a network to learn from, whereas the program generates as many rows as wanted from
-the structure it stores. \Cref{fig:tables} shows every table and \cref{tab:equal} pairs the two at every
+Spending the same budget on real rows gives \G{OneRowsCRet}: the few hundred rows that fit train linear
+models and CatBoost (\G{OneRowsCLin} and \G{OneRowsCCb}) but not the MLP (\G{OneRowsCMlp}), and the robust
+score keeps the worst family, whereas the program generates as many rows as wanted from the structure
+it stores. \Cref{fig:tables} shows every table and \cref{tab:equal} pairs the two at every
 budget. Half the default budget already suffices: there DOPE reaches \G{OneDopeBRet}
 [\G{OneDopeBLo}, \G{OneDopeBHi}] and beats compressed rows with wins, ties and losses \G{OneEqBWtl}
 (sign test $p=\G{OneEqBP}$). Wherever DOPE fits the budget, it wins \G{OneEqWins} and loses
@@ -410,7 +411,7 @@ and reaches \G{OneKernelRet} [\G{OneKernelLo}, \G{OneKernelHi}]. Its linear audi
 \G{OneKernelLin} but CatBoost only \G{OneKernelCb}: without trees its program misses the thresholds
 and interactions that tree auditors exploit, as the no-trees ablation below shows for DOPE. On the
 \G{OneKernelSupported} regression and binary tables it supports, DOPE at the smallest budget, about the
-kernel's size, is level with it (wins, ties and losses \G{OneKernelVsAWtl}; Hodges--Lehmann difference
+kernel's size, cannot be separated from it (wins, ties and losses \G{OneKernelVsAWtl}; Hodges--Lehmann difference
 \G{OneKernelVsAHl} [\G{OneKernelVsALo}, \G{OneKernelVsAHi}]); at half the default budget it is ahead
 (\G{OneKernelVsBWtl}; \G{OneKernelVsBHl} [\G{OneKernelVsBLo}, \G{OneKernelVsBHi}]), and at the
 default budget \G{OneKernelVsCWtl}.
@@ -473,17 +474,18 @@ misspecification remark in \cref{sec:theory} predicts. A single regime gives \G{
 A fixed byte split without the self-audit gives \G{OneDopeNoAuditRet} (better, tied or worse on
 \G{OneAblDopeNoAuditWtl} tables): the self-audit rarely changes which program is kept, and its main
 value is the retention estimate it reports with every artifact. Drawing four times as many rows
-from the same program gives \G{OneDopeFourRet}, the free-sample effect of \cref{prop:finite}; part of
-it is confounded with the MLP auditor switching solver on larger training sets.
+from the same program gives \G{OneDopeFourRet}; the MLP auditor also switches solver on larger training
+sets, so we do not attribute this gain to the program.
 
 \paragraph{Compute.}
 Compilation, including the self-audit, takes a median of \G{OneDopeCFit} per table at the default
 budget on a two-core machine, against \G{OneCopulaFit} for the Gaussian copula and \G{OneArfFit}
 for ARF. Writing synthetic rows to CSV, end to end, runs at a median of \G{OneDopeCRate} rows per
-second; the in-memory sampler is measured separately with \texttt{dope throughput} (supplement).
+second; the in-memory sampler is measured separately with the engine CLI's \texttt{throughput} command
+(\texttt{engine/target/release/dope throughput}; supplement).
 A draw touches only a few kilobytes of parameters, but its cost grows with the number of trees, so
 the largest programs sample several times more slowly than the default one; sampling scales with
-cores or, through the tensor path, with a GPU.
+cores; the GPU path is built but not measured here.
 
 \paragraph{The self-audit predicts retention.}
 Over all \G{OneAuditN} fitted DOPE programs, the self-audited retention that the compiler reports,
@@ -496,7 +498,7 @@ test data, roughly how much predictive structure a program keeps.
 DOPE's median retention is \G{OneDopeCLin} for linear auditors, \G{OneDopeCCb} for CatBoost and
 \G{OneDopeCMlp} for MLPs, so boosted trees, which exploit the finest interactions, usually set its
 robust score. For compressed real rows at the same budget the limiting family is the MLP
-(\G{OneRowsCMlp}, against \G{OneRowsCCb} for CatBoost): a network trained on a few dozen rows
+(\G{OneRowsCMlp}, against \G{OneRowsCCb} for CatBoost): a network trained on a few hundred rows
 overfits, and its log-loss on test rows can be far worse than the null.
 
 \section{Related work}
@@ -526,8 +528,8 @@ distortion.
 \paragraph{Privacy.} Membership and attribute attacks on synthetic data
 \citep{shokri2017membership,stadler2022groundhog,vanbreugel2023domias} and holdout-referenced distances
 \citep{platzer2021holdout} are empirical; formal differential privacy \citep{dwork2014foundations} requires
-a mechanism. DOPE stores no rows and few parameters, which makes a mechanism cheap to add, but this paper
-makes no privacy claim.
+a mechanism. DOPE stores no rows, but an artifact keeps column names, category labels
+and quantiles unless \texttt{--anonymize} replaces them with codes, and this paper makes no privacy claim.
 
 \section{Limitations}
 \label{sec:limits}
@@ -535,25 +537,25 @@ makes no privacy claim.
 The panel is public, and its tables are smaller and better curated than many private ones. The
 retention gate is measured with point estimates per table; the contract's lower confidence bound and
 the driver-agreement gate are not measured here, and foundation-model auditors are not yet included.
-Large neural generators (TabSyn, TabDDPM, TabDiff) were not run on CPU, CTGAN and TVAE only on the
-smaller tables, and fits over the wall-clock limit count as failures; an earlier engine was compared
-with them on a separate regression panel, recorded in the repository. A development panel of other
-tables guided most engineering choices, but the evaluation is not sealed: the forest and the self-audit
-were added after an earlier engine had been scored on three of the confirmation tables (adult, airfoil
-and abalone), and their held-out retention informed that design, so results on those tables are
-selection-exposed. The compact container, which stores the schema and the codes as one compressed
-stream, and the regrowth of trees into the compressed slack were added after a first full run of the
-panel showed that plain header text took most of a default artifact; they change how a program is
-stored and how many trees fit a budget, not how anything is fitted, every DOPE cell was re-run, and
-the superseded records are kept in the repository. Each program serves one declared target. Columns that are exact functions of one
+Large neural generators (TabSyn, TabDDPM, TabDiff) were not run, CTGAN and TVAE ran only on the
+smaller tables, and fits over the wall-clock limit count as failures. Every result is measured on CPU;
+the CUDA and Metal backends are built but not tested. The evaluation is not sealed, so every result
+here is selection-exposed validation. A development panel of other tables guided most engineering
+choices, but the forest and the self-audit were added after an earlier engine had been scored on three
+of the confirmation tables (adult, airfoil and abalone). The compact container, which stores the schema
+and the codes as one compressed stream, and the regrowth of trees into the bytes it saves were added
+after a first full run of the whole panel showed that plain header text took most of a default
+artifact. These changes alter how a program is stored and how many trees fit a budget, not how anything
+is fitted; every DOPE cell was re-run, and the superseded records are kept in the repository. Each program serves one declared target. Columns that are exact functions of one
 another, such as an education level and its numeric code, are kept only as strongly dependent, not as
-identical. DOPE is not a formal differential-privacy
-mechanism, and empirical attack results are not formal DP and not HIPAA de-identification.
+identical. This paper runs no privacy attacks; DOPE is not a formal
+differential-privacy mechanism and not HIPAA de-identification.
 
 \section{Conclusion}
 
 A few kilobytes of the right structure train models nearly as well as the table they came from, and
-far better than the same few kilobytes spent on the rows themselves. Retention measures how much of a table's
+at the smallest budgets better than the same bytes spent on the rows themselves (wins, ties and losses
+\G{OneEqAWtl} at the smallest budget and \G{OneEqBWtl} at half the default). Retention measures how much of a table's
 predictive information survives, TDL measures what that costs in bytes, and DOPE is a program that
 spends its bytes where the theory says they count. The engine, the benchmark records and the scripts
 that regenerate every number in this paper are open.

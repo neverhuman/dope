@@ -7,8 +7,9 @@ reproducible and are not extended. See the
 producer-level clarification of the frozen paper's `driver_fidelity`
 (`0.905 [0.844, 0.922]` and `0.975` vs. `0.923`) as an absolute feature-target
 correlation proxy (`absolute_target_correlation`) rather than holdout
-permutation-importance agreement (`D80`, which remains `unmeasured`). The new manuscript
-is the TDL package in [`paper/`](../../paper/README.md). The review ledgers that used to
+permutation-importance agreement (`D80`, which remains `unmeasured`). It is superseded:
+the current paper is the DOPE 1.0 engine manuscript,
+[`paper/dope1.tex`](../../paper/dope1.tex) (see [`paper/`](../../paper/README.md)). The review ledgers that used to
 sit here are in [`paper/archive/`](../../paper/archive/README.md).
 
 The paper reports DOPE against copula, tree, forest, neural and diffusion baselines on 100
@@ -20,7 +21,7 @@ the official test split is sealed. The release score MFS-v3 is printed as null. 
 evidence label is `selection_exposed_validation` (see the
 [claims policy](../claims-policy.md)).
 
-The current active manuscript is [`paper/`](../../paper/README.md). For its future
+The current manuscript is [`paper/dope1.tex`](../../paper/dope1.tex). For the TDL manuscript's future
 first-page review, [`COMPREHENSION_v2.md`](../internal/whitepaper/COMPREHENSION_v2.md) preregisters five
 unaffiliated technically literate reviewers, the questions, and the pass threshold.
 No reviews have been collected. [`COMPREHENSION_v1.md`](../internal/whitepaper/COMPREHENSION_v1.md) remains

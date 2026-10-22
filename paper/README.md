@@ -1,8 +1,12 @@
-# TDL paper package
+# Manuscripts
 
-The canonical manuscript package for **D.O.P.E.: How Few Bytes Carry What a Table Teaches**
-(metric name TDL awaits owner decision D-01). This is the active paper landing page for the
-manuscript in `main.tex` and supplement in `supplement.tex`, both in the ICLR 2027 layout
+**The current paper is the DOPE 1.0 engine manuscript, `dope1.tex`** (described below). It is the
+paper of the v1.0.0 release.
+
+`main.tex` and `supplement.tex` hold the earlier TDL and research-kernel manuscript,
+**D.O.P.E.: How Few Bytes Carry What a Table Teaches** (metric name TDL awaits owner decision D-01).
+Its results come from the research kernel's historical panel and the equal-byte study, not from the
+DOPE 1.0 engine. Both are in the ICLR 2027 layout
 (`iclr2027_conference.sty`, final-copy mode with the venue header removed). Figure 1 is the
 transfer-per-byte frontier (`generated/transfer-per-byte.pdf`): published generators on the
 historical panel, and the equal-byte study against real rows. Every result is labelled
@@ -12,8 +16,8 @@ paper remains available as [`docs/whitepaper/dope-mfs.pdf`](../docs/whitepaper/d
 and [`docs/whitepaper/supplement.pdf`](../docs/whitepaper/supplement.pdf), with its
 qualifications documented in [`docs/whitepaper/`](../docs/whitepaper/README.md).
 
-The package also holds the DOPE 1.0 engine manuscript, **D.O.P.E.: Downstream Objective-Preserving
-Encoding — How few bytes does a table's predictive structure need?**: `dope1.tex` (preprint),
+The DOPE 1.0 engine manuscript, **D.O.P.E.: Downstream Objective-Preserving
+Encoding — How few bytes does a table's predictive structure need?**, is `dope1.tex` (preprint),
 `dope1-venue.tex` (the same body in the double-blind ICLR 2027 layout) and `dope1-supplement.tex`
 (proofs, artifact format, settings and per-table results). It describes the standalone engine in
 [`engine/`](../engine/) and its sixteen-table benchmark in [`bench/real-world/`](../bench/real-world/).
@@ -24,7 +28,7 @@ drift from the code or the records.
 
 | Path | Contents | Owner |
 | --- | --- | --- |
-| `main.tex`, `supplement.tex` | active manuscript and supplement | L3 |
+| `main.tex`, `supplement.tex` | earlier TDL and research-kernel manuscript and supplement (historical, selection-exposed results) | L3 |
 | `dope1.tex`, `dope1-venue.tex`, `dope1-supplement.tex`, `dope1-content.tex`, `dope1-hero.tex`, `dope1-preamble.tex` | DOPE 1.0 engine manuscript (preprint and venue builds) and supplement | L3 |
 | `macros.tex` | shared macros; reads generated macro files first, then typesets visible `[pending]` placeholders | L3 |
 | `references-dope1.bib` | entries added for the DOPE 1.0 manuscript | L3 |

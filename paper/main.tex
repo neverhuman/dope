@@ -52,6 +52,8 @@
 \renewcommand{\headrulewidth}{0pt}
 
 \begin{abstract}
+\emph{This manuscript describes the repository's research kernel and its historical, selection-exposed
+validation. The current engine is described in a separate manuscript, \texttt{paper/dope1.tex}.}
 Organizations cannot share their tables, but would often like outside learners to learn what those tables
 teach. \emph{Transfer Description Length} (\MetricName) measures a synthetic-data method by the quantity
 that matters for that use: the fewest bytes that carry a declared share of a table's predictive value, on
@@ -186,7 +188,7 @@ $y \leftarrow m(x) + \sigma(x)\varepsilon$; mask features at their missing rates
 \end{minipage}}
 \end{figure}
 
-\paragraph{Three changes in this release.} \emph{Packed values.} The historical codec wrote every unit
+\paragraph{Three changes to the research kernel.} \emph{Packed values.} The historical codec wrote every unit
 value as a sixteen-bit word and every unbounded value as a scaled varint, so the header bit width changed
 precision but hardly bytes. A header flag now stores grid codes (one byte at $q\cBits$) and refuses a
 kernel whose parameters are off its grid; old artifacts are untouched. For the headline shape the decoded
