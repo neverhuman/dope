@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add global CPU thread control, fit JSON stdout, runtime identity/digest diagnostics,
+  and a documented complete Rust CLI workflow. Exercise commands without helper tools.
+- Add a Linux x86-64 CPU release builder, dependency/ELF boundary checks, upstream
+  license collection and tag-only GitHub/Sigstore signed provenance with verification
+  before draft publication. Python training tools remain outside deployment.
 - Add whole-generator parameter caps, explicit decimal/binary byte units and
   small/medium/large engine presets (2/4/16 KiB). Forced plans obey both caps;
   fit and inspect report the versioned scalar-state breakdown.

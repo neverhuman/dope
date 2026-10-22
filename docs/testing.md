@@ -2,11 +2,22 @@
 
 ## DOPE engine and benchmark surfaces
 
+The standalone engine also checks global worker controls and JSON output, plus a native
+customer journey with an empty tool PATH. Release policy fixtures bind verification to
+the expected repository/workflow/tag/commit and reject failed signatures, changed hashes,
+links, invalid inventories and forbidden dependency names. These fixtures mock GitHub
+verification; live OIDC signing is qualified only by the trusted tagged release job.
+`just engine-release` builds and exercises the optimized GNU CPU binary and collects its
+upstream notices. The separate signed-engine workflow runs that same script on PR/main
+with read-only permissions and grants signing permissions only to admitted tag jobs.
+
 The engine gate also tests complete-generator parameter caps, forced-plan refusals,
 S/M/L preset precedence and checksummed `fit-tiers` catalogs. Offline ranking fixtures
 cover missing versus failed cells, seed failures, oversized artifacts, duplicate
 receipts, batch Elo order invariance, perfect winners, bootstrap replay and common
-cohorts. It verifies both Elo report cohorts with `--check`; `just bench-check` retains
+cohorts. The separate `ops/ci/engine-benchmark.sh` gate verifies both Elo report cohorts with
+`--check`; hosted CPU invokes it only after provisioning its pinned Python/NumPy
+environment. `just bench-check` retains
 these drift checks alongside the pre-existing benchmark/claims renders. These are
 engineering and historical-evidence checks, not prospective dataset qualification.
 

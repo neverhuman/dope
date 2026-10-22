@@ -28,7 +28,7 @@ class Curves(unittest.TestCase):
         self.assertEqual(c["btr_auc"], 0.)
         self.assertEqual(c["failed_cells"], 2)
 
-    def test_missing_is_not_failure_or_fabricated_rating(self):
+    def test_missing_failed_and_unqualified_cells(self):
         self.assertEqual(elo.curve([], [("1k", 0)], [1024, 4096])["status"], "incomplete")
         self.assertEqual(elo.curve([cell(status="failed")], [("1k", 0)], [1024, 4096])["btr_auc"], 0.)
         for invalid in [None, float("nan"), float("inf")]:

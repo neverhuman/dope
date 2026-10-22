@@ -27,8 +27,15 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | `dope frontier --train t.csv --test h.csv -t y --budgets 1k,4k,16k` | Retention against bytes and the Transfer Description Length. |
 | `dope throughput model.dope [-n 1000000] [--device cpu]` | Sampling speed in rows per second. |
 | `dope doctor` | Backends compiled into this build. |
+| `dope --threads 8 fit data.csv -t y --json --report fit.json` | Bound CPU parallelism and emit machine-readable fit output. |
+| `dope --threads 4 doctor --json` | Runtime identity, backend, worker count and executable SHA-256. |
 
 ## The program
+
+All customer commands execute in Rust. The signed release is the `dope` CLI from
+this workspace; Python training/research tools are not deployment dependencies.
+See the root [README recipes](../README.md#command-line-recipes) and
+[signed binary release workflow](../docs/signed-engine-release.md).
 
 | Part | Stored as | Fitted by |
 | --- | --- | --- |

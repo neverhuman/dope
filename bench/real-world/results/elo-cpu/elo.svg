@@ -30,7 +30,7 @@
 <line x1="738.25" x2="822.91" y1="128" y2="128" stroke="#2a78d6" stroke-width="5" stroke-linecap="round"/>
 <circle cx="771.35" cy="128" r="7" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"/>
 <text x="920" y="133" font-size="15">1833 [1784, 1910]</text>
-<text x="215" y="191" text-anchor="end" font-size="17">Real rows (xz)</text>
+<text x="215" y="191" text-anchor="end" font-size="17"><tspan x="215" dy="-9">Compressed original</tspan><tspan x="215" dy="18">training rows</tspan></text>
 <line x1="624.91" x2="752.18" y1="186" y2="186" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
 <circle cx="682.95" cy="186" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
 <text x="920" y="191" font-size="15">1701 [1615, 1805]</text>

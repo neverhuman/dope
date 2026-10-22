@@ -12,6 +12,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod args;
+mod runtime;
 mod tiers;
 use args::*;
 
@@ -58,6 +59,7 @@ fn group(n: usize) -> String {
 }
 
 fn run(cli: Cli) -> Result<(), String> {
+    runtime::configure(cli.threads)?;
     let e = |err: dope_core::DopeError| {
         format!(
             "{err}\n  hint: {}\n  docs: {}",
@@ -111,7 +113,12 @@ fn run(cli: Cli) -> Result<(), String> {
                 )
                 .map_err(|x| x.to_string())?;
             }
-            if !a.quiet {
+            if a.json {
+                println!(
+                    "{}",
+                    serde_json::to_string(&fitted.report).map_err(|e| e.to_string())?
+                );
+            } else if !a.quiet {
                 let r = &fitted.report;
                 println!(
                     "compiled {} -> {}  ({} bytes, budget {})",
@@ -379,14 +386,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 device::describe(&dev)
             );
         }
-        Command::Doctor => {
-            println!("dope {}", env!("CARGO_PKG_VERSION"));
-            println!("  backends   {}", device::backends().join(", "));
-            println!(
-                "  default    {}",
-                device::describe(&device::parse("auto").map_err(e)?)
-            );
-        }
+        Command::Doctor(a) => runtime::doctor(a.json)?,
     }
     Ok(())
 }

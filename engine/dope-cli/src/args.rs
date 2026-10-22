@@ -10,6 +10,9 @@ use std::path::PathBuf;
     about = "Compile a table into a tiny generative program that preserves what models learn from it."
 )]
 pub(crate) struct Cli {
+    /// Number of CPU worker threads (1–1024); otherwise use Rayon's default.
+    #[arg(long, global = true, value_parser = clap::value_parser!(u16).range(1..=1024))]
+    pub(crate) threads: Option<u16>,
     #[command(subcommand)]
     pub(crate) command: Command,
 }
@@ -36,7 +39,7 @@ pub(crate) enum Command {
     /// Measure sampling throughput (rows per second, no output written).
     Throughput(ThroughputArgs),
     /// Report the compute backends available in this build.
-    Doctor,
+    Doctor(DoctorArgs),
 }
 
 #[derive(Args)]
@@ -72,6 +75,9 @@ pub(crate) struct FitArgs {
     /// Write the fit report as JSON.
     #[arg(long)]
     pub(crate) report: Option<PathBuf>,
+    /// Print the fit report as one JSON object on stdout.
+    #[arg(long, conflicts_with = "quiet")]
+    pub(crate) json: bool,
     /// Force a plan "knots,inputs,hidden" (ablations).
     #[arg(long)]
     pub(crate) plan: Option<String>,
@@ -92,6 +98,13 @@ pub(crate) struct FitArgs {
     pub(crate) tolerance: f64,
     #[arg(short, long)]
     pub(crate) quiet: bool,
+}
+
+#[derive(Args)]
+pub(crate) struct DoctorArgs {
+    /// Print runtime identity, available backends, thread count and executable digest.
+    #[arg(long)]
+    pub(crate) json: bool,
 }
 
 #[derive(Args)]

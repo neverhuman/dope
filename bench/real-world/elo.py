@@ -39,7 +39,7 @@ def load(path: Path) -> list[dict]:
 
 
 def schedule_from(records: list[dict], methods: list[str]) -> dict:
-    """Historical fallback. For new campaigns supply an explicit schedule JSON."""
+    """Historical schedule inference. New campaigns supply an explicit schedule JSON."""
     return {m: sorted({(r["budget"], r["seed"]) for r in records if r["method"] == m}) for m in methods}
 
 
@@ -134,6 +134,11 @@ def markdown(result: dict) -> str:
         rows.append(f"| {LABELS.get(r['method'], r['method'])} | {r['elo']:.0f} [{r['lo']:.0f}, {r['hi']:.0f}] | "
                     f"{r['mean_btr_auc']:.1f} | {r['wins']} / {r['ties']} / {r['losses']} |")
     rows += ["", "![Elo ratings and paired dataset intervals](elo.svg)", "",
+             "**Compressed original training rows** (method ID `rows`; previously “Real rows (xz)”) "
+             "is a storage baseline: a seeded random subset of the original training table, stored as an "
+             "xz-compressed CSV. It keeps as many rows as fit each byte budget; larger budgets may hold "
+             "the full training table. The downstream models train on those retained original rows and "
+             "are scored on held-out real rows. xz is lossless compression, not a learned model.", "",
              "## Individual dataset rankings", "", "Local Elo uses only the alternatives complete on that dataset. "
              "Its 1500 center is local, so compare alternatives within a row group, not scores across datasets.", "",
              "![Per-dataset local Elo with missing alternatives explicit](datasets.svg)", "",
@@ -142,7 +147,7 @@ def markdown(result: dict) -> str:
         for m, c in sorted(cells.items(), key=lambda kv: (-(kv[1].get("elo") or 0), kv[0])):
             score = "—" if c["btr_auc"] is None else f"{c['btr_auc']:.1f}"
             elo = "—" if "elo" not in c else f"{c['elo']:.0f}"
-            rows.append(f"| {d} | {m} | {score} | {elo} | {c['status']} |")
+            rows.append(f"| {d} | {LABELS.get(m, m)} | {score} | {elo} | {c['status']} |")
     return "\n".join(rows) + "\n"
 
 
