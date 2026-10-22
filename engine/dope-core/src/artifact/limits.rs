@@ -44,7 +44,7 @@ impl Budget {
         self.0 = add(self.0, bytes)?;
         require(self.0 <= MAX_MATERIALIZED)
     }
-    // Covers coexisting f64 arrays, i32/u32 codes and temporary unpack copies.
+    // Covers simultaneously live f64 arrays, i32/u32 codes and unpacking buffers.
     fn elements(&mut self, n: usize) -> Result<()> {
         self.charge(mul(n, 32)?)
     }
