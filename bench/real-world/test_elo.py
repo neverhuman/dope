@@ -89,6 +89,13 @@ class Elo(unittest.TestCase):
         self.assertEqual({r["datasets"] for r in s["leaderboard"]}, {1})
         self.assertEqual(set(elo.outputs(s)), {"elo.json", "elo.md", "datasets.csv", "elo.svg", "datasets.svg"})
 
+    def test_last_bit_float_noise_does_not_drift_surfaces(self):
+        rows = [cell(ds=d, method=m, retention=v) for d in ["x", "y"] for m, v in [("a", .9), ("b", .6)]]
+        s = elo.summarize(rows, ["a", "b"], [1024, 4096], 1., 10, 1)
+        noisy = json.loads(json.dumps(s))
+        noisy["per_dataset"]["x"]["a"]["elo"] = float(np.nextafter(noisy["per_dataset"]["x"]["a"]["elo"], 0))
+        self.assertEqual(elo.outputs(s), elo.outputs(noisy))
+
     def test_predeclared_schedule_preserves_absent_cells(self):
         rows = [cell(method=m) for m in ["a", "b"]]
         schedule = {m: [["1k", 0], ["1k", 1]] for m in ["a", "b"]}

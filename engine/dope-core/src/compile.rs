@@ -382,6 +382,23 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         },
     )) = best
     else {
+        let (k, s, h) = PLANS[PLANS.len() - 1];
+        let s = s.min(d);
+        let margs = ctx.marginals(k);
+        ctx.net(s, h)?;
+        let (b, _) = ctx.assemble(
+            k,
+            margs,
+            s,
+            &ctx.nets[&(s, h)],
+            &(Regimes::single(d), Dependence::Independent),
+        )?;
+        if b.len() > budget {
+            return Err(DopeError::Budget(format!(
+                "{budget} bytes is too small for this table; at least {} are needed (try --anonymize or a larger --budget)",
+                b.len()
+            )));
+        }
         return Err(DopeError::Budget(format!(
             "no candidate fits {budget} bytes and the requested parameter cap; increase the caps or use --anonymize"
         )));

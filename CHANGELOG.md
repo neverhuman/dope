@@ -11,7 +11,8 @@
   small/medium/large engine presets (2/4/16 KiB). Forced plans obey both caps;
   fit and inspect report the versioned scalar-state breakdown.
 - Add `dope fit-tiers` for dataset-specific pretrained artifacts with source,
-  training and binary digests, checksums and a model card for release review.
+  training and binary digests, checksums and a model card for release review;
+  `--anonymize` replaces names and labels with positional codes.
 - Add descriptive BTR-AUC/Elo reports, per-dataset rankings and plots, paired
   dataset bootstrap intervals, predeclared schedule/dataset support, and CI
   replay checks. Current reports reuse development evidence; no new sealed-test,

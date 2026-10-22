@@ -151,8 +151,20 @@ def markdown(result: dict) -> str:
     return "\n".join(rows) + "\n"
 
 
+def stable(value):
+    """Round floats so last-bit BLAS differences across hosts cannot drift the surfaces."""
+    if isinstance(value, float):
+        return round(value, 6)
+    if isinstance(value, dict):
+        return {k: stable(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [stable(v) for v in value]
+    return value
+
+
 def outputs(result: dict) -> dict[str, bytes]:
     from render_elo import svg, dataset_svg
+    result = stable(result)
     table = io.StringIO()
     writer = csv.writer(table, lineterminator="\n")
     writer.writerow(["dataset", "method", "btr_auc", "elo", "status", "failed_cells"])
