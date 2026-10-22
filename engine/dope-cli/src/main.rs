@@ -12,19 +12,28 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod args;
+mod tiers;
 use args::*;
 
 fn parse_bytes(s: &str) -> Result<usize, String> {
     let t = s.trim().to_ascii_lowercase();
-    let t = t.trim_end_matches("ib").trim_end_matches('b');
-    let (num, mul) = match t.chars().last() {
-        Some('k') => (&t[..t.len() - 1], 1024.0),
-        Some('m') => (&t[..t.len() - 1], 1024.0 * 1024.0),
-        _ => (t, 1.0),
-    };
-    num.parse::<f64>()
-        .map(|v| (v * mul).round() as usize)
-        .map_err(|_| format!("bad byte size: {s}"))
+    let (num, mul) = [
+        ("kib", 1024.0),
+        ("mib", 1048576.0),
+        ("kb", 1000.0),
+        ("mb", 1000000.0),
+        ("k", 1024.0),
+        ("m", 1048576.0),
+        ("b", 1.0),
+    ]
+    .into_iter()
+    .find_map(|(suffix, mul)| t.strip_suffix(suffix).map(|n| (n, mul)))
+    .unwrap_or((&t, 1.0));
+    let value = num.trim().parse::<f64>().map_err(|_| "invalid byte size")? * mul;
+    if !value.is_finite() || value < 1.0 || value.round() >= usize::MAX as f64 {
+        return Err("byte size must be positive, finite and fit in usize".into());
+    }
+    Ok(value.round() as usize)
 }
 
 fn writer(path: &Option<PathBuf>) -> Result<Box<dyn Write>, String> {
@@ -79,6 +88,8 @@ fn run(cli: Cli) -> Result<(), String> {
             };
             let opts = FitOptions {
                 budget: a.budget.as_deref().map(parse_bytes).transpose()?,
+                size: a.size,
+                max_parameters: a.max_parameters,
                 seed: a.seed,
                 task,
                 anonymize: a.anonymize,
@@ -120,6 +131,12 @@ fn run(cli: Cli) -> Result<(), String> {
                     r.knots, r.dependence, r.regimes, r.inputs, r.hidden, r.bits[0], r.bits[1], r.bits[2], r.bits[3], r.trees, r.depth
                 );
                 println!(
+                    "  parameters   {} total scalar slots ({} network, {} forest)",
+                    group(r.parameters.total),
+                    group(r.parameters.network),
+                    group(r.parameters.forest)
+                );
+                println!(
                     "  stored gain  {:.3} of the null loss explained on held-out rows",
                     r.stored_gain
                 );
@@ -144,6 +161,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 );
             }
         }
+        Command::FitTiers(a) => tiers::fit_tiers(a)?,
         Command::Sample(a) => {
             let program =
                 decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
@@ -206,6 +224,7 @@ fn run(cli: Cli) -> Result<(), String> {
                     "dependence": program.dependence.name(),
                     "screened": program.screened.iter().map(|&j| &program.schema.features[j].name).collect::<Vec<_>>(),
                     "net": [program.net.inputs, program.net.hidden, program.net.outputs],
+                    "parameters": program.parameters(),
                     "dropped": program.schema.dropped,
                 });
                 println!("{}", serde_json::to_string_pretty(&v).unwrap_or_default());
@@ -227,6 +246,10 @@ fn run(cli: Cli) -> Result<(), String> {
                     program.schema.task, program.schema.target.name
                 );
                 println!("  features     {}", program.features());
+                println!(
+                    "  parameters   {} total scalar slots",
+                    group(program.parameters().total)
+                );
                 println!(
                     "  dependence   {} × {} regime(s)",
                     program.dependence.name(),
@@ -374,6 +397,27 @@ fn main() -> ExitCode {
         Err(msg) => {
             eprintln!("error: {msg}");
             ExitCode::FAILURE
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_bytes;
+    #[test]
+    fn byte_units_and_invalid_values() {
+        for (s, n) in [
+            ("4096", 4096),
+            ("4k", 4096),
+            ("4KiB", 4096),
+            ("4KB", 4000),
+            ("1.5MiB", 1572864),
+            ("1MB", 1000000),
+        ] {
+            assert_eq!(parse_bytes(s), Ok(n));
+        }
+        for s in ["0", "-1k", "NaN", "inf", "1e300", "nonsense", "4kk", "4kbb"] {
+            assert!(parse_bytes(s).is_err(), "accepted {s}");
         }
     }
 }

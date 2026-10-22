@@ -17,6 +17,8 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | Command | What it does |
 | --- | --- |
 | `dope fit data.csv --target y [--budget 4k] [--seed 0] [--anonymize] [--device auto]` | Compile a program within a byte budget (whole file) and print its self-audit. |
+| `dope fit data.csv -t y --size large --max-parameters 4000` | Apply the 16 KiB preset and a complete-generator scalar cap; explicit `--budget` overrides the preset. |
+| `dope fit-tiers data.csv -t y --dataset-id ID --source URL --data-license SPDX --out DIR` | Train 2/4/16 KiB dataset-specific pretrained artifacts with checksums and a catalog for release review. |
 | `dope sample model.dope -n N [--space raw\|ml] [--scaling unit\|quantile] [--seed S]` | Draw rows in original units and labels, or ML-ready (one-hot, `[0,1]`). |
 | `dope predict model.dope data.csv` | Use the stored conditional model as a predictor (values or class probabilities). |
 | `dope inspect model.dope [--json]` | Byte breakdown (stored, and per section before compression) and the program structure. |
@@ -49,6 +51,14 @@ report (`--report fit.json`, `self_audit`) and `dope fit` print that estimate. E
 the file is counted, including the safetensors header and the schema.
 
 ## The artifact
+
+`--size small|medium|large` selects a 2/4/16 KiB maximum; without a preset or
+explicit budget the default stays 4 KiB. `KB`/`MB` are decimal and `KiB`/`MiB`
+are binary; historical `k`/`m` stay binary. `--max-parameters N` is an optional
+additional hard cap, applied to the full decoded generator, including its forest,
+marginals and calibration. Fit reports and `inspect --json` expose a versioned
+component count. Larger capacity does not guarantee larger lift. See
+[the count definition, model-zoo builder and study protocol](../docs/model-sizes-and-elo.md).
 
 `model.dope` is a standard safetensors file with one `U8` tensor, `dope`, and
 `__metadata__ = {"dope": "1"}`. The tensor is a single brotli stream (pure-Rust

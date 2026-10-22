@@ -50,6 +50,12 @@ pub(super) struct Ctx<'a> {
 }
 
 impl Ctx<'_> {
+    pub(super) fn fits_parameters(&self, program: &Program) -> bool {
+        self.opts
+            .max_parameters
+            .is_none_or(|cap| program.parameters().total <= cap)
+    }
+
     pub(super) fn d(&self) -> usize {
         self.schema.features.len()
     }
@@ -212,7 +218,14 @@ impl Ctx<'_> {
         let (depth, bits) = self.forest_shape();
         let budget = self.opts.budget.unwrap_or(DEFAULT_BUDGET);
         let per_tree = Forest::byte_len(1, depth, head.outputs(), bits, d);
-        let max_trees = (budget / per_tree).clamp(1, MAX_TREES);
+        let mut max_trees = (budget / per_tree).clamp(1, MAX_TREES);
+        if let Some(cap) = self.opts.max_parameters {
+            let scalar_slots = depth + (1 << depth) * head.outputs() + 1;
+            max_trees = max_trees.min(cap / scalar_slots);
+            if max_trees == 0 {
+                return;
+            }
+        }
         let nominal = (budget / 2 / per_tree).max(1);
         let qn = self.nets[&(s, h)].q.net();
         let (xf, xv) = (

@@ -8,6 +8,7 @@
 //! decomposition (paper, Thm. 1): conditional-mean error enters retention
 //! directly, covariate error only through a learner's extrapolation.
 
+use crate::budget::{ModelSize, ParameterCount};
 use crate::copula::Dependence;
 use crate::error::{DopeError, Result};
 use crate::eval::SelfAudit;
@@ -60,6 +61,10 @@ const FOREST_OVERHEAD: usize = 96;
 pub struct FitOptions {
     /// Maximum artifact size in bytes (whole safetensors file).
     pub budget: Option<usize>,
+    /// Optional preset; an explicit byte budget overrides its byte cap.
+    pub size: Option<ModelSize>,
+    /// Maximum complete-generator scalar count (ParameterCount version 1).
+    pub max_parameters: Option<usize>,
     pub seed: u64,
     pub task: Option<Task>,
     /// Replace column names and category labels by positional codes.
@@ -86,6 +91,8 @@ impl Default for FitOptions {
     fn default() -> Self {
         Self {
             budget: None,
+            size: None,
+            max_parameters: None,
             seed: 0,
             task: None,
             anonymize: false,
@@ -109,6 +116,9 @@ pub struct FitReport {
     pub features: usize,
     pub budget: usize,
     pub bytes: usize,
+    pub size: Option<ModelSize>,
+    pub max_parameters: Option<usize>,
+    pub parameters: ParameterCount,
     pub knots: usize,
     pub inputs: usize,
     pub hidden: usize,
@@ -157,6 +167,18 @@ use ctx::Ctx;
 /// Compile `raw` with column `target` into an artifact.
 pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
     let start = Instant::now();
+    let mut resolved = opts.clone();
+    resolved.budget = Some(
+        opts.budget
+            .or_else(|| opts.size.map(ModelSize::budget))
+            .unwrap_or(DEFAULT_BUDGET),
+    );
+    let opts = &resolved;
+    if opts.budget == Some(0) || opts.max_parameters == Some(0) {
+        return Err(DopeError::Budget(
+            "byte and parameter caps must be positive".into(),
+        ));
+    }
     let intake = IntakeOptions {
         task: opts.task,
         ..Default::default()
@@ -360,20 +382,8 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         },
     )) = best
     else {
-        let (k, s, h) = PLANS[PLANS.len() - 1];
-        let s = s.min(d);
-        let margs = ctx.marginals(k);
-        ctx.net(s, h)?;
-        let (b, _) = ctx.assemble(
-            k,
-            margs,
-            s,
-            &ctx.nets[&(s, h)],
-            &(Regimes::single(d), Dependence::Independent),
-        )?;
         return Err(DopeError::Budget(format!(
-            "{budget} bytes is too small for this table; at least {} are needed (try --anonymize or a larger --budget)",
-            b.len()
+            "no candidate fits {budget} bytes and the requested parameter cap; increase the caps or use --anonymize"
         )));
     };
     let q = &entry.q;
@@ -383,6 +393,9 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         features: d,
         budget,
         bytes: bytes.len(),
+        size: opts.size,
+        max_parameters: opts.max_parameters,
+        parameters: program.parameters(),
         knots: k,
         inputs: s,
         hidden: h,

@@ -84,6 +84,17 @@ dope frontier --train train.csv --test test.csv -t income   # bytes vs retention
 `--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
 with positional codes; `--device cuda` runs on a GPU.
 
+Choose `--size small|medium|large` for **2 / 4 / 16 KiB** caps, or set an exact
+`--budget 12KiB --max-parameters 4000` to constrain both whole-file bytes and the
+complete generator's scalar state. `--budget` overrides a preset; a larger cap offers
+capacity, and lift is measured by evaluation. `dope inspect --json` reports both counts.
+
+`dope fit-tiers train.csv -t income --dataset-id adult-v1 --source SOURCE_URL
+--data-license CC-BY-4.0 --out target/adult-v1` trains all three sizes and writes
+portable artifacts, checksums, a catalog and a model card for review before release.
+Recipients can sample these **dataset-specific** pretrained generators immediately.
+See [model sizes, pretrained releases and the large-scale study](docs/model-sizes-and-elo.md).
+
 ## Walkthrough: UCI Adult census income
 
 A real public table (UCI Adult, `CC-BY-4.0`) with eight categorical columns and a binary
@@ -218,6 +229,21 @@ under log-loss *is* the share of the predictive information `I(X;Y)` the program
 (under squared loss, the share of `Var E[Y|X]`). TDL then estimates, on a grid of tested budgets,
 how many bytes a table's predictive information needs, and DOPE spends its bytes on the
 target model first.
+
+### Relative rankings across datasets
+
+**Budgeted Transfer Retention (BTR-AUC)** scores robust retention across a fixed
+log-byte grid. Elo then summarizes paired dataset wins, with a one-point BTR-AUC tie
+margin and dataset bootstrap intervals. This is a diagnostic companion to TDL;
+the current report uses a selection-exposed envelope of tested configurations.
+
+![Budgeted transfer Elo with paired dataset intervals](bench/real-world/results/elo/elo.svg)
+
+The [all-method report](bench/real-world/results/elo/elo.md) includes seven common
+datasets; the [broader CPU-method report](bench/real-world/results/elo-cpu/elo.md)
+includes sixteen. Each contains local Elo and KPI scores for every dataset and
+alternative, with missing measurements explicit. The point estimates do not establish
+a decisive lead where intervals overlap. [Protocol and reproduction](docs/model-sizes-and-elo.md#master-kpi-budgeted-transfer-retention-auc-version-1).
 
 ## Use a DOPE artifact from Python
 
