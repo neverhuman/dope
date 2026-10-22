@@ -100,9 +100,9 @@ restoration never replaces fresh boundary tests or changes the job quota.
 its partial scope can produce boundary or release false positives and never
 supersedes the clean full gate.
 
-`just paper` regenerates every generated paper input, figure, README benchmark
-block, and PDF from committed, SHA-pinned ledgers; `just paper-check` verifies
-macros against those ledgers, figure hashes, the README block, and the build.
+`just paper` regenerates every generated paper input, figure, the benchmark block
+of `HISTORY.md`, and PDF from committed, SHA-pinned ledgers; `just paper-check` verifies
+macros against those ledgers, figure hashes, the history-page block, and the build.
 Both recipes enter `paper_build.py` once after their existing legacy preparation
 and drift checks. The direct `build_pdf.sh` entry creates its own fresh admission.
 The independent unit gate is `just paper-tests`: it retains the entire former

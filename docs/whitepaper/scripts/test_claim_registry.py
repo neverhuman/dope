@@ -11,7 +11,7 @@ class ClaimRegistryTests(unittest.TestCase):
         cls.inputs = C.load_inputs()
 
     def compile(self, **changes):
-        names = ("registry", "panel", "headline", "macros", "tex", "readme", "citation", "lineages")
+        names = ("registry", "panel", "headline", "macros", "tex", "readme", "citation", "lineages", "history")
         values = dict(zip(names, copy.deepcopy(self.inputs)))
         values.update(changes)
         return C.compile_claims(*(values[name] for name in names))
@@ -74,6 +74,9 @@ class ClaimRegistryTests(unittest.TestCase):
         readme = self.inputs[5].replace("a few-kilobyte **program**", "a **kilobyte-scale** generator", 1)
         self.assertNotEqual(readme, self.inputs[5])
         self.assertIn("README uses forbidden language", self.failures(readme=readme))
+        history = self.inputs[8].replace("These are historical", "These are state-of-the-art historical", 1)
+        self.assertNotEqual(history, self.inputs[8])
+        self.assertIn("HISTORY.md uses forbidden language", self.failures(history=history))
         title = C.title_of(self.inputs[4])
         tex = self.inputs[4].replace("}{" + title + "}}", "}{DOPE: Compressing Data into Transferable Knowledge}}", 1)
         self.assertNotEqual(tex, self.inputs[4])

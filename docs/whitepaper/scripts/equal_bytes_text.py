@@ -1,4 +1,4 @@
-"""Text outputs of the equal-byte study: paper macros and tables, the README block.
+"""Text outputs of the equal-byte study: paper macros and tables, the HISTORY.md block.
 
 Inputs are the committed study summary (research/benchmark/equal_bytes/results)
 and, for the generator markers in Figure 1, the frozen v2 ledger

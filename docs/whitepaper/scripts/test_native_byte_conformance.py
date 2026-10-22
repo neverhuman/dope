@@ -1,4 +1,4 @@
-"""One native artifact's pinned byte accounting, and the README and supplement sentences bound to it."""
+"""One native artifact's pinned byte accounting, and the history-page and supplement sentences bound to it."""
 import copy
 import json
 import unittest
@@ -79,7 +79,8 @@ class NativeByteConformanceTests(unittest.TestCase):
 
     def test_published_sentences_that_drift_from_the_pin_are_refused(self):
         pin = json.loads(N.PIN.read_text())
-        readme = (N.REPO / "README.md").read_text()
+        readme = N.HISTORY.read_text()
+        self.assertNotIn("### One measured native artifact", (N.REPO / "README.md").read_text())
         supplement = (N.PAPER / "supplement.tex").read_text()
         generated = N.GENERATED.read_text()
         self.assertEqual(N.text_failures(pin, readme, supplement, generated), [])

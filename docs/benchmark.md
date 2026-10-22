@@ -5,8 +5,8 @@
 sealed. Labels and wording rules are in the [claims policy](claims-policy.md). The metric
 is defined in [metric](metric.md).
 
-No result number is typed on this page. The panel numbers are rendered into the README's
-generated benchmark block from `docs/whitepaper/generated/v2-headline.json`, and the
+No result number is typed on this page. The panel numbers are rendered into the generated
+benchmark block of the [historical results page](history.md) from `docs/whitepaper/generated/v2-headline.json`, and the
 paper's tables come from the same committed ledgers.
 
 ## 1. The v2 validation panel
@@ -33,7 +33,7 @@ estimate.
 **Cohorts are not one ranking.** The full-panel rows (DOPE, TabSyn scaled schedule,
 both ARF configurations, Gaussian copula, Chow–Liu, independent marginals and the
 controls) share lineages. The CTGAN and TVAE block and the historical Forest-Flow block
-are smaller, separate cohorts, and the README table's lineage column says so. A row from
+are smaller, separate cohorts, and the history-page table's lineage column says so. A row from
 a small cohort is never read as a win or a loss against a full-panel row.
 
 **Not run.** These are Stage 2 blocks of `predeclare_v2.json` with no number: TabDDPM v6,
@@ -77,7 +77,7 @@ D-07 (licenses and GPU budget) and is follow-on work (FOLLOW-AUDQ).
 
 ```bash
 just setup          # Python environment for the paper scripts
-just paper          # regenerate every generated/ file, figure, the README block and both PDFs
+just paper          # regenerate every generated/ file, figure, the HISTORY.md block and both PDFs
 just paper-check    # verify macros against ledgers, figure hashes, and the build
 bash ops/ci/paper-clean.sh   # what CI runs: delete generated/, rebuild, require a zero diff
 ```

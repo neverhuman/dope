@@ -74,7 +74,7 @@ python3 -B -m research.benchmark.equal_bytes.run --binary target/release/dope-ke
   --out research/benchmark/equal_bytes/results/panel $(comm -23 <(ls target/eb-all) <(ls target/eb) | sed 's|^|target/eb-all/|')
 python3 -B -m research.benchmark.equal_bytes.summarize research/benchmark/equal_bytes/results/lineages \
   research/benchmark/equal_bytes/results/panel --rungs L2,L4 --out research/benchmark/equal_bytes/results/panel-summary.json
-python3 docs/whitepaper/scripts/equal_bytes_render.py --write-readme  # figures, paper macros and tables, README block
+python3 docs/whitepaper/scripts/equal_bytes_render.py --write-readme  # figures, paper macros and tables, HISTORY.md block
 python3 docs/whitepaper/scripts/equal_bytes_render.py --check  # text outputs must match the committed files
 ```
 

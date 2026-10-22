@@ -307,12 +307,18 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
             self.assertGreater(len(qa_report.read_text()), 500)
         readme_path = REPO_ROOT / "README.md"
         readme_text = readme_path.read_text()
-        self.assertIn("dope-kernel compile-csv", readme_text)
-        self.assertNotIn("dope compile-csv", readme_text)
-        self.assertIn("cross-model feature-driver preservation: not yet measured", readme_text)
-        self.assertIn("Feature-Target Correlation Proxy", readme_text)
-        self.assertIn("strongest measured comparator on this historical block", readme_text)
+        # Historical kernel and v2-panel material lives on the history page.
+        history_text = (REPO_ROOT / "HISTORY.md").read_text()
+        self.assertIn("dope-kernel compile-csv", history_text)
+        for text in (readme_text, history_text):
+            self.assertNotIn("dope compile-csv", text)
+        self.assertIn("cross-model feature-driver preservation: not yet measured", history_text)
+        # The landing page's scope paragraph wraps the same label across lines.
+        self.assertIn("cross-model feature-driver preservation: not yet measured", " ".join(readme_text.split()))
+        self.assertIn("Feature-Target Correlation Proxy", history_text)
+        self.assertIn("strongest measured comparator on this historical block", history_text)
         self.assertIn("paper/main.tex", readme_text)
+        self.assertIn("HISTORY.md", readme_text)
         # The landing page is the prose outside generated blocks and collapsed <details>
         # sections; the historical and kernel blocks stay verbatim inside them.
         stripped = re.sub(r"<!-- BEGIN (DOPE1 \w+|BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART|EQUAL BYTES) -->.*?<!-- END \1 -->", "", readme_text, flags=re.S)

@@ -32,7 +32,7 @@ drift from the code or the records.
 | `build.sh` | checks the contract macros and the DOPE 1.0 benchmark surfaces, builds every PDF into `target/paper/`, fails on unresolved references or citations, and requires a generated hero as Figure 1 on page 1 | L3 |
 | `scripts/contract_macros.py` | writes `generated/contract-macros.tex`; `--check` refuses drift and any headline-threshold disagreement | L3 |
 | `generated/` | numbers, tables and figures rendered from `generated/headline-results.json` | L2 (tools/claims) |
-| `generated/equal-bytes-*`, `generated/transfer-per-byte.*`, `generated/readme-equal-bytes.md` | macros, tables, figures and the README block of the equal-byte study, rendered by `docs/whitepaper/scripts/equal_bytes_render.py` and authenticated by the claims firewall | L3 |
+| `generated/equal-bytes-*`, `generated/transfer-per-byte.*`, `generated/readme-equal-bytes.md` | macros, tables, figures and the `HISTORY.md` block of the equal-byte study, rendered by `docs/whitepaper/scripts/equal_bytes_render.py` and authenticated by the claims firewall | L3 |
 | `generated/dope1-*` | figures, tables and macros of the DOPE 1.0 manuscript from `bench/real-world/render.py` (hash-listed in `bench/real-world/results/render-manifest.json`) | L2 (tools/claims) |
 | `equal-bytes.bib` | entries copied from the historical bibliographies plus two with DOI or venue URL | L3 |
 | `archive/` | review ledgers and readiness notes moved out of the historical paper directory (T-111) | L3 |

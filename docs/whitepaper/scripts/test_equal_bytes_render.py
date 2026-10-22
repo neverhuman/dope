@@ -15,20 +15,24 @@ class EqualBytesRenderTests(unittest.TestCase):
         for name, expected in T.text_outputs().items():
             self.assertEqual((T.REPO / name).read_text(), expected, name)
 
-    def test_readme_carries_the_generated_block_once(self):
-        readme = (T.REPO / "README.md").read_text()
+    def test_history_page_carries_the_generated_block_once(self):
+        history = (T.REPO / "HISTORY.md").read_text()
         block = (T.REPO / "paper/generated/readme-equal-bytes.md").read_text().strip()
-        self.assertEqual(readme.count(T.README_BEGIN), 1)
-        self.assertIn(block, readme)
+        self.assertEqual(history.count(T.README_BEGIN), 1)
+        self.assertIn(block, history)
+        self.assertNotIn(T.README_BEGIN, (T.REPO / "README.md").read_text())
 
-    def test_readme_block_is_the_only_place_with_study_numbers(self):
+    def test_generated_block_is_the_only_place_with_study_numbers(self):
         # The DOPE 1.0 engine's generated blocks are authenticated by tools/claims/dope1.py.
         if str(T.REPO) not in sys.path:
             sys.path.insert(0, str(T.REPO))
         from tools.claims import dope1
         readme = dope1.strip((T.REPO / "README.md").read_text())
-        start, end = readme.index(T.README_BEGIN), readme.index(T.README_END) + len(T.README_END)
-        failures = claim_registry.lint_public_text(readme[:start] + readme[end:].split("<details>")[0], "README")
+        failures = claim_registry.lint_public_text(readme, "README")
+        history = (T.REPO / "HISTORY.md").read_text()
+        start, end = history.index(T.README_BEGIN), history.index(T.README_END) + len(T.README_END)
+        failures += claim_registry.lint_public_text(history[:start] + history[end:].split("<details>")[0],
+                                                    "HISTORY.md")
         self.assertEqual([f for f in failures if "hand-typed" in f], [])
 
     def test_origin_correction_preserves_historical_membership(self):

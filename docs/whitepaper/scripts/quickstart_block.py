@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""README block for the quickstart: the committed reference run on UCI Adult.
+"""History-page block for the quickstart: the committed reference run on UCI Adult.
 
 The block is a pure rendering of examples/quickstart/results/adult-reference.json,
 the report.json that `python3 examples/quickstart/quickstart.py --dataset adult`
-writes. claim_registry.py checks that the README carries it byte for byte, so the
-README's quickstart numbers can never drift from a committed run.
+writes. claim_registry.py checks that the historical results page (HISTORY.md)
+carries it byte for byte, so its quickstart numbers can never drift from a committed run.
 
     python3 -B docs/whitepaper/scripts/quickstart_block.py --write-readme   # also writes the paper macros
     python3 -B docs/whitepaper/scripts/quickstart_block.py --check
@@ -32,6 +32,7 @@ SHORT = {
 }
 BEGIN = "<!-- BEGIN QUICKSTART -->"
 END = "<!-- END QUICKSTART -->"
+HISTORY = "HISTORY.md"
 
 
 def _size(n: float) -> str:
@@ -179,10 +180,10 @@ def load_report(root: Path = REPO) -> dict:
 
 def failures(readme: str, root: Path = REPO) -> list[str]:
     if readme.count(BEGIN) != 1 or readme.count(END) != 1:
-        return ["README: quickstart block markers must appear exactly once"]
+        return [f"{HISTORY}: quickstart block markers must appear exactly once"]
     start, end = readme.index(BEGIN), readme.index(END) + len(END)
     if readme[start:end] != readme_block(load_report(root)):
-        return ["README: generated quickstart block drift"]
+        return [f"{HISTORY}: generated quickstart block drift"]
     return []
 
 
@@ -202,7 +203,7 @@ def main(argv=None) -> int:
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--write-readme", action="store_true")
     args = parser.parse_args(argv)
-    readme_path = REPO / "README.md"
+    readme_path = REPO / HISTORY
     readme = readme_path.read_text()
     if args.write_readme:
         readme_path.write_text(splice(readme, readme_block(load_report())))
@@ -218,7 +219,7 @@ def main(argv=None) -> int:
     for failure in found:
         print(failure, file=sys.stderr)
     if not found:
-        print("README quickstart block is current")
+        print(f"{HISTORY} quickstart block is current")
     return 1 if found else 0
 
 

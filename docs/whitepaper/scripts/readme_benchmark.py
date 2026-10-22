@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""README benchmark block from the v2 headline JSON that the paper also reads.
+"""History-page benchmark block from the v2 headline JSON that the paper also reads.
 
 The table rows, the strongest comparator, and every interval come from
 docs/whitepaper/generated/v2-headline.json, written by review_v2_emit.py.
 The panel size, fit-seed count and interval level come from the pre-declaration
 (research/benchmark/review_fixes/predeclare_v2.json), and the byte cap from the
 embedded release contract (production/kpi-contract.json); no count is typed here.
-The two images are drawn by v2_figures.py from that same file, so the README
-and the paper cannot disagree. `--check` compares the committed block.
+The two images are drawn by v2_figures.py from that same file, so the
+historical results page (HISTORY.md) and the paper cannot disagree.
+`--write-readme` splices the block into that page; `--check` compares the
+committed block.
 """
 
 from __future__ import annotations
@@ -24,7 +26,7 @@ REPO = Path(__file__).resolve().parents[3]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 HEADLINE = REPO / "docs" / "whitepaper" / "generated" / "v2-headline.json"
-README = REPO / "README.md"
+HISTORY = REPO / "HISTORY.md"
 PNGS = (REPO / "docs" / "readme" / "pareto.png", REPO / "docs" / "readme" / "paired.png")
 BEGIN = "<!-- BEGIN BENCHMARK -->"
 END = "<!-- END BENCHMARK -->"
@@ -214,14 +216,14 @@ def expected_readme_block(headline: dict) -> str:
 def main() -> None:
     headline = json.loads(HEADLINE.read_text())
     if "--write-readme" in sys.argv:
-        README.write_text(splice_readme(README.read_text(), benchmark_block(headline)))
+        HISTORY.write_text(splice_readme(HISTORY.read_text(), benchmark_block(headline)))
     if "--check" in sys.argv:
-        if readme_block(README.read_text()) != expected_readme_block(headline):
-            raise SystemExit("README benchmark block does not match v2-headline.json")
+        if readme_block(HISTORY.read_text()) != expected_readme_block(headline):
+            raise SystemExit("HISTORY.md benchmark block does not match v2-headline.json")
         missing = [str(path) for path in PNGS if not path.is_file()]
         if missing:
-            raise SystemExit(f"README figures are missing: {missing}")
-        print("README benchmark block matches v2-headline.json")
+            raise SystemExit(f"benchmark figures are missing: {missing}")
+        print("HISTORY.md benchmark block matches v2-headline.json")
     if "--print" in sys.argv or len(sys.argv) == 1:
         print(benchmark_block(headline))
 

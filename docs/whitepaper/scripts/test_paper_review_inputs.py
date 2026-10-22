@@ -140,7 +140,7 @@ class ReviewInputTests(unittest.TestCase):
             REVIEW.authenticated_graph()
 
     def conformance_fixture(self):
-        names = (REVIEW.NATIVE_BYTE_PIN, REVIEW.NATIVE_BYTE_CHECKER, 'README.md',
+        names = (REVIEW.NATIVE_BYTE_PIN, REVIEW.NATIVE_BYTE_CHECKER, *REVIEW.CAPTURED_DOCUMENTS,
                  'docs/whitepaper/supplement.tex',
                  'docs/whitepaper/generated/native-byte-conformance.tex')
         for name in names:
@@ -154,7 +154,7 @@ class ReviewInputTests(unittest.TestCase):
     def test_conformance_checker_uses_captured_files_before_numerical_replay(self):
         self.conformance_fixture()
         run = subprocess.run
-        readme = self.root / 'README.md'
+        readme = self.root / REVIEW.HISTORY
         original = readme.read_bytes()
 
         class NumericalReplayReached(Exception):
@@ -183,7 +183,7 @@ class ReviewInputTests(unittest.TestCase):
 
     def test_conformance_document_drift_refuses_before_numerical_replay(self):
         self.conformance_fixture()
-        (self.root / 'README.md').write_text('missing the measured byte profile\n')
+        (self.root / REVIEW.HISTORY).write_text('missing the measured byte profile\n')
         run = subprocess.run
 
         def captured_run(command, **kwargs):

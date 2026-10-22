@@ -43,13 +43,17 @@ JSONL_INPUTS = (CONTROL_LEDGER, PRIVACY_LEDGER, TABSYN_LEDGER, FIDELITY_LEDGER, 
                 TABSYN_SEEDS_FITS)
 OUTPUT_PREFIXES = ('review-', 'v2-')
 _ADMISSION = object()
+# The historical results page carries the v2 benchmark block; the README carries none.
+HISTORY = 'HISTORY.md'
 AUXILIARY_OUTPUTS = (
-    'README.md', 'docs/readme/pareto.png', 'docs/readme/paired.png',
+    HISTORY, 'docs/readme/pareto.png', 'docs/readme/paired.png',
     'docs/whitepaper/figures/teaser.pdf', 'docs/whitepaper/figures/pareto.pdf',
     'docs/whitepaper/generated/teaser-figure-hashes.json',
     'docs/whitepaper/generated/pareto-figure-hashes.json',
     'docs/whitepaper/generated/readme-figure-hashes.json',
 )
+# check_paper.py lints both public pages, so the compiler snapshot captures them.
+CAPTURED_DOCUMENTS = ('README.md', HISTORY)
 
 
 @dataclass(frozen=True)
@@ -78,7 +82,8 @@ class AuthenticatedPaperBuild:
             if safe_bytes(self.root, name) != raw:
                 raise ValueError('stale paper build context')
         declared = validate_graph(json.loads(self.graph), dict(self.inputs))
-        original = tuple((name, raw) for name, raw in self.consumed if name not in AUXILIARY_OUTPUTS)
+        original = tuple((name, raw) for name, raw in self.consumed
+                         if name not in AUXILIARY_OUTPUTS and name not in CAPTURED_DOCUMENTS)
         if code_snapshot() != self.code or consumed_snapshot(declared) != original:
             raise ValueError('stale paper build dependency inventory')
 
@@ -288,7 +293,7 @@ def authenticate_build(*, log_directory=None):
     consumed = consumed_snapshot(declared)
     has_headline = 'docs/whitepaper/generated/v2-headline.json' in declared
     if has_headline:
-        consumed += (('README.md', safe_bytes(REPO, 'README.md')),)
+        consumed += tuple((name, safe_bytes(REPO, name)) for name in CAPTURED_DOCUMENTS)
     captured_inputs = tuple(sorted(inputs.items())) + ((LOCK.relative_to(REPO).as_posix(), lock_raw),)
     verified = AuthenticatedPaperBuild(REPO, json.dumps(graph).encode(), captured_inputs,
                                        code, consumed, (), _ADMISSION,
@@ -301,7 +306,7 @@ def authenticate_build(*, log_directory=None):
     with tempfile.TemporaryDirectory(dir=target) as directory:
         root = Path(directory)
         for name, raw in verified.inputs + verified.code + tuple(
-                (name, raw) for name, raw in verified.consumed if name == 'README.md'):
+                (name, raw) for name, raw in verified.consumed if name in CAPTURED_DOCUMENTS):
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(raw)
@@ -327,7 +332,7 @@ def authenticate_build(*, log_directory=None):
                 # seed the numerical render inventory with committed outputs.
                 conformance_root = root / 'native-byte-conformance'
                 captured = dict(verified.inputs + verified.code + verified.consumed)
-                for name in (NATIVE_BYTE_PIN, NATIVE_BYTE_CHECKER, 'README.md',
+                for name in (NATIVE_BYTE_PIN, NATIVE_BYTE_CHECKER, HISTORY,
                              'docs/whitepaper/supplement.tex',
                              'docs/whitepaper/generated/native-byte-conformance.tex'):
                     path = conformance_root / name
@@ -370,9 +375,11 @@ def authenticate_build(*, log_directory=None):
                     run_renderer([sys.executable, '-B', str(root / 'docs/whitepaper/scripts' / script),
                                   *args], log)
             auxiliary = tuple((name, safe_bytes(root, name)) for name in AUXILIARY_OUTPUTS)
-            if dict(auxiliary)['README.md'] != dict(consumed)['README.md']:
-                raise ValueError('README differs from expected rendering')
-            if (rendered_inventory(root) != declared | (set(AUXILIARY_OUTPUTS) - {'README.md'})
+            if dict(auxiliary)[HISTORY] != dict(consumed)[HISTORY]:
+                raise ValueError('history page differs from expected rendering')
+            if safe_bytes(root, 'README.md') != dict(consumed)['README.md']:
+                raise ValueError('historical renderer changed the README')
+            if (rendered_inventory(root) != declared | (set(AUXILIARY_OUTPUTS) - {HISTORY})
                     or any(safe_bytes(root, name) != raw for name, raw in expected)):
                 raise ValueError('auxiliary renderer changed expected review inventory')
     verified.revalidate()

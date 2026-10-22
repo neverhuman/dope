@@ -34,7 +34,7 @@ class FirewallTests(unittest.TestCase):
                          'research/transfer/locks', 'research/transfer/manifests',
                          'bench/real-world/results', 'bench/real-world/figures'):
                 shutil.copytree(ROOT / name, root / name)
-            inputs = {'README.md', 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
+            inputs = {'README.md', C.HISTORY, 'Cargo.toml', 'pyproject.toml', 'CITATION.cff',
                       'contracts/tdl-contract-v1.json', 'docs/vnext/CLAIMS.md',
                       'evidence/status.json', C.REGISTRY['sources']['headline'],
                       'research/benchmark/results/review-fixes-v2/scalar-cells.jsonl',
@@ -111,7 +111,7 @@ class FirewallTests(unittest.TestCase):
     def test_new_firewall_checks_nested_paper_citation_and_structured_metadata(self):
         with self.public_fixture() as root:
             self.assertEqual(check.public_failures(root, check_render=False), [])
-            for name in ('paper/sections/deep/CANARY_FILE.tex', 'CITATION.cff'):
+            for name in ('paper/sections/deep/CANARY_FILE.tex', 'CITATION.cff', C.HISTORY):
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 original = path.read_text() if path.is_file() else ''
@@ -310,19 +310,24 @@ class FirewallTests(unittest.TestCase):
 
     def test_generated_blocks_are_admitted_but_new_prose_numbers_and_demo_drift_fail(self):
         from unittest.mock import patch
-        readme_path = ROOT / 'README.md'
-        candidate = "# DOPE\n\n![Historical validation hero](paper/generated/hero-frontier.png)\n\n"
+        history_path, readme_path = ROOT / C.HISTORY, ROOT / 'README.md'
+        candidate = "# Historical results\n\n"
         candidate += (ROOT / 'paper/generated/readme-result-card.md').read_text()
         candidate += (ROOT / 'paper/generated/readme-demo-notes.md').read_text()
         original_read = Path.read_text
-        def check(text):
+        readme = original_read(readme_path)
+        def check(text, landing=readme):
             def read(path, *args, **kwargs):
-                return text if path == readme_path else original_read(path, *args, **kwargs)
+                return {history_path: text, readme_path: landing}.get(path) or original_read(path, *args, **kwargs)
             with patch.object(Path, 'read_text', read):
                 return C.public_failures(check_render=False)
         self.assertEqual(check(candidate), [])
         self.assertTrue(any('hand-typed' in f for f in check(candidate + "New result: 0.123.")))
         self.assertTrue(any('demo notes drift' in f for f in check(candidate.replace('`artifact_bytes` 151', '`artifact_bytes` 152'))))
+        self.assertTrue(any('result card markers are missing' in f for f in check(candidate.replace(render.BEGIN, ''))))
+        # The landing page refuses historical blocks and hand-typed numbers of its own.
+        self.assertIn('README: generated TDL RESULTS block belongs in HISTORY.md', check(candidate, readme + candidate))
+        self.assertTrue(any(f.startswith('README: hand-typed') for f in check(candidate, readme + "New result: 0.123.")))
 
     def test_figure_and_card_drift_is_detected_by_same_gate(self):
         from unittest.mock import patch

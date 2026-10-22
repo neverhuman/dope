@@ -176,6 +176,10 @@
       "command": "just fast",
       "purpose": "verify Python exception inventory and Rust port plan"
     },
+    "HISTORY.md": {
+      "command": "python3 tools/claims/check.py && python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
+      "purpose": "authenticate every historical generated block on the history page and lint its prose against the claims firewall"
+    },
     "docs/install.md": {
       "command": "cargo test --locked --test vnext_dope_install",
       "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
