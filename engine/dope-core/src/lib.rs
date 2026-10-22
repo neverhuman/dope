@@ -27,6 +27,7 @@
 #![allow(clippy::needless_range_loop, clippy::excessive_precision)]
 
 pub mod artifact;
+pub mod budget;
 pub mod compile;
 pub mod copula;
 pub mod device;
@@ -52,6 +53,7 @@ pub mod train;
 pub mod train_cpu;
 
 pub use artifact::{byte_report, decode, ByteReport};
+pub use budget::{ModelSize, ParameterCount};
 pub use compile::{fit, FitOptions, FitReport, Fitted, DEFAULT_BUDGET};
 pub use encode::{MlEncoder, Scaling};
 pub use error::{DopeError, Result};

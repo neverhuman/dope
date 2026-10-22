@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="576" viewBox="0 0 1100 576" role="img" aria-labelledby="title desc">
+<title id="title">Budgeted transfer Elo on a common dataset cohort</title>
+<desc id="desc">Batch Bradley–Terry ratings with 95 percent dataset bootstrap intervals. Selection-exposed descriptive evidence.</desc>
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<g font-family="DejaVu Sans, sans-serif" fill="#242424">
+<text x="30" y="34" font-size="25" font-weight="bold">Predictive information kept across byte budgets</text>
+<text x="30" y="61" font-size="15">BTR-AUC → Elo · 7 common datasets · 95% dataset bootstrap intervals</text>
+<text x="30" y="85" font-size="13" fill="#666">Development test envelope · 1,024–67,108,864 bytes · not a sealed study</text>
+<line x1="256.16" x2="256.16" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="256.16" y="546" text-anchor="middle" font-size="13">1000</text>
+<line x1="316.66" x2="316.66" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="316.66" y="546" text-anchor="middle" font-size="13">1100</text>
+<line x1="377.16" x2="377.16" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="377.16" y="546" text-anchor="middle" font-size="13">1200</text>
+<line x1="437.66" x2="437.66" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="437.66" y="546" text-anchor="middle" font-size="13">1300</text>
+<line x1="498.16" x2="498.16" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="498.16" y="546" text-anchor="middle" font-size="13">1400</text>
+<line x1="558.66" x2="558.66" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="558.66" y="546" text-anchor="middle" font-size="13">1500</text>
+<line x1="619.16" x2="619.16" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="619.16" y="546" text-anchor="middle" font-size="13">1600</text>
+<line x1="679.66" x2="679.66" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="679.66" y="546" text-anchor="middle" font-size="13">1700</text>
+<line x1="740.17" x2="740.17" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="740.17" y="546" text-anchor="middle" font-size="13">1800</text>
+<line x1="800.67" x2="800.67" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="800.67" y="546" text-anchor="middle" font-size="13">1900</text>
+<line x1="861.17" x2="861.17" y1="105" y2="521" stroke="#e0e0dd"/>
+<text x="861.17" y="546" text-anchor="middle" font-size="13">2000</text>
+<text x="215" y="133" text-anchor="end" font-size="17">DOPE</text>
+<line x1="732.55" x2="807.81" y1="128" y2="128" stroke="#2a78d6" stroke-width="5" stroke-linecap="round"/>
+<circle cx="762.75" cy="128" r="7" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="133" font-size="15">1837 [1787, 1912]</text>
+<text x="215" y="191" text-anchor="end" font-size="17">Real rows (xz)</text>
+<line x1="702.15" x2="829.50" y1="186" y2="186" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="755.38" cy="186" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="191" font-size="15">1825 [1737, 1948]</text>
+<text x="215" y="249" text-anchor="end" font-size="17">DOPE research kernel</text>
+<line x1="570.97" x2="719.51" y1="244" y2="244" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="643.14" cy="244" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="249" font-size="15">1640 [1520, 1766]</text>
+<text x="215" y="307" text-anchor="end" font-size="17">ARF</text>
+<line x1="453.67" x2="533.46" y1="302" y2="302" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="497.25" cy="302" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="307" font-size="15">1398 [1326, 1458]</text>
+<text x="215" y="365" text-anchor="end" font-size="17">Gaussian copula</text>
+<line x1="430.76" x2="533.66" y1="360" y2="360" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="485.85" cy="360" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="365" font-size="15">1380 [1289, 1459]</text>
+<text x="215" y="423" text-anchor="end" font-size="17">TVAE</text>
+<line x1="365.09" x2="443.25" y1="418" y2="418" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="409.37" cy="418" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="423" font-size="15">1253 [1180, 1309]</text>
+<text x="215" y="481" text-anchor="end" font-size="17">CTGAN</text>
+<line x1="282.35" x2="415.23" y1="476" y2="476" stroke="#777770" stroke-width="5" stroke-linecap="round"/>
+<circle cx="356.91" cy="476" r="7" fill="#777770" stroke="#fcfcfb" stroke-width="2"/>
+<text x="920" y="481" font-size="15">1167 [1043, 1263]</text>
+<text x="30" y="570" font-size="12" fill="#666">1500 = cohort center · local per-dataset rankings and coverage are in elo.md / datasets.csv</text>
+</g></svg>

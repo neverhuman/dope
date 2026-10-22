@@ -57,6 +57,8 @@ engine:
 bench-check:
     python3 bench/real-world/render.py --check
     python3 tools/claims/dope1.py --check
+    python3 -B bench/real-world/elo.py --check
+    python3 -B bench/real-world/elo.py --methods dope,rows,kernel,copula,arf --out bench/real-world/results/elo-cpu --check
 
 check: fast
     bash ops/ci/check-budgets.sh

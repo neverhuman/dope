@@ -81,7 +81,30 @@ release build of `dope-kernel` at commit `36cf658a` (binary SHA-256
 column named `cnt`, the bike target; the wrapper now passes positional column names). Runs were
 split into resumable chunks on a two-core VM; `report.py` keeps the first record of any cell.
 
-## Files
+## Budgeted transfer Elo
+
+The additive [`elo.py`](elo.py) reducer computes BTR-AUC (robust predictive retention
+across a fixed log-byte grid) and batch Elo, with dataset bootstrap intervals, explicit
+coverage and local rankings for every dataset. It reads the immutable raw ledger;
+it does not change `summary.json`, historical paper numbers or certification semantics.
+
+```bash
+python3 bench/real-world/elo.py
+python3 bench/real-world/elo.py --check
+python3 bench/real-world/elo.py --methods dope,rows,kernel,copula,arf --out bench/real-world/results/elo-cpu
+python3 -m unittest discover -s bench/real-world -p 'test_*.py' -v
+```
+
+See the [all-method report](results/elo/elo.md) (7 common datasets),
+[CPU-method report](results/elo-cpu/elo.md) (16), and the
+[KPI, Elo and prospective thousand-dataset protocol](../../docs/model-sizes-and-elo.md).
+The current score is a selection-exposed **envelope of tested configurations**.
+For new studies, supply an explicit `--schedule`, a dataset-ID list via `--datasets`, and preregister validation-only
+configuration selection. Missing scheduled cells are incomplete, failures count as
+zero, and conflicts in duplicate receipts are refused. Elo scores depend on the cohort
+and protocol; these reports do not qualify a sealed-test or D80 claim.
+
+## Ledger and generated files
 
 | File | Contents |
 | --- | --- |

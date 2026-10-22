@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add whole-generator parameter caps, explicit decimal/binary byte units and
+  small/medium/large engine presets (2/4/16 KiB). Forced plans obey both caps;
+  fit and inspect report the versioned scalar-state breakdown.
+- Add `dope fit-tiers` for dataset-specific pretrained artifacts with source,
+  training and binary digests, checksums and a model card for release review.
+- Add descriptive BTR-AUC/Elo reports, per-dataset rankings and plots, paired
+  dataset bootstrap intervals, predeclared schedule/dataset support, and CI
+  replay checks. Current reports reuse development evidence; no new sealed-test,
+  pretrained foundation-model or certification claim is made.
+
 ## 1.0.0 - 2026-10-22 (uncertified research release)
 
 This release publishes the DOPE 1.0 engine (`engine/`, version 1.0.0), its

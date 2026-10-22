@@ -2,6 +2,14 @@
 
 ## DOPE engine and benchmark surfaces
 
+The engine gate also tests complete-generator parameter caps, forced-plan refusals,
+S/M/L preset precedence and checksummed `fit-tiers` catalogs. Offline ranking fixtures
+cover missing versus failed cells, seed failures, oversized artifacts, duplicate
+receipts, batch Elo order invariance, perfect winners, bootstrap replay and common
+cohorts. It verifies both Elo report cohorts with `--check`; `just bench-check` retains
+these drift checks alongside the pre-existing benchmark/claims renders. These are
+engineering and historical-evidence checks, not prospective dataset qualification.
+
 `just engine` (`ops/ci/engine.sh`, also run by `cpu.sh`) formats, lints with warnings denied and
 tests the standalone `engine/` workspace: unit tests, end-to-end tests (byte budget, exact
 safetensors round trip, native versus tensor sampler parity with trees, trees buying held-out
