@@ -30,11 +30,56 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | `dope --threads 8 fit data.csv -t y --json --report fit.json` | Bound CPU parallelism and emit machine-readable fit output. |
 | `dope --threads 4 doctor --json` | Runtime identity, backend, worker count and executable SHA-256. |
 
+## Recipes
+
+The deployed `dope` application is **Rust end to end**: fitting, sampling, prediction,
+encoding and built-in evaluation need no Python interpreter or libtorch. Python research
+training and benchmark harnesses stay outside the deployment package.
+
+```bash
+# Bound both deployment size and complete-generator state; cap CPU parallelism.
+dope --threads 8 fit train.csv --target price --task regression \
+  --size large --budget 12KiB --max-parameters 4000 --seed 42 \
+  --device cpu --out prices.dope --report fit.json
+
+# One JSON object on stdout for shell scripts, services and agents.
+dope --threads 4 fit train.csv -t price --size medium --json -o prices.dope
+# Diagnostics identify the Rust runtime, backends, worker count and executable hash.
+dope --threads 4 doctor --json
+
+# Generate original-unit rows, or one-hot features and numbers on [0,1].
+dope --threads 8 sample prices.dope -n 100000 --seed 42 --device cpu -o synthetic.csv
+dope sample prices.dope -n 100000 --space ml --scaling unit -o ml-ready.csv
+# Inference CSVs may contain just the input features; no target values are required.
+dope predict prices.dope unlabelled.csv -o predictions.csv
+dope encode real.csv --model prices.dope --scaling quantile -o encoded.csv
+
+# Evaluate on held-out real rows and save a machine-readable receipt.
+dope eval -m prices.dope --train train.csv --test test.csv \
+  --auditors linear,gbdt,mlp --factor 4 --seed 42 --json evaluation.json
+dope frontier --train train.csv --test test.csv -t price \
+  --budgets 2KiB,4KiB,8KiB,16KiB --tau 0.9 --json frontier.json
+dope --threads 8 throughput prices.dope -n 1000000 --repeats 3 --device cpu
+```
+
+| Control | Meaning |
+|---|---|
+| `--target`, `--task` | Explicit target name/index; optional regression/classification override |
+| `--size`, `--budget` | 2/4/16 KiB preset or exact whole-file cap; explicit budget wins |
+| `--max-parameters` | Additional hard cap on the full generator's versioned scalar count |
+| `--threads` | Global CPU worker limit, 1–1024; accepted before or after a subcommand |
+| `--device`, `--seed` | Compute backend and reproducible random seed |
+| `fit --json`, `fit --report` | JSON stdout and/or a saved report; `--quiet` suppresses human output |
+| `sample --space`, `--scaling` | Original-unit or ML-ready rows; unit or quantile scaling |
+
+Use `dope --help` and `dope fit --help` for all parameters. The signed CPU release
+supports `--device cpu` and `auto`; GPU variants require separate builds and qualification.
+
 ## The program
 
 All customer commands execute in Rust. The signed release is the `dope` CLI from
 this workspace; Python training/research tools are not deployment dependencies.
-See the root [README recipes](../README.md#command-line-recipes) and
+See [the recipes](#recipes) and the
 [signed binary release workflow](../docs/signed-engine-release.md).
 
 | Part | Stored as | Fitted by |
