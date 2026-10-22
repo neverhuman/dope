@@ -108,6 +108,18 @@ class BoundWorkerTests(unittest.TestCase):
         auth["admission"].write_bytes(canonical_json(envelope))
         return spec, pilot, contract, cell, root, auth, worker
 
+    def test_development_requires_native_receipt_bridge_before_work(self):
+        prepared = self.prepare()
+        worker = prepared[6]
+        authority = replace(worker.authority, learner_seed=ORIGINAL_STREAM_HEX,
+                            native_seed_sha256=NativeSeed(ORIGINAL_STREAM_HEX).sha256,
+                            owner_recipe_decision_sha256=OWNER_GRANT_SHA256)
+        with self.assertRaisesRegex(ValueError, "native_receipt_bridge_required"):
+            PilotWorkerRuntime(authority, worker.registry, worker.null_reference,
+                worker.driver_plan, worker.wall_by_role, verify_assembly=lambda value: None,
+                verify_operation=lambda value: None, kind="development")
+        self.assertEqual(FixtureLearner.prepares, 0)
+
     def run_bound(self, prepared):
         spec, pilot, contract, cell, root, auth, worker = prepared
         return execute_pilot_cell(spec, pilot, contract, cell, root, worker_runtime=worker, **auth)
@@ -129,6 +141,8 @@ class BoundWorkerTests(unittest.TestCase):
         self.assertIn("bound_learner_driver_metric_runtime_implementation", receipt["pipeline_prerequisites"])
         self.assertTrue(receipt["fixture_validation_complete"])
         self.assertFalse(worker.development_admission_used)
+        self.assertFalse(receipt["native_receipt_verified"])
+        self.assertIsNone(receipt["native_receipt"])
         private = json.loads(read_regular(root / "private-learners.json"))
         self.assertEqual(private["execution"]["completed_path_count"], 60)
         self.assertTrue(all(len(row["losses"]) == 3 for row in private["paired"]["comparisons"]))

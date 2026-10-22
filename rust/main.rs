@@ -89,6 +89,7 @@ include!("main/campaign_commands.rs");
 include!("main/mixed_commands.rs");
 include!("main/table_commands.rs");
 
+include!("main/pilot_receipt_commands.rs");
 include!("main/dispatch.rs");
 include!("main/metadata_commands.rs");
 include!("main/release_commands.rs");

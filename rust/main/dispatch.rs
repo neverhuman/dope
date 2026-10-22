@@ -1,5 +1,22 @@
 fn run(command: Command) -> Result<()> {
     match command {
+        Command::VerifyPilotReceipts {
+            root,
+            bundle,
+            policy,
+            expected_bundle_sha256,
+            expected_policy_sha256,
+            expected_executable_sha256,
+        } => {
+            pilot_receipt_commands::run(
+                &root,
+                &bundle,
+                &policy,
+                &expected_bundle_sha256,
+                &expected_policy_sha256,
+                &expected_executable_sha256,
+            )?;
+        }
         command @ (Command::FitTable { .. }
         | Command::SampleTable { .. }
         | Command::InspectTable { .. }) => return run_table(command),
