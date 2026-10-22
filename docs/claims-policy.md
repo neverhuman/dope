@@ -69,7 +69,7 @@ from committed machine-readable results.
 
 ## 3. Banned phrases
 
-The linter matches case-insensitively in README prose outside generated blocks, in
+The linter matches case-insensitively in README and `HISTORY.md` prose outside generated blocks, in
 active `paper/**/*.tex` outside `paper/archive/`, and in `CITATION.cff`.
 Known generated TeX is exempt from prose-number lint only through its checker:
 the claims renderer authenticates its outputs, and the contract-macro generator

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Byte accounting of one native artifact, pinned once and checked in README and supplement.
+"""Byte accounting of one native artifact, pinned once and checked in HISTORY.md and supplement.
 
 The pin is a source-free projection of the installed public demo's research receipt:
 the same DOPERAW1 file measured by compile, inspect, the receipt and its file size.
 ``--project RECEIPT --evidence HANDOFF`` derives it from those measured records and
 ``--write`` renders the supplement paragraph from it into generated/; the default
-mode checks the pin, the generated paragraph and the README sentences against each
+mode checks the pin, the generated paragraph and the history-page sentences against each
 other. It is an engineering conformance example, not a benchmark result, and
 carries no row, header, extremum, fitted value or private path.
 """
@@ -22,6 +22,7 @@ PAPER = Path(__file__).resolve().parents[1]
 REPO = PAPER.parents[1]
 PIN = PAPER / "receipts" / "native-byte-conformance-v1.json"
 GENERATED = PAPER / "generated" / "native-byte-conformance.tex"
+HISTORY = REPO / "HISTORY.md"
 SUBSECTION = "\\subsection{One native artifact, accounted end to end}"
 FORMAT = "dope-native-byte-conformance"
 PARTS = ("framing_bytes", "transform_schema_bytes", "native_payload_bytes")
@@ -211,7 +212,7 @@ def _section(text: str, start: str, stop: str) -> str:
 
 
 def readme_fragments(pin: dict) -> list[str]:
-    """The README phrases for this artifact, each number bound to the label it measures."""
+    """The history-page phrases for this artifact, each number bound to the label it measures."""
     accounting, artifact = pin["accounting"], pin["artifact"]
     number = readme_number
     return [
@@ -256,9 +257,9 @@ def supplement_paragraph(pin: dict) -> str:
     )
 
 
-def text_failures(pin: dict, readme: str, supplement: str, generated: str) -> list[str]:
-    section = _section(readme, "### One measured native artifact", "\n## ")
-    failures = [f"README.md: missing {fragment!r}" for fragment in readme_fragments(pin) if fragment not in section]
+def text_failures(pin: dict, history: str, supplement: str, generated: str) -> list[str]:
+    section = _section(history, "### One measured native artifact", "\n## ")
+    failures = [f"HISTORY.md: missing {fragment!r}" for fragment in readme_fragments(pin) if fragment not in section]
     if generated != supplement_paragraph(pin):
         failures.append("generated/native-byte-conformance.tex differs from the pin; run --write")
     inputs = f"{SUBSECTION}\n\\label{{app:native-bytes}}\n\\input{{generated/native-byte-conformance.tex}}\n"
@@ -267,9 +268,9 @@ def text_failures(pin: dict, readme: str, supplement: str, generated: str) -> li
     return failures
 
 
-def check(readme_path: Path = REPO / "README.md", supplement_path: Path = PAPER / "supplement.tex") -> dict:
+def check(history_path: Path = HISTORY, supplement_path: Path = PAPER / "supplement.tex") -> dict:
     pin = load_pin(PIN.read_bytes())
-    failures = text_failures(pin, readme_path.read_text(), supplement_path.read_text(), GENERATED.read_text())
+    failures = text_failures(pin, history_path.read_text(), supplement_path.read_text(), GENERATED.read_text())
     if failures:
         raise ConformanceError("; ".join(failures))
     return pin

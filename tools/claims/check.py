@@ -127,7 +127,8 @@ def lint_cr10_pretraining_overlap_caveats(data: dict, auditors: dict,
 def publication_failures(data: dict, status: dict, root: Path = ROOT) -> list[str]:
     """New checks also run through the historical renderer's existing publication gate."""
     surfaces = {}
-    for name in ("README.md", "CITATION.cff"):
+    # The landing page, the historical results page and the citation file are public surfaces.
+    for name in ("README.md", "HISTORY.md", "CITATION.cff"):
         if (root / name).is_file():
             surfaces[name] = (root / name).read_text()
     for index, path in enumerate(sorted((root / "paper").rglob("*.tex"))):

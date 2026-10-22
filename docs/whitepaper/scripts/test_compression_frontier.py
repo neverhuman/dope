@@ -24,7 +24,8 @@ class CompressionFrontierTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.data = json.loads((REPO / R.DATA_JSON).read_text())
-        cls.readme = (REPO / "README.md").read_text()
+        cls.readme = (REPO / "HISTORY.md").read_text()
+        cls.landing = (REPO / "README.md").read_text()
 
     def test_committed_text_outputs_equal_their_rendering(self):
         for name, text in R.text_outputs(self.data).items():
@@ -54,7 +55,10 @@ class CompressionFrontierTests(unittest.TestCase):
     def test_readme_carries_both_generated_blocks(self):
         self.assertEqual(B.block_failures(self.readme, REPO), [])
         self.assertEqual(B.block_failures(self.readme.replace("22,301", "22,302"), REPO),
-                         ["README: generated compression block drift"])
+                         ["HISTORY.md: generated compression block drift"])
+        # The landing page carries neither block.
+        for marker in (R.README_BEGIN, R.README_END, Q.BEGIN, Q.END):
+            self.assertNotIn(marker, self.landing)
 
     def test_generated_tex_is_authenticated(self):
         verified, failures = B.verified_tex(REPO)

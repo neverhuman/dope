@@ -20,7 +20,7 @@ The canonical public result rows are in
 `paper/generated/headline-results.json`. Each row binds its historical source,
 cohort, byte scope and evidence status. The current source is historical,
 selection-exposed CatBoost validation; it supplies no TDL result. The renderer
-emits `STATUS.md`, a README block, TeX macros, figure CSV, PNG/PDF/SVG and their
+emits `STATUS.md`, a block for the historical results page (`HISTORY.md`), TeX macros, figure CSV, PNG/PDF/SVG and their
 SHA256 manifest. Every image comes from that CSV. These historical points do not
 establish an optimized budget frontier, a driver certificate or cold closure.
 The hero has two explicitly separate cohorts: the matched classical size/transfer
@@ -33,8 +33,12 @@ Rendering refuses points and intervals outside the fixed axes, missing/duplicate
 and mixed classical cohorts (`test_figure.py`). Proposed TDL thresholds are checked
 against the contract but are not drawn as achieved gates.
 
-Place `paper/generated/readme-result-card.md` verbatim in the README, including
-its `BEGIN TDL RESULTS` / `END TDL RESULTS` markers. Include
+Place `paper/generated/readme-result-card.md` verbatim in `HISTORY.md`, including
+its `BEGIN TDL RESULTS` / `END TDL RESULTS` markers. Every historical generated block
+(TDL RESULTS, BENCHMARK, EQUAL BYTES, COMPRESSION, QUICKSTART, PINNED DEMOS) lives on
+that page and is authenticated there; the README carries only the DOPE engine's
+generated blocks (`tools/claims/dope1.py`) and is refused if it carries a historical
+block. Include
 `generated/headline-macros.tex` from the canonical paper. The generated
 `result-card.tex` supplies its evidence table. Preserve native engineering
 examples using the exact `readme-demo-notes.md` block and its PINNED DEMOS markers;
@@ -48,8 +52,8 @@ The firewall rejects non-citable fixtures, unqualified headline auditors,
 incomplete or mixed headline cohorts, non-sealed final claims, unmeasured driver
 and budget gates, source drift, and generated output/figure drift. Prohibited
 claims are checked here and in the existing historical registry. Fixture tests
-seed each failure class. The old BENCHMARK marker remains admitted during lane
-integration because the historical compiler already verifies that block.
+seed each failure class. The BENCHMARK block on the history page is admitted
+because the historical compiler already verifies that block.
 
 Python package metadata reads the Cargo version through `package_version.py`.
 `version.py --write` synchronizes the static citation version; the public gate

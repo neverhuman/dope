@@ -15,8 +15,8 @@ The UCI Adult table (CC BY 4.0, DOI 10.24432/C5XW20) is downloaded once into
 `target/quickstart/adult/`: `train.csv` (the encoded fit rows), complete `encoder.json`,
 `model.dpk`, `inspect.json`, `samples.csv`, `synthetic.csv` (decoded rows) and
 `report.json`. The committed reference run is
-[`results/adult-reference.json`](results/adult-reference.json); the README's quick-start
-table preserves that historical prototype run. Its byte subtotal omits complete receiver metadata and does not measure full transfer size. Current v2 reports charge actual encoder.json plus model.dpk; no corrected reference total is asserted.
+[`results/adult-reference.json`](results/adult-reference.json); the quick-start table on the
+[historical results page](../../HISTORY.md) preserves that historical prototype run. Its byte subtotal omits complete receiver metadata and does not measure full transfer size. Current v2 reports charge actual encoder.json plus model.dpk; no corrected reference total is asserted.
 
 Your own table:
 

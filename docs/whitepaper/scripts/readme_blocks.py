@@ -1,8 +1,8 @@
-"""Authenticate the README blocks and paper TeX added with the compression frontier.
+"""Authenticate the history-page blocks and paper TeX added with the compression frontier.
 
-claim_registry.public_failures calls these helpers. Each generated surface must equal
-its renderer's output from a committed input, so a number can only reach the README or
-the paper through a generator:
+claim_registry.public_failures calls these helpers on HISTORY.md. Each generated
+surface must equal its renderer's output from a committed input, so a number can only
+reach that page or the paper through a generator:
 
 * the COMPRESSION block and paper/generated/compression-{macros,table}.tex render
   from paper/generated/compression-frontier.json (itself recomputed and compared by
@@ -48,7 +48,7 @@ def block_failures(readme: str, root: Path) -> list[str]:
 
 
 def strip_blocks(readme: str) -> str:
-    """README prose without the generated blocks (they are authenticated, not linted)."""
+    """Page prose without the generated blocks (they are authenticated, not linted)."""
     return quickstart.strip(frontier.strip_readme_block(readme))
 
 

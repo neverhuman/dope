@@ -12,7 +12,8 @@ the interval rule, and checks that:
   that falls below the full-panel count, or an opened test split fails);
 - a small cohort is printed with its lineage count and called separate;
 - an inconclusive verdict is never worded as equivalence;
-- title, abstract, README prose and CITATION.cff avoid the forbidden language.
+- title, abstract, README and HISTORY.md prose and CITATION.cff avoid the
+  forbidden language.
 
 ``--check`` exits non-zero on any failure. ``--json`` prints the compiled
 claims. Neither mode writes a file. check_paper.py runs the same compilation
@@ -103,7 +104,8 @@ REGISTRY = json.loads(r'''
      "state": "null_with_reason"}
   ],
   "forbidden_language": {
-    "applies_to": ["title", "abstract", "README prose outside the generated block", "CITATION.cff"],
+    "applies_to": ["title", "abstract", "README prose outside the generated block",
+                   "HISTORY.md prose outside the generated block", "CITATION.cff"],
     "patterns": ["intelligen", "state[- ]of[- ]the[- ]art", "\\bsota\\b", "differentially private", "privacy[- ]preserving",
                  "\\bequivalent to\\b", "\\bguarantee", "kilobyte[- ]scale", "kilobyte generator", "compression is intelligence",
                  "transferable knowledge"]
@@ -114,6 +116,10 @@ TEX = PAPER / "dope-mfs.tex"
 GENERATED = PAPER / "generated"
 MACRO_DEF = re.compile(r"\\newcommand\{\\([A-Za-z]+)\}\{(.*)\}$")
 MACRO_USE = re.compile(r"\\([A-Z][A-Za-z]+)")
+# The README carries only the DOPE engine's generated blocks; every historical
+# generated block lives on the history page and is authenticated there.
+HISTORY = "HISTORY.md"
+HISTORICAL_BLOCKS = ("TDL RESULTS", "BENCHMARK", "EQUAL BYTES", "COMPRESSION", "QUICKSTART", "PINNED DEMOS")
 STATE_OF_VERDICT = {"above": "above", "below": "below", "inseparable": "inconclusive"}
 
 
@@ -202,7 +208,7 @@ def contrast_row(claim, panel):
 
 
 def compile_claims(registry: dict, panel: dict, headline: dict, macros: dict[str, str], tex: str, readme: str,
-                   citation: str, lineages: int) -> tuple[list[dict], list[str]]:
+                   citation: str, lineages: int, history: str) -> tuple[list[dict], list[str]]:
     failures: list[str] = []
     compiled = []
     abstract = abstract_of(tex)
@@ -251,7 +257,8 @@ def compile_claims(registry: dict, panel: dict, headline: dict, macros: dict[str
     used = {name for name in MACRO_USE.findall(abstract) if name in macros}
     for name in sorted(used - covered):
         failures.append(f"abstract macro \\{name} belongs to no registered claim")
-    texts = {"title": title_of(tex), "abstract": abstract, "README": readme_prose(readme)}
+    texts = {"title": title_of(tex), "abstract": abstract, "README": readme_prose(readme),
+             HISTORY: readme_prose(history)}
     if citation is not None:
         texts["CITATION.cff"] = citation
     for label, text in texts.items():
@@ -269,7 +276,7 @@ def load_inputs():
     # The build snapshot carries no CITATION.cff; paper-tests checks it against the same patterns.
     citation = REPO / "CITATION.cff"
     return (REGISTRY, panel, headline, generated_macros(), TEX.read_text(), (REPO / "README.md").read_text(),
-            citation.read_text() if citation.is_file() else None, lineages)
+            citation.read_text() if citation.is_file() else None, lineages, (REPO / HISTORY).read_text())
 
 
 def publication_failures() -> list[str]:
@@ -280,7 +287,6 @@ def publication_failures() -> list[str]:
 # TDL publication rules extend this registry; tools/claims/check.py is only an entry point.
 EVIDENCE_STATUSES = frozenset(("sealed_test", "validation", "selection_exposed_validation", "historical",
                                "specified_unrun", "unqualified", "failed"))
-LEGACY_README_PROSE_SHA256 = "8d90e1fc7dd3a910a3c01b721fd29a8a0329d67ce646aeb54ddd1b788d1f279e"
 PUBLIC_BANNED = (r"privacy[- ]preserving", r"\bminimum\b", r"\bbeats\s+TabSyn\b",
                  r"validated\s+across\s+(?:Kumo|Mitra|TabICL|TabPFN)",
                  r"1\.9\s*(?:KiB|KB)\s+(?:cold\s+closure|standalone)", r"\boutperforms\b",
@@ -482,7 +488,7 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
             path = root / name
             if not path.is_file() or path.read_bytes() != expected:
                 failures.append(f"{name}: generated output or figure hash drift")
-    # The equal-byte study renders its own README block and paper macros from
+    # The equal-byte study renders its own history-page block and paper macros from
     # committed study outputs; every one of them must equal a fresh rendering.
     import equal_bytes_text
     # Public surfaces only; the renderer's own check covers its research outputs.
@@ -492,54 +498,58 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
         path = root / name
         if not path.is_file() or path.read_text() != expected:
             failures.append(f"{name}: equal-byte generated output drift")
+    # The landing page: the DOPE engine's generated blocks and hero, and linted prose.
+    from tools.claims import dope1
     readme = (root / "README.md").read_text()
-    # Existing v2 BENCHMARK is already compiled by the historical registry.
-    # The L3 landing page uses the new marker. While lanes integrate, both are admitted.
-    if render.BEGIN in readme:
-        failures.extend(readme_hero_failures(readme))
-        if readme.count(render.BEGIN) != 1 or readme.count(render.END) != 1 or readme.index(render.BEGIN) > readme.index(render.END):
-            failures.append("README: generated result markers must be unique and ordered")
-        else:
-            block = readme[readme.index(render.BEGIN):readme.index(render.END) + len(render.END)]
-            expected = outputs["paper/generated/readme-result-card.md"].decode().strip()
-            if block != expected:
-                failures.append("README: generated result card drift")
-            prose = readme.replace(block, "")
-            if "<!-- BEGIN BENCHMARK -->" in prose:
-                import readme_benchmark
-                historical = readme_benchmark.readme_block(prose)
-                original = json.loads((root / REGISTRY["sources"]["headline"]).read_text())
-                if historical != readme_benchmark.expected_readme_block(original):
-                    failures.append("README: historical generated benchmark drift")
-                prose = prose.replace(historical, "")
-            failures.extend(readme_blocks.block_failures(readme, root))
-            prose = readme_blocks.strip_blocks(prose)
-            if render.DEMO_BEGIN in prose:
-                if prose.count(render.DEMO_BEGIN) != 1 or prose.count(render.DEMO_END) != 1 or prose.index(render.DEMO_BEGIN) > prose.index(render.DEMO_END):
-                    failures.append("README: demo markers must be unique and ordered")
-                else:
-                    demo = prose[prose.index(render.DEMO_BEGIN):prose.index(render.DEMO_END) + len(render.DEMO_END)]
-                    if demo != outputs["paper/generated/readme-demo-notes.md"].decode().strip():
-                        failures.append("README: generated historical demo notes drift")
-                    prose = prose.replace(demo, "")
-            begin, end = equal_bytes_text.README_BEGIN, equal_bytes_text.README_END
-            if begin in prose:
-                if prose.count(begin) != 1 or prose.count(end) != 1 or prose.index(begin) > prose.index(end):
-                    failures.append("README: equal-byte markers must be unique and ordered")
-                else:
-                    block = prose[prose.index(begin):prose.index(end) + len(end)]
-                    if block != equal_outputs["paper/generated/readme-equal-bytes.md"].strip():
-                        failures.append("README: generated equal-byte block drift")
-                    prose = prose.replace(block, "")
-            if "<!-- BEGIN DOPE1 " in prose:
-                from tools.claims import dope1
-                failures.extend(dope1.failures(readme, root))
-                prose = dope1.strip(prose)
-            failures.extend(lint_public_text(prose, "README"))
-    elif "<!-- BEGIN BENCHMARK -->" not in readme:
-        failures.append("README: generated result card markers are missing")
-    elif hashlib.sha256(readme_prose(readme).encode()).hexdigest() != LEGACY_README_PROSE_SHA256:
-        failures.append("README: changed prose must adopt the generated TDL result card")
+    failures.extend(readme_hero_failures(readme))
+    for name in HISTORICAL_BLOCKS:
+        if f"<!-- BEGIN {name} -->" in readme or f"<!-- END {name} -->" in readme:
+            failures.append(f"README: generated {name} block belongs in {HISTORY}")
+    failures.extend(dope1.failures(readme, root))
+    failures.extend(lint_public_text(dope1.strip(readme), "README"))
+    # The history page: every historical generated block, authenticated, and linted prose.
+    history_path = root / HISTORY
+    history = history_path.read_text() if history_path.is_file() else ""
+    if render.BEGIN not in history:
+        failures.append(f"{HISTORY}: generated result card markers are missing")
+    elif history.count(render.BEGIN) != 1 or history.count(render.END) != 1 or history.index(render.BEGIN) > history.index(render.END):
+        failures.append(f"{HISTORY}: generated result markers must be unique and ordered")
+    else:
+        block = history[history.index(render.BEGIN):history.index(render.END) + len(render.END)]
+        expected = outputs["paper/generated/readme-result-card.md"].decode().strip()
+        if block != expected:
+            failures.append(f"{HISTORY}: generated result card drift")
+        prose = history.replace(block, "")
+        # The v2 BENCHMARK block is also compiled by the historical registry.
+        if "<!-- BEGIN BENCHMARK -->" in prose:
+            import readme_benchmark
+            historical = readme_benchmark.readme_block(prose)
+            original = json.loads((root / REGISTRY["sources"]["headline"]).read_text())
+            if historical != readme_benchmark.expected_readme_block(original):
+                failures.append(f"{HISTORY}: historical generated benchmark drift")
+            prose = prose.replace(historical, "")
+        failures.extend(readme_blocks.block_failures(history, root))
+        prose = readme_blocks.strip_blocks(prose)
+        if render.DEMO_BEGIN in prose:
+            if prose.count(render.DEMO_BEGIN) != 1 or prose.count(render.DEMO_END) != 1 or prose.index(render.DEMO_BEGIN) > prose.index(render.DEMO_END):
+                failures.append(f"{HISTORY}: demo markers must be unique and ordered")
+            else:
+                demo = prose[prose.index(render.DEMO_BEGIN):prose.index(render.DEMO_END) + len(render.DEMO_END)]
+                if demo != outputs["paper/generated/readme-demo-notes.md"].decode().strip():
+                    failures.append(f"{HISTORY}: generated historical demo notes drift")
+                prose = prose.replace(demo, "")
+        begin, end = equal_bytes_text.README_BEGIN, equal_bytes_text.README_END
+        if begin in prose:
+            if prose.count(begin) != 1 or prose.count(end) != 1 or prose.index(begin) > prose.index(end):
+                failures.append(f"{HISTORY}: equal-byte markers must be unique and ordered")
+            else:
+                block = prose[prose.index(begin):prose.index(end) + len(end)]
+                if block != equal_outputs["paper/generated/readme-equal-bytes.md"].strip():
+                    failures.append(f"{HISTORY}: generated equal-byte block drift")
+                prose = prose.replace(block, "")
+        if "<!-- BEGIN DOPE1 " in prose or "<!-- END DOPE1 " in prose:
+            failures.append(f"{HISTORY}: the DOPE engine's generated blocks belong in README.md")
+        failures.extend(lint_public_text(prose, HISTORY))
     verified_outputs = set(outputs) | {name for name in equal_outputs if name.endswith(".tex")}
     compression_tex, compression_failures = readme_blocks.verified_tex(root)
     verified_outputs |= compression_tex

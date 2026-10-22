@@ -91,6 +91,7 @@ out.write_text('median='+str(panel['median'])+'\\n')
         path = self.root / self.renderer
         path.write_text(path.read_text() + f"(root / {headline!r}).write_text(json.dumps(panel))\n")
         self.write('README.md', b'fixture README\n')
+        self.write(REVIEW.HISTORY, b'fixture history page\n')
         self.write('docs/whitepaper/scripts/v2_figures.py', f'''import json
 import os
 import shutil
@@ -99,12 +100,12 @@ root = Path(__file__).resolve().parents[3]
 panel = json.loads((root / {headline!r}).read_text())
 assert panel['official_tests_opened'] is False
 for name in {REVIEW.AUXILIARY_OUTPUTS!r}:
-    if name != 'README.md':
+    if name != {REVIEW.HISTORY!r}:
         path = root / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('median=' + str(panel['median']) + '\\n')
 '''.encode())
-        self.write('docs/whitepaper/scripts/readme_benchmark.py', b'# fixture README already matches\n')
+        self.write('docs/whitepaper/scripts/readme_benchmark.py', b'# fixture history page already matches\n')
         self.relock()
 
     def publish(self, verified):
@@ -422,6 +423,17 @@ elif args and args[0]=='docs/whitepaper/scripts/build_pdf.sh':
             with self.assertRaisesRegex(ValueError, 'expected rendering'):
                 BUILD.compile_pdfs(verified, receipt)
 
+    def test_history_page_drift_or_a_rewritten_readme_is_refused_at_admission(self):
+        self.add_auxiliary_renderers()
+        for target, message in ((REVIEW.HISTORY, 'history page differs from expected rendering'),
+                                ('README.md', 'historical renderer changed the README')):
+            with self.subTest(target=target):
+                self.write('docs/whitepaper/scripts/readme_benchmark.py', (
+                    'from pathlib import Path\n'
+                    f"(Path(__file__).resolve().parents[3] / {target!r}).write_text('rewritten\\n')\n").encode())
+                with self.assertRaisesRegex(ValueError, message):
+                    self.admit()
+
     def test_unexpected_nonreview_render_output_is_not_silently_published(self):
         script = self.root / self.renderer
         script.write_text(script.read_text() + "(root/'docs/whitepaper/generated/rogue.tex').write_text('extra')\n")
@@ -552,13 +564,14 @@ elif args and args[0]=='docs/whitepaper/scripts/build_pdf.sh':
             iso = Path(ext_dir)
             for rel, raw in real_code.items():
                 dst = iso / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(raw)
-            for rel in ('README.md', 'docs/whitepaper/generated/v2-headline.json',
+            for rel in ('README.md', 'HISTORY.md', 'docs/whitepaper/generated/v2-headline.json',
                         'research/benchmark/results/review-fixes-v2/panel.json',
                         'research/benchmark/review_fixes/predeclare_v2.json'):
                 dst = iso / rel; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes((ROOT / rel).read_bytes())
             res = subprocess.run([sys.executable, '-B', str(iso / 'docs/whitepaper/scripts/readme_benchmark.py'), '--write-readme'],
                                  cwd=iso, capture_output=True, text=True)
             self.assertEqual(res.returncode, 0, res.stderr)
+            self.assertEqual((iso / 'HISTORY.md').read_bytes(), (ROOT / 'HISTORY.md').read_bytes())
             self.assertEqual((iso / 'README.md').read_bytes(), (ROOT / 'README.md').read_bytes())
             (iso / 'research/benchmark/results/review-fixes-v2/panel.json').unlink()
             missing = subprocess.run([sys.executable, '-B', str(iso / 'docs/whitepaper/scripts/readme_benchmark.py'), '--write-readme'],

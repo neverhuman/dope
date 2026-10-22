@@ -271,8 +271,9 @@ def main() -> int:
         failures.extend(table_member_failures(strip_tex_comments(path.read_text())))
         failures.extend(real_row_bound_failures(strip_tex_comments(path.read_text())))
         failures.extend(mfs_gate_state_failures(strip_tex_comments(path.read_text())))
-    failures.extend(real_row_bound_failures((ROOT.parents[1] / "README.md").read_text()))
-    failures.extend(mfs_gate_state_failures((ROOT.parents[1] / "README.md").read_text()))
+    for document in ("README.md", "HISTORY.md"):
+        failures.extend(real_row_bound_failures((ROOT.parents[1] / document).read_text()))
+        failures.extend(mfs_gate_state_failures((ROOT.parents[1] / document).read_text()))
     tex = strip_comments(raw_tex)
     # Drop verbatim-ish inputs of generated tables; those files are the generator.
     body = "\n".join(line for line in tex.splitlines() if "\\input{generated/" not in line)

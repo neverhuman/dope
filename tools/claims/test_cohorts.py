@@ -21,16 +21,16 @@ class CohortProvenanceTests(unittest.TestCase):
 
     def public_failures(self, candidate):
         # Regenerate the card too: output drift alone cannot prove provenance.
-        readme = (ROOT / "README.md").read_text()
-        start, end = readme.index(render.BEGIN), readme.index(render.END) + len(render.END)
+        history = (ROOT / C.HISTORY).read_text()
+        start, end = history.index(render.BEGIN), history.index(render.END) + len(render.END)
         card = render.text_outputs(candidate, self.status)["paper/generated/readme-result-card.md"].decode().strip()
-        readme = readme[:start] + card + readme[end:]
+        history = history[:start] + card + history[end:]
         original = Path.read_text
         def read(path, *args, **kwargs):
             if path == ROOT / "paper/generated/headline-results.json":
                 return json.dumps(candidate)
-            if path == ROOT / "README.md":
-                return readme
+            if path == ROOT / C.HISTORY:
+                return history
             return original(path, *args, **kwargs)
         with patch.object(Path, "read_text", read):
             return C.public_failures(check_render=False)

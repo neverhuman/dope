@@ -1,4 +1,4 @@
-"""The README benchmark block and figures come from v2-headline.json, like the paper."""
+"""The history-page benchmark block and figures come from v2-headline.json, like the paper."""
 
 import copy
 import importlib.util
@@ -16,11 +16,13 @@ TOY = REPO / "examples" / "readme-regression"
 class ReadmeBenchmark(unittest.TestCase):
     def test_readme_block_matches_the_v2_headline(self):
         headline = json.loads(bench.HEADLINE.read_text())
-        readme = bench.README.read_text()
-        self.assertEqual(bench.readme_block(readme), bench.expected_readme_block(headline))
-        self.assertIn("docs/whitepaper/dope-mfs.pdf", readme)
+        history = bench.HISTORY.read_text()
+        self.assertEqual(bench.readme_block(history), bench.expected_readme_block(headline))
+        self.assertNotIn(bench.BEGIN, (REPO / "README.md").read_text())
+        self.assertIn("docs/whitepaper/dope-mfs.pdf", (REPO / "README.md").read_text())
+        self.assertIn("HISTORY.md", (REPO / "README.md").read_text())
         for path in bench.PNGS:
-            self.assertIn("docs/readme/" + path.name, readme)
+            self.assertIn("docs/readme/" + path.name, history)
             self.assertTrue(path.is_file(), f"committed README figure {path.name} is missing")
             self.assertEqual(path.read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
 
@@ -30,7 +32,8 @@ class ReadmeBenchmark(unittest.TestCase):
         strongest = next(arm for arm in headline["arms"] if (arm["method"], arm["configuration"]) == key)
         block = bench.benchmark_block(headline)
         self.assertIn(f"The strongest full-panel comparator is {strongest['display']}.", block)
-        self.assertIn("D.O.P.E.", bench.README.read_text())
+        self.assertIn("D.O.P.E.", (REPO / "README.md").read_text())
+        self.assertIn("D.O.P.E.", bench.HISTORY.read_text())
 
     def test_counts_and_cap_come_from_their_sources(self):
         headline = json.loads(bench.HEADLINE.read_text())
@@ -54,7 +57,7 @@ class ReadmeBenchmark(unittest.TestCase):
         headline = json.loads(bench.HEADLINE.read_text())
         predeclare = json.loads(bench.PREDECLARE.read_text())
         contract = json.loads(bench.CONTRACT.read_text())
-        committed = bench.readme_block(bench.README.read_text())
+        committed = bench.readme_block(bench.HISTORY.read_text())
         self.assertEqual(committed, bench.expected_readme_block(headline))
 
         def rendered(h, p, c):
@@ -117,9 +120,9 @@ class ReadmeBenchmark(unittest.TestCase):
         self.assertEqual(len(train[0].split(",")), 4)
         self.assertFalse(train[0].startswith("x"))
 
-    def test_inspect_transcript_matches_the_readme(self):
+    def test_inspect_transcript_matches_the_history_page(self):
         transcript = (TOY / "INSPECT.txt").read_text()
-        readme = (REPO / "README.md").read_text()
+        readme = bench.HISTORY.read_text()
         self.assertIn('"artifact_bytes": 151', transcript)
         self.assertIn('"rows_fitted": 400', transcript)
         self.assertIn('"dependence": "chow_liu"', transcript)

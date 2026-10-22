@@ -22,7 +22,7 @@ REVIEW = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = REVIEW
 SPEC.loader.exec_module(REVIEW)
 PDF_STEMS = ('dope-mfs', 'supplement', 'dope-mfs-anonymous', 'supplement-anonymous')
-OUTPUT_PATHS = ('docs/whitepaper/generated', 'docs/whitepaper/figures', 'docs/readme', 'README.md',
+OUTPUT_PATHS = ('docs/whitepaper/generated', 'docs/whitepaper/figures', 'docs/readme', 'README.md', 'HISTORY.md',
                 *(f'docs/whitepaper/{stem}.pdf' for stem in PDF_STEMS))
 COMPILER_OUTPUTS = ('docs/whitepaper/generated/architecture-figure-hashes.json',
                     'docs/whitepaper/figures/architecture.pdf',
@@ -140,14 +140,14 @@ def auxiliary_outputs(verified, *, check, receipt):
     verified.revalidate()
     REVIEW.render_review_outputs(verified, check=True)
     if {name for name, _ in verified.auxiliary_expected} != set(REVIEW.AUXILIARY_OUTPUTS):
-        raise ValueError('incomplete expected figure/README inventory')
+        raise ValueError('incomplete expected figure/history-page inventory')
     for name, _ in verified.auxiliary_expected:
         if (REPO / name).resolve() != REPO.resolve() / name:
-            raise ValueError('redirected figure/README output')
+            raise ValueError('redirected figure/history-page output')
     for name, raw in verified.auxiliary_expected:
         if check:
             if REVIEW.safe_bytes(REPO, name) != raw:
-                raise ValueError('figure/README output differs from expected rendering')
+                raise ValueError('figure/history-page output differs from expected rendering')
         else:
             path = REPO / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,7 +186,7 @@ def compile_pdfs(verified, receipt):
         REVIEW.render_review_outputs(verified, check=True)
         for name, raw in verified.auxiliary_expected:
             if REVIEW.safe_bytes(REPO, name) != raw:
-                raise ValueError('figure/README output differs from expected rendering')
+                raise ValueError('figure/history-page output differs from expected rendering')
     validate_compiler_inputs()
     root = REPO / 'target/paper-build'
     root.mkdir(parents=True, exist_ok=True)

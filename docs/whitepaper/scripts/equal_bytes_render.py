@@ -1,4 +1,4 @@
-"""Render the equal-byte study: figures, paper macros and the README block.
+"""Render the equal-byte study: figures, paper macros and the HISTORY.md block.
 
 Inputs are the committed study summary (research/benchmark/equal_bytes/results)
 and, for the generator markers in Figure 1, the frozen v2 ledger
@@ -147,7 +147,8 @@ def scaling_figure(rows: list[dict]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--write-readme", action="store_true", help="also replace the README block in place")
+    parser.add_argument("--write-readme", action="store_true",
+                        help="also replace the block on the historical results page (HISTORY.md) in place")
     args = parser.parse_args()
     failures: list[str] = []
     for name, text in text_outputs().items():
@@ -160,7 +161,7 @@ def main() -> int:
         paired(summary, json.loads(panel_path.read_text()) if panel_path.is_file() else None)
         scaling_figure(scaling_rows())
     if args.write_readme:
-        readme = REPO / "README.md"
+        readme = REPO / "HISTORY.md"
         text = readme.read_text()
         start, end = text.index(README_BEGIN), text.index(README_END) + len(README_END)
         block = (REPO / "paper/generated/readme-equal-bytes.md").read_text().strip()

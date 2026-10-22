@@ -1,7 +1,7 @@
-"""Renderers for the compression frontier: figure, README block, TeX macros and tables.
+"""Renderers for the compression frontier: figure, history-page block, TeX macros and tables.
 
 Pure functions of the JSON written by compression_frontier.py. claim_registry.py calls
-them to authenticate the committed README block and TeX files without recomputing the
+them to authenticate the committed HISTORY.md block and TeX files without recomputing the
 bootstrap, so a hand edit to any rendered output fails the claims firewall.
 """
 
@@ -18,6 +18,7 @@ FULL_PANEL_MIN = 80
 EVIDENCE = "selection_exposed_validation"
 README_BEGIN = "<!-- BEGIN COMPRESSION -->"
 README_END = "<!-- END COMPRESSION -->"
+HISTORY = "HISTORY.md"
 FIGURE_PNG = "paper/generated/compression-frontier.png"
 FIGURE_PDF = "paper/generated/compression-frontier.pdf"
 DATA_JSON = "paper/generated/compression-frontier.json"
@@ -334,7 +335,7 @@ def render(data: dict, formats: dict[str, Path]) -> None:
 
 
 def readme_block(data: dict) -> str:
-    """The README hero block: figure, three numbered facts, evidence label."""
+    """The history-page block: figure, three numbered facts, evidence label."""
     rows = {(r["method"], r["configuration"]): r for r in data["rows"]}
     dope = rows[("DOPE", "headline")]
     tab = rows[("TabSyn", "scaled_200_vae_1000_diffusion")]
@@ -385,12 +386,12 @@ def text_outputs(data: dict) -> dict[str, str]:
 
 
 def readme_failures(readme: str, data: dict) -> list[str]:
-    """The README must carry the generated block exactly once, byte for byte."""
+    """The history page must carry the generated block exactly once, byte for byte."""
     if readme.count(README_BEGIN) != 1 or readme.count(README_END) != 1:
-        return ["README: compression block markers must appear exactly once"]
+        return [f"{HISTORY}: compression block markers must appear exactly once"]
     start, end = readme.index(README_BEGIN), readme.index(README_END) + len(README_END)
     if readme[start:end] != readme_block(data):
-        return ["README: generated compression block drift"]
+        return [f"{HISTORY}: generated compression block drift"]
     return []
 
 

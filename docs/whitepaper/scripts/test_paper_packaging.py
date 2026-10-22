@@ -115,7 +115,7 @@ elif args == ['research/benchmark/verify_paper_numbers.py']:
         self.assertLess(prepare, generate)
         self.assertLess(generate, driver)
         missing = "".join(line for line in current.splitlines(keepends=True) if checker + " --write" not in line)
-        for name in (checker, "docs/whitepaper/receipts/native-byte-conformance-v1.json", "README.md",
+        for name in (checker, "docs/whitepaper/receipts/native-byte-conformance-v1.json", "HISTORY.md",
                      "docs/whitepaper/supplement.tex"):
             (root / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(repo / name, root / name)
@@ -237,6 +237,7 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         ):
             self.assertEqual(check_paper.mfs_gate_state_failures(phrase), [], phrase)
         sources = [check_paper.TEX, check_paper.ROOT / "supplement.tex", check_paper.ROOT.parents[1] / "README.md"]
+        sources.append(check_paper.ROOT.parents[1] / "HISTORY.md")
         sources += sorted((check_paper.ROOT / "generated").glob("*.tex"))
         for path in sources:
             self.assertEqual(check_paper.mfs_gate_state_failures(check_paper.strip_tex_comments(path.read_text())), [],
@@ -259,6 +260,7 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         ):
             self.assertEqual(check_paper.real_row_bound_failures(phrase), [], phrase)
         sources = [check_paper.TEX, check_paper.ROOT / "supplement.tex", check_paper.ROOT.parents[1] / "README.md"]
+        sources.append(check_paper.ROOT.parents[1] / "HISTORY.md")
         sources += sorted((check_paper.ROOT / "generated").glob("*.tex"))
         for path in sources:
             self.assertEqual(check_paper.real_row_bound_failures(check_paper.strip_tex_comments(path.read_text())), [],
@@ -357,8 +359,10 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
         bibtex = re.search(r"@misc\{taylor2026dope,\n  title  = \{(.*)\},\n", readme)
         self.assertIsNotNone(bibtex)
         self.assertEqual(bibtex.group(1), "{D.O.P.E.}: " + title.removeprefix("D.O.P.E.: "))
-        prose = readme.split("<!-- BEGIN BENCHMARK -->")[0] + readme.split("<!-- END BENCHMARK -->")[1]
-        for text in (prose, citation, title):
+        self.assertNotIn("<!-- BEGIN BENCHMARK -->", readme)
+        history = (check_paper.ROOT.parents[1] / "HISTORY.md").read_text()
+        history = history.split("<!-- BEGIN BENCHMARK -->")[0] + history.split("<!-- END BENCHMARK -->")[1]
+        for text in (readme, history, citation, title):
             self.assertNotRegex(text.lower(), r"kilobyte[- ]scale|kilobyte generator")
         self.assertIn("Downstream Objective-Preserving Encoding", readme)
 
