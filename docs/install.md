@@ -2,6 +2,9 @@
 
 The `dope` facade and historical `dope-kernel` are distinct executables. The
 facade installer preserves the kernel installation and its historical readers.
+The DOPE 1.0 engine CLI (`engine/dope-cli`, installed by `cargo install`) is a
+third, separate program that is also named `dope`; keep only one `dope` on
+`PATH`, or call the facade by its absolute path under the install prefix.
 This source change provides Linux x86_64 CPU-alpha packaging; no signed public
 release or download URL is established by these instructions.
 

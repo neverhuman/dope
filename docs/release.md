@@ -1,7 +1,10 @@
 # Release procedure
 
-The version source is `Cargo.toml`; ordinary binaries remain
-`0.3.0-alpha.1`. This branch is a PR implementation, not a certified release.
+The version source is `Cargo.toml`; ordinary research-kernel binaries remain
+`0.3.0-alpha.1`. This procedure governs a certified release, which has not been
+made. The DOPE 1.0 engine (`engine/Cargo.toml`) is versioned separately, and
+`v1.0.0` is an uncertified research release of the engine, benchmark and
+manuscript: none of the gates below was run for it (see `CHANGELOG.md`).
 Document release changes in `CHANGELOG.md` before a release candidate.
 
 1. Run `cargo test --locked --test vnext_custody`, `just check`, `just security`,
