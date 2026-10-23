@@ -1,0 +1,2 @@
+# Coordinator transport only; offline workers and tests use the standard library.
+boto3==1.35.49

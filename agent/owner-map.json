@@ -829,7 +829,9 @@
     ".github/workflows/engine-release.yml": "release",
     "docs/signed-engine-release.md": "governance",
     "ops/ci/engine-benchmark.sh": "external-evidence",
-    "ops/licenses/engine/": "release"
+    "ops/licenses/engine/": "release",
+    "research/landmark_cache/": "external-evidence",
+    "docs/landmark-precalculation.md": "governance"
   },
   "workspace": "dope"
 }

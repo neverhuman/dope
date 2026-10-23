@@ -3295,7 +3295,9 @@
     ".github/workflows/engine-release.yml": {"command": "actionlint .github/workflows/engine-release.yml", "purpose": "verify read-only PR checks and tag-only signing/publication policy"},
     "docs/signed-engine-release.md": {"command": "bash ops/ci/engine-release.sh", "purpose": "verify documented Rust runtime, CLI and release packaging/verification commands"},
     "ops/ci/engine-benchmark.sh": {"command": "bash ops/ci/engine-benchmark.sh", "purpose": "verify Elo evidence only after its Python/NumPy interpreter is provisioned"},
-    "ops/licenses/engine/": {"command": "bash ops/ci/engine-release.sh", "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"}
+    "ops/licenses/engine/": {"command": "bash ops/ci/engine-release.sh", "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"},
+    "research/landmark_cache/": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify TRAIN-only schedules, native recipe bindings, immutable private cache, interruption accounting and dashboard redaction"},
+    "docs/landmark-precalculation.md": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify documented cache and source-role contracts without opening real data"}
   },
   "workspace": "dope"
 }

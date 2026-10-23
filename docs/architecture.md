@@ -12,6 +12,13 @@ sampling in `sample.rs` (candle tensors on CPU, CUDA or Metal) and `sample_cpu.r
 row-parallel CPU path). Python is used only by the benchmark harness in
 `bench/real-world/`, never by fitting or sampling. `ops/ci/engine.sh` is its CI gate.
 
+`research/landmark_cache/` is a private offline orchestration boundary around
+the existing native landmark CLI. It schedules only declared official TRAIN
+objects, binds source/recipe/executable identities, retains terminal outcomes,
+and publishes content-verified private reports for later consumer admission.
+Its aggregate dashboard has no raw data or measured gains. It trains no shared
+model and adds no dependency or alternate scorer to the product engine.
+
 ## Research kernel (`rust/`, `dope-kernel`)
 
 `rust/main.rs` owns CLI argument parsing. `rust/data.rs` validates input before
