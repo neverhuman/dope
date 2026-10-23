@@ -116,3 +116,11 @@ and protocol; these reports do not qualify a sealed-test or D80 claim.
 | `results/throughput.json` | in-memory sampling throughput (`throughput.py`) |
 | `results/readme-block.md`, `figures/*.png` | generated README surfaces (hash-listed in `results/render-manifest.json`) |
 | `../../paper/generated/dope1-*` | generated paper macros and figures |
+
+## Development probes
+
+[`probes/`](probes/README.md) keeps the receipts of the two development probes that the
+[multilevel plan](../../docs/plans/multilevel-implementation.md) and the
+[landmark plan](../../docs/plans/landmark-signatures.md) cite: nine PMLB tables, selection-exposed,
+outside every summary above. The Rust tool `engine/dope-probes` rebuilds their inputs and replays
+every cited number; it is not part of the `dope` binary.
