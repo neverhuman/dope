@@ -30,6 +30,34 @@ class ModelTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):torch.set_num_threads(1)
 
+    def test_categorical_sampler_gradually_reveals_and_never_redraws_visible_cells(self):
+        from research.levels.decoder import sample
+        class ProbeDecoder:
+            config=tiny()
+            def __init__(self):self.inputs=[]
+            def __call__(self,code,schema,values,observed,time):
+                self.inputs.append((values.clone(),observed.clone()))
+                logits=torch.full((*values.shape,4),-1e9)
+                logits[:,:,2 if float(time)>.5 else 3]=100
+                return torch.zeros_like(values),logits,torch.full_like(values,-100)
+        schema=dict(columns=[dict(kind='numeric'),dict(kind='categorical')],target_index=1)
+        probe=ProbeDecoder()
+        values,observed=sample(probe,torch.zeros(256),schema,200,7,steps=8)
+        self.assertEqual(set(values[:,1].tolist()),{2.,3.})
+        self.assertTrue(observed[:,1].all())
+        self.assertTrue((probe.inputs[0][0][:,1]==0).all())
+        self.assertTrue((probe.inputs[0][1][:,1]==False).all())
+        for (previous,_),(current,present) in zip(probe.inputs,probe.inputs[1:]):
+            revealed=previous[:,1]!=0
+            self.assertTrue(torch.equal(previous[revealed,1],current[revealed,1]))
+            self.assertTrue((present[:,1]==(current[:,1]!=0)).all())
+        replay,_=sample(ProbeDecoder(),torch.zeros(256),schema,200,7,steps=8)
+        self.assertTrue(torch.equal(values,replay))
+        redraw,_=sample(ProbeDecoder(),torch.zeros(256),schema,200,7,steps=8,categorical_schedule='redraw-v1')
+        self.assertTrue((redraw[:,1]==3).all())
+        with self.assertRaises(ResearchError):
+            sample(ProbeDecoder(),torch.zeros(256),schema,2,7,steps=8,categorical_schedule='unknown')
+
     def test_holdout_mutations_do_not_change_fit_transforms_or_context(self):
         source=table(0,123)
         args={k:source[k] for k in ('rows','kinds','slots','row_ids','task','roles')}

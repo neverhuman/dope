@@ -55,38 +55,47 @@ def alpha(time):
 
 
 @torch.no_grad()
-def sample(decoder, code, schema, rows, seed, *, steps=None):
+def sample(decoder, code, schema, rows, seed, *, steps=None, categorical_schedule='reveal-v1'):
     steps = decoder.config.diffusion_steps if steps is None else steps
     require(type(rows) is int and 1 <= rows <= 1000000 and steps in (8, 16, 32, 64)
             and rows*len(schema["columns"]) <= 4000000, "sampler_allocation_unsupported")
+    require(categorical_schedule in ('reveal-v1', 'redraw-v1'), 'unknown_categorical_schedule')
     chunk=min(256,33554432//(len(schema['columns'])**2*decoder.config.heads),
               33554432//(len(schema['columns'])*decoder.config.width))
     require(chunk>=1,'sampler_graph_allocation_unsupported')
-    outputs=[_sample_chunk(decoder,code,schema,min(chunk,rows-start),seed+start,steps)
+    outputs=[_sample_chunk(decoder,code,schema,min(chunk,rows-start),seed+start,steps,categorical_schedule)
              for start in range(0,rows,chunk)]
     return torch.cat([v for v,_ in outputs]),torch.cat([o for _,o in outputs])
 
 
 @torch.no_grad()
-def _sample_chunk(decoder,code,schema,rows,seed,steps):
+def _sample_chunk(decoder,code,schema,rows,seed,steps,categorical_schedule='reveal-v1'):
     generator = torch.Generator(device=code.device).manual_seed(seed)
     count = len(schema["columns"])
     values = torch.randn((rows, count), generator=generator, device=code.device)
     kinds = torch.tensor([c["kind"] == "categorical" for c in schema["columns"]], device=code.device)
     values[:, kinds] = 0
     observed = torch.zeros_like(values, dtype=torch.bool)
+    revealed = torch.zeros_like(observed)
     # Fixed DDIM numerical path and masked categorical reveal; all RNG comes from the seed.
     for i in range(steps, 0, -1):
         time = torch.tensor(i/steps, device=code.device)
         a = alpha(time)
-        epsilon, logits, missing = decoder(code, schema, values, observed, time)
+        visible = observed & (~kinds | revealed) if categorical_schedule == 'reveal-v1' else observed
+        epsilon, logits, missing = decoder(code, schema, values, visible, time)
+        categorical_values = values.clone()
         x0 = ((values-(1-a).sqrt()*epsilon)/a.sqrt()).clamp(-16, 16)
         previous = alpha(torch.tensor((i-1)/steps, device=code.device))
         values = previous.sqrt()*x0 + (1-previous).sqrt()*epsilon if i > 1 else x0
         probabilities = logits.softmax(-1)
         categories = torch.multinomial(probabilities.reshape(-1, probabilities.shape[-1]), 1,
                                        generator=generator).reshape(rows, count).float()
-        values[:, kinds] = categories[:, kinds]
+        if categorical_schedule == 'reveal-v1' and kinds.any():
+            newly = (torch.rand(values.shape, generator=generator, device=code.device) < 1/i) & ~revealed & kinds
+            revealed |= newly
+            values[:, kinds] = torch.where(newly[:, kinds], categories[:, kinds], categorical_values[:, kinds])
+        else:
+            values[:, kinds] = categories[:, kinds]
         observed = torch.rand(values.shape, generator=generator, device=code.device) > torch.sigmoid(missing)
     target = schema.get("target_index")
     if target is not None: observed[:, target] = True

@@ -16,7 +16,7 @@ use crate::{
 };
 pub use carrier::{read_code, ExportedCode, LocalEncoding};
 use manifest::{bad, check, ModelManifest, LAYOUT, PREPROCESSING};
-pub use sampling::{sample, LearnedSamples};
+pub use sampling::{sample, sample_with_schedule, CategoricalSchedule, LearnedSamples};
 use std::path::Path;
 
 pub fn read_manifest(root: &Path) -> Result<ModelManifest> {

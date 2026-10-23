@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 798
-- **`keep-with-reason`**: 772 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 801
+- **`keep-with-reason`**: 775 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -830,3 +830,6 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/transfer/pilot_native_receipt.py` | `research/transfer` | `keep-with-reason` | Private typed v1 receipt mapping and bounded native verification. The executor supplies pinned basis documents before work, then separately approves the completed proposal via issue_policy(bundle_path, bundle_sha256). Th | Offline external-ML benchmark or direct validation tooling; retain with its Python library/fixture boundary and no product certification authority. |
 | `research/transfer/tests/test_pilot_native_receipt.py` | `research/transfer/tests` | `keep-with-reason` | Authored fixture regressions for the actual Rust receipt transport; no SDK fit. | Offline external-ML benchmark or direct validation tooling; retain with its Python library/fixture boundary and no product certification authority. |
 | `tools/claims/dope1.py` | `tools/claims` | `keep-with-reason` | Generated README surfaces of the DOPE engine benchmark. The README carries two generated blocks, each a byte-for-byte copy of a file written by a generator, and a generated hero figure: * ``DOPE1 RESULTS``: ``bench/real- | Publication/evidence tooling and direct tests; retain with its Python rendering or evidence-reader boundary. |
+| `research/levels/benchmark.py` | `research/levels` | `keep-with-reason` | Bounded owned-development comparison against an explicit checksum-pinned previous native generator. | Direct offline shared-model development evaluation and tests; no native product dependency or certification authority. |
+| `research/levels/comparison.py` | `research/levels` | `keep-with-reason` | Deterministic NumPy development readout and complete scheduled failure denominators. | Direct offline shared-model development evaluation and tests; no native product dependency or certification authority. |
+| `research/levels/tests/test_comparison.py` | `research/levels` | `keep-with-reason` | Readout determinism, protocol binding, sealed-family exclusion and native failure journey tests. | Direct offline shared-model development evaluation and tests; no native product dependency or certification authority. |

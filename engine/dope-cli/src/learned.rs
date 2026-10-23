@@ -53,6 +53,9 @@ pub(crate) struct Sample {
     seed: u64,
     #[arg(long, default_value_t = 32)]
     steps: usize,
+    /// Gradual categorical reveal, or the initial experimental redraw recipe.
+    #[arg(long, default_value = "reveal-v1", value_parser = ["reveal-v1", "redraw-v1"])]
+    categorical_schedule: String,
     #[arg(long)]
     out: PathBuf,
 }
@@ -149,13 +152,19 @@ fn execute(command: LearnedCommand) -> Result<()> {
                 return Err(bad());
             }
             let width = [256, 1024, 4096, 5120][levels[0] as usize];
-            let samples = learned::sample(
+            let schedule = if a.categorical_schedule == "reveal-v1" {
+                learned::CategoricalSchedule::RevealV1
+            } else {
+                learned::CategoricalSchedule::RedrawV1
+            };
+            let samples = learned::sample_with_schedule(
                 &decoder,
                 &code.narrow(0, 0, width)?,
                 &manifest.schema,
                 a.rows,
                 a.seed,
                 a.steps,
+                schedule,
             )?;
             let headers: Vec<_> = (0..samples.schema.columns.len())
                 .map(|i| format!("column_{i}"))

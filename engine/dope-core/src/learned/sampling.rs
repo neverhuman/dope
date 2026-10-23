@@ -10,6 +10,21 @@ pub struct LearnedSamples {
     pub schema: Schema,
     pub rows: Vec<Vec<Option<f64>>>,
 }
+
+/// Named execution recipes; redraw retains the initial experimental replay path.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CategoricalSchedule {
+    RevealV1,
+    RedrawV1,
+}
+
+fn reveal(step: usize, seed: u64, column: usize, row: usize, columns: usize) -> bool {
+    rng::uniform(
+        seed,
+        0x524556 + (step * columns + column) as u64,
+        row as u64,
+    ) < 1. / step as f64
+}
 fn alpha(time: f32) -> f32 {
     (((time + 0.008) / 1.008 * std::f32::consts::FRAC_PI_2)
         .cos()
@@ -24,6 +39,26 @@ pub fn sample(
     rows: usize,
     seed: u64,
     steps: usize,
+) -> Result<LearnedSamples> {
+    sample_with_schedule(
+        decoder,
+        code,
+        schema,
+        rows,
+        seed,
+        steps,
+        CategoricalSchedule::RevealV1,
+    )
+}
+
+pub fn sample_with_schedule(
+    decoder: &Decoder,
+    code: &Tensor,
+    schema: &Schema,
+    rows: usize,
+    seed: u64,
+    steps: usize,
+    schedule: CategoricalSchedule,
 ) -> Result<LearnedSamples> {
     schema.validate(&decoder.graph)?;
     let columns = schema.columns.len();
@@ -43,6 +78,7 @@ pub fn sample(
         let count = (rows - row0).min(chunk);
         let mut values = vec![vec![0f32; columns]; count];
         let mut observed = vec![vec![0f32; columns]; count];
+        let mut revealed = vec![vec![false; columns]; count];
         for (r, row) in values.iter_mut().enumerate() {
             for (j, value) in row.iter_mut().enumerate() {
                 if schema.columns[j].kind == "numeric" {
@@ -60,7 +96,23 @@ pub fn sample(
                 &Device::Cpu,
             )?;
             let present = Tensor::from_vec(
-                observed.iter().flatten().copied().collect::<Vec<_>>(),
+                observed
+                    .iter()
+                    .enumerate()
+                    .flat_map(|(r, row)| {
+                        let revealed = &revealed;
+                        row.iter().enumerate().map(move |(j, value)| {
+                            if schedule == CategoricalSchedule::RevealV1
+                                && schema.columns[j].kind == "categorical"
+                                && !revealed[r][j]
+                            {
+                                0.
+                            } else {
+                                *value
+                            }
+                        })
+                    })
+                    .collect::<Vec<_>>(),
                 (count, columns),
                 &Device::Cpu,
             )?;
@@ -86,7 +138,9 @@ pub fn sample(
                         } else {
                             x0
                         };
-                    } else {
+                    } else if schedule == CategoricalSchedule::RedrawV1
+                        || (!revealed[r][j] && reveal(step, seed, j, row0 + r, columns))
+                    {
                         let maximum = logits[r][j]
                             .iter()
                             .copied()
@@ -115,6 +169,7 @@ pub fn sample(
                             }
                         }
                         values[r][j] = chosen as f32;
+                        revealed[r][j] = true;
                     }
                     let probability = 1. / (1. + (-missing[r][j]).exp());
                     observed[r][j] = u8::from(
@@ -150,4 +205,17 @@ pub fn sample(
         schema: schema.clone(),
         rows: output,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn categorical_reveal_is_gradual_and_final_step_completes_every_row() {
+        let early = (0..512).filter(|&row| reveal(8, 19, 1, row, 2)).count();
+        assert!((32..96).contains(&early));
+        assert!((0..512).all(|row| reveal(1, 19, 1, row, 2)));
+        assert!((0..512).any(|row| !reveal(8, 19, 1, row, 2)));
+    }
 }

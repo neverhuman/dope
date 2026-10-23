@@ -14,7 +14,7 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison) ;; *) exit 2;; esac
     "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest "research.levels.tests.$2" -v
     ;;
   prepare-native)
@@ -45,6 +45,7 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh contracts
     bash ops/ci/shared-levels.sh torch test_models
     bash ops/ci/shared-levels.sh torch test_training
+    bash ops/ci/shared-levels.sh torch test_comparison
     bash ops/ci/shared-levels.sh native
     ;;
   *) echo 'Usage: shared-levels.sh contracts|prepare-torch|torch SHARD|prepare-native|native|all' >&2;exit 2;;

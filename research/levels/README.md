@@ -79,6 +79,44 @@ To start ultra, use a **new** run and the same graph/corpus/source identity with
 that residual stage, use its own checkpoint with `--phase ultra-residual --resume`.
 This is a frozen-base development experiment; it does not qualify a new tier.
 
+The learned sampler defaults to `reveal-v1`: categorical cells start masked,
+each still-masked cell reveals with probability `1 / remaining_steps`, and
+revealed categories stay fixed. This matches the training mask schedule and
+guarantees completion at the final step. Python `sample` and native
+`dope learned sample --categorical-schedule reveal-v1` use the same transition
+rule. Their random streams differ; bit-identical cross-backend draws are not
+claimed. `redraw-v1` preserves the initial experimental sampling recipe for
+replaying frozen runs. This changes only the experimental learned sampler.
+
+## Repeatable owned development comparison
+
+Use a frozen trained package and an explicitly checksum-pinned previous native
+generator. This command opens only owned mechanisms 7 and 8, using the same
+physical fit/query roles, six tables, three sampling seeds and sample counts for
+both methods. The old generator receives a whole-file byte cap equal to the
+selected shared code including its positional schema. Shared weights and model
+metadata are charged separately; training compute is not matched.
+
+```bash
+python3 -B -m research.levels.benchmark \
+  --model target/shared-runs/model --baseline /absolute/path/to/previous/dope \
+  --expected-baseline-sha256 FULL_VERIFIED_BINARY_SHA256 \
+  --out target/shared-runs/comparison --levels low,medium,high,ultra \
+  --categorical-schedule reveal-v1 --device cpu --wall-seconds 600
+```
+
+Request ultra only after exporting its trained residual checkpoint. `all` means
+S/M/L. The protocol is saved before generating any development tables. Every
+scheduled method/table/level/seed has a retained complete or failed record;
+missing or duplicate cells refuse summary generation. The independent readout
+is deterministic NumPy64 ridge, with regression MSE or binary Brier loss.
+Uninformative real-model gains retain null retention, and sample seeds are not
+treated as independent datasets. Paired loss deltas are descriptive; this small
+development experiment never qualifies superiority, external accuracy or Elo.
+The historical Candle neural auditor's ignored CPU device seed remains outside
+this readout and requires separate qualification before neural replay claims.
+Keep an external process deadline around the command if a hard wall is needed.
+
 ## Real data and native landmark corpus admission
 
 Replace `--prior-only` with `--corpus PRIVATE_MANIFEST.json`. A
