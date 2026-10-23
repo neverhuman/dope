@@ -7,6 +7,7 @@ for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg strace t
   ci_require_command "$tool"
 done
 python3 -B -m unittest discover -s ops/ci -p test_frozen_evidence.py -v
+python3 -B -m unittest discover -s research/landmark_cache/tests -v
 python3 -B ops/ci/check-frozen-evidence.py
 bash ops/ci/test-cpu-tool-readiness.sh
 sha256sum --check --status scripts/native-legal.sha256
