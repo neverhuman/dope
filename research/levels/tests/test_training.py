@@ -107,6 +107,12 @@ class TrainingTests(unittest.TestCase):
         self.assertNotEqual(digest(vars(config())),digest(vars(longer)))
         for bad in (0,65,True,3.5):
             with self.assertRaises(ResearchError):replace(config(),neural_unrolls=bad).validate()
+        with tempfile.TemporaryDirectory() as directory:
+            cfg=replace(longer,steps=2,validate_every=1,checkpoint_every=1,proxy_ramp_steps=1)
+            train(tiny(),cfg,Corpus(prior_only=True),Path(directory)/'logged',source_sha256='a'*64)
+            rows=[json.loads(line) for line in (Path(directory)/'logged/episodes.jsonl').read_text().splitlines()]
+            self.assertEqual(rows[0]['neural_unrolls'],dict(low=None,medium=None,high=None))
+            self.assertEqual(rows[1]['neural_unrolls'],dict(low=48,medium=48,high=48))
 
     def test_long_neural_fit_differentiates_through_synthetic_rows_and_targets(self):
         from research.levels.proxies import features,labels,neural_fit,loss

@@ -153,6 +153,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                     source_provenance=provenance,
                     context_rows=len(context.values),query_rows=len(query.values),columns=len(context.columns),
                     proxy_rows=min(config.proxy_rows,len(context.values)),
+                    neural_unrolls={level:record.get('neural_unrolls') for level,record in raw.items()},
                     encoder_passes=1+sum(config.consistency_weight>0 and len(context.values)>=8 for _ in raw),
                     decoder_passes=len(raw)*(1+int(any(r['proxy_ramp']>0 for r in raw.values())
                         and bool(config.transfer_weight or config.driver_weight))),phase=phase))
