@@ -1,1 +1,6 @@
 # Generic release builds use the toolchain's portable target defaults.
+
+[target.aarch64-apple-darwin]
+# Rust 1.88 cannot name the newer NEON f16 vector type. Candle retains a
+# conversion-based fallback; F32 model execution and artifact formats are unchanged.
+rustflags = ["-C", "target-feature=-fp16"]

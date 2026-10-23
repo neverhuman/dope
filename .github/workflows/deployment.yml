@@ -9,6 +9,9 @@ on:
 
 permissions:
   contents: read
+defaults:
+  run:
+    working-directory: deployment-source
 
 concurrency:
   group: deployment-${{ github.ref }}
@@ -30,14 +33,15 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+          path: deployment-source
       - name: Provision bounded CPU tools
         run: bash ops/ci/deployment.sh provision
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: |
             ~/.cargo/registry
-            target/deployment
-          key: dope-deployment-cpu-v1-${{ hashFiles('deploy/Cargo.lock', 'Cargo.lock', 'rust-toolchain.toml') }}
+            deployment-source/target/deployment
+          key: dope-deployment-cpu-v2-${{ hashFiles('deployment-source/deploy/Cargo.lock', 'deployment-source/Cargo.lock', 'deployment-source/rust-toolchain.toml') }}
       - name: Verify carrier, numerical profiles, bounds and inference graph
         run: bash ops/ci/deployment.sh check
 
@@ -49,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: rust-deployment-evidence
-          path: target/deployment-evidence
+          path: deployment-source/target/deployment-evidence
           if-no-files-found: error

@@ -71,3 +71,18 @@ and dependency inventory are retained as an artifact even on failure.
 Return to the official published Candle dependency once it includes the ZIP 9
 compatibility fix and passes the same locked conformance/advisory checks. This is
 an engineering dependency repair, not measured CUDA execution or scientific qualification.
+
+The engine now uses this same exact core/NN dependency pin after its independent
+lockfile scan found ZIP 7.4.0 affected by those three advisories. The security lane
+audits `engine/Cargo.lock` as well as the root and merge-guard locks; deployment
+retains its separate scan. The root lock also moves `ctutils` from 0.4.3 to 0.4.4
+for RUSTSEC-2026-0385, without an advisory exclusion. Source-pinned upstream
+license bytes accompany the new NN dependency in the engine release notices.
+
+Rust 1.88 cannot compile the newer Apple ARM NEON FP16 vector type, so the
+Apple ARM target disables the optional `fp16` target feature and uses Candle's
+conversion-based fallback. F32 model execution and carrier contracts are retained;
+locked engine tests and learned operator/recipient parity qualify the change.
+GPU execution and speed equivalence are not inferred from these CPU checks.
+Previously measured comparator binaries and training snapshots remain frozen;
+this dependency repair does not reinterpret their scientific receipts.
