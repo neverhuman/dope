@@ -16,8 +16,8 @@ pub mod gbdt;
 pub mod linear;
 pub mod nn;
 
-pub(crate) use audit::SelfAudit;
 pub use audit::SELF_AUDIT_ROWS;
+pub(crate) use audit::{audit_predict, SelfAudit};
 pub use frontier::{frontier, FrontierOptions, FrontierPoint, FrontierResult};
 
 use crate::artifact::decode;
@@ -200,7 +200,11 @@ impl EvalResult {
     }
 }
 
-fn to_matrix(enc: &MlEncoder<'_>, data: &ModelData, rows: &[usize]) -> (Matrix, Vec<f64>) {
+pub(crate) fn to_matrix(
+    enc: &MlEncoder<'_>,
+    data: &ModelData,
+    rows: &[usize],
+) -> (Matrix, Vec<f64>) {
     let x: Vec<Vec<f64>> = data
         .x
         .iter()

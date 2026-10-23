@@ -235,3 +235,9 @@ For other headered CSV data, the core CLI supports `compile-csv`, `inspect`, and
 column or gives its zero-based index. The compiled artifact does not preserve
 training rows. A successful compile is not a release or privacy certification.
 Keep protected or otherwise sensitive data within its authorized environment.
+
+## Native landmarks and portable level sessions
+
+See [landmarks and controlled levels](landmarks.md) for `dope landmarks real|synthetic|compare`
+and `dope fit-levels`. These belong to the standalone `engine/` binary. Real/transfer reports
+are private; `all` never implies ultra; learned universal encoder weights are not included.

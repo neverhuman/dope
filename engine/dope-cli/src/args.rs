@@ -19,6 +19,11 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 pub(crate) enum Command {
+    /// Experimental portable levels with explicit release permissions.
+    FitLevels(LevelArgs),
+    /// Native dataset structure signatures (real measurements stay private).
+    #[command(subcommand)]
+    Landmarks(LandmarkCommand),
     /// Compile a CSV into a .dope artifact (a safetensors file).
     Fit(FitArgs),
     /// Compile small/medium/large artifacts and a portable catalog for one table.
@@ -40,6 +45,106 @@ pub(crate) enum Command {
     Throughput(ThroughputArgs),
     /// Report the compute backends available in this build.
     Doctor(DoctorArgs),
+}
+
+#[derive(Subcommand)]
+pub(crate) enum LandmarkCommand {
+    /// Describe authorized fit rows. Output is a private measurement.
+    Real(LandmarkRealArgs),
+    /// Describe samples of an artifact. Opens no real dataset.
+    Synthetic(LandmarkSyntheticArgs),
+    /// Train on synthetic/fit rows, score on disjoint real query rows.
+    Compare(LandmarkCompareArgs),
+}
+
+#[derive(Args)]
+pub(crate) struct LandmarkCommon {
+    #[arg(long, default_value_t = 0)]
+    pub(crate) seed: u64,
+    #[arg(long, default_value = "landmarks-native-v1")]
+    pub(crate) panel: String,
+    #[arg(long, default_value_t = 5)]
+    pub(crate) folds: usize,
+    #[arg(long, default_value_t = 2_000_000_000)]
+    pub(crate) work_budget: u64,
+    /// At most 64 private feature spectra; 0 disables them.
+    #[arg(long, default_value_t = 64)]
+    pub(crate) spectrum_features: usize,
+    /// Training rows per ridge fold (maximum 50000).
+    #[arg(long, default_value_t = 8192)]
+    pub(crate) ridge_rows: usize,
+    /// Training rows per tree/network fold (maximum 4096).
+    #[arg(long, default_value_t = 4096)]
+    pub(crate) small_rows: usize,
+    #[arg(long, default_value_t = 2048)]
+    pub(crate) knn_reference: usize,
+    /// Write JSON instead of a human-readable report.
+    #[arg(long)]
+    pub(crate) json: bool,
+    #[arg(short, long)]
+    pub(crate) out: Option<PathBuf>,
+}
+#[derive(Args)]
+pub(crate) struct LandmarkRealArgs {
+    pub(crate) csv: PathBuf,
+    #[arg(short, long)]
+    pub(crate) target: String,
+    #[arg(long, value_parser=["regression","classification"])]
+    pub(crate) task: Option<String>,
+    /// Optional grouping/time-block column; excluded from predictor features.
+    #[arg(long)]
+    pub(crate) group: Option<String>,
+    #[command(flatten)]
+    pub(crate) common: LandmarkCommon,
+}
+#[derive(Args)]
+pub(crate) struct LandmarkSyntheticArgs {
+    pub(crate) model: PathBuf,
+    #[arg(long, default_value_t = 4096)]
+    pub(crate) rows: usize,
+    #[command(flatten)]
+    pub(crate) common: LandmarkCommon,
+}
+#[derive(Args)]
+pub(crate) struct LandmarkCompareArgs {
+    pub(crate) model: PathBuf,
+    #[arg(long)]
+    pub(crate) train: PathBuf,
+    #[arg(long)]
+    pub(crate) query: PathBuf,
+    /// Diagnostic broad panel; core mirror always remains the selection score.
+    #[arg(long)]
+    pub(crate) broad: bool,
+    #[command(flatten)]
+    pub(crate) common: LandmarkCommon,
+}
+#[derive(Args)]
+pub(crate) struct LevelArgs {
+    pub(crate) csv: PathBuf,
+    #[arg(short, long)]
+    pub(crate) target: String,
+    /// Highest level computed locally, independent of release permissions.
+    #[arg(long, default_value = "high")]
+    pub(crate) compute_through: String,
+    /// Explicit release allowlist. all = low,medium,high; ultra is explicit.
+    #[arg(long)]
+    pub(crate) export_levels: String,
+    /// New directory for authorized public objects and inventory.
+    #[arg(short, long)]
+    pub(crate) out: PathBuf,
+    /// Generate deterministic artifact-derived 96-coordinate descriptors.
+    #[arg(long)]
+    pub(crate) descriptors: bool,
+    /// Concatenate only authorized descriptors, with level boundaries and masks.
+    #[arg(long, requires = "descriptors")]
+    pub(crate) combine: bool,
+    /// Optional PRIVATE report outside the release directory.
+    #[arg(long)]
+    pub(crate) private_report: Option<PathBuf>,
+    #[arg(long, default_value_t = 0)]
+    pub(crate) seed: u64,
+    #[arg(long,value_parser=["regression","classification"])]
+    pub(crate) task: Option<String>,
 }
 
 #[derive(Args)]

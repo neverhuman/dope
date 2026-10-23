@@ -560,3 +560,11 @@ bytes to the server artifact digest. Never transfer a previous head's result.
 [The remediation record](audit-remediation-20261021.md) pins one actual historical
 main audit and distinguishes it from new validation. Scientific acceptance,
 sealed-custodian separation, rights and custody keep their independent gates.
+
+## Native landmark and level boundary gate
+
+`bash ops/ci/landmarks.sh` is shared by the dedicated native-landmarks workflow and local
+runs. It runs engine formatting, Clippy with warnings denied, and the landmark core/CLI
+integration suites. The normal engine gate retains full test discovery. See
+[the implementation guide](landmarks.md#validation-and-next-engineering-work) for the
+properties exercised and scientific gates that remain unrun.

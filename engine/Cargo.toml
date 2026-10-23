@@ -23,10 +23,10 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 rayon = "1"
+sha2 = "0.10"
 # Pure-Rust (safe code) brotli: the artifact's program container is one brotli stream.
 brotli = "8"
 clap = { version = "4", features = ["derive"] }
-sha2 = "0.10"
 
 [profile.release]
 opt-level = 3

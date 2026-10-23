@@ -1,0 +1,18 @@
+{
+  "panel": "landmarks-native-v1",
+  "dimensions": 96,
+  "blocks": [
+    {"offset": 0, "length": 23, "name": "gain"},
+    {"offset": 23, "length": 23, "name": "standard_error"},
+    {"offset": 46, "length": 23, "name": "within_panel_midrank"},
+    {"offset": 69, "length": 18, "name": "contrasts"},
+    {"offset": 87, "length": 3, "name": "target_statistics"},
+    {"offset": 90, "length": 3, "name": "task_one_hot"},
+    {"offset": 93, "length": 1, "name": "log2_classes_div_6"},
+    {"offset": 94, "length": 1, "name": "log10_rows_div_6"},
+    {"offset": 95, "length": 1, "name": "log2_features_div_12"}
+  ],
+  "mask": "one presence boolean for each coordinate; absent numeric storage is zero",
+  "T03": "masked: heteroscedasticity is not implemented in this recipe",
+  "identity": "bind panel, complete options, source artifact SHA256 and schema SHA256"
+}

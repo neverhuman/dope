@@ -186,3 +186,9 @@ dope-core/src/
   stats.rs rng.rs                             numerics and portable randomness
 dope-cli/src/main.rs                          the `dope` command
 ```
+
+## Experimental landmarks and portable levels
+
+The native CLI now provides `landmarks real`, `landmarks synthetic`, `landmarks compare`
+and `fit-levels --export-levels`. See [the detailed guide](../docs/landmarks.md) for commands,
+privacy boundaries, byte accounting, recipe identity and unrun promotion gates.

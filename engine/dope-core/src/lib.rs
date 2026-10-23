@@ -35,6 +35,8 @@ pub mod encode;
 pub mod error;
 pub mod eval;
 pub mod forest;
+pub mod landmark;
+pub mod levels;
 pub mod marginal;
 pub mod noise;
 pub mod output;
