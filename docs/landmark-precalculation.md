@@ -46,6 +46,7 @@ Native row caps and estimated-work pruning remain visible in each report.
 python3 -B -m research.landmark_cache plan \
   --catalog /private/catalog.jsonl --bucket EXPLICIT_SOURCE_BUCKET \
   --engine-sha256 ACTUAL_BINARY_SHA256 --source-commit ACTUAL_NATIVE_COMMIT \
+  --work-budget 2000000000000 \
   --out /private/new-plan.json
 
 python3 -B -m research.landmark_cache run \
@@ -58,9 +59,21 @@ python3 -B -m research.landmark_cache run \
 
 Choose host allocations from fresh load/RAM/disk measurements. Reserve RAM for
 existing users as well as every simultaneous worker. Native processes run at
-nice 10 with bounded address space, CPU time, wall time and Rayon threads. AWS
+nice 10 with bounded CPU time, wall time and Rayon threads. Linux enforces a
+finite address-space limit. macOS rejects that limit, so its parent instead
+samples the native PID's RSS every 250 ms and kills its process group above the
+allocation; observation failure also stops it. This sampled resident-memory
+watchdog is not an instantaneous address-space ceiling. Receipts distinguish
+the policies and report a sampled peak, or null when no observation was made. AWS
 credentials are absent from the native child's environment. No GPU is required.
 The orchestration parent is not a hostile-code sandbox or sealed evaluator.
+
+The example selects the higher-coverage two-trillion-unit profile. A real pilot
+on three heavily pruned tables removed their budget-omitted cells within the
+same row caps; native runs took about 20–99 seconds. This is a different complete
+recipe identity from the default 20-billion-unit discovery profile. Do not mix
+the two option sets in one coordinate space. Both retain unsupported cases;
+larger budgets cannot remove the native 512-encoded-column shape limit.
 
 ## Publication and interruption
 
@@ -108,6 +121,12 @@ python3 -B -m research.landmark_cache dashboard \
   --out target/landmarks/dashboard
 python3 -m http.server 8765 --bind 127.0.0.1 --directory target/landmarks/dashboard
 ```
+
+For live remote snapshots, pass explicit `--remote HOST:/absolute/progress.json`
+values and `--interval 15` to `dashboard` instead of local progress files. The
+collector uses existing SSH access, keeps the last complete copy if a pull
+fails, and copies no source rows or report measurements. Host timestamps retain
+the actual last worker update. No credentials are distributed to offline workers.
 
 Refresh the snapshot while workers run. The page polls its aggregate JSON every
 15 seconds and shows scheduled/terminal coverage, reusable reports, unsupported

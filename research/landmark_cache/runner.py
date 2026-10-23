@@ -76,6 +76,43 @@ def validate_report(report, binding):
     canonical(report)  # Reject nonfinite JSON, including permissive parser NaNs.
 
 
+def wait_native(process, timeout, memory_bytes, *, watch_rss=False):
+    deadline, peak = time.monotonic() + timeout, None
+
+    def stop(reason):
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+        return None, peak, reason
+
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return stop("native_wall_cap")
+        try:
+            code = process.wait(timeout=min(0.25, remaining) if watch_rss else remaining)
+            return code, peak, None
+        except subprocess.TimeoutExpired:
+            if not watch_rss:
+                return stop("native_wall_cap")
+        try:
+            observed = subprocess.run(["/bin/ps", "-o", "rss=", "-p", str(process.pid)],
+                                      stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                      text=True, timeout=2, check=False)
+            if process.poll() is not None:
+                return process.returncode, peak, None
+            require(observed.returncode == 0 and observed.stdout.strip().isdigit(),
+                    "memory_observation_unavailable")
+            rss = int(observed.stdout.strip()) * 1024
+            peak = max(peak or 0, rss)
+            if rss > memory_bytes:
+                return stop("native_rss_cap")
+        except (OSError, ValueError, subprocess.TimeoutExpired):
+            return stop("memory_observation_unavailable")
+
+
 def fetch_train(client, cell, cache):
     binding = cell["binding"]
     cache.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -143,6 +180,7 @@ def run_cell(cell, *, binary, root, client, store, threads, timeout, memory_byte
                        binding_sha256=digest(cell["binding"]), state="running", host=os.uname().nodename,
                        attempt=attempt.name, started_unix=time.time(), repair_reason=repair_reason,
                        threads=threads, wall_cap_seconds=timeout, memory_cap_bytes=memory_bytes,
+                       memory_policy="sampled_rss_250ms" if sys.platform == "darwin" else "rlimit_as",
                        official_test_access=False, model_training=False)
         write_private(attempt / "receipt.json", receipt)
         try:
@@ -173,13 +211,12 @@ def run_cell(cell, *, binary, root, client, store, threads, timeout, memory_byte
                                                    stderr=log, env=environment, start_new_session=True)
                         receipt["native_pid"] = process.pid
                         write_private(attempt / "receipt.json", receipt)
-                        try:
-                            code = process.wait(timeout=timeout)
-                        except subprocess.TimeoutExpired:
-                            os.killpg(process.pid, signal.SIGKILL)
-                            process.wait()
-                            receipt.update(state="overbudget", code="native_wall_cap")
-                            code = None
+                        code, peak, disposition = wait_native(process, timeout, memory_bytes,
+                                                              watch_rss=sys.platform == "darwin")
+                        receipt["sampled_native_rss_peak_bytes"] = peak
+                        if disposition:
+                            receipt.update(state="overbudget" if disposition != "memory_observation_unavailable"
+                                           else "failed", code=disposition)
                     if code == 0:
                         report = json.loads(output.read_bytes())
                         validate_report(report, cell["binding"])
@@ -250,7 +287,9 @@ def run(plan, *, binary, root, client, store, workers=4, threads=2, timeout=600,
             for _ in range(workers):
                 submit()
             while active:
-                done, _ = concurrent.futures.wait(active, return_when=concurrent.futures.FIRST_COMPLETED)
+                done, _ = concurrent.futures.wait(active, timeout=15, return_when=concurrent.futures.FIRST_COMPLETED)
+                if not done:
+                    record()
                 for future in done:
                     cell = active.pop(future)
                     try:

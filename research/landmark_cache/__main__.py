@@ -3,7 +3,7 @@ import argparse
 import json
 from pathlib import Path
 
-from .plan import make_plan, validate_plan
+from .plan import OPTIONS, make_plan, require, validate_plan
 from .runner import run, write_private
 
 
@@ -15,6 +15,7 @@ def main():
     p.add_argument("--bucket", required=True)
     p.add_argument("--engine-sha256", required=True)
     p.add_argument("--source-commit", required=True)
+    p.add_argument("--work-budget", type=int, default=OPTIONS["work_budget"])
     p.add_argument("--out", type=Path, required=True)
     p = sub.add_parser("run")
     p.add_argument("--plan", type=Path, required=True)
@@ -46,20 +47,27 @@ def main():
     p.add_argument("--profile", required=True)
     p.add_argument("--output-bucket", required=True)
     p.add_argument("--prefix", required=True)
+    p.add_argument("--workers", type=int, default=8)
     p = sub.add_parser("dashboard")
-    p.add_argument("--progress", type=Path, nargs="+", required=True)
+    p.add_argument("--progress", type=Path, nargs="*", default=[])
+    p.add_argument("--remote", nargs="*", default=[])
+    p.add_argument("--interval", type=int, default=0)
     p.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "plan":
         if args.out.exists():
             parser.error("plan output must be new")
+        require(1 <= args.work_budget < 2**64, "invalid_native_work_budget")
         result = make_plan(args.catalog, bucket=args.bucket, engine_sha256=args.engine_sha256,
-                           source_commit=args.source_commit)
+                           source_commit=args.source_commit,
+                           options=dict(OPTIONS, work_budget=args.work_budget))
         write_private(args.out, result)
         print(json.dumps(dict(plan_sha256=result["plan_sha256"], scheduled=len(result["cells"]))))
     elif args.command == "dashboard":
-        from .dashboard import render
-        render(args.progress, args.out)
+        from .dashboard import watch
+        if not args.progress and not args.remote:
+            parser.error("dashboard requires progress files or explicit remote snapshots")
+        watch(args.remote, args.progress, args.out, args.interval)
     else:
         plan = validate_plan(json.loads(args.plan.read_bytes()))
         if args.command == "prefetch":
@@ -97,17 +105,24 @@ def main():
                 parser.error("S3 transport requires profile, output bucket and prefix")
             client, store = s3_store(args)
         if args.command == "publish-local":
+            import concurrent.futures
             from .storage import LocalStore
             from .runner import validate_report
+            from .plan import require
+            require(1 <= args.workers <= 32, "invalid_publisher_allocation")
             local = LocalStore(args.store)
-            published = 0
-            for cell in plan["cells"]:
+
+            def publish(cell):
                 body = local.lookup(cell)
                 if body is not None:
                     report = json.loads(body)
                     validate_report(report, cell["binding"])
                     store.publish(cell, report)
-                    published += 1
+                    return 1
+                return 0
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+                published = sum(pool.map(publish, plan["cells"]))
             print(json.dumps({"published": published, "scheduled": len(plan["cells"])}))
             return
         result = run(plan, binary=args.binary, root=args.out,

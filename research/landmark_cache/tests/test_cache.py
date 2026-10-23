@@ -5,13 +5,15 @@ import json
 import tempfile
 import threading
 import time
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from research.landmark_cache.dashboard import summarize
 from research.landmark_cache.plan import OPTIONS, canonical, digest, make_plan, validate_plan
-from research.landmark_cache.runner import canonical_train, run, run_cell, validate_report, write_private
+from research.landmark_cache.runner import canonical_train, run, run_cell, validate_report, wait_native, write_private
 from research.landmark_cache.storage import LocalStore, LocalTrainSource, S3Store
 
 
@@ -255,6 +257,21 @@ class CacheTests(unittest.TestCase):
         self.assertNotIn("SECRET", json.dumps(dashboard))
         self.assertNotIn("gains", json.dumps(dashboard))
         self.assertEqual(dashboard["counts"]["complete"], 1)
+
+    def test_wall_timeout_kills_the_owned_process_group(self):
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"], start_new_session=True)
+        code, _, reason = wait_native(process, 0.05, 2**30)
+        self.assertIsNone(code)
+        self.assertEqual(reason, "native_wall_cap")
+        self.assertIsNotNone(process.poll())
+
+    def test_sampled_rss_cap_kills_an_overbudget_process(self):
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"], start_new_session=True)
+        code, peak, reason = wait_native(process, 3, 1024, watch_rss=True)
+        self.assertIsNone(code)
+        self.assertEqual(reason, "native_rss_cap")
+        self.assertGreater(peak, 1024)
+        self.assertIsNotNone(process.poll())
 
 
 if __name__ == "__main__":
