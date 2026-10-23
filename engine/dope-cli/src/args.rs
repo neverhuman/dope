@@ -319,7 +319,7 @@ pub(crate) struct EvalArgs {
     pub(crate) synth: Option<PathBuf>,
     #[arg(long, default_value_t = 4.0)]
     pub(crate) factor: f64,
-    /// Comma list of auditors: linear,gbdt,mlp
+    /// Auditors: linear,gbdt,mlp; explicit CPU controls: linear-seeded-v1,mlp-seeded-v1.
     #[arg(long, default_value = "linear,gbdt,mlp")]
     pub(crate) auditors: String,
     #[arg(long, default_value_t = 0)]

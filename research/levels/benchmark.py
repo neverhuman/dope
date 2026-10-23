@@ -35,9 +35,24 @@ def native_sample(binary, artifact, destination, rows, seed, seconds):
     return values, np.ones(values.shape, dtype=bool)
 
 
+def native_audit(binary, artifact, context, query, synthetic, report, seed, seconds):
+    names = ['linear-seeded-v1', 'gbdt', 'mlp-seeded-v1']
+    result = subprocess.run([str(binary), '--threads', '4', 'eval', '--model', str(artifact),
+        '--train', str(context), '--test', str(query), '--synth', str(synthetic),
+        '--auditors', ','.join(names), '--seed', str(seed), '--json', str(report)],
+        capture_output=True, timeout=seconds)
+    require(result.returncode == 0, 'comparison_native_audit_failed')
+    value = json.loads(report.read_bytes())
+    require([a['auditor'] for a in value['auditors']] == names
+            and all(np.isfinite(a[k]) and a[k] >= 0 for a in value['auditors']
+                    for k in ('null_loss', 'real_loss', 'synth_loss')), 'comparison_native_audit_invalid')
+    return value['auditors']
+
+
 def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low', 'medium', 'high'),
         table_seeds=(20261101, 20261102, 20261103), sample_seeds=(101, 211, 307),
-        fit_seed=20261023, categorical_schedule='reveal-v1', device='cpu', wall_seconds=600, resource_check=None):
+        fit_seed=20261023, categorical_schedule='reveal-v1', device='cpu', wall_seconds=600, resource_check=None,
+        auditor_engine=None, expected_auditor_sha256=None):
     import torch
     from .packages import load_package, encode_table, export_encoding
     from .decoder import sample
@@ -52,6 +67,11 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
     require(categorical_schedule in ('reveal-v1', 'redraw-v1'), 'unknown_categorical_schedule')
     require(baseline.is_file() and baseline.stat().st_size <= 200000000
             and file_sha(baseline) == expected_baseline_sha256, 'comparison_binary_digest_mismatch')
+    require((auditor_engine is None) == (expected_auditor_sha256 is None), 'comparison_auditor_pin_required')
+    if auditor_engine is not None:
+        auditor_engine = Path(auditor_engine).resolve()
+        require(auditor_engine.is_file() and file_sha(auditor_engine) == expected_auditor_sha256,
+                'comparison_auditor_digest_mismatch')
     require(out.parent.is_dir() and not out.exists(), 'comparison_output_must_be_new')
     initial = snapshot(out.parent, cuda=device == 'cuda')
     require(admissible(initial, cuda=device == 'cuda')
@@ -83,6 +103,12 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
         auditor='numpy64 ridge relative1e-3; MSE regression/Brier binary; fit-only normalized predictors plus missing flags',
         device=device, wall_seconds=wall_seconds, matched_training_compute=False,
         official_test_access=False, final_family_access=False, qualification='owned_development_exploration_only')
+    if auditor_engine is not None:
+        protocol.update(format='dope-owned-comparison-protocol-v3', native_auditor=dict(
+            engine_sha256=expected_auditor_sha256, names=['linear-seeded-v1', 'gbdt', 'mlp-seeded-v1'],
+            representation='common baseline artifact schema; fit context only; supplied synthetic rows',
+            loss='existing native regression MSE/classification log loss; auxiliary to unchanged primary ridge',
+            driver_qualified=False))
     private_json(out/'protocol.json', protocol)
     records = []
     for family in (7, 8):
@@ -103,6 +129,11 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                 writer = csv.writer(stream)
                 writer.writerow([f'c{i}' for i in range(9)])
                 writer.writerows(context.values.tolist())
+            query_path = directory/'query.csv'
+            if auditor_engine is not None:
+                with query_path.open('w', newline='') as stream:
+                    writer = csv.writer(stream); writer.writerow([f'c{i}' for i in range(9)])
+                    writer.writerows(query.values.tolist())
             encoded = None
             for level in selected:
                 artifact = directory/(level+'.dope')
@@ -122,6 +153,14 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                                 code = export_encoding(encoded, level)
                                 (directory/(level+'.safetensors')).write_bytes(code.bytes)
                             record['code_bytes'] = len(code.bytes)
+                            if auditor_engine is not None and not artifact.exists():
+                                require(not native_error, 'comparison_native_fit_failed')
+                                try:
+                                    native_fit(baseline, csv_path, artifact, len(code.bytes), source['task'], fit_seed,
+                                               max(.01, min(60, wall_seconds-(time.monotonic()-started))))
+                                except (ResearchError, subprocess.SubprocessError):
+                                    native_error = True
+                                    raise
                             before = time.monotonic()
                             if method == 'shared':
                                 values, observed = sample(model.decoder, encoded.code[:LEVELS[level]].to(device),
@@ -143,6 +182,18 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                                     directory/f'{level}-seed-{sample_seed}.csv', len(context.values), sample_seed,
                                     max(.01, min(20, wall_seconds-(time.monotonic()-started))))
                                 record['artifact_bytes'] = artifact.stat().st_size
+                            if auditor_engine is not None:
+                                synthetic = directory/f'{level}-{sample_seed}-{method}-audit.csv'
+                                with synthetic.open('w', newline='') as stream:
+                                    writer = csv.writer(stream); writer.writerow([f'c{i}' for i in range(9)])
+                                    writer.writerows([[float(v) if m else '' for v,m in zip(row,mask)]
+                                                      for row,mask in zip(values,observed)])
+                                report = directory/f'{level}-{sample_seed}-{method}-audit.json'
+                                record['native_auditors'] = native_audit(auditor_engine, artifact, csv_path,
+                                    query_path, synthetic, report, fit_seed,
+                                    max(.01, min(60, wall_seconds-(time.monotonic()-started))))
+                                record.update(native_report_sha256=file_sha(report),
+                                              native_synthetic_sha256=file_sha(synthetic))
                             metric = ridge_loss(values, observed, query, classification)
                             record.update(state='complete', synthetic_loss=metric,
                                 retention=retention(null, real, metric), sample_and_audit_seconds=time.monotonic()-before)
@@ -164,6 +215,8 @@ def main(argv=None):
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--expected-baseline-sha256', required=True)
+    parser.add_argument('--auditor-engine', type=Path)
+    parser.add_argument('--expected-auditor-sha256')
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--levels', default='all')
     parser.add_argument('--categorical-schedule', choices=('reveal-v1', 'redraw-v1'), default='reveal-v1')
@@ -171,7 +224,9 @@ def main(argv=None):
     parser.add_argument('--wall-seconds', type=int, default=600)
     args = parser.parse_args(argv)
     result = run(args.model, args.baseline, args.expected_baseline_sha256, args.out,
-                 selected=levels(args.levels), categorical_schedule=args.categorical_schedule, device=args.device, wall_seconds=args.wall_seconds)
+                 selected=levels(args.levels), categorical_schedule=args.categorical_schedule, device=args.device,
+                 wall_seconds=args.wall_seconds, auditor_engine=args.auditor_engine,
+                 expected_auditor_sha256=args.expected_auditor_sha256)
     print(json.dumps({k:result[k] for k in ('scheduled', 'complete', 'failures', 'superiority_qualified')}))
     return 0 if result['all_cells_complete'] else 2
 
