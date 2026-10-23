@@ -1,0 +1,82 @@
+"""Training, surrogate gradients and frozen-base residual regressions."""
+from dataclasses import replace
+import tempfile
+import json
+import hashlib
+import unittest
+from pathlib import Path
+import torch
+from research.levels.contracts import TrainConfig,ResearchError
+from research.levels.corpus import Corpus
+from research.levels.losses import objective
+from research.levels.model import SharedModel
+from research.levels.packages import export_package,load_package,load_decoder
+from research.levels.train import train
+from research.levels.tests.test_models import tiny,fixture
+
+
+def config():
+    return TrainConfig(steps=4,accumulation=1,validate_every=2,checkpoint_every=2,cpu_threads=1,
+                       wall_seconds=120,consistency_weight=0,profile_weight=0)
+
+
+class TrainingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):torch.set_num_threads(1)
+
+    def test_prior_development_mechanisms_do_not_alias_training_families(self):
+        corpus=Corpus(prior_only=True)
+        train_families={corpus.get('train',i)['family_id'] for i in range(30)}
+        dev_families={corpus.get('development',i)['family_id'] for i in range(30)}
+        self.assertFalse(train_families.intersection(dev_families))
+        self.assertNotIn('owned-prior:9',train_families|dev_families)
+
+    def test_transfer_and_driver_surrogates_have_decoder_and_encoder_gradients(self):
+        model=SharedModel(tiny());context,query,_=fixture()
+        loss,raw=objective(model,context,query,([0.]*23,[False]*23),config(),101)
+        loss.backward()
+        self.assertTrue(all(torch.isfinite(p.grad).all() for p in model.parameters() if p.grad is not None))
+        self.assertGreater(sum(float(p.grad.abs().sum()) for p in model.encoder.parameters() if p.grad is not None),0)
+        self.assertGreater(sum(float(p.grad.abs().sum()) for p in model.decoder.parameters() if p.grad is not None),0)
+        self.assertEqual(set(raw),{'low','medium','high'})
+
+    def test_ultra_refuses_random_base_then_freezes_all_lower_weights(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);cfg=replace(config(),transfer_weight=0,driver_weight=0)
+            with self.assertRaisesRegex(ResearchError,'ultra_requires'):
+                train(tiny(),cfg,Corpus(prior_only=True),root/'bad',source_sha256='a'*64,phase='ultra-residual')
+            ordinary,part=train(tiny(),cfg,Corpus(prior_only=True),root/'ordinary',source_sha256='a'*64,stop_after=1)
+            latest=json.loads((root/'ordinary/checkpoints/latest.json').read_bytes())
+            checkpoint=root/'ordinary/checkpoints'/latest['checkpoint']
+            self.assertEqual(checkpoint.name,'step-000000001')
+            self.assertTrue(checkpoint.is_dir())
+            self.assertEqual(hashlib.sha256((checkpoint/'manifest.json').read_bytes()).hexdigest(),latest['manifest_sha256'])
+            residual,result=train(tiny(),cfg,Corpus(prior_only=True),root/'residual',source_sha256='a'*64,
+                                  phase='ultra-residual',base_checkpoint=part['last_checkpoint'],stop_after=1)
+            changed=[]
+            for name,value in ordinary.state_dict().items():
+                if not torch.equal(value,residual.state_dict()[name]):changed.append(name)
+            self.assertTrue(changed)
+            self.assertTrue(all(any(name.startswith(prefix) for prefix in
+                ('encoder.distribution_heads.3.','encoder.task_heads.3.','decoder.conditions.3.','profiles.ultra.'))
+                                for name in changed),changed)
+            self.assertEqual(result['optimizer_updates'],1)
+            export_package(result['last_checkpoint'],root/'model')
+            loaded,_=load_package(root/'model')
+            for name,value in residual.encoder.state_dict().items():
+                self.assertTrue(torch.equal(value,loaded.encoder.state_dict()[name]))
+            (root/'model/encoder.safetensors').unlink()
+            decoder,_=load_decoder(root/'model')
+            self.assertEqual(set(decoder.state_dict()),set(residual.decoder.state_dict()))
+
+    def test_resource_pause_discards_partial_update_and_resume_replays_it(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);cfg=replace(config(),accumulation=2,transfer_weight=0,driver_weight=0)
+            checks=[]
+            def guard():checks.append(True);return len(checks)<3
+            _,part=train(tiny(),cfg,Corpus(prior_only=True),root/'part',source_sha256='a'*64,resource_check=guard)
+            self.assertEqual(part['state'],'resource_pause');self.assertEqual(part['optimizer_updates'],0)
+            resumed,_=train(tiny(),cfg,Corpus(prior_only=True),root/'resumed',source_sha256='a'*64,
+                            resume=part['last_checkpoint'],stop_after=1)
+            whole,_=train(tiny(),cfg,Corpus(prior_only=True),root/'whole',source_sha256='a'*64,stop_after=1)
+            for name,value in whole.state_dict().items():self.assertTrue(torch.equal(value,resumed.state_dict()[name]),name)

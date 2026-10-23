@@ -568,3 +568,17 @@ runs. It runs engine formatting, Clippy with warnings denied, and the landmark c
 integration suites. The normal engine gate retains full test discovery. See
 [the implementation guide](landmarks.md#validation-and-next-engineering-work) for the
 properties exercised and scientific gates that remain unrun.
+
+## Shared learned graph conformance
+
+Run `python3 -B -m unittest discover -s research/levels/tests -v` in the pinned
+reference environment, then `cargo +1.88.0 test --manifest-path engine/Cargo.toml
+--locked -p dope-core -p dope-cli`. This covers fit-only and family refusals,
+actual optimizer/resume updates, proxy gradients, frozen ordinary weights during
+ultra training, native/PyTorch coupled graph parity, selected-prefix export and
+sampling with encoder weights/source physically absent. Tiny tracked weights are
+public synthetic conformance fixtures; they grant no accuracy/privacy evidence.
+The separate `shared-levels.yml` workflow runs independent CPU shards on the
+existing Linux general pool on trusted main/codex pushes and manual dispatch,
+including X64 and ARM64 native jobs. Required PR CI remains independent. It does not
+weaken the four existing required contexts or infer GPU availability from CI slots.

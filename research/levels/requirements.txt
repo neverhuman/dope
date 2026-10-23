@@ -1,0 +1,4 @@
+# Offline training only. Customer inference stays in native Rust.
+torch==2.7.0
+numpy==1.26.4
+safetensors==0.7.0

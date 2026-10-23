@@ -13,6 +13,7 @@ use std::process::ExitCode;
 
 mod args;
 mod landmarks;
+mod learned;
 mod levels;
 mod runtime;
 mod tiers;
@@ -71,6 +72,7 @@ fn run(cli: Cli) -> Result<(), String> {
     };
     match cli.command {
         Command::Landmarks(a) => landmarks::run(a)?,
+        Command::Learned(a) => learned::run(a)?,
         Command::FitLevels(a) => levels::run(a)?,
         Command::Fit(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
