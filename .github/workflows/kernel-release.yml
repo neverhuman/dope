@@ -1,0 +1,74 @@
+name: Signed research kernel
+
+# Dispatch-only: a research-kernel release names a commit already on main, which is usually
+# older than main's head and does not carry this workflow, so a tag-push trigger cannot build it.
+# The workflow runs from main, builds the named commit's `git archive` export reproducibly, signs
+# the outputs with GitHub artifact attestations and stages a draft release tagged at that commit.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'dope-kernel-vVERSION; VERSION must equal the commit''s Cargo.toml version'
+        required: true
+      commit:
+        description: 'full 40-character source commit, an ancestor of main'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kernel-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      KERNEL_RELEASE_TAG: ${{ inputs.tag }}
+      KERNEL_RELEASE_COMMIT: ${{ inputs.commit }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit only a new versioned tag for a commit already on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          [[ "$KERNEL_RELEASE_TAG" =~ ^dope-kernel-v[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]
+          [[ "$KERNEL_RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          git merge-base --is-ancestor "$KERNEL_RELEASE_COMMIT" refs/remotes/origin/main
+          version=$(git show "$KERNEL_RELEASE_COMMIT:Cargo.toml" | sed -n '/^\[package\]/,/^\[/s/^version = "\(.*\)"$/\1/p' | head -n1)
+          [[ "dope-kernel-v$version" == "$KERNEL_RELEASE_TAG" ]]
+          if git rev-parse -q --verify "refs/tags/$KERNEL_RELEASE_TAG" > /dev/null; then echo "tag exists" >&2; exit 1; fi
+          if gh release view "$KERNEL_RELEASE_TAG" > /dev/null 2>&1; then echo "release exists" >&2; exit 1; fi
+      - name: Build the commit reproducibly in the pinned builder
+        run: bash ops/ci/kernel-release.sh "$KERNEL_RELEASE_COMMIT" target/kernel-release
+      - name: Sign provenance for the binary and the package members
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: target/kernel-release/dist/*
+          create-storage-record: false
+      - name: Verify the signer and the built commit, then stage a draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          dist=target/kernel-release/dist
+          bash scripts/verify-kernel-release.sh "$dist" "$KERNEL_RELEASE_TAG" "$KERNEL_RELEASE_COMMIT"
+          cp -- "$ATTESTATION_BUNDLE" "$dist/dope-kernel.sigstore.json"
+          gh release create "$KERNEL_RELEASE_TAG" --draft --target "$KERNEL_RELEASE_COMMIT" \
+            --title "DOPE research kernel $KERNEL_RELEASE_TAG" \
+            --notes "Signed research-kernel CLI (dope-kernel) for Linux x86-64, built from $KERNEL_RELEASE_COMMIT. Verify with scripts/verify-kernel-release.sh before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-kernel-release.md." \
+            "$dist/dope-kernel" "$dist/BUILDINFO.json" "$dist/Cargo.lock" \
+            "$dist/SHA256SUMS" "$dist/dope-kernel.sigstore.json"
