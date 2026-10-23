@@ -28,8 +28,10 @@ def producer(binary):
     cpu=''
     if Path('/proc/cpuinfo').exists():
         cpu=next((line.split(':',1)[1].strip()for line in Path('/proc/cpuinfo').read_text().splitlines()if line.startswith('model name')),'')
+    base=Path(__file__).parent.parent
+    sources=list(Path(__file__).parent.glob('*.py'))+[base/name for name in ('landmark_features.py','contracts.py','resources.py')]
     return dict(engine_sha256=sha(binary),platform=platform.platform(),machine=platform.machine(),cpu_model=cpu,
-                source_sha256=digest({p.name:sha(p)for p in Path(__file__).parent.glob('*.py')}),
+                source_sha256=digest({str(p.relative_to(base)):sha(p)for p in sources}),
                 source_admission='unadmitted; consumer must separately resolve rights/family/physical split policy')
 
 
