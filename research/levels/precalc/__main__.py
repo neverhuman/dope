@@ -26,9 +26,12 @@ def main():
     job.add_argument('--source-urls',type=Path);job.add_argument('--local-store',type=Path)
     upload=sub.add_parser('publish');upload.add_argument('--plan',type=Path,required=True);upload.add_argument('--root',type=Path,required=True)
     index=sub.add_parser('index');index.add_argument('--plan',type=Path,required=True);index.add_argument('--runs',type=Path,nargs='+',required=True)
+    repair=sub.add_parser('recover');repair.add_argument('--source-run',type=Path,required=True);repair.add_argument('--root',type=Path,required=True)
+    repair.add_argument('--catalog',type=Path,required=True);repair.add_argument('--binary',type=Path,required=True)
+    repair.add_argument('--expected-binary-sha256',required=True);repair.add_argument('--source-commit',required=True);repair.add_argument('--local-store',type=Path)
     download=sub.add_parser('download');download.add_argument('--entry-key',required=True)
     download.add_argument('--expected-entry-sha256',required=True);download.add_argument('--out',type=Path,required=True)
-    for parser in (job,upload,download,index):
+    for parser in (job,upload,download,index,repair):
         parser.add_argument('--bucket',default='veox-jopedime-datasets-use2');parser.add_argument('--profile',default='veox-jepson')
         parser.add_argument('--prefix',default='derived/dope/landmark-inputs/fit-cv-v1/precalc-20261023')
     args=p.parse_args();os.umask(0o077)
@@ -36,6 +39,12 @@ def main():
         value=make_plan(args.catalog,source_commit=args.source_commit,split_seed=args.split_seed);private(args.out,value)
         print(json.dumps(dict(plan_sha256=value['sha256'],scheduled=len(value['cells']),splits=value['splits'],model_training=False)));return
     require(args.bucket=='veox-jopedime-datasets-use2','precalc_bucket_not_authorized')
+    if args.command=='recover':
+        from .recover import recover
+        store=LocalStore(args.local_store)if args.local_store else PrivateStore(client(args.profile),args.bucket,args.prefix)
+        result=recover(args.source_run,args.root,catalog=args.catalog,binary=args.binary,expected_engine=args.expected_binary_sha256,
+                       source_commit=args.source_commit,store=store)
+        print(json.dumps({k:result[k]for k in ('state','scheduled','recovered','refused','new_native_executions')}));return
     if args.command=='download':
         from .store import materialize
         print(json.dumps(materialize(PrivateStore(client(args.profile),args.bucket,args.prefix),args.entry_key,args.expected_entry_sha256,args.out)));return

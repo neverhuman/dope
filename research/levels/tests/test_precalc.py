@@ -141,3 +141,40 @@ class PrecalcTests(unittest.TestCase):
             (root/'reused'/'plan.json').write_bytes(canonical(child));(root/'reused'/'ownership.json').write_bytes(canonical(dict(plan_sha256=child['sha256'])))
             with patch('research.levels.precalc.plan.CATALOG_SHA256',plan['catalog_sha256']),self.assertRaisesRegex(ResearchError,'unqualified_continuation'):
                 build(plan,[root/'reused'],store)
+
+    def test_recovery_preserves_failed_receipt_and_never_executes_a_native_fit(self):
+        from types import SimpleNamespace
+        from research.levels.precalc.recover import recover
+        from research.levels.precalc.coverage import build
+        with tempfile.TemporaryDirectory()as d:
+            root=Path(d);source,plan=catalog_fixture(root);cell=plan['cells'][0]
+            binary=root/'binary';binary.write_bytes(b'synthetic nonexecutable binary fixture')
+            engine=hashlib.sha256(binary.read_bytes()).hexdigest()
+            who=dict(engine_sha256=engine,source_sha256='c'*64,platform='synthetic-fixture')
+            key=cache_key(cell,plan,who);parent=root/'parent';out=parent/'cells'/key;out.mkdir(parents=True)
+            (parent/'source-cache').mkdir();(parent/'source-cache'/(cell['scope']['train_sha256']+'.csv')).write_bytes(source.read_bytes())
+            raw,scope=fit_csv(source,cell['scope']);(out/'fit.csv').write_bytes(raw);n=scope['rows']
+            report=dict(panel=OPTIONS['panel'],options=plan['options'],kind='real',privacy='private',task='regression',rows=n,
+                cells=[dict(id=i,state='uninformative',gain=-.2,train_rows=[n-n//5-1]*5,query_rows=n)for i in range(1,24)])
+            (out/'report.json').write_bytes(canonical(report))
+            original=dict(key=key,cell_key=cell['key'],state='failed',native_exit=0,producer=who,elapsed_seconds=.1)
+            (out/'receipt.json').write_bytes(canonical(original));before=(out/'receipt.json').read_bytes()
+            for name,value in [('plan.json',plan),('producer.json',who),('ownership.json',dict(pid=999999999,plan_sha256=plan['sha256'])),
+                ('terminal.json',dict(state='resource_or_budget_paused',records=[original]))]:
+                (parent/name).write_bytes(canonical(value))
+            (out/'native-owner.json').write_bytes(canonical(dict(key=key,binary_sha256=engine,pid=999999998)))
+            store=LocalStore(root/'store');allocation=dict(memory_available=100*2**30,disk_available=100*2**30,cpu_available=128,load=[0,0,0])
+            def read_only_process(command,**kwargs):
+                self.assertEqual(command[:2],['/bin/ps','-p'])
+                return SimpleNamespace(returncode=1,stdout='')
+            with patch('research.levels.precalc.plan.CATALOG_SHA256',plan['catalog_sha256']),patch('research.levels.precalc.recover.allocation_snapshot',return_value=allocation),patch('research.levels.precalc.recover.subprocess.run',side_effect=read_only_process),patch('research.levels.precalc.recover.os.nice'):
+                result=recover(parent,root/'recovered',catalog=root/'catalog.jsonl',binary=binary,expected_engine=engine,source_commit='d'*40,store=store)
+                self.assertEqual(result['recovered'],1);self.assertEqual(result['new_native_executions'],0)
+                self.assertEqual((out/'receipt.json').read_bytes(),before)
+                self.assertFalse(result['records'][0]['encoder_input_usable'])
+                self.assertEqual(build(plan,[parent,root/'recovered'],store)['counts'],dict(pending=5,ready=1))
+                with self.assertRaisesRegex(ResearchError,'original_failure_required'):build(plan,[root/'recovered'],store)
+                (out/'fit.csv').write_bytes(raw+b'corruption')
+                refused=recover(parent,root/'refused',catalog=root/'catalog.jsonl',binary=binary,expected_engine=engine,source_commit='d'*40,store=store)
+                self.assertEqual(refused['recovered'],0);self.assertEqual(refused['refused'],1)
+                self.assertEqual(build(plan,[parent,root/'refused'],store)['counts'],dict(failed=1,pending=5))
