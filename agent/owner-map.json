@@ -836,6 +836,8 @@
     "docs/signed-kernel-release.md": "governance",
     "ops/ci/engine-benchmark.sh": "external-evidence",
     "ops/licenses/engine/": "release",
+    "research/landmark_cache/": "external-evidence",
+    "docs/landmark-precalculation.md": "governance",
     "research/levels/": "external-evidence",
     "engine/dope-core/src/learned/": "rust-core"
   },
