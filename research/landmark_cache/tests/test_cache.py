@@ -104,6 +104,18 @@ class CacheTests(unittest.TestCase):
         changed["options"]["seed"] += 1
         self.assertNotEqual(self.cell["key"], digest(changed))
 
+    def test_plan_cli_binds_an_explicit_work_budget(self):
+        from research.landmark_cache import __main__ as cli
+        output = self.root / "new-cli-plan.json"
+        argv = ["landmark_cache", "plan", "--catalog", str(self.catalog), "--bucket", "source-bucket",
+                "--engine-sha256", "e" * 64, "--source-commit", "f" * 40,
+                "--work-budget", "2000000000000", "--out", str(output)]
+        with patch.object(sys, "argv", argv), patch.object(cli, "make_plan", return_value=self.plan) as make:
+            with patch("sys.stdout", new_callable=io.StringIO):
+                cli.main()
+        self.assertEqual(make.call_args.kwargs["options"]["work_budget"], 2_000_000_000_000)
+        self.assertEqual(json.loads(output.read_bytes()), self.plan)
+
     def test_target_first_is_moved_without_value_or_order_changes(self):
         source = self.root / "source.csv"
         source.write_text("label0,1,2\nlabel1,3,4\n")

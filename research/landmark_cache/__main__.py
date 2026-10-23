@@ -73,7 +73,6 @@ def main():
         if args.command == "prefetch":
             import concurrent.futures
             from .runner import fetch_train
-            from .plan import require
             require(1 <= args.workers <= 32 and 0 <= args.shard < args.shards <= 128,
                     "invalid_prefetch_allocation")
             client = s3_client(args)
@@ -108,7 +107,6 @@ def main():
             import concurrent.futures
             from .storage import LocalStore
             from .runner import validate_report
-            from .plan import require
             require(1 <= args.workers <= 32, "invalid_publisher_allocation")
             local = LocalStore(args.store)
 
