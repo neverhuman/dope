@@ -3280,6 +3280,14 @@
       "command": "bash ops/ci/landmarks.sh",
       "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
     },
+    "engine/dope-probes/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-probes",
+      "purpose": "verify the NumPy-exact probe split, receipt replay of every cited levels/landmark number and the committed replay output"
+    },
+    "bench/real-world/probes/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-probes",
+      "purpose": "verify the NumPy-exact probe split, receipt replay of every cited levels/landmark number and the committed replay output"
+    },
     "engine/dope-core/src/budget.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify full-generator scalar accounting and hard caps through decoded artifacts"},
     "engine/dope-core/tests/budgets.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify forced architectures, preset precedence and impossible-cap refusals"},
     "engine/dope-cli/src/tiers.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify all three portable artifacts, catalog integrity and existing-output refusal"},

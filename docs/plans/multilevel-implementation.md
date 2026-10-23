@@ -128,12 +128,19 @@ It does not override repository governance or freeze the candidate TDL protocol.
 | `progressive-tiers-and-embeddings.md` | Shared preparation; audited carry; target/covariate refinement; artifact encoder; learned local proposer | Do not alias `all` to 256 KiB ultra; avoid blanket monotonicity claims, arbitrary DCR trimming, mandatory dictionary coding and immediate binary-format commitments. |
 | `dope-levels-spec.md` | Standalone selected releases; carry/replace alternatives; practical implementation tickets; per-level caches; deterministic descriptor | Base the PR on main, not #308; preserve legacy flags; split calibration cleanly; do not call mixture free; do not make ultra synonymous with a bundle; treat supplied probe numbers as unverified. |
 
-The third input references `levels_probe.py` and `analyze_probe.py`. These scripts and
-their raw receipts are not in the three attachments or the reviewed checkout. Its
-nine-table gains, mixture wins and compression percentages are **supplied observations,
-not independently reproduced evidence**. They motivate experiments E0/E3/E11, not
-requirements or performance claims. Marginal compression estimates such as
-`compressed(A+B)-compressed(A)` do not measure a valid framed conditional codec.
+The third input references `levels_probe.py` and `analyze_probe.py`. Their raw receipts and
+pinned inputs are now in [`bench/real-world/probes/`](../../bench/real-world/probes/README.md).
+The Rust tool `engine/dope-probes` rebuilds the inputs (same rows, same order), reruns the probe
+against a given `dope` binary and replays every table from the receipts; the Python driver
+itself is not in the repository. A Rust rerun with the same engine binary rebuilt
+byte-identical programs wherever the inputs were byte-identical. Even so, robust retention of
+identical programs moved by up to 0.10, because `dope eval`'s MLP auditor is not seeded on CPU.
+On one `574_house_16H` program with fixed files, MLP retention ranged from 0.888 to 1.069 over
+four evaluations. The nine-table gains, mixture wins and compression percentages therefore
+remain **selection-exposed development observations, not reproduced evidence**. They motivate
+experiments E0/E3/E11, not requirements or performance claims, and E0 needs a seeded auditor
+first. Marginal compression estimates such as `compressed(A+B)-compressed(A)` do not measure a
+valid framed conditional codec, and their sizes depend on the brotli encoder.
 
 ### Review corrections retained in this revision
 
@@ -1444,6 +1451,9 @@ probe scripts or recreate E0 as a new study. Keep private/raw inputs out of Git.
 
 **Done:** every baseline result has source/data/config/artifact identities and an evidence
 label; scripts reproduce receipts; absent source probes remain explicitly unverified.
+*Status:* the levels probe's receipts, inputs and Rust driver/replay are in
+`bench/real-world/probes/`; its retention cells do not reproduce until the CPU MLP auditor is
+seeded (see that README).
 No duplicate size parser, tier CLI or Elo implementation is introduced.
 
 ### ML-01 — Fit-only preparation and role-aware calibration
