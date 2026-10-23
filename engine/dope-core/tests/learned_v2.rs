@@ -28,7 +28,14 @@ fn close(a: &Tensor, b: &Tensor, tolerance: f32) {
 
 #[test]
 fn all_v2_graphs_match_codes_and_decoder_operators_for_every_tier() {
-    for name in ["slot", "matched", "pooled"] {
+    for name in [
+        "slot",
+        "matched",
+        "pooled",
+        "slot-bounded",
+        "matched-bounded",
+        "pooled-bounded",
+    ] {
         let path = root(name);
         let meta: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("fixture.json")).unwrap()).unwrap();
@@ -57,6 +64,9 @@ fn all_v2_graphs_match_codes_and_decoder_operators_for_every_tier() {
                 )
                 .unwrap();
             close(&code, &tensors[&format!("code_{}", level.name())], 0.002);
+            if model.graph.bounded_code() {
+                assert!(code.to_vec1::<f32>().unwrap().iter().all(|v| v.abs() <= 1.));
+            }
             close(&code, &full.narrow(0, 0, width).unwrap(), 0.);
             let expected = &tensors[&format!("code_{}", level.name())];
             let (n, c, m) = decoder
@@ -111,6 +121,16 @@ fn all_v2_graphs_match_codes_and_decoder_operators_for_every_tier() {
             .unwrap();
         close(&free, &tensors["code_target_free"], 0.002);
     }
+}
+
+#[test]
+fn bounded_graph_refuses_out_of_range_carrier_instead_of_clamping() {
+    let path = root("slot-bounded");
+    let model = learned::read_manifest(&path.join("model")).unwrap();
+    let mut raw = std::fs::read(path.join("low.code")).unwrap();
+    let offset = 8 + u64::from_le_bytes(raw[..8].try_into().unwrap()) as usize;
+    raw[offset..offset + 2].copy_from_slice(&0x3e00u16.to_le_bytes());
+    assert!(learned::read_code(&raw, &model).is_err());
 }
 
 #[test]

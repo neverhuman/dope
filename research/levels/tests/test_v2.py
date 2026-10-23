@@ -6,7 +6,8 @@ import tempfile
 import unittest
 import torch
 from research.levels.contracts import (LAYOUT, LAYOUT_V2, SLOT_GRAPH, MATCHED_GRAPH,
-    POOLED_GRAPH, LEVELS, ResearchError, level_widths)
+    POOLED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH,
+    LEVELS, ResearchError, level_widths)
 from research.levels.corpus import Corpus
 from research.levels.model import SharedModel, tensors
 from research.levels.packages import export_package, encode_table, export_encoding, read_code, load_decoder
@@ -31,6 +32,47 @@ class V2Tests(unittest.TestCase):
         for cfg in [replace(tiny(),layout=LAYOUT_V2),replace(tiny(),graph=SLOT_GRAPH),
                     replace(graph_config(),summary_slots=1),replace(graph_config(),summary_slots=33)]:
             with self.assertRaises(ResearchError):cfg.validate()
+
+    def test_bounded_graphs_keep_prefixes_and_target_isolation_without_changing_unbounded_graphs(self):
+        context,_,_=fixture();v,o=tensors(context,'cpu')
+        for graph in (SLOT_BOUNDED_GRAPH,MATCHED_BOUNDED_GRAPH,POOLED_BOUNDED_GRAPH):
+            cfg=graph_config(graph);self.assertTrue(cfg.validate().bounded_code())
+            model=SharedModel(cfg)
+            with torch.no_grad():
+                full=model.encoder(v,o,context.schema,through='ultra')
+                self.assertLessEqual(float(full.abs().max()),1.)
+                self.assertTrue(torch.equal(full[:1024],model.encoder(v,o,context.schema,through='low')))
+                changed=v.clone();changed[:,-1]*=-3
+                other=model.encoder(changed,o,context.schema,through='ultra')
+                start=0
+                for width in (1024,3072,4096,2048):
+                    self.assertTrue(torch.equal(full[start:start+width//2],other[start:start+width//2]))
+                    start+=width
+                for head in list(model.encoder.distribution_heads)+list(model.encoder.task_heads):
+                    head.bias.fill_(1000.)
+                self.assertTrue(torch.equal(model.encoder(v,o,context.schema,through='ultra'),torch.ones(10240)))
+        unbounded=SharedModel(graph_config())
+        with torch.no_grad():
+            unbounded.encoder.distribution_heads[0].bias.fill_(1000.)
+            self.assertGreater(float(unbounded.encoder(v,o,context.schema,through='low').abs().max()),1.)
+
+    def test_bounded_graph_training_export_and_malicious_carrier_range_refusal(self):
+        cfg=replace(config(),steps=1,validate_every=1,checkpoint_every=1,transfer_weight=0,driver_weight=0)
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            model,terminal=train(graph_config(SLOT_BOUNDED_GRAPH),cfg,Corpus(prior_only=True),
+                                 root/'trained',source_sha256='b'*64)
+            manifest=export_package(terminal['last_checkpoint'],root/'model')
+            context,_,_=fixture();local=encode_table(model,manifest,context)
+            exported=export_encoding(local,'low')
+            code,_=read_code(exported.bytes,manifest)
+            self.assertTrue(torch.isfinite(code).all());self.assertLessEqual(float(code.abs().max()),1.)
+            # Preserve metadata/coordinate identity/length but alter one FP16 value to 1.5.
+            raw=bytearray(exported.bytes);offset=8+int.from_bytes(raw[:8],'little')
+            raw[offset:offset+2]=(0x3e00).to_bytes(2,'little')
+            with self.assertRaisesRegex(ResearchError,'bounded_code_range'):read_code(bytes(raw),manifest)
+            local.code[0]=1.5
+            with self.assertRaisesRegex(ResearchError,'bounded_code_range'):export_encoding(local,'low')
 
     def test_slot_readout_retains_ordered_information_that_pooled_control_removes(self):
         torch.manual_seed(31);slot=SharedModel(graph_config())

@@ -164,6 +164,8 @@ def export_encoding(local, selected='all', *, max_bytes=65536):
     # Materialize only the admitted buffer before serialization, hashing or logging.
     code=local.code[:width].detach().clone().to(torch.float16).contiguous()
     require(torch.isfinite(code).all().item(),'export_code_nonfinite')
+    if 'graph' in local.model and ModelConfig(**local.model['graph']).bounded_code():
+        require((code.abs()<=1).all().item(), 'bounded_code_range')
     manifest=dict(format='dope-table-code-v1',representation_kind='table_code',layout=model_layout(local.model),
         preprocessing=PREPROCESSING,coordinate_space_id=local.model['coordinate_space_id'],
         exported_levels=selected,target_included=local.target_included,
@@ -206,4 +208,6 @@ def read_code(raw, model_manifest):
             and len(raw)==8+header_length+width*2,'code_inventory_mismatch')
     code=load(raw)['code']
     require(torch.isfinite(code).all().item(),'nonfinite_code')
+    if 'graph' in model_manifest and ModelConfig(**model_manifest['graph']).bounded_code():
+        require((code.abs()<=1).all().item(), 'bounded_code_range')
     return code.float(),manifest

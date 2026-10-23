@@ -1861,6 +1861,13 @@ future replacement for the existing compiler.
 
 ## Human-directed v2 tier investigation (2026-10-23)
 
+The first unbounded v2 pilot's two trained models failed native FP16 absolute
+parity (0.00390625/0.0078125 versus 0.002). No scheduled downstream comparison
+was run. Preserve those models and receipts. A separately named bounded-code
+candidate applies per-block tanh and refuses out-of-range carriers; it requires
+fresh training and fresh full-size proofs, with the original tolerance unchanged.
+This is a numerical/optimization hypothesis, not an accuracy or plan-completion claim.
+
 The original widths and experiment criteria above remain the historical v1 design.
 The human requested retiring256-coordinate S as a primary future training requirement
 and approved investigation of a larger minimum and a richer encoder readout.

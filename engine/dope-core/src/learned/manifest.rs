@@ -44,7 +44,24 @@ impl Graph {
     pub fn slot_readout(&self) -> bool {
         matches!(
             self.graph.as_str(),
-            "slot-code-diffusion-v2" | "pooled-control-code-diffusion-v2"
+            "slot-code-diffusion-v2"
+                | "pooled-control-code-diffusion-v2"
+                | "slot-bounded-code-diffusion-v2"
+                | "pooled-control-bounded-code-diffusion-v2"
+        )
+    }
+    pub fn bounded_code(&self) -> bool {
+        matches!(
+            self.graph.as_str(),
+            "slot-bounded-code-diffusion-v2"
+                | "pooled-control-bounded-code-diffusion-v2"
+                | "pooled-bounded-code-diffusion-v2"
+        )
+    }
+    pub fn pooled_control(&self) -> bool {
+        matches!(
+            self.graph.as_str(),
+            "pooled-control-code-diffusion-v2" | "pooled-control-bounded-code-diffusion-v2"
         )
     }
     pub fn readout_slots(&self) -> usize {
@@ -77,6 +94,9 @@ impl Graph {
                         "slot-code-diffusion-v2"
                             | "pooled-control-code-diffusion-v2"
                             | "pooled-code-diffusion-v2"
+                            | "slot-bounded-code-diffusion-v2"
+                            | "pooled-control-bounded-code-diffusion-v2"
+                            | "pooled-bounded-code-diffusion-v2"
                     )),
             "unknown learned graph",
         )?;

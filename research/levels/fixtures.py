@@ -6,7 +6,7 @@ import torch
 from safetensors.torch import save_file
 from .checkpoints import private_json, save_checkpoint
 from .cli import source_fingerprint
-from .contracts import ModelConfig, TrainConfig, digest, LAYOUT_V2, SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH, level_widths
+from .contracts import ModelConfig, TrainConfig, digest, LAYOUT_V2, V2_GRAPHS, level_widths
 from .data import episode
 from .losses import objective
 from .model import SharedModel,tensors
@@ -78,6 +78,6 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--out',type=Path,required=True)
-    parser.add_argument('--graph',choices=['mixed-code-diffusion-v1',SLOT_GRAPH,MATCHED_GRAPH,POOLED_GRAPH],
+    parser.add_argument('--graph',choices=['mixed-code-diffusion-v1',*V2_GRAPHS],
                         default='mixed-code-diffusion-v1')
     args=parser.parse_args();generate(args.out,graph=args.graph)

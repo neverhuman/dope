@@ -1,7 +1,7 @@
 {
   "model": {
     "layout": "nested-1024-4096-8192-plus-2048-v2",
-    "graph": "slot-code-diffusion-v2"
+    "graph": "slot-bounded-code-diffusion-v2"
   },
   "train": {
     "steps": 12,

@@ -2,7 +2,7 @@
 import torch
 from torch import nn
 from .blocks import Block, Induced, Tokenizer
-from .contracts import block_widths, level_widths, MATCHED_GRAPH, require
+from .contracts import block_widths, level_widths, require
 
 
 class TableEncoder(nn.Module):
@@ -77,6 +77,7 @@ class TableEncoder(nn.Module):
                     task = self.readout(residual, self.task_norm)
             d = self.distribution_heads[i](distribution)
             t = self.task_heads[i](task) if task is not None else torch.zeros_like(d)
+            if self.config.bounded_code(): d, t = d.tanh(), t.tanh()
             blocks.append(torch.cat((d, t)))
             if sum(blocks_widths[:i+1]) == widths[through]:
                 break
@@ -85,7 +86,7 @@ class TableEncoder(nn.Module):
     def readout(self, summary, norm):
         if not self.config.slot_readout(): return norm(summary.mean(dim=0))
         result = norm(summary)
-        if self.config.graph == MATCHED_GRAPH:
+        if self.config.pooled_control():
             result = result.mean(dim=0, keepdim=True).expand_as(result)
         return result.reshape(-1)
 

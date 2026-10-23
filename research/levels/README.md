@@ -1,5 +1,27 @@
 # Experimental shared table encoding
 
+### Bounded v2 numerical candidate
+
+The explicit `slot-bounded-code-diffusion-v2`,
+`pooled-control-bounded-code-diffusion-v2` and `pooled-bounded-code-diffusion-v2`
+graphs apply tanh separately to every distribution/task readout block before
+fixed FP16 conversion. Their readers reject values outside [-1,1]. This changes
+the learned representation and requires fresh training; it does not convert an
+existing checkpoint. Prefixes use no scale or state from higher blocks.
+
+The preceding unbounded v2 pilot completed both 200 ordinary plus 50 residual
+stages, with matching initialization/data and frozen ordinary weights. Its two
+terminal models failed the unchanged native absolute parity gate: 0.00390625
+and 0.0078125 against 0.002. Unbounded slot codes reached magnitude 10.289,
+where FP16 spacing can exceed that gate. All 768 planned utility cells remain
+unexecuted pending qualification. These failed receipts and old graph identities
+are preserved; the bounded candidate is a new numerical/optimization hypothesis,
+not a claimed accuracy improvement or a relaxed parity threshold.
+
+The opt-in `gpu-v2-pilot.json` now selects the bounded slot candidate. New source,
+full-width exact resume and native parity proofs are required before scientific
+training. Existing unbounded and v1 configurations retain their semantics.
+
 This implements the missing learned path from [the multilevel design](../../docs/plans/multilevel-implementation.md).
 The existing `fit-levels` portable generator remains a separate implementation.
 Shared model weights are fixed local dependencies; every encoded table exports a

@@ -6,8 +6,10 @@ dataset exports. Each graph receives one ordinary and one frozen-base residual
 optimizer update. The graph width is four, with two ordinary and two residual
 queries for slot graphs. The code widths remain the full v2 contract.
 
-`slot`, `matched` and `pooled` cover the slot readout, parameter-matched pooled
-readout and width-only pooled control respectively. `fixture.json` binds the
+`slot`, `matched` and `pooled` cover the original slot readout, parameter-matched pooled
+readout and width-only pooled control respectively. The corresponding `-bounded`
+directories cover separately versioned tanh readouts and range-refusing readers;
+they do not replace the original fixtures. `fixture.json` binds the
 generator source fingerprint, public schema and operator tolerance. Each model
 manifest binds its exact encoder and decoder bytes. Python generated the stored
 FP16 code and FP32 decoder operators; native tests independently replay every

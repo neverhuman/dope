@@ -206,6 +206,11 @@ impl TableEncoder {
             } else {
                 d.zeros_like()?
             };
+            let (d, t) = if self.graph.bounded_code() {
+                (d.tanh()?, t.tanh()?)
+            } else {
+                (d, t)
+            };
             blocks.push(Tensor::cat(&[d, t], 0)?);
             if widths[..i + 1].iter().sum::<usize>() == width {
                 break;
@@ -228,7 +233,7 @@ impl TableEncoder {
             return Ok(norm.forward(&summary.mean(0)?)?);
         }
         let result = norm.forward(summary)?;
-        let result = if self.graph.graph == "pooled-control-code-diffusion-v2" {
+        let result = if self.graph.pooled_control() {
             result.mean_keepdim(0)?.broadcast_as(result.shape())?
         } else {
             result

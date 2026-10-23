@@ -133,6 +133,10 @@ impl LocalEncoding {
                 .all(|v| v.is_finite() && f16::from_f32(*v).is_finite()),
             "learned code nonfinite",
         )?;
+        check(
+            !self.model.graph.bounded_code() || values.iter().all(|v| v.abs() <= 1.),
+            "bounded learned code range",
+        )?;
         let stored = Stored {
             bytes: values
                 .iter()
@@ -250,6 +254,10 @@ pub fn read_code(bytes: &[u8], model: &ModelManifest) -> Result<(Tensor, CodeMan
     check(
         values.iter().all(|v| v.is_finite()),
         "learned code nonfinite",
+    )?;
+    check(
+        !model.graph.bounded_code() || values.iter().all(|v| v.abs() <= 1.),
+        "bounded learned code range",
     )?;
     Ok((Tensor::from_vec(values, size, &Device::Cpu)?, manifest))
 }

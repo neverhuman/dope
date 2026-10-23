@@ -13,6 +13,11 @@ LAYOUT_V2 = "nested-1024-4096-8192-plus-2048-v2"
 SLOT_GRAPH = "slot-code-diffusion-v2"
 MATCHED_GRAPH = "pooled-control-code-diffusion-v2"
 POOLED_GRAPH = "pooled-code-diffusion-v2"
+SLOT_BOUNDED_GRAPH = "slot-bounded-code-diffusion-v2"
+MATCHED_BOUNDED_GRAPH = "pooled-control-bounded-code-diffusion-v2"
+POOLED_BOUNDED_GRAPH = "pooled-bounded-code-diffusion-v2"
+V2_GRAPHS = (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH,
+             SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
 PREPROCESSING = "fit-only-positional-mixed-v1"
 
 
@@ -79,7 +84,7 @@ class ModelConfig:
 
     def validate(self):
         require((self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1")
-                or (self.layout == LAYOUT_V2 and self.graph in (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH)),
+                or (self.layout == LAYOUT_V2 and self.graph in V2_GRAPHS),
                 "unknown_model_graph")
         for name in ("width", "heads", "feature_blocks", "inducing_blocks", "inducing_slots",
                      "summary_slots", "target_blocks", "decoder_blocks", "condition_slots",
@@ -99,7 +104,13 @@ class ModelConfig:
         return self
 
     def slot_readout(self):
-        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH)
+        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH)
+
+    def bounded_code(self):
+        return self.graph in (SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
+
+    def pooled_control(self):
+        return self.graph in (MATCHED_GRAPH, MATCHED_BOUNDED_GRAPH)
 
     def readout_slots(self):
         return self.summary_slots//2 if self.slot_readout() else 1
