@@ -28,7 +28,23 @@ def main(argv=None):
         help='CPU threads remain bounded and nice10; never overrides GPU/memory/disk refusal')
     export=sub.add_parser('export');export.add_argument('--checkpoint',type=Path,required=True)
     export.add_argument('--out',type=Path,required=True)
+    labels=sub.add_parser('landmarks', help='Create separate private fit-only IID profile labels')
+    labels.add_argument('--dataset',type=Path,required=True)
+    labels.add_argument('--engine',type=Path,required=True)
+    labels.add_argument('--expected-engine-sha256',required=True)
+    labels.add_argument('--out',type=Path,required=True)
+    labels.add_argument('--wall-seconds',type=int,default=300)
     args=parser.parse_args(argv)
+    if args.command=='landmarks':
+        from .corpus import prepare_landmarks
+        from .resources import Guard,snapshot
+        resource=snapshot(args.out.parent,cuda=False)
+        require(resource['load'][0]<resource['cpu_available']*.85, 'cpu_load_allocation_refused')
+        Guard(args.out.parent,args.out.parent/'landmark-resources.jsonl',cuda=False).admit()
+        if hasattr(os,'nice'):os.nice(10)
+        print(json.dumps(prepare_landmarks(json.loads(args.dataset.read_bytes()), args.engine,
+                         args.expected_engine_sha256,args.out,wall_seconds=args.wall_seconds)))
+        return 0
     if args.command=='export':
         from .packages import export_package
         manifest=export_package(args.checkpoint,args.out)

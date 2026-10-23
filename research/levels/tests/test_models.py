@@ -1,11 +1,16 @@
 from dataclasses import replace
+import copy
+import csv
+import hashlib
+import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 import numpy as np
 import torch
-from research.levels.contracts import ModelConfig, TrainConfig, ResearchError, LEVELS
-from research.levels.corpus import Corpus
+from research.levels.contracts import ModelConfig, TrainConfig, ResearchError, LEVELS, canonical, digest
+from research.levels.corpus import Corpus, read_dataset, read_landmarks, landmark_input, prepare_landmarks, file_sha, LANDMARK_OPTIONS
 from research.levels.data import episode, fit_transform, role_indices, transform
 from research.levels.model import SharedModel,tensors
 from research.levels.packages import LocalEncoding,export_encoding,read_code
@@ -69,6 +74,59 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(first[0].schema,second[0].schema)
         self.assertEqual(first[2],second[2])
 
+    def test_real_landmark_scope_and_row_selection_exclude_reserved_values(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);path=root/'source.csv'
+            rows=[[str(i*.1),str(i)] for i in range(160)]
+            item=dict(path=str(path),has_header=False,column_kinds=['numeric','numeric'],target_index=0,
+                      task='regression',family_id='owned:scope-fixture',dataset_id='physical-table-1',
+                      split_policy='iid',split_seed=12,meta_role='train',source_role='official_train',
+                      rights=dict(admitted=True,license_id='CC0-1.0'))
+            def source():
+                with path.open('w',newline='') as stream:csv.writer(stream).writerows(rows)
+                item['train_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+                return read_dataset(item)
+            first=source();raw,scope=landmark_input(item,first)
+            context=episode(**{k:first[k] for k in ('rows','kinds','slots','row_ids','task','roles')},
+                            config=tiny(),cursor=0,seed=12)[0]
+            for i in first['roles']['tune']+first['roles']['calibration']+first['roles']['confirmation']:
+                rows[i]=['-918273','918273']
+            second=source();changed,other_scope=landmark_input(item,second)
+            self.assertEqual(first['roles'],second['roles'])
+            self.assertEqual(first['row_ids'],second['row_ids'])
+            self.assertEqual(raw,changed)
+            self.assertNotEqual(scope['source_sha256'],other_scope['source_sha256'])
+            other=episode(**{k:second[k] for k in ('rows','kinds','slots','row_ids','task','roles')},
+                          config=tiny(),cursor=0,seed=12)[0]
+            np.testing.assert_array_equal(context.values,other.values)
+            self.assertEqual(context.schema,other.schema)
+            binding=dict(scope=other_scope,engine_sha256='a'*64,options=LANDMARK_OPTIONS)
+            report=dict(options=LANDMARK_OPTIONS,panel='landmarks-native-v1',kind='real',privacy='private',
+                        task='regression',rows=other_scope['row_count'],
+                        cells=[dict(id=i,state='complete' if i==1 else 'unsupported',gain=.3 if i==1 else None)
+                               for i in range(1,24)])
+            report_raw=canonical(report);(root/'report.json').write_bytes(report_raw)
+            manifest=dict(format='dope-role-landmarks-v1',binding=binding,key=digest(binding),
+                          report_bytes=len(report_raw),report_sha256=hashlib.sha256(report_raw).hexdigest())
+            def attach(value):
+                manifest_raw=canonical(value);(root/'manifest.json').write_bytes(manifest_raw)
+                item['landmarks']=dict(manifest_path=str(root/'manifest.json'),
+                    manifest_sha256=hashlib.sha256(manifest_raw).hexdigest(),
+                    report_path=str(root/'report.json'),engine_sha256='a'*64)
+            attach(manifest)
+            values,mask=read_landmarks(item,second)
+            self.assertEqual(values,[.3]+[0.]*22);self.assertEqual(mask,[True]+[False]*22)
+            whole=copy.deepcopy(manifest);whole['format']='dope-landmark-cache-cell-v1';attach(whole)
+            with self.assertRaisesRegex(ResearchError,'role_scoped_landmarks_required'):read_dataset(item)
+            invalid=copy.deepcopy(manifest);invalid['binding']['scope']['allowed_roles']+=['confirmation']
+            invalid['key']=digest(invalid['binding']);attach(invalid)
+            with self.assertRaisesRegex(ResearchError,'landmark_role_binding'):read_dataset(item)
+            attach(manifest);(root/'report.json').write_bytes(report_raw+b' ')
+            with self.assertRaisesRegex(ResearchError,'landmark_report_digest'):read_dataset(item)
+            for policy in ('group','time'):
+                with self.assertRaisesRegex(ResearchError,'block_policy_unsupported'):
+                    landmark_input(dict(item,split_policy=policy),second)
+
     def test_target_free_distribution_prefix_and_row_permutation(self):
         model=SharedModel(tiny()).eval();context,_,_=fixture()
         values,observed=tensors(context,'cpu')
@@ -85,6 +143,23 @@ class ModelTests(unittest.TestCase):
             self.assertFalse(torch.allclose(high,other))
             row=model.encoder(values.flip(0),observed.flip(0),context.schema)
             torch.testing.assert_close(high,row,atol=2e-5,rtol=2e-5)
+
+    def test_scoped_landmark_native_failure_keeps_receipt_without_publishing_labels(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'owned.csv'
+            source.write_text(''.join(f'{i},{i*.1}\n' for i in range(160)))
+            item=dict(path=str(source),train_sha256=file_sha(source),has_header=False,
+                      column_kinds=['numeric','numeric'],target_index=1,task='regression',
+                      family_id='owned:failure',dataset_id='physical-1',split_policy='iid',split_seed=1,
+                      meta_role='train',source_role='official_train',rights=dict(admitted=True,license_id='CC0-1.0'))
+            # The real Python executable rejects native CLI arguments with nonzero exit.
+            with self.assertRaisesRegex(ResearchError,'native_scoped_landmark_failed'):
+                prepare_landmarks(item,sys.executable,file_sha(Path(sys.executable).resolve()),root/'failed')
+            self.assertTrue((root/'failed'/'plan.json').is_file())
+            self.assertTrue((root/'failed'/'failure.json').is_file())
+            self.assertFalse((root/'failed'/'manifest.json').exists())
+            with self.assertRaises(FileExistsError):
+                prepare_landmarks(item,sys.executable,file_sha(Path(sys.executable).resolve()),root/'failed')
 
     def test_feature_binding_retains_which_identical_marginal_drives_target(self):
         model=SharedModel(tiny()).eval()

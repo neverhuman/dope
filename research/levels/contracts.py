@@ -131,12 +131,16 @@ class TrainConfig:
 def validate_corpus(manifest):
     """No unresolved or cross-role families; only owned TRAIN exports enter real episodes."""
     require(manifest.get("format") == "dope-meta-corpus-v1", "unknown_corpus")
-    families, identities = {}, set()
+    families, identities, physical = {}, set(), set()
     for item in manifest["datasets"]:
         family, role = item["family_id"], item["meta_role"]
         require(role in ("train", "development", "final") and family
                 and not family.startswith("unresolved:"), "unresolved_source_family")
         require(families.setdefault(family, role) == role, "family_role_overlap")
+        dataset = item.get('dataset_id')
+        require(isinstance(dataset,str) and bool(dataset), 'physical_dataset_id_required')
+        require((family,dataset) not in physical, 'duplicate_physical_dataset')
+        physical.add((family,dataset))
         require(item["source_role"] == "official_train" and item["rights"]["admitted"] is True
                 and bool(item["rights"]["license_id"]), "source_not_admitted")
         identity = item["train_sha256"]

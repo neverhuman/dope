@@ -40,6 +40,7 @@ case "${1:-all}" in
     cargo +1.88.0 clippy --manifest-path engine/Cargo.toml --locked -p dope-core -p dope-cli --all-targets -j2 -- -D warnings
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_cli -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-probes --test private_errors -j2
     ;;
   all)
     bash ops/ci/shared-levels.sh contracts

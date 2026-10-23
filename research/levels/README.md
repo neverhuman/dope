@@ -124,13 +124,39 @@ Replace `--prior-only` with `--corpus PRIVATE_MANIFEST.json`. A
 
 - `family_id` resolved across derivatives; `meta_role` train/development/final;
 - `source_role: official_train`, `rights: {admitted: true, license_id: ...}`;
-- local `path`, `train_sha256`, `has_header`, explicit source `target_index`,
+- stable opaque `dataset_id` identifying physical row offsets independently of
+  content, local `path`, `train_sha256`, `has_header`, explicit source `target_index`,
   source-order `column_kinds`, and `task` regression/classification;
 - `split_policy` iid/group/time, `split_seed`, plus `group_index`/`time_index`
   where applicable. Time requires explicit `time_kind` numeric/iso8601. ISO
   timestamps must carry a timezone; numeric chronology is never lexical order;
 - optional `landmarks` with local immutable `manifest_path`, `manifest_sha256`,
-  `report_path` from the verified native cache.
+  `report_path`, and checksum-pinned `engine_sha256` from the role-scoped producer below.
+
+Whole-TRAIN precalculation reports are diagnostic evidence; they are **refused as
+gradient labels**, because they include reserved calibration/confirmation rows.
+After source admission, generate a separate private fit-only artifact in a new
+directory. The dataset JSON is one admitted dataset entry from the corpus manifest:
+
+```sh
+python3 -B -m research.levels.cli landmarks --dataset PRIVATE_DATASET.json \
+  --engine /absolute/path/to/dope --expected-engine-sha256 VERIFIED_BINARY_SHA256 \
+  --out target/private-fit-labels
+```
+
+The producer opens only that declared official TRAIN file, selects physical fit
+rows before invoking the native panel, removes entity/time predictor identifiers,
+and writes a target-last positional CSV, plan, report and manifest (manifest last).
+Its reader recomputes the exact input and physical-row scope and checks source,
+schema, split, recipe, binary and report hashes. Unsupported cells remain masked;
+failed attempts retain their plan/report and static failure receipt. Directories
+are private and existing outputs are refused. This first scope supports IID only:
+group/time profile labels refuse until their native fold policy is qualified.
+Real episodes without profile labels still support all declared split policies.
+Content hashes bind source lineage but never seed row-role selection; changing
+held-out values cannot reshuffle fit rows. Preserve the stable dataset identity.
+These are new derived labels with separate lineage; never overwrite or relaunch
+the finished whole-TRAIN corpus. No actual completed pilot used real profile labels.
 
 No automatic inference of family, license or target is an admission decision.
 The completed private precalculation index contains 3,266 reusable reports,

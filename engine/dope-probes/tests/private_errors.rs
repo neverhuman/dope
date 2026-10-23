@@ -2,26 +2,53 @@
 use dope_probes::inputs::{split_table, Inputs, SplitParams};
 use dope_probes::landmarks::Tstr;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 const PRIVATE: &str = "PRIVATE_SOURCE_CANARY_59612";
 
 struct PrivateDir(PathBuf);
+static NEXT_DIR: AtomicU64 = AtomicU64::new(0);
 impl PrivateDir {
     fn new() -> Self {
         let nonce = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let path =
-            std::env::temp_dir().join(format!("dope-private-{}-{nonce}", std::process::id()));
-        std::fs::create_dir(&path).unwrap();
-        Self(path)
+        Self::at_clock_tick(nonce)
+    }
+    fn at_clock_tick(nonce: u128) -> Self {
+        // Guest clocks can give concurrent tests the same timestamp. Exclusive mkdir
+        // plus a process-local sequence also tolerates an existing stale directory.
+        for _ in 0..1024 {
+            let sequence = NEXT_DIR.fetch_add(1, Ordering::Relaxed);
+            let path = std::env::temp_dir().join(format!(
+                "dope-private-{}-{nonce}-{sequence}",
+                std::process::id()
+            ));
+            match std::fs::create_dir(&path) {
+                Ok(()) => return Self(path),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => panic!("cannot create private test directory: {error}"),
+            }
+        }
+        panic!("private test directory allocation exhausted");
     }
 }
 impl Drop for PrivateDir {
     fn drop(&mut self) {
         let _ = std::fs::remove_dir_all(&self.0);
     }
+}
+
+#[test]
+fn temporary_dirs_do_not_collide_at_same_clock_tick() {
+    let workers: Vec<_> = (0..32)
+        .map(|_| std::thread::spawn(|| PrivateDir::at_clock_tick(0)))
+        .collect();
+    let directories: Vec<_> = workers.into_iter().map(|w| w.join().unwrap()).collect();
+    let paths: std::collections::BTreeSet<_> = directories.iter().map(|d| &d.0).collect();
+    assert_eq!(paths.len(), 32);
+    assert!(paths.iter().all(|p| p.is_dir()));
 }
 
 #[test]

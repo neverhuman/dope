@@ -50,8 +50,10 @@ does not block integration. Historical ARM failures remain recorded as unqualifi
 while editing, using the existing Cargo target and inherited compiler cache.
 It refuses zero executed tests and records raw logs, command exits and source
 hashes under `target/focus/`. It never replaces the full CPU PR lane.
-The CPU workflow pins sccache and preserves the lane's Cargo target cache to
-shorten repeated locked checks. Local builds reuse their worktree target.
+The CPU workflow pins sccache and caches Cargo registry/git dependencies to
+shorten repeated locked checks. Compiled objects use sccache; full target trees
+are excluded because they include environments/evidence and can exhaust the job
+quota during post-job compression. Local builds reuse their worktree target.
 CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
 early package transaction, retaining the 300-second package-lock wait and
 120-minute CPU job quota. `cpu.sh` checks all required tools before tests and never

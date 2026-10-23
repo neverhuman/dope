@@ -3,8 +3,12 @@ import csv
 from collections import OrderedDict
 from datetime import datetime
 import hashlib
+import io
 import json
+import os
+import platform
 from pathlib import Path
+import subprocess
 import numpy as np
 from .contracts import canonical, digest, require, validate_corpus
 from .data import role_indices
@@ -18,9 +22,11 @@ def file_sha(path):
     return h.hexdigest()
 
 
-def read_dataset(item):
+def read_dataset(item, *, include_landmarks=True):
     require(item['meta_role']in('train','development') and item['source_role']=='official_train'
-            and item['rights']['admitted']is True,'source_role_not_allowed')
+            and item['rights']['admitted']is True and bool(item['rights']['license_id'])
+            and bool(item['family_id']) and not item['family_id'].startswith('unresolved:'),
+            'source_role_not_allowed')
     path = Path(item["path"])
     require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 200000000,
             "source_path_unsupported")
@@ -36,7 +42,10 @@ def read_dataset(item):
     kinds, target = item["column_kinds"], item["target_index"]
     require(0 <= target < len(kinds) and all(len(row) == len(kinds) for row in rows), "source_schema_drift")
     order = [j for j in range(len(kinds)) if j != target] + [target]
-    row_ids = [item["train_sha256"]+f":{i}" for i in range(len(rows))]
+    # Content hashes include held-out targets. They bind lineage, never row selection.
+    require(isinstance(item.get('dataset_id'), str) and bool(item['dataset_id']), 'physical_dataset_id_required')
+    physical = digest(dict(family=item['family_id'], dataset=item['dataset_id']))
+    row_ids = [physical+f":{i}" for i in range(len(rows))]
     policy = item["split_policy"]
     groups = [row[item["group_index"]] for row in rows] if policy == "group" else None
     times = None
@@ -54,33 +63,59 @@ def read_dataset(item):
     # Entity/time identifiers cannot become predictor features.
     excluded = {item.get("group_index"), item.get("time_index")}
     order = [j for j in order if j == target or j not in excluded]
-    return dict(rows=[[row[j] for j in order] for row in rows], kinds=[kinds[j] for j in order],
+    result = dict(rows=[[row[j] for j in order] for row in rows], kinds=[kinds[j] for j in order],
                 slots=[j+1 if j != target else 0 for j in order], row_ids=row_ids,
                 task=item["task"], family_id=item["family_id"],
                 roles=role_indices(row_ids, item["split_seed"], policy=policy, groups=groups, times=times),
-                landmarks=read_landmarks(item), evidence="unqualified_real_development")
+                evidence="unqualified_real_development")
+    result['landmarks'] = read_landmarks(item, result) if include_landmarks else ([0.]*23, [False]*23)
+    return result
 
 
-def read_landmarks(item):
+LANDMARK_OPTIONS = dict(panel='landmarks-native-v1', folds=5, ridge_rows=8192,
+                        small_rows=4096, knn_reference=2048, spectrum_features=64,
+                        work_budget=2000000000, seed=0)
+
+
+def landmark_input(item, data):
+    """A new, private fit-only input; never reinterpret a whole-TRAIN report."""
+    require(item['split_policy'] == 'iid', 'scoped_landmark_block_policy_unsupported')
+    indices = sorted(data['roles']['fit'])
+    require(indices and not set(indices).intersection(
+        data['roles']['tune']+data['roles']['calibration']+data['roles']['confirmation']), 'landmark_role_overlap')
+    stream = io.StringIO(newline='')
+    writer = csv.writer(stream, lineterminator='\n')
+    writer.writerow([f'c{i}' for i in range(len(data['kinds']))])
+    writer.writerows(data['rows'][i] for i in indices)
+    raw = stream.getvalue().encode('utf-8')
+    scope = dict(format='dope-fit-landmark-scope-v1', source_sha256=item['train_sha256'],
+                 dataset_id=item['dataset_id'], family_id=item['family_id'], source_role='official_train',
+                 split_policy=item['split_policy'], split_seed=item['split_seed'], allowed_roles=['fit'],
+                 row_count=len(indices), row_ids_sha256=digest([data['row_ids'][i] for i in indices]),
+                 input_sha256=hashlib.sha256(raw).hexdigest(), source_target_index=item['target_index'],
+                 column_kinds=data['kinds'], slots=data['slots'], task=data['task'])
+    return raw, scope
+
+
+def read_landmarks(item, data):
     declared = item.get("landmarks")
     if declared is None: return ([0.]*23, [False]*23)
     manifest_raw = Path(declared["manifest_path"]).read_bytes()
     require(hashlib.sha256(manifest_raw).hexdigest() == declared["manifest_sha256"], "landmark_manifest_digest")
     manifest = json.loads(manifest_raw)
-    binding = manifest["binding"]
-    require(manifest["format"] == "dope-landmark-cache-cell-v1"
-            and binding["train_sha256"] == item["train_sha256"]
-            and binding["source_role"] == "official_train"
-            and binding["target"]["index"] in (item["target_index"], -1)
-            and manifest["key"] == digest(binding), "landmark_source_binding")
-    require(binding["target"]["index"] != -1 or item["target_index"] == len(item["column_kinds"])-1,
-            "landmark_target_binding")
+    require(manifest.get('format') == 'dope-role-landmarks-v1', 'role_scoped_landmarks_required')
+    _, scope = landmark_input(item, data)
+    binding = manifest['binding']
+    require(binding['scope'] == scope and binding['options'] == LANDMARK_OPTIONS
+            and binding['engine_sha256'] == declared['engine_sha256']
+            and manifest['key'] == digest(binding), 'landmark_role_binding')
     raw = Path(declared["report_path"]).read_bytes()
     require(len(raw) == manifest["report_bytes"] and hashlib.sha256(raw).hexdigest() == manifest["report_sha256"],
             "landmark_report_digest")
     report = json.loads(raw)
     require(report["options"] == binding["options"] and report["panel"] == "landmarks-native-v1"
             and report["kind"] == "real" and report["privacy"] == "private"
+            and report['task'] == scope['task'] and report['rows'] == scope['row_count']
             and [c["id"] for c in report["cells"]] == list(range(1,24)), "landmark_recipe_binding")
     values, mask = [], []
     for cell in report["cells"]:
@@ -89,6 +124,55 @@ def read_landmarks(item):
         require(np.isfinite(value), "landmark_nonfinite")
         values.append(float(value)); mask.append(valid)
     return values, mask
+
+
+def prepare_landmarks(item, engine, expected_engine_sha256, out, *, wall_seconds=300, threads=4):
+    """Run the pinned native panel on admitted IID fit rows and publish the manifest last."""
+    require(type(wall_seconds) is int and 1 <= wall_seconds <= 1800
+            and type(threads) is int and 1 <= threads <= 4, 'landmark_allocation_unsupported')
+    engine, out = Path(engine).resolve(), Path(out)
+    require(engine.is_file() and file_sha(engine) == expected_engine_sha256, 'landmark_engine_digest')
+    data = read_dataset(item, include_landmarks=False)
+    raw, scope = landmark_input(item, data)
+    out.mkdir(mode=0o700, parents=False, exist_ok=False)
+    def write(name, content):
+        with (out/name).open('xb') as stream:
+            os.chmod(out/name, 0o600); stream.write(content); stream.flush(); os.fsync(stream.fileno())
+    write('fit.csv', raw)
+    binding = dict(scope=scope, engine_sha256=expected_engine_sha256, options=LANDMARK_OPTIONS)
+    plan = canonical(dict(binding=binding, threads=threads, wall_seconds=wall_seconds))
+    write('plan.json', plan)
+    command = [str(engine), '--threads', str(threads), 'landmarks', 'real', str((out/'fit.csv').resolve()),
+               '--target', str(len(data['kinds'])-1), '--task', data['task'], '--json']
+    for name, value in LANDMARK_OPTIONS.items():command += ['--'+name.replace('_','-'), str(value)]
+    try:
+        with (out/'report.json').open('xb') as stream:
+            os.chmod(out/'report.json', 0o600)
+            result = subprocess.run(command, stdout=stream, stderr=subprocess.DEVNULL,
+                                    timeout=wall_seconds, check=False)
+            stream.flush(); os.fsync(stream.fileno())
+        require(result.returncode == 0, 'native_scoped_landmark_failed')
+        report_raw = (out/'report.json').read_bytes()
+        report = json.loads(report_raw)
+        require(report['options'] == LANDMARK_OPTIONS and report['kind'] == 'real'
+                and report['privacy'] == 'private' and report['panel'] == LANDMARK_OPTIONS['panel']
+                and report['task'] == scope['task'] and report['rows'] == scope['row_count']
+                and [c['id'] for c in report['cells']] == list(range(1,24)), 'scoped_landmark_report_invalid')
+        manifest = dict(format='dope-role-landmarks-v1', binding=binding, key=digest(binding),
+                        report_bytes=len(report_raw), report_sha256=hashlib.sha256(report_raw).hexdigest(),
+                        plan_sha256=hashlib.sha256(plan).hexdigest(),
+                        producer_sha256=file_sha(__file__), platform=platform.platform(),
+                        python_version=platform.python_version())
+        # Validate every label before publication. Failed/unsupported cells retain their masks.
+        for cell in report['cells']:
+            require(cell.get('gain') is None or np.isfinite(cell['gain']), 'landmark_nonfinite')
+        write('manifest.json', canonical(manifest))
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        write('failure.json', canonical(dict(state='failed', error_type=type(error).__name__)))
+        require(False, 'native_scoped_landmark_failed')
+    return dict(manifest_path=str((out/'manifest.json').resolve()),
+                manifest_sha256=file_sha(out/'manifest.json'), report_path=str((out/'report.json').resolve()),
+                engine_sha256=expected_engine_sha256)
 
 
 class Corpus:

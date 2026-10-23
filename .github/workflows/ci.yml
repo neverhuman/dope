@@ -41,9 +41,9 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-            engine/target
-          key: rust-cpu-lan-ubuntu24-x86-64-v1-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'engine/Cargo.lock') }}
+          # sccache owns compiled objects. Full target trees include Python environments
+          # and generated evidence; their post-job tar exceeded the CPU job quota.
+          key: rust-cpu-dependencies-ubuntu24-x86-64-v2-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'engine/Cargo.lock') }}
       - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
         with:
           version: v0.16.0
