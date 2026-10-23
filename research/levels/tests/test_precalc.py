@@ -131,4 +131,3 @@ class PrecalcTests(unittest.TestCase):
                 reused=run(planned,binary=binary,root=root/'reused',source_client=NoSource(),bucket='private',store=store,workers=1,threads=1,timeout=1,wall_seconds=35)
             self.assertEqual(reused['records'][0]['state'],'cached');self.assertEqual(reused['terminal'],1)
             self.assertEqual(build(planned,[root/'reused'],store)['counts'],dict(ready=1))
-
