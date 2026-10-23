@@ -1,0 +1,73 @@
+{
+  "description": "Inputs of the levels and landmark development probes (selection-exposed development evidence only). Download <pmlb_base>/<table>/<table>.tsv.gz, decompress it, and run `dope-probes split`. The split carries source fields through verbatim. The probes' own files were written by pandas and match these files row for row; the four classification tables are byte-identical, and regression values differ by at most 8e-13 relative (pandas' default float parser).",
+  "pmlb_base": "https://media.githubusercontent.com/media/EpistasisLab/pmlb/7c1f4bdc00136dc2e55c87fa6b8ba6e8af6d1a68/datasets",
+  "split": {
+    "seed": 20261022,
+    "test_share": 0.2,
+    "max_test_rows": 5000,
+    "max_train_rows": 12000,
+    "target": "target"
+  },
+  "classification": [
+    "adult",
+    "car_evaluation",
+    "churn",
+    "mushroom"
+  ],
+  "tables": {
+    "197_cpu_act": {
+      "tsv_gz": "d00fd6bac2eda0821a04ff10277663d211127745a19a474c0feee41a16914fdc",
+      "tsv": "62a986c2c8d5a2ac084cd5d256b82d2583bac6bc7cd816959b436761aaf2b314",
+      "train_csv": "d1e3acaa76aff29d6d383111e1666daddbd10106c56b82c826451c6e80d98bf6",
+      "test_csv": "329cad1b345dc21929defc589ed93cdd245023e210de317ed0ca2ed0407c8349"
+    },
+    "218_house_8L": {
+      "tsv_gz": "034378d7304b89725c914779ed819b6d22e62f60f15d1eac774c4a1244bbc790",
+      "tsv": "3738ebd191a17477a1311dd9a733db9a5be1988cf922a5bfaf1bfc0cfb89be23",
+      "train_csv": "408ca2eb8922e883f059260569af06c1674e4bf0260ee4b6861000c97beb13d7",
+      "test_csv": "c46e7e10551e6db5beee5bf36e6299604d4e369b92ab140d9f7f7f112aba106e"
+    },
+    "225_puma8NH": {
+      "tsv_gz": "0be6203e167cc5e7b038368dbfe0a7790d5dc423c9d7e42887907c5c03f81c27",
+      "tsv": "62fd52b03da511a39e923f26a6c7f6d73f49152abf70d8de93482db0059b73f7",
+      "train_csv": "cb2c218d966a9891e2db4ba046d042083256aaf49de61b22a1971c2b77425694",
+      "test_csv": "3a9a7bfb9673676997a660602f9b4f87bef6fb0377421908cae51f3caebc5813"
+    },
+    "344_mv": {
+      "tsv_gz": "087be6d353160ac187935aae1bf246b787d88be3d84b44e1533ce71cc8c43cb6",
+      "tsv": "8b4e7976388182fa614452f9ea69369fec7cced02f97d0f5a1a7828d6ceeb049",
+      "train_csv": "5349b60ccb38c3ef6d626d2be77a8152dcdedf1550dfe4030966261f0c58300d",
+      "test_csv": "e94570550bf540e577b1ed96ef67c05f7363731e42190aaaf1c1cf64b66a6fe0"
+    },
+    "574_house_16H": {
+      "tsv_gz": "a551e2941365201552a3a819f035c64f297467464f7c7c349d00711316ce3c57",
+      "tsv": "b38bc84b7fa0ae81797d66bc4d8344ce2a4a53ea28d2f3e4afba73ecca2bf489",
+      "train_csv": "c4654f664d638d847c7919c9a06760741a055689a98a2b5fb4e8ba52d3580201",
+      "test_csv": "c1746d4f6486ca2398adb6df7bd2d70fec8ed5b74a9019b9feece403834dadf9"
+    },
+    "adult": {
+      "tsv_gz": "fb8bc76eafa39558b6044907f23416faf99099cefb8afd06a2cf5afbdae1b506",
+      "tsv": "dffccfccfa4a18b473c940d0606b21662ff0d0cceab2c2139d430b3e947d480c",
+      "train_csv": "e56f729c783abeb33394a6df8b738b77832406e61848b83d1a1c8caf69478511",
+      "test_csv": "f4d82c0f50c5077381188199bb635dfdbdba716bfda17288e43949b571bdab0a"
+    },
+    "car_evaluation": {
+      "tsv_gz": "9c18fe91ba5401cab754456a9bfbfe54a6c307b0d4b880259fb4218edef77998",
+      "tsv": "33f57982e3f090e0579c012734577264d52affd1fa14c485562633b7f58e595b",
+      "train_csv": "34b899217e8b0d254da86a3907803e7a756547c31ae3d602b1932658a293f466",
+      "test_csv": "5eb05be57643677b738206f72031c2a77040e54e328a5370d129a65d5207b6fa"
+    },
+    "churn": {
+      "tsv_gz": "7a8bf22bd4c0845187d4d6eb39b215181ba149834b851430a68052a7a3a86bcc",
+      "tsv": "42de232ebc4fc95958dbdc32bdc38e5ea0d72ff37487f1aefd1cc35a7248419e",
+      "train_csv": "2c927dc0fe8ab2d3bb63a290c126d3db0f889f3c4b7c7b3754015103472ac9df",
+      "test_csv": "e9b393921d20cf86590f4771fed1247735c7f82a954bdcd8eee23f0988016adf"
+    },
+    "mushroom": {
+      "tsv_gz": "d8daa6822f14604f8567a5a8e5dfa93db6c383cf01aac01812c0ebdce3ab158a",
+      "tsv": "7e0917451dc2a8ba711b8f2b5c8a07afda14639f0047d5404c0c2ab76edc287f",
+      "train_csv": "0ea0fdf217acbac61418193f8685b7456820e218b5aaae978e408e3042efc545",
+      "test_csv": "c6609d4f1f1da6eef223be36ec77e592f0d4667761b06882d24ea6f2f5f2ce51"
+    }
+  }
+}
