@@ -93,6 +93,7 @@ def run_cell(cell,plan,*,binary,source,root,threads=4,timeout=1800,rss_bytes=2*2
         started=time.monotonic();receipt=dict(key=key,cell_key=cell['key'],dataset_id=cell['scope']['dataset_id'],
             split=cell['scope']['split'],producer=who,model_training=False,official_test_access=False,
             state='failed',threads=threads,wall_limit=timeout,rss_limit=rss_bytes)
+        p=None
         try:
             if cell['state']=='unsupported':receipt.update(state='unsupported',reason=cell['reason'])
             else:
@@ -107,9 +108,12 @@ def run_cell(cell,plan,*,binary,source,root,threads=4,timeout=1800,rss_bytes=2*2
                     os.chmod(report.name,0o600);os.chmod(log.name,0o600)
                     p=subprocess.Popen(args,stdout=report,stderr=log,stdin=subprocess.DEVNULL,env=env,start_new_session=True)
                     private(out/'native-owner.json',dict(pid=p.pid,host=platform.node(),key=key,binary_sha256=who['engine_sha256']))
-                    end=time.monotonic()+timeout;peak=0;disposition=None
+                    end=time.monotonic()+timeout;peak=0;disposition=None;next_host_check=time.monotonic()+5
                     while p.poll()is None:
                         if time.monotonic()>=end:disposition='native_wall_limit'
+                        if time.monotonic()>=next_host_check:
+                            host=allocation_snapshot(out);next_host_check=time.monotonic()+5
+                            if host['memory_available']<4*2**30 or host['disk_available']<2*2**30:disposition='host_resource_pressure'
                         observed=subprocess.run(['/bin/ps','-o','rss=','-p',str(p.pid)],capture_output=True,text=True,timeout=3)
                         if observed.returncode==0 and observed.stdout.strip().isdigit():
                             peak=max(peak,int(observed.stdout.strip())*1024)
@@ -123,7 +127,7 @@ def run_cell(cell,plan,*,binary,source,root,threads=4,timeout=1800,rss_bytes=2*2
                         time.sleep(.25)
                 receipt.update(native_exit=p.returncode,sampled_rss_peak=peak)
                 if disposition is not None:
-                    receipt.update(state='overbudget'if disposition in ('native_wall_limit','native_rss_limit')else'failed',reason=disposition)
+                    receipt.update(state='overbudget'if disposition in ('native_wall_limit','native_rss_limit')else('resource_paused'if disposition=='host_resource_pressure'else'failed'),reason=disposition)
                     raise ValueError('precalc_native_resource_limit')
                 require(p.returncode==0,'precalc_native_exit')
                 report=json.loads((out/'report.json').read_bytes())
@@ -137,6 +141,8 @@ def run_cell(cell,plan,*,binary,source,root,threads=4,timeout=1800,rss_bytes=2*2
                     report_sha256=sha(out/'report.json'),feature_sha256=sha(out/'features.json'))
                 if store is not None:publish(cell,plan,receipt,out,store)
         except (OSError,ValueError,KeyError,TypeError,subprocess.SubprocessError)as error:
+            if p is not None and p.poll()is None:
+                p.kill();p.wait()
             if receipt['state']=='complete':receipt['state']='publication_failed'
             receipt.update(error_type=type(error).__name__);receipt.setdefault('reason','precalc_input_native_or_publication_refused')
         receipt['elapsed_seconds']=time.monotonic()-started
@@ -194,6 +200,13 @@ def run(plan,*,binary,root,source_client,bucket,store,workers,threads=4,timeout=
             receipt=json.loads(existing.read_bytes())
             if receipt['state']=='complete':require(lookup(cell,plan,who,store)is not None,'precalc_completed_cache_missing')
             return receipt
+        selected=plan.get('reuse_entries',{}).get(cell['key'])
+        if selected is not None:
+            raw=store.get(selected['entry_key'])
+            require(raw is not None and hashlib.sha256(raw).hexdigest()==selected['entry_sha256'],'precalc_pinned_reuse_digest')
+            index=json.loads(raw);cached=lookup(cell,plan,index['producer'],store)
+            require(cached is not None,'precalc_pinned_reuse_missing')
+            private(root/'cells'/cached['key']/'receipt.json',dict(cached,producer=index['producer']));return cached
         prior=store.get('dispositions/'+cache_key(cell,plan,who)+'.json')
         if prior is not None:return json.loads(prior)
         cached=lookup(cell,plan,who,store)
@@ -208,7 +221,7 @@ def run(plan,*,binary,root,source_client,bucket,store,workers,threads=4,timeout=
         v=allocation_snapshot(root)
         return (time.monotonic()-started+timeout+30<wall_seconds and v['disk_available']>10*2**30
                 and (v['memory_available']is None or v['memory_available']>8*2**30)
-                and v['load'][0]<v['cpu_available']-8+active*threads)
+                and v['load'][0]<v['cpu_available']-8)
     summary=dict(format='dope-fit-cv-precalc-progress-v1',plan_sha256=plan['sha256'],scheduled=len(assigned),terminal=0,pending=len(assigned),records=[],workers=workers,threads_per_worker=threads,model_training=False,official_test_access=False)
     with(root/'run.lock').open('a')as lock,concurrent.futures.ThreadPoolExecutor(max_workers=workers)as pool:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);pending=iter(assigned);active={}
@@ -223,7 +236,7 @@ def run(plan,*,binary,root,source_client,bucket,store,workers,threads=4,timeout=
             for future in done:
                 cell=active.pop(future)
                 try:records.append(future.result())
-                except Exception as error:
+                except (OSError,ValueError,KeyError,TypeError,RuntimeError,subprocess.SubprocessError)as error:
                     failure=dict(cell_key=cell['key'],key=cache_key(cell,plan,who),state='interrupted',
                                  error_type=type(error).__name__,model_training=False,official_test_access=False)
                     private(root/'failures'/(cell['key']+'.json'),failure)

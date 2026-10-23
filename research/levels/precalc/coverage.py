@@ -16,7 +16,7 @@ def build(plan, roots, store):
             receipt=json.loads(path.read_bytes());key=receipt['cell_key']
             require(key in cells,'precalc_coverage_unknown_cell')
             if receipt['state']in ('complete','cached'):
-                checked=lookup(cells[key],plan,producer,store)
+                checked=lookup(cells[key],plan,receipt['producer'],store)
                 require(checked is not None,'precalc_coverage_missing_publication')
                 object_key=index_key(cells[key],plan,checked['key']);raw=store.get(object_key)
                 record=dict(cell_key=key,state='ready',entry_key=object_key,

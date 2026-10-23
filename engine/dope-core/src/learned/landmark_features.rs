@@ -38,7 +38,10 @@ pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Re
             && manifest["format"] == "dope-fit-cv-landmark-input-v1"
             && manifest["feature_recipe"] == RECIPE
             && options == expected_options
-            && matches!(options.work_budget, 2_000_000_000 | 20_000_000_000 | 2_000_000_000_000)
+            && matches!(
+                options.work_budget,
+                2_000_000_000 | 20_000_000_000 | 2_000_000_000_000
+            )
             && manifest["engine_sha256"].as_str().is_some_and(|v| {
                 v.len() == 64
                     && v.bytes()

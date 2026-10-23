@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import platform
 from pathlib import Path
 from ..contracts import canonical,require,digest
 from .plan import make_plan,validate_plan
@@ -50,7 +51,7 @@ def main():
         require(not args.source_urls or args.local_store is not None,'precalc_delegated_source_requires_local_store')
         result=run(value,binary=args.binary,root=args.root,source_client=source,bucket=args.bucket,store=store,
             workers=args.workers,threads=args.threads,timeout=args.timeout,shard=args.shard,shards=args.shards,wall_seconds=args.wall_seconds)
-        store.put('runs/'+value['sha256']+'/'+args.root.name+'/terminal.json',canonical(result))
+        store.put('runs/'+value['sha256']+'/'+digest(platform.node())[:16]+'/'+args.root.name+'/terminal.json',canonical(result))
         print(json.dumps({k:result[k]for k in ('state','scheduled','terminal','pending')}));return
     store=PrivateStore(client(args.profile),args.bucket,args.prefix);cells={c['key']:c for c in value['cells']};counts={}
     for path in sorted(args.root.glob('cells/*/receipt.json')):

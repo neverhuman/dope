@@ -117,3 +117,18 @@ class PrecalcTests(unittest.TestCase):
             self.assertEqual(entry['manifest_sha256'],hashlib.sha256((out/'manifest.json').read_bytes()).hexdigest())
             result=build(plan,[run],store);self.assertEqual(result['counts'],dict(pending=5,ready=1));self.assertEqual(result['scheduled'],6)
             self.assertFalse((root/'download'/'fit.csv').exists())
+            # A new transport/host producer may reuse a separately pinned old producer;
+            # both the raw-data API and native execution are forbidden in this proof.
+            from research.levels.precalc.worker import run
+            planned=copy.deepcopy(plan);planned['cells']=[cell]
+            planned['reuse_entries']={cell['key']:dict(entry_key=key,entry_sha256=hashlib.sha256(raw).hexdigest())}
+            planned.pop('sha256');planned['sha256']=digest(planned)
+            binary=root/'binary';binary.write_bytes(b'not executable; must never run')
+            class NoSource:
+                def get_object(self,**kw):raise AssertionError('raw source read during reuse')
+            allocation=dict(memory_available=100*2**30,disk_available=100*2**30,cpu_available=128,load=[0,0,0])
+            with patch('research.levels.precalc.plan.CATALOG_SHA256',planned['catalog_sha256']),patch('research.levels.precalc.worker.os.nice'),patch('research.levels.precalc.worker.allocation_snapshot',return_value=allocation),patch('research.levels.precalc.worker.run_cell',side_effect=AssertionError('native execution during reuse')):
+                reused=run(planned,binary=binary,root=root/'reused',source_client=NoSource(),bucket='private',store=store,workers=1,threads=1,timeout=1,wall_seconds=35)
+            self.assertEqual(reused['records'][0]['state'],'cached');self.assertEqual(reused['terminal'],1)
+            self.assertEqual(build(planned,[root/'reused'],store)['counts'],dict(ready=1))
+
