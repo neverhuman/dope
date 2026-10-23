@@ -838,7 +838,8 @@
     "engine/dope-core/src/learned/landmark_features.rs": "rust-core",
     "engine/dope-core/tests/learned_landmark_inputs.rs": "rust-core",
     "engine/dope-cli/tests/learned_landmark_cli.rs": "rust-core",
-    "engine/dope-core/src/learned/": "rust-core"
+    "engine/dope-core/src/learned/": "rust-core",
+    "research/levels/precalc/": "external-evidence"
   },
   "workspace": "dope"
 }

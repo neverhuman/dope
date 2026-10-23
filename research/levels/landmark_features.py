@@ -69,7 +69,7 @@ def training_csv(data):
 
 def validate_options(options):
     require(options == dict(OPTIONS,work_budget=options.get('work_budget'))
-            and options['work_budget'] in (2000000000,20000000000), 'cv_landmark_options_unsupported')
+            and options['work_budget'] in (2000000000,20000000000,2000000000000), 'cv_landmark_options_unsupported')
 
 
 def report_features(report, rows, task, *, options=None):
