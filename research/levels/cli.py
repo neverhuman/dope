@@ -20,6 +20,7 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     sub=parser.add_subparsers(dest='command',required=True)
     run=sub.add_parser('train');run.add_argument('--config',type=Path,required=True)
+    run.add_argument('--landmark-input-cache',type=Path)
     run.add_argument('--corpus',type=Path);run.add_argument('--prior-only',action='store_true')
     run.add_argument('--prior-recipe', choices=('owned-mechanisms-v1','owned-mechanisms-unique-v2'),
                      default='owned-mechanisms-v1',help='Explicit prior stream; v1 remains historical replay')
@@ -36,7 +37,35 @@ def main(argv=None):
     labels.add_argument('--expected-engine-sha256',required=True)
     labels.add_argument('--out',type=Path,required=True)
     labels.add_argument('--wall-seconds',type=int,default=300)
+    inputs=sub.add_parser('landmark-inputs',help='Private five-fold CV encoder features from training rows only')
+    source=inputs.add_mutually_exclusive_group(required=True)
+    source.add_argument('--dataset',type=Path)
+    source.add_argument('--owned-family',type=int,choices=range(9))
+    inputs.add_argument('--owned-seed',type=int,default=20261023)
+    inputs.add_argument('--engine',type=Path,required=True)
+    inputs.add_argument('--expected-engine-sha256',required=True)
+    inputs.add_argument('--out',type=Path,required=True)
+    inputs.add_argument('--wall-seconds',type=int,default=300)
     args=parser.parse_args(argv)
+    if args.command=='landmark-inputs':
+        from .landmark_features import prepare_input
+        from .corpus import read_dataset
+        from .contracts import digest
+        from .resources import Guard,snapshot
+        resource=snapshot(args.out.parent,cuda=False)
+        require(resource['load'][0]<resource['cpu_available']*.85,'cpu_load_allocation_refused')
+        Guard(args.out.parent,args.out.parent/'landmark-input-resources.jsonl').admit()
+        if hasattr(os,'nice'):os.nice(10)
+        if args.dataset is not None:
+            data=read_dataset(json.loads(args.dataset.read_bytes()),include_landmarks=False)
+        else:
+            from .priors import table
+            data=table(args.owned_family,args.owned_seed)
+            data['source_provenance']=dict(kind='owned_prior',physical_table_id=digest(
+                dict(family=args.owned_family,seed=args.owned_seed)))
+        print(json.dumps(prepare_input(data,args.engine,args.expected_engine_sha256,args.out,
+                                      wall_seconds=args.wall_seconds)))
+        return 0
     if args.command=='landmarks':
         from .corpus import prepare_landmarks
         from .resources import Guard,snapshot
@@ -67,7 +96,8 @@ def main(argv=None):
     from .corpus import Corpus
     from .train import train
     corpus=Corpus(None if args.corpus is None else json.loads(args.corpus.read_bytes()),
-                  seed=config.seed,prior_only=args.prior_only,prior_recipe=args.prior_recipe)
+                  seed=config.seed,prior_only=args.prior_only,prior_recipe=args.prior_recipe,
+                  input_cache=None if args.landmark_input_cache is None else json.loads(args.landmark_input_cache.read_bytes()))
     _,terminal=train(model,config,corpus,args.out,source_sha256=source_fingerprint(),resume=args.resume,
         phase=args.phase,base_checkpoint=args.ordinary_base,stop_after=args.stop_after,
         resource_check=guard,repair_reason=args.repair_reason)

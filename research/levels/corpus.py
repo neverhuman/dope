@@ -13,6 +13,7 @@ import numpy as np
 from .contracts import canonical, digest, require, validate_corpus
 from .data import role_indices
 from .priors import table
+from .landmark_features import InputCache
 
 
 def file_sha(path):
@@ -44,7 +45,7 @@ def read_dataset(item, *, include_landmarks=True):
     order = [j for j in range(len(kinds)) if j != target] + [target]
     # Content hashes include held-out targets. They bind lineage, never row selection.
     require(isinstance(item.get('dataset_id'), str) and bool(item['dataset_id']), 'physical_dataset_id_required')
-    physical = digest(dict(family=item['family_id'], dataset=item['dataset_id']))
+    physical = item.get('physical_dataset_id', digest(dict(family=item['family_id'], dataset=item['dataset_id'])))
     row_ids = [physical+f":{i}" for i in range(len(rows))]
     policy = item["split_policy"]
     groups = [row[item["group_index"]] for row in rows] if policy == "group" else None
@@ -65,7 +66,7 @@ def read_dataset(item, *, include_landmarks=True):
     order = [j for j in order if j == target or j not in excluded]
     result = dict(rows=[[row[j] for j in order] for row in rows], kinds=[kinds[j] for j in order],
                 slots=[j+1 if j != target else 0 for j in order], row_ids=row_ids,
-                task=item["task"], family_id=item["family_id"],
+                task=item["task"], family_id=item["family_id"], split_policy=policy,
                 roles=role_indices(row_ids, item["split_seed"], policy=policy, groups=groups, times=times),
                 evidence="unqualified_real_development",
                 source_provenance=dict(kind="admitted_official_train",physical_table_id=physical,
@@ -182,14 +183,17 @@ PRIOR_RECIPES = ("owned-mechanisms-v1", "owned-mechanisms-unique-v2")
 
 class Corpus:
     def __init__(self, manifest=None, *, seed=20261023, prior_only=False,
-                 prior_recipe="owned-mechanisms-v1"):
+                 prior_recipe="owned-mechanisms-v1", input_cache=None):
         require(prior_recipe in PRIOR_RECIPES, "unknown_prior_recipe")
         self.prior_recipe = prior_recipe
         self.seed, self.prior_only, self.loaded = seed, prior_only, OrderedDict()
+        self.input_cache = InputCache(input_cache) if input_cache is not None else None
         self.manifest = validate_corpus(manifest) if manifest is not None else None
         require(prior_only or self.manifest is not None, "real_corpus_manifest_required")
         self.identity = digest(dict(manifest=self.manifest, prior_recipe=prior_recipe,
                                     prior_only=prior_only, seed=seed))
+        if self.input_cache is not None:
+            self.identity=digest(dict(corpus_sha256=self.identity,landmark_input_cache_sha256=self.input_cache.identity))
 
     def development(self, cursor, recipe):
         """A versioned observer draw; never change the training stream or historical draws."""
@@ -202,7 +206,7 @@ class Corpus:
         result['source_provenance'] = dict(kind='owned_prior', prior_recipe=self.prior_recipe,
             development_recipe=recipe, physical_table_id=digest(dict(family=family, seed=table_seed)), draw=cursor)
         result['landmarks'] = ([0.]*23, [False]*23)
-        return result
+        return self.input_cache.attach(result) if self.input_cache is not None else result
 
     def get(self, role, cursor):
         require(role in ("train", "development"), "final_access_forbidden")
@@ -219,7 +223,7 @@ class Corpus:
             result["source_provenance"] = dict(kind="owned_prior",prior_recipe=self.prior_recipe,
                 physical_table_id=digest(dict(family=family,seed=table_seed)),draw=draw)
             result["landmarks"] = ([0.]*23, [False]*23)
-            return result
+            return self.input_cache.attach(result) if self.input_cache is not None else result
         entries = [d for d in self.manifest["datasets"] if d["meta_role"] == role]
         families = sorted({d["family_id"] for d in entries})
         require(families, "empty_corpus_role")
@@ -231,4 +235,4 @@ class Corpus:
             self.loaded[key] = read_dataset(chosen)
             if len(self.loaded)>2:self.loaded.popitem(last=False)
         self.loaded.move_to_end(key)
-        return self.loaded[key]
+        return self.input_cache.attach(self.loaded[key]) if self.input_cache is not None else self.loaded[key]

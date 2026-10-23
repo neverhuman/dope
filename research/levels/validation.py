@@ -30,7 +30,7 @@ def observe(model, corpus, config, step, *, phase='ordinary', resource_check=Non
                     context, query, identity = episode(**{k:source[k] for k in
                         ('rows','kinds','slots','row_ids','task','roles')}, config=model.config,
                         cursor=cursor, seed=corpus.seed)
-                    _, raw = objective(model, context, query, source['landmarks'], config, step,
+                    _, raw = objective(model, context, query, source['landmark_input'] if model.config.landmark_input() else source['landmarks'], config, step,
                                        phase=phase, differentiable=False)
                     records.append(raw)
                     family = digest(source['family_id'])

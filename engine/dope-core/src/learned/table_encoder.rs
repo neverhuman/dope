@@ -22,6 +22,7 @@ pub struct TableEncoder {
     task_norm: LayerNorm,
     distribution_heads: Vec<Linear>,
     task_heads: Vec<Linear>,
+    landmark_projection: Option<Linear>,
 }
 impl TableEncoder {
     pub fn load(weights: &mut Weights, graph: &Graph) -> Result<Self> {
@@ -75,6 +76,15 @@ impl TableEncoder {
                 )
             })
             .collect::<Result<_>>()?;
+        let landmark_projection = if graph.landmark_input() {
+            Some(weights.linear(
+                "landmark_projection",
+                46,
+                graph.width * graph.readout_slots(),
+            )?)
+        } else {
+            None
+        };
         Ok(Self {
             graph: graph.clone(),
             tokenizer,
@@ -88,6 +98,7 @@ impl TableEncoder {
             task_norm,
             distribution_heads,
             task_heads,
+            landmark_projection,
         })
     }
 
@@ -99,7 +110,41 @@ impl TableEncoder {
         target_included: bool,
         width: usize,
     ) -> Result<Tensor> {
+        self.encode_with_landmarks(values, observed, schema, target_included, width, None)
+    }
+
+    pub fn encode_with_landmarks(
+        &self,
+        values: &Tensor,
+        observed: &Tensor,
+        schema: &Schema,
+        target_included: bool,
+        width: usize,
+        landmarks: Option<&[f32; 46]>,
+    ) -> Result<Tensor> {
         schema.validate(&self.graph)?;
+        let landmark = if let Some(projection) = &self.landmark_projection {
+            if target_included {
+                let features =
+                    landmarks.ok_or_else(|| super::manifest::bad("CV landmark inputs required"))?;
+                super::landmark_features::validate(features)?;
+                let input = if self.graph.landmark_masked() {
+                    [0f32; 46]
+                } else {
+                    *features
+                };
+                Some(
+                    projection
+                        .forward(&Tensor::from_slice(&input, (1, 46), values.device())?)?
+                        .squeeze(0)?,
+                )
+            } else {
+                None
+            }
+        } else {
+            check(landmarks.is_none(), "CV landmark input graph required")?;
+            None
+        };
         let (count, columns) = values.dims2()?;
         check(
             schema.target_index == Some(columns.saturating_sub(1))
@@ -200,8 +245,13 @@ impl TableEncoder {
                 .forward(&distribution.unsqueeze(0)?)?
                 .squeeze(0)?;
             let t = if let Some(task) = &task {
+                let conditioned = if let Some(landmark) = &landmark {
+                    (task + landmark)?
+                } else {
+                    task.clone()
+                };
                 self.task_heads[i]
-                    .forward(&task.unsqueeze(0)?)?
+                    .forward(&conditioned.unsqueeze(0)?)?
                     .squeeze(0)?
             } else {
                 d.zeros_like()?

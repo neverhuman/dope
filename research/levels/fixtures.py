@@ -6,7 +6,7 @@ import torch
 from safetensors.torch import save_file
 from .checkpoints import private_json, save_checkpoint
 from .cli import source_fingerprint
-from .contracts import ModelConfig, TrainConfig, digest, LAYOUT_V2, V2_GRAPHS, level_widths
+from .contracts import ModelConfig, TrainConfig, digest, LAYOUT_V2, V2_GRAPHS, LANDMARK_GRAPHS, level_widths
 from .data import episode
 from .losses import objective
 from .model import SharedModel,tensors
@@ -29,12 +29,15 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
     context,query,_=episode(**{k:source[k] for k in ('rows','kinds','slots','row_ids','task','roles')},
                             config=config,cursor=0,seed=12)
     model=SharedModel(config)
+    landmark_features=([.1*(i+1) for i in range(23)],[True]*23) if config.landmark_input() else None
+    profile=landmark_features if landmark_features is not None else ([0.]*23,[False]*23)
+    input_args=dict(landmark_features=landmark_features) if landmark_features is not None else {}
     optimizer=make_optimizer(model,train_config)
-    loss,_=objective(model,context,query,([0.]*23,[False]*23),train_config,0)
+    loss,_=objective(model,context,query,profile,train_config,0)
     loss.backward();optimizer.step();optimizer.zero_grad()
     if graph != 'mixed-code-diffusion-v1':
         model.phase('ultra-residual');optimizer=make_optimizer(model,train_config)
-        loss,_=objective(model,context,query,([0.]*23,[False]*23),train_config,0,phase='ultra-residual')
+        loss,_=objective(model,context,query,profile,train_config,0,phase='ultra-residual')
         loss.backward();optimizer.step();optimizer.zero_grad()
     recipe=dict(model=config.manifest(),source_sha256=source_fingerprint(),
                 evidence='synthetic_development_only')
@@ -44,8 +47,8 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
                    else ['low','medium','high','ultra']))
     manifest=export_package(checkpoint,output/'model')
     values,observed=tensors(context,'cpu')
-    local=encode_table(model,manifest,context)
-    target_free=encode_table(model,manifest,context,target_included=False)
+    local=encode_table(model,manifest,context,**input_args)
+    target_free=encode_table(model,manifest,context,target_included=False,**input_args)
     raw=export_encoding(local,'low').bytes
     (output/'low.code').write_bytes(raw)
     torch.manual_seed(91827)
@@ -58,8 +61,11 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
     expected=dict(values=values,observed=observed.float(),noisy=noisy,noisy_observed=present.float(),
         code_high=local.code,code_target_free=target_free.code,
         numeric=numeric,categorical=categorical,missing=missing)
+    if landmark_features is not None:
+        from .landmark_features import feature_tensor
+        expected['landmark_inputs']=feature_tensor(landmark_features,'cpu')
     if graph != 'mixed-code-diffusion-v1':
-        full=encode_table(model,manifest,context,through='ultra')
+        full=encode_table(model,manifest,context,through='ultra',**input_args)
         for level,width in level_widths(config.layout).items():
             (output/(level+'.code')).write_bytes(export_encoding(full,level).bytes)
             with torch.no_grad():
@@ -78,6 +84,6 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--out',type=Path,required=True)
-    parser.add_argument('--graph',choices=['mixed-code-diffusion-v1',*V2_GRAPHS],
+    parser.add_argument('--graph',choices=['mixed-code-diffusion-v1',*V2_GRAPHS,*LANDMARK_GRAPHS],
                         default='mixed-code-diffusion-v1')
     args=parser.parse_args();generate(args.out,graph=args.graph)

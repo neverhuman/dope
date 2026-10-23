@@ -139,12 +139,12 @@ class ExportedCode:
 
 
 @torch.no_grad()
-def encode_table(model, manifest, context, *, target_included=True, through='high'):
+def encode_table(model, manifest, context, *, target_included=True, through='high', landmark_features=None):
     require(ModelConfig(**manifest['graph']).validate() == model.config
             and model_layout(manifest) == model.config.layout, 'encoder_model_binding')
     require(through in manifest['trained_levels'],'level_not_trained')
     values,observed=tensors(context,next(model.parameters()).device)
-    code=quantized_code(model.encoder(values,observed,context.schema,target_included=target_included,through=through))
+    code=quantized_code(model.encoder(values,observed,context.schema,target_included=target_included,through=through,landmark_features=landmark_features))
     schema=context.schema
     if not target_included:
         schema=dict(schema,columns=schema['columns'][:-1],target_index=None,task=None)
