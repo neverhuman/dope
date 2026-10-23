@@ -250,6 +250,22 @@ shards can run concurrently. Thirteen slots are configured across xbabe1–4;
 actual availability is owned by their existing controllers, not inferred from
 configuration. GPU allocations remain separate from these CPU runners.
 
+### Neural proxy unroll controls
+
+Training JSON accepts `neural_unrolls` from 1 to 64 (default 3). Both the real
+reference fit and differentiable synthetic fit use the same explicit count,
+initialization, learning rate and regularizer. Per-level records include the
+actual count. The checkpoint recipe binds it: changing the count refuses exact
+resume. A warm-start stage explicitly records its ordinary base and new recipe
+and resets the optimizer/RNG; it is a separate experiment. Use a frozen source
+snapshot and fresh matched initialization for controlled comparisons.
+Longer unrolls increase differentiation cost; retain
+the existing allocation and external deadline, including failed attempts.
+
+These are gradient approximations. A stronger real/null proxy ceiling does not
+establish improved shared-model samples or parity with an exact native learner.
+Independent neural/tree/driver evidence remains required.
+
 ### Versioned prior exposure controls
 
 The default `owned-mechanisms-v1` corpus is retained for replay. In prior-only runs,
