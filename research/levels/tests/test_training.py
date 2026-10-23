@@ -161,9 +161,13 @@ class TrainingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);cfg=replace(config(),accumulation=2,transfer_weight=0,driver_weight=0)
             checks=[]
-            def guard():checks.append(True);return len(checks)<3
+            # Admit the fixed observer, outer update and first episode; pause before the second.
+            def guard():checks.append(True);return len(checks)<=cfg.validation_episodes+2
             _,part=train(tiny(),cfg,Corpus(prior_only=True),root/'part',source_sha256='a'*64,resource_check=guard)
             self.assertEqual(part['state'],'resource_pause');self.assertEqual(part['optimizer_updates'],0)
+            events=[json.loads(line) for line in (root/'part/episodes.jsonl').read_text().splitlines()]
+            self.assertEqual(events[-1]['state'],'partial_update_discarded')
+            self.assertEqual(events[-1]['completed_episodes'],1)
             resumed,_=train(tiny(),cfg,Corpus(prior_only=True),root/'resumed',source_sha256='a'*64,
                             resume=part['last_checkpoint'],stop_after=1)
             whole,_=train(tiny(),cfg,Corpus(prior_only=True),root/'whole',source_sha256='a'*64,stop_after=1)
