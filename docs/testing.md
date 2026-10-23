@@ -565,6 +565,13 @@ sealed-custodian separation, rights and custody keep their independent gates.
 
 ## Native landmark and level boundary gate
 
+The CPU lane also runs `python3 -B -m unittest discover -s
+research/landmark_cache/tests -v` before native builds. These offline fixtures
+verify TRAIN-only scheduling, target-last normalization, recipe/executable
+bindings, conditional private cache publication, interruption retention and
+dashboard redaction. They open no S3 source and fit no shared model. See
+[the precalculation runbook](landmark-precalculation.md) for bounded real jobs.
+
 `bash ops/ci/landmarks.sh` is shared by the dedicated native-landmarks workflow and local
 runs. It runs engine formatting, Clippy with warnings denied, and the landmark core/CLI
 integration suites. The normal engine gate retains full test discovery. See
