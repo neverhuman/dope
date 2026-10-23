@@ -9,7 +9,26 @@ from dataclasses import asdict, dataclass
 LEVELS = {"low": 256, "medium": 1024, "high": 4096, "ultra": 5120}
 BLOCKS = (256, 768, 3072, 1024)
 LAYOUT = "nested-256-1024-4096-plus-1024-v1"
+LAYOUT_V2 = "nested-1024-4096-8192-plus-2048-v2"
+SLOT_GRAPH = "slot-code-diffusion-v2"
+MATCHED_GRAPH = "pooled-control-code-diffusion-v2"
+POOLED_GRAPH = "pooled-code-diffusion-v2"
+SLOT_BOUNDED_GRAPH = "slot-bounded-code-diffusion-v2"
+MATCHED_BOUNDED_GRAPH = "pooled-control-bounded-code-diffusion-v2"
+POOLED_BOUNDED_GRAPH = "pooled-bounded-code-diffusion-v2"
+V2_GRAPHS = (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH,
+             SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
 PREPROCESSING = "fit-only-positional-mixed-v1"
+
+
+def level_widths(layout):
+    require(layout in (LAYOUT, LAYOUT_V2), 'unknown_code_layout')
+    return dict(LEVELS) if layout == LAYOUT else dict(low=1024, medium=4096, high=8192, ultra=10240)
+
+
+def block_widths(layout):
+    widths = list(level_widths(layout).values())
+    return tuple(b-a for a,b in zip([0]+widths[:-1], widths))
 
 
 class ResearchError(ValueError):
@@ -64,7 +83,9 @@ class ModelConfig:
     graph: str = "mixed-code-diffusion-v1"
 
     def validate(self):
-        require(self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1", "unknown_model_graph")
+        require((self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1")
+                or (self.layout == LAYOUT_V2 and self.graph in V2_GRAPHS),
+                "unknown_model_graph")
         for name in ("width", "heads", "feature_blocks", "inducing_blocks", "inducing_slots",
                      "summary_slots", "target_blocks", "decoder_blocks", "condition_slots",
                      "max_features", "max_categories", "max_context", "max_query", "cell_cap",
@@ -78,7 +99,21 @@ class ModelConfig:
                 and 2 <= self.max_categories <= 256 and self.max_context <= 16384
                 and self.max_query <= 1024 and self.cell_cap <= 262144
                 and self.diffusion_steps <= 64, "model_envelope_exceeded")
+        require(not self.slot_readout() or (2 <= self.summary_slots <= 32 and self.summary_slots % 2 == 0),
+                'slot_readout_envelope')
         return self
+
+    def slot_readout(self):
+        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH)
+
+    def bounded_code(self):
+        return self.graph in (SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
+
+    def pooled_control(self):
+        return self.graph in (MATCHED_GRAPH, MATCHED_BOUNDED_GRAPH)
+
+    def readout_slots(self):
+        return self.summary_slots//2 if self.slot_readout() else 1
 
     def manifest(self):
         return asdict(self.validate())

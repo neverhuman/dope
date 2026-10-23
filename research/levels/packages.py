@@ -8,10 +8,20 @@ import uuid
 import torch
 from safetensors.torch import load_file, save, load
 from .checkpoints import private_json
-from .contracts import LAYOUT, LEVELS, PREPROCESSING, ModelConfig, canonical, digest, levels, require, validate_schema
+from .contracts import LAYOUT, level_widths, PREPROCESSING, ModelConfig, canonical, digest, levels, require, validate_schema
 from .corpus import file_sha
 from .model import SharedModel, tensors
 from .table_encoder import quantized_code
+
+
+def model_layout(model):
+    layout = model.get('layout', LAYOUT)
+    level_widths(layout)
+    if 'graph' in model:
+        require(ModelConfig(**model['graph']).validate().layout == layout, 'model_layout_binding')
+    else:
+        require(layout == LAYOUT, 'versioned_model_graph_required')
+    return layout
 
 
 def atomic_bytes(path, raw):
@@ -47,7 +57,7 @@ def export_package(checkpoint, output):
         files[component]=dict(file=name,bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest(),
                               parameters=sum(t.numel() for t in tensors.values()))
     manifest=dict(format='dope-shared-model-v1',graph=metadata['recipe']['model'],
-        preprocessing=PREPROCESSING,layout=LAYOUT,weights=files,
+        preprocessing=PREPROCESSING,layout=metadata['recipe']['model']['layout'],weights=files,
         trained_levels=metadata['state']['trained_levels'],dtype='F32',
         source_sha256=metadata['recipe']['source_sha256'],
         training_manifest_sha256=digest(metadata['recipe']),
@@ -69,7 +79,7 @@ def package_manifest(path):
     require(set(manifest)=={'format','graph','preprocessing','layout','weights','trained_levels','dtype',
             'source_sha256','training_manifest_sha256','evidence','certified','output_schema',
             'supported_backends','quantization','coordinate_space_id'} and identity==digest(supplied)
-            and manifest['format']=='dope-shared-model-v1' and manifest['layout']==LAYOUT
+            and manifest['format']=='dope-shared-model-v1' and manifest['layout']==manifest['graph']['layout']
             and manifest['preprocessing']==PREPROCESSING and manifest['quantization']=='fixed-fp16-v1'
             and manifest['dtype']=='F32' and manifest['certified']is False
             and manifest['supported_backends']==['cpu_reference']
@@ -130,6 +140,8 @@ class ExportedCode:
 
 @torch.no_grad()
 def encode_table(model, manifest, context, *, target_included=True, through='high'):
+    require(ModelConfig(**manifest['graph']).validate() == model.config
+            and model_layout(manifest) == model.config.layout, 'encoder_model_binding')
     require(through in manifest['trained_levels'],'level_not_trained')
     values,observed=tensors(context,next(model.parameters()).device)
     code=quantized_code(model.encoder(values,observed,context.schema,target_included=target_included,through=through))
@@ -141,7 +153,8 @@ def encode_table(model, manifest, context, *, target_included=True, through='hig
 
 def export_encoding(local, selected='all', *, max_bytes=65536):
     selected=levels(selected)
-    width=max(LEVELS[level] for level in selected)
+    widths=level_widths(model_layout(local.model))
+    width=max(widths[level] for level in selected)
     require(width<=local.code.numel() and all(level in local.model['trained_levels'] for level in selected),
             'requested_view_unavailable')
     validate_schema(local.schema)
@@ -151,10 +164,12 @@ def export_encoding(local, selected='all', *, max_bytes=65536):
     # Materialize only the admitted buffer before serialization, hashing or logging.
     code=local.code[:width].detach().clone().to(torch.float16).contiguous()
     require(torch.isfinite(code).all().item(),'export_code_nonfinite')
-    manifest=dict(format='dope-table-code-v1',representation_kind='table_code',layout=LAYOUT,
+    if 'graph' in local.model and ModelConfig(**local.model['graph']).bounded_code():
+        require((code.abs()<=1).all().item(), 'bounded_code_range')
+    manifest=dict(format='dope-table-code-v1',representation_kind='table_code',layout=model_layout(local.model),
         preprocessing=PREPROCESSING,coordinate_space_id=local.model['coordinate_space_id'],
         exported_levels=selected,target_included=local.target_included,
-        dtype='F16',schema=local.schema,views=[dict(level=level,offset=0,length=LEVELS[level]) for level in selected],
+        dtype='F16',schema=local.schema,views=[dict(level=level,offset=0,length=widths[level]) for level in selected],
         normalization='raw_generation_code',evidence=local.model['evidence'],certified=False)
     raw=save({'code':code},metadata={'manifest':canonical(manifest).decode()})
     require(type(max_bytes)is int and len(raw)<=max_bytes,'code_payload_budget_exceeded')
@@ -162,6 +177,7 @@ def export_encoding(local, selected='all', *, max_bytes=65536):
 
 
 def read_code(raw, model_manifest):
+    layout=model_layout(model_manifest)
     # Byte-buffer metadata is read with the format's bounded JSON prefix, without file access.
     require(8<=len(raw)<=1048576,'code_size_invalid')
     header_length=int.from_bytes(raw[:8],'little')
@@ -169,7 +185,7 @@ def read_code(raw, model_manifest):
     header=json.loads(raw[8:8+header_length])
     require(set(header)=={'__metadata__','code'} and set(header['__metadata__'])=={'manifest'},'unexpected_code_tensors')
     manifest=json.loads(header['__metadata__']['manifest'])
-    require(manifest['format']=='dope-table-code-v1' and manifest['layout']==LAYOUT
+    require(manifest['format']=='dope-table-code-v1' and manifest['layout']==layout
             and manifest['preprocessing']==PREPROCESSING
             and manifest['coordinate_space_id']==model_manifest['coordinate_space_id']
             and manifest['representation_kind']=='table_code' and manifest['dtype']=='F16'
@@ -181,14 +197,17 @@ def read_code(raw, model_manifest):
     validate_schema(manifest['schema'],ModelConfig(**model_manifest['graph']) if 'graph'in model_manifest else None)
     require(type(manifest['target_included'])is bool
             and manifest['target_included']==(manifest['schema']['target_index']is not None),'code_target_disclosure_mismatch')
+    widths=level_widths(layout)
     selected=levels(','.join(manifest['exported_levels']))
     require(manifest['exported_levels']==selected and all(l in model_manifest['trained_levels'] for l in selected),
             'code_views_invalid')
-    width=max(LEVELS[level] for level in selected)
-    require(manifest['views']==[dict(level=level,offset=0,length=LEVELS[level]) for level in selected]
+    width=max(widths[level] for level in selected)
+    require(manifest['views']==[dict(level=level,offset=0,length=widths[level]) for level in selected]
             and header['code']['shape']==[width] and header['code']['dtype']=='F16'
             and header['code']['data_offsets']==[0,width*2]
             and len(raw)==8+header_length+width*2,'code_inventory_mismatch')
     code=load(raw)['code']
     require(torch.isfinite(code).all().item(),'nonfinite_code')
+    if 'graph' in model_manifest and ModelConfig(**model_manifest['graph']).bounded_code():
+        require((code.abs()<=1).all().item(), 'bounded_code_range')
     return code.float(),manifest

@@ -8,7 +8,7 @@ import subprocess
 import time
 import numpy as np
 from .comparison import schedule, ridge_loss, retention, summarize
-from .contracts import LEVELS, ResearchError, levels, require
+from .contracts import LEVELS, level_widths, ResearchError, levels, require
 from .corpus import file_sha
 from .checkpoints import private_json
 from .train import append
@@ -148,7 +148,7 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                         try:
                             require(time.monotonic()-started < wall_seconds and resource_check(), 'comparison_budget_or_resource_pause')
                             if encoded is None:
-                                encoded = encode_table(model, manifest, context, through=max(selected, key=LEVELS.get))
+                                encoded = encode_table(model, manifest, context, through=max(selected, key=level_widths(model.config.layout).get))
                             if code is None:
                                 code = export_encoding(encoded, level)
                                 (directory/(level+'.safetensors')).write_bytes(code.bytes)
@@ -163,7 +163,7 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                                     raise
                             before = time.monotonic()
                             if method == 'shared':
-                                values, observed = sample(model.decoder, encoded.code[:LEVELS[level]].to(device),
+                                values, observed = sample(model.decoder, encoded.code[:level_widths(model.config.layout)[level]].to(device),
                                     encoded.schema, len(context.values), sample_seed, steps=32, categorical_schedule=categorical_schedule)
                                 if device == 'cuda':
                                     torch.cuda.synchronize()

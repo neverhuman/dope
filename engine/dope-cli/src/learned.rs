@@ -135,7 +135,7 @@ fn execute(command: LearnedCommand) -> Result<()> {
             publish(&a.out, exported.bytes())?;
             println!(
                 "{}",
-                serde_json::json!({"format":"dope-table-code-v1","bytes":exported.bytes().len(),
+                serde_json::json!({"format":"dope-table-code-v1","bytes":exported.bytes().len(),"layout":exported.manifest.layout,
                 "levels":exported.manifest.exported_levels,"certified":false})
             );
         }
@@ -151,7 +151,7 @@ fn execute(command: LearnedCommand) -> Result<()> {
             {
                 return Err(bad());
             }
-            let width = [256, 1024, 4096, 5120][levels[0] as usize];
+            let width = model.graph.widths()[levels[0] as usize];
             let schedule = if a.categorical_schedule == "reveal-v1" {
                 learned::CategoricalSchedule::RevealV1
             } else {
@@ -183,7 +183,7 @@ fn execute(command: LearnedCommand) -> Result<()> {
             let (_, manifest) = learned::read_code(&bytes, &model)?;
             println!(
                 "{}",
-                serde_json::json!({"format":manifest.format,"code_bytes":bytes.len(),
+                serde_json::json!({"format":manifest.format,"code_bytes":bytes.len(),"layout":manifest.layout,
                 "coordinate_space_id":manifest.coordinate_space_id,"levels":manifest.exported_levels,
                 "target_included":manifest.target_included,"model_manifest_bytes":std::fs::metadata(a.model.join("model.json"))?.len(),
                 "encoder_weight_bytes":model.weights["encoder"].bytes,"decoder_weight_bytes":model.weights["decoder"].bytes,

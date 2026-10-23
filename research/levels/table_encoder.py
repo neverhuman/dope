@@ -2,7 +2,7 @@
 import torch
 from torch import nn
 from .blocks import Block, Induced, Tokenizer
-from .contracts import BLOCKS, LEVELS, require
+from .contracts import block_widths, level_widths, require
 
 
 class TableEncoder(nn.Module):
@@ -13,15 +13,21 @@ class TableEncoder(nn.Module):
         self.tokenizer = Tokenizer(w, config.max_categories)
         self.features = nn.ModuleList(Block(w, h) for _ in range(config.feature_blocks))
         self.rows = nn.ModuleList(Induced(w, h, config.inducing_slots) for _ in range(config.inducing_blocks))
-        self.summaries = nn.Parameter(torch.randn(config.summary_slots, w)*.02)
+        slots = config.readout_slots() if config.slot_readout() else config.summary_slots
+        self.summaries = nn.Parameter(torch.randn(slots, w)*.02)
+        if config.slot_readout():
+            self.residual_summaries = nn.Parameter(torch.randn(slots, w)*.02)
         self.pool = nn.ModuleList(Block(w, h) for _ in range(2))
         self.target = nn.ModuleList(Block(w, h) for _ in range(config.target_blocks))
         self.distribution_norm, self.task_norm = nn.LayerNorm(w), nn.LayerNorm(w)
-        self.distribution_heads = nn.ModuleList(nn.Linear(w, b//2) for b in BLOCKS)
-        self.task_heads = nn.ModuleList(nn.Linear(w, b//2) for b in BLOCKS)
+        self.distribution_heads = nn.ModuleList(nn.Linear(w*config.readout_slots(), b//2)
+                                              for b in block_widths(config.layout))
+        self.task_heads = nn.ModuleList(nn.Linear(w*config.readout_slots(), b//2)
+                                      for b in block_widths(config.layout))
 
     def forward(self, values, observed, schema, *, target_included=True, through="high"):
-        require(through in LEVELS and values.ndim == 2 and values.shape == observed.shape,
+        widths = level_widths(self.config.layout)
+        require(through in widths and values.ndim == 2 and values.shape == observed.shape,
                 "encoder_input_shape")
         columns = schema["columns"]
         require(values.shape[0]*(len(columns)-1)**2*self.config.heads<=33554432
@@ -45,22 +51,44 @@ class TableEncoder(nn.Module):
         summary = self.summaries
         for block in self.pool:
             summary = block(summary, rows)
-        distribution = self.distribution_norm(summary.mean(dim=0))
+        distribution = self.readout(summary, self.distribution_norm)
         if target_included:
             target = rows + self.tokenizer(values[:, -1:], observed[:, -1:], columns[-1:]).squeeze(1)
             for block in self.target:
                 target = block(target, rows)
-            task = self.task_norm(target.mean(dim=0))
+            if self.config.slot_readout():
+                task_summary = self.summaries
+                for block in self.pool: task_summary = block(task_summary, target)
+                task = self.readout(task_summary, self.task_norm)
+            else:
+                task = self.task_norm(target.mean(dim=0))
         else:
             task = None
         blocks = []
-        for i, width in enumerate(BLOCKS):
+        blocks_widths = block_widths(self.config.layout)
+        for i, width in enumerate(blocks_widths):
+            if i == 3 and self.config.slot_readout():
+                residual = self.residual_summaries
+                for block in self.pool: residual = block(residual, rows)
+                distribution = self.readout(residual, self.distribution_norm)
+                if target_included:
+                    residual = self.residual_summaries
+                    for block in self.pool: residual = block(residual, target)
+                    task = self.readout(residual, self.task_norm)
             d = self.distribution_heads[i](distribution)
             t = self.task_heads[i](task) if task is not None else torch.zeros_like(d)
+            if self.config.bounded_code(): d, t = d.tanh(), t.tanh()
             blocks.append(torch.cat((d, t)))
-            if sum(BLOCKS[:i+1]) == LEVELS[through]:
+            if sum(blocks_widths[:i+1]) == widths[through]:
                 break
         return torch.cat(blocks)
+
+    def readout(self, summary, norm):
+        if not self.config.slot_readout(): return norm(summary.mean(dim=0))
+        result = norm(summary)
+        if self.config.pooled_control():
+            result = result.mean(dim=0, keepdim=True).expand_as(result)
+        return result.reshape(-1)
 
 
 def quantized_code(code):

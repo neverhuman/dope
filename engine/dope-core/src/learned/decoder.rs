@@ -1,7 +1,7 @@
 //! Only selected code, positional schema, noisy row state and time enter this graph.
 use super::{
     blocks::Block,
-    manifest::{check, Graph, Schema, BLOCKS, WIDTHS},
+    manifest::{check, Graph, Schema},
     tokenizer::Tokenizer,
     weights::Weights,
 };
@@ -24,7 +24,8 @@ pub struct Decoder {
 impl Decoder {
     pub fn load(weights: &mut Weights, graph: &Graph) -> Result<Self> {
         let tokenizer = Tokenizer::load(weights, graph)?;
-        let conditions = BLOCKS
+        let conditions = graph
+            .blocks()
             .iter()
             .enumerate()
             .map(|(i, b)| {
@@ -72,7 +73,7 @@ impl Decoder {
         let (rows, columns) = noisy.dims2()?;
         check(
             code.rank() == 1
-                && WIDTHS.contains(&width)
+                && self.graph.widths().contains(&width)
                 && time.is_finite()
                 && (0.0..=1.0).contains(&time)
                 && rows > 0
@@ -91,7 +92,7 @@ impl Decoder {
         )?;
         let mut conditions = Vec::new();
         let mut start = 0;
-        for (block, projection) in BLOCKS.iter().zip(&self.conditions) {
+        for (block, projection) in self.graph.blocks().iter().zip(&self.conditions) {
             if start + block > width {
                 break;
             }

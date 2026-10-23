@@ -832,6 +832,8 @@
     "docs/signed-engine-release.md": "governance",
     "ops/ci/engine-benchmark.sh": "external-evidence",
     "ops/licenses/engine/": "release",
+    "engine/dope-core/tests/learned_v2.rs": "rust-core",
+    "engine/dope-cli/tests/learned_v2_cli.rs": "rust-core",
     "research/levels/": "external-evidence",
     "engine/dope-core/src/learned/": "rust-core"
   },
