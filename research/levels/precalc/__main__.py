@@ -62,7 +62,7 @@ def main():
 
 if __name__=='__main__':
     try:main()
-    except Exception as error:
+    except (OSError,ValueError,KeyError,TypeError,RuntimeError,ImportError)as error:
         # Network/native/input diagnostics may contain private values or delegated URLs.
         print(json.dumps(dict(state='failed',error_type=type(error).__name__,repair_hint='Preserve the attempt; inspect private receipts and repair the declared allocation/input before a new run.')))
         raise SystemExit(1)

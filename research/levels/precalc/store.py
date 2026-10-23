@@ -19,7 +19,7 @@ class PrivateStore:
         try:r=self.client.get_object(Bucket=self.bucket,Key=self.prefix+'/'+locator(key))
         except Exception as error:
             if getattr(error,'response',{}).get('Error',{}).get('Code')in('NoSuchKey','404'):return None
-            raise
+            raise ValueError('precalc_private_read_failed')from None
         stream=r['Body']
         try:raw=stream.read(64000001)
         finally:stream.close()
@@ -48,7 +48,9 @@ def _fetch_source(client,bucket,cell,root):
     if path.exists():
         require(not path.is_symlink()and path.stat().st_size==s['train_bytes']
                 and hashlib.sha256(path.read_bytes()).hexdigest()==s['train_sha256'],'precalc_source_cache_corrupt');return path
-    response=client.get_object(Bucket=bucket,Key=s['source_key']);stream=response['Body'];partial=path.with_suffix('.partial')
+    try:response=client.get_object(Bucket=bucket,Key=s['source_key'])
+    except Exception:raise ValueError('precalc_TRAIN_transport_failed')from None
+    stream=response['Body'];partial=path.with_suffix('.partial')
     import os
     try:
         require(response['ContentLength']==s['train_bytes']<=200000000,'precalc_source_transport_size')
