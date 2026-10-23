@@ -801,7 +801,15 @@
     "examples/adult/walkthrough.py": "external-evidence",
     "examples/adult/TRANSCRIPT.md": "external-evidence",
     "tools/claims/dope1.py": "governance",
-    "ops/ci/engine.sh": "release"
+    "ops/ci/engine.sh": "release",
+    "engine/dope-cli/src/landmarks.rs": "rust-core",
+    "engine/dope-cli/src/levels.rs": "rust-core",
+    "engine/dope-cli/tests/landmark_cli.rs": "rust-core",
+    "engine/dope-core/src/landmark/": "rust-core",
+    "engine/dope-core/src/levels.rs": "rust-core",
+    "engine/dope-core/tests/landmarks.rs": "rust-core",
+    "ops/ci/landmarks.sh": "governance",
+    "schemas/landmark-coordinates-native-v1.schema.json": "rust-core"
   },
   "workspace": "dope"
 }

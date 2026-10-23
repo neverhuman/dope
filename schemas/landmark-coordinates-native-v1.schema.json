@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOPE native landmark global coordinates",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["panel", "options", "kind", "values", "mask"],
+  "properties": {
+    "panel": {"const": "landmarks-native-v1"},
+    "kind": {"enum": ["real", "synthetic"]},
+    "values": {"type": "array", "minItems": 96, "maxItems": 96, "items": {"type": "number"}},
+    "mask": {"type": "array", "minItems": 96, "maxItems": 96, "items": {"type": "boolean"}},
+    "options": {
+      "type": "object", "additionalProperties": false,
+      "required": ["panel", "folds", "ridge_rows", "small_rows", "knn_reference", "spectrum_features", "seed", "work_budget"],
+      "properties": {
+        "panel": {"const": "landmarks-native-v1"},
+        "folds": {"type": "integer", "minimum": 2, "maximum": 10},
+        "ridge_rows": {"type": "integer", "minimum": 20, "maximum": 50000},
+        "small_rows": {"type": "integer", "minimum": 20, "maximum": 4096},
+        "knn_reference": {"type": "integer", "minimum": 1, "maximum": 2048},
+        "spectrum_features": {"type": "integer", "minimum": 0, "maximum": 64},
+        "seed": {"type": "integer", "minimum": 0},
+        "work_budget": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

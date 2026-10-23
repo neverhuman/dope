@@ -200,6 +200,10 @@ These are source observations about internal selection and representation. They 
 show that an external benchmark test file was used in fitting, or establish a measured
 loss of utility on any particular dataset.
 
+See [native landmark and portable-level implementation](../landmarks.md) for the
+first runtime milestone and [landmark design](landmark-signatures.md) for the full panel proposal.
+The shared trained encoder, progressive code and fusion promotion remain gated work.
+
 ## 4. Names, budgets and public interfaces
 
 ### 4.1 Separate controls

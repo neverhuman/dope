@@ -1,0 +1,38 @@
+name: Native landmarks and release boundaries
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-landmarks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-landmarks:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on:
+      group: neverhuman-lan
+      labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Pin native toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            engine/target
+          key: native-landmarks-ubuntu24-rust188-${{ hashFiles('engine/Cargo.lock') }}
+      - name: Native signatures and level export invariants
+        env:
+          RAYON_NUM_THREADS: '2'
+        run: bash ops/ci/landmarks.sh

@@ -64,6 +64,22 @@ impl<'a> MlEncoder<'a> {
         h
     }
 
+    /// Encoded feature column -> original feature slot (target excluded).
+    pub fn groups(&self) -> Vec<usize> {
+        self.schema
+            .features
+            .iter()
+            .enumerate()
+            .flat_map(|(j, f)| {
+                let width = match &f.kind {
+                    Kind::Numeric(_) => 1,
+                    Kind::Categorical(c) => c.levels.len(),
+                };
+                std::iter::repeat_n(j, width + usize::from(self.missing[j] > 0.0))
+            })
+            .collect()
+    }
+
     fn numeric(&self, j: usize, u: f64) -> f64 {
         match self.scaling {
             Scaling::Unit => u.clamp(0.0, 1.0),

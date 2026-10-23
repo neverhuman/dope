@@ -12,6 +12,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod args;
+mod landmarks;
+mod levels;
 use args::*;
 
 fn parse_bytes(s: &str) -> Result<usize, String> {
@@ -57,6 +59,8 @@ fn run(cli: Cli) -> Result<(), String> {
         )
     };
     match cli.command {
+        Command::Landmarks(a) => landmarks::run(a)?,
+        Command::FitLevels(a) => levels::run(a)?,
         Command::Fit(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
             let target = table.column_index(&a.target).map_err(e)?;

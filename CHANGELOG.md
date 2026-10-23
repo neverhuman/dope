@@ -148,3 +148,12 @@ remain open and gate a future certified release.
 
 - Add tiered compact kernels, measured release gates, and versioned MFS-v2
   evidence on the single PR branch. No production release is declared.
+
+## Experimental native landmark and portable-level milestone
+
+- Add the versioned Rust landmark panel, private transfer references, paired uncertainty
+  and source-free synthetic signatures.
+- Add explicitly allowlisted portable levels, deterministic artifact descriptors, authorized
+  concatenation and exact release inventories.
+- Add focused native CI and regression coverage. The existing fit defaults and format-1
+  decoder remain unchanged. No learned checkpoint or external quality improvement is claimed.

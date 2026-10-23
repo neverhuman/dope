@@ -1470,15 +1470,15 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
@@ -3247,6 +3247,38 @@
     "ops/ci/engine.sh": {
       "command": "bash ops/ci/engine.sh",
       "purpose": "run the engine gate used by CI"
+    },
+    "engine/dope-core/src/landmark/": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "engine/dope-core/src/levels.rs": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "engine/dope-cli/src/landmarks.rs": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "engine/dope-cli/src/levels.rs": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "engine/dope-core/tests/landmarks.rs": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "engine/dope-cli/tests/landmark_cli.rs": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "schemas/landmark-coordinates-native-v1.schema.json": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
+    },
+    "ops/ci/landmarks.sh": {
+      "command": "bash ops/ci/landmarks.sh",
+      "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
     }
   },
   "workspace": "dope"

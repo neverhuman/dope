@@ -27,7 +27,7 @@ pub(crate) struct SelfAudit {
 
 const AUDIT_FAMILIES: [&str; 2] = ["linear", "gbdt"];
 
-fn audit_predict(
+pub(crate) fn audit_predict(
     name: &str,
     head: Head,
     x: &Matrix,
