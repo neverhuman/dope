@@ -3,6 +3,7 @@ import concurrent.futures
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -51,7 +52,7 @@ def measured_features(report,rows,task,options):
         require(str(error)=='cv_landmark_input_shape_or_empty'
                 and report['rows']==rows and report['task']==task and report['options']==options
                 and all(c['state']in('uninformative','unsupported','over_budget','failed')
-                        and c.get('gain')is None for c in report['cells']), 'precalc_invalid_empty_measurement')
+                        and(c.get('gain')is None or(type(c['gain'])in(int,float)and math.isfinite(c['gain'])))for c in report['cells']), 'precalc_invalid_empty_measurement')
         return [0.]*23,[False]*23
 
 

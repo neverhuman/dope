@@ -88,6 +88,8 @@ class PrecalcTests(unittest.TestCase):
         report=dict(options=options,panel=options['panel'],kind='real',privacy='private',rows=80,task='regression',
                     cells=[dict(id=i+1,state='uninformative',gain=None)for i in range(23)])
         self.assertEqual(measured_features(report,80,'regression',options),([0.]*23,[False]*23))
+        for cell in report['cells']:cell['gain']=0.
+        self.assertEqual(measured_features(report,80,'regression',options),([0.]*23,[False]*23))
 
     def test_bounded_high_budget_is_an_explicit_recipe_and_nonfinite_storage_is_refused(self):
         from research.levels.landmark_features import validate_options
