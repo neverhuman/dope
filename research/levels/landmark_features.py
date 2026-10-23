@@ -173,7 +173,9 @@ def derive_observed(directory, expected_manifest, expected_engine, output):
                 manifest_sha256=sha(out/'manifest.json'),engine_sha256=expected_engine)
 
 
-def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, work_budget=20000000000):
+def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, work_budget=20000000000,
+                  recipe=FEATURE_RECIPE):
+    require(recipe in FEATURE_RECIPES, 'cv_landmark_unknown_recipe')
     require(type(wall_seconds)is int and 1<=wall_seconds<=1800, 'cv_landmark_budget_unsupported')
     require(data['source_provenance']['kind']in('owned_prior','admitted_official_train'),
             'cv_landmark_source_not_admitted')
@@ -184,7 +186,7 @@ def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, wo
         with(out/name).open('xb')as stream:
             os.chmod(out/name,0o600);stream.write(value);stream.flush();os.fsync(stream.fileno())
     write('fit.csv',raw)
-    plan=dict(feature_recipe=FEATURE_RECIPE,scope=scope,options=options,
+    plan=dict(feature_recipe=recipe,scope=scope,options=options,
               engine_sha256=expected_engine,wall_seconds=wall_seconds,threads=4)
     write('plan.json',canonical(plan))
     command=[str(engine),'--threads','4','landmarks','real',str((out/'fit.csv').resolve()),
@@ -196,8 +198,8 @@ def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, wo
             result=subprocess.run(command,stdout=stream,stderr=subprocess.DEVNULL,timeout=wall_seconds)
             stream.flush();os.fsync(stream.fileno())
         require(result.returncode==0,'cv_landmark_native_failed')
-        report_features(json.loads((out/'report.json').read_bytes()),scope['rows'],scope['task'],options=options)
-        manifest=dict(format='dope-fit-cv-landmark-input-v1',feature_recipe=FEATURE_RECIPE,scope=scope,
+        report_features(json.loads((out/'report.json').read_bytes()),scope['rows'],scope['task'],options=options,recipe=recipe)
+        manifest=dict(format='dope-fit-cv-landmark-input-v1'if recipe==FEATURE_RECIPE else'dope-fit-cv-landmark-input-v2',feature_recipe=recipe,scope=scope,
                       options=options,engine_sha256=expected_engine,report_sha256=sha(out/'report.json'),
                       producer=dict(source_sha256=sha(__file__),platform=platform.platform()))
         write('manifest.json',canonical(manifest))

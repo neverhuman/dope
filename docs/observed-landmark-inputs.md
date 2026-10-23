@@ -38,6 +38,12 @@ reruns CV. The original measurement and failure receipts remain immutable.
 Dataset admission, exact physical rows and CSV binding are checked again when
 the view is consumed; derivation grants no source rights or training admission.
 
+For newly scheduled measurements, `landmark-inputs --feature-recipe
+fit-cv-gain23-observed-mask-squash-v2` explicitly produces v2 from the same
+training-only native CV panel. The default producer remains v1. A v1 failure on
+an already saved all-weak report must be adopted under a reviewed derivation,
+not worked around by repeating its fits. Undefined v2 inputs still refuse.
+
 An entire pinned private corpus can be derived with:
 
 ```sh
@@ -60,6 +66,16 @@ read back. No raw source data is added to that prefix.
 selected view. Use the returned pin in an input cache with
 `format=dope-fit-cv-landmark-cache-v1` and the explicit v2 `feature_recipe`.
 The cache container format stays compatible; its recipe identifies semantics.
+
+The owned benchmark accepts `--landmark-input-cache PRIVATE_INDEX`. An input
+graph requires a matching cache recipe; non-input graphs refuse it. The v4
+comparison protocol pins cache identity, fit-only scope and separate
+precomputation costs. Features attach to the stable owned physical table before
+context/query construction, and only the encoder receives them. Per-case
+receipts keep feature/manifest digests rather than raw scores. Missing or invalid
+table inputs leave both scheduled methods explicitly failed, preserving the
+complete matched denominator. Historical v2/v3 benchmark routes remain
+available when no feature cache is supplied.
 
 The finite precalculation registry covers canonical fit and five outer-fold
 training partitions. Each has inner CV confined to that training partition;

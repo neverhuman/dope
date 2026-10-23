@@ -9,7 +9,7 @@ from research.levels.contracts import (ResearchError,canonical,LANDMARK_INPUT_GR
     LANDMARK_OBSERVED_GRAPH,LANDMARK_OBSERVED_MASKED_GRAPH)
 from research.levels.corpus import Corpus
 from research.levels.landmark_features import (FEATURE_RECIPE,OBSERVED_RECIPE,OPTIONS,
-    InputCache,derive_observed,read_input,report_features,feature_tensor)
+    InputCache,derive_observed,read_input,report_features,feature_tensor,prepare_input)
 from research.levels.tests.test_landmark_inputs import write_cache
 from research.levels.tests.test_v2 import graph_config
 from research.levels.tests.test_models import fixture
@@ -118,3 +118,30 @@ class ObservedLandmarkTests(unittest.TestCase):
             with self.assertRaises(ResearchError):
                 train(graph_config(LANDMARK_INPUT_GRAPH),cfg,FixtureCorpus(FEATURE_RECIPE),root/'cross',
                       source_sha256='a'*64,resume=part['last_checkpoint'])
+
+    def test_fresh_owned_producer_explicitly_selects_observed_recipe_and_keeps_v1_default(self):
+        from types import SimpleNamespace
+        data=Corpus(prior_only=True).get('train',0)
+        n=len(data['roles']['fit'])
+        def native(command,*,stdout,**kwargs):
+            # Inert producer fixture; no scientific/native measurement claim.
+            options=dict(OPTIONS,work_budget=20000000000)
+            value=dict(panel=OPTIONS['panel'],options=options,kind='real',privacy='private',
+                rows=n,task=data['task'],cells=[dict(id=i,state='uninformative',gain=-.2 if i%2 else 0.,
+                    query_rows=n,train_rows=[n-n//5-1]*5)for i in range(1,24)])
+            stdout.write(canonical(value));return SimpleNamespace(returncode=0)
+        with tempfile.TemporaryDirectory()as directory:
+            root=Path(directory);binary=root/'inert-native';binary.write_bytes(b'not executable')
+            expected=hashlib.sha256(binary.read_bytes()).hexdigest()
+            with patch('research.levels.landmark_features.subprocess.run',side_effect=native),\
+                    patch('research.levels.landmark_features.platform.platform',return_value='synthetic-unit-platform'):
+                with self.assertRaisesRegex(ResearchError,'shape_or_empty'):
+                    prepare_input(data,binary,expected,root/'v1')
+                self.assertEqual(json.loads((root/'v1/plan.json').read_bytes())['feature_recipe'],FEATURE_RECIPE)
+                self.assertTrue((root/'v1/failure.json').is_file());self.assertFalse((root/'v1/manifest.json').exists())
+                pin=prepare_input(data,binary,expected,root/'v2',recipe=OBSERVED_RECIPE)
+            manifest=json.loads((root/'v2/manifest.json').read_bytes())
+            self.assertEqual(manifest['format'],'dope-fit-cv-landmark-input-v2')
+            self.assertEqual(manifest['feature_recipe'],OBSERVED_RECIPE)
+            values,mask=read_input(root/'v2',pin['manifest_sha256'],expected,data=data,recipe=OBSERVED_RECIPE)
+            self.assertEqual(values[:2],[-.2,0.]);self.assertEqual(mask,[True]*23)

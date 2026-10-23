@@ -46,6 +46,8 @@ def main(argv=None):
     inputs.add_argument('--expected-engine-sha256',required=True)
     inputs.add_argument('--out',type=Path,required=True)
     inputs.add_argument('--wall-seconds',type=int,default=300)
+    from .landmark_features import FEATURE_RECIPE,FEATURE_RECIPES
+    inputs.add_argument('--feature-recipe',choices=FEATURE_RECIPES,default=FEATURE_RECIPE)
     derived=sub.add_parser('derive-landmark-inputs',help='Observed-score view of a saved private fit-CV report; no new fits')
     derived.add_argument('--input',type=Path,required=True)
     derived.add_argument('--expected-manifest-sha256',required=True)
@@ -73,7 +75,7 @@ def main(argv=None):
             data['source_provenance']=dict(kind='owned_prior',physical_table_id=digest(
                 dict(family=args.owned_family,seed=args.owned_seed)))
         print(json.dumps(prepare_input(data,args.engine,args.expected_engine_sha256,args.out,
-                                      wall_seconds=args.wall_seconds)))
+                                      wall_seconds=args.wall_seconds,recipe=args.feature_recipe)))
         return 0
     if args.command=='landmarks':
         from .corpus import prepare_landmarks
