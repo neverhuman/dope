@@ -133,3 +133,11 @@ class PrecalcTests(unittest.TestCase):
                 reused=run(planned,binary=binary,root=root/'reused',source_client=NoSource(),bucket='private',store=store,workers=1,threads=1,timeout=1,wall_seconds=35)
             self.assertEqual(reused['records'][0]['state'],'cached');self.assertEqual(reused['terminal'],1)
             self.assertEqual(build(planned,[root/'reused'],store)['counts'],dict(ready=1))
+            child=copy.deepcopy(planned);child.pop('sha256');child['parent_plan_sha256']=plan['sha256'];child['sha256']=digest(child)
+            (root/'reused'/'plan.json').write_bytes(canonical(child));(root/'reused'/'ownership.json').write_bytes(canonical(dict(plan_sha256=child['sha256'])))
+            with patch('research.levels.precalc.plan.CATALOG_SHA256',plan['catalog_sha256']):
+                self.assertEqual(build(plan,[root/'reused'],store)['counts'],dict(pending=5,ready=1))
+            child['cells'][0]['reason']='mutated-scope';child['sha256']=digest({k:v for k,v in child.items()if k!='sha256'})
+            (root/'reused'/'plan.json').write_bytes(canonical(child));(root/'reused'/'ownership.json').write_bytes(canonical(dict(plan_sha256=child['sha256'])))
+            with patch('research.levels.precalc.plan.CATALOG_SHA256',plan['catalog_sha256']),self.assertRaisesRegex(ResearchError,'unqualified_continuation'):
+                build(plan,[root/'reused'],store)
