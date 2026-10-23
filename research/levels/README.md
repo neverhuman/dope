@@ -327,3 +327,46 @@ completed optimizer boundary and never retries automatically. More monitor table
 increase overhead and do not establish accuracy, independent real-source coverage,
 or permission to select a favorable checkpoint. Predeclare any selection rule and
 keep every scheduled benchmark checkpoint and negative result.
+
+### Opt-in v2 tier and slot readouts
+
+V1 artifacts retain their exact 256/1024/4096/5120 layout and original graph.
+The new experimental `nested-1024-4096-8192-plus-2048-v2` layout uses
+1024/4096/8192/10240 coordinates: S/M/L/Ultra carry2/8/16/20KiB of FP16 values,
+before charged schema/carrier metadata and fixed dependencies. No aliases or
+old artifact widths are reinterpreted. `all` still excludes Ultra. New v2 is
+implemented for research, unqualified for scientific accuracy or default promotion.
+
+`slot-code-diffusion-v2` retains ordered summary tokens instead of reducing all
+feature and target state to two pooled vectors. The declared even2–32 summary
+slots split into separate ordinary and residual query parameters. Each query set
+attends the feature rows through the two shared pool blocks; task queries attend
+target-conditioned rows through those same blocks. Per-slot normalization precedes
+flattening and the block projections. Ordinary tiers read only ordinary queries;
+Ultra additionally trains its own residual queries and fourth projections while
+all ordinary weights remain frozen. Target-free output never reads target state.
+
+Two explicit controls share the new layout: `pooled-code-diffusion-v2` retains
+the original mean-pooled readout; `pooled-control-code-diffusion-v2` uses the slot
+model's identical parameter shapes and query attention, then averages normalized
+slots and repeats that vector before projection. This last control has redundant
+projection parameters, deliberately retaining the pooling bottleneck at matching
+nominal parameter count. It is not a claim of equal effective representation rank.
+Actual encoder/decoder calls, wall time and dependency bytes must still be measured.
+
+At default width256, the slot and parameter-matched control each have82,546,078
+parameters, versus43,224,478 for the width-only pooled control and30,881,090 in the
+original model. More payload and more fixed weights are separate costs. No measured
+benefit is inferred from this capacity increase. Use the opt-in
+`configs/gpu-v2-pilot.json` only after fresh resource/process admission and exact
+pinned-runtime resume proof. It requests the40-table balanced observer and owned
+priors, with profile/transfer/driver weights zero. Keep the frozen v1 studies intact.
+
+The v2 tiny public fixtures exercise one ordinary and one residual optimizer update
+solely for cross-runtime conformance. They cover all three graphs and four widths;
+they are not a trained production model. Generate into a fresh directory with
+`python3 -m research.levels.fixtures --out NEW_DIRECTORY --graph slot-code-diffusion-v2`.
+Keep the generated checkpoint under private target evidence; ship only the declared
+small synthetic model/code/operator fixtures. Native `learned encode`, `inspect`
+and decoder-only `sample` resolve widths from the bound graph/layout and refuse
+cross-layout codes. Neither native sampling nor the recipient needs encoder weights.

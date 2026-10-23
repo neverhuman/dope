@@ -1,7 +1,7 @@
 """Per-type/per-level normalized objectives and explicit masked auxiliary supervision."""
 import torch
 from torch.nn import functional as F
-from .contracts import LEVELS, require
+from .contracts import level_widths, require
 from .decoder import alpha
 from .model import tensors
 from .proxies import transfer_driver
@@ -48,7 +48,7 @@ def objective(model, context, query, profile, config, step, *, phase="ordinary",
     ramp = min(1., step/max(1,config.proxy_ramp_steps))
     total, records = code.sum()*0, {}
     for level in selected:
-        prefix = code[:LEVELS[level]]
+        prefix = code[:level_widths(model.config.layout)[level]]
         gen, terms = generation(model.decoder, prefix, schema, qv, qo)
         transfer, driver, state = gen*0, gen*0, {}
         if ramp > 0 and (config.transfer_weight or config.driver_weight):

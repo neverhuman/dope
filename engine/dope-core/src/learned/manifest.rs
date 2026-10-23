@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 pub const LAYOUT: &str = "nested-256-1024-4096-plus-1024-v1";
+pub const LAYOUT_V2: &str = "nested-1024-4096-8192-plus-2048-v2";
 pub const PREPROCESSING: &str = "fit-only-positional-mixed-v1";
 pub const BLOCKS: [usize; 4] = [256, 768, 3072, 1024];
 pub const WIDTHS: [usize; 4] = [256, 1024, 4096, 5120];
@@ -18,7 +19,7 @@ pub fn check(value: bool, code: &'static str) -> Result<()> {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Graph {
     pub width: usize,
@@ -40,9 +41,43 @@ pub struct Graph {
     pub graph: String,
 }
 impl Graph {
+    pub fn slot_readout(&self) -> bool {
+        matches!(
+            self.graph.as_str(),
+            "slot-code-diffusion-v2" | "pooled-control-code-diffusion-v2"
+        )
+    }
+    pub fn readout_slots(&self) -> usize {
+        if self.slot_readout() {
+            self.summary_slots / 2
+        } else {
+            1
+        }
+    }
+    pub fn widths(&self) -> [usize; 4] {
+        if self.layout == LAYOUT_V2 {
+            [1024, 4096, 8192, 10240]
+        } else {
+            WIDTHS
+        }
+    }
+    pub fn blocks(&self) -> [usize; 4] {
+        if self.layout == LAYOUT_V2 {
+            [1024, 3072, 4096, 2048]
+        } else {
+            BLOCKS
+        }
+    }
     pub fn validate(&self) -> Result<()> {
         check(
-            self.layout == LAYOUT && self.graph == "mixed-code-diffusion-v1",
+            (self.layout == LAYOUT && self.graph == "mixed-code-diffusion-v1")
+                || (self.layout == LAYOUT_V2
+                    && matches!(
+                        self.graph.as_str(),
+                        "slot-code-diffusion-v2"
+                            | "pooled-control-code-diffusion-v2"
+                            | "pooled-code-diffusion-v2"
+                    )),
             "unknown learned graph",
         )?;
         check(
@@ -61,7 +96,9 @@ impl Graph {
                 && (1..=16384).contains(&self.max_context)
                 && (1..=1024).contains(&self.max_query)
                 && (1..=262144).contains(&self.cell_cap)
-                && (1..=64).contains(&self.diffusion_steps),
+                && (1..=64).contains(&self.diffusion_steps)
+                && (!self.slot_readout()
+                    || ((2..=32).contains(&self.summary_slots) && self.summary_slots % 2 == 0)),
             "learned graph envelope exceeded",
         )
     }
