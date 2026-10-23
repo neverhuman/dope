@@ -108,6 +108,7 @@ class LandmarkInputTests(unittest.TestCase):
             def __init__(self):
                 super().__init__(prior_only=True)
                 class FixtureCache:
+                    feature_recipe=FEATURE_RECIPE
                     def attach(self,data):return data
                 self.input_cache=FixtureCache()
             def get(self,*a):

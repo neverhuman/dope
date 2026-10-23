@@ -57,6 +57,8 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
     model_config.validate();config.validate()
     require(not model_config.landmark_input() or (config.profile_weight == 0 and corpus.input_cache is not None),
             'cv_landmark_input_cache_and_zero_profile_weight_required')
+    require(not model_config.landmark_input() or corpus.input_cache.feature_recipe==model_config.landmark_recipe(),
+            'cv_landmark_model_cache_recipe_mismatch')
     require(config.validation_recipe == 'fixed-six-v1' or corpus.prior_only,
             'unique_validation_requires_owned_priors')
     require(phase != 'ultra-residual' or resume or base_checkpoint, 'ultra_requires_trained_ordinary_base')

@@ -50,6 +50,8 @@ impl Graph {
                 | "pooled-control-bounded-code-diffusion-v2"
                 | "slot-landmark-input-bounded-v3"
                 | "slot-landmark-masked-bounded-v3"
+                | "slot-landmark-observed-bounded-v4"
+                | "slot-landmark-observed-masked-bounded-v4"
         )
     }
     pub fn bounded_code(&self) -> bool {
@@ -60,16 +62,36 @@ impl Graph {
                 | "pooled-bounded-code-diffusion-v2"
                 | "slot-landmark-input-bounded-v3"
                 | "slot-landmark-masked-bounded-v3"
+                | "slot-landmark-observed-bounded-v4"
+                | "slot-landmark-observed-masked-bounded-v4"
         )
     }
     pub fn landmark_input(&self) -> bool {
         matches!(
             self.graph.as_str(),
-            "slot-landmark-input-bounded-v3" | "slot-landmark-masked-bounded-v3"
+            "slot-landmark-input-bounded-v3"
+                | "slot-landmark-masked-bounded-v3"
+                | "slot-landmark-observed-bounded-v4"
+                | "slot-landmark-observed-masked-bounded-v4"
         )
     }
     pub fn landmark_masked(&self) -> bool {
-        self.graph == "slot-landmark-masked-bounded-v3"
+        matches!(
+            self.graph.as_str(),
+            "slot-landmark-masked-bounded-v3" | "slot-landmark-observed-masked-bounded-v4"
+        )
+    }
+    pub fn landmark_recipe(&self) -> Option<&'static str> {
+        if matches!(
+            self.graph.as_str(),
+            "slot-landmark-observed-bounded-v4" | "slot-landmark-observed-masked-bounded-v4"
+        ) {
+            Some(super::landmark_features::OBSERVED_RECIPE)
+        } else if self.landmark_input() {
+            Some(super::landmark_features::RECIPE)
+        } else {
+            None
+        }
     }
     pub fn pooled_control(&self) -> bool {
         matches!(
@@ -112,6 +134,8 @@ impl Graph {
                             | "pooled-bounded-code-diffusion-v2"
                             | "slot-landmark-input-bounded-v3"
                             | "slot-landmark-masked-bounded-v3"
+                            | "slot-landmark-observed-bounded-v4"
+                            | "slot-landmark-observed-masked-bounded-v4"
                     )),
             "unknown learned graph",
         )?;

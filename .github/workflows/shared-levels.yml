@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [test_models, test_training, test_comparison, test_validation, test_v2, test_landmark_inputs, test_precalc]
+        suite: [test_models, test_training, test_comparison, test_validation, test_v2, test_landmark_inputs, test_precalc, test_observed_landmarks, test_landmark_views]
     runs-on:
       group: neverhuman-lan
       labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
