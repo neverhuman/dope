@@ -4,6 +4,11 @@ import hashlib
 import re
 from pathlib import Path
 from ..contracts import require
+try:
+    from botocore.exceptions import BotoCoreError,ClientError
+except ImportError:
+    BotoCoreError=ClientError=RuntimeError
+NETWORK_ERRORS=(OSError,ValueError,RuntimeError,BotoCoreError,ClientError)
 
 
 def locator(value):
@@ -17,7 +22,7 @@ class PrivateStore:
 
     def get(self,key):
         try:r=self.client.get_object(Bucket=self.bucket,Key=self.prefix+'/'+locator(key))
-        except Exception as error:
+        except NETWORK_ERRORS as error:
             if getattr(error,'response',{}).get('Error',{}).get('Code')in('NoSuchKey','404'):return None
             raise ValueError('precalc_private_read_failed')from None
         stream=r['Body']
@@ -33,7 +38,7 @@ class PrivateStore:
         try:self.client.put_object(Bucket=self.bucket,Key=self.prefix+'/'+locator(key),Body=raw,IfNoneMatch='*',
                 ServerSideEncryption='AES256',ChecksumSHA256=base64.b64encode(checksum).decode(),
                 ContentType='application/json',Metadata={'sha256':checksum.hex(),'privacy':'private-measurement'})
-        except Exception as error:
+        except NETWORK_ERRORS as error:
             require(getattr(error,'response',{}).get('Error',{}).get('Code')in('PreconditionFailed','412'),
                     'precalc_publication_failed')
         require(self.get(key)==raw,'precalc_immutable_collision_or_readback')
@@ -49,7 +54,7 @@ def _fetch_source(client,bucket,cell,root):
         require(not path.is_symlink()and path.stat().st_size==s['train_bytes']
                 and hashlib.sha256(path.read_bytes()).hexdigest()==s['train_sha256'],'precalc_source_cache_corrupt');return path
     try:response=client.get_object(Bucket=bucket,Key=s['source_key'])
-    except Exception:raise ValueError('precalc_TRAIN_transport_failed')from None
+    except NETWORK_ERRORS:raise ValueError('precalc_TRAIN_transport_failed')from None
     stream=response['Body'];partial=path.with_suffix('.partial')
     import os
     try:

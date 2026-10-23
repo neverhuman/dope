@@ -49,7 +49,7 @@ class PrecalcTests(unittest.TestCase):
             self.assertNotIn(b'SECRET',after)
 
     def test_s3_writes_are_private_conditional_and_never_overwrite(self):
-        class Error(Exception):
+        class Error(RuntimeError):
             def __init__(self):self.response={'Error':{'Code':'PreconditionFailed'}}
         class Client:
             def __init__(self):self.objects={};self.calls=[]
