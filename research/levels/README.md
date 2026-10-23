@@ -117,6 +117,23 @@ The historical Candle neural auditor's ignored CPU device seed remains outside
 this readout and requires separate qualification before neural replay claims.
 Keep an external process deadline around the command if a hard wall is needed.
 
+For an additional native control panel, pass `--auditor-engine /absolute/path/to/dope`
+and `--expected-auditor-sha256 VERIFIED_SHA256`. Protocol v3 records this separate
+binary and uses `linear-seeded-v1,gbdt,mlp-seeded-v1` with the same fit-only baseline
+artifact representation for both methods. Native MSE/classification log loss is
+auxiliary to the unchanged ridge/Brier primary metric. Every requested native
+auditor must complete; an auditor failure retains a failed scheduled cell. The
+ordinary protocol v2 path remains available without these options.
+
+The new CPU neural recipe `candle-mlp-host-init-v1` generates weights and biases
+with the repository's counter RNG and orders optimizer/early-stopping variables by
+name. It uses no Candle global device RNG. Replay is tested across fresh
+processes, interleaved seeds and one/four CPU thread pools on a pinned runtime;
+bitwise equality across architectures is not claimed. The historical `mlp` and
+`linear` names and default auditor roster retain their behavior. No new native
+auditor output retrospectively qualifies the frozen ridge cohort or driver
+fidelity; independent driver and external-source evidence remain required.
+
 ## Real data and native landmark corpus admission
 
 Replace `--prior-only` with `--corpus PRIVATE_MANIFEST.json`. A
