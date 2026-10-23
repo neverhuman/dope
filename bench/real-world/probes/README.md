@@ -61,6 +61,10 @@ $P replay-levels target/probes/levels/levels-probe.jsonl
 ```
 
 Everything is written under `target/`; raw data stays out of Git.
+Parser failures retain file/line/column coordinates, and failed engine calls
+retain their exit status. Their diagnostics omit source strings, declared target
+names, artifact metadata and engine stderr, which may contain private input text.
+Repair hints still identify the relevant command and documentation.
 
 ## What reproduces, and what does not
 

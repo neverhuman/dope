@@ -42,7 +42,7 @@ pub struct Inputs {
 impl Inputs {
     pub fn load(path: &Path) -> Result<Self> {
         let text = fs::read_to_string(path).map_err(|e| Error::io(path, e))?;
-        serde_json::from_str(&text).map_err(|e| Error::msg(format!("{}: {e}", path.display())))
+        serde_json::from_str(&text).map_err(|e| Error::json(path, e))
     }
 }
 
@@ -79,10 +79,7 @@ pub fn split_table(tsv: &[u8], p: &SplitParams, out: &Path) -> Result<(String, S
         .split('\t')
         .collect();
     if !header.contains(&p.target.as_str()) {
-        return Err(Error::msg(format!(
-            "target column `{}` is missing",
-            p.target
-        )));
+        return Err(Error::msg("declared target column is missing"));
     }
     let rows: Vec<Vec<&str>> = lines.map(|l| l.split('\t').collect()).collect();
     if let Some((i, r)) = rows

@@ -42,8 +42,18 @@ impl Error {
         Error::Io(format!("{}: {e}", path.display()))
     }
 
-    pub fn csv(e: csv::Error) -> Self {
-        Error::Input(e.to_string())
+    pub fn csv(_e: csv::Error) -> Self {
+        Error::Input("CSV input or output is malformed".into())
+    }
+
+    /// Parser diagnostics may contain input strings. Retain coordinates, never their text.
+    pub fn json(path: &Path, e: serde_json::Error) -> Self {
+        Error::Input(format!(
+            "{}: invalid JSON at line {}, column {}",
+            path.display(),
+            e.line(),
+            e.column()
+        ))
     }
 
     /// Agent-readable repair guidance: what the step was for, why it failed, the usual fixes,
@@ -116,8 +126,14 @@ pub fn load_jsonl<T: serde::de::DeserializeOwned>(path: &Path) -> Result<Vec<T>>
         .enumerate()
         .filter(|(_, l)| !l.trim().is_empty())
         .map(|(i, l)| {
-            serde_json::from_str(l)
-                .map_err(|e| Error::msg(format!("{}:{}: {e}", path.display(), i + 1)))
+            serde_json::from_str(l).map_err(|e| {
+                Error::msg(format!(
+                    "{}:{}: invalid JSON at column {}",
+                    path.display(),
+                    i + 1,
+                    e.column()
+                ))
+            })
         })
         .collect()
 }

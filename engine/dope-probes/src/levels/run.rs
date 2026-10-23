@@ -84,9 +84,9 @@ fn run(dope: &Path, args: &[&dyn AsRef<std::ffi::OsStr>]) -> Result<String> {
         .map_err(|e| Error::io(dope, e))?;
     if !out.status.success() {
         return Err(Error::engine(format!(
-            "{} failed: {}",
+            "{} failed with status {} (private stderr omitted)",
             dope.display(),
-            String::from_utf8_lossy(&out.stderr)
+            out.status
         )));
     }
     Ok(String::from_utf8_lossy(&out.stdout).into_owned())
@@ -94,17 +94,17 @@ fn run(dope: &Path, args: &[&dyn AsRef<std::ffi::OsStr>]) -> Result<String> {
 
 fn read_json(path: &Path) -> Result<serde_json::Value> {
     let text = fs::read_to_string(path).map_err(|e| Error::io(path, e))?;
-    serde_json::from_str(&text).map_err(|e| Error::engine(format!("{}: {e}", path.display())))
+    serde_json::from_str(&text).map_err(|e| Error::json(path, e))
 }
 
 /// The artifact's inflated program: the `dope` tensor of the safetensors file, brotli-decoded.
 pub fn inflate(path: &Path) -> Result<Vec<u8>> {
     let bytes = fs::read(path).map_err(|e| Error::io(path, e))?;
     let st = safetensors::SafeTensors::deserialize(&bytes)
-        .map_err(|e| Error::msg(format!("{}: {e}", path.display())))?;
+        .map_err(|_| Error::msg(format!("{}: invalid safetensors artifact", path.display())))?;
     let t = st
         .tensor("dope")
-        .map_err(|e| Error::msg(format!("{}: {e}", path.display())))?;
+        .map_err(|_| Error::msg(format!("{}: required tensor is missing", path.display())))?;
     let mut out = Vec::new();
     brotli::Decompressor::new(t.data(), 4096)
         .read_to_end(&mut out)
