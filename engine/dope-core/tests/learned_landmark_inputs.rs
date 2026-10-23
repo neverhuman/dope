@@ -5,9 +5,9 @@ use dope_core::{
     levels::Level,
 };
 use std::path::PathBuf;
-fn root(name: &str) -> PathBuf {
+fn root(version: &str, name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests/fixtures/learned-v3")
+        .join(format!("tests/fixtures/learned-{version}"))
         .join(name)
 }
 fn close(a: &Tensor, b: &Tensor, tolerance: f32) {
@@ -23,8 +23,13 @@ fn close(a: &Tensor, b: &Tensor, tolerance: f32) {
 }
 #[test]
 fn new_landmark_input_graphs_match_all_tiers_and_preserve_target_free_isolation() {
-    for name in ["input", "masked"] {
-        let r = root(name);
+    for (version, name) in [
+        ("v3", "input"),
+        ("v3", "masked"),
+        ("v4", "input"),
+        ("v4", "masked"),
+    ] {
+        let r = root(version, name);
         let meta: serde_json::Value =
             serde_json::from_slice(&std::fs::read(r.join("fixture.json")).unwrap()).unwrap();
         let schema: Schema = serde_json::from_value(meta["schema"].clone()).unwrap();

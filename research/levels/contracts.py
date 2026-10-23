@@ -20,7 +20,10 @@ V2_GRAPHS = (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH,
              SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
 LANDMARK_INPUT_GRAPH = "slot-landmark-input-bounded-v3"
 LANDMARK_MASKED_GRAPH = "slot-landmark-masked-bounded-v3"
-LANDMARK_GRAPHS = (LANDMARK_INPUT_GRAPH, LANDMARK_MASKED_GRAPH)
+LANDMARK_OBSERVED_GRAPH = "slot-landmark-observed-bounded-v4"
+LANDMARK_OBSERVED_MASKED_GRAPH = "slot-landmark-observed-masked-bounded-v4"
+LANDMARK_GRAPHS = (LANDMARK_INPUT_GRAPH, LANDMARK_MASKED_GRAPH,
+                   LANDMARK_OBSERVED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH)
 PREPROCESSING = "fit-only-positional-mixed-v1"
 
 
@@ -116,7 +119,12 @@ class ModelConfig:
         return self.graph in LANDMARK_GRAPHS
 
     def landmark_masked(self):
-        return self.graph == LANDMARK_MASKED_GRAPH
+        return self.graph in (LANDMARK_MASKED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH)
+
+    def landmark_recipe(self):
+        if self.graph in (LANDMARK_OBSERVED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH):
+            return 'fit-cv-gain23-observed-mask-squash-v2'
+        return 'fit-cv-gain23-mask-squash-v1' if self.landmark_input() else None
 
     def pooled_control(self):
         return self.graph in (MATCHED_GRAPH, MATCHED_BOUNDED_GRAPH)

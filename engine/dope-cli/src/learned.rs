@@ -128,11 +128,12 @@ fn execute(command: LearnedCommand) -> Result<()> {
                 a.seed,
             )?;
             let landmarks = match (&a.landmark_input, &a.landmark_manifest_sha256) {
-                (Some(path), Some(expected)) => Some(learned::landmark_features::load(
+                (Some(path), Some(expected)) => Some(learned::landmark_features::load_for_recipe(
                     path,
                     expected,
                     &a.csv,
                     &context.schema,
+                    manifest.graph.landmark_recipe().ok_or_else(bad)?,
                 )?),
                 (None, None) => None,
                 _ => return Err(bad()),

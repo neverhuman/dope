@@ -46,7 +46,16 @@ def main(argv=None):
     inputs.add_argument('--expected-engine-sha256',required=True)
     inputs.add_argument('--out',type=Path,required=True)
     inputs.add_argument('--wall-seconds',type=int,default=300)
+    derived=sub.add_parser('derive-landmark-inputs',help='Observed-score view of a saved private fit-CV report; no new fits')
+    derived.add_argument('--input',type=Path,required=True)
+    derived.add_argument('--expected-manifest-sha256',required=True)
+    derived.add_argument('--expected-engine-sha256',required=True)
+    derived.add_argument('--out',type=Path,required=True)
     args=parser.parse_args(argv)
+    if args.command=='derive-landmark-inputs':
+        from .landmark_features import derive_observed
+        print(json.dumps(derive_observed(args.input,args.expected_manifest_sha256,args.expected_engine_sha256,args.out)))
+        return 0
     if args.command=='landmark-inputs':
         from .landmark_features import prepare_input
         from .corpus import read_dataset

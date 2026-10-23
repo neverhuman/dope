@@ -3,7 +3,17 @@ use dope_core::levels::digest;
 use std::{path::PathBuf, process::Command};
 #[test]
 fn training_only_cv_features_are_inputs_and_not_recipient_dependencies() {
-    let root = std::env::temp_dir().join(format!("dope-landmark-input-cli-{}", std::process::id()));
+    journey("v3");
+}
+#[test]
+fn observed_score_recipe_is_bound_to_the_model_and_not_a_recipient_dependency() {
+    journey("v4");
+}
+fn journey(version: &str) {
+    let root = std::env::temp_dir().join(format!(
+        "dope-landmark-input-cli-{version}-{}",
+        std::process::id()
+    ));
     std::fs::create_dir(&root).unwrap();
     let csv = root.join("fit.csv");
     let text = String::from("PRIVATE_HEADER,c,target\n")
@@ -24,18 +34,23 @@ fn training_only_cv_features_are_inputs_and_not_recipient_dependencies() {
     assert_eq!(report["rows"], 80);
     assert_eq!(report["options"]["folds"], 5);
     std::fs::write(features.join("report.json"), &measured.stdout).unwrap();
-    let manifest = serde_json::json!({"format":"dope-fit-cv-landmark-input-v1",
+    let mut manifest = serde_json::json!({"format":"dope-fit-cv-landmark-input-v1",
         "feature_recipe":"fit-cv-gain23-mask-squash-v1","options":report["options"],
         "engine_sha256":digest(&std::fs::read(env!("CARGO_BIN_EXE_dope")).unwrap()),
         "report_sha256":digest(&measured.stdout),"producer":{"purpose":"actual native CV unit journey"},
         "scope":{"allowed_roles":["fit"],"split_policy":"iid","training_input_sha256":digest(text.as_bytes()),
         "column_kinds":["numeric","categorical","numeric"],"task":"regression","rows":80,
         "physical_rows_sha256":digest(b"owned-unit-rows"),"physical_table_id":digest(b"owned-unit-table")}});
+    if version == "v4" {
+        manifest["format"] = serde_json::json!("dope-fit-cv-landmark-input-v2");
+        manifest["feature_recipe"] = serde_json::json!("fit-cv-gain23-observed-mask-squash-v2");
+    }
     let raw = serde_json::to_vec(&manifest).unwrap();
     let expected = digest(&raw);
     std::fs::write(features.join("manifest.json"), raw).unwrap();
-    let model = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../dope-core/tests/fixtures/learned-v3/input/model");
+    let model = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
+        "../dope-core/tests/fixtures/learned-{version}/input/model"
+    ));
     let code = root.join("all.code");
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_dope"));
     cmd.args(["--threads", "1", "learned", "encode", "--model"])

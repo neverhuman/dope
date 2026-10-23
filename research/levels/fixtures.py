@@ -30,6 +30,8 @@ def generate(output, *, graph="mixed-code-diffusion-v1"):
                             config=config,cursor=0,seed=12)
     model=SharedModel(config)
     landmark_features=([.1*(i+1) for i in range(23)],[True]*23) if config.landmark_input() else None
+    if config.landmark_recipe()=='fit-cv-gain23-observed-mask-squash-v2':
+        landmark_features=([-1.,0.,.005]+[.1]*(23-3),[True]*23)
     profile=landmark_features if landmark_features is not None else ([0.]*23,[False]*23)
     input_args=dict(landmark_features=landmark_features) if landmark_features is not None else {}
     optimizer=make_optimizer(model,train_config)

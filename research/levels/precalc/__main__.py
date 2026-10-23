@@ -31,7 +31,11 @@ def main():
     repair.add_argument('--expected-binary-sha256',required=True);repair.add_argument('--source-commit',required=True);repair.add_argument('--local-store',type=Path)
     download=sub.add_parser('download');download.add_argument('--entry-key',required=True)
     download.add_argument('--expected-entry-sha256',required=True);download.add_argument('--out',type=Path,required=True)
-    for parser in (job,upload,download,index,repair):
+    view=sub.add_parser('derive-observed-view');view.add_argument('--source-index-key',required=True)
+    view.add_argument('--expected-source-index-sha256',required=True);view.add_argument('--workers',type=int,default=4)
+    selected=sub.add_parser('download-view');selected.add_argument('--entry-key',required=True)
+    selected.add_argument('--expected-entry-sha256',required=True);selected.add_argument('--out',type=Path,required=True)
+    for parser in (job,upload,download,index,repair,view,selected):
         parser.add_argument('--bucket',default='veox-jopedime-datasets-use2');parser.add_argument('--profile',default='veox-jepson')
         parser.add_argument('--prefix',default='derived/dope/landmark-inputs/fit-cv-v1/precalc-20261023')
     args=p.parse_args();os.umask(0o077)
@@ -39,6 +43,19 @@ def main():
         value=make_plan(args.catalog,source_commit=args.source_commit,split_seed=args.split_seed);private(args.out,value)
         print(json.dumps(dict(plan_sha256=value['sha256'],scheduled=len(value['cells']),splits=value['splits'],model_training=False)));return
     require(args.bucket=='veox-jopedime-datasets-use2','precalc_bucket_not_authorized')
+    if args.command in('derive-observed-view','download-view'):
+        from .views import derive_corpus,materialize_view
+        store=PrivateStore(client(args.profile),args.bucket,args.prefix)
+        if args.command=='derive-observed-view':
+            from .worker import allocation_snapshot
+            resources=allocation_snapshot(Path.cwd())
+            require(1<=args.workers<=16 and resources['memory_available']>=12*2**30
+                    and resources['disk_available']>=10*2**30
+                    and resources['load'][0]<resources['cpu_available']-8,'precalc_view_resource_refused')
+            os.nice(10)
+            print(json.dumps(derive_corpus(store,args.source_index_key,args.expected_source_index_sha256,workers=args.workers)))
+        else:print(json.dumps(materialize_view(store,args.entry_key,args.expected_entry_sha256,args.out)))
+        return
     if args.command=='recover':
         from .recover import recover
         store=LocalStore(args.local_store)if args.local_store else PrivateStore(client(args.profile),args.bucket,args.prefix)

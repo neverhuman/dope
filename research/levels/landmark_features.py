@@ -11,6 +11,8 @@ import subprocess
 from .contracts import canonical, digest, require
 
 FEATURE_RECIPE = 'fit-cv-gain23-mask-squash-v1'
+OBSERVED_RECIPE = 'fit-cv-gain23-observed-mask-squash-v2'
+FEATURE_RECIPES = (FEATURE_RECIPE, OBSERVED_RECIPE)
 OPTIONS = dict(panel='landmarks-native-v1', folds=5, ridge_rows=8192,
                small_rows=4096, knn_reference=2048, spectrum_features=64,
                work_budget=2000000000, seed=0)
@@ -79,7 +81,8 @@ def expected_query_rows(coordinate,rows,options):
     return sum(min(rows//folds+(k<rows%folds),cap)for k in range(folds))
 
 
-def report_features(report, rows, task, *, options=None):
+def report_features(report, rows, task, *, options=None, recipe=FEATURE_RECIPE):
+    require(recipe in FEATURE_RECIPES, 'cv_landmark_unknown_recipe')
     options=OPTIONS if options is None else options
     validate_options(options)
     require(report['panel']==OPTIONS['panel'] and report['options']==options
@@ -88,8 +91,14 @@ def report_features(report, rows, task, *, options=None):
             and [c['id'] for c in report['cells']]==list(range(1,24)), 'cv_landmark_report_binding')
     values,mask=[],[]
     for cell in report['cells']:
-        valid=cell['state']=='complete' and cell.get('gain')is not None
+        if recipe==OBSERVED_RECIPE:
+            require(cell['state']in('complete','uninformative','unsupported','over_budget','failed'),
+                    'cv_landmark_unknown_cell_state')
+        valid=(cell['state']=='complete' or (recipe==OBSERVED_RECIPE and cell['state']=='uninformative')) and cell.get('gain')is not None
         if valid:
+            if recipe==OBSERVED_RECIPE:
+                require(type(cell['gain'])in(int,float) and all(type(n)is int for n in cell['train_rows']),
+                        'cv_landmark_observation_type')
             require(len(cell['train_rows'])==5 and cell['query_rows']==expected_query_rows(cell['id'],rows,options)
                     and all(1<=n<rows for n in cell['train_rows']), 'cv_landmark_out_of_fold_required')
         values.append(float(cell['gain']) if valid else 0.);mask.append(valid)
@@ -97,7 +106,9 @@ def report_features(report, rows, task, *, options=None):
     return values,mask
 
 
-def read_input(directory, expected_manifest, expected_engine, *, data=None, csv_path=None, kinds=None, task=None):
+def read_input(directory, expected_manifest, expected_engine, *, data=None, csv_path=None, kinds=None, task=None,
+               recipe=FEATURE_RECIPE):
+    require(recipe in FEATURE_RECIPES, 'cv_landmark_unknown_recipe')
     root=Path(directory)
     for name,limit in [('manifest.json',262144),('report.json',1048576)]:
         path=root/name
@@ -106,7 +117,8 @@ def read_input(directory, expected_manifest, expected_engine, *, data=None, csv_
     require(sha(root/'manifest.json')==expected_manifest, 'cv_landmark_manifest_digest')
     m=json.loads((root/'manifest.json').read_bytes())
     require(set(m)=={'format','feature_recipe','scope','options','engine_sha256','report_sha256','producer'}
-            and m['format']=='dope-fit-cv-landmark-input-v1' and m['feature_recipe']==FEATURE_RECIPE
+            and m['format']==('dope-fit-cv-landmark-input-v1' if recipe==FEATURE_RECIPE else 'dope-fit-cv-landmark-input-v2')
+            and m['feature_recipe']==recipe
             and m['engine_sha256']==expected_engine
             and sha(root/'report.json')==m['report_sha256'], 'cv_landmark_input_binding')
     validate_options(m['options'])
@@ -118,7 +130,47 @@ def read_input(directory, expected_manifest, expected_engine, *, data=None, csv_
     else:
         require(csv_path is not None and sha(csv_path)==scope['training_input_sha256']
                 and kinds==scope['column_kinds'] and task==scope['task'], 'cv_landmark_csv_binding')
-    return report_features(json.loads((root/'report.json').read_bytes()),scope['rows'],scope['task'],options=m['options'])
+    return report_features(json.loads((root/'report.json').read_bytes()),scope['rows'],scope['task'],
+                           options=m['options'],recipe=recipe)
+
+
+def observed_view(source, report, expected_manifest, expected_engine):
+    """Pure, versioned view. Preserve the exact native report and measurement scope."""
+    require(len(source)<=262144 and len(report)<=1048576, 'cv_landmark_input_file_invalid')
+    require(hashlib.sha256(source).hexdigest()==expected_manifest, 'cv_landmark_manifest_digest')
+    m=json.loads(source)
+    require(set(m)=={'format','feature_recipe','scope','options','engine_sha256','report_sha256','producer'}
+            and m['format']=='dope-fit-cv-landmark-input-v1' and m['feature_recipe']==FEATURE_RECIPE
+            and m['engine_sha256']==expected_engine and m['report_sha256']==hashlib.sha256(report).hexdigest(),
+            'cv_landmark_derivation_binding')
+    require(m['scope']['allowed_roles']==['fit'] and m['scope']['split_policy']=='iid',
+            'cv_landmark_fit_only_required')
+    values,mask=report_features(json.loads(report),m['scope']['rows'],m['scope']['task'],
+                              options=m['options'],recipe=OBSERVED_RECIPE)
+    derived=dict(m,format='dope-fit-cv-landmark-input-v2',feature_recipe=OBSERVED_RECIPE,
+                 producer=dict(source_sha256=sha(__file__),derivation=dict(
+                     source_manifest_sha256=expected_manifest,source_report_sha256=m['report_sha256'],
+                     source_feature_recipe=FEATURE_RECIPE,new_native_executions=0,new_optimizer_updates=0)))
+    return derived,dict(feature_recipe=OBSERVED_RECIPE,values=values,mask=mask)
+
+
+def derive_observed(directory, expected_manifest, expected_engine, output):
+    """New feature view of an exact saved report. No source read, native fit or optimizer."""
+    root=Path(directory);out=Path(output)
+    require(not out.exists(), 'cv_landmark_derivation_output_exists')
+    for name,limit in [('manifest.json',262144),('report.json',1048576)]:
+        path=root/name
+        require(path.is_file() and not path.is_symlink() and path.stat().st_size<=limit,
+                'cv_landmark_input_file_invalid')
+    source=(root/'manifest.json').read_bytes();report=(root/'report.json').read_bytes()
+    derived,features=observed_view(source,report,expected_manifest,expected_engine)
+    out.mkdir(mode=0o700)
+    for name,raw in [('report.json',report),('manifest.json',canonical(derived)),
+                     ('features.json',canonical(features))]:
+        with(out/name).open('xb')as stream:
+            os.chmod(out/name,0o600);stream.write(raw);stream.flush();os.fsync(stream.fileno())
+    return dict(physical_table_id=derived['scope']['physical_table_id'],directory=str(out.resolve()),
+                manifest_sha256=sha(out/'manifest.json'),engine_sha256=expected_engine)
 
 
 def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, work_budget=20000000000):
@@ -159,7 +211,8 @@ def prepare_input(data, engine, expected_engine, output, *, wall_seconds=300, wo
 class InputCache:
     def __init__(self,index):
         require(index.get('format')=='dope-fit-cv-landmark-cache-v1'
-                and index.get('feature_recipe')==FEATURE_RECIPE, 'cv_landmark_cache_recipe')
+                and index.get('feature_recipe')in FEATURE_RECIPES, 'cv_landmark_cache_recipe')
+        self.feature_recipe=index['feature_recipe']
         self.entries={}
         for row in index['entries']:
             key=row['physical_table_id']
@@ -171,7 +224,8 @@ class InputCache:
         data=dict(data);key=data['source_provenance']['physical_table_id']
         require(key in self.entries, 'cv_landmark_cache_entry_required')
         pin=self.entries[key]
-        data['landmark_input']=read_input(pin['directory'],pin['manifest_sha256'],pin['engine_sha256'],data=data)
+        data['landmark_input']=read_input(pin['directory'],pin['manifest_sha256'],pin['engine_sha256'],
+                                          data=data,recipe=self.feature_recipe)
         data['source_provenance']=dict(data['source_provenance'],landmark_input_manifest_sha256=pin['manifest_sha256'],
                                        landmark_feature_sha256=digest(data['landmark_input']))
         return data

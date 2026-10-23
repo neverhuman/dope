@@ -5,6 +5,7 @@ use serde_json::Value;
 use std::path::Path;
 
 pub const RECIPE: &str = "fit-cv-gain23-mask-squash-v1";
+pub const OBSERVED_RECIPE: &str = "fit-cv-gain23-observed-mask-squash-v2";
 
 fn read(path: &Path, limit: u64) -> Result<Vec<u8>> {
     let meta = std::fs::symlink_metadata(path)?;
@@ -18,6 +19,21 @@ fn read(path: &Path, limit: u64) -> Result<Vec<u8>> {
 /// Caller supplies a producer-manifest digest. The producer reads only the declared
 /// fit partition; native code checks exact CSV/report/options/schema bindings again.
 pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Result<[f32; 46]> {
+    load_for_recipe(directory, expected, csv, schema, RECIPE)
+}
+
+/// The model graph, rather than a caller-selected mask, binds the feature recipe.
+pub fn load_for_recipe(
+    directory: &Path,
+    expected: &str,
+    csv: &Path,
+    schema: &Schema,
+    recipe: &str,
+) -> Result<[f32; 46]> {
+    check(
+        matches!(recipe, RECIPE | OBSERVED_RECIPE),
+        "unknown CV landmark recipe",
+    )?;
     let raw = read(&directory.join("manifest.json"), 262144)?;
     check(
         digest(&raw) == expected,
@@ -35,8 +51,13 @@ pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Re
     let kinds: Vec<_> = schema.columns.iter().map(|c| c.kind.as_str()).collect();
     check(
         manifest.as_object().is_some_and(|v| v.len() == 7)
-            && manifest["format"] == "dope-fit-cv-landmark-input-v1"
-            && manifest["feature_recipe"] == RECIPE
+            && manifest["format"]
+                == if recipe == RECIPE {
+                    "dope-fit-cv-landmark-input-v1"
+                } else {
+                    "dope-fit-cv-landmark-input-v2"
+                }
+            && manifest["feature_recipe"] == recipe
             && options == expected_options
             && matches!(
                 options.work_budget,
@@ -89,7 +110,10 @@ pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Re
     let mut features = [0f32; 46];
     for (i, cell) in cells.iter().enumerate() {
         check(cell["id"] == i + 1, "CV landmark coordinate order mismatch")?;
-        if cell["state"] == "complete" && !cell["gain"].is_null() {
+        if (cell["state"] == "complete"
+            || (recipe == OBSERVED_RECIPE && cell["state"] == "uninformative"))
+            && !cell["gain"].is_null()
+        {
             let gain = cell["gain"]
                 .as_f64()
                 .ok_or_else(|| bad("invalid CV landmark gain"))? as f32;
