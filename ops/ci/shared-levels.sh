@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export PATH="$HOME/.cargo/bin:$PATH"
 case "${1:-all}" in
   contracts)
     python3 -B -m unittest research.levels.tests.test_contracts research.levels.tests.test_operations -v
@@ -10,15 +11,28 @@ case "${1:-all}" in
   prepare-torch)
     python3 -m venv target/shared-python
     target/shared-python/bin/pip install --index-url https://download.pytorch.org/whl/cpu torch==2.7.0
-    target/shared-python/bin/pip install numpy==1.26.4 safetensors==0.7.0
+    target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
     case "${2:?test shard required}" in test_models|test_training) ;; *) exit 2;; esac
     "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest "research.levels.tests.$2" -v
     ;;
   prepare-native)
-    sudo apt-get update
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends rustup
+    if ! command -v rustup >/dev/null 2>&1; then
+      case "$(uname -m)" in
+        x86_64) target_triple=x86_64-unknown-linux-gnu;;
+        aarch64) target_triple=aarch64-unknown-linux-gnu;;
+        *) echo 'Unsupported native CI architecture' >&2;exit 2;;
+      esac
+      mkdir -p target/shared-tools
+      installer_url="https://static.rust-lang.org/rustup/dist/$target_triple/rustup-init"
+      curl --fail --location --retry 3 "$installer_url" --output target/shared-tools/rustup-init
+      curl --fail --location --retry 3 "$installer_url.sha256" --output target/shared-tools/rustup-init.sha256
+      installer_sha=$(cut -d ' ' -f1 target/shared-tools/rustup-init.sha256)
+      printf '%s  %s\n' "$installer_sha" target/shared-tools/rustup-init | sha256sum --check -
+      chmod u+x target/shared-tools/rustup-init
+      target/shared-tools/rustup-init -y --no-modify-path --default-toolchain none
+    fi
     rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
     ;;
   native)

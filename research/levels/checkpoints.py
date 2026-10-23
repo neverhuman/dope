@@ -3,6 +3,8 @@ import json
 import os
 from pathlib import Path
 import random
+import platform
+import safetensors
 import uuid
 import numpy as np
 import torch
@@ -52,7 +54,9 @@ def save_checkpoint(root, model, optimizer, *, recipe, state):
     metadata = dict(format="dope-research-checkpoint-v1", recipe=recipe, state=state,
                     optimizer_entries=optimizer_metadata, optimizer_groups=groups,
                     python_rng=random.getstate(), numpy_rng=[numpy[0],numpy[1].tolist(),*numpy[2:]],
-                    torch_version=torch.__version__, cuda_version=torch.version.cuda, backend=device.type)
+                    torch_version=torch.__version__, cuda_version=torch.version.cuda, backend=device.type,
+                    numpy_version=np.__version__,safetensors_version=safetensors.__version__,
+                    python_version=platform.python_version())
     try:
         save_file(tensors,str(staging/'state.safetensors'))
         os.chmod(staging/'state.safetensors',0o600)
@@ -81,7 +85,10 @@ def load_checkpoint(path, model, optimizer, *, recipe):
     require(metadata['format'] == 'dope-research-checkpoint-v1'
             and metadata['recipe'] == recipe and metadata['torch_version'] == torch.__version__
             and metadata['cuda_version'] == torch.version.cuda
-            and metadata['backend'] == next(model.parameters()).device.type, "resume_recipe_or_runtime_mismatch")
+            and metadata['backend'] == next(model.parameters()).device.type
+            and metadata.get('numpy_version')==np.__version__
+            and metadata.get('safetensors_version')==safetensors.__version__
+            and metadata.get('python_version')==platform.python_version(), "resume_recipe_or_runtime_mismatch")
     require(not (path/'state.safetensors').is_symlink()
             and file_sha(path/'state.safetensors') == metadata['tensor_sha256'], "checkpoint_digest_mismatch")
     tensors = load_file(str(path/'state.safetensors'),device='cpu')
