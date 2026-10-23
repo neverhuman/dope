@@ -37,6 +37,11 @@ pub struct CodeManifest {
     pub evidence: String,
     pub certified: bool,
 }
+pub struct EncoderInputs<'a> {
+    pub target_included: bool,
+    pub through: Level,
+    pub landmarks: Option<&'a [f32; 46]>,
+}
 pub struct LocalEncoding {
     code: Tensor,
     schema: Schema,
@@ -76,10 +81,36 @@ impl LocalEncoding {
         model: ModelManifest,
         values: &Tensor,
         observed: &Tensor,
-        mut schema: Schema,
+        schema: Schema,
         target_included: bool,
         through: Level,
     ) -> Result<Self> {
+        Self::encode_inputs(
+            encoder,
+            model,
+            values,
+            observed,
+            schema,
+            EncoderInputs {
+                target_included,
+                through,
+                landmarks: None,
+            },
+        )
+    }
+    pub fn encode_inputs(
+        encoder: &TableEncoder,
+        model: ModelManifest,
+        values: &Tensor,
+        observed: &Tensor,
+        mut schema: Schema,
+        inputs: EncoderInputs<'_>,
+    ) -> Result<Self> {
+        let EncoderInputs {
+            target_included,
+            through,
+            landmarks,
+        } = inputs;
         check(
             model.graph == encoder.graph && model.layout == encoder.graph.layout,
             "learned encoder model binding mismatch",
@@ -88,12 +119,13 @@ impl LocalEncoding {
             model.trained_levels.iter().any(|l| l == through.name()),
             "requested learned level is untrained",
         )?;
-        let code = encoder.encode(
+        let code = encoder.encode_with_landmarks(
             values,
             observed,
             &schema,
             target_included,
             model.graph.widths()[through as usize],
+            landmarks,
         )?;
         if !target_included {
             schema.columns.pop();

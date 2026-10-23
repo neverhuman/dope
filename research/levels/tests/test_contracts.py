@@ -27,3 +27,13 @@ class ContractTests(unittest.TestCase):
         with self.assertRaises(ResearchError):validate_corpus(invalid)
         invalid=copy.deepcopy(manifest);invalid['datasets'][0].pop('dataset_id')
         with self.assertRaisesRegex(ResearchError,'physical_dataset_id_required'):validate_corpus(invalid)
+
+    def test_physical_dataset_id_is_optional_but_unique_and_valid_when_declared(self):
+        items=[dict(family_id=f'family:{i}',dataset_id=f'table:{i}',physical_dataset_id=str(i)*64,
+            meta_role=role,train_sha256=str(i)*64,source_role='official_train',
+            rights=dict(admitted=True,license_id='MIT'),target_index=1,split_policy='iid')
+            for i,role in [(1,'train'),(2,'development')]]
+        validate_corpus(dict(format='dope-meta-corpus-v1',datasets=items))
+        items[1]['physical_dataset_id']=items[0]['physical_dataset_id']
+        with self.assertRaisesRegex(ResearchError,'duplicate_physical_dataset'):
+            validate_corpus(dict(format='dope-meta-corpus-v1',datasets=items))

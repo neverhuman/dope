@@ -43,7 +43,9 @@ def objective(model, context, query, profile, config, step, *, phase="ordinary",
     device = next(model.parameters()).device
     cv, co = tensors(context, device); qv, qo = tensors(query, device)
     schema = context.schema
-    code = quantized_code(model.encoder(cv, co, schema, through="ultra" if phase == "ultra-residual" else "high"))
+    inputs = dict(landmark_features=profile) if model.config.landmark_input() else {}
+    require(not model.config.landmark_input() or config.profile_weight == 0, 'input_landmarks_are_not_profile_targets')
+    code = quantized_code(model.encoder(cv, co, schema, through="ultra" if phase == "ultra-residual" else "high", **inputs))
     selected = ["low","medium","high"] if phase == "ordinary" else ["ultra"]
     ramp = min(1., step/max(1,config.proxy_ramp_steps))
     total, records = code.sum()*0, {}
@@ -61,11 +63,11 @@ def objective(model, context, query, profile, config, step, *, phase="ordinary",
         labels = torch.tensor(profile[0], dtype=torch.float32, device=device)
         mask = torch.tensor(profile[1], dtype=torch.bool, device=device)
         predictions = model.profiles[level](prefix)
-        profile_loss = F.huber_loss(predictions[mask],labels[mask]) if mask.any() else predictions.sum()*0
+        profile_loss = F.huber_loss(predictions[mask],labels[mask]) if mask.any() and not model.config.landmark_input() else predictions.sum()*0
         consistency = gen*0
         if config.consistency_weight and len(cv) >= 8:
             small = quantized_code(model.encoder(cv[::2], co[::2], schema,
-                                   through="ultra" if level == "ultra" else level))
+                                   through="ultra" if level == "ultra" else level, **inputs))
             consistency = F.mse_loss(F.normalize(prefix, dim=0), F.normalize(small,dim=0))
         value = gen + ramp*(config.transfer_weight*transfer+config.driver_weight*driver)
         value = value + config.profile_weight*profile_loss+config.consistency_weight*consistency
@@ -73,7 +75,8 @@ def objective(model, context, query, profile, config, step, *, phase="ordinary",
         total = total+value/len(selected)
         record = dict(total=float(value.detach()),generation=float(gen.detach()),
                       transfer_proxy=float(transfer.detach()),driver_proxy=float(driver.detach()),
-                      profile=float(profile_loss.detach()),profile_slots=int(mask.sum()),
+                      profile=float(profile_loss.detach()),profile_slots=0 if model.config.landmark_input() else int(mask.sum()),
+                      landmark_input_slots=int(mask.sum()) if model.config.landmark_input() else 0,
                       consistency=float(consistency.detach()),proxy_ramp=ramp,**state)
         record.update({name:float(v.detach()) for name,v in terms.items()})
         records[level] = record

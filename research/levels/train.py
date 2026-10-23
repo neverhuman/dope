@@ -38,7 +38,7 @@ def prepared(corpus, role, cursor, model_config, *, with_provenance=False):
     context, query, identity = episode(**{k:source[k] for k in
         ('rows','kinds','slots','row_ids','task','roles')}, config=model_config,
         cursor=cursor,seed=corpus.seed)
-    result = (context,query,identity,source['landmarks'])
+    result = (context,query,identity,source['landmark_input'] if model_config.landmark_input() else source['landmarks'])
     return (*result,source['source_provenance']) if with_provenance else result
 
 
@@ -55,6 +55,8 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
           stop_after=None, phase='ordinary', resource_check=None, repair_reason=None, base_checkpoint=None):
     started=time.monotonic()
     model_config.validate();config.validate()
+    require(not model_config.landmark_input() or (config.profile_weight == 0 and corpus.input_cache is not None),
+            'cv_landmark_input_cache_and_zero_profile_weight_required')
     require(config.validation_recipe == 'fixed-six-v1' or corpus.prior_only,
             'unique_validation_requires_owned_priors')
     require(phase != 'ultra-residual' or resume or base_checkpoint, 'ultra_requires_trained_ordinary_base')
@@ -144,6 +146,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                     source_provenance=provenance,
                     context_rows=len(context.values),query_rows=len(query.values),columns=len(context.columns),
                     proxy_rows=min(config.proxy_rows,len(context.values)),
+                    landmark_input_slots={level:record.get('landmark_input_slots',0) for level,record in raw.items()},
                     neural_unrolls={level:record.get('neural_unrolls') for level,record in raw.items()},
                     encoder_passes=1+sum(config.consistency_weight>0 and len(context.values)>=8 for _ in raw),
                     decoder_passes=len(raw)*(1+int(any(r['proxy_ramp']>0 for r in raw.values())

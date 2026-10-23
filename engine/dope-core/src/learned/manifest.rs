@@ -48,6 +48,8 @@ impl Graph {
                 | "pooled-control-code-diffusion-v2"
                 | "slot-bounded-code-diffusion-v2"
                 | "pooled-control-bounded-code-diffusion-v2"
+                | "slot-landmark-input-bounded-v3"
+                | "slot-landmark-masked-bounded-v3"
         )
     }
     pub fn bounded_code(&self) -> bool {
@@ -56,7 +58,18 @@ impl Graph {
             "slot-bounded-code-diffusion-v2"
                 | "pooled-control-bounded-code-diffusion-v2"
                 | "pooled-bounded-code-diffusion-v2"
+                | "slot-landmark-input-bounded-v3"
+                | "slot-landmark-masked-bounded-v3"
         )
+    }
+    pub fn landmark_input(&self) -> bool {
+        matches!(
+            self.graph.as_str(),
+            "slot-landmark-input-bounded-v3" | "slot-landmark-masked-bounded-v3"
+        )
+    }
+    pub fn landmark_masked(&self) -> bool {
+        self.graph == "slot-landmark-masked-bounded-v3"
     }
     pub fn pooled_control(&self) -> bool {
         matches!(
@@ -97,6 +110,8 @@ impl Graph {
                             | "slot-bounded-code-diffusion-v2"
                             | "pooled-control-bounded-code-diffusion-v2"
                             | "pooled-bounded-code-diffusion-v2"
+                            | "slot-landmark-input-bounded-v3"
+                            | "slot-landmark-masked-bounded-v3"
                     )),
             "unknown learned graph",
         )?;

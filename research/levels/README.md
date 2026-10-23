@@ -28,6 +28,68 @@ Shared model weights are fixed local dependencies; every encoded table exports a
 bounded FP16 code and charged positional schema. This is development software,
 not a certified release, empirical privacy result, external accuracy or Elo claim.
 
+## Training-only CV landmark INPUT features (explicit v3 graphs)
+
+The human-specified input path is `slot-landmark-input-bounded-v3`. Its matched
+`slot-landmark-masked-bounded-v3` control has identical parameter shapes and
+initialization but zeroes the supplied landmark vector. Both require a valid
+nonempty input: a missing cache is a failure, not landmark-conditioned training.
+Historical graphs/defaults and auxiliary profile labels retain replay semantics.
+
+For each dataset and declared split, calculate the 23 native small-model gains
+using **five-fold cross-validation inside that split's training/fit partition**.
+Each fold fits preprocessing and model selection inside its fold-training rows;
+its query rows are used only for out-of-fold measurement. No outer tune/query,
+validation, calibration, confirmation or official TEST row contributes to these
+inputs. Group/time input recipes remain unsupported until their CV policy is
+qualified; random IID folds must not be substituted. The private producer writes
+only fit rows and binds their physical IDs, exact CSV bytes, schema/task, five-fold
+options, native binary, report and input-recipe hashes. The producer defaults to
+the 20-billion native work allowance; the 2-billion bounded recipe is also
+supported. These allocations retain distinct cache identities and masks, never
+interchangeable receipts. Whole-official-TRAIN
+reports from the earlier cache are diagnostic evidence, not these fit-only inputs.
+
+The encoder concatenates 23 fixed-scaled gains `g/(1+abs(g))` with 23 validity
+indicators and projects these 46 inputs into the task readout. A real zero gain
+is distinct from a missing/failed measurement. Nonfinite, malformed, all-missing
+or nonzero-masked inputs refuse. Landmarks affect only the task-conditioned
+readouts; the distribution path and target-free code do not consume them.
+`profile_weight` must be zero for these new graphs: predicting landmark targets
+alone is not the input path. Source-free recipients need no landmark report,
+encoder or raw training table; feature vectors/provenance are never extra public
+code metadata. Model weights, precalculation and encoding costs remain separate.
+
+Prepare an owned-prior input cache entry without opening an external dataset:
+
+```bash
+python3 -m research.levels.cli landmark-inputs --owned-family 0 --owned-seed 20261023 \
+  --engine /absolute/path/to/dope --expected-engine-sha256 VERIFIED_SHA256 \
+  --out NEW_PRIVATE_DIRECTORY
+```
+
+For an admitted real source, supply `--dataset PRIVATE_DATASET_ITEM.json` instead
+of `--owned-family`. The same family/rights/source-role admission applies; this
+command does not grant admission. The emitted entry is collected under a private
+`{"format":"dope-fit-cv-landmark-cache-v1","feature_recipe":"fit-cv-gain23-mask-squash-v1","entries":[...]}`
+index. Each entry binds physical table ID, local directory, manifest digest and
+native binary digest. Pass the complete index to `train --landmark-input-cache`.
+Prepare every training/development table required by the declared stream; do not
+selectively supply favorable tables. Corpus identity binds this entire cache for
+exact checkpoint resume. Optional `physical_dataset_id` is a 64-character opaque
+stable physical ID; supplying it keeps row splits independent of later family
+metadata resolution. Historical items without it retain their original IDs.
+
+Native encoding takes the producer's exact `fit.csv`, explicit source-order kinds
+and target, plus `--landmark-input PRIVATE_DIRECTORY
+--landmark-manifest-sha256 VERIFIED_SHA256`. It rechecks CSV/report/recipe/role
+bindings before using the features. Python `encode_table` accepts the validated
+`landmark_features` tuple from `read_input`; direct tensors in tiny tests are only
+synthetic conformance fixtures. All new graphs need fresh training, exact resume
+and full-width native parity before scientific utility evaluation. A green
+fixture is not evidence of an accuracy win. The preceding source21 768-case study
+remains a frozen landmark-free control and is not reinterpreted.
+
 ## Implemented boundary
 
 - Target-independent context selection, physical row identities, fit-only mixed

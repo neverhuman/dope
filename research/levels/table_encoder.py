@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from .blocks import Block, Induced, Tokenizer
 from .contracts import block_widths, level_widths, require
+from .landmark_features import feature_tensor
 
 
 class TableEncoder(nn.Module):
@@ -25,10 +26,22 @@ class TableEncoder(nn.Module):
         self.task_heads = nn.ModuleList(nn.Linear(w*config.readout_slots(), b//2)
                                       for b in block_widths(config.layout))
 
-    def forward(self, values, observed, schema, *, target_included=True, through="high"):
+        if config.landmark_input():
+            self.landmark_projection = nn.Linear(46, w*config.readout_slots())
+
+    def forward(self, values, observed, schema, *, target_included=True, through="high", landmark_features=None):
         widths = level_widths(self.config.layout)
         require(through in widths and values.ndim == 2 and values.shape == observed.shape,
                 "encoder_input_shape")
+        landmark = None
+        if self.config.landmark_input():
+            # Target-derived CV scores never enter feature rows, distribution readout or public schema.
+            if target_included:
+                inputs = feature_tensor(landmark_features, values.device)
+                if self.config.landmark_masked(): inputs = inputs*0
+                landmark = self.landmark_projection(inputs)
+        else:
+            require(landmark_features is None, 'landmark_input_graph_required')
         columns = schema["columns"]
         require(values.shape[0]*(len(columns)-1)**2*self.config.heads<=33554432
                 and values.numel()*self.config.width<=33554432, 'encoder_attention_allocation_unsupported')
@@ -76,7 +89,7 @@ class TableEncoder(nn.Module):
                     for block in self.pool: residual = block(residual, target)
                     task = self.readout(residual, self.task_norm)
             d = self.distribution_heads[i](distribution)
-            t = self.task_heads[i](task) if task is not None else torch.zeros_like(d)
+            t = self.task_heads[i](task if landmark is None else task+landmark) if task is not None else torch.zeros_like(d)
             if self.config.bounded_code(): d, t = d.tanh(), t.tanh()
             blocks.append(torch.cat((d, t)))
             if sum(blocks_widths[:i+1]) == widths[through]:

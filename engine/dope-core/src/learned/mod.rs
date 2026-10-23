@@ -4,6 +4,7 @@ mod blocks;
 mod carrier;
 pub mod decoder;
 pub mod intake;
+pub mod landmark_features;
 pub mod manifest;
 mod sampling;
 pub mod table_encoder;
@@ -14,7 +15,7 @@ use crate::{
     levels::{digest, Level},
     Result,
 };
-pub use carrier::{read_code, ExportedCode, LocalEncoding};
+pub use carrier::{read_code, EncoderInputs, ExportedCode, LocalEncoding};
 use manifest::{bad, check, ModelManifest, PREPROCESSING};
 pub use sampling::{sample, sample_with_schedule, CategoricalSchedule, LearnedSamples};
 use std::path::Path;

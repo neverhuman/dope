@@ -18,6 +18,9 @@ MATCHED_BOUNDED_GRAPH = "pooled-control-bounded-code-diffusion-v2"
 POOLED_BOUNDED_GRAPH = "pooled-bounded-code-diffusion-v2"
 V2_GRAPHS = (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH,
              SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
+LANDMARK_INPUT_GRAPH = "slot-landmark-input-bounded-v3"
+LANDMARK_MASKED_GRAPH = "slot-landmark-masked-bounded-v3"
+LANDMARK_GRAPHS = (LANDMARK_INPUT_GRAPH, LANDMARK_MASKED_GRAPH)
 PREPROCESSING = "fit-only-positional-mixed-v1"
 
 
@@ -84,7 +87,7 @@ class ModelConfig:
 
     def validate(self):
         require((self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1")
-                or (self.layout == LAYOUT_V2 and self.graph in V2_GRAPHS),
+                or (self.layout == LAYOUT_V2 and self.graph in V2_GRAPHS + LANDMARK_GRAPHS),
                 "unknown_model_graph")
         for name in ("width", "heads", "feature_blocks", "inducing_blocks", "inducing_slots",
                      "summary_slots", "target_blocks", "decoder_blocks", "condition_slots",
@@ -104,10 +107,16 @@ class ModelConfig:
         return self
 
     def slot_readout(self):
-        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH)
+        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH) + LANDMARK_GRAPHS
 
     def bounded_code(self):
-        return self.graph in (SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
+        return self.graph in (SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH) + LANDMARK_GRAPHS
+
+    def landmark_input(self):
+        return self.graph in LANDMARK_GRAPHS
+
+    def landmark_masked(self):
+        return self.graph == LANDMARK_MASKED_GRAPH
 
     def pooled_control(self):
         return self.graph in (MATCHED_GRAPH, MATCHED_BOUNDED_GRAPH)
@@ -189,6 +198,12 @@ def validate_corpus(manifest):
         require(families.setdefault(family, role) == role, "family_role_overlap")
         dataset = item.get('dataset_id')
         require(isinstance(dataset,str) and bool(dataset), 'physical_dataset_id_required')
+        if 'physical_dataset_id' in item:
+            pid=item['physical_dataset_id']
+            require(isinstance(pid,str) and len(pid)==64 and all(c in '0123456789abcdef' for c in pid),
+                    'physical_dataset_digest_required')
+            require(pid not in physical,'duplicate_physical_dataset')
+            physical.add(pid)
         require((family,dataset) not in physical, 'duplicate_physical_dataset')
         physical.add((family,dataset))
         require(item["source_role"] == "official_train" and item["rights"]["admitted"] is True
