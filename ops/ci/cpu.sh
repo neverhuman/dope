@@ -23,6 +23,7 @@ cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --lo
 cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof
 /usr/bin/python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
+bash ops/ci/engine-benchmark.sh target/ci-python/bin/python
 PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
 uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt 'jsonschema==4.26.0'
 PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_checkpoint_index research.benchmark.tests.test_validation_figure research.benchmark.tests.test_retained_metrics research.benchmark.tests.test_tabddpm_retained research.benchmark.tests.test_tabddpm_matched_coverage research.benchmark.tests.test_baseline_completion research.benchmark.tests.test_forest_fit_variance research.benchmark.tests.test_forest_complete_cohort research.benchmark.tests.test_forest_projected_cohort research.benchmark.tests.test_retained_comparison research.benchmark.tests.test_arf_tabsyn_followon research.benchmark.tests.test_cpu_fit_batch research.benchmark.tests.test_arf_contract research.benchmark.tests.test_local_checkpoint research.benchmark.tests.test_public_demo research.benchmark.tests.test_equal_bytes -q

@@ -1,0 +1,90 @@
+name: Signed Rust engine
+
+on:
+  pull_request:
+    paths: ['engine/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
+  push:
+    branches: [main]
+    tags: ['dope-engine-v*']
+    paths: ['engine/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || github.ref == 'refs/heads/main'
+    runs-on:
+      group: neverhuman-lan
+      labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Provision native build tools in the disposable guest
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install -y --no-install-recommends rustup build-essential pkg-config jq binutils
+      - name: Install the pinned Rust build and lint components
+        run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - name: Check Rust CLI, closure, release build and customer commands
+        env:
+          CARGO_BUILD_JOBS: '2'
+          CARGO_PROFILE_DEV_DEBUG: '0'
+        run: |
+          cargo fmt --manifest-path engine/Cargo.toml --all -- --check
+          cargo clippy --manifest-path engine/Cargo.toml --locked --all-targets -- -D warnings
+          bash ops/ci/engine-release.sh
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/dope-engine-v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      ENGINE_RELEASE_TAG: ${{ github.ref_name }}
+      CARGO_BUILD_JOBS: '2'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit only a versioned tag whose source is already on main
+        run: |
+          [[ "$ENGINE_RELEASE_TAG" =~ ^dope-engine-v[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]
+          [[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]
+          git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main
+      - name: Install the pinned Rust toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Build, test, collect notices and stage the complete Rust CLI
+        run: bash ops/ci/engine-release.sh
+      - name: Sign provenance for the binary and all fixed package members
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: target/engine-release/*
+          create-storage-record: false
+      - name: Verify the expected signer, source ref and commit before publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          bash scripts/verify-engine-release.sh target/engine-release "$ENGINE_RELEASE_TAG" "$GITHUB_SHA"
+          cp -- "$ATTESTATION_BUNDLE" target/engine-release/dope.sigstore.json
+          gh release create "$ENGINE_RELEASE_TAG" --verify-tag --draft \
+            --title "DOPE Rust engine $ENGINE_RELEASE_TAG" \
+            --notes 'Signed CPU Rust engine for Linux x86-64. Verify binary and SHA256SUMS attestations before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-engine-release.md.' \
+            target/engine-release/BUILDINFO.json target/engine-release/Cargo.lock \
+            target/engine-release/DEPENDENCIES.txt target/engine-release/LICENSE \
+            target/engine-release/THIRD_PARTY_NOTICES target/engine-release/dope-linux-x86_64 \
+            target/engine-release/SHA256SUMS target/engine-release/dope.sigstore.json

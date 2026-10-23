@@ -809,7 +809,27 @@
     "engine/dope-core/src/levels.rs": "rust-core",
     "engine/dope-core/tests/landmarks.rs": "rust-core",
     "ops/ci/landmarks.sh": "governance",
-    "schemas/landmark-coordinates-native-v1.schema.json": "rust-core"
+    "schemas/landmark-coordinates-native-v1.schema.json": "rust-core",
+    "engine/dope-core/src/budget.rs": "rust-core",
+    "engine/dope-core/tests/budgets.rs": "rust-core",
+    "engine/dope-cli/src/tiers.rs": "rust-core",
+    "bench/real-world/elo.py": "external-evidence",
+    "bench/real-world/elo_math.py": "external-evidence",
+    "bench/real-world/render_elo.py": "external-evidence",
+    "bench/real-world/test_elo.py": "external-evidence",
+    "docs/model-sizes-and-elo.md": "governance",
+    "engine/dope-cli/src/runtime.rs": "rust-core",
+    "engine/dope-cli/tests/native_cli.rs": "rust-core",
+    "engine/dope-cli/tests/release_policy.rs": "rust-core",
+    "ops/ci/engine-release.sh": "release",
+    "ops/ci/engine-release-smoke.sh": "release",
+    "ops/ci/engine-runtime-graph.sh": "release",
+    "ops/ci/engine-notices.sh": "release",
+    "scripts/verify-engine-release.sh": "release",
+    ".github/workflows/engine-release.yml": "release",
+    "docs/signed-engine-release.md": "governance",
+    "ops/ci/engine-benchmark.sh": "external-evidence",
+    "ops/licenses/engine/": "release"
   },
   "workspace": "dope"
 }

@@ -33,29 +33,33 @@ pub(super) fn allocate(
 ) -> Result<Option<Candidate>> {
     let (head, d, opts) = (ctx.head, ctx.d(), ctx.opts);
     let empty = ctx.empty_net();
-    let reserve = {
-        let margs = ctx.marginals(9);
-        let indep = (Regimes::single(d), Dependence::Independent);
-        let floor = ctx.assemble(9, margs.clone(), 0, &empty, &indep)?.0.len();
-        let cap = (share * budget as f64) as usize;
-        let mut pick = None;
-        for (_, dep) in deps {
-            let extra = ctx
-                .assemble(9, margs.clone(), 0, &empty, dep)?
-                .0
-                .len()
-                .saturating_sub(floor);
-            if extra <= cap {
-                pick = Some(dep.clone());
-                break;
+    let reserve =
+        if opts.max_parameters.is_some() && opts.dependence.is_none() && opts.regimes.is_none() {
+            // Reserve minimal parameter state; the final pass may upgrade it.
+            (Regimes::single(d), Dependence::Independent)
+        } else {
+            let margs = ctx.marginals(9);
+            let indep = (Regimes::single(d), Dependence::Independent);
+            let floor = ctx.assemble(9, margs.clone(), 0, &empty, &indep)?.0.len();
+            let cap = (share * budget as f64) as usize;
+            let mut pick = None;
+            for (_, dep) in deps {
+                let extra = ctx
+                    .assemble(9, margs.clone(), 0, &empty, dep)?
+                    .0
+                    .len()
+                    .saturating_sub(floor);
+                if extra <= cap {
+                    pick = Some(dep.clone());
+                    break;
+                }
             }
-        }
-        match (pick, &opts.dependence, d >= 2) {
-            (Some(p), _, _) => p,
-            (None, None, true) => (Regimes::single(d), Dependence::fit_factor(r_fit, d, 1)),
-            _ => deps[deps.len() - 1].1.clone(),
-        }
-    };
+            match (pick, &opts.dependence, d >= 2) {
+                (Some(p), _, _) => p,
+                (None, None, true) => (Regimes::single(d), Dependence::fit_factor(r_fit, d, 1)),
+                _ => deps[deps.len() - 1].1.clone(),
+            }
+        };
     let plans: Vec<(usize, usize, usize)> = opts.plan.map_or_else(|| PLANS.to_vec(), |p| vec![p]);
     let forced = opts.plan.is_some();
     let null_val = null_loss(head, &ctx.y_val);
@@ -69,8 +73,15 @@ pub(super) fn allocate(
         }
         let (k, s) = (k.max(3) | 1, s.min(d));
         let margs = ctx.marginals(k);
-        let (floor, _) = ctx.assemble(k, margs.clone(), 0, &empty, &reserve)?;
+        let (floor, floor_program) = ctx.assemble(k, margs.clone(), 0, &empty, &reserve)?;
         let o = head.outputs();
+        let net_extra = h * s + h + o * s + o * h;
+        if opts
+            .max_parameters
+            .is_some_and(|cap| floor_program.parameters().total + net_extra > cap)
+        {
+            continue;
+        }
         let estimate =
             floor.len() + (6 * (h * s + h + o * s + o * h)).div_ceil(8) + 4 * (4 + o) + 96;
         if !forced && estimate > budget {
@@ -78,8 +89,9 @@ pub(super) fn allocate(
         }
         ctx.net(s, h)?;
         let entry = ctx.nets[&(s, h)].clone();
-        let (bytes, _) = ctx.assemble(k, margs.clone(), s, &entry, &reserve)?;
-        if forced || bytes.len() <= budget {
+        let (bytes, program) = ctx.assemble(k, margs.clone(), s, &entry, &reserve)?;
+        // A forced architecture is still subject to both hard caps.
+        if bytes.len() <= budget && ctx.fits_parameters(&program) {
             ctx.boost(s, h);
             // The remaining bytes buy trees. The per-tree estimate ignores the
             // artifact's compression, so scale the room by what the trees
@@ -101,9 +113,13 @@ pub(super) fn allocate(
                 grown = next;
                 room = scaled;
             }
-            while grown.forest.trees() > 0
-                && ctx.assemble(k, margs.clone(), s, &grown, &reserve)?.0.len() > budget
-            {
+            loop {
+                let (encoded, program) = ctx.assemble(k, margs.clone(), s, &grown, &reserve)?;
+                if (encoded.len() <= budget && ctx.fits_parameters(&program))
+                    || grown.forest.trees() == 0
+                {
+                    break;
+                }
                 let keep = grown
                     .forest
                     .trees()
@@ -139,7 +155,7 @@ pub(super) fn allocate(
     let mut chosen = None;
     for (_, dep) in deps {
         let (bytes, program) = ctx.assemble(k, margs.clone(), s, &entry, dep)?;
-        if forced || bytes.len() <= budget {
+        if bytes.len() <= budget && ctx.fits_parameters(&program) {
             chosen = Some((bytes, program));
             break;
         }
@@ -154,6 +170,9 @@ pub(super) fn allocate(
             &(Regimes::single(d), Dependence::Independent),
         )?,
     };
+    if bytes.len() > budget || !ctx.fits_parameters(&program) {
+        return Ok(None);
+    }
     Ok(Some(Candidate {
         k,
         s,

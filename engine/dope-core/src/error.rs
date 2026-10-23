@@ -31,7 +31,7 @@ impl DopeError {
                 "the file is not a DOPE artifact from this engine version; refit it with `dope fit`"
             }
             DopeError::Budget(_) => {
-                "raise --budget (for example 8k or 16k), or pass --anonymize to drop names and labels from the schema"
+                "raise --budget or --max-parameters, or pass --anonymize to reduce schema bytes"
             }
             DopeError::Device(_) => {
                 "run `dope doctor` to list compiled backends; build with --features cuda or metal, or pass --device cpu"

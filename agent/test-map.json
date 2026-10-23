@@ -3229,8 +3229,8 @@
       "purpose": "verify the pure-Rust DOPE 1.0 engine: formatting, clippy with warnings as errors, unit, end-to-end (byte budget, safetensors round trip, forest parity between native and tensor samplers) and CLI tests"
     },
     "bench/real-world/": {
-      "command": "python3 bench/real-world/render.py --check && python3 tools/claims/dope1.py --check",
-      "purpose": "verify that the README block, figures and paper macros are exactly what the committed benchmark records imply"
+      "command": "python3 -B -m unittest discover -s bench/real-world -p 'test_*.py' -v && just bench-check",
+      "purpose": "verify historical benchmark surfaces plus BTR-AUC/Elo integrity, coverage and deterministic report drift"
     },
     "examples/adult/walkthrough.py": {
       "command": "python3 tools/claims/dope1.py --check",
@@ -3279,7 +3279,23 @@
     "ops/ci/landmarks.sh": {
       "command": "bash ops/ci/landmarks.sh",
       "purpose": "verify native signatures, private data roles, thread determinism, portable level release boundaries and coordinate schema"
-    }
+    },
+    "engine/dope-core/src/budget.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify full-generator scalar accounting and hard caps through decoded artifacts"},
+    "engine/dope-core/tests/budgets.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify forced architectures, preset precedence and impossible-cap refusals"},
+    "engine/dope-cli/src/tiers.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify all three portable artifacts, catalog integrity and existing-output refusal"},
+    "docs/model-sizes-and-elo.md": {"command": "bash ops/ci/engine.sh", "purpose": "verify documented presets, parameter budgets, catalogs and descriptive ranking protocol"},
+    "engine/dope-cli/src/runtime.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify CPU worker settings, JSON diagnostics and executable identity"},
+    "engine/dope-cli/tests/native_cli.rs": {"command": "bash ops/ci/engine.sh", "purpose": "exercise customer commands with an empty tool PATH and validate JSON/worker controls"},
+    "engine/dope-cli/tests/release_policy.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify signature policy invocation, failure propagation, inventory/hash checks and graph refusals"},
+    "ops/ci/engine-release.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"},
+    "ops/ci/engine-release-smoke.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "exercise all commands of the actual optimized deliverable without external tool lookup"},
+    "ops/ci/engine-runtime-graph.sh": {"command": "bash ops/ci/engine.sh", "purpose": "reject training bindings and GPU dependencies from the CPU release closure"},
+    "ops/ci/engine-notices.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "collect upstream license bytes for the actual normal/build graph"},
+    "scripts/verify-engine-release.sh": {"command": "bash ops/ci/engine.sh", "purpose": "verify expected signer/source identity and fixed hash inventory before execution"},
+    ".github/workflows/engine-release.yml": {"command": "actionlint .github/workflows/engine-release.yml", "purpose": "verify read-only PR checks and tag-only signing/publication policy"},
+    "docs/signed-engine-release.md": {"command": "bash ops/ci/engine-release.sh", "purpose": "verify documented Rust runtime, CLI and release packaging/verification commands"},
+    "ops/ci/engine-benchmark.sh": {"command": "bash ops/ci/engine-benchmark.sh", "purpose": "verify Elo evidence only after its Python/NumPy interpreter is provisioned"},
+    "ops/licenses/engine/": {"command": "bash ops/ci/engine-release.sh", "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"}
   },
   "workspace": "dope"
 }

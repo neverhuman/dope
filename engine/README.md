@@ -17,6 +17,8 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | Command | What it does |
 | --- | --- |
 | `dope fit data.csv --target y [--budget 4k] [--seed 0] [--anonymize] [--device auto]` | Compile a program within a byte budget (whole file) and print its self-audit. |
+| `dope fit data.csv -t y --size large --max-parameters 4000` | Apply the 16 KiB preset and a complete-generator scalar cap; explicit `--budget` overrides the preset. |
+| `dope fit-tiers data.csv -t y --dataset-id ID --source URL --data-license SPDX --out DIR` | Train 2/4/16 KiB dataset-specific pretrained artifacts with checksums and a catalog for release review. |
 | `dope sample model.dope -n N [--space raw\|ml] [--scaling unit\|quantile] [--seed S]` | Draw rows in original units and labels, or ML-ready (one-hot, `[0,1]`). |
 | `dope predict model.dope data.csv` | Use the stored conditional model as a predictor (values or class probabilities). |
 | `dope inspect model.dope [--json]` | Byte breakdown (stored, and per section before compression) and the program structure. |
@@ -25,8 +27,60 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | `dope frontier --train t.csv --test h.csv -t y --budgets 1k,4k,16k` | Retention against bytes and the Transfer Description Length. |
 | `dope throughput model.dope [-n 1000000] [--device cpu]` | Sampling speed in rows per second. |
 | `dope doctor` | Backends compiled into this build. |
+| `dope --threads 8 fit data.csv -t y --json --report fit.json` | Bound CPU parallelism and emit machine-readable fit output. |
+| `dope --threads 4 doctor --json` | Runtime identity, backend, worker count and executable SHA-256. |
+
+## Recipes
+
+The deployed `dope` application is **Rust end to end**: fitting, sampling, prediction,
+encoding and built-in evaluation need no Python interpreter or libtorch. Python research
+training and benchmark harnesses stay outside the deployment package.
+
+```bash
+# Bound both deployment size and complete-generator state; cap CPU parallelism.
+dope --threads 8 fit train.csv --target price --task regression \
+  --size large --budget 12KiB --max-parameters 4000 --seed 42 \
+  --device cpu --out prices.dope --report fit.json
+
+# One JSON object on stdout for shell scripts, services and agents.
+dope --threads 4 fit train.csv -t price --size medium --json -o prices.dope
+# Diagnostics identify the Rust runtime, backends, worker count and executable hash.
+dope --threads 4 doctor --json
+
+# Generate original-unit rows, or one-hot features and numbers on [0,1].
+dope --threads 8 sample prices.dope -n 100000 --seed 42 --device cpu -o synthetic.csv
+dope sample prices.dope -n 100000 --space ml --scaling unit -o ml-ready.csv
+# Inference CSVs may contain just the input features; no target values are required.
+dope predict prices.dope unlabelled.csv -o predictions.csv
+dope encode real.csv --model prices.dope --scaling quantile -o encoded.csv
+
+# Evaluate on held-out real rows and save a machine-readable receipt.
+dope eval -m prices.dope --train train.csv --test test.csv \
+  --auditors linear,gbdt,mlp --factor 4 --seed 42 --json evaluation.json
+dope frontier --train train.csv --test test.csv -t price \
+  --budgets 2KiB,4KiB,8KiB,16KiB --tau 0.9 --json frontier.json
+dope --threads 8 throughput prices.dope -n 1000000 --repeats 3 --device cpu
+```
+
+| Control | Meaning |
+|---|---|
+| `--target`, `--task` | Explicit target name/index; optional regression/classification override |
+| `--size`, `--budget` | 2/4/16 KiB preset or exact whole-file cap; explicit budget wins |
+| `--max-parameters` | Additional hard cap on the full generator's versioned scalar count |
+| `--threads` | Global CPU worker limit, 1–1024; accepted before or after a subcommand |
+| `--device`, `--seed` | Compute backend and reproducible random seed |
+| `fit --json`, `fit --report` | JSON stdout and/or a saved report; `--quiet` suppresses human output |
+| `sample --space`, `--scaling` | Original-unit or ML-ready rows; unit or quantile scaling |
+
+Use `dope --help` and `dope fit --help` for all parameters. The signed CPU release
+supports `--device cpu` and `auto`; GPU variants require separate builds and qualification.
 
 ## The program
+
+All customer commands execute in Rust. The signed release is the `dope` CLI from
+this workspace; Python training/research tools are not deployment dependencies.
+See [the recipes](#recipes) and the
+[signed binary release workflow](../docs/signed-engine-release.md).
 
 | Part | Stored as | Fitted by |
 | --- | --- | --- |
@@ -49,6 +103,14 @@ report (`--report fit.json`, `self_audit`) and `dope fit` print that estimate. E
 the file is counted, including the safetensors header and the schema.
 
 ## The artifact
+
+`--size small|medium|large` selects a 2/4/16 KiB maximum; without a preset or
+explicit budget the default stays 4 KiB. `KB`/`MB` are decimal and `KiB`/`MiB`
+are binary; historical `k`/`m` stay binary. `--max-parameters N` is an optional
+additional hard cap, applied to the full decoded generator, including its forest,
+marginals and calibration. Fit reports and `inspect --json` expose a versioned
+component count. Larger capacity does not guarantee larger lift. See
+[the count definition, model-zoo builder and study protocol](../docs/model-sizes-and-elo.md).
 
 `model.dope` is a standard safetensors file with one `U8` tensor, `dope`, and
 `__metadata__ = {"dope": "1"}`. The tensor is a single brotli stream (pure-Rust

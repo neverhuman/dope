@@ -53,10 +53,15 @@ fast-audit:
 engine:
     bash ops/ci/engine.sh
 
+# Stage and smoke-test the optimized Rust-only CPU CLI; signing runs only for admitted tags.
+engine-release:
+    bash ops/ci/engine-release.sh
+
 # The real-world benchmark surfaces (README block, figures, paper macros) match the records.
 bench-check:
     python3 bench/real-world/render.py --check
     python3 tools/claims/dope1.py --check
+    bash ops/ci/engine-benchmark.sh
 
 check: fast
     bash ops/ci/check-budgets.sh

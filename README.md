@@ -84,6 +84,11 @@ dope frontier --train train.csv --test test.csv -t income   # bytes vs retention
 `--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
 with positional codes; `--device cuda` runs on a GPU.
 
+`--size small|medium|large` picks a preset cap; `--max-parameters N` caps stored values;
+`dope fit-tiers` builds all three sizes ([details, Elo ranking](docs/model-sizes-and-elo.md)).
+Scripting flags and signed Linux binaries: [engine/README.md](engine/README.md#recipes),
+[docs/signed-engine-release.md](docs/signed-engine-release.md).
+
 ## Walkthrough: UCI Adult census income
 
 A real public table (UCI Adult, `CC-BY-4.0`) with eight categorical columns and a binary

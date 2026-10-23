@@ -461,7 +461,9 @@ version = "1.0.0"
 dependencies = [
  "clap",
  "dope-core",
+ "rayon",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]

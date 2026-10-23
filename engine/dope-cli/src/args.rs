@@ -10,6 +10,9 @@ use std::path::PathBuf;
     about = "Compile a table into a tiny generative program that preserves what models learn from it."
 )]
 pub(crate) struct Cli {
+    /// Number of CPU worker threads (1–1024); otherwise use Rayon's default.
+    #[arg(long, global = true, value_parser = clap::value_parser!(u16).range(1..=1024))]
+    pub(crate) threads: Option<u16>,
     #[command(subcommand)]
     pub(crate) command: Command,
 }
@@ -23,6 +26,8 @@ pub(crate) enum Command {
     Landmarks(LandmarkCommand),
     /// Compile a CSV into a .dope artifact (a safetensors file).
     Fit(FitArgs),
+    /// Compile small/medium/large artifacts and a portable catalog for one table.
+    FitTiers(TierArgs),
     /// Draw synthetic rows from an artifact.
     Sample(SampleArgs),
     /// Use the stored conditional model as a predictor.
@@ -39,7 +44,7 @@ pub(crate) enum Command {
     /// Measure sampling throughput (rows per second, no output written).
     Throughput(ThroughputArgs),
     /// Report the compute backends available in this build.
-    Doctor,
+    Doctor(DoctorArgs),
 }
 
 #[derive(Subcommand)]
@@ -152,9 +157,15 @@ pub(crate) struct FitArgs {
     /// Output artifact.
     #[arg(short, long, default_value = "model.dope")]
     pub(crate) out: PathBuf,
-    /// Byte budget for the whole file, e.g. 2048, 4k, 64k.
+    /// Whole-file cap: 2048 bytes, 4k/4KiB (binary), 4KB (decimal).
     #[arg(short, long)]
     pub(crate) budget: Option<String>,
+    /// small (2 KiB), medium (4 KiB), large (16 KiB); --budget overrides this cap.
+    #[arg(long)]
+    pub(crate) size: Option<dope_core::ModelSize>,
+    /// Hard cap on complete-generator scalar parameters, including marginals and trees.
+    #[arg(long)]
+    pub(crate) max_parameters: Option<usize>,
     #[arg(long, default_value_t = 0)]
     pub(crate) seed: u64,
     /// regression | classification (inferred by default).
@@ -169,6 +180,9 @@ pub(crate) struct FitArgs {
     /// Write the fit report as JSON.
     #[arg(long)]
     pub(crate) report: Option<PathBuf>,
+    /// Print the fit report as one JSON object on stdout.
+    #[arg(long, conflicts_with = "quiet")]
+    pub(crate) json: bool,
     /// Force a plan "knots,inputs,hidden" (ablations).
     #[arg(long)]
     pub(crate) plan: Option<String>,
@@ -189,6 +203,41 @@ pub(crate) struct FitArgs {
     pub(crate) tolerance: f64,
     #[arg(short, long)]
     pub(crate) quiet: bool,
+}
+
+#[derive(Args)]
+pub(crate) struct DoctorArgs {
+    /// Print runtime identity, available backends, thread count and executable digest.
+    #[arg(long)]
+    pub(crate) json: bool,
+}
+
+#[derive(Args)]
+pub(crate) struct TierArgs {
+    pub(crate) csv: PathBuf,
+    #[arg(short, long)]
+    pub(crate) target: String,
+    /// A new directory; existing directories are refused to prevent overwrite.
+    #[arg(short, long)]
+    pub(crate) out: PathBuf,
+    /// Dataset identifier for this release (no raw column values).
+    #[arg(long)]
+    pub(crate) dataset_id: String,
+    /// Public source URL or dataset DOI, retained in the catalog.
+    #[arg(long)]
+    pub(crate) source: String,
+    /// SPDX license of the training data (artifact release rights must be reviewed).
+    #[arg(long)]
+    pub(crate) data_license: String,
+    #[arg(long, default_value_t = 0)]
+    pub(crate) seed: u64,
+    #[arg(long)]
+    pub(crate) task: Option<String>,
+    #[arg(long, default_value = "auto")]
+    pub(crate) device: String,
+    /// Replace column names and labels with positional codes.
+    #[arg(long)]
+    pub(crate) anonymize: bool,
 }
 
 #[derive(Args)]

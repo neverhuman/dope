@@ -94,3 +94,117 @@ fn errors_name_the_problem_without_echoing_cells() {
     assert!(!err.contains("paris"));
     std::fs::remove_dir_all(dir).ok();
 }
+
+#[test]
+fn size_parameter_caps_and_tier_catalog() {
+    let dir = workdir("tiers");
+    dope(
+        &dir,
+        &[
+            "fit",
+            "train.csv",
+            "-t",
+            "score",
+            "--size",
+            "small",
+            "--max-parameters",
+            "200",
+            "--no-audit",
+            "--report",
+            "fit.json",
+            "--device",
+            "cpu",
+        ],
+    );
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(dir.join("fit.json")).unwrap()).unwrap();
+    assert_eq!(report["budget"], 2048);
+    assert!(report["parameters"]["total"].as_u64().unwrap() <= 200);
+    let inspect: serde_json::Value =
+        serde_json::from_str(&dope(&dir, &["inspect", "model.dope", "--json"])).unwrap();
+    assert_eq!(report["parameters"], inspect["parameters"]);
+    dope(
+        &dir,
+        &[
+            "fit-tiers",
+            "train.csv",
+            "-t",
+            "score",
+            "-o",
+            "zoo",
+            "--dataset-id",
+            "test-fixture",
+            "--source",
+            "fixture",
+            "--data-license",
+            "MIT",
+            "--device",
+            "cpu",
+        ],
+    );
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(dir.join("zoo/catalog.json")).unwrap()).unwrap();
+    assert_eq!(manifest["kind"], "per-dataset-pretrained-generators");
+    assert_eq!(manifest["release_authorized"], false);
+    assert_eq!(manifest["anonymized"], false);
+    assert_eq!(manifest["target_index"], 2);
+    for item in manifest["artifacts"].as_array().unwrap() {
+        let file = dir.join("zoo").join(item["file"].as_str().unwrap());
+        let bytes = std::fs::read(&file).unwrap();
+        assert_eq!(bytes.len() as u64, item["bytes"].as_u64().unwrap());
+        assert!(item["bytes"].as_u64().unwrap() <= item["budget_bytes"].as_u64().unwrap());
+        use sha2::{Digest, Sha256};
+        assert_eq!(item["sha256"], format!("{:x}", Sha256::digest(&bytes)));
+        let p = dope_core::decode(&bytes).unwrap();
+        assert_eq!(
+            item["parameters"],
+            serde_json::to_value(p.parameters()).unwrap()
+        );
+    }
+    let out = Command::new(env!("CARGO_BIN_EXE_dope"))
+        .current_dir(&dir)
+        .args([
+            "fit-tiers",
+            "train.csv",
+            "-t",
+            "score",
+            "-o",
+            "zoo",
+            "--dataset-id",
+            "fixture",
+            "--source",
+            "fixture",
+            "--data-license",
+            "MIT",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    assert!(String::from_utf8_lossy(&out.stderr).contains("already exists"));
+    dope(
+        &dir,
+        &[
+            "fit-tiers",
+            "train.csv",
+            "-t",
+            "score",
+            "-o",
+            "zoo-anon",
+            "--dataset-id",
+            "test-fixture",
+            "--source",
+            "fixture",
+            "--data-license",
+            "MIT",
+            "--device",
+            "cpu",
+            "--anonymize",
+        ],
+    );
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(dir.join("zoo-anon/catalog.json")).unwrap()).unwrap();
+    assert_eq!(manifest["anonymized"], true);
+    let p = dope_core::decode(&std::fs::read(dir.join("zoo-anon/small.dope")).unwrap()).unwrap();
+    assert_ne!(p.schema.target.name, "score");
+    std::fs::remove_dir_all(dir).ok();
+}
