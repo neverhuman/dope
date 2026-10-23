@@ -249,6 +249,10 @@ fn run_auditor(
             nn::fit_predict(x, y, head, test, &nn::Params::softmax_linear(seed), &dev)?
         }
         ("linear", _) => linear::fit_predict(x, y, head, test),
+        ("linear-seeded-v1", Head::Multiclass(_)) => {
+            nn::fit_predict_seeded_cpu(x, y, head, test, &nn::Params::softmax_linear(seed))?
+        }
+        ("linear-seeded-v1", _) => linear::fit_predict(x, y, head, test),
         ("gbdt", _) => gbdt::fit_predict(
             x,
             y,
@@ -260,9 +264,12 @@ fn run_auditor(
             },
         ),
         ("mlp", _) => nn::fit_predict(x, y, head, test, &nn::Params::mlp(seed), &dev)?,
+        ("mlp-seeded-v1", _) => {
+            nn::fit_predict_seeded_cpu(x, y, head, test, &nn::Params::mlp(seed))?
+        }
         _ => {
             return Err(DopeError::Input(
-                "auditors must be linear, gbdt or mlp".into(),
+                "auditors must be linear, gbdt, mlp, linear-seeded-v1 or mlp-seeded-v1".into(),
             ))
         }
     })
