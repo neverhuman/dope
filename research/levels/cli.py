@@ -21,6 +21,8 @@ def main(argv=None):
     sub=parser.add_subparsers(dest='command',required=True)
     run=sub.add_parser('train');run.add_argument('--config',type=Path,required=True)
     run.add_argument('--corpus',type=Path);run.add_argument('--prior-only',action='store_true')
+    run.add_argument('--prior-recipe', choices=('owned-mechanisms-v1','owned-mechanisms-unique-v2'),
+                     default='owned-mechanisms-v1',help='Explicit prior stream; v1 remains historical replay')
     run.add_argument('--out',type=Path,required=True);run.add_argument('--resume',type=Path)
     run.add_argument('--ordinary-base',type=Path);run.add_argument('--stop-after',type=int)
     run.add_argument('--phase',choices=['ordinary','ultra-residual'],default='ordinary')
@@ -65,7 +67,7 @@ def main(argv=None):
     from .corpus import Corpus
     from .train import train
     corpus=Corpus(None if args.corpus is None else json.loads(args.corpus.read_bytes()),
-                  seed=config.seed,prior_only=args.prior_only)
+                  seed=config.seed,prior_only=args.prior_only,prior_recipe=args.prior_recipe)
     _,terminal=train(model,config,corpus,args.out,source_sha256=source_fingerprint(),resume=args.resume,
         phase=args.phase,base_checkpoint=args.ordinary_base,stop_after=args.stop_after,
         resource_check=guard,repair_reason=args.repair_reason)

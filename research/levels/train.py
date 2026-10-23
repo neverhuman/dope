@@ -33,12 +33,13 @@ def learning_rate(config, step):
     return config.min_learning_rate+(config.learning_rate-config.min_learning_rate)*(1+math.cos(math.pi*progress))/2
 
 
-def prepared(corpus, role, cursor, model_config):
+def prepared(corpus, role, cursor, model_config, *, with_provenance=False):
     source = corpus.get(role,cursor)
     context, query, identity = episode(**{k:source[k] for k in
         ('rows','kinds','slots','row_ids','task','roles')}, config=model_config,
         cursor=cursor,seed=corpus.seed)
-    return context,query,identity,source['landmarks']
+    result = (context,query,identity,source['landmarks'])
+    return (*result,source['source_provenance']) if with_provenance else result
 
 
 def validation(model, corpus, config, step, *, phase='ordinary'):
@@ -136,7 +137,9 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                     optimizer.zero_grad(set_to_none=True);interrupted=True;break
                 cursor=state['cursor'];state['cursor']+=1;attempts+=1
                 require(attempts <= config.accumulation*4,'too_many_unsupported_episodes')
-                try:context,query,identity,profile=prepared(corpus,'train',cursor,model_config)
+                try:
+                    context,query,identity,profile,provenance=prepared(
+                        corpus,'train',cursor,model_config,with_provenance=True)
                 except ResearchError as error:
                     append(out/'episodes.jsonl',dict(cursor=cursor,state='unsupported',reason=str(error)))
                     continue
@@ -147,6 +150,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                 per_level.append(raw);successful+=1;state['episodes']+=1
                 state['processed_cells']+=(len(context.values)+len(query.values))*len(context.columns)
                 append(out/'episodes.jsonl',dict(cursor=cursor,state='complete',identity=identity,
+                    source_provenance=provenance,
                     context_rows=len(context.values),query_rows=len(query.values),columns=len(context.columns),
                     proxy_rows=min(config.proxy_rows,len(context.values)),
                     encoder_passes=1+sum(config.consistency_weight>0 and len(context.values)>=8 for _ in raw),
