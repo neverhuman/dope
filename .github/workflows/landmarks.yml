@@ -24,6 +24,12 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Provision native build tools in the disposable guest
+        run: |
+          sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup build-essential
       - name: Pin native toolchain
         run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3

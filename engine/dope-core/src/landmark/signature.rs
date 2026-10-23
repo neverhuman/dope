@@ -73,28 +73,41 @@ fn evaluate(id: usize, head: Head, folds: &[Fold], opts: &LandmarkOptions) -> La
     let mut losses = 0.0;
     let mut nulls = 0.0;
     let mut gains = Vec::new();
-    for (k, f) in folds.iter().enumerate() {
-        let Some((p, lambda)) =
-            learners::run(id, &f.z, &f.y, head, &f.q, opts, job_seed(opts.seed, id, k))
-        else {
-            cell.state = CellState::Unsupported;
-            return cell;
+    // Schedule both landmarks and folds. A tightly budgeted panel may contain
+    // only linear, so landmark-level parallelism alone would leave cores idle.
+    // Collect in fold order and reduce serially for bit-identical statistics.
+    let measurements: Vec<_> = folds
+        .par_iter()
+        .enumerate()
+        .map(|(k, f)| {
+            let (p, lambda) =
+                learners::run(id, &f.z, &f.y, head, &f.q, opts, job_seed(opts.seed, id, k))
+                    .ok_or(CellState::Unsupported)?;
+            let loss: f64 = ridge::losses(head, &p, &f.qy).iter().sum();
+            let null: f64 = ridge::losses(head, &ridge::null(head, &f.y, f.qy.len()), &f.qy)
+                .iter()
+                .sum();
+            if !loss.is_finite() || !null.is_finite() {
+                return Err(CellState::Failed);
+            }
+            Ok((loss, null, lambda, f.y.len(), f.qy.len()))
+        })
+        .collect();
+    for measurement in measurements {
+        let (pred_loss, null_loss, lambda, train_rows, query_rows) = match measurement {
+            Ok(v) => v,
+            Err(state) => {
+                cell.state = state;
+                return cell;
+            }
         };
-        let pred_loss: f64 = ridge::losses(head, &p, &f.qy).iter().sum();
-        let null_loss: f64 = ridge::losses(head, &ridge::null(head, &f.y, f.qy.len()), &f.qy)
-            .iter()
-            .sum();
-        if !pred_loss.is_finite() || !null_loss.is_finite() {
-            cell.state = CellState::Failed;
-            return cell;
-        }
         losses += pred_loss;
         nulls += null_loss;
         if null_loss > 1e-12 {
             gains.push(1.0 - pred_loss / null_loss);
         }
-        cell.train_rows.push(f.y.len());
-        cell.query_rows += f.qy.len();
+        cell.train_rows.push(train_rows);
+        cell.query_rows += query_rows;
         if let Some(l) = lambda {
             cell.lambda_indices.push(l);
         }
@@ -128,6 +141,7 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
     let assigned = folds::assign_folds(frame, opts.folds, opts.seed)?;
     let (enabled, mut work) = cost::plan(frame, opts)?;
     let ridge_folds: Vec<Fold> = (0..opts.folds)
+        .into_par_iter()
         .map(|k| {
             prepare(
                 frame,
@@ -140,7 +154,12 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
             )
         })
         .collect::<Result<_>>()?;
-    let small_folds: Vec<Fold> = (0..opts.folds)
+    let small_folds: Vec<Fold> = (0..if enabled[15..21].iter().any(|v| *v) {
+        opts.folds
+    } else {
+        0
+    })
+        .into_par_iter()
         .map(|k| {
             prepare(
                 frame,

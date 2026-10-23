@@ -119,7 +119,9 @@ IQR / 1.349, standard deviation then 1 as fallbacks, clipping to ±5, and zero p
 for missing numerics. Categoricals use training-frequency-selected levels and an other
 column. Category ordering never uses a target. Numeric target centering/scaling is also
 training-only. Classification uses declared binary/multiclass columns and Brier loss for
-signatures. Folds share preprocessing and each recipe receives a domain-separated RNG seed.
+signatures. Folds share preprocessing and each recipe receives a domain-separated RNG seed. Independent
+fold jobs run in parallel even when work pruning retains just one recipe; results are
+collected and reduced in fold order. Unused small-learner fold frames are not built.
 Training rows and small-learner query rows are capped using stable identity hashes. The
 default ridge cap is 8,192 rows per fold (raise `--ridge-rows` to at most 50,000);
 `--small-rows` and `--knn-reference` expose the other bounded fitting controls.
