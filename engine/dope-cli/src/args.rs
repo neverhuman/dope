@@ -19,6 +19,9 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 pub(crate) enum Command {
+    /// Experimental frozen shared encoder and code-only CPU decoder.
+    #[command(subcommand)]
+    Learned(crate::learned::LearnedCommand),
     /// Experimental portable levels with explicit release permissions.
     FitLevels(LevelArgs),
     /// Native dataset structure signatures (real measurements stay private).

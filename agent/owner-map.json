@@ -831,7 +831,9 @@
     ".github/workflows/engine-release.yml": "release",
     "docs/signed-engine-release.md": "governance",
     "ops/ci/engine-benchmark.sh": "external-evidence",
-    "ops/licenses/engine/": "release"
+    "ops/licenses/engine/": "release",
+    "research/levels/": "external-evidence",
+    "engine/dope-core/src/learned/": "rust-core"
   },
   "workspace": "dope"
 }

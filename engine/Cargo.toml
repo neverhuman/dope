@@ -14,8 +14,9 @@ repository = "https://github.com/neverhuman/dope"
 rust-version = "1.88"
 
 [workspace.dependencies]
-candle-core = "0.9"
-candle-nn = "0.9"
+# Same reviewed ZIP9 security backport as deploy/; exact source, never a moving branch.
+candle-core = { version = "=0.11.0", git = "https://github.com/eveselove/planly-candle", rev = "b76d808ad646c479b9f61b9e0c59503143543f12" }
+candle-nn = { version = "=0.11.0", git = "https://github.com/eveselove/planly-candle", rev = "b76d808ad646c479b9f61b9e0c59503143543f12" }
 safetensors = "0.7"
 half = "2"
 csv = "1"

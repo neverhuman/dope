@@ -3,7 +3,7 @@ id = "rust-ts-vite-react-postgres-bounded-python"
 version = "0.1.0"
 
 [python]
-allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/", "research/transfer/", "bench/metrics/", "bench/real-world/", "examples/adult/", "tools/claims/", "docs/whitepaper/scripts/", "ops/ci/paper-prepare.py", "ops/ci/paper-review-outputs.py", "ops/ci/check-frozen-evidence.py", "ops/ci/test_frozen_evidence.py"]
+allowed_non_product_paths = ["research/levels/","src/dope_kernel/", "validation/external/", "research/benchmark/", "research/transfer/", "bench/metrics/", "bench/real-world/", "examples/adult/", "tools/claims/", "docs/whitepaper/scripts/", "ops/ci/paper-prepare.py", "ops/ci/paper-review-outputs.py", "ops/ci/check-frozen-evidence.py", "ops/ci/test_frozen_evidence.py"]
 allowed_truth_paths = []
 
 [[streaming_exception]]
@@ -105,3 +105,12 @@ required_checks = [
     "no-product-routes",
     "no-subprocess",
 ]
+
+
+[[streaming_exception]]
+runtime = "python"
+classification = "advanced-data"
+owner = "external-evidence"
+reason = "Offline shared table encoder experiments require pinned PyTorch autograd, mixed-data priors and optimizer/RNG checkpoint parity; native frozen encoding and code-only sampling are Rust."
+expires = "2027-04-23"
+migration_path = "Retain the isolated experimental trainer and its direct conformance tests while autograd is required; promote only verified tensor exports to the closed Rust graph, never Python product or certification truth."

@@ -2,7 +2,7 @@ DOPE locked default Linux x86-64 native dependency notices
 Inventory: normal/build Cargo packages and installed Rust library notices.
 No GPU/research adapters or separately provisioned OS runtime are distributed here.
 License texts retain upstream bytes; this inventory does not qualify a release.
-Cargo.lock sha256 fb7f5738335946adc61e9652b26fca3083b86413e7e485ef9a22833e7eef7769
+Cargo.lock sha256 55ea6780198998e6f14249924a4e586f32c1909484e910142c391971d47d53a1
 
 ===== ahash 0.8.12 =====
 --- LICENSE-APACHE sha256 a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2 ---

@@ -1,0 +1,16 @@
+{
+  "model": {},
+  "train": {
+    "steps": 200,
+    "seed": 20261023,
+    "accumulation": 4,
+    "validate_every": 10,
+    "checkpoint_every": 10,
+    "proxy_rows": 32,
+    "proxy_ramp_steps": 100,
+    "precision": "bf16",
+    "wall_seconds": 600,
+    "cpu_threads": 4,
+    "device": "cuda"
+  }
+}

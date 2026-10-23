@@ -119,3 +119,14 @@ hardware qualification. `rust/neural/deployment.rs` supplies native latent and o
 semantics, while the shared sampling APIs own row seeds and marginal decoding.
 No Python or libtorch enters this deployment graph. See `deploy/README.md` for exact
 supported graphs, byte overhead, runtime dependencies and promotion requirements.
+
+## Experimental shared table encoding
+
+`research/levels/` is a dated offline PyTorch autograd exception. It owns bounded
+meta-training, private source admission, differentiable proxies and optimizer/RNG
+checkpoints, not product scoring or certification. Only fixed tensor weights and
+charged selected table codes cross into `engine/dope-core/src/learned/`.
+The native CPU graph has no Python, encoder-state or source-data dependency when
+sampling. The `dope learned` command is explicit and experimental; existing
+portable levels, DPK3.2/v1 readers and defaults remain independent. See
+[the implemented boundary and remaining evidence gates](../research/levels/README.md).

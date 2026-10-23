@@ -1,0 +1,31 @@
+{
+  "model": {
+    "width": 64,
+    "heads": 4,
+    "feature_blocks": 4,
+    "inducing_blocks": 2,
+    "inducing_slots": 16,
+    "summary_slots": 8,
+    "target_blocks": 2,
+    "decoder_blocks": 6,
+    "condition_slots": 4,
+    "max_features": 16,
+    "max_categories": 16,
+    "max_context": 64,
+    "max_query": 16,
+    "cell_cap": 1024
+  },
+  "train": {
+    "steps": 12,
+    "seed": 20261023,
+    "accumulation": 2,
+    "validate_every": 2,
+    "checkpoint_every": 2,
+    "proxy_rows": 16,
+    "proxy_ramp_steps": 4,
+    "precision": "bf16",
+    "wall_seconds": 600,
+    "cpu_threads": 4,
+    "device": "cuda"
+  }
+}
