@@ -67,7 +67,15 @@ jobs:
           dist=target/kernel-release/dist
           bash scripts/verify-kernel-release.sh "$dist" "$KERNEL_RELEASE_TAG" "$KERNEL_RELEASE_COMMIT"
           cp -- "$ATTESTATION_BUNDLE" "$dist/dope-kernel.sigstore.json"
-          gh release create "$KERNEL_RELEASE_TAG" --draft --target "$KERNEL_RELEASE_COMMIT" \
+          # Create exactly the admitted ref; refuse a concurrent creator instead of replacing it.
+          gh api --method POST "repos/$GH_REPO/git/refs" \
+            -f "ref=refs/tags/$KERNEL_RELEASE_TAG" -f "sha=$KERNEL_RELEASE_COMMIT" \
+            > target/kernel-release/tag-created.json
+          if [[ "$(gh api "repos/$GH_REPO/git/ref/tags/$KERNEL_RELEASE_TAG" --jq '.object.sha')" != "$KERNEL_RELEASE_COMMIT" ]]; then
+            echo "release tag does not name the admitted commit" >&2
+            exit 1
+          fi
+          gh release create "$KERNEL_RELEASE_TAG" --verify-tag --draft \
             --title "DOPE research kernel $KERNEL_RELEASE_TAG" \
             --notes "Signed research-kernel CLI (dope-kernel) for Linux x86-64, built from $KERNEL_RELEASE_COMMIT. Verify with scripts/verify-kernel-release.sh before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-kernel-release.md." \
             "$dist/dope-kernel" "$dist/BUILDINFO.json" "$dist/Cargo.lock" \

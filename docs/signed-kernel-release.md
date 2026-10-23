@@ -22,8 +22,12 @@ privacy or any tier.
 
 3. The workflow checks the tag and commit, builds the commit with `ops/ci/kernel-release.sh`, signs
    `dope-kernel`, `BUILDINFO.json`, `Cargo.lock` and `SHA256SUMS` with GitHub artifact
-   attestations, verifies them, and stages a **draft** release tagged at the commit.
-4. A maintainer reads the draft and publishes it. Publishing creates the tag.
+   attestations, verifies them, explicitly creates the tag at the admitted source commit,
+   re-reads the remote ref to check that exact commit, and stages a **draft** release using
+   `--verify-tag`. A concurrent or existing tag causes refusal; no ref is replaced.
+4. A maintainer reads the draft and publishes it. The tag already exists. If draft creation
+   fails after tag creation, preserve the failed run and tag for inspection; do not delete
+   or move the tag to make a retry succeed.
 
 ## Verify a release
 
