@@ -13,6 +13,10 @@ concurrency:
   group: native-landmarks-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: native-landmarks-source
+
 jobs:
   native-landmarks:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -23,6 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          path: native-landmarks-source
           persist-credentials: false
       - name: Provision native build tools in the disposable guest
         run: |
@@ -36,8 +41,8 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            engine/target
-          key: native-landmarks-ubuntu24-rust188-${{ hashFiles('engine/Cargo.lock') }}
+            native-landmarks-source/engine/target
+          key: native-landmarks-isolated-ubuntu24-rust188-${{ hashFiles('native-landmarks-source/engine/Cargo.lock') }}
       - name: Native signatures and level export invariants
         env:
           RAYON_NUM_THREADS: '2'

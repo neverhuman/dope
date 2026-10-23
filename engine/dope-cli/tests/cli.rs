@@ -96,6 +96,74 @@ fn errors_name_the_problem_without_echoing_cells() {
 }
 
 #[test]
+fn seeded_cpu_auditors_replay_across_fresh_processes_and_learn_signal() {
+    let dir = workdir("seeded-auditors");
+    let mut query = String::from("age,city,score\n");
+    for i in 400..500u32 {
+        let city = ["paris", "lima", "oslo"][(i % 3) as usize];
+        let age = 20 + (i * 7919) % 50;
+        let score =
+            age as f64 * 0.5 + if city == "oslo" { 10.0 } else { 0.0 } + ((i * 31) % 7) as f64;
+        query += &format!("{age},{city},{score}\n");
+    }
+    std::fs::write(dir.join("query.csv"), query).unwrap();
+    dope(
+        &dir,
+        &[
+            "fit",
+            "train.csv",
+            "--target",
+            "score",
+            "--budget",
+            "2KiB",
+            "--no-audit",
+            "--seed",
+            "17",
+            "--device",
+            "cpu",
+            "-o",
+            "m.dope",
+        ],
+    );
+    let run = |threads, report| {
+        dope(
+            &dir,
+            &[
+                "--threads",
+                threads,
+                "eval",
+                "--model",
+                "m.dope",
+                "--train",
+                "train.csv",
+                "--test",
+                "query.csv",
+                "--auditors",
+                "linear-seeded-v1,gbdt,mlp-seeded-v1",
+                "--factor",
+                "1",
+                "--seed",
+                "123",
+                "--json",
+                report,
+            ],
+        );
+        serde_json::from_slice::<serde_json::Value>(&std::fs::read(dir.join(report)).unwrap())
+            .unwrap()
+    };
+    let first = run("1", "first.json");
+    assert_eq!(first, run("4", "second.json"));
+    let auditors = first["auditors"].as_array().unwrap();
+    assert_eq!(auditors.len(), 3);
+    for auditor in auditors {
+        assert!(auditor["real_loss"].as_f64().unwrap() < auditor["null_loss"].as_f64().unwrap());
+        assert_eq!(auditor["informative"], true);
+    }
+    assert_eq!(auditors[2]["auditor"], "mlp-seeded-v1");
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn size_parameter_caps_and_tier_catalog() {
     let dir = workdir("tiers");
     dope(

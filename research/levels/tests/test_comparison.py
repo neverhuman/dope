@@ -94,3 +94,20 @@ else:
             self.assertFalse(protocol['official_test_access'])
             self.assertFalse(protocol['final_family_access'])
             self.assertEqual(protocol['baseline_sha256'], file_sha(binary))
+            with self.assertRaisesRegex(ResearchError, 'auditor_pin_required'):
+                run(root/'model', binary, file_sha(binary), root/'unpinned',
+                    auditor_engine=binary)
+            self.assertFalse((root/'unpinned').exists())
+            # A successful generator is not evidence that the separate auditor ran.
+            # This fixture has no eval command; every auxiliary-audit failure stays counted.
+            with patch('research.levels.resources.snapshot', return_value=admission), patch('os.nice'):
+                audited = run(root/'model', binary, file_sha(binary), root/'audited', selected=['low'],
+                    table_seeds=[20261101], sample_seeds=[101], resource_check=lambda: True,
+                    auditor_engine=binary, expected_auditor_sha256=file_sha(binary))
+            self.assertEqual(audited['scheduled'], 4)
+            self.assertEqual(audited['failures'], 4)
+            self.assertEqual(audited['complete'], 0)
+            protocol = json.loads((root/'audited/protocol.json').read_bytes())
+            self.assertEqual(protocol['format'], 'dope-owned-comparison-protocol-v3')
+            self.assertEqual(protocol['native_auditor']['engine_sha256'], file_sha(binary))
+            self.assertFalse(protocol['native_auditor']['driver_qualified'])

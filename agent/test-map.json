@@ -3307,7 +3307,8 @@
     "research/landmark_cache/": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify TRAIN-only schedules, native recipe bindings, immutable private cache, interruption accounting and dashboard redaction"},
     "docs/landmark-precalculation.md": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify documented cache and source-role contracts without opening real data"},
     "research/levels/": {"command": "python3 -B -m unittest discover -s research/levels/tests -v", "purpose": "verify stable physical row identities, fit-only landmark scope and native failure receipts, family contracts, gradient paths, frozen residuals, exact checkpoint resume, matched comparison denominator/determinism/failure journeys and monitor/allocation refusals"},
-    "engine/dope-core/src/learned/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity", "purpose": "verify native encoder/decoder fixture parity, exact admitted prefix, typed intake and source-free recipient sampling"}
+    "engine/dope-core/src/learned/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity", "purpose": "verify native encoder/decoder fixture parity, exact admitted prefix, typed intake and source-free recipient sampling"},
+    "engine/dope-core/tests/seeded_auditors.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors", "purpose": "verify versioned CPU neural replay under interleaved seeds and thread pools, malformed-input refusals and tree feature-tie replay"}
   },
   "workspace": "dope"
 }

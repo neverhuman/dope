@@ -2,10 +2,10 @@
 //! with candle on any device.
 
 use super::Matrix;
-use crate::error::Result;
+use crate::error::{DopeError, Result};
 use crate::rng::Rng;
 use crate::target::Head;
-use candle_core::{DType, Device, Tensor, D};
+use candle_core::{DType, Device, Tensor, Var, D};
 use candle_nn::{linear, AdamW, Module, Optimizer, ParamsAdamW, VarBuilder, VarMap};
 
 #[derive(Clone, Debug)]
@@ -99,7 +99,8 @@ fn tensors(
     Ok((xt, yt))
 }
 
-/// Fit and predict like `gbdt::fit_predict`.
+/// Historical device-initialized auditor. CPU device seeding is unsupported;
+/// use `fit_predict_seeded_cpu` for new reproducible development controls.
 pub fn fit_predict(
     x: &Matrix,
     y: &[f64],
@@ -107,6 +108,114 @@ pub fn fit_predict(
     test: &Matrix,
     p: &Params,
     dev: &Device,
+) -> Result<Vec<f64>> {
+    fit_predict_impl(x, y, head, test, p, dev, false)
+}
+
+/// Version of the explicit host-generated initialization and ordered parameter recipe.
+pub const SEEDED_CPU_RECIPE: &str = "candle-mlp-host-init-v1";
+
+/// A bounded CPU-only auditor initialized independently of Candle's global device RNG.
+/// Pin the recipe, parameters, source, representation and runtime in comparison receipts.
+/// Bitwise replay is tested on one runtime, not promised across CPU architectures.
+pub fn fit_predict_seeded_cpu(
+    x: &Matrix,
+    y: &[f64],
+    head: Head,
+    test: &Matrix,
+    p: &Params,
+) -> Result<Vec<f64>> {
+    let shape_ok = |m: &Matrix| {
+        m.rows > 0
+            && m.rows <= 50_000
+            && m.cols > 0
+            && m.cols <= 1024
+            && m.rows.checked_mul(m.cols) == Some(m.data.len())
+            && m.data.len() <= 2_000_000
+            && m.data
+                .iter()
+                .all(|v| v.is_finite() && (*v as f32).is_finite())
+    };
+    let labels_ok = y.iter().all(|v| {
+        v.is_finite()
+            && match head {
+                Head::Regression => (*v as f32).is_finite(),
+                Head::Binary => *v == 0.0 || *v == 1.0,
+                Head::Multiclass(k) => v.fract() == 0.0 && *v >= 0.0 && *v < k as f64,
+            }
+    });
+    if !shape_ok(x)
+        || !shape_ok(test)
+        || x.cols != test.cols
+        || y.len() != x.rows
+        || !labels_ok
+        || head.outputs() == 0
+        || head.outputs() > 64
+        || p.hidden.len() > 4
+        || p.hidden.iter().any(|&n| n == 0 || n > 512)
+        || p.batch == 0
+        || p.batch > 4096
+        || p.max_epochs == 0
+        || p.max_epochs > 200
+        || p.patience == 0
+        || p.patience > 200
+        || !p.learning_rate.is_finite()
+        || p.learning_rate <= 0.0
+        || p.learning_rate > 0.1
+        || !p.weight_decay.is_finite()
+        || !(0.0..=1.0).contains(&p.weight_decay)
+    {
+        return Err(DopeError::Input(
+            "seeded neural auditor contract invalid".into(),
+        ));
+    }
+    let predictions = fit_predict_impl(x, y, head, test, p, &Device::Cpu, true)?;
+    if predictions.iter().any(|v| !v.is_finite()) {
+        return Err(DopeError::Input(
+            "seeded neural auditor nonfinite result".into(),
+        ));
+    }
+    Ok(predictions)
+}
+
+fn seeded_layers(dims: &[usize], vars: &VarMap, seed: u64) -> Result<Vec<candle_nn::Linear>> {
+    let mut layers = Vec::new();
+    for (i, pair) in dims.windows(2).enumerate() {
+        let (input, output) = (pair[0], pair[1]);
+        let scale = (2.0 / input as f64).sqrt();
+        let weight: Vec<f32> = (0..input * output)
+            .map(|j| (crate::rng::normal(seed, 2 * i as u64, j as u64) * scale) as f32)
+            .collect();
+        let bound = 1.0 / (input as f64).sqrt();
+        let bias: Vec<f32> = (0..output)
+            .map(|j| {
+                ((2.0 * crate::rng::uniform(seed, 2 * i as u64 + 1, j as u64) - 1.0) * bound) as f32
+            })
+            .collect();
+        let weight = Var::from_vec(weight, (output, input), &Device::Cpu)?;
+        let bias = Var::from_vec(bias, output, &Device::Cpu)?;
+        layers.push(candle_nn::Linear::new(
+            weight.as_tensor().clone(),
+            Some(bias.as_tensor().clone()),
+        ));
+        let mut map = vars
+            .data()
+            .lock()
+            .map_err(|_| DopeError::Device("auditor variables unavailable".into()))?;
+        map.insert(format!("l{i}.weight"), weight);
+        map.insert(format!("l{i}.bias"), bias);
+    }
+    Ok(layers)
+}
+
+fn fit_predict_impl(
+    x: &Matrix,
+    y: &[f64],
+    head: Head,
+    test: &Matrix,
+    p: &Params,
+    dev: &Device,
+    seeded: bool,
 ) -> Result<Vec<f64>> {
     let o = head.outputs();
     let mut idx: Vec<usize> = (0..x.rows).collect();
@@ -119,14 +228,29 @@ pub fn fit_predict(
     let mut dims = vec![x.cols];
     dims.extend(&p.hidden);
     dims.push(o);
-    // Deterministic initialisation: candle's init uses the device RNG.
-    dev.set_seed(p.seed).ok();
-    let layers = (0..dims.len() - 1)
-        .map(|i| linear(dims[i], dims[i + 1], vb.pp(format!("l{i}"))))
-        .collect::<candle_core::Result<Vec<_>>>()?;
+    let layers = if seeded {
+        seeded_layers(&dims, &varmap, p.seed)?
+    } else {
+        // Preserve historical device initialization, including unsupported CPU seeding.
+        dev.set_seed(p.seed).ok();
+        (0..dims.len() - 1)
+            .map(|i| linear(dims[i], dims[i + 1], vb.pp(format!("l{i}"))))
+            .collect::<candle_core::Result<Vec<_>>>()?
+    };
     let model = Mlp { layers };
+    let variables = if seeded {
+        let map = varmap
+            .data()
+            .lock()
+            .map_err(|_| DopeError::Device("auditor variables unavailable".into()))?;
+        let mut names: Vec<_> = map.keys().collect();
+        names.sort();
+        names.into_iter().map(|name| map[name].clone()).collect()
+    } else {
+        varmap.all_vars()
+    };
     let mut opt = AdamW::new(
-        varmap.all_vars(),
+        variables.clone(),
         ParamsAdamW {
             lr: p.learning_rate,
             weight_decay: p.weight_decay,
@@ -151,11 +275,15 @@ pub fn fit_predict(
         let l = loss(head, &model.forward(&xv)?, &yv)?
             .to_dtype(DType::F32)?
             .to_scalar::<f32>()? as f64;
+        if seeded && !l.is_finite() {
+            return Err(DopeError::Input(
+                "seeded neural auditor nonfinite objective".into(),
+            ));
+        }
         if l < best.0 - 1e-7 {
             best = (
                 l,
-                varmap
-                    .all_vars()
+                variables
                     .iter()
                     .map(|v| v.as_tensor().copy())
                     .collect::<candle_core::Result<_>>()?,
@@ -168,7 +296,7 @@ pub fn fit_predict(
             }
         }
     }
-    for (v, t) in varmap.all_vars().iter().zip(&best.1) {
+    for (v, t) in variables.iter().zip(&best.1) {
         v.set(t)?;
     }
     let all: Vec<usize> = (0..test.rows).collect();
