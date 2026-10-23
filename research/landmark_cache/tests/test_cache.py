@@ -238,6 +238,22 @@ class CacheTests(unittest.TestCase):
         self.assertEqual(result["pending"], 0)
         self.assertEqual(result["counts"]["failed"], 1)
 
+    def test_execution_refuses_a_different_preparation_before_source_access(self):
+        binary = self.root / "fixture-binary"
+        binary.write_bytes(b"not executed")
+        plan = copy.deepcopy(self.plan)
+        binding = plan["cells"][0]["binding"]
+        binding["engine_sha256"] = hashlib.sha256(binary.read_bytes()).hexdigest()
+        binding["preparation_recipe_sha256"] = "0" * 64
+        plan["cells"][0]["key"] = digest(binding)
+        plan.pop("plan_sha256")
+        plan["plan_sha256"] = digest(plan)
+        with self.assertRaisesRegex(ValueError, "preparation_recipe_mismatch"):
+            run(plan, binary=binary, root=self.root / "run", client=self.client,
+                store=self.store, workers=1, threads=1, timeout=5, wall_seconds=600)
+        self.assertEqual(self.client.calls, [])
+        self.assertFalse((self.root / "run").exists())
+
     def test_unsupported_job_never_fetches_source(self):
         cell = dict(self.cell, initial_state="unsupported", reason="unsupported_task")
         receipt = run_cell(cell, binary=Path("unused"), root=self.root, client=self.client,

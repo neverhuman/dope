@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-from .plan import canonical, digest, file_sha, require, validate_plan
+from .plan import canonical, digest, file_sha, preparation_recipe, require, validate_plan
 
 
 def write_private(path, value):
@@ -243,7 +243,12 @@ def run(plan, *, binary, root, client, store, workers=4, threads=2, timeout=600,
         memory_bytes=8 * 2**30, shard=0, shards=1, wall_seconds=43_200, repair_reason=None):
     validate_plan(plan)
     binary, root = Path(binary).resolve(), Path(root).resolve()
-    require(file_sha(binary) == plan["cells"][0]["binding"]["engine_sha256"], "engine_digest_mismatch")
+    engine_sha = file_sha(binary)
+    preparation_sha = digest(preparation_recipe())
+    require(bool(plan["cells"]) and all(c["binding"]["engine_sha256"] == engine_sha
+                                      for c in plan["cells"]), "engine_digest_mismatch")
+    require(all(c["binding"]["preparation_recipe_sha256"] == preparation_sha
+                for c in plan["cells"]), "preparation_recipe_mismatch")
     require(1 <= workers <= 32 and 1 <= threads <= 16 and 0 <= shard < shards <= 128
             and 1 <= timeout <= 3600 and 1 <= wall_seconds <= 86_400
             and 256 * 2**20 <= memory_bytes <= 512 * 2**30, "invalid_resource_allocation")

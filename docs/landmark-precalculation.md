@@ -33,6 +33,10 @@ metadata, native executable SHA, native source commit, preparation source hashes
 and **all** landmark options. Linux and macOS executables have different keys;
 cross-platform numerical equivalence is not assumed. Partitioning uses catalog
 dataset order, so hosts with different executables still receive disjoint datasets.
+Before any execution or source access, the runner verifies that its actual four
+preparation modules and executable match every cell. To execute an older plan,
+use its preserved source snapshot; do not relabel a new implementation with an
+old recipe. Publication and verified lookup can still transport old reports.
 
 The default precalculation profile uses five folds, 8,192 ridge rows, 4,096 small
 learner rows, 2,048 kNN references, 64 feature spectra, seed 0 and 20 billion

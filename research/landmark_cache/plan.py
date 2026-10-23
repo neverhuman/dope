@@ -34,6 +34,11 @@ def require(condition, code):
         raise ValueError(code)
 
 
+def preparation_recipe():
+    return {name: file_sha(Path(__file__).with_name(name))
+            for name in ("plan.py", "runner.py", "storage.py", "exec_native.py")}
+
+
 def make_plan(catalog, *, bucket, engine_sha256, source_commit, options=None):
     raw = Path(catalog).read_bytes()
     require(hashlib.sha256(raw).hexdigest() == CATALOG_SHA256, "catalog_digest_mismatch")
@@ -42,8 +47,7 @@ def make_plan(catalog, *, bucket, engine_sha256, source_commit, options=None):
     validate_bucket(bucket)
     options = dict(OPTIONS if options is None else options)
     require(set(options) == set(OPTIONS) and options["panel"] == OPTIONS["panel"], "invalid_recipe")
-    preparation = {name: file_sha(Path(__file__).with_name(name))
-                   for name in ("plan.py", "runner.py", "storage.py", "exec_native.py")}
+    preparation = preparation_recipe()
     cells, seen = [], set()
     for row in (json.loads(line) for line in raw.splitlines()):
         identity = row["dataset_hash"]
