@@ -172,7 +172,7 @@ does not qualify the full CPU or paper job under their respective 120-minute
 and 60-minute quotas; setup, unit tests, compilation and drift need separately admitted measured
 job proof. The historical cancellation remains failed, without unchanged retry.
 
-The CPU PR lane is required. The scheduled GPU lane uses CUDA 12.8, libtorch
+The CPU PR lane is required. The manually dispatched GPU lane uses CUDA 12.8, libtorch
 2.7, and `CUBLAS_WORKSPACE_CONFIG=:4096:8`; it checks repeated training,
 resource measurement, and sealed corpus validation. A failed or absent GPU
 lane blocks promotion and claims for its affected backend.
@@ -191,8 +191,11 @@ The full CPU job has a finite 120-minute quota. Paper-clean, security and
 full-audit each retain a 60-minute quota. Disposable guest package installs
 wait at most 300 seconds for an existing dpkg lock, within those job quotas, then
 fail if it remains held.
-The GPU compute spend cap is one scheduled 120-minute job per
-week with no automatic retries. A single neural
+Each explicitly dispatched GPU qualification job has a 120-minute cap and no
+automatic retries. An operator freezes its source, candidate, data authorization
+and budget before dispatch; pushes, PRs and a weekly timer do not launch it.
+The historical `scheduled_gpu_minutes` budget key retains its v1 name and value
+for compatibility; it now bounds this manual job. A single neural
 fit is limited to 10 minutes and 16 GiB of estimated GPU memory. Abort a run
 when its timer, memory quota, or sealed-corpus authorization fails; the job
 must retain the partial log and mark the affected backend ineligible. The
@@ -209,7 +212,7 @@ the 600-second compiler cap, GPU memory admission, and required sealed inputs.
 Security evidence is the CI secret scan, dependency advisory scan, workflow lint,
 and SPDX SBOM. Backup evidence is the signed prior passing manifest and its
 hash-verified bundle. Monitoring evidence is the campaign ledger, certification
-JSON, and scheduled GPU job result. Rollback evidence is the restore procedure
+JSON, and the manually dispatched GPU job result. Rollback evidence is the restore procedure
 in [release.md](release.md#rollback). Abuse controls are the strict input
 boundary, byte limits, privacy tests, and allowlisted release inventory. A
 production promotion needs all five evidence classes plus the exact source
@@ -234,7 +237,7 @@ row and column when input validation fails.
 For data failures, use the reported row and column to fix numeric input;
 avoid copying a source field into an issue or report. For an artifact failure,
 compare its recorded digest and regenerate it from the same source commit.
-For a backend failure, check the build feature and the scheduled GPU report.
+For a backend failure, check the build feature and the manual GPU report.
 Rerun the narrow failing command before repeating a whole campaign.
 
 ## Unified-spec extraction and compatibility proof
@@ -591,3 +594,26 @@ The separate `shared-levels.yml` workflow runs independent CPU shards on the
 existing Linux general pool on trusted main/codex pushes and manual dispatch,
 including X64 and ARM64 native jobs. Required PR CI remains independent. It does not
 weaken the four existing required contexts or infer GPU availability from CI slots.
+
+## Manual research and routine correctness CI
+
+Model training campaigns, utility/accuracy comparisons and new scientific
+conclusions run only after an explicit manual launch with a frozen experiment
+plan. They are not PR/push CI jobs, do not publish required status contexts and
+do not run on a timer. The shared-level CI shards retain bounded public
+conformance fixtures for feature roles, gradients, resume, native parity and
+serialization. Existing retained-evidence and metric-math checks verify frozen
+claims; they do not start new training or qualify a new accuracy result.
+
+A manual development experiment may use its relevant source-bound correctness
+checks and checkpoint/native proofs independently of the general CPU merge
+suite. Record that check scope and any excluded or failed general lane in the
+experiment receipt. This separation never marks CI green, changes branch
+protections or permits merging without the required checks and review. Release
+promotion still needs its complete CI and separately admitted certification.
+
+GPU/sealed-corpus qualification is explicitly dispatched through
+`.github/workflows/gpu.yml`. Private owned-data development runs use a separate
+manual operator and preserve model/optimizer/RNG/sampler checkpoints, disjoint
+fit/query roles, all scheduled failures, costs and uncertainty. Neither path
+automatically admits unresolved S3 metadata or reads an unapproved holdout.
