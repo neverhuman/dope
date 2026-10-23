@@ -38,7 +38,10 @@ pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Re
             && manifest["format"] == "dope-fit-cv-landmark-input-v1"
             && manifest["feature_recipe"] == RECIPE
             && options == expected_options
-            && matches!(options.work_budget, 2_000_000_000 | 20_000_000_000)
+            && matches!(
+                options.work_budget,
+                2_000_000_000 | 20_000_000_000 | 2_000_000_000_000
+            )
             && manifest["engine_sha256"].as_str().is_some_and(|v| {
                 v.len() == 64
                     && v.bytes()
@@ -92,7 +95,7 @@ pub fn load(directory: &Path, expected: &str, csv: &Path, schema: &Schema) -> Re
                 .ok_or_else(|| bad("invalid CV landmark gain"))? as f32;
             check(gain.is_finite(), "nonfinite CV landmark gain")?;
             check(
-                cell["query_rows"] == rows
+                cell["query_rows"] == expected_query_rows(i + 1, rows, &options)
                     && cell["train_rows"].as_array().is_some_and(|v| {
                         v.len() == 5
                             && v.iter()
@@ -117,4 +120,34 @@ pub(crate) fn validate(features: &[f32; 46]) -> Result<()> {
             && (0..23).all(|i| features[23 + i] == 1. || features[i] == 0.),
         "invalid or empty CV landmark features",
     )
+}
+
+fn expected_query_rows(coordinate: usize, rows: u64, options: &LandmarkOptions) -> u64 {
+    let folds = options.folds as u64;
+    let cap = if coordinate <= 15 || coordinate == 22 {
+        options.ridge_rows as u64
+    } else {
+        options.small_rows.div_ceil(options.folds) as u64
+    };
+    (0..folds)
+        .map(|fold| (rows / folds + u64::from(fold < rows % folds)).min(cap))
+        .sum()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn iid_query_counts_bind_the_native_per_fold_caps() {
+        let options = LandmarkOptions::default();
+        for id in 1..=23 {
+            assert_eq!(expected_query_rows(id, 100, &options), 100);
+        }
+        assert_eq!(expected_query_rows(1, 50_000, &options), 40_960);
+        assert_eq!(expected_query_rows(22, 50_000, &options), 40_960);
+        assert_eq!(expected_query_rows(16, 5_001, &options), 4_100);
+        assert_eq!(expected_query_rows(23, 5_001, &options), 4_100);
+        assert_eq!(expected_query_rows(23, 4_097, &options), 4_097);
+    }
 }

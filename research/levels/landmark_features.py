@@ -69,7 +69,14 @@ def training_csv(data):
 
 def validate_options(options):
     require(options == dict(OPTIONS,work_budget=options.get('work_budget'))
-            and options['work_budget'] in (2000000000,20000000000), 'cv_landmark_options_unsupported')
+            and options['work_budget'] in (2000000000,20000000000,2000000000000), 'cv_landmark_options_unsupported')
+
+
+def expected_query_rows(coordinate,rows,options):
+    """IID folds are balanced; native code caps only each fold's own held-out rows."""
+    folds=options['folds']
+    cap=options['ridge_rows']if coordinate<=15 or coordinate==22 else(options['small_rows']+folds-1)//folds
+    return sum(min(rows//folds+(k<rows%folds),cap)for k in range(folds))
 
 
 def report_features(report, rows, task, *, options=None):
@@ -83,7 +90,7 @@ def report_features(report, rows, task, *, options=None):
     for cell in report['cells']:
         valid=cell['state']=='complete' and cell.get('gain')is not None
         if valid:
-            require(len(cell['train_rows'])==5 and cell['query_rows']==rows
+            require(len(cell['train_rows'])==5 and cell['query_rows']==expected_query_rows(cell['id'],rows,options)
                     and all(1<=n<rows for n in cell['train_rows']), 'cv_landmark_out_of_fold_required')
         values.append(float(cell['gain']) if valid else 0.);mask.append(valid)
     validate_values((values,mask))

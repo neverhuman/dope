@@ -137,3 +137,18 @@ class LandmarkInputTests(unittest.TestCase):
             self.assertEqual(raw_objective['low']['profile'],0.)
             with self.assertRaisesRegex(ResearchError,'not_profile_targets'):
                 objective(whole,c,q,inputs(),replace(cfg,profile_weight=.1),0)
+
+    def test_query_evidence_matches_declared_native_caps_inside_training_rows(self):
+        from research.levels.landmark_features import expected_query_rows
+        n=50001
+        report=dict(panel=OPTIONS['panel'],options=OPTIONS,kind='real',privacy='private',task='regression',rows=n,
+            cells=[dict(id=i,state='complete',gain=.1,train_rows=[1000]*5,
+                        query_rows=40960 if i<=15 or i==22 else 4100)for i in range(1,24)])
+        self.assertEqual(report_features(report,n,'regression'),([.1]*23,[True]*23))
+        for coordinate in (1,16,22,23):
+            self.assertEqual(expected_query_rows(coordinate,103,OPTIONS),103)
+        for coordinate in (1,16,22,23):
+            bad=copy.deepcopy(report);bad['cells'][coordinate-1]['query_rows']=n
+            with self.assertRaisesRegex(ResearchError,'out_of_fold'):report_features(bad,n,'regression')
+        bad=copy.deepcopy(report);bad['cells'][0]['train_rows']=[n]*5
+        with self.assertRaisesRegex(ResearchError,'out_of_fold'):report_features(bad,n,'regression')
