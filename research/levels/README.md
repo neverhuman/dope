@@ -249,3 +249,22 @@ trusted pushes to main/codex branches and manual dispatch. Independent stdlib, P
 shards can run concurrently. Thirteen slots are configured across xbabe1–4;
 actual availability is owned by their existing controllers, not inferred from
 configuration. GPU allocations remain separate from these CPU runners.
+
+### Versioned prior exposure controls
+
+The default `owned-mechanisms-v1` corpus is retained for replay. In prior-only runs,
+its two adjacent cursors reuse a physical table, so episode counts are exposures,
+not independent table counts. The opt-in training flag
+`--prior-recipe owned-mechanisms-unique-v2` gives each prior-only **training** cursor
+a distinct family/seed table, cycling the same seven training mechanisms with the
+same 256-row/eight-predictor shapes. Fixed development draws and the mixed
+50/50 real/prior stream stay identical to v1; no source is admitted by this option.
+
+Both recipes record opaque physical-table IDs and source provenance in completed
+`episodes.jsonl` rows. Real records also bind their content digest. Count unique IDs
+across the recorded resume lineage to distinguish new tables, repeated exposures
+and physical rows; a cursor-dependent episode hash is not a unique-table count.
+The corpus identity binds the explicit recipe. Cross-recipe resume or warm-start
+is refused. A new source snapshot and fresh initialization are required for a
+controlled exposure comparison; do not relabel previous checkpoints or imply
+that this engineering control improves accuracy.

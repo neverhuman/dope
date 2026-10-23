@@ -31,6 +31,51 @@ class TrainingTests(unittest.TestCase):
         self.assertFalse(train_families.intersection(dev_families))
         self.assertNotIn('owned-prior:9',train_families|dev_families)
 
+    def test_versioned_prior_stream_counts_physical_tables_and_keeps_development_fixed(self):
+        from research.levels.contracts import digest
+        legacy=Corpus(prior_only=True)
+        unique=Corpus(prior_only=True,prior_recipe='owned-mechanisms-unique-v2')
+        self.assertEqual(legacy.identity,digest(dict(manifest=None,prior_recipe='owned-mechanisms-v1',
+                                                   prior_only=True,seed=20261023)))
+        self.assertNotEqual(legacy.identity,unique.identity)
+        old=[legacy.get('train',i) for i in range(28)]
+        new=[unique.get('train',i) for i in range(28)]
+        self.assertEqual(len({r['source_provenance']['physical_table_id'] for r in old}),14)
+        self.assertEqual(len({r['source_provenance']['physical_table_id'] for r in new}),28)
+        for i in range(14):self.assertEqual(old[2*i]['row_ids'],old[2*i+1]['row_ids'])
+        self.assertEqual({r['family_id'] for r in new},{f'owned-prior:{i}' for i in range(7)})
+        for family in range(7):self.assertEqual(sum(r['family_id']==f'owned-prior:{family}' for r in new),4)
+        for i in range(12):
+            a,b=legacy.get('development',i),unique.get('development',i)
+            self.assertEqual(a['row_ids'],b['row_ids'])
+            self.assertEqual(a['rows'],b['rows'])
+            self.assertFalse(set(a['row_ids']).intersection(r for source in new for r in source['row_ids']))
+        # Mixed real/prior mode already consumes prior draws at even cursors; its stream stays unchanged.
+        mixed=Corpus(dict(format='dope-meta-corpus-v1',datasets=[dict(family_id=f'owned:{i}',dataset_id=str(i),
+            meta_role=role,train_sha256=str(i)*64,source_role='official_train',rights=dict(admitted=True,
+            license_id='CC0-1.0'),target_index=1,split_policy='iid') for i,role in [(1,'train'),(2,'development')]]),
+            prior_recipe='owned-mechanisms-unique-v2')
+        for i in range(0,28,2):self.assertEqual(mixed.get('train',i)['row_ids'],legacy.get('train',i)['row_ids'])
+        with self.assertRaisesRegex(ResearchError,'unknown_prior_recipe'):Corpus(prior_only=True,prior_recipe='unknown')
+        for cursor in (-1,True,1.5):
+            with self.assertRaisesRegex(ResearchError,'invalid_corpus_cursor'):unique.get('train',cursor)
+        with self.assertRaisesRegex(ResearchError,'final_access_forbidden'):unique.get('final',0)
+
+    def test_unique_prior_resume_keeps_provenance_and_refuses_cross_recipe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);cfg=replace(config(),transfer_weight=0,driver_weight=0)
+            def corpus():return Corpus(prior_only=True,prior_recipe='owned-mechanisms-unique-v2')
+            whole,full=train(tiny(),cfg,corpus(),root/'whole',source_sha256='a'*64)
+            _,part=train(tiny(),cfg,corpus(),root/'part',source_sha256='a'*64,stop_after=2)
+            resumed,terminal=train(tiny(),cfg,corpus(),root/'resumed',source_sha256='a'*64,resume=part['last_checkpoint'])
+            self.assertEqual(terminal['optimizer_updates'],4)
+            for name,value in whole.state_dict().items():self.assertTrue(torch.equal(value,resumed.state_dict()[name]),name)
+            def rows(name):return [json.loads(line) for line in (root/name/'episodes.jsonl').read_text().splitlines()]
+            self.assertEqual(rows('whole'),rows('part')+rows('resumed'))
+            self.assertEqual(len({r['source_provenance']['physical_table_id'] for r in rows('whole')}),4)
+            with self.assertRaisesRegex(ResearchError,'resume_recipe_or_runtime_mismatch'):
+                train(tiny(),cfg,Corpus(prior_only=True),root/'wrong',source_sha256='a'*64,resume=part['last_checkpoint'])
+
     def test_transfer_and_driver_surrogates_have_decoder_and_encoder_gradients(self):
         model=SharedModel(tiny());context,query,_=fixture()
         loss,raw=objective(model,context,query,([0.]*23,[False]*23),config(),101)
