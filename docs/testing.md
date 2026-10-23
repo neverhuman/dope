@@ -50,8 +50,10 @@ does not block integration. Historical ARM failures remain recorded as unqualifi
 while editing, using the existing Cargo target and inherited compiler cache.
 It refuses zero executed tests and records raw logs, command exits and source
 hashes under `target/focus/`. It never replaces the full CPU PR lane.
-The CPU workflow pins sccache and preserves the lane's Cargo target cache to
-shorten repeated locked checks. Local builds reuse their worktree target.
+The CPU workflow pins sccache and caches Cargo registry/git dependencies to
+shorten repeated locked checks. Compiled objects use sccache; full target trees
+are excluded because they include environments/evidence and can exhaust the job
+quota during post-job compression. Local builds reuse their worktree target.
 CPU guest setup installs Rust, Just, TeX, Poppler, and ripgrep in its existing
 early package transaction, retaining the 300-second package-lock wait and
 120-minute CPU job quota. `cpu.sh` checks all required tools before tests and never
@@ -575,3 +577,17 @@ runs. It runs engine formatting, Clippy with warnings denied, and the landmark c
 integration suites. The normal engine gate retains full test discovery. See
 [the implementation guide](landmarks.md#validation-and-next-engineering-work) for the
 properties exercised and scientific gates that remain unrun.
+
+## Shared learned graph conformance
+
+Run `python3 -B -m unittest discover -s research/levels/tests -v` in the pinned
+reference environment, then `cargo +1.88.0 test --manifest-path engine/Cargo.toml
+--locked -p dope-core -p dope-cli`. This covers fit-only and family refusals,
+actual optimizer/resume updates, proxy gradients, frozen ordinary weights during
+ultra training, native/PyTorch coupled graph parity, selected-prefix export and
+sampling with encoder weights/source physically absent. Tiny tracked weights are
+public synthetic conformance fixtures; they grant no accuracy/privacy evidence.
+The separate `shared-levels.yml` workflow runs independent CPU shards on the
+existing Linux general pool on trusted main/codex pushes and manual dispatch,
+including X64 and ARM64 native jobs. Required PR CI remains independent. It does not
+weaken the four existing required contexts or infer GPU availability from CI slots.

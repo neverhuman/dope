@@ -27,6 +27,9 @@ printf '%s\n' 'jankurai-security-step={"label":"cargo-audit","tool":"cargo-audit
 cargo audit --file ops/merge_guard/Cargo.lock --json > target/security/merge-guard-cargo-audit.json
 ci_require_artifact target/security/merge-guard-cargo-audit.json
 printf '%s\n' 'jankurai-security-step={"label":"cargo-audit-merge-guard","tool":"cargo-audit","shell_command":"cargo audit --file ops/merge_guard/Cargo.lock --json","status":"ran","advisory":false,"exit_code":0}'
+cargo audit --file engine/Cargo.lock --json > target/security/engine-cargo-audit.json
+ci_require_artifact target/security/engine-cargo-audit.json
+printf '%s\n' 'jankurai-security-step={"label":"cargo-audit-engine","tool":"cargo-audit","shell_command":"cargo audit --file engine/Cargo.lock --json","status":"ran","advisory":false,"exit_code":0}'
 if ! command -v actionlint >/dev/null 2>&1; then
   mkdir -p target/tools/actionlint
   archive="target/tools/actionlint/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
