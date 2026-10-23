@@ -164,7 +164,10 @@ earlier levels probe (nine PMLB tables × five programs), each table's held-out 
 three auditors, three sampling seeds). Small and selection-exposed; it shows direction and
 failure modes, not effect sizes. External T2 retention varies by about
 0.0109 between sampling seeds (median standard deviation), so per-table
-differences below about 0.01 are noise.
+differences below about 0.01 are noise. Part of that spread is the engine's MLP auditor, whose
+CPU weight initialization is not seeded (repeated `dope eval` of one fixed program on fixed
+files: MLP retention 0.944–0.977 on `197_cpu_act`, 0.888–1.069 on `574_house_16H`; see
+[the probe README](../../bench/real-world/probes/README.md)).
 
 **A. Which program does each audit pick?** (external T2 retention of the picked program)
 
@@ -185,15 +188,21 @@ differences below about 0.01 are noise.
 | Predictor | mean selection regret | best-program hits | mean within-table Spearman | pooled Spearman | mean bias vs T2 |
 |---|---:|---:|---:|---:|---:|
 | Engine self-audit (today) | 0.0288 | 2/9 | 0.33 | 0.87 | +0.038 |
-| Two learners (ridge + small GBDT) on clean T1 | 0.0026 | 5/9 | 0.51 | 0.77 | +0.003 |
-| 16-landmark family minimum | 0.0243 | 2/9 | 0.17 | 0.64 | -0.168 |
-| Same, kNN-1 excluded (post hoc) | 0.0452 | 2/9 | 0.12 | 0.81 | -0.098 |
+| Two learners (ridge + small GBDT) on clean T1 | 0.0026 | 5/9 | 0.50 | 0.77 | +0.003 |
+| 16-landmark family minimum | 0.0243 | 2/9 | 0.16 | 0.64 | -0.168 |
+| Same, kNN-1 excluded (post hoc) | 0.0452 | 2/9 | 0.11 | 0.81 | -0.098 |
 | Minimum over strong landmarks | 0.0262 | 2/9 | 0.22 | 0.45 | -0.299 |
-| Gain-weighted mean over the panel | 0.0450 | 2/9 | 0.28 | 0.63 | +0.033 |
-| Pooled ratio over strong landmarks | 0.0399 | 3/9 | 0.51 | 0.72 | +0.028 |
+| Gain-weighted mean over the panel | 0.0450 | 2/9 | 0.27 | 0.63 | +0.033 |
+| Pooled ratio over strong landmarks | 0.0399 | 3/9 | 0.50 | 0.71 | +0.028 |
 | Signature gap `S_syn` vs `S_real` (no real holdout) | 0.0622 | 2/9 | 0.01 | 0.62 | — |
 | Always the 2 KiB program | 0.0099 | | | | |
 | Always the 64 KiB program | 0.0526 | | | | |
+
+Spearman correlations use average ranks for ties (tied scores occur, for example where the low
+and medium artifacts are identical). The prototype's first report broke ties in NumPy's
+platform-dependent `argsort` order; the replay in [`bench/real-world/probes/`](../../bench/real-world/probes/README.md)
+moved six cells by 0.01 and changed no conclusion. Every table in this section is regenerated
+from the committed receipts by `dope-probes replay-landmarks` and checked in CI.
 
 **C. Real signatures are telling** (5-fold CV gains on real training rows; Brier for the four
 classification tables; "linearity" = linear gain / best gain; "interaction" = GBDT gain minus best
@@ -936,9 +945,11 @@ modules #310 tickets have already landed.
 Each ticket is one reviewable PR; "done" includes tests passing under the named gate, maps and
 docs updated, `just check` green.
 
-**LM-00 Probe in repository.** Move `landmark_probe.py`, `analyze_landmarks.py`, `landmark_tables.py` and
-`posthoc_rawlin.py` to `research/levels/probe/` beside the levels probe, with a README stating it is a development
-probe. *Depends on:* #310 ML-00. *Done:* reproduces §2.2 tables from receipts on the same inputs.
+**LM-00 Probe in repository.** *Done* in [`bench/real-world/probes/`](../../bench/real-world/probes/README.md):
+the receipts, the pinned inputs and the Rust tool `engine/dope-probes` (not shipped), which rebuilds the
+inputs with a NumPy-exact split and regenerates §2.2 A–D and the §5.5a comparison from the receipts, with
+CI checks. The Python prototype's scikit-learn learners are not ported; a rerun of the question uses the
+native panel (`dope landmarks compare`) under E-L1. *Depends on:* #310 ML-00.
 
 **LM-01 Frame, folds and ridge core.** `landmark/{mod,panel,frame,folds,ridge,basis}.rs` with
 L01–L15 and the target statistics; `MlEncoder::groups()`. *Tests:* A-L01 (determinism across
@@ -1089,8 +1100,8 @@ to feature slot identities.
 
 ## Appendix C. Probe method
 
-Scripts `landmark_probe.py` and `analyze_landmarks.py` (delivered with this document; moved
-in-repo by LM-00). This is a **Python prototype** (NumPy closed-form ridge plus scikit-learn
+Receipts, inputs and a Rust replay are in [`bench/real-world/probes/`](../../bench/real-world/probes/README.md)
+(LM-00). The probe itself was a **Python prototype** run outside the repository (NumPy closed-form ridge plus scikit-learn
 trees, kNN and a small MLP), not the native panel, and a 16-landmark subset of `landmarks-v1`:
 `lin, log, square, tanh, abs, fourier, rows, step, pairs, rff, stump, tree3, gbdt (100 × depth 4),
 knn1, knn15, mlp (32 tanh units)`. No learning-curve, missingness or `best1` landmarks;
@@ -1098,10 +1109,11 @@ classification uses the Brier score.
 
 * **Programs.** The 45 artifacts of the earlier levels probe: nine PMLB tables × (2, 4, 16,
   64 KiB independent fits, plus one fit at the summed low+med+high bytes), built by the engine
-  release binary of `65b1d2a`, on the train/test files written by that probe's `split.py`
-  (shuffle seed 20261022, test = min(20%, 5,000) rows, train ≤ 12,000 rows). Raw results:
-  `landmark-results.jsonl` and `rawlin-results.jsonl`; `landmark_tables.py` and
-  `posthoc_rawlin.py` regenerate the §2.2 tables and the §5.5a comparison.
+  release binary of `65b1d2a`, on the train/test files of that probe (shuffle seed 20261022,
+  test = min(20%, 5,000) rows, train ≤ 12,000 rows; `dope-probes split` rebuilds them). Raw
+  results: `results/landmark-probe.jsonl` and `results/landmark-rawlin.jsonl`;
+  `dope-probes replay-landmarks`, `landmark-diff` and `rawlin` regenerate the §2.2 tables and the
+  §5.5a comparison.
 * **Splits.** Each table's held-out test file is halved with a fixed seed: **T1** plays the tune
   role for the panel (the compiler never saw it); **T2** is the external evaluation
   (`dope eval --factor 1`, engine linear/GBDT/MLP auditors, three sampling seeds, median robust

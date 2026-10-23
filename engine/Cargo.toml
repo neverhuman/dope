@@ -4,7 +4,7 @@
 # crate at the repository root (dope-kernel) is unaffected.
 [workspace]
 resolver = "2"
-members = ["dope-core", "dope-cli"]
+members = ["dope-core", "dope-cli", "dope-probes"]
 
 [workspace.package]
 version = "1.0.0"

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add the levels and landmark development probes' receipts under `bench/real-world/probes/` and
+  the non-shipped Rust tool `engine/dope-probes`: a NumPy-exact input split, a levels-probe
+  driver and a replay that regenerates every number the multilevel and landmark plans cite,
+  checked in CI. Spearman ties now use average ranks (six landmark-plan cells move by 0.01).
+  Development evidence only; no new benchmark or quality claim.
 - Add global CPU thread control, fit JSON stdout, runtime identity/digest diagnostics,
   and a documented complete Rust CLI workflow. Exercise commands without helper tools.
 - Add a Linux x86-64 CPU release builder, dependency/ELF boundary checks, upstream

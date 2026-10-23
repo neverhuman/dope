@@ -185,6 +185,7 @@ dope-core/src/
   eval/ (linear, gbdt, nn)                    retention auditors, the self-audit and the TDL frontier
   stats.rs rng.rs                             numerics and portable randomness
 dope-cli/src/main.rs                          the `dope` command
+dope-probes/                                  development-probe inputs and receipt replay (not shipped)
 ```
 
 ## Experimental landmarks and portable levels

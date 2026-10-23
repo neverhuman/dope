@@ -484,6 +484,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "dope-probes"
+version = "1.0.0"
+dependencies = [
+ "brotli",
+ "clap",
+ "csv",
+ "safetensors 0.7.0",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "dyn-stack"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
