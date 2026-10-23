@@ -67,7 +67,9 @@ def read_dataset(item, *, include_landmarks=True):
                 slots=[j+1 if j != target else 0 for j in order], row_ids=row_ids,
                 task=item["task"], family_id=item["family_id"],
                 roles=role_indices(row_ids, item["split_seed"], policy=policy, groups=groups, times=times),
-                evidence="unqualified_real_development")
+                evidence="unqualified_real_development",
+                source_provenance=dict(kind="admitted_official_train",physical_table_id=physical,
+                                       content_sha256=item["train_sha256"]))
     result['landmarks'] = read_landmarks(item, result) if include_landmarks else ([0.]*23, [False]*23)
     return result
 
@@ -175,22 +177,34 @@ def prepare_landmarks(item, engine, expected_engine_sha256, out, *, wall_seconds
                 engine_sha256=expected_engine_sha256)
 
 
+PRIOR_RECIPES = ("owned-mechanisms-v1", "owned-mechanisms-unique-v2")
+
+
 class Corpus:
-    def __init__(self, manifest=None, *, seed=20261023, prior_only=False):
+    def __init__(self, manifest=None, *, seed=20261023, prior_only=False,
+                 prior_recipe="owned-mechanisms-v1"):
+        require(prior_recipe in PRIOR_RECIPES, "unknown_prior_recipe")
+        self.prior_recipe = prior_recipe
         self.seed, self.prior_only, self.loaded = seed, prior_only, OrderedDict()
         self.manifest = validate_corpus(manifest) if manifest is not None else None
         require(prior_only or self.manifest is not None, "real_corpus_manifest_required")
-        self.identity = digest(dict(manifest=self.manifest, prior_recipe="owned-mechanisms-v1",
+        self.identity = digest(dict(manifest=self.manifest, prior_recipe=prior_recipe,
                                     prior_only=prior_only, seed=seed))
 
     def get(self, role, cursor):
         require(role in ("train", "development"), "final_access_forbidden")
+        require(type(cursor) is int and cursor >= 0, "invalid_corpus_cursor")
         # Exactly half real/prior with a real corpus; all-prior runs are explicitly labeled.
         use_prior = self.prior_only or cursor % 2 == 0
         if use_prior:
             families = list(range(7)) if role == "train" else [7,8]
-            family = families[(cursor//2) % len(families)]
-            result = table(family, self.seed + cursor//(2*len(families)))
+            unique = self.prior_only and role == "train" and self.prior_recipe == "owned-mechanisms-unique-v2"
+            draw = cursor if unique else cursor//2
+            family = families[draw % len(families)]
+            table_seed = self.seed + draw//len(families)
+            result = table(family, table_seed)
+            result["source_provenance"] = dict(kind="owned_prior",prior_recipe=self.prior_recipe,
+                physical_table_id=digest(dict(family=family,seed=table_seed)),draw=draw)
             result["landmarks"] = ([0.]*23, [False]*23)
             return result
         entries = [d for d in self.manifest["datasets"] if d["meta_role"] == role]
