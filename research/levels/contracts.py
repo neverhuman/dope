@@ -95,6 +95,8 @@ class TrainConfig:
     weight_decay: float = .01
     gradient_clip: float = 1.
     validate_every: int = 50
+    validation_recipe: str = "fixed-six-v1"
+    validation_episodes: int = 6
     checkpoint_every: int = 50
     proxy_rows: int = 32
     neural_unrolls: int = 3
@@ -109,7 +111,7 @@ class TrainConfig:
     device: str = "cpu"
 
     def validate(self):
-        require(all(type(v)is int for v in (self.steps,self.seed,self.accumulation,self.validate_every,
+        require(all(type(v)is int for v in (self.steps,self.seed,self.accumulation,self.validate_every,self.validation_episodes,
                 self.checkpoint_every,self.proxy_rows,self.neural_unrolls,self.proxy_ramp_steps,self.wall_seconds,self.cpu_threads))
                 and 0<=self.seed<2**32, 'training_integer_required')
         require(1 <= self.steps <= 10000000 and 1 <= self.accumulation <= 256
@@ -120,6 +122,10 @@ class TrainConfig:
                 and 1 <= self.wall_seconds <= 7200 and 1 <= self.cpu_threads <= 16
                 and self.precision in ("fp32", "bf16")
                 and self.device in ("cpu", "cuda"), "invalid_training_allocation")
+        require((self.validation_recipe == 'fixed-six-v1' and self.validation_episodes == 6)
+                or (self.validation_recipe == 'owned-balanced-unique-v2'
+                    and 2 <= self.validation_episodes <= 64 and self.validation_episodes % 2 == 0),
+                'invalid_validation_panel')
         require(all(math.isfinite(v) and v >= 0 for v in (
             self.learning_rate, self.min_learning_rate, self.warmup_fraction,
             self.weight_decay, self.gradient_clip, self.transfer_weight,
@@ -128,6 +134,13 @@ class TrainConfig:
                 and 0 <= self.warmup_fraction < 1 and self.gradient_clip > 0,
                 "invalid_optimizer_recipe")
         return self
+
+    def manifest(self):
+        """Keep the historical default recipe bytes; explicit new panels bind both fields."""
+        result = asdict(self.validate())
+        if self.validation_recipe == 'fixed-six-v1':
+            result.pop('validation_recipe'); result.pop('validation_episodes')
+        return result
 
 
 def validate_corpus(manifest):

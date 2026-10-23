@@ -285,3 +285,45 @@ The corpus identity binds the explicit recipe. Cross-recipe resume or warm-start
 is refused. A new source snapshot and fresh initialization are required for a
 controlled exposure comparison; do not relabel previous checkpoints or imply
 that this engineering control improves accuracy.
+
+### Distinct physical development panels
+
+The historical default `fixed-six-v1` keeps its six episode draws and
+recipe representation for replay. Those draws cover **three distinct physical
+prior tables**, each observed twice: four classification and two regression
+exposures. Episode counts are not independent source counts.
+
+For a future prior-only run, training JSON can explicitly set:
+
+```json
+{"validation_recipe": "owned-balanced-unique-v2", "validation_episodes": 40}
+```
+
+This opt-in observer uses twenty distinct owned classification tables and twenty
+regression tables from development mechanisms 7 and 8. It accepts an even count
+from 2 to 64. The training corpus and its physical stream are unchanged; the new
+observer is bound into the checkpoint recipe, and changing its recipe or count
+refuses exact resume. Real/mixed corpora refuse this owned-prior observer; they
+need a separately admitted family-balanced panel rather than a silent fallback.
+Existing frozen experiments, plots and benchmarks retain their original monitor.
+The independent source fingerprint still changes with this implementation; replay
+old checkpoints with their frozen source rather than bypassing source checks.
+
+Each new validation event records its scheduled/completed episodes, distinct
+physical tables, opaque family counts, task counts, context/query lineage hashes,
+wall cost and panel digest. Only fit context and tune queries from meta-development
+sources enter the observer. Calibration, confirmation and final sources stay out.
+The observer uses no gradients or optimizer updates and restores the training RNG
+and model mode. Draws and corruption RNG are fixed across checkpoints; the number
+of physical tables, not the number of plotted observations, describes coverage.
+The dashboard displays that coverage when it is recorded; historical metrics
+without lineage remain explicitly unavailable.
+
+Validation costs count against the existing run allowance. Time and resource
+admission are checked before each episode; an in-flight episode can finish after
+the boundary, so retain an external hard deadline. An interrupted panel publishes
+its disposition and completed count with **no partial mean**, saves the last
+completed optimizer boundary and never retries automatically. More monitor tables
+increase overhead and do not establish accuracy, independent real-source coverage,
+or permission to select a favorable checkpoint. Predeclare any selection rule and
+keep every scheduled benchmark checkpoint and negative result.

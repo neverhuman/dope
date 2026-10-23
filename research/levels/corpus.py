@@ -191,6 +191,19 @@ class Corpus:
         self.identity = digest(dict(manifest=self.manifest, prior_recipe=prior_recipe,
                                     prior_only=prior_only, seed=seed))
 
+    def development(self, cursor, recipe):
+        """A versioned observer draw; never change the training stream or historical draws."""
+        require(type(cursor) is int and cursor >= 0, 'invalid_corpus_cursor')
+        if recipe == 'fixed-six-v1': return self.get('development', cursor)
+        require(recipe == 'owned-balanced-unique-v2', 'unknown_validation_recipe')
+        require(self.prior_only, 'unique_validation_requires_owned_priors')
+        family, table_seed = 7 + cursor % 2, self.seed + cursor // 2
+        result = table(family, table_seed)
+        result['source_provenance'] = dict(kind='owned_prior', prior_recipe=self.prior_recipe,
+            development_recipe=recipe, physical_table_id=digest(dict(family=family, seed=table_seed)), draw=cursor)
+        result['landmarks'] = ([0.]*23, [False]*23)
+        return result
+
     def get(self, role, cursor):
         require(role in ("train", "development"), "final_access_forbidden")
         require(type(cursor) is int and cursor >= 0, "invalid_corpus_cursor")
