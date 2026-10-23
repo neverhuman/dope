@@ -97,6 +97,7 @@ class TrainConfig:
     validate_every: int = 50
     checkpoint_every: int = 50
     proxy_rows: int = 32
+    neural_unrolls: int = 3
     transfer_weight: float = .25
     driver_weight: float = .10
     profile_weight: float = .10
@@ -109,12 +110,13 @@ class TrainConfig:
 
     def validate(self):
         require(all(type(v)is int for v in (self.steps,self.seed,self.accumulation,self.validate_every,
-                self.checkpoint_every,self.proxy_rows,self.proxy_ramp_steps,self.wall_seconds,self.cpu_threads))
+                self.checkpoint_every,self.proxy_rows,self.neural_unrolls,self.proxy_ramp_steps,self.wall_seconds,self.cpu_threads))
                 and 0<=self.seed<2**32, 'training_integer_required')
         require(1 <= self.steps <= 10000000 and 1 <= self.accumulation <= 256
                 and 1 <= self.validate_every <= self.steps
                 and 1 <= self.checkpoint_every <= self.steps
-                and 4 <= self.proxy_rows <= 128 and self.proxy_ramp_steps >= 0
+                and 4 <= self.proxy_rows <= 128 and 1 <= self.neural_unrolls <= 64
+                and self.proxy_ramp_steps >= 0
                 and 1 <= self.wall_seconds <= 7200 and 1 <= self.cpu_threads <= 16
                 and self.precision in ("fp32", "bf16")
                 and self.device in ("cpu", "cuda"), "invalid_training_allocation")

@@ -1,6 +1,7 @@
 """Differentiable development proxies. They never certify exact learner transfer/drivers."""
 import torch
 from torch.nn import functional as F
+from .contracts import require
 
 
 def features(values, observed, schema, probabilities=None):
@@ -58,7 +59,8 @@ def neural_fit(x, y, schema, *, differentiable, iterations=3):
 
 
 def transfer_driver(real_values, real_observed, query_values, query_observed,
-                    synthetic, soft_observed, probabilities, schema, *, differentiable):
+                    synthetic, soft_observed, probabilities, schema, *, differentiable, neural_unrolls=3):
+    require(type(neural_unrolls) is int and 1 <= neural_unrolls <= 64, 'invalid_proxy_unrolls')
     xr, groups = features(real_values, real_observed, schema)
     xq, _ = features(query_values, query_observed, schema)
     xs, _ = features(synthetic, soft_observed, schema, probabilities)
@@ -74,8 +76,8 @@ def transfer_driver(real_values, real_observed, query_values, query_observed,
     gain = null_loss-real_loss
     valid = bool((gain > 1e-4).item())
     regret = (syn_loss-real_loss)/gain.clamp_min(1e-4) if valid else syn_loss*0
-    real_nn = neural_fit(xr.detach(), yr.detach(), schema, differentiable=False)
-    syn_nn = neural_fit(xs, ys, schema, differentiable=differentiable)
+    real_nn = neural_fit(xr.detach(), yr.detach(), schema, differentiable=False, iterations=neural_unrolls)
+    syn_nn = neural_fit(xs, ys, schema, differentiable=differentiable, iterations=neural_unrolls)
     nn_real = loss(torch.tanh(xq @ real_nn[0]) @ real_nn[1], yq, schema).detach()
     nn_syn = loss(torch.tanh(xq @ syn_nn[0]) @ syn_nn[1], yq, schema)
     nn_gain = null_loss-nn_real
@@ -97,4 +99,4 @@ def transfer_driver(real_values, real_observed, query_values, query_observed,
               if driver_valid else syn_loss*0)
     return transfer, driver, dict(linear_informative=valid, neural_informative=nn_valid,
                                  driver_proxy_informative=driver_valid, exact_tree="not_run",
-                                 exact_driver_ceiling="not_measured", neural_unrolls=3)
+                                 exact_driver_ceiling="not_measured", neural_unrolls=neural_unrolls)

@@ -75,6 +75,9 @@ class TrainingTests(unittest.TestCase):
             self.assertEqual(len({r['source_provenance']['physical_table_id'] for r in rows('whole')}),4)
             with self.assertRaisesRegex(ResearchError,'resume_recipe_or_runtime_mismatch'):
                 train(tiny(),cfg,Corpus(prior_only=True),root/'wrong',source_sha256='a'*64,resume=part['last_checkpoint'])
+            with self.assertRaisesRegex(ResearchError,'resume_recipe_or_runtime_mismatch'):
+                train(tiny(),replace(cfg,neural_unrolls=48),corpus(),root/'wrong-unroll',
+                      source_sha256='a'*64,resume=part['last_checkpoint'])
 
     def test_transfer_and_driver_surrogates_have_decoder_and_encoder_gradients(self):
         model=SharedModel(tiny());context,query,_=fixture()
@@ -84,6 +87,46 @@ class TrainingTests(unittest.TestCase):
         self.assertGreater(sum(float(p.grad.abs().sum()) for p in model.encoder.parameters() if p.grad is not None),0)
         self.assertGreater(sum(float(p.grad.abs().sum()) for p in model.decoder.parameters() if p.grad is not None),0)
         self.assertEqual(set(raw),{'low','medium','high'})
+
+    def test_bounded_neural_unrolls_keep_default_replay_and_long_gradient_path(self):
+        from research.levels.contracts import digest
+        context,query,_=fixture();model=SharedModel(tiny())
+        def measured(cfg):
+            torch.manual_seed(19283)
+            return objective(model,context,query,([0.]*23,[False]*23),cfg,101)
+        default,records=measured(config())
+        explicit,other=measured(replace(config(),neural_unrolls=3))
+        self.assertTrue(torch.equal(default,explicit));self.assertEqual(records,other)
+        longer=replace(config(),neural_unrolls=48)
+        value,record=measured(longer);value.backward()
+        self.assertFalse(torch.equal(default,value))
+        self.assertTrue(all(v['neural_unrolls']==48 for v in record.values()))
+        self.assertTrue(all(torch.isfinite(p.grad).all() for p in model.parameters() if p.grad is not None))
+        for part in (model.encoder,model.decoder):
+            self.assertGreater(sum(float(p.grad.abs().sum()) for p in part.parameters() if p.grad is not None),0)
+        self.assertNotEqual(digest(vars(config())),digest(vars(longer)))
+        for bad in (0,65,True,3.5):
+            with self.assertRaises(ResearchError):replace(config(),neural_unrolls=bad).validate()
+        with tempfile.TemporaryDirectory() as directory:
+            cfg=replace(longer,steps=2,validate_every=1,checkpoint_every=1,proxy_ramp_steps=1)
+            train(tiny(),cfg,Corpus(prior_only=True),Path(directory)/'logged',source_sha256='a'*64)
+            rows=[json.loads(line) for line in (Path(directory)/'logged/episodes.jsonl').read_text().splitlines()]
+            self.assertEqual(rows[0]['neural_unrolls'],dict(low=None,medium=None,high=None))
+            self.assertEqual(rows[1]['neural_unrolls'],dict(low=48,medium=48,high=48))
+
+    def test_long_neural_fit_differentiates_through_synthetic_rows_and_targets(self):
+        from research.levels.proxies import features,labels,neural_fit,loss
+        from research.levels.model import tensors
+        context,query,_=fixture();cv,co=tensors(context,'cpu');qv,qo=tensors(query,'cpu')
+        xs,_=features(cv,co,context.schema);xs.requires_grad_()
+        ys=labels(cv,context.schema).clone().requires_grad_()
+        xq,_=features(qv,qo,context.schema);yq=labels(qv,context.schema)
+        a,b=neural_fit(xs,ys,context.schema,differentiable=True,iterations=48)
+        value=loss(torch.tanh(xq@a)@b,yq,context.schema)
+        gradients=torch.autograd.grad(value,(xs,ys))
+        for gradient in gradients:
+            self.assertTrue(torch.isfinite(gradient).all())
+            self.assertGreater(float(gradient.abs().sum()),0)
 
     def test_ultra_refuses_random_base_then_freezes_all_lower_weights(self):
         with tempfile.TemporaryDirectory() as directory:

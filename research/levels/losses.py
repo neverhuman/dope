@@ -56,7 +56,8 @@ def objective(model, context, query, profile, config, step, *, phase="ordinary",
             synthetic, present, probabilities = soft_rows(model.decoder, prefix, schema, n)
             with torch.autocast(device_type=device.type,enabled=False):
                 transfer, driver, state = transfer_driver(cv[:n].float(),co[:n],qv.float(),qo,
-                    synthetic.float(),present.float(),probabilities.float(),schema,differentiable=differentiable)
+                    synthetic.float(),present.float(),probabilities.float(),schema,differentiable=differentiable,
+                    neural_unrolls=config.neural_unrolls)
         labels = torch.tensor(profile[0], dtype=torch.float32, device=device)
         mask = torch.tensor(profile[1], dtype=torch.bool, device=device)
         predictions = model.profiles[level](prefix)
