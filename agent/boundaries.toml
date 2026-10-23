@@ -3,7 +3,7 @@ id = "rust-ts-vite-react-postgres-bounded-python"
 version = "0.1.0"
 
 [python]
-allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/", "research/transfer/", "bench/metrics/", "bench/real-world/", "examples/adult/", "tools/claims/", "docs/whitepaper/scripts/", "ops/ci/paper-prepare.py", "ops/ci/paper-review-outputs.py", "ops/ci/check-frozen-evidence.py", "ops/ci/test_frozen_evidence.py"]
+allowed_non_product_paths = ["src/dope_kernel/", "validation/external/", "research/benchmark/", "research/landmark_cache/", "research/transfer/", "bench/metrics/", "bench/real-world/", "examples/adult/", "tools/claims/", "docs/whitepaper/scripts/", "ops/ci/paper-prepare.py", "ops/ci/paper-review-outputs.py", "ops/ci/check-frozen-evidence.py", "ops/ci/test_frozen_evidence.py"]
 allowed_truth_paths = []
 
 [[streaming_exception]]
@@ -29,6 +29,14 @@ owner = "research"
 reason = "Offline, sealed-test benchmark adapters call pinned author ML libraries on rights-cleared data; Rust owns product compilation, contracts, and tier claims."
 expires = "2027-09-29"
 migration_path = "Retain audited offline adapters while the named ML libraries are required for comparative evidence."
+
+[[streaming_exception]]
+runtime = "python"
+classification = "advanced-data"
+owner = "external-evidence"
+reason = "Private offline TRAIN-only corpus preparation delegates all landmark fitting and scoring to the pinned native Rust executable; it cannot admit data, certify results or serve product requests."
+expires = "2027-03-01"
+migration_path = "Retire this preparation utility after the shared training corpus is frozen, or migrate corpus transport to Rust before any product integration."
 
 [[audited_runtime_boundary]]
 id = "python-v1-compatibility"

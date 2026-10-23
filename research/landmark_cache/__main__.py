@@ -72,6 +72,7 @@ def main():
         plan = validate_plan(json.loads(args.plan.read_bytes()))
         if args.command == "prefetch":
             import concurrent.futures
+            from botocore.exceptions import BotoCoreError, ClientError
             from .runner import fetch_train
             require(1 <= args.workers <= 32 and 0 <= args.shard < args.shards <= 128,
                     "invalid_prefetch_allocation")
@@ -83,7 +84,7 @@ def main():
                 try:
                     fetch_train(client, cell, args.out)
                     return dict(key=cell["key"], state="verified")
-                except Exception as error:
+                except (OSError, ValueError, BotoCoreError, ClientError) as error:
                     return dict(key=cell["key"], state="failed", error_type=type(error).__name__)
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
@@ -93,6 +94,8 @@ def main():
                           cells=receipts)
             write_private(args.out / "prefetch.private.json", result)
             print(json.dumps({k: result[k] for k in ("scheduled", "verified")}))
+            if result["verified"] != result["scheduled"]:
+                raise SystemExit("TRAIN prefetch incomplete; inspect private receipts and repair before retrying")
             return
         if args.command == "run" and args.offline_sources:
             from .storage import LocalStore, LocalTrainSource

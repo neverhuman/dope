@@ -228,7 +228,7 @@ def run_cell(cell, *, binary, root, client, store, threads, timeout, memory_byte
                     elif code is not None:
                         receipt.update(state="failed", code="native_exit", native_exit=code)
                     canonical_path.unlink(missing_ok=True)
-        except Exception as error:
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
             # Static codes only. Native/transport messages can include private paths or values.
             allowed = {"source_row_count_mismatch", "source_row_width_mismatch", "target_index_invalid",
                        "source_header_declaration_mismatch", "source_TRAIN_hash_mismatch", "cached_TRAIN_corrupt"}
@@ -294,7 +294,7 @@ def run(plan, *, binary, root, client, store, workers=4, threads=2, timeout=600,
                     cell = active.pop(future)
                     try:
                         receipts.append(future.result())
-                    except Exception:
+                    except (OSError, ValueError, subprocess.SubprocessError):
                         receipts.append(dict(key=cell["key"], state="interrupted",
                                              code="prior_attempt_or_worker_requires_reconciliation"))
                     record()

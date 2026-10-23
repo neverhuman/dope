@@ -8,6 +8,7 @@ import time
 import subprocess
 import sys
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -23,6 +24,8 @@ class ClientError(Exception):
 
 
 class MemoryS3:
+    exceptions = SimpleNamespace(ClientError=ClientError)
+
     def __init__(self):
         self.objects, self.calls = {}, []
 

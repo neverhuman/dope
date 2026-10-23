@@ -94,6 +94,11 @@ PID and preserve the original attempt before supplying `--repair-reason` for an
 actual diagnosed repair. An interrupted `.partial` source download must be
 preserved/renamed explicitly before a replacement download; no broad cleanup.
 Filesystem publication uses private permissions; it is not independent custody.
+Expected input, filesystem and native-process failures produce static private
+receipt codes. An unexpected programming or SDK failure stops the run and leaves
+its attempt for reconciliation; it is never converted into a successful result.
+Prefetch writes its private per-object receipt and exits unsuccessfully when any
+scheduled TRAIN object was not verified.
 
 Hosts without S3 credentials can use `--offline-sources /private/train-blobs`
 and `--local-store /private/cache` instead of S3 arguments. The blob directory
@@ -140,3 +145,28 @@ TRAIN-only access, private permissions, conditional publication, corrupt cache
 rejection, interruption retention and dashboard redaction. A real native/S3
 pilot is separate operational evidence. Root `just fast`/`just check`, security,
 audit and receiving-main gates retain their existing roles and platform limits.
+
+## Completed catalog pass and training handoff
+
+The higher-coverage pass scheduled all 3,859 catalog entries: 3,266 reusable
+reports, 441 unsupported inputs and 152 native 512-column refusals. Original
+failure receipts are preserved. All 3,266 S3 report objects and their bound
+manifests were downloaded and verified before the corpus index was published.
+The 75,118 native slots comprise 57,660 complete, 13,095 uninformative and 4,363
+unsupported slots, with zero failed or over-budget slots. These are operational
+coverage counts, not a model accuracy result or certification.
+
+The private content-addressed corpus index binds both host plans, all shard
+progress snapshots, refusal classifications, preparation source hashes and
+every report digest. Its publication receipt is retained with the run's private
+operator evidence. Linux and macOS executable identities remain distinct. The
+original discovery profile remains available separately.
+
+Feature spectra refer to the inferred native frame's feature slots; the current
+report does not export their mapping back to raw source columns. A consuming
+trainer must handle that explicitly, preserve slot availability masks and never
+interpret uninformative or unsupported slots as measured zero effects. Resolve
+the source-family/rights and family-disjoint role prerequisites above before
+starting meta-training. The shared layered GPU trainer, its checkpoints and
+S/M/L/ultra comparisons are separate work; the probe replay PR supplies no such
+trainer. No training-convergence claim follows from this preparation pass.

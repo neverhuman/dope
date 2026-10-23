@@ -21,7 +21,7 @@ class S3Store:
     def get(self, key):
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=self.prefix + "/" + key)
-        except Exception as error:
+        except self.client.exceptions.ClientError as error:
             code = getattr(error, "response", {}).get("Error", {}).get("Code")
             if code in ("NoSuchKey", "404"):
                 return None
@@ -42,7 +42,7 @@ class S3Store:
                                    ChecksumSHA256=base64.b64encode(checksum).decode(),
                                    ContentType="application/json",
                                    Metadata={"sha256": checksum.hex(), "privacy": "private-measurement"})
-        except Exception as error:
+        except self.client.exceptions.ClientError as error:
             code = getattr(error, "response", {}).get("Error", {}).get("Code")
             if code not in ("PreconditionFailed", "412"):
                 raise
