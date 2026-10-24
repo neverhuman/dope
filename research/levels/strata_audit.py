@@ -1,7 +1,7 @@
 """Independent Verification, Cohort Strata Decomposition & 132 Filtered-Candidate Bias Audit."""
 from __future__ import annotations
 
-import csv, hashlib, math, warnings
+import csv, hashlib, math, struct, warnings, zlib
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple
 
@@ -297,3 +297,135 @@ def audit_filtered_candidates_and_auditors(
         "auditor_roster_and_backends": auditor_roster,
         "filtered_candidates_sample_25": filtered_info[:25],
     }
+
+
+def serialize_dope_latent_wire_bytes(enc: Dict[str, Any]) -> bytes:
+    """Pack normalized-space DOPE-MLC-v2 encoding into the v2 compact binary wire representation (42B fixed prefix + fp16/uint8 tensors)."""
+    buf = bytearray()
+    lvl_map = {"medium": 0, "high": 1, "ultra": 2}
+    task_map = {"regression": 0, "classification": 1}
+    tb = enc["target_bundle"]
+    trees, pairs, disc = tb["trees"], tb["pairs"], enc.get("discrete_support", {})
+    buf.extend(struct.pack(
+        "<BBBBIIHHHHHH", 1, lvl_map[enc["level"]], task_map[enc["task"]], len(trees),
+        int(enc["n_train"]), int(enc["p_use"]), len(enc["regime_weights"]),
+        int(enc["chol_factor"].shape[1]), len(enc["knot_grid"]), len(pairs), len(tb["w_basis"]), len(disc),
+    ))
+    gates = tb["gates"]
+    scalars_fp16 = np.array([
+        tb["res_net_mean"], tb["neural_w"], tb["residual_std"], tb["noise_scale"],
+        tb["class_prior"], tb["y_min"], tb["y_max"],
+        gates["monotone_w"], gates["hinge_w"], gates["pair_w"], gates["tree_w"],
+    ], dtype=np.float16)
+    buf.extend(scalars_fp16.tobytes())
+    for k in ("regime_weights", "regime_means", "regime_scales", "chol_factor", "diag_res_std", "dist_latent", "task_latent", "col_knots", "binary_probs", "binary_low_high"):
+        buf.extend(np.asarray(enc[k], dtype=np.float16).tobytes())
+    buf.extend(np.packbits(np.asarray(enc["is_binary_col"], dtype=bool)).tobytes())
+    for j, (u_vals, cum_p) in sorted(disc.items()):
+        u_arr, c_arr = np.asarray(u_vals, dtype=np.float16), np.asarray(cum_p, dtype=np.float16)
+        buf.extend(struct.pack("<HH", int(j), len(u_arr)))
+        buf.extend(u_arr.tobytes())
+        buf.extend(c_arr.tobytes())
+    if pairs:
+        buf.extend(np.asarray(pairs, dtype=np.uint8).tobytes())
+    buf.extend(np.asarray(tb["w_basis"], dtype=np.float16).tobytes())
+    for t in trees:
+        feats = np.asarray(t["features"], dtype=np.uint8)
+        thresh = np.asarray(t["thresholds"], dtype=np.float16)
+        leaf_v = np.asarray(t["leaf_values"], dtype=np.float16)
+        buf.extend(struct.pack("<B", len(feats)))
+        buf.extend(feats.tobytes())
+        buf.extend(thresh.tobytes())
+        buf.extend(leaf_v.tobytes())
+    return bytes(buf)
+
+
+def deserialize_dope_latent_wire_bytes(payload: bytes) -> Dict[str, Any]:
+    """Isolated receiver decoder: reconstruct normalized-space DOPE-MLC-v2 encoding dict solely from wire bytes."""
+    mv = memoryview(payload)
+    ver, lvl_id, task_id, n_trees, n_train, p_use, n_reg, rank_use, n_knots, n_pairs, n_w, n_disc = struct.unpack_from("<BBBBIIHHHHHH", mv, 0)
+    if ver != 1:
+        raise ValueError(f"unsupported_wire_version_{ver}")
+    off = struct.calcsize("<BBBBIIHHHHHH")
+    level = ("medium", "high", "ultra")[lvl_id]
+    task = ("regression", "classification")[task_id]
+
+    def _read_f16(count: int) -> np.ndarray:
+        nonlocal off
+        arr = np.frombuffer(mv, dtype=np.float16, count=count, offset=off).copy()
+        off += count * 2
+        return arr
+
+    sc = [float(v) for v in _read_f16(11)]
+    reg_w = _read_f16(n_reg)
+    reg_m = _read_f16(n_reg * p_use).reshape(n_reg, p_use)
+    reg_s = _read_f16(n_reg * p_use).reshape(n_reg, p_use)
+    chol = _read_f16(p_use * rank_use).reshape(p_use, rank_use)
+    diag_std = _read_f16(p_use)
+    dist_lat = _read_f16(128)
+    task_lat = _read_f16(128)
+    col_knots = _read_f16(p_use * n_knots).reshape(p_use, n_knots)
+    bin_p = _read_f16(p_use)
+    bin_lh = _read_f16(p_use * 2).reshape(p_use, 2)
+
+    n_pack = (p_use + 7) // 8
+    is_bin = np.unpackbits(np.frombuffer(mv, dtype=np.uint8, count=n_pack, offset=off))[:p_use].astype(bool).copy()
+    off += n_pack
+
+    disc: Dict[int, Tuple[np.ndarray, np.ndarray]] = {}
+    for _ in range(n_disc):
+        col_j, u_len = struct.unpack_from("<HH", mv, off)
+        off += 4
+        u_arr = _read_f16(u_len)
+        c_arr = _read_f16(u_len)
+        disc[int(col_j)] = (u_arr, c_arr)
+
+    pairs: List[Tuple[int, int]] = []
+    if n_pairs > 0:
+        p_arr = np.frombuffer(mv, dtype=np.uint8, count=n_pairs * 2, offset=off).reshape(n_pairs, 2)
+        off += n_pairs * 2
+        pairs = [(int(a), int(b)) for a, b in p_arr]
+
+    w_basis = _read_f16(n_w)
+    trees: List[Dict[str, Any]] = []
+    for _ in range(n_trees):
+        (depth,) = struct.unpack_from("<B", mv, off)
+        off += 1
+        feats = [int(x) for x in np.frombuffer(mv, dtype=np.uint8, count=depth, offset=off)]
+        off += depth
+        thresh = [float(x) for x in _read_f16(depth)]
+        leaf_v = _read_f16(1 << depth)
+        trees.append({"features": feats, "thresholds": thresh, "leaf_values": leaf_v})
+
+    if off != len(payload):
+        raise ValueError(f"wire_payload_trailing_bytes_{len(payload) - off}")
+
+    knot_grid = np.linspace(0.01 if level == "medium" else 0.005, 0.99 if level == "medium" else 0.995, n_knots).astype(np.float16)
+    gates = {"monotone_w": sc[7], "hinge_w": sc[8], "pair_w": sc[9], "tree_w": sc[10]}
+    return {
+        "level": level, "task": task, "n_train": int(n_train), "p_use": int(p_use),
+        "gates": gates, "task_latent": task_lat, "dist_latent": dist_lat,
+        "knot_grid": knot_grid, "col_knots": col_knots,
+        "is_binary_col": is_bin, "binary_probs": bin_p, "binary_low_high": bin_lh,
+        "discrete_support": disc, "chol_factor": chol, "diag_res_std": diag_std,
+        "regime_weights": reg_w, "regime_means": reg_m, "regime_scales": reg_s,
+        "target_bundle": {
+            "gates": gates, "pairs": pairs, "w_basis": w_basis,
+            "res_net_mean": sc[0], "neural_w": sc[1], "trees": trees,
+            "residual_std": sc[2], "noise_scale": sc[3], "class_prior": sc[4],
+            "y_min": sc[5], "y_max": sc[6],
+        },
+    }
+
+
+def estimate_scaler_sidecar_bytes(scaler: FitOnlyTableTransform, p_use: int) -> Dict[str, int]:
+    """Compute mandatory sidecar bytes required if an external receiver must also apply or invert FitOnlyTableTransform."""
+    num_cols = sum(1 for j in range(p_use) if scaler.kinds[j] == "numeric")
+    cat_cols = sum(1 for j in range(p_use) if scaler.kinds[j] != "numeric")
+    cat_levels = sum(len(scaler.categorical_encoders[j].vocab_tokens) for j in range(p_use) if scaler.kinds[j] != "numeric")
+    # Numeric: 1B kind/transform + 5x4B float32 (median, iqr, mean, std, tail_weight) + 9x2B fp16 knots + 2x2B fp16 (skew, kurt) = 43B/col
+    # Categorical (hashed token IDs, no raw source strings): 1B kind + 2x4B float32 (mean, std) + 2B cardinality + K*(4B hash32 + 2B enc_fp16 + 2B freq_fp16)
+    # TargetScaler: 1B task + 5x4B float32 stats = 21B; Seed + header = 8B
+    raw_bytes = 8 + 21 + 43 * num_cols + 11 * cat_cols + 8 * cat_levels
+    return {"scaler_sidecar_raw_bytes": int(raw_bytes), "numeric_cols": int(num_cols), "categorical_cols": int(cat_cols), "retained_cat_levels": int(cat_levels)}
+

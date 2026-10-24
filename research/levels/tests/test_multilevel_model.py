@@ -1,10 +1,19 @@
 import unittest
+import zlib
 import numpy as np
 import torch
 
 from research.levels.multilevel_model import LEVEL_WIDTHS, MultiLevelLandmarkModel
 from research.levels.scaling import FitOnlyTableTransform
-from research.levels.strata_audit import AUDITORS, LEVELS, METHODS, summarize_cohort_records
+from research.levels.strata_audit import (
+    AUDITORS,
+    LEVELS,
+    METHODS,
+    deserialize_dope_latent_wire_bytes,
+    estimate_scaler_sidecar_bytes,
+    serialize_dope_latent_wire_bytes,
+    summarize_cohort_records,
+)
 from research.levels.world_class_eval import _KumoTabularWrapper, _TabularKumoAttentionNet
 
 
@@ -153,6 +162,40 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
         self.assertEqual(summary["elo_leaderboard_overall"][0]["method"], "dope_mlc_v2")
         self.assertGreater(summary["elo_leaderboard_overall"][0]["elo"], 1500.0)
         self.assertEqual(len(summary["cross_size_elo_by_artifact_bytes"]), len(METHODS))
+
+    def test_wire_serialization_isolated_receiver_roundtrip_and_parity(self):
+        rng = np.random.default_rng(2026)
+        n_tr = 140
+        X_raw = rng.normal(size=(n_tr, 7))
+        y_raw = 1.4 * X_raw[:, 0] - 0.8 * (X_raw[:, 1] ** 2) + 0.5 * X_raw[:, 2] + rng.normal(0.0, 0.1, size=n_tr)
+
+        scaler = FitOnlyTableTransform.fit(X_raw, y_raw, task="regression")
+        X_tr, y_tr = scaler.transform(X_raw, y_raw)
+        sidecar = estimate_scaler_sidecar_bytes(scaler, 7)
+        self.assertGreater(sidecar["scaler_sidecar_raw_bytes"], 200)
+
+        sender_model = MultiLevelLandmarkModel().eval()
+        receiver_model = MultiLevelLandmarkModel().eval()
+        receiver_model.load_state_dict(sender_model.state_dict())
+
+        report = _mock_report(n_rows=n_tr, n_features=7, task="regression")
+        for level in ("medium", "high", "ultra"):
+            enc_mem = sender_model.encode_table(X_tr, y_tr, report, task="regression", level=level)
+            raw_wire = serialize_dope_latent_wire_bytes(enc_mem)
+            z_wire = zlib.compress(raw_wire, level=9)
+            dec_wire = deserialize_dope_latent_wire_bytes(zlib.decompress(z_wire))
+
+            # Verify bit-exact roundtrip of serialized wire bytes
+            self.assertEqual(serialize_dope_latent_wire_bytes(dec_wire), raw_wire)
+
+            X_mem, y_mem = sender_model.generate_synthetic(enc_mem, n_rows=n_tr, seed=20261023)
+            X_dec, y_dec = receiver_model.generate_synthetic(dec_wire, n_rows=n_tr, seed=20261023)
+
+            # X_syn depends only on fp16/bool tensors already quantized in encode_table -> bit-exact match
+            self.assertEqual(float(np.max(np.abs(X_mem - X_dec))), 0.0)
+            # y_syn differs only by fp16 quantization of 11 target_bundle scalars & tree thresholds
+            corr_y = float(np.corrcoef(y_mem, y_dec)[0, 1])
+            self.assertGreater(corr_y, 0.999)
 
 
 if __name__ == "__main__":
