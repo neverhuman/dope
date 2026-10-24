@@ -3335,6 +3335,8 @@
     "research/levels/budget_planner.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify 4-tier DML3 complete byte envelope and CSC1 compact scaler sidecar"},
     "research/levels/v3_ablation_and_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify v3 corpus exposure manifest and A0..A3 ablation pipeline"},
     "research/levels/v3_ledger_replay.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify frozen-checkpoint per-dataset multitask ledger and CSC1 raw-domain inverse replay"},
+    "research/levels/v3_canonical_roster_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify canonical 6-auditor roster, LocalGatedAttentionAuditor identity, driver fidelity and equal-wire rows_wire/copula_wire comparators"},
+    "research/levels/v3_canonical_runner.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify process-group bounded canonical runner, CSC1 vs diagnostic fp64 raw-receiver separation and paired Elo/bootstrap reducer"},
     "research/levels/tests/test_dope_mlc_v3.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify DOPE-MLC-v3 landmarks, inter-landmark stats, active col_gate_head, 4-tier DML3/CSC1 wire envelope, LR-VLOT multiclass and frozen ledger replay"}
   },
   "workspace": "dope"

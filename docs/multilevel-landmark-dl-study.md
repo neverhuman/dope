@@ -293,6 +293,9 @@ python3 -B -m research.levels.v3_ablation_and_eval
 
 # 8. Run bounded frozen-A3 per-dataset/per-tier/per-auditor ledger & targeted recovery pass
 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 RAYON_NUM_THREADS=1 nice -n 10 python3 -B -m research.levels.v3_ledger_replay
+
+# 9. Run bounded canonical 6-auditor roster & equal-wire comparator evaluation (<= 840s wall cap)
+python3 -B -m research.levels.v3_canonical_roster_eval --run-id canonical_v3_bounded_run_v2 --max-v2-slice 80 --workers 4 --wall-budget-s 840
 ```
 
 ---
@@ -350,8 +353,63 @@ OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 RAYON_NUM_THREADS=1 n
   - `multiclass` (`53` initial / `54` all, `100.0% <= cap`): mean wire `11,964.9 B`, `2/54` floor applied, all-dataset 6-auditor `clipped_R = 0.8998` (`unclipped_R = 0.9167`), non-floor (`52/54`) `clipped_R = 0.9021`.
   - `regression` (`40` initial / `41` all, `100.0% <= cap`): mean wire `3,632.5 B`; because `world_class_eval.py` selected high-signal tables for the `1,000`-dataset panel (`cb_sig >= 0.025`), `30/41` residual `dev_val` regression cells have near-zero oracle signal (`real_score - chance < 0.05` floor; mean `real_score = 0.1000`, `syn_score = 0.0747`), yielding all-dataset `clipped_R = 0.2296` (`unclipped_R = 0.2296`) and non-floor (`11/41`) `clipped_R = 0.7241` (`0.7669` at `High`).
   - `classification` (`17/17`, `100.0% <= cap`): mean wire `5,301.9 B`; `13/17` residual `dev_val` binary cells have `real_score - 0.5 < 0.03` floor (mean `real_score = 0.5132`, `syn_score = 0.5119`), yielding all-dataset `clipped_R = 0.5271` (`unclipped_R = 0.1782`) and non-floor (`4/17`) `clipped_R = 0.7250`.
-- **Visibly Open Obligations**:
-  1. `v2_canonical_gbdt_mlp_attention_6aud_roster_on_v3`: **OPEN** — `task-2502` evaluated the 6-auditor scikit-learn probe + `task-2354` 2-auditor pair, not `v2`'s canonical `CatBoost / LightGBM / XGBoost / MLP / Linear / LocalGatedAttention` roster (`_KumoTabularWrapper` — local gated attention, never official Kumo/TabPFN).
-  2. `v3_full_1000_panel_transfer_elo_and_driver_fidelity`: **OPEN** — the `1,000`-dataset `v2` panel (`eval_gradient_disjoint_v2_panel`) was evaluated under `v2`, not re-scored in full under `v3`.
+- **Visibly Open Obligations After `task-2502` & Bounded Canonical 6-Auditor Evaluation (`Section 7.5`)**:
+  1. `v2_canonical_gbdt_mlp_attention_6aud_roster_on_v3`: **EXECUTED UNDER BOUNDED CPU PROTOCOL (`Section 7.5`)** — `canonical_v3_bounded_run_v2` evaluates all `69/69` held-out multiclass datasets and a stratified `80/1,000` slice (`50` regression + `30` binary) of `eval_gradient_disjoint_v2_panel` across all 6 canonical model families (`CatBoost`, `LightGBM`, `XGBoost`, `MLP`, `Linear/Logistic`, and `LocalGatedAttentionAuditor` [`_LocalGatedAttentionNet`, local gated attention trained from scratch per table, **never** official Kumo/TabPFN]) under `CANONICAL_V3_AUDITOR_PROTOCOL_SPEC`.
+  2. `v3_full_1000_panel_transfer_elo_and_driver_fidelity`: **OPEN (`920/1,000` datasets remain unmeasured under `v3`)** — `80/1,000` datasets of `eval_gradient_disjoint_v2_panel` were evaluated in `canonical_v3_bounded_run_v2`; the remaining `920/1,000` datasets remain open.
   3. `source_family_disjointness_audit`: **OPEN (unverified beyond exact SHA-256)** — `0` cross-role `train_sha256` and `canonical_sha256` overlaps are verified, which does not by itself prove upstream benchmark-family disjointness.
   4. `untouched_sealed_confirmatory_generalization`: **OPEN** — all `v2` and `v3` panels are selection/development/reconciliation validation cohorts (`untouched_sealed_confirmatory_test = false`).
+
+---
+
+### 7.5 Bounded Canonical 6-Auditor Evaluation, Authentic-Label Integrity & Equal-Wire Comparator Tournament (`canonical_v3_bounded_run_v2`)
+
+- **Immutable Evidence Custody & Run Provenance**:
+  - **Primary Canonical Run (`canonical_v3_bounded_run_v2`, `task-2954`)**: Stored in `target/s3-multilevel-training-20261023/v3/runs/canonical_v3_bounded_run_v2/` (`ledger.jsonl` `SHA-256: e60e1954090b2ea94596272811f810bd0be0ac4b7d9df8806ef1a555cc89b5f1`, `ledger.jsonl.gz` `SHA-256: f9cca53e8b49a98b8722a3b6c87144346358198aa5ca72b7683d3b9107c513a5`, `receipt.json`, `elapsed_wall_seconds = 281.3s <= 840s`, `completed_dataset_tier_cells = 596/596`, `failed_or_skipped_dataset_records = 0`, `unexecuted_or_interrupted_records = 0`).
+  - **Preserved Earlier Runs & Snapshots (Never Overwritten)**:
+    - `target/s3-multilevel-training-20261023/v3/runs/task2808_smoke_20261024T163116Z/`: Preserved 25s smoke test (`v3_canonical_6aud_and_v2panel_slice_ledger.jsonl.gz` `SHA-256: 6ccd1412...`, decompressed `recovered_from_gzip_v3_canonical_6aud_and_v2panel_slice_ledger.jsonl` `SHA-256: 8299b25b...`, `77` lines; `exact_source_bytes_captured_at_163043Z = false`, `exact_source_sha256 = null`).
+    - `target/s3-multilevel-training-20261023/v3/runs/monitor_observed_20261024T163552Z/`: Preserved monitor-captured source snapshot (`20261024T163552Z-observed-v3_canonical_roster_eval.py` `SHA-256: c59b1d45...`, `20261024T163552Z-observed-v3_canonical_runner.py` `SHA-256: 4ecce5b6...`).
+    - `target/s3-multilevel-training-20261023/v3/runs/task2842_canceled_partial_20261024T163834Z/`: Preserved canceled partial run (`v3_canonical_6aud_and_v2panel_slice_ledger.jsonl` `SHA-256: e1dcecb8...`, `84` lines) prior to label-integrity fixes.
+    - `target/s3-multilevel-training-20261023/v3/runs/canonical_v3_bounded_run_v1/`: Preserved initial full run (`ledger.jsonl.gz` `SHA-256: 23c0f21e...`, `596` cells) prior to removing the redundant `y_tr_ro * (k_cls - 1)` multiclass index multiplier on already-indexed `FitOnlyTableTransform` targets.
+- **Authentic-Label Integrity & Protocol Disclosure (`CANONICAL_V3_AUDITOR_PROTOCOL_SPEC`)**:
+  - `fit_and_score_canonical_auditor` enforces `y_tr_ro.flags.writeable = False` and `y_te_ro.flags.writeable = False` with pre/post SHA-256 verification (`label_sha256_verified = True` across all `3,576` auditor evaluations per domain).
+  - Degenerate constant regression (`ptp < 1e-12`) or single-class binary/multiclass (`len(present) < 2`) targets use authentic-label constant predictors; partial multiclass support (`2 <= len(present) < k_cls`, occurring in `63` `rows_wire` auditor cells where row subsampling at tight caps missed a rare class) uses an invertible contiguous bijection (`np.searchsorted(present, y_tr_c)` and inverse index mapping `present[pred_contig]`), never perturbing, flipping, or inventing labels.
+  - All auditor constructors are driven by `CANONICAL_V3_AUDITOR_PROTOCOL_SPEC` (`24-25` tree estimators, `32x16` `MLP`, `12`-step `hidden_dim=32` `LocalGatedAttentionAuditor`, max `340` train / `160` test rows / `36` features), which differs from the historical `v2` `world_class_eval.py` wrapper (`is_identical_to_historical_v2_world_class_eval_wrapper = false`). Historical `v2` receipt scores are not compared directly against this bounded protocol; all comparator numbers below are re-evaluated side-by-side on identical splits, auditors, and byte caps inside `canonical_v3_bounded_run_v2`.
+  - Host CPU guard (`82%` `/proc/stat` check + `os.nice(10)` + single-threaded BLAS/OpenMP/Torch workers) operates as a dispatch admission gate before queueing new dataset tasks (`cpu_guard_semantics = "dispatch_admission_gate_only_82pct_proc_stat_plus_nice10_single_thread_workers_does_not_throttle_already_active_in_flight_workers"`).
+
+#### 7.5.1 Held-Out Multiclass Panel (`69/69` Datasets, `276` Cells, `0` Failed Auditor Cells) & Stratified `v2`-Panel Slice (`80/80` Datasets: `50` Reg + `30` Bin, `320` Cells, `0` Failed Auditor Cells)
+
+| Cohort & Tier (`Cap`) | Completed / Planned DS (`Missing Rate`) | Mean / Max `DML3` Wire Bytes (`% <= Cap`) | `Sender-Scaled` 6-Aud Clipped / Unclipped $R$ (`Zero-Imputed Sensitivity`) | `Sender-Scaled` Driver Fidelity $D$ | `Isolated Receiver CSC1 Raw` (Deployed Wire) Clipped / Unclipped $R$ (`D`) | `Diagnostic Exact fp64 Inverse Control` (Uncharged Sidecar) Clipped $R$ (`Mean \|Delta vs CSC1\|`) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`Multiclass Small` (`2,048 B`)** | `69 / 69` (`0.0%`) | `1,418.0 B / 2,047 B` (`100.0%`) | **`0.7271 / 0.7098`** (`0.7271`) | `0.6462` | **`0.7018 / 0.6939`** (`0.6484`) | `0.7248` (`0.03205`) |
+| **`Multiclass Medium` (`4,096 B`)** | `69 / 69` (`0.0%`) | `2,510.7 B / 3,812 B` (`100.0%`) | **`0.7767 / 0.7712`** (`0.7767`) | `0.6715` | **`0.7789 / 0.7554`** (`0.6734`) | `0.7812` (`0.00510`) |
+| **`Multiclass High` (`16,384 B`)** | `69 / 69` (`0.0%`) | `6,435.3 B / 14,048 B` (`100.0%`) | **`0.8402 / 0.8355`** (`0.8402`) | `0.7157` | **`0.8451 / 0.8423`** (`0.7114`) | `0.8470` (`0.00801`) |
+| **`Multiclass Ultra` (`65,536 B`)** | `69 / 69` (`0.0%`) | `9,877.5 B / 24,195 B` (`100.0%`) | **`0.8362 / 0.8415`** (`0.8362`) | `0.7158` | **`0.8404 / 0.8340`** (`0.7147`) | `0.8440` (`0.00917`) |
+| **`v2-Slice Small` (`2,048 B`)** | `80 / 80` (`0.0%`) | `974.4 B / 1,422 B` (`100.0%`) | **`0.8297 / 0.7535`** (`0.8297`) | `0.7654` | **`0.8379 / 0.7605`** (`0.7604`) | `0.8406` (`0.01224`) |
+| **`v2-Slice Medium` (`4,096 B`)** | `80 / 80` (`0.0%`) | `1,616.0 B / 2,420 B` (`100.0%`) | **`0.8544 / 0.7455`** (`0.8544`) | `0.7708` | **`0.8626 / 0.7288`** (`0.7677`) | `0.8640` (`0.00309`) |
+| **`v2-Slice High` (`16,384 B`)** | `80 / 80` (`0.0%`) | `3,420.5 B / 7,165 B` (`100.0%`) | **`0.8708 / 0.6773`** (`0.8708`) | `0.7786` | **`0.8768 / 0.6775`** (`0.7820`) | `0.8801` (`0.00557`) |
+| **`v2-Slice Ultra` (`65,536 B`)** | `80 / 80` (`0.0%`) | `6,079.5 B / 12,990 B` (`100.0%`) | **`0.8723 / 0.6969`** (`0.8723`) | `0.7797` | **`0.8774 / 0.6954`** (`0.7789`) | `0.8809` (`0.00625`) |
+
+- **Per-Auditor Canonical Breakdown at `High` & `Ultra` (`Sender-Scaled Clipped R / CSC1 Raw Clipped R / Driver Fidelity D`, `0` Failed Cells Across All Auditors)**:
+  - **Held-Out Multiclass (`69/69` DS)**:
+    - `catboost`: `High` `0.8350 / 0.8339 / 0.7058`, `Ultra` `0.8301 / 0.8372 / 0.7124`
+    - `lightgbm`: `High` `0.8279 / 0.8305 / 0.7318`, `Ultra` `0.8234 / 0.8423 / 0.7277`
+    - `xgboost`: `High` `0.8138 / 0.8147 / 0.6463`, `Ultra` `0.8034 / 0.7908 / 0.6125`
+    - `mlp`: `High` `0.7834 / 0.7973 / 0.8684`, `Ultra` `0.8200 / 0.8332 / 0.8795`
+    - `linear`: `High` `0.9110 / 0.9115 / 0.6683`, `Ultra` `0.8910 / 0.8909 / 0.6745`
+    - `local_gated_attention` (`LocalGatedAttentionAuditor`, **not** official Kumo/TabPFN): `High` `0.8698 / 0.8825 / 0.6733`, `Ultra` `0.8493 / 0.8480 / 0.6880`
+  - **Stratified `v2`-Panel Slice (`80/80` DS: `50` Regression + `30` Binary)**:
+    - `catboost`: `High` `0.8673 / 0.8689 / 0.8041`, `Ultra` `0.8804 / 0.8820 / 0.7947`
+    - `lightgbm`: `High` `0.9076 / 0.9061 / 0.7531`, `Ultra` `0.9164 / 0.9192 / 0.7613`
+    - `xgboost`: `High` `0.8292 / 0.8654 / 0.7063`, `Ultra` `0.8343 / 0.8629 / 0.7052`
+    - `mlp`: `High` `0.7956 / 0.7981 / 0.8925`, `Ultra` `0.7879 / 0.7899 / 0.8993`
+    - `linear`: `High` `0.9193 / 0.9200 / 0.7544`, `Ultra` `0.9120 / 0.9094 / 0.7413`
+    - `local_gated_attention` (`LocalGatedAttentionAuditor`, **not** official Kumo/TabPFN): `High` `0.9058 / 0.9025 / 0.7610`, `Ultra` `0.9029 / 0.9007 / 0.7764`
+
+#### 7.5.2 Equal-Wire Comparator Tournament & Paired Uncertainty (`200x` Dataset-Cluster Bootstrap)
+
+| Wire Method | Supported Scope in Tournament | Paired Elo (`200x` Bootstrap `95% CI`, `SE`) | Tournament Win Share (`W / D / L`) | Paired `DOPE-MLC-v3 minus Comparator` Mean $\Delta R$ (`95% CI`) / Median $\Delta R$ | Paired Cells (`Wins / Ties <=0.10 [<=0.01] / Losses / Missing`) |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **`rows_wire` (`RWW1`)** | All `149` DS $\times$ `4` tiers (`CSC1` + quantized real training rows) | **`1611.8`** (`[1585.7, 1639.2]`, `SE=12.90`) | `71.95%` (`2967 / 248 / 1081`) | `-0.0528` (`[-0.0651, -0.0411]`) / `-0.0355` | `1,788` (`249 / 965 [234] / 574 / 0`) |
+| **`dope_mlc_v2_wire`** | `80` reg/bin DS $\times$ `3` tiers (`Med/High/Ultra` only; no `Small` or `multiclass`) | **`1542.0`** (`[1522.2, 1560.2]`, `SE=10.36`) | `57.48%` (`1185 / 113 / 862`) | `-0.0116` (`[-0.0156, -0.0056]`) / `-0.0114` | `720` (`27 / 654 [209] / 39 / 0`) |
+| **`dope_mlc_v3_wire` (`DML3`)** | All `149` DS $\times$ `4` tiers (`Small/Med/High/Ultra` across reg, bin, multiclass) | **`1474.8`** (`[1453.4, 1494.8]`, `SE=11.31`) | `46.61%` (`1839 / 327 / 2130`) | Reference (`0.0000`) | — |
+| **`copula_wire` (`CPW1`)** | All `149` DS $\times$ `4` tiers (`CSC1` + Gaussian/low-rank copula) | **`1371.3`** (`[1348.1, 1396.1]`, `SE=11.86`) | `27.68%` (`1048 / 282 / 2966`) | **`+0.1488`** (`[+0.1351, +0.1616]`) / **`+0.0513`** | `1,788` (`749 / 877 [263] / 162 / 0`) |

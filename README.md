@@ -155,15 +155,19 @@ CatBoost retention from `R_1x=0.8808` $\to$ `R_2x=0.9010` $\to$ **`R_5x=0.9070`*
   `mean_B=6,293.9B` / `max_B=14,909B`, `Ultra` `mean_B=13,146.8B` / `max_B=39,629B`), with
   preliminary two-auditor (`RF+Logistic`) clipped/unclipped mean retention on `mc_2354=68`
   `R_2aud_small=0.7966/0.8078`, `R_2aud_med=0.8393/0.8393`, `R_2aud_high=0.9120/0.9139`,
-  `R_2aud_ultra=0.9202/0.9422`, six-auditor scikit-learn probe (`RF, Logistic, HistGBR, ExtraTrees, KNN, RidgeClassifier` —
-  distinct from the `v2` canonical `CatBoost/LightGBM/XGBoost/MLP/Linear/LocalAttention` roster)
+  `R_2aud_ultra=0.9202/0.9422`, and six-auditor scikit-learn probe (`RF, Logistic, HistGBR, ExtraTrees, KNN, RidgeClassifier`)
   clipped/unclipped retention `R_6aud_small=0.7940/0.7940`, `R_6aud_med=0.8370/0.8376`, `R_6aud_high=0.8982/0.8982`,
-  **`R_6aud_ultra=0.9156/0.9185`** (`all_69_clipped=0.9205`), and isolated-receiver `CSC_v=1` raw-domain inverse
-  retention (evaluated on `mc_raw_cells=492` multiclass cells only; `CSC_v=1` uses `dtype=fp16` approximate inverse scaling
-  with `max_test_diff=1.8005` at `High`/`Ultra`, not bit-exact `dtype=fp64` scaler parity)
-  `R_raw_small=0.7838`, `R_raw_med=0.8355`, `R_raw_high=0.8888`, **`R_raw_ultra=0.9071`**. Full `v3`
-  thousand-dataset transfer/Elo/driver-fidelity study, original `v2` canonical auditor roster, upstream
-  source-family disjointness, and untouched confirmatory generalization remain open.
+  **`R_6aud_ultra=0.9156/0.9185`** (`all_69_clipped=0.9205`).
+  In the **bounded canonical six-auditor evaluation** (`run_id=canonical_v3_bounded_run_v2`,
+  `ledger_gz_sha=f9cca53e`, `elapsed=281.3s`, `completed_cells=596/596`, `failed_cells=0`,
+  `missing_or_error_rate=0.0` across `CatBoost`, `LightGBM`, `XGBoost`, `MLP`, `Linear/Logistic`, and
+  `LocalGatedAttentionAuditor` [`_LocalGatedAttentionNet`, `adamw_steps=12`, `hidden_dim=32` on CPU;
+  **not** official KumoTabular or TabPFN], using `CANONICAL_V3_AUDITOR_PROTOCOL_SPEC` with read-only
+  authentic targets and invertible contiguous label bijections; historical `v2` wrapper scores are not
+  compared directly against this bounded protocol):
+  - **Held-Out Multiclass Panel (`mc_datasets=69/69`, `within_cap=100.0%`):** Complete-case (`= zero-imputed sensitivity`, `missing_rate=0.0`) six-auditor clipped retention is `R_mc_scaled=0.7271/0.7767/0.8402/0.8362` (`D_mc_scaled=0.6462/0.6715/0.7157/0.7158`) and isolated-receiver `CSC_v=1` raw-domain retention is `R_mc_csc1_raw=0.7018/0.7789/0.8451/0.8404` (`D_mc_csc1_raw=0.6484/0.6734/0.7114/0.7147`; vs. diagnostic exact `dtype=fp64` inverse control `R_mc_fp64_ctrl=0.7248/0.7812/0.8470/0.8440`, `mean_abs_delta=0.03205/0.00510/0.00801/0.00917`) across `Small`/`Medium`/`High`/`Ultra`.
+  - **Stratified `v2`-Panel Reconciliation Slice (`v2_slice_datasets=80/80` [`reg=50`, `bin=30`], `within_cap=100.0%`):** Six-auditor clipped retention is `R_v2s_scaled=0.8297/0.8544/0.8708/0.8723` (`D_v2s_scaled=0.7654/0.7708/0.7786/0.7797`) and isolated-receiver `CSC_v=1` raw-domain retention is `R_v2s_csc1_raw=0.8379/0.8626/0.8768/0.8774` (`D_v2s_csc1_raw=0.7604/0.7677/0.7820/0.7789`; vs. diagnostic exact `dtype=fp64` inverse control `R_v2s_fp64_ctrl=0.8406/0.8640/0.8801/0.8809`, `mean_abs_delta=0.01224/0.00309/0.00557/0.00625`).
+  - **Equal-Wire Comparator Tournament & Paired Uncertainty (`bootstrap_reps=200`):** Across `paired_cells=1,788`, `DOPE-MLC-v3` (`Elo=1474.8`, `CI=[1453.4, 1494.8]`, `SE=11.31`) records positive retention delta over equal-wire Gaussian/low-rank copula (`copula_wire` `Elo=1371.3`, `CI=[1348.1, 1396.1]`, `mean_delta_R=+0.1488`, `CI=[+0.1351, +0.1616]`, `W/T_010/L=749/877/162`), differs from `DOPE-MLC-v2` by `mean_delta_R=-0.0116` (`CI=[-0.0156, -0.0056]`, `W/T_010/L=27/654/39` across the `paired_v2_cells=720` regression/binary `Medium`/`High`/`Ultra` cells supported by `v2`; `v2` `Elo=1542.0`, `CI=[1522.2, 1560.2]`) while adding `Small` and `multiclass` support, and trails raw quantized training-row subsampling (`rows_wire` `Elo=1611.8`, `CI=[1585.7, 1639.2]`, `mean_delta_R=-0.0528`, `CI=[-0.0651, -0.0411]`, `W/T_010/L=249/965/574`). The remaining `unmeasured_v2_panel=920/1,000` datasets under `v3`, upstream source-family disjointness beyond exact `train_sha256`, and untouched confirmatory generalization remain open.
 
 </details>
 

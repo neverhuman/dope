@@ -210,6 +210,162 @@ class DopeMlcV3Tests(unittest.TestCase):
             )
             self.assertFalse(addendum["task2569_fast_audit_finding_disclosure"]["is_passing_scientific_or_release_gate"])
 
+    def test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical(self):
+        from research.levels.budget_planner import pack_compact_scaler_sidecar, unpack_compact_scaler_sidecar
+        from research.levels.v3_canonical_roster_eval import (
+            CANONICAL_6_AUDITORS,
+            evaluate_canonical_oracle,
+            pack_copula_complete_wire,
+            pack_rows_complete_wire,
+            score_synthetic_against_oracle,
+            unpack_copula_complete_wire,
+            unpack_rows_complete_wire,
+        )
+        from research.levels.v3_canonical_runner import summarize_canonical_ledger_and_elo
+
+        # 1. Verify CSC1 preserves categorical frequency codes (k_id = 5) alongside numeric columns
+        rng = np.random.default_rng(123)
+        u = rng.normal(size=60)
+        X_mixed = [[str(10.0 + float(u[i])), "cat_A" if i % 2 == 0 else "cat_B", str(0.5 * float(u[i]))] for i in range(60)]
+        y_reg = [1.5 * float(u[i]) + (2.0 if i % 2 == 0 else -2.0) for i in range(60)]
+        sc_mix = FitOnlyTableTransform.fit(X_mixed, y_reg, task="regression")
+        X_s, y_s = sc_mix.transform(X_mixed, y_reg)
+        sc_bytes = pack_compact_scaler_sidecar(sc_mix, 3, level="medium")
+        sc_dec = unpack_compact_scaler_sidecar(sc_bytes)
+        X_inv_exact, _ = sc_mix.inverse_transform(X_s, y_s)
+        X_inv_csc1, _ = sc_dec.inverse_transform(X_s, y_s)
+        # Column 1 is categorical and must be preserved identically by CSC1
+        self.assertTrue(np.allclose(X_inv_csc1[:, 1], X_inv_exact[:, 1]))
+
+        # 2. Verify rows_wire and copula_wire complete packets respect tier byte caps and unpack cleanly
+        for lvl in ("small", "medium", "high", "ultra"):
+            w_r = pack_rows_complete_wire(X_s, y_s, sc_mix, lvl, seed=42)
+            self.assertLessEqual(len(w_r), TIER_BYTE_CAPS[lvl])
+            Xr, yr, sc_r = unpack_rows_complete_wire(w_r, 60, seed=42)
+            self.assertEqual(Xr.shape, (60, 3))
+            self.assertEqual(yr.shape, (60,))
+
+            w_c = pack_copula_complete_wire(X_s, y_s, sc_mix, lvl, task="regression")
+            self.assertLessEqual(len(w_c), TIER_BYTE_CAPS[lvl])
+            Xc, yc, sc_c = unpack_copula_complete_wire(w_c, 60, seed=42)
+            self.assertEqual(Xc.shape, (60, 3))
+            self.assertEqual(yc.shape, (60,))
+
+        # 3. Verify canonical 6-auditor oracle + synthetic scoring + LocalGatedAttentionAuditor identity
+        oracle = evaluate_canonical_oracle(X_s[:40], y_s[:40], X_s[40:], y_s[40:], task="regression")
+        self.assertEqual(set(oracle.keys()), set(CANONICAL_6_AUDITORS))
+        for aud, info in oracle.items():
+            self.assertFalse(info["is_official_kumo_or_tabpfn"])
+
+        syn_eval = score_synthetic_against_oracle(
+            oracle, X_s[:40], y_s[:40], X_s[40:], y_s[40:], task="regression", compute_drivers=True
+        )
+        self.assertEqual(syn_eval["completed_auditors"], 6)
+        self.assertEqual(syn_eval["expected_auditors_denom"], 6)
+        self.assertEqual(syn_eval["missing_or_error_rate"], 0.0)
+        self.assertGreater(syn_eval["complete_case_mean_clipped_R"], 0.8)
+        self.assertGreater(syn_eval["mean_driver_fidelity_D"], 0.5)
+        self.assertEqual(
+            syn_eval["per_auditor"]["local_gated_attention"]["auditor_display_name"],
+            "LocalGatedAttentionNet",
+        )
+        self.assertFalse(syn_eval["per_auditor"]["local_gated_attention"]["is_official_kumo_or_tabpfn"])
+
+        # 4. Verify summarize_canonical_ledger_and_elo accounts for unexecuted cells honestly
+        unexec_row = {
+            "dataset_id": "ds_unexec",
+            "role": "eval_gradient_disjoint_multiclass_panel",
+            "task": "multiclass",
+            "level": "all",
+            "cell_status": "unexecuted_wall_budget_reached",
+        }
+        red = summarize_canonical_ledger_and_elo([unexec_row], total_planned_mc=69, total_planned_v2_slice=80, n_boot=10)
+        self.assertEqual(red["coverage"]["completed_multiclass_datasets"], 0)
+        self.assertEqual(red["coverage"]["remaining_unexecuted_multiclass_datasets"], 69)
+        self.assertEqual(red["coverage"]["unexecuted_or_interrupted_records"], 1)
+
+    def test_canonical_auditor_label_integrity_and_overwrite_refusal(self) -> None:
+        import hashlib
+        from pathlib import Path
+        import tempfile
+        from unittest.mock import patch
+        from research.levels.v3_canonical_roster_eval import (
+            CANONICAL_6_AUDITORS,
+            CANONICAL_V3_AUDITOR_PROTOCOL_SPEC,
+            fit_and_score_canonical_auditor,
+            score_synthetic_against_oracle,
+        )
+        from research.levels.v3_canonical_runner import run_bounded_canonical_eval
+
+        rng = np.random.default_rng(20261024)
+        X_tr = rng.normal(size=(36, 4))
+        X_te = rng.normal(size=(16, 4))
+
+        # 1. Constant regression, single-class binary, single-class multiclass, and missing-class multiclass:
+        #    check that y_train and y_test bytes are never mutated and no synthetic class members are invented.
+        cases = [
+            ("regression", np.full(36, 3.14159, dtype=np.float64), rng.normal(size=16), 2, "constant_target_train_constant_predictor"),
+            ("classification", np.zeros(36, dtype=np.float64), np.array([0, 1] * 8, dtype=np.float64), 2, "single_class_train_constant_predictor"),
+            ("multiclass", np.full(36, 2.0, dtype=np.float64), np.array([0.0, 1.0, 2.0, 3.0] * 4, dtype=np.float64), 4, "single_class_train_constant_predictor"),
+            ("multiclass", np.array([0.0, 3.0] * 18, dtype=np.float64), np.array([0.0, 1.0, 2.0, 3.0, 4.0] * 3 + [0.0], dtype=np.float64), 5, "partial_class_support_invertible_bijection"),
+        ]
+        for task, y_tr, y_te, n_cls, expected_status in cases:
+            y_tr_sha = hashlib.sha256(np.ascontiguousarray(y_tr).tobytes()).hexdigest()
+            y_te_sha = hashlib.sha256(np.ascontiguousarray(y_te).tobytes()).hexdigest()
+            for aud in CANONICAL_6_AUDITORS:
+                res = fit_and_score_canonical_auditor(
+                    aud, X_tr, y_tr, X_te, y_te, task=task, n_classes=n_cls, compute_importance=True
+                )
+                self.assertEqual(hashlib.sha256(np.ascontiguousarray(y_tr).tobytes()).hexdigest(), y_tr_sha)
+                self.assertEqual(hashlib.sha256(np.ascontiguousarray(y_te).tobytes()).hexdigest(), y_te_sha)
+                self.assertTrue(res["label_sha256_verified"])
+                self.assertEqual(res["train_label_status"], expected_status)
+                if expected_status == "partial_class_support_invertible_bijection":
+                    self.assertEqual(res["present_train_classes"], 2)
+                    self.assertEqual(res["missing_train_classes_count"], 3)
+
+        # 2. Verify complete-case vs zero-imputed sensitivity separation when an auditor fails or is missing
+        partial_oracle = {
+            "linear": {
+                "status": "completed",
+                "real_score": 0.6,
+                "chance": 0.0,
+                "floor": 0.05,
+                "importance": np.ones(4) / 4.0,
+                "is_official_kumo_or_tabpfn": False,
+            }
+        }
+        sc_res = score_synthetic_against_oracle(
+            partial_oracle,
+            X_tr,
+            X_tr[:, 0] + 0.1 * rng.normal(size=36),
+            X_te,
+            X_te[:, 0] + 0.1 * rng.normal(size=16),
+            task="regression",
+            auditors=("linear", "catboost"),
+            compute_drivers=False,
+        )
+        self.assertEqual(sc_res["expected_auditors_denom"], 2)
+        self.assertEqual(sc_res["completed_auditors"], 1)
+        self.assertEqual(sc_res["failed_auditors"], 1)
+        self.assertAlmostEqual(sc_res["missing_or_error_rate"], 0.5)
+        self.assertIsNotNone(sc_res["complete_case_mean_clipped_R"])
+        self.assertAlmostEqual(
+            sc_res["sensitivity_zero_imputed_all_denom_mean_clipped_R"],
+            0.5 * float(sc_res["complete_case_mean_clipped_R"]),
+            places=3,
+        )
+
+        # 3. Verify CANONICAL_V3_AUDITOR_PROTOCOL_SPEC drives constructor parameters and overwrite refusal works
+        self.assertEqual(CANONICAL_V3_AUDITOR_PROTOCOL_SPEC["auditors"]["lightgbm"]["multiclass"]["n_estimators"], 24)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_out = Path(tmpdir)
+            existing_run = tmp_out / "runs" / "duplicate_run_id"
+            existing_run.mkdir(parents=True, exist_ok=True)
+            with patch("research.levels.v3_canonical_runner.V3_OUT_DIR", tmp_out):
+                with self.assertRaises(FileExistsError):
+                    run_bounded_canonical_eval(max_v2_slice=1, workers_count=1, wall_budget_s=1.0, run_id="duplicate_run_id")
+
 
 if __name__ == "__main__":
     unittest.main()

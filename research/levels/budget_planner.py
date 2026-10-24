@@ -31,7 +31,10 @@ TIER_COORD_WIDTHS: Dict[str, int] = {
     "ultra": 10240,
 }
 
-_KIND_TO_ID = {"constant": 0, "binary": 1, "signed_log1p_hybrid": 2, "quantile_robust_hybrid": 3, "asinh_hybrid": 4}
+_KIND_TO_ID = {
+    "constant": 0, "binary": 1, "signed_log1p_hybrid": 2,
+    "quantile_robust_hybrid": 3, "asinh_hybrid": 4, "categorical_code": 5,
+}
 _ID_TO_KIND = {v: k for k, v in _KIND_TO_ID.items()}
 _TASK_TO_ID = {"regression": 0, "classification": 1, "binary": 1, "multiclass": 2}
 _ID_TO_TASK = {0: "regression", 1: "classification", 2: "multiclass"}
@@ -132,8 +135,14 @@ def pack_compact_scaler_sidecar(scaler: Optional[FitOnlyTableTransform], p_use: 
             parts.append(s6.tobytes())
             parts.append(q_take.tobytes())
         else:
-            parts.append(struct.pack("<B", 0))
-            parts.append(np.zeros(6 + (3 if compact_q else 9), dtype=np.float16).tobytes())
+            ce = scaler.categorical_encoders.get(j)
+            pm = float(ce.post_mean) if ce is not None else 0.0
+            ps = float(ce.post_std) if ce is not None else 1.0
+            mr = float(ce.missing_rate) if ce is not None else 0.0
+            parts.append(struct.pack("<B", 5))
+            s6 = np.array([0.0, 1.0, pm, ps, mr, 0.0], dtype=np.float16)
+            parts.append(s6.tobytes())
+            parts.append(np.zeros(3 if compact_q else 9, dtype=np.float16).tobytes())
     return b"".join(parts)
 
 
@@ -160,7 +169,8 @@ def unpack_compact_scaler_sidecar(buf: bytes) -> Optional[FitOnlyTableTransform]
         skewness=0.0, kurtosis=0.0, positive_label="1", class_prior=float(t_vals[4]),
         class_labels=c_labels, class_priors=c_priors,
     )
-    inst = FitOnlyTableTransform(task=task, kinds=("numeric",) * p_use, target_scaler=t_scaler)
+    kinds_list = ["numeric"] * p_use
+    num_scalers: Dict[int, NumericColumnScaler] = {}
     for j in range(p_use):
         (k_id,) = struct.unpack_from("<B", buf, offset)
         offset += 1
@@ -177,13 +187,16 @@ def unpack_compact_scaler_sidecar(buf: bytes) -> Optional[FitOnlyTableTransform]
         else:
             q9 = np.frombuffer(buf, dtype=np.float16, count=9, offset=offset).astype(np.float64)
             offset += 18
-        inst.numeric_scalers[j] = NumericColumnScaler(
-            slot=j, anonymous_name=f"f_{j:03d}", transform_kind=_ID_TO_KIND.get(k_id, "quantile_robust_hybrid"),
-            missing_rate=float(s_vals[4]), center=float(s_vals[0]), scale=max(float(s_vals[1]), 1e-9),
-            post_mean=float(s_vals[2]), post_std=max(float(s_vals[3]), 1e-9),
-            quantiles=tuple(float(v) for v in q9), skewness=0.0, kurtosis=0.0, blend_quantile_weight=float(s_vals[5]),
-        )
-    return inst
+        if k_id == 5:
+            kinds_list[j] = "categorical"
+        else:
+            num_scalers[j] = NumericColumnScaler(
+                slot=j, anonymous_name=f"f_{j:03d}", transform_kind=_ID_TO_KIND.get(k_id, "quantile_robust_hybrid"),
+                missing_rate=float(s_vals[4]), center=float(s_vals[0]), scale=max(float(s_vals[1]), 1e-9),
+                post_mean=float(s_vals[2]), post_std=max(float(s_vals[3]), 1e-9),
+                quantiles=tuple(float(v) for v in q9), skewness=0.0, kurtosis=0.0, blend_quantile_weight=float(s_vals[5]),
+            )
+    return FitOnlyTableTransform(task=task, kinds=tuple(kinds_list), numeric_scalers=num_scalers, target_scaler=t_scaler)
 
 
 def _pack_dml3_from_encoding(
