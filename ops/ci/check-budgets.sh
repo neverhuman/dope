@@ -16,6 +16,11 @@ for workflow, expected in (
 ):
     actual = [int(value) for value in re.findall(r"^\s+timeout-minutes:\s*(\d+)$", Path(workflow).read_text(), re.M)]
     assert actual == expected, (workflow, actual, expected)
+# Scientific GPU/sealed qualification must require an explicit operator dispatch.
+# Keep this inexpensive trigger check next to the existing cost/quota proof.
+gpu_workflow = Path(".github/workflows/gpu.yml").read_text()
+event_block = gpu_workflow.split("\non:\n", 1)[1].split("\npermissions:", 1)[0]
+assert set(re.findall(r"^  ([a-z_]+):", event_block, re.M)) == {"workflow_dispatch"}, "GPU scientific work must be manual-only"
 def source_tree(path):
     root = Path(path)
     parts = [root, *sorted(root.with_suffix("").rglob("*.rs"))]

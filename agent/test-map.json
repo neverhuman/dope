@@ -3302,6 +3302,10 @@
     "scripts/verify-engine-release.sh": {"command": "bash ops/ci/engine.sh", "purpose": "verify expected signer/source identity and fixed hash inventory before execution"},
     ".github/workflows/engine-release.yml": {"command": "actionlint .github/workflows/engine-release.yml", "purpose": "verify read-only PR checks and tag-only signing/publication policy"},
     "docs/signed-engine-release.md": {"command": "bash ops/ci/engine-release.sh", "purpose": "verify documented Rust runtime, CLI and release packaging/verification commands"},
+    "ops/ci/kernel-release.sh": {"command": "bash ops/ci/kernel-release.sh HEAD", "purpose": "reproducibly build one commit's dope-kernel in the pinned builder; check linkage, glibc ceiling and version"},
+    "scripts/verify-kernel-release.sh": {"command": "shellcheck scripts/verify-kernel-release.sh", "purpose": "verify signer/source identity, fixed inventory and the built commit before execution"},
+    ".github/workflows/kernel-release.yml": {"command": "actionlint .github/workflows/kernel-release.yml", "purpose": "verify dispatch-only, main-only signing of a commit already on main"},
+    "docs/signed-kernel-release.md": {"command": "bash ops/ci/kernel-release.sh HEAD", "purpose": "verify the documented reproducible build and verification commands"},
     "ops/ci/engine-benchmark.sh": {"command": "bash ops/ci/engine-benchmark.sh", "purpose": "verify Elo evidence only after its Python/NumPy interpreter is provisioned"},
     "ops/licenses/engine/": {"command": "bash ops/ci/engine-release.sh", "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"},
     "research/landmark_cache/": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify TRAIN-only schedules, native recipe bindings, immutable private cache, interruption accounting and dashboard redaction"},
@@ -3337,7 +3341,11 @@
     "research/levels/v3_ledger_replay.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify frozen-checkpoint per-dataset multitask ledger and CSC1 raw-domain inverse replay"},
     "research/levels/v3_canonical_roster_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify canonical 6-auditor roster, LocalGatedAttentionAuditor identity, driver fidelity and equal-wire rows_wire/copula_wire comparators"},
     "research/levels/v3_canonical_runner.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify process-group bounded canonical runner, CSC1 vs diagnostic fp64 raw-receiver separation and paired Elo/bootstrap reducer"},
-    "research/levels/tests/test_dope_mlc_v3.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify DOPE-MLC-v3 landmarks, inter-landmark stats, active col_gate_head, 4-tier DML3/CSC1 wire envelope, LR-VLOT multiclass and frozen ledger replay"}
+    "research/levels/rust_v3_parity.py": {"command": "DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify fail-closed trained-checkpoint SafeTensors export, 4-tier forward parity (<1e-5) and 12-cell DML3/CSC1 cross-runtime sampling parity"},
+    "research/levels/tests/test_dope_mlc_v3.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify DOPE-MLC-v3 landmarks, inter-landmark stats, active col_gate_head, 4-tier DML3/CSC1 wire envelope, LR-VLOT multiclass and trained Rust SafeTensors parity"},
+    "engine/dope-core/src/mlc_v3/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors inference, LandmarkHyperRouter/ConditionalHyperTargetNet/CovariateRefinementNet forward passes, DML3/CSC1 wire decoding and synthetic sampling"},
+    "engine/dope-cli/src/mlc_v3.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope", "purpose": "verify dope mlc-v3 CLI inspect-weights, inspect-wire, route and sample commands"},
+    "engine/dope-core/tests/mlc_v3_safetensors.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors loading, 4-tier routing, CRC32 wire tamper refusal and synthetic table sampling"}
   },
   "workspace": "dope"
 }

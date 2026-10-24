@@ -286,6 +286,7 @@ class DopeMlcV3Tests(unittest.TestCase):
 
     def test_canonical_auditor_label_integrity_and_overwrite_refusal(self) -> None:
         import hashlib
+        import json
         from pathlib import Path
         import tempfile
         from unittest.mock import patch
@@ -358,6 +359,7 @@ class DopeMlcV3Tests(unittest.TestCase):
 
         # 3. Verify CANONICAL_V3_AUDITOR_PROTOCOL_SPEC drives constructor parameters and overwrite refusal works
         self.assertEqual(CANONICAL_V3_AUDITOR_PROTOCOL_SPEC["auditors"]["lightgbm"]["multiclass"]["n_estimators"], 24)
+        from research.levels.v3_canonical_runner import aggregate_canonical_runs
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_out = Path(tmpdir)
             existing_run = tmp_out / "runs" / "duplicate_run_id"
@@ -365,6 +367,124 @@ class DopeMlcV3Tests(unittest.TestCase):
             with patch("research.levels.v3_canonical_runner.V3_OUT_DIR", tmp_out):
                 with self.assertRaises(FileExistsError):
                     run_bounded_canonical_eval(max_v2_slice=1, workers_count=1, wall_budget_s=1.0, run_id="duplicate_run_id")
+
+                # Verify aggregate_canonical_runs rejects duplicate logical (dataset_id, level) cells across runs
+                for s_name in ("shard_a", "shard_b"):
+                    s_dir = tmp_out / "runs" / s_name
+                    s_dir.mkdir(parents=True, exist_ok=True)
+                    (s_dir / "ledger.jsonl").write_text(
+                        json.dumps({"dataset_id": "ds_dup", "role": "eval_gradient_disjoint_v2_panel", "task": "regression", "level": "small", "cell_status": "completed"}) + "\n",
+                        encoding="utf-8",
+                    )
+                    (s_dir / "receipt.json").write_text(
+                        json.dumps({"ledger_jsonl_sha256": "00", "ledger_jsonl_gz_sha256": "00", "elapsed_wall_seconds": 1.0, "coverage": {"completed_dataset_tier_cells": 1}}),
+                        encoding="utf-8",
+                    )
+                with self.assertRaises(ValueError):
+                    aggregate_canonical_runs(["shard_a", "shard_b"], "agg_out")
+
+        # 4. Verify parent cancellation/SIGKILL leaves 0 orphan _worker_loop processes and forces CPU-only env
+        import os, signal, subprocess, sys, time
+        sup_code = (
+            "import json, multiprocessing as mp, time\n"
+            "from research.levels.v3_canonical_runner import _worker_loop\n"
+            "ctx = mp.get_context('spawn')\n"
+            "tq, rq = ctx.Queue(), ctx.Queue()\n"
+            "ws = [ctx.Process(target=_worker_loop, args=(tq, rq, '', ''), daemon=True) for _ in range(2)]\n"
+            "for w in ws: w.start()\n"
+            "ready = [rq.get(timeout=15.0) for _ in range(2)]\n"
+            "print(json.dumps({'pids': [r[1] for r in ready], 'cuda': [r[2] for r in ready]}), flush=True)\n"
+            "time.sleep(30.0)\n"
+        )
+        proc = subprocess.Popen([sys.executable, "-B", "-c", sup_code], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            line = proc.stdout.readline() if proc.stdout else ""
+            info = json.loads(line.strip())
+            self.assertEqual(info["cuda"], ["", ""])
+            w_pids = [int(p) for p in info["pids"]]
+            proc.send_signal(signal.SIGKILL)
+            proc.wait(timeout=5.0)
+            deadline = time.perf_counter() + 4.0
+            alive = list(w_pids)
+            while alive and time.perf_counter() < deadline:
+                still = []
+                for wp in alive:
+                    try:
+                        os.kill(wp, 0)
+                        still.append(wp)
+                    except ProcessLookupError:
+                        pass
+                alive = still
+                if alive:
+                    time.sleep(0.1)
+            self.assertEqual(alive, [])
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait(timeout=2.0)
+
+    def test_08_safetensors_export_and_rust_router_parity(self):
+        """Verify trained-checkpoint SafeTensors export, 4-tier forward parity, and 12-cell DML3/CSC1 sampling parity."""
+        import os
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from research.levels.rust_v3_parity import (
+            PARITY_FIXTURES_DIR,
+            PARITY_RECEIPT_PATH,
+            TRAINED_PT_PATH,
+            TRAINED_ST_PATH,
+            resolve_dope_binary,
+            run_rust_v3_parity_verification,
+        )
+
+        require_strict = os.environ.get("DOPE_REQUIRE_RUST_PARITY") == "1"
+        dope_bin = resolve_dope_binary()
+        if dope_bin is None:
+            if require_strict:
+                self.fail("DOPE_REQUIRE_RUST_PARITY=1 but dope binary is missing at engine/target/{debug,release}/dope")
+            self.skipTest("dope binary not built; run mandatory gate: python3 -m research.levels.rust_v3_parity")
+
+        if TRAINED_PT_PATH.is_file():
+            rec = run_rust_v3_parity_verification(
+                dope_bin=dope_bin,
+                pt_path=TRAINED_PT_PATH,
+                st_path=TRAINED_ST_PATH,
+                fixtures_dir=PARITY_FIXTURES_DIR,
+                receipt_path=PARITY_RECEIPT_PATH,
+                require_trained_hashes=True,
+                tolerance=1e-5,
+            )
+            self.assertTrue(rec["all_checks_under_tolerance"])
+            self.assertLess(rec["max_observed_forward_abs_err"], 1e-5)
+            self.assertLess(rec["max_observed_fixed_draw_sample_abs_err"], 1e-5)
+            self.assertEqual(len(rec["dml3_csc1_cells"]), 12)
+        else:
+            if require_strict:
+                self.fail(f"DOPE_REQUIRE_RUST_PARITY=1 but trained checkpoint is missing at {TRAINED_PT_PATH}")
+            torch.manual_seed(20261024)
+            model = MultiLevelLandmarkModel()
+            with torch.no_grad():
+                for p in model.parameters():
+                    if p.ndim >= 2:
+                        p.add_(0.02 * torch.randn_like(p))
+            with TemporaryDirectory() as tmpdir:
+                tmp = Path(tmpdir)
+                pt_tmp = tmp / "seeded_v3.pt"
+                st_tmp = tmp / "seeded_v3.safetensors"
+                torch.save({"model_state_dict": model.state_dict()}, pt_tmp)
+                rec = run_rust_v3_parity_verification(
+                    dope_bin=dope_bin,
+                    pt_path=pt_tmp,
+                    st_path=st_tmp,
+                    fixtures_dir=tmp / "fixtures",
+                    receipt_path=tmp / "receipt.json",
+                    require_trained_hashes=False,
+                    tolerance=1e-5,
+                )
+                self.assertTrue(rec["all_checks_under_tolerance"])
+                self.assertLess(rec["max_observed_forward_abs_err"], 1e-5)
+                self.assertLess(rec["max_observed_fixed_draw_sample_abs_err"], 1e-5)
+                self.assertEqual(len(rec["dml3_csc1_cells"]), 12)
 
 
 if __name__ == "__main__":

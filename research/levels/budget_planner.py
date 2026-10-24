@@ -347,3 +347,35 @@ def deserialize_dope_v3_envelope(wire_bytes: bytes) -> Tuple[Dict[str, Any], Opt
         tb["trees"] = trees
     scaler = unpack_compact_scaler_sidecar(sc_bytes) if sc_bytes else None
     return enc, scaler
+
+
+def export_v3_checkpoint_to_safetensors(pt_path: Any, safetensors_path: Any) -> Dict[str, Any]:
+    """Export a trained DOPE-MLC-v3 PyTorch checkpoint (.pt) to a metadata-free F32 .safetensors file for 100% Rust inference."""
+    import hashlib
+    from pathlib import Path
+    import torch
+    from safetensors.torch import save_file
+
+    src, dst = Path(pt_path), Path(safetensors_path)
+    ckpt = torch.load(src, map_location="cpu", weights_only=False)
+    state_dict = ckpt["model_state_dict"] if isinstance(ckpt, dict) and "model_state_dict" in ckpt else ckpt
+    clean_tensors = {}
+    total_params = 0
+    for key in sorted(state_dict.keys()):
+        tensor = state_dict[key].detach().cpu().to(dtype=torch.float32).contiguous()
+        if not bool(torch.isfinite(tensor).all().item()):
+            raise ValueError(f"nonfinite_v3_weight_tensor_{key}")
+        clean_tensors[str(key)] = tensor
+        total_params += int(tensor.numel())
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    save_file(clean_tensors, str(dst))
+    raw_bytes = dst.read_bytes()
+    return {
+        "source_pt": str(src),
+        "source_pt_sha256": hashlib.sha256(src.read_bytes()).hexdigest(),
+        "safetensors_path": str(dst),
+        "safetensors_sha256": hashlib.sha256(raw_bytes).hexdigest(),
+        "safetensors_bytes": len(raw_bytes),
+        "tensor_count": len(clean_tensors),
+        "parameter_count": total_params,
+    }

@@ -28,7 +28,7 @@ DEFAULT_V2_CKPT = Path("/home/ubuntu/dope/target/s3-multilevel-training-20261023
 
 AUDITOR_ERRORS = (
     ValueError, RuntimeError, np.linalg.LinAlgError, CatBoostError,
-    LightGBMError, XGBoostError, ArithmeticError, IndexError, KeyError, TypeError,
+    LightGBMError, XGBoostError, ArithmeticError, IndexError, KeyError, TypeError, OSError,
 )
 CANONICAL_6_AUDITORS = ("catboost", "lightgbm", "xgboost", "mlp", "linear", "local_gated_attention")
 CORE_COMPARATOR_AUDITORS = ("catboost", "lightgbm", "linear")

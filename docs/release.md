@@ -33,9 +33,9 @@ Document release changes in `CHANGELOG.md` before a release candidate.
    External exact-library claims require separate hashed evidence.
 5. Reconcile every discrepancy in the candidate's reproduction record. An open,
    incomplete, or independently unverified discrepancy blocks release.
-6. Publish only the staged allowlisted bundle after required CPU CI and the
-   scheduled GPU lane pass. Store manifests, hashes, certification, and the
-   full Pareto vector with the release.
+6. Publish only the staged allowlisted bundle after required CPU CI and manually
+   dispatched GPU qualification both pass. Store manifests, hashes, certification,
+   and the full Pareto vector with the release.
 
 The launch checklist records: security scan and SBOM hashes; a backup of the
 last signed passing manifest; monitoring locations for the ledger, audit, and
@@ -114,8 +114,8 @@ array/archive boundaries, callback rejection, network/exec denial, label
 permutation, terminal failed audits and interruption budgets. Run it as a
 non-root producer with the fixture launcher available; production does not invoke
 sudo or launch an evaluator from the producer. Real owner deployment, signed
-protocol custody, mounted sealed corpora and scheduled GPU qualification are
-not established by these fixture tests. Missing frozen CPU/GPU auditor families
+protocol custody, mounted sealed corpora and manually dispatched GPU
+qualification are not established by these fixture tests. Missing frozen CPU/GPU auditor families
 continue to block release.
 
 ## Rollback

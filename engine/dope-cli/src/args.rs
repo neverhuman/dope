@@ -22,6 +22,9 @@ pub(crate) enum Command {
     /// Experimental frozen shared encoder and code-only CPU decoder.
     #[command(subcommand)]
     Learned(crate::learned::LearnedCommand),
+    /// 100% pure-Rust DOPE-MLC-v3 SafeTensors inference and DML3/CSC1 wire sampling.
+    #[command(subcommand)]
+    MlcV3(crate::mlc_v3::MlcV3Command),
     /// Experimental portable levels with explicit release permissions.
     FitLevels(LevelArgs),
     /// Native dataset structure signatures (real measurements stay private).
