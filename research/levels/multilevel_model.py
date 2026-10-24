@@ -371,14 +371,14 @@ def _fit_oblivious_trees(
     if n_trees <= 0 or n < 12 or p == 0:
         return []
     r, trees = residual.copy(), []
-    col_quantiles = [np.unique(np.quantile(X[:, f], np.linspace(0.10, 0.90, 9))) for f in range(p)]
+    col_quantiles = [np.unique(np.quantile(X[:, f], np.linspace(0.15, 0.85, 7))) for f in range(p)]
 
     for _ in range(n_trees):
         if float(np.std(r)) <= 1e-7:
             break
         r_centered = r - float(np.mean(r))
         corrs = np.abs((X.T @ r_centered) / float(n)) * (0.5 + 0.5 * driver_prior / max(float(np.max(driver_prior)), 1e-6))
-        top_feats = np.argsort(corrs)[::-1][: min(p, 14)]
+        top_feats = np.argsort(corrs)[::-1][: min(p, 8)]
         chosen_feats, chosen_thresh, leaf_idx = [], [], np.zeros(n, dtype=np.int64)
         for d in range(depth):
             best_gain, best_f, best_t = -1.0, int(top_feats[d % len(top_feats)]), 0.0

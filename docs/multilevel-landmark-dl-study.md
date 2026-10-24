@@ -98,48 +98,152 @@ ordering `Loss(Ultra) < Loss(High) < Loss(Medium)` at every epoch.
 
 ---
 
-## 4. World-Class Model Transfer, Feature-Importance Dynamics & Elo Leaderboard
+## 4. 1,000-Dataset Stratified S3 World-Class Transfer, Driver Fidelity & Minimal-Artifact-Size Elo Study
 
-`research/levels/world_class_eval.py` evaluated `DOPE-MLC-v2` (`Medium`, `High`, `Ultra`) against
-5 baseline generators (`kernel`, `rows`, `copula`, `joint_diffusion_v1`, `arf`) across 24 unseen
-holdout datasets (`12` regression + `12` binary classification) and 6 world-class downstream
-model families (**CatBoost**, **Tabular Kumo (`kumo_tabpfn`)**, **LightGBM**, **XGBoost**,
-**MLP**, and **Linear/Logistic**; pretraining overlap is unknown for TabPFN/Kumo-style priors).
+`research/levels/world_class_eval.py` evaluated `DOPE-MLC-v2` (`Medium` `4,096 B`, `High` `16,384 B`,
+`Ultra` `65,536 B`) against 5 baseline generators (`rows`, `kernel`, `copula`,
+`joint_diffusion_v1`, `arf`) across **1,000 diverse, stratified S3 datasets** (`627` regression +
+`373` binary classification; `65,874` downstream model fits in `361.22s` on 40 workers) and 6
+downstream model families (**CatBoost**, **Local Gated Attention Network** `[raw ledger key:
+kumo_tabpfn, _TabularKumoAttentionNet, hidden=48, 18 AdamW steps trained from scratch per table;
+official pretrained KumoTabular/TabPFN foundation-model comparison is not performed]`,
+**LightGBM**, **XGBoost**, **MLP**, and **Linear/Logistic**).
 
-### 4.1 Overall Multi-Auditor Bradley–Terry Elo Leaderboard
+### 4.1 Coverage, Cost, Admission Funnel & Cohort Separation Receipt
 
-| Rank | Generator Method | Overall Elo | Wins | Draws | Losses | Win Share |
-|---:|---|---:|---:|---:|---:|---:|
-| **#1** | **`dope_mlc_v2` (Unified 3-Level Model)** | **`1680.1`** | **603** | **18** | **204** | **`74.18%`** |
-| #2 | `kernel` (DOPE v1 Kernel) | `1638.6` | 560 | 12 | 253 | `68.61%` |
-| #3 | `rows` (Raw Subsample Baseline) | `1533.6` | 428 | 26 | 371 | `53.45%` |
-| #4 | `copula` (Gaussian Copula) | `1528.2` | 422 | 25 | 378 | `52.67%` |
-| #5 | `joint_diffusion_v1` (Tabular Diffusion) | `1447.6` | 327 | 23 | 475 | `41.03%` |
-| #6 | `arf` (Adversarial Random Forests) | `1171.8` | 66 | 34 | 725 | `10.06%` |
+- **Candidate Dispatch, Admission Funnel & `132` Filtered Candidates Audit (`target/s3-multilevel-training-20261023/coverage_cost_and_separation_receipt.json`)**:
+  - **Initial Preserved Run (`task-797`, `xbabe1`, `workers = 40`, `361.22s` / `4.01` CPU core-hours)**:
+    `1,132` stratified S3 candidate datasets dispatched; **`1,000` completed** (`627` regression,
+    `373` binary classification); `132` filtered (`93` regression, `39` classification; median
+    `509` rows, `13` cols) strictly due to near-zero real-table holdout CatBoost oracle signal
+    ($S_{\text{real}} - S_{\text{null}} < 0.025$, mean holdout oracle gain = `0.0062`), where the
+    null-normalized retention denominator is ill-conditioned; **`0` unhandled worker exceptions**.
+  - **Admission Rate by Stratum & Unnormalized Low-Signal Probe**:
+    In the strictly dataset-disjoint `is_val` stratum, `242 / 258` (`93.80%`) candidates were
+    admitted (`16` filtered); in the in-corpus unseen-fold stratum, `758 / 874` (`86.73%`) were
+    admitted (`116` filtered). Across a 24-dataset unnormalized test-score probe
+    ($\Delta S = S_{\text{syn}} - S_{\text{real}}$) on the filtered low-signal tables,
+    `DOPE-MLC-v2 Ultra` (`mean ΔS = -0.0151`) outperforms `rows Ultra` (`mean ΔS = -0.0435`) by
+    **`+0.0284`**, confirming that filtering near-zero oracle denominators does not conceal
+    synthetic degradation.
+  - **Three-Way Disjoint Partition & Reconciliation of the `1,132` Candidates (`task-942`, `xbabe3`, `workers = 28`)**:
+    In the preserved initial run (`dope_mlc_v2_s3_best.pt`, trained with a 90/10 dataset hash
+    split), **`242` completed datasets** (`strictly_dataset_disjoint_242`) were strictly
+    dataset-disjoint from gradient training (and belonged to the 10% validation hash split), while
+    **`758` completed datasets** (`in_corpus_unseen_row_fold_758`) had training splits in the 90%
+    meta-training corpus and were evaluated on unseen `outer5-iid-fold0-v1` holdout test rows
+    ($D_{\text{test}}$, `0` row overlap; **row-disjoint, not dataset-disjoint**).
+    To reconcile with a **100% gradient-training dataset-disjoint 1,000-dataset cohort**
+    (`reconciled_strictly_dataset_disjoint_1000`), `dope_mlc_v2_disjoint1000_best.pt` was trained
+    exclusively on the **`2,001` remaining S3 datasets (`11,976` splits)** after holding out all
+    **`1,132` evaluation candidates** (`1,129` in `s3_prepared_splits_cache.pt` / `6,758` splits,
+    plus `3` filtered low-signal candidates `7c29a13351d14ec5`, `a42f75735fd26aa1`, and
+    `d181d4da916c742b` excluded during tensor cache build due to degenerate binary target splits;
+    `0` in the completed `1,000`) and holding out the **`58` training-family validation datasets
+    (`dev_val_only`, `345` splits; `0` overlap with both the `2,001` training datasets and the
+    `1,132` evaluation candidates)**. On `dev_val_only` (`58` datasets, `345` splits), validation
+    loss converged from `0.60288` (`Epoch 0`) to **`0.57414` (`Epoch 8`)** with strict monotonic
+    tier ordering (`Ultra = 0.57053 < High = 0.57397 < Medium = 0.57791`). Because `Epoch 8` was
+    also monitored on `val_sub` during the initial reconciliation pass, all four cohorts are
+    reported as **development/reconciliation validation evidence** (never claimed as an untouched
+    sealed confirmatory test).
 
-### 4.2 Strict Monotonic Multi-Level Progression (`DOPE-MLC-v2`)
+### 4.2 Separate Cohort Comparison: Strictly Held-Out (`242`) vs. In-Corpus Unseen-Fold (`758`) vs. Disjoint-Trained (`1,000`)
 
-| Tier | Encoding Budget | Mean Holdout Retention $R$ | Driver Attribution Fidelity $D$ | Feature Importance Spearman $\rho$ | Top-3 Driver Overlap | BTR-AUC | Binary ROC-AUC | Regression $R^2$ |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **`Medium` (Macro)** | 4 KiB (`4,096` coords) | **`0.7852`** | **`0.7690`** | **`0.5590`** | `63.84%` | **`75.92`** | `0.7668` | `0.4036` |
-| **`High` (Larger)** | 16 KiB (`8,192` coords) | **`0.8203`** | **`0.7919`** | **`0.6073`** | `66.67%` | **`79.53`** | `0.7845` | `0.4137` |
-| **`Ultra` (Fine)** | 64 KiB (`10,240` coords) | **`0.8552`** | **`0.8161`** | **`0.6246`** | `66.35%` | **`83.17`** | **`0.7864`** | **`0.4244`** |
+| Cohort / Stratum | Datasets ($n$) | Evidence & Separation Status | `DOPE-MLC-v2` Overall Elo `[95% CI]` | Win Share | Cross-Size Elo (`4 KiB` $\to$ `16 KiB` $\to$ `64 KiB`) | `Medium` (`4 KiB`) Retention $R$ (Mean / Med) | `High` (`16 KiB`) Retention $R$ (Mean / Med) | `Ultra` (`64 KiB`) Retention $R$ (Mean / Med) | `Ultra` Driver Fidelity $D$ `[95% CI]` |
+|---|---:|---|---:|---:|---|---:|---:|---:|---:|
+| **`strictly_dataset_disjoint_242`** | **`242`** | `0` splits in gradient training (`10%` val hash split, dev-selected) | **`1671.1` `[1655.2, 1688.0]` (`#1`)** | **`73.06%`** | **`1626.7` $\to$ `1690.5` $\to$ `1703.7`** | `0.8122` / `0.8991` | `0.8464` / `0.9327` | **`0.8493` / `0.9275`** | **`0.8034` `[0.7905, 0.8147]` (`D80` pass)** |
+| **`in_corpus_unseen_row_fold_758`** | **`758`** | In-corpus dataset IDs, unseen `outer5-iid-fold0-v1` test rows (`row-disjoint`) | **`1645.4` `[1637.8, 1653.6]` (`#1`)** | **`69.81%`** | **`1587.6` $\to$ `1676.4` $\to$ `1682.3`** | `0.8779` / `0.9439` | `0.9133` / `0.9692` | **`0.9129` / `0.9716`** | **`0.7851` `[0.7779, 0.7918]`** |
+| **`pooled_1000` (Preserved Initial)** | **`1,000`** | `242` strictly held-out + `758` in-corpus unseen test folds (`task-797`) | **`1651.3` `[1643.4, 1659.6]` (`#1`)** | **`70.58%`** | **`1610.6` $\to$ `1726.6` $\to$ `1742.0`** | `0.8620` / `0.9335` | `0.8971` / `0.9642` | **`0.8975` / `0.9658`** | **`0.7896` `[0.7831, 0.7959]`** |
+| **`reconciled_strictly_dataset_disjoint_1000`** | **`1,000`** | **`0` overlap** between `2,001` gradient-training datasets and all `1,132` eval candidates (`Epoch 8` verified on `58` `dev_val` datasets; selection-exposed dev cohort) | **`1650.7` `[1643.4, 1657.5]` (`#1`)** | **`70.51%`** | **`1596.1` $\to$ `1675.5` $\to$ `1690.1`** | `0.8620` / `0.9349` | `0.8946` / `0.9624` | **`0.8998` / `0.9671`** | **`0.7904` `[0.7844, 0.7972]`** |
 
-### 4.3 World-Class Downstream Model Transfer at `Ultra` ($N_{\text{syn}} = N_{\text{train}} \to D_{\text{test}}$)
+### 4.3 Overall 1,000-Dataset Multi-Auditor Bradley–Terry Elo Leaderboard (Preserved Pooled & Reconciled 100% Disjoint)
 
-| Downstream Auditor Family | Real Test Score | Syn$\to$Real Test Score | Holdout Retention $R$ | Driver Fidelity $D$ (`D80` $\ge 0.80$) | Feature Importance Spearman $\rho$ | Top-3 Driver Overlap | Binary Real Acc | Binary Syn$\to$Real Acc |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **CatBoost** | `0.6589` | `0.5874` | **`0.8282`** | **`0.8321`** | **`0.7492`** | **`70.37%`** | `76.76%` | **`77.68%`** |
-| **Tabular Kumo (`kumo_tabpfn`)** | `0.6447` | `0.6395` | **`0.9429`** | **`0.8612`** | **`0.5808`** | **`68.89%`** | `75.84%` | `74.91%` |
-| **LightGBM** | `0.6299` | `0.5840` | **`0.8184`** | **`0.8201`** | **`0.6252`** | `61.67%` | `70.59%` | **`70.71%`** |
-| **MLP** | `0.6306` | `0.6207` | **`0.8591`** | **`0.8612`** | **`0.6742`** | **`68.63%`** | `71.26%` | `70.37%` |
-| **Linear / Logistic** | `0.5645` | `0.5462` | **`0.9337`** | **`0.7892`** | **`0.6243`** | `64.71%` | `79.89%` | `77.81%` |
-| **XGBoost** | `0.6278` | `0.5241` | **`0.7768`** | **`0.7449`** | **`0.4962`** | `64.91%` | `72.72%` | `70.05%` |
+Across **44,369 pairwise auditor-dataset matches per method** (with 200× dataset-cluster bootstrap
+95% confidence intervals), `DOPE-MLC-v2` achieves **Rank #1 overall Elo (`1651.3`)**:
 
-- **Unlimited Synthetic Expansion from Fixed Encoding**: Generating $5\times N_{\text{train}}$
+| Rank | Generator Method | Overall Elo | 95% Bootstrap CI | Bootstrap SE | Wins | Draws | Losses | Win Share |
+|---:|---|---:|---|---:|---:|---:|---:|---:|
+| **#1** | **`dope_mlc_v2` (Unified 3-Level Model)** | **`1651.3`** | **`[1643.4, 1659.6]`** | `4.26` | **30,959** | **717** | **12,693** | **`70.58%`** |
+| #2 | `rows` (Non-Anonymized Raw Row Subsample) | `1593.3` | `[1582.1, 1603.4]` | `5.32` | 26,888 | 1,528 | 15,953 | `62.32%` |
+| #3 | `kernel` (DOPE v1 Kernel Sketch) | `1592.5` | `[1585.8, 1600.2]` | `3.67` | 26,881 | 1,426 | 16,062 | `62.20%` |
+| #4 | `copula` (Gaussian Copula) | `1545.8` | `[1538.9, 1553.0]` | `3.59` | 23,805 | 1,458 | 19,106 | `55.29%` |
+| #5 | `joint_diffusion_v1` (Tabular Diffusion) | `1432.4` | `[1424.0, 1440.7]` | `4.37` | 16,660 | 1,064 | 26,645 | `38.75%` |
+| #6 | `arf` (Adversarial Random Forests) | `1184.7` | `[1170.7, 1200.6]` | `7.34` | 4,335 | 965 | 39,069 | `10.86%` |
+
+### 4.3 Elo & Transfer Performance vs. Minimal Network-Egress Artifact Size
+
+When all 18 `(method, artifact_budget)` pairs compete in a single **Unified Cross-Size
+Bradley–Terry Pool** (`cross_size_elo_by_artifact_bytes`), `DOPE-MLC-v2`'s Elo rises
+monotonically as a function of the **minimal network-egress artifact size** leaving the source
+environment:
+
+| Minimal Egress Artifact Size | `DOPE-MLC-v2` Cross-Size Elo | `rows` (Raw Subsample) Cross-Size Elo | `kernel` Cross-Size Elo | `copula` Cross-Size Elo | `joint_diffusion_v1` Cross-Size Elo | `arf` Cross-Size Elo | `DOPE-MLC-v2` Within-Tier Elo |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **`4,096 B` (`4 KiB`, `Medium` Macro Tier)** | **`1610.6` `[1601.7, 1618.8]`** | `1415.3` `[1400.4, 1431.8]` | `1596.0` | `1526.4` | `1332.9` | `1140.5` | **`1652.1` (`#1`, `71.11%` win)** |
+| **`16,384 B` (`16 KiB`, `High` Larger Tier)** | **`1726.6` `[1714.4, 1737.4]`** | `1648.3` `[1635.0, 1662.2]` | `1596.0` | `1526.4` | `1424.1` | `1140.5` | **`1669.6` (`#1`, `72.62%` win)** |
+| **`65,536 B` (`64 KiB`, `Ultra` Fine Tier)** | **`1742.0` `[1728.6, 1756.2]`** | `1818.6` *(copies `88.2%` raw rows)* | `1596.0` | `1526.4` | `1494.7` | `1140.5` | **`1658.4` (`#1` encoder, `70.50%` win)** |
+
+- At **`4,096 B` (`4 KiB`)**, `DOPE-MLC-v2` achieves **`13.9×` median compression** (`35.91×` mean
+  compression vs raw CSV) and beats the non-anonymized raw row subsample (`rows`) by **`+195.3`
+  cross-size Elo points** (`1610.6` vs `1415.3`) and `+18.7` retention points (`0.8620` vs `0.6746`).
+- At **`16,384 B` (`16 KiB`)**, `DOPE-MLC-v2` achieves **`3.48×` median compression** (`8.98×` mean
+  compression) and beats `rows` by **`+78.3` cross-size Elo points** (`1726.6` vs `1648.3`) and
+  `+4.3` retention points (`0.8971` vs `0.8539`).
+- At **`65,536 B` (`64 KiB`)**, `DOPE-MLC-v2` reaches **`1742.0` cross-size Elo** (`+146.0` Elo over
+  `kernel`, `+215.6` over `copula`, `+247.3` over `joint_diffusion_v1`, `+601.5` over `arf`); the
+  non-anonymized `rows` control only edges higher at `64 KiB` because a `64 KiB` raw budget is large
+  enough to copy **`88.2%` of the entire raw training table** (`median compression = 1.00×`).
+
+### 4.4 Strict Monotonic Multi-Level Progression (`DOPE-MLC-v2`, 1,000 Datasets)
+
+| Tier | Egress Bytes | Compression (Med / Mean) | Mean Retention $R$ `[95% CI]` | Median $R$ `[IQR p25, p75]` | Mean Driver Fidelity $D$ `[95% CI]` | Feature Spearman $\rho$ | Top-3 Driver Overlap | BTR-AUC | Regression $R^2$ |
+|---|---:|---:|---|---|---|---:|---:|---:|---:|
+| **`Medium` (Macro / Legal)** | `4,096 B` (`4 KiB`) | `13.90×` / `35.91×` | **`0.8620` `[0.8521, 0.8726]`** | **`0.9335` `[0.8199, 0.9781]`** | **`0.7566` `[0.7512, 0.7624]`** | **`0.5985`** | `69.95%` | **`83.11`** | `0.6620` |
+| **`High` (Larger / Interaction)** | `16,384 B` (`16 KiB`) | `3.48×` / `8.98×` | **`0.8971` `[0.8846, 0.9090]`** | **`0.9642` `[0.8849, 0.9918]`** | **`0.7821` `[0.7759, 0.7877]`** | **`0.6331`** | `72.35%` | **`86.82`** | `0.7049` |
+| **`Ultra` (Fine / Max Transfer)** | `65,536 B` (`64 KiB`) | `0.87×` / `2.24×` | **`0.8975` `[0.8883, 0.9095]`** | **`0.9658` `[0.8768, 0.9942]`** | **`0.7896` `[0.7831, 0.7959]`** | **`0.6363`** | **`72.42%`** | **`86.97`** | **`0.7145`** |
+
+### 4.5 World-Class Downstream Model Transfer at `Ultra` (1,000 Datasets, $N_{\text{syn}} = N_{\text{train}} \to D_{\text{test}}$)
+
+| Downstream Auditor Family | Datasets ($n$) | Real Test Score | Syn$\to$Real Test Score | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Feature Spearman $\rho$ | Top-3 Driver Overlap | Binary Real Acc | Binary Syn$\to$Real Acc |
+|---|---:|---:|---:|---|---|---:|---:|---:|---:|
+| **CatBoost** | `1,000` | `0.8472` | `0.7801` | **`0.8810` `[0.8692, 0.8915]`** | **`0.8130` `[0.8055, 0.8213]` (`D80` pass)** | **`0.7036`** | **`76.33%`** | `85.88%` | **`83.13%`** |
+| **Local Gated Attention Net (`kumo_tabpfn` key)** | `962` | `0.7920` | `0.7530` | **`0.9211` `[0.9094, 0.9333]`** | **`0.8781` `[0.8743, 0.8824]` (`D80` pass)** | **`0.6470`** | **`73.56%`** | `84.01%` | **`82.35%`** |
+| **LightGBM** | `989` | `0.8387` | `0.7809` | **`0.8978` `[0.8852, 0.9085]`** | **`0.7703` `[0.7615, 0.7793]`** | **`0.6263`** | `69.94%` | `85.59%` | **`83.18%`** |
+| **MLP** | `965` | `0.8040` | `0.7594` | **`0.9143` `[0.9021, 0.9245]`** | **`0.8915` `[0.8872, 0.8960]` (`D80` pass)** | **`0.7740`** | **`78.03%`** | `84.60%` | **`82.69%`** |
+| **Linear / Logistic** | `969` | `0.7767` | `0.7503` | **`0.9297` `[0.9182, 0.9398]`** | **`0.7853` `[0.7745, 0.7950]`** | **`0.5567`** | `70.76%` | `83.99%` | **`82.14%`** |
+| **XGBoost** | `989` | `0.8530` | `0.7308` | **`0.8121` `[0.7915, 0.8285]`** | **`0.7221` `[0.7131, 0.7310]`** | **`0.5305`** | `66.70%` | `85.20%` | `78.52%` |
+
+- **Actual Auditor Roster, Alias Mapping, Backends & Per-Auditor Low-Oracle-Signal Skips (`0` Unhandled Failures)**:
+  - `catboost`: `catboost.CatBoostRegressor` / `CatBoostClassifier` (`Cython` backend, `iterations=60, depth=5, lr=0.10`), evaluated on `1,000 / 1,000` datasets (`0` skips).
+  - `kumo_tabpfn` *(Explicit Alias Mapping $\to$ **Local Gated Attention Net**)*: `_KumoTabularWrapper` / `_TabularKumoAttentionNet` (a local PyTorch SiLU-gated attention-residual network with `hidden=48` and `18` `AdamW` steps trained from scratch per table with input-gradient attribution; the historical raw JSON key `kumo_tabpfn` is preserved for ledger immutability, but **this is a local attention-network baseline and NOT the official pretrained `KumoTabular` or `TabPFN` foundation model; official Kumo/TabPFN comparison is not performed in this run**), evaluated on `962 / 1,000` datasets (`38` skipped strictly where real-table oracle gain $S_{\text{real}} - S_{\text{null}} < 0.02$).
+  - `lightgbm`: `lightgbm.LGBMRegressor` / `LGBMClassifier` (`C++` histogram GBDT, `n_estimators=55, max_depth=5, lr=0.10`), evaluated on `989 / 1,000` datasets (`11` skipped where real oracle gain $< 0.02$).
+  - `xgboost`: `xgboost.XGBRegressor` / `XGBClassifier` (`C++ hist` tree method, `n_estimators=55, max_depth=4, lr=0.10`), evaluated on `989 / 1,000` datasets (`11` skipped where real oracle gain $< 0.02$).
+  - `mlp`: `sklearn.neural_network.MLPRegressor` / `MLPClassifier` (`hidden=(48, 24), Adam max_iter=65`), evaluated on `965 / 1,000` datasets (`35` skipped where real oracle gain $< 0.02$).
+  - `linear`: `sklearn.linear_model.Ridge(alpha=1.0)` / `LogisticRegression(C=1.0, max_iter=150)`, evaluated on `969 / 1,000` datasets (`31` skipped where real oracle gain $< 0.02$).
+
+### 4.6 Performance Across Diverse Dataset Regimes (1,000 Datasets)
+
+| Regime Axis | Stratum | Datasets ($n$) | `Medium` (`4 KiB`) Retention $R$ | `High` (`16 KiB`) Retention $R$ | `Ultra` (`64 KiB`) Retention $R$ | `Ultra` Driver Fidelity $D$ |
+|---|---|---:|---:|---:|---:|---:|
+| **Signal Nonlinearity** | `Mostly Linear (<0.05)` | `687` | `0.9467` | `0.9585` | `0.9477` | **`0.8190`** |
+| **Signal Nonlinearity** | `Moderate Nonlinear (0.05-0.20)` | `92` | `0.7263` | `0.8180` | **`0.8318`** | `0.7313` |
+| **Signal Nonlinearity** | **`Strong Nonlinear (>0.20)`** | **`221`** | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts vs Med)** | `0.7226` |
+| **Sample Size ($N_{\text{train}}$)** | `Small (<300 rows)` | `265` | `0.7580` | `0.8147` | **`0.8407`** | **`0.8075`** |
+| **Sample Size ($N_{\text{train}}$)** | `Medium (300-1,500 rows)` | `583` | `0.8886` | **`0.9184`** | `0.9091` | `0.7796` |
+| **Sample Size ($N_{\text{train}}$)** | `Large (>1,500 rows)` | `152` | `0.9413` | **`0.9587`** | `0.9519` | **`0.7966`** |
+| **Feature Width ($p$)** | `Narrow (<=8 cols)` | `360` | `0.8374` | **`0.9056`** | `0.8964` | **`0.8384`** |
+| **Feature Width ($p$)** | `Medium (9-25 cols)` | `485` | `0.8705` | `0.8891` | **`0.8942`** | `0.7523` |
+| **Feature Width ($p$)** | `Wide (>25 cols)` | `155` | `0.8926` | `0.9022` | **`0.9104`** | **`0.7930`** |
+| **Categorical Share** | `Pure Numeric` | `584` | `0.8888` | `0.9222` | **`0.9261`** | **`0.7924`** |
+| **Categorical Share** | `Mixed (<50% cat)` | `307` | `0.8226` | **`0.8588`** | `0.8543` | `0.7745` |
+| **Categorical Share** | `Categorical Heavy (>=50% cat)` | `109` | `0.8294` | **`0.8699`** | `0.8659` | **`0.8174`** |
+
+- **Unlimited Synthetic Expansion from Fixed Encoding**: Generating $1\times \to 2\times \to 5\times N_{\text{train}}$
   synthetic rows from the frozen `Ultra` encoding increases downstream CatBoost holdout retention
-  from `0.6561` ($1\times N_{\text{train}}$) to **`0.6769`** ($5\times N_{\text{train}}$,
-  `+2.08` retention points) without revisiting raw training data.
+  monotonically from **`0.8808`** ($1\times N_{\text{train}}$) $\to$ **`0.9010`**
+  ($2\times N_{\text{train}}$) $\to$ **`0.9070`** ($5\times N_{\text{train}}$, `+2.62` retention
+  points) without revisiting raw training data.
 
 ---
 
@@ -155,9 +259,9 @@ python3 -B -m research.levels.rapid_validate
 # 3. Train DOPE-MLC-v2 across all 19,079 regression + binary classification splits
 python3 -B -m research.levels.s3_multilevel_trainer --device cuda --epochs 8
 
-# 4. Evaluate world-class model transfer, feature importance dynamics, and Elo
-python3 -B -m research.levels.world_class_eval
+# 4. Evaluate 1,000-dataset world-class model transfer, driver dynamics, and Elo
+python3 -B -m research.levels.world_class_eval --max-datasets 1000 --workers 44
 
-# 5. Render publication figures (PNG + PDF)
+# 5. Render all 5 publication figures (PNG + PDF)
 python3 -B -m research.levels.render_multilevel_evidence
 ```
