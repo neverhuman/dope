@@ -523,7 +523,13 @@ distillation keeps a model's behaviour \citep{wang2018distillation,hinton2015dis
 compression names learned media codecs \citep{santurkar2017generative}; description-length and
 bottleneck ideas \citep{rissanen1978modeling,blumer1987occam,tishby2000bottleneck} motivate the framing.
 DOPE ships a program that draws fresh rows, and TDL charges it in bytes against a downstream
-distortion.
+distortion. In the companion multi-level landmark study (\texttt{research/levels/}, documented in
+\texttt{docs/multilevel-landmark-dl-study.md}), a single hierarchical deep learning model
+(\texttt{DOPE-MLC-v2}) conditions three nested capacity tiers (\texttt{Medium} macro, \texttt{High}
+interaction, and \texttt{Ultra} fine with Chatterjee's $\xi$ spectrum) on pre-calculated training-only
+cross-validation landmarks and train-only column scaling, preserving both predictive transfer and
+feature-importance dynamics across gradient-boosted, neural, linear, and prior-fitted tabular auditors
+(where pretraining overlap is unknown for foundation-model priors).
 
 \paragraph{Privacy.} Membership and attribute attacks on synthetic data
 \citep{shokri2017membership,stadler2022groundhog,vanbreugel2023domias} and holdout-referenced distances

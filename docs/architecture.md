@@ -137,3 +137,5 @@ The native CPU graph has no Python, encoder-state or source-data dependency when
 sampling. The `dope learned` command is explicit and experimental; existing
 portable levels, DPK3.2/v1 readers and defaults remain independent. See
 [the implemented boundary and remaining evidence gates](../research/levels/README.md).
+
+Private split-bound CV input caches are implemented in `research/levels/precalc`; see [fit-CV cache](fit-cv-landmark-cache.md).

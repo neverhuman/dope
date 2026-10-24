@@ -1857,3 +1857,27 @@ The workstream is complete when:
 ML-01 and ML-04 while finalizing ML-02's export contract. Start ML-06/07 as soon as those
 shared contracts are stable; the shared encoder is a parallel priority, not an indefinite
 future replacement for the existing compiler.
+
+
+## Human-directed v2 tier investigation (2026-10-23)
+
+The first unbounded v2 pilot's two trained models failed native FP16 absolute
+parity (0.00390625/0.0078125 versus 0.002). No scheduled downstream comparison
+was run. Preserve those models and receipts. A separately named bounded-code
+candidate applies per-block tanh and refuses out-of-range carriers; it requires
+fresh training and fresh full-size proofs, with the original tolerance unchanged.
+This is a numerical/optimization hypothesis, not an accuracy or plan-completion claim.
+
+The original widths and experiment criteria above remain the historical v1 design.
+The human requested retiring256-coordinate S as a primary future training requirement
+and approved investigation of a larger minimum and a richer encoder readout.
+The opt-in v2 candidate uses1024/4096/8192/10240 coordinates, with a separate trained
+Ultra query/residual stage. V1 formats, aliases, results and checkpoints are unchanged.
+Do not retroactively remove S from a frozen cohort or reinterpret its failed criterion.
+
+All v1 code blocks currently expand two width256 pooled states. The v2 slot readout
+retains multiple summary states before projection; its pooled-width and matched-shape
+controls separate that hypothesis from increasing code width or parameter count.
+Implementation/native fixture qualification does not establish E8/E10 success. A fresh
+predeclared multi-seed study, full costs, exact resume and independent accuracy/harm
+checks are required before promotion. Full-S3 source admission remains separate.

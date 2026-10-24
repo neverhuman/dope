@@ -8,7 +8,7 @@ import subprocess
 import time
 import numpy as np
 from .comparison import schedule, ridge_loss, retention, summarize
-from .contracts import LEVELS, ResearchError, levels, require
+from .contracts import LEVELS, level_widths, ResearchError, digest, levels, require
 from .corpus import file_sha
 from .checkpoints import private_json
 from .train import append
@@ -52,7 +52,7 @@ def native_audit(binary, artifact, context, query, synthetic, report, seed, seco
 def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low', 'medium', 'high'),
         table_seeds=(20261101, 20261102, 20261103), sample_seeds=(101, 211, 307),
         fit_seed=20261023, categorical_schedule='reveal-v1', device='cpu', wall_seconds=600, resource_check=None,
-        auditor_engine=None, expected_auditor_sha256=None):
+        auditor_engine=None, expected_auditor_sha256=None, landmark_input_cache=None):
     import torch
     from .packages import load_package, encode_table, export_encoding
     from .decoder import sample
@@ -92,6 +92,11 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
         torch.backends.cuda.matmul.allow_tf32 = False
         torch.cuda.set_per_process_memory_fraction(min(1., 16*2**30/torch.cuda.get_device_properties(0).total_memory))
     model, manifest = load_package(model_path, device)
+    from .landmark_features import InputCache
+    input_cache=InputCache(landmark_input_cache)if landmark_input_cache is not None else None
+    require(model.config.landmark_input()==(input_cache is not None), 'comparison_landmark_cache_required_for_graph')
+    require(input_cache is None or input_cache.feature_recipe==model.config.landmark_recipe(),
+            'comparison_landmark_cache_recipe_mismatch')
     require(all(level in manifest['trained_levels'] for level in selected), 'comparison_level_not_trained')
     fixed_bytes = sum(v['bytes'] for v in manifest['weights'].values()) + (Path(model_path)/'model.json').stat().st_size
     protocol = dict(format='dope-owned-comparison-protocol-v2', cases=cases, fit_seed=fit_seed,
@@ -109,11 +114,25 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
             representation='common baseline artifact schema; fit context only; supplied synthetic rows',
             loss='existing native regression MSE/classification log loss; auxiliary to unchanged primary ridge',
             driver_qualified=False))
+    if input_cache is not None:
+        protocol.update(format='dope-owned-comparison-protocol-v4',landmark_inputs=dict(
+            cache_sha256=input_cache.identity,feature_recipe=input_cache.feature_recipe,
+            scope='innerCV inside source fit rows only; no tune/calibration/confirmation labels',
+            serving='private encoder input; code/decoder-only recipient',
+            precomputation_cost='excluded from sample timing; report original cache costs separately'))
     private_json(out/'protocol.json', protocol)
     records = []
     for family in (7, 8):
         for seed in table_seeds:
             source = table(family, seed)
+            input_features=None;feature_failure=False;feature_provenance={}
+            if input_cache is not None:
+                source['source_provenance']=dict(kind='owned_prior',physical_table_id=digest(dict(family=family,seed=seed)))
+                try:
+                    source=input_cache.attach(source);input_features=source['landmark_input']
+                    feature_provenance={k:v for k,v in source['source_provenance'].items()
+                                        if k in('landmark_input_manifest_sha256','landmark_feature_sha256')}
+                except (ResearchError,OSError,KeyError,TypeError,ValueError):feature_failure=True
             context, query, identity = episode(**{k:source[k] for k in
                 ('rows', 'kinds', 'slots', 'row_ids', 'task', 'roles')},
                 config=model.config, cursor=0, seed=fit_seed)
@@ -145,10 +164,13 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                             sample_seed=sample_seed, method=method, episode_sha256=identity,
                             context_rows=len(context.values), query_rows=len(query.values),
                             real_loss=real, null_loss=null, fixed_model_bytes=fixed_bytes if method == 'shared' else 0)
+                        if input_cache is not None:record.update(landmark_feature_recipe=input_cache.feature_recipe,**feature_provenance)
                         try:
+                            require(not feature_failure,'comparison_landmark_inputs_unavailable')
                             require(time.monotonic()-started < wall_seconds and resource_check(), 'comparison_budget_or_resource_pause')
                             if encoded is None:
-                                encoded = encode_table(model, manifest, context, through=max(selected, key=LEVELS.get))
+                                input_args=dict(landmark_features=input_features)if input_cache is not None else{}
+                                encoded = encode_table(model, manifest, context, through=max(selected, key=level_widths(model.config.layout).get),**input_args)
                             if code is None:
                                 code = export_encoding(encoded, level)
                                 (directory/(level+'.safetensors')).write_bytes(code.bytes)
@@ -163,7 +185,7 @@ def run(model_path, baseline, expected_baseline_sha256, out, *, selected=('low',
                                     raise
                             before = time.monotonic()
                             if method == 'shared':
-                                values, observed = sample(model.decoder, encoded.code[:LEVELS[level]].to(device),
+                                values, observed = sample(model.decoder, encoded.code[:level_widths(model.config.layout)[level]].to(device),
                                     encoded.schema, len(context.values), sample_seed, steps=32, categorical_schedule=categorical_schedule)
                                 if device == 'cuda':
                                     torch.cuda.synchronize()
@@ -217,6 +239,7 @@ def main(argv=None):
     parser.add_argument('--expected-baseline-sha256', required=True)
     parser.add_argument('--auditor-engine', type=Path)
     parser.add_argument('--expected-auditor-sha256')
+    parser.add_argument('--landmark-input-cache',type=Path)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--levels', default='all')
     parser.add_argument('--categorical-schedule', choices=('reveal-v1', 'redraw-v1'), default='reveal-v1')
@@ -226,7 +249,8 @@ def main(argv=None):
     result = run(args.model, args.baseline, args.expected_baseline_sha256, args.out,
                  selected=levels(args.levels), categorical_schedule=args.categorical_schedule, device=args.device,
                  wall_seconds=args.wall_seconds, auditor_engine=args.auditor_engine,
-                 expected_auditor_sha256=args.expected_auditor_sha256)
+                 expected_auditor_sha256=args.expected_auditor_sha256,
+                 landmark_input_cache=None if args.landmark_input_cache is None else json.loads(args.landmark_input_cache.read_bytes()))
     print(json.dumps({k:result[k] for k in ('scheduled', 'complete', 'failures', 'superiority_qualified')}))
     return 0 if result['all_cells_complete'] else 2
 

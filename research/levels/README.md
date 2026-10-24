@@ -1,10 +1,94 @@
 # Experimental shared table encoding
 
+### Bounded v2 numerical candidate
+
+The explicit `slot-bounded-code-diffusion-v2`,
+`pooled-control-bounded-code-diffusion-v2` and `pooled-bounded-code-diffusion-v2`
+graphs apply tanh separately to every distribution/task readout block before
+fixed FP16 conversion. Their readers reject values outside [-1,1]. This changes
+the learned representation and requires fresh training; it does not convert an
+existing checkpoint. Prefixes use no scale or state from higher blocks.
+
+The preceding unbounded v2 pilot completed both 200 ordinary plus 50 residual
+stages, with matching initialization/data and frozen ordinary weights. Its two
+terminal models failed the unchanged native absolute parity gate: 0.00390625
+and 0.0078125 against 0.002. Unbounded slot codes reached magnitude 10.289,
+where FP16 spacing can exceed that gate. All 768 planned utility cells remain
+unexecuted pending qualification. These failed receipts and old graph identities
+are preserved; the bounded candidate is a new numerical/optimization hypothesis,
+not a claimed accuracy improvement or a relaxed parity threshold.
+
+The opt-in `gpu-v2-pilot.json` now selects the bounded slot candidate. New source,
+full-width exact resume and native parity proofs are required before scientific
+training. Existing unbounded and v1 configurations retain their semantics.
+
 This implements the missing learned path from [the multilevel design](../../docs/plans/multilevel-implementation.md).
 The existing `fit-levels` portable generator remains a separate implementation.
 Shared model weights are fixed local dependencies; every encoded table exports a
 bounded FP16 code and charged positional schema. This is development software,
 not a certified release, empirical privacy result, external accuracy or Elo claim.
+
+## Training-only CV landmark INPUT features (explicit v3 graphs)
+
+The human-specified input path is `slot-landmark-input-bounded-v3`. Its matched
+`slot-landmark-masked-bounded-v3` control has identical parameter shapes and
+initialization but zeroes the supplied landmark vector. Both require a valid
+nonempty input: a missing cache is a failure, not landmark-conditioned training.
+Historical graphs/defaults and auxiliary profile labels retain replay semantics.
+
+For each dataset and declared split, calculate the 23 native small-model gains
+using **five-fold cross-validation inside that split's training/fit partition**.
+Each fold fits preprocessing and model selection inside its fold-training rows;
+its query rows are used only for out-of-fold measurement. No outer tune/query,
+validation, calibration, confirmation or official TEST row contributes to these
+inputs. Group/time input recipes remain unsupported until their CV policy is
+qualified; random IID folds must not be substituted. The private producer writes
+only fit rows and binds their physical IDs, exact CSV bytes, schema/task, five-fold
+options, native binary, report and input-recipe hashes. The producer defaults to
+the 20-billion native work allowance; the 2-billion bounded recipe is also
+supported. These allocations retain distinct cache identities and masks, never
+interchangeable receipts. Whole-official-TRAIN
+reports from the earlier cache are diagnostic evidence, not these fit-only inputs.
+
+The encoder concatenates 23 fixed-scaled gains `g/(1+abs(g))` with 23 validity
+indicators and projects these 46 inputs into the task readout. A real zero gain
+is distinct from a missing/failed measurement. Nonfinite, malformed, all-missing
+or nonzero-masked inputs refuse. Landmarks affect only the task-conditioned
+readouts; the distribution path and target-free code do not consume them.
+`profile_weight` must be zero for these new graphs: predicting landmark targets
+alone is not the input path. Source-free recipients need no landmark report,
+encoder or raw training table; feature vectors/provenance are never extra public
+code metadata. Model weights, precalculation and encoding costs remain separate.
+
+Prepare an owned-prior input cache entry without opening an external dataset:
+
+```bash
+python3 -m research.levels.cli landmark-inputs --owned-family 0 --owned-seed 20261023 \
+  --engine /absolute/path/to/dope --expected-engine-sha256 VERIFIED_SHA256 \
+  --out NEW_PRIVATE_DIRECTORY
+```
+
+For an admitted real source, supply `--dataset PRIVATE_DATASET_ITEM.json` instead
+of `--owned-family`. The same family/rights/source-role admission applies; this
+command does not grant admission. The emitted entry is collected under a private
+`{"format":"dope-fit-cv-landmark-cache-v1","feature_recipe":"fit-cv-gain23-mask-squash-v1","entries":[...]}`
+index. Each entry binds physical table ID, local directory, manifest digest and
+native binary digest. Pass the complete index to `train --landmark-input-cache`.
+Prepare every training/development table required by the declared stream; do not
+selectively supply favorable tables. Corpus identity binds this entire cache for
+exact checkpoint resume. Optional `physical_dataset_id` is a 64-character opaque
+stable physical ID; supplying it keeps row splits independent of later family
+metadata resolution. Historical items without it retain their original IDs.
+
+Native encoding takes the producer's exact `fit.csv`, explicit source-order kinds
+and target, plus `--landmark-input PRIVATE_DIRECTORY
+--landmark-manifest-sha256 VERIFIED_SHA256`. It rechecks CSV/report/recipe/role
+bindings before using the features. Python `encode_table` accepts the validated
+`landmark_features` tuple from `read_input`; direct tensors in tiny tests are only
+synthetic conformance fixtures. All new graphs need fresh training, exact resume
+and full-width native parity before scientific utility evaluation. A green
+fixture is not evidence of an accuracy win. The preceding source21 768-case study
+remains a frozen landmark-free control and is not reinterpreted.
 
 ## Implemented boundary
 
@@ -285,3 +369,88 @@ The corpus identity binds the explicit recipe. Cross-recipe resume or warm-start
 is refused. A new source snapshot and fresh initialization are required for a
 controlled exposure comparison; do not relabel previous checkpoints or imply
 that this engineering control improves accuracy.
+
+### Distinct physical development panels
+
+The historical default `fixed-six-v1` keeps its six episode draws and
+recipe representation for replay. Those draws cover **three distinct physical
+prior tables**, each observed twice: four classification and two regression
+exposures. Episode counts are not independent source counts.
+
+For a future prior-only run, training JSON can explicitly set:
+
+```json
+{"validation_recipe": "owned-balanced-unique-v2", "validation_episodes": 40}
+```
+
+This opt-in observer uses twenty distinct owned classification tables and twenty
+regression tables from development mechanisms 7 and 8. It accepts an even count
+from 2 to 64. The training corpus and its physical stream are unchanged; the new
+observer is bound into the checkpoint recipe, and changing its recipe or count
+refuses exact resume. Real/mixed corpora refuse this owned-prior observer; they
+need a separately admitted family-balanced panel rather than a silent fallback.
+Existing frozen experiments, plots and benchmarks retain their original monitor.
+The independent source fingerprint still changes with this implementation; replay
+old checkpoints with their frozen source rather than bypassing source checks.
+
+Each new validation event records its scheduled/completed episodes, distinct
+physical tables, opaque family counts, task counts, context/query lineage hashes,
+wall cost and panel digest. Only fit context and tune queries from meta-development
+sources enter the observer. Calibration, confirmation and final sources stay out.
+The observer uses no gradients or optimizer updates and restores the training RNG
+and model mode. Draws and corruption RNG are fixed across checkpoints; the number
+of physical tables, not the number of plotted observations, describes coverage.
+The dashboard displays that coverage when it is recorded; historical metrics
+without lineage remain explicitly unavailable.
+
+Validation costs count against the existing run allowance. Time and resource
+admission are checked before each episode; an in-flight episode can finish after
+the boundary, so retain an external hard deadline. An interrupted panel publishes
+its disposition and completed count with **no partial mean**, saves the last
+completed optimizer boundary and never retries automatically. More monitor tables
+increase overhead and do not establish accuracy, independent real-source coverage,
+or permission to select a favorable checkpoint. Predeclare any selection rule and
+keep every scheduled benchmark checkpoint and negative result.
+
+### Opt-in v2 tier and slot readouts
+
+V1 artifacts retain their exact 256/1024/4096/5120 layout and original graph.
+The new experimental `nested-1024-4096-8192-plus-2048-v2` layout uses
+1024/4096/8192/10240 coordinates: S/M/L/Ultra carry2/8/16/20KiB of FP16 values,
+before charged schema/carrier metadata and fixed dependencies. No aliases or
+old artifact widths are reinterpreted. `all` still excludes Ultra. New v2 is
+implemented for research, unqualified for scientific accuracy or default promotion.
+
+`slot-code-diffusion-v2` retains ordered summary tokens instead of reducing all
+feature and target state to two pooled vectors. The declared even2–32 summary
+slots split into separate ordinary and residual query parameters. Each query set
+attends the feature rows through the two shared pool blocks; task queries attend
+target-conditioned rows through those same blocks. Per-slot normalization precedes
+flattening and the block projections. Ordinary tiers read only ordinary queries;
+Ultra additionally trains its own residual queries and fourth projections while
+all ordinary weights remain frozen. Target-free output never reads target state.
+
+Two explicit controls share the new layout: `pooled-code-diffusion-v2` retains
+the original mean-pooled readout; `pooled-control-code-diffusion-v2` uses the slot
+model's identical parameter shapes and query attention, then averages normalized
+slots and repeats that vector before projection. This last control has redundant
+projection parameters, deliberately retaining the pooling bottleneck at matching
+nominal parameter count. It is not a claim of equal effective representation rank.
+Actual encoder/decoder calls, wall time and dependency bytes must still be measured.
+
+At default width256, the slot and parameter-matched control each have82,546,078
+parameters, versus43,224,478 for the width-only pooled control and30,881,090 in the
+original model. More payload and more fixed weights are separate costs. No measured
+benefit is inferred from this capacity increase. Use the opt-in
+`configs/gpu-v2-pilot.json` only after fresh resource/process admission and exact
+pinned-runtime resume proof. It requests the40-table balanced observer and owned
+priors, with profile/transfer/driver weights zero. Keep the frozen v1 studies intact.
+
+The v2 tiny public fixtures exercise one ordinary and one residual optimizer update
+solely for cross-runtime conformance. They cover all three graphs and four widths;
+they are not a trained production model. Generate into a fresh directory with
+`python3 -m research.levels.fixtures --out NEW_DIRECTORY --graph slot-code-diffusion-v2`.
+Keep the generated checkpoint under private target evidence; ship only the declared
+small synthetic model/code/operator fixtures. Native `learned encode`, `inspect`
+and decoder-only `sample` resolve widths from the bound graph/layout and refuse
+cross-layout codes. Neither native sampling nor the recipient needs encoder weights.

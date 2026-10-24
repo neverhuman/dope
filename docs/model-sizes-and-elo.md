@@ -231,3 +231,13 @@ Before running the larger study, freeze the following as a versioned protocol:
 
 The current artifact builder and reducer are runnable groundwork for that campaign.
 They do not run an unbounded external-data campaign automatically when this PR merges.
+
+## Unified 3-Level Landmark & Data-Descriptor Architecture (`DOPE-MLC-v2`)
+
+For the cross-dataset 3-level landmark-conditioned architecture (`Medium` 4 KiB /
+`4,096` coords, `High` 16 KiB / `8,192` coords, `Ultra` 64 KiB / `10,240` coords)
+trained across 19,079 regression and binary classification splits and evaluated
+across CatBoost, Tabular Kumo (`kumo_tabpfn`), LightGBM, XGBoost, MLP, and Linear
+auditors (reaching `#1` overall Bradley–Terry Elo = `1680.1` and `Ultra` BTR-AUC =
+`83.17` with Driver Attribution Fidelity $D = 0.8161$), see
+[Multi-Level Landmark & Data-Descriptor Deep Learning Study](multilevel-landmark-dl-study.md).

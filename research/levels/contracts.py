@@ -9,7 +9,32 @@ from dataclasses import asdict, dataclass
 LEVELS = {"low": 256, "medium": 1024, "high": 4096, "ultra": 5120}
 BLOCKS = (256, 768, 3072, 1024)
 LAYOUT = "nested-256-1024-4096-plus-1024-v1"
+LAYOUT_V2 = "nested-1024-4096-8192-plus-2048-v2"
+SLOT_GRAPH = "slot-code-diffusion-v2"
+MATCHED_GRAPH = "pooled-control-code-diffusion-v2"
+POOLED_GRAPH = "pooled-code-diffusion-v2"
+SLOT_BOUNDED_GRAPH = "slot-bounded-code-diffusion-v2"
+MATCHED_BOUNDED_GRAPH = "pooled-control-bounded-code-diffusion-v2"
+POOLED_BOUNDED_GRAPH = "pooled-bounded-code-diffusion-v2"
+V2_GRAPHS = (SLOT_GRAPH, MATCHED_GRAPH, POOLED_GRAPH,
+             SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH)
+LANDMARK_INPUT_GRAPH = "slot-landmark-input-bounded-v3"
+LANDMARK_MASKED_GRAPH = "slot-landmark-masked-bounded-v3"
+LANDMARK_OBSERVED_GRAPH = "slot-landmark-observed-bounded-v4"
+LANDMARK_OBSERVED_MASKED_GRAPH = "slot-landmark-observed-masked-bounded-v4"
+LANDMARK_GRAPHS = (LANDMARK_INPUT_GRAPH, LANDMARK_MASKED_GRAPH,
+                   LANDMARK_OBSERVED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH)
 PREPROCESSING = "fit-only-positional-mixed-v1"
+
+
+def level_widths(layout):
+    require(layout in (LAYOUT, LAYOUT_V2), 'unknown_code_layout')
+    return dict(LEVELS) if layout == LAYOUT else dict(low=1024, medium=4096, high=8192, ultra=10240)
+
+
+def block_widths(layout):
+    widths = list(level_widths(layout).values())
+    return tuple(b-a for a,b in zip([0]+widths[:-1], widths))
 
 
 class ResearchError(ValueError):
@@ -64,7 +89,9 @@ class ModelConfig:
     graph: str = "mixed-code-diffusion-v1"
 
     def validate(self):
-        require(self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1", "unknown_model_graph")
+        require((self.layout == LAYOUT and self.graph == "mixed-code-diffusion-v1")
+                or (self.layout == LAYOUT_V2 and self.graph in V2_GRAPHS + LANDMARK_GRAPHS),
+                "unknown_model_graph")
         for name in ("width", "heads", "feature_blocks", "inducing_blocks", "inducing_slots",
                      "summary_slots", "target_blocks", "decoder_blocks", "condition_slots",
                      "max_features", "max_categories", "max_context", "max_query", "cell_cap",
@@ -78,7 +105,32 @@ class ModelConfig:
                 and 2 <= self.max_categories <= 256 and self.max_context <= 16384
                 and self.max_query <= 1024 and self.cell_cap <= 262144
                 and self.diffusion_steps <= 64, "model_envelope_exceeded")
+        require(not self.slot_readout() or (2 <= self.summary_slots <= 32 and self.summary_slots % 2 == 0),
+                'slot_readout_envelope')
         return self
+
+    def slot_readout(self):
+        return self.graph in (SLOT_GRAPH, MATCHED_GRAPH, SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH) + LANDMARK_GRAPHS
+
+    def bounded_code(self):
+        return self.graph in (SLOT_BOUNDED_GRAPH, MATCHED_BOUNDED_GRAPH, POOLED_BOUNDED_GRAPH) + LANDMARK_GRAPHS
+
+    def landmark_input(self):
+        return self.graph in LANDMARK_GRAPHS
+
+    def landmark_masked(self):
+        return self.graph in (LANDMARK_MASKED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH)
+
+    def landmark_recipe(self):
+        if self.graph in (LANDMARK_OBSERVED_GRAPH, LANDMARK_OBSERVED_MASKED_GRAPH):
+            return 'fit-cv-gain23-observed-mask-squash-v2'
+        return 'fit-cv-gain23-mask-squash-v1' if self.landmark_input() else None
+
+    def pooled_control(self):
+        return self.graph in (MATCHED_GRAPH, MATCHED_BOUNDED_GRAPH)
+
+    def readout_slots(self):
+        return self.summary_slots//2 if self.slot_readout() else 1
 
     def manifest(self):
         return asdict(self.validate())
@@ -95,6 +147,8 @@ class TrainConfig:
     weight_decay: float = .01
     gradient_clip: float = 1.
     validate_every: int = 50
+    validation_recipe: str = "fixed-six-v1"
+    validation_episodes: int = 6
     checkpoint_every: int = 50
     proxy_rows: int = 32
     neural_unrolls: int = 3
@@ -109,7 +163,7 @@ class TrainConfig:
     device: str = "cpu"
 
     def validate(self):
-        require(all(type(v)is int for v in (self.steps,self.seed,self.accumulation,self.validate_every,
+        require(all(type(v)is int for v in (self.steps,self.seed,self.accumulation,self.validate_every,self.validation_episodes,
                 self.checkpoint_every,self.proxy_rows,self.neural_unrolls,self.proxy_ramp_steps,self.wall_seconds,self.cpu_threads))
                 and 0<=self.seed<2**32, 'training_integer_required')
         require(1 <= self.steps <= 10000000 and 1 <= self.accumulation <= 256
@@ -120,6 +174,10 @@ class TrainConfig:
                 and 1 <= self.wall_seconds <= 7200 and 1 <= self.cpu_threads <= 16
                 and self.precision in ("fp32", "bf16")
                 and self.device in ("cpu", "cuda"), "invalid_training_allocation")
+        require((self.validation_recipe == 'fixed-six-v1' and self.validation_episodes == 6)
+                or (self.validation_recipe == 'owned-balanced-unique-v2'
+                    and 2 <= self.validation_episodes <= 64 and self.validation_episodes % 2 == 0),
+                'invalid_validation_panel')
         require(all(math.isfinite(v) and v >= 0 for v in (
             self.learning_rate, self.min_learning_rate, self.warmup_fraction,
             self.weight_decay, self.gradient_clip, self.transfer_weight,
@@ -128,6 +186,13 @@ class TrainConfig:
                 and 0 <= self.warmup_fraction < 1 and self.gradient_clip > 0,
                 "invalid_optimizer_recipe")
         return self
+
+    def manifest(self):
+        """Keep the historical default recipe bytes; explicit new panels bind both fields."""
+        result = asdict(self.validate())
+        if self.validation_recipe == 'fixed-six-v1':
+            result.pop('validation_recipe'); result.pop('validation_episodes')
+        return result
 
 
 def validate_corpus(manifest):
@@ -141,6 +206,12 @@ def validate_corpus(manifest):
         require(families.setdefault(family, role) == role, "family_role_overlap")
         dataset = item.get('dataset_id')
         require(isinstance(dataset,str) and bool(dataset), 'physical_dataset_id_required')
+        if 'physical_dataset_id' in item:
+            pid=item['physical_dataset_id']
+            require(isinstance(pid,str) and len(pid)==64 and all(c in '0123456789abcdef' for c in pid),
+                    'physical_dataset_digest_required')
+            require(pid not in physical,'duplicate_physical_dataset')
+            physical.add(pid)
         require((family,dataset) not in physical, 'duplicate_physical_dataset')
         physical.add((family,dataset))
         require(item["source_role"] == "official_train" and item["rights"]["admitted"] is True

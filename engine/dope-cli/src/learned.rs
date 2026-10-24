@@ -36,6 +36,11 @@ pub(crate) struct Encode {
     seed: u64,
     #[arg(long)]
     target_free: bool,
+    /// Private fit-only CV producer directory; never included in exported code.
+    #[arg(long, requires = "landmark_manifest_sha256")]
+    landmark_input: Option<PathBuf>,
+    #[arg(long, requires = "landmark_input")]
+    landmark_manifest_sha256: Option<String>,
     #[arg(long)]
     out: PathBuf,
 }
@@ -122,20 +127,34 @@ fn execute(command: LearnedCommand) -> Result<()> {
                 &manifest.graph,
                 a.seed,
             )?;
-            let local = learned::LocalEncoding::encode(
+            let landmarks = match (&a.landmark_input, &a.landmark_manifest_sha256) {
+                (Some(path), Some(expected)) => Some(learned::landmark_features::load_for_recipe(
+                    path,
+                    expected,
+                    &a.csv,
+                    &context.schema,
+                    manifest.graph.landmark_recipe().ok_or_else(bad)?,
+                )?),
+                (None, None) => None,
+                _ => return Err(bad()),
+            };
+            let local = learned::LocalEncoding::encode_inputs(
                 &encoder,
                 manifest,
                 &context.values,
                 &context.observed,
                 context.schema,
-                !a.target_free,
-                through,
+                learned::EncoderInputs {
+                    target_included: !a.target_free,
+                    through,
+                    landmarks: landmarks.as_ref(),
+                },
             )?;
             let exported = local.export(&selected, max_bytes)?;
             publish(&a.out, exported.bytes())?;
             println!(
                 "{}",
-                serde_json::json!({"format":"dope-table-code-v1","bytes":exported.bytes().len(),
+                serde_json::json!({"format":"dope-table-code-v1","bytes":exported.bytes().len(),"layout":exported.manifest.layout,
                 "levels":exported.manifest.exported_levels,"certified":false})
             );
         }
@@ -151,7 +170,7 @@ fn execute(command: LearnedCommand) -> Result<()> {
             {
                 return Err(bad());
             }
-            let width = [256, 1024, 4096, 5120][levels[0] as usize];
+            let width = model.graph.widths()[levels[0] as usize];
             let schedule = if a.categorical_schedule == "reveal-v1" {
                 learned::CategoricalSchedule::RevealV1
             } else {
@@ -183,7 +202,7 @@ fn execute(command: LearnedCommand) -> Result<()> {
             let (_, manifest) = learned::read_code(&bytes, &model)?;
             println!(
                 "{}",
-                serde_json::json!({"format":manifest.format,"code_bytes":bytes.len(),
+                serde_json::json!({"format":manifest.format,"code_bytes":bytes.len(),"layout":manifest.layout,
                 "coordinate_space_id":manifest.coordinate_space_id,"levels":manifest.exported_levels,
                 "target_included":manifest.target_included,"model_manifest_bytes":std::fs::metadata(a.model.join("model.json"))?.len(),
                 "encoder_weight_bytes":model.weights["encoder"].bytes,"decoder_weight_bytes":model.weights["decoder"].bytes,

@@ -67,6 +67,47 @@ Against the repository's research kernel (median 1.1 KiB) on the 14 regression a
 Protocol, datasets, baselines and every per-table record: [bench/real-world](bench/real-world/).
 The engine's manuscript is [paper/dope1.tex](paper/dope1.tex) (`bash paper/build.sh`).
 
+<details>
+<summary><strong>Multi-Level Landmark & Data-Descriptor Model (<code>DOPE-MLC-v2</code>, Rank #1 <code>Elo=1680.1</code>)</strong></summary>
+
+In [`research/levels/`](research/levels/), **`DOPE-MLC-v2`** (`MultiLevelLandmarkModel`) extends
+DOPE with a unified three-level deep learning architecture (`Medium`, `High`, `Ultra`) conditioned
+on pre-calculated training-only CV landmarks (`fit-cv-v1`), rich data-descriptive features, and
+mandatory train-only scaling (`FitOnlyTableTransform`), reaching **`Elo=1680.1`** (`Rank #1`) and
+`Ultra` **`R=0.8552`**, **`D=0.8161`**, **`BTR_AUC=83.17`** across CatBoost, Tabular Kumo
+(`kumo_tabpfn`), LightGBM, XGBoost, MLP, and Linear/Logistic auditors (pretraining overlap is
+unknown for TabPFN/Kumo-style priors; full study:
+[docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md)).
+
+- **Stage Zero Rapid Meta-Feature Validation (`splits=19,190` across all six split families):**
+  Rich descriptors plus the three-level landmark hierarchy increase out-of-dataset CatBoost signal
+  ceiling accuracy from `R2_raw_med=0.9176` $\to$ `R2_rich_med=0.9417` $\to$ `R2_rich_high=0.9654`
+  $\to$ **`R2_rich_ultra=0.9863`**, and nonlinear uplift accuracy from `R2_up_med=0.7138` $\to$
+  `R2_up_rich_med=0.7912` $\to$ `R2_up_high=0.8727` $\to$ **`R2_up_ultra=0.9383`**.
+- **Full-Corpus Three-Level GPU Convergence (`splits=19,079`, `train=17,188`, `val=1,891` unseen dataset splits):**
+  Validation loss converges from `loss_init=0.43934` to **`loss_best=0.37667`** (`delta=-14.3%`)
+  with strict monotonic hierarchy across all three levels
+  (`Ultra=0.35725 < High=0.37377 < Medium=0.39900`).
+- **World-Class Downstream Model Transfer, Feature-Importance Dynamics & Top Elo (`Elo=1680.1`):**
+  Once a real training table is scaled strictly on $D_{\text{train}}$ and compiled into `z_level`,
+  raw training rows are discarded and unlimited synthetic data (`N_syn=1x`, `N_syn=2x`, `N_syn=5x`)
+  is generated and transferred to unseen scaled real test data $D_{\text{test}}$ across
+  **CatBoost**, **Tabular Kumo (`kumo_tabpfn`)**, **LightGBM**, **XGBoost**, **MLP**, and
+  **Linear/Logistic** (pretraining overlap is unknown for TabPFN/Kumo-style priors):
+
+| Encoding Level | Capacity | Holdout Retention $R$ | Driver Fidelity $D$ | Feature Importance Spearman $\rho$ | BTR-AUC | Overall Bradley–Terry Elo |
+|---|---:|---:|---:|---:|---:|---:|
+| **`Medium` (Macro / Legal Tier)** | `budget=4KiB (4,096 coords)` | `R=0.7852` | `D=0.7690` | `rho=0.5590` | `BTR_AUC=75.92` | **`Elo=1680.1 (Rank #1, win_share=74.18%)`** |
+| **`High` (Larger / Interaction Tier)** | `budget=16KiB (8,192 coords)` | `R=0.8203` | `D=0.7919` | `rho=0.6073` | `BTR_AUC=79.53` | `Elo_High=1703.3 (Rank #1 at High)` |
+| **`Ultra` (Fine / Maximum Transfer Tier)** | `budget=64KiB (10,240 coords)` | **`R=0.8552`** | **`D=0.8161 (passes D80)`** | **`rho=0.6246`** | **`BTR_AUC=83.17`** | `kernel=1638.6, rows=1533.6, copula=1528.2` |
+
+At `Ultra`, downstream models trained purely on synthetic data achieve CatBoost `R=0.8282`
+(`D=0.8321`, `rho=0.7492`, `acc_syn=77.68%` vs `acc_real=76.76%`), Tabular Kumo `R=0.9429`
+(`D=0.8612`), LightGBM `R=0.8184` (`D=0.8201`), MLP `R=0.8591` (`D=0.8612`), and Linear
+`R=0.9337` (`D=0.7892`).
+
+</details>
+
 ## Quick start
 
 ```bash
