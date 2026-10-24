@@ -15,6 +15,7 @@ mod args;
 mod landmarks;
 mod learned;
 mod levels;
+mod mlc_v3;
 mod runtime;
 mod tiers;
 use args::*;
@@ -73,6 +74,7 @@ fn run(cli: Cli) -> Result<(), String> {
     match cli.command {
         Command::Landmarks(a) => landmarks::run(a)?,
         Command::Learned(a) => learned::run(a)?,
+        Command::MlcV3(a) => mlc_v3::run(a)?,
         Command::FitLevels(a) => levels::run(a)?,
         Command::Fit(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;

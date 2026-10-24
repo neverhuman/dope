@@ -3,6 +3,7 @@ cpu_pr_minutes = 120
 paper_clean_minutes = 60
 security_minutes = 60
 audit_minutes = 60
+# Historical v1 key; bounds the explicitly dispatched GPU job, not a schedule.
 scheduled_gpu_minutes = 120
 single_neural_fit_seconds = 600
 gpu_memory_bytes = 17179869184

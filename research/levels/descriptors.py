@@ -43,6 +43,7 @@ FINE_ADDED_INDICES: Tuple[int, ...] = (17, 18, 19, 20, 22)
 
 LEVEL_LANDMARK_INDICES: Dict[str, Tuple[int, ...]] = {
     "low": MACRO_INDICES[:6],
+    "small": MACRO_INDICES[:6],
     "medium": MACRO_INDICES,
     "high": tuple(sorted(MACRO_INDICES + LARGER_ADDED_INDICES)),
     "ultra": tuple(range(23)),
@@ -219,10 +220,10 @@ def extract_report_descriptors(
             vals = item.get("values") or [None] * 9
             for k in range(min(len(vals), 9)):
                 # Respect level visibility:
-                # Medium sees lin(0), log(3), sat(4), abs(6)
+                # Small/Low/Medium sees lin(0), log(3), sat(4), abs(6)
                 # High adds step(1), hinge(2), periodic(5), stump(8)
                 # Ultra adds Chatterjee xi(7)
-                if level == "medium" and k in (1, 2, 5, 7, 8):
+                if level in ("low", "small", "medium") and k in (1, 2, 5, 7, 8):
                     continue
                 if level == "high" and k == 7:
                     continue
@@ -281,6 +282,8 @@ def extract_report_descriptors(
     return {
         "level": level,
         "gains23": squashed_gains,
+        "ses23": squashed_ses,
+        "lambdas23": lambdas,
         "mask23": present,
         "midranks23": midranks,
         "contrasts16": contrasts,

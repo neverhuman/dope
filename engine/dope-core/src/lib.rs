@@ -39,6 +39,7 @@ pub mod landmark;
 pub mod learned;
 pub mod levels;
 pub mod marginal;
+pub mod mlc_v3;
 pub mod noise;
 pub mod output;
 pub mod program;
