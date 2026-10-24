@@ -55,6 +55,10 @@ class NumericColumnScaler:
             shifted = vals - self.center
             scaled = np.sign(shifted) * np.log1p(np.abs(shifted) / max(self.scale, 1e-9))
             z_log = (scaled - self.post_mean) / max(self.post_std, 1e-9)
+        elif self.transform_kind == "asinh_hybrid":
+            shifted = vals - self.center
+            scaled = np.arcsinh(shifted / max(self.scale, 1e-9))
+            z_log = (scaled - self.post_mean) / max(self.post_std, 1e-9)
         else:
             z_log = (vals - self.post_mean) / max(self.post_std, 1e-9)
 
@@ -93,6 +97,9 @@ class NumericColumnScaler:
         if self.transform_kind == "signed_log1p_hybrid":
             scaled = self.post_mean + z_unclipped * self.post_std
             return self.center + np.sign(scaled) * np.expm1(np.abs(scaled)) * self.scale
+        if self.transform_kind == "asinh_hybrid":
+            scaled = self.post_mean + z_unclipped * self.post_std
+            return self.center + np.sinh(scaled) * self.scale
         return self.post_mean + z_unclipped * self.post_std
 
 
@@ -136,8 +143,16 @@ class TargetScaler:
     kurtosis: float
     positive_label: Optional[str] = None
     class_prior: float = 0.5
+    class_labels: Tuple[float, ...] = ()
+    class_priors: Tuple[float, ...] = ()
 
     def transform(self, y: Sequence[Any]) -> np.ndarray:
+        if self.task == "multiclass" and self.class_labels:
+            labels = np.asarray(self.class_labels, dtype=np.float64)
+            arr = np.array([_parse_float(v) for v in y], dtype=np.float64)
+            arr = np.nan_to_num(arr, nan=float(labels[0]))
+            idx = np.argmin(np.abs(arr[:, None] - labels[None, :]), axis=1)
+            return idx.astype(np.float64)
         if self.task == "classification":
             out = np.zeros(len(y), dtype=np.float64)
             for i, v in enumerate(y):
@@ -155,6 +170,10 @@ class TargetScaler:
 
     def inverse_transform(self, y_scaled: np.ndarray) -> np.ndarray:
         arr = np.asarray(y_scaled, dtype=np.float64).reshape(-1)
+        if self.task == "multiclass" and self.class_labels:
+            labels = np.asarray(self.class_labels, dtype=np.float64)
+            idx = np.clip(np.rint(arr).astype(np.int64), 0, len(labels) - 1)
+            return labels[idx]
         if self.task == "classification":
             return (arr >= 0.5).astype(np.float64)
         return arr * self.std + self.mean
@@ -269,6 +288,20 @@ class FitOnlyTableTransform:
         X_scaled = self.transform_features(X, include_missing_indicators=include_missing_indicators)
         y_scaled = self.transform_target(y) if y is not None else None
         return X_scaled, y_scaled
+
+    def inverse_transform(
+        self, X_scaled: np.ndarray, y_scaled: Optional[np.ndarray] = None,
+    ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+        arr = np.asarray(X_scaled, dtype=np.float64)
+        arr = arr.reshape(-1, 1) if arr.ndim == 1 else arr
+        p = min(arr.shape[1], len(self.kinds))
+        cols = [
+            self.numeric_scalers[j].inverse_transform(arr[:, j]) if self.kinds[j] == "numeric" else arr[:, j]
+            for j in range(p)
+        ]
+        X_raw = np.column_stack(cols) if cols else np.zeros((arr.shape[0], 0), dtype=np.float64)
+        y_raw = self.target_scaler.inverse_transform(y_scaled) if (y_scaled is not None and self.target_scaler is not None) else y_scaled
+        return X_raw, y_raw
 
     def anonymous_metadata(self) -> Dict[str, Any]:
         col_summaries = []
@@ -406,6 +439,22 @@ def _fit_categorical_column(
 
 
 def _fit_target_scaler(y: Sequence[Any], *, task: str) -> TargetScaler:
+    if task == "multiclass":
+        raw = np.array([_parse_float(v) for v in y], dtype=np.float64)
+        finite = raw[np.isfinite(raw)]
+        if finite.size == 0:
+            return TargetScaler("multiclass", 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, None, 0.5, (0.0, 0.5, 1.0), (0.34, 0.33, 0.33))
+        u_vals, u_counts = np.unique(np.round(finite, 6), return_counts=True)
+        if u_vals.size > 32:
+            order = np.argsort(u_counts)[::-1][:32]
+            u_vals = np.sort(u_vals[order])
+            u_counts = np.array([np.sum(np.abs(finite - v) <= 1e-5) for v in u_vals], dtype=np.float64)
+        priors = u_counts.astype(np.float64) / max(float(np.sum(u_counts)), 1.0)
+        return TargetScaler(
+            "multiclass", float(np.mean(finite)), max(float(np.std(finite)), 1e-6),
+            float(np.median(finite)), 1.0, 0.0, 0.0, None, float(priors[0]),
+            tuple(float(v) for v in u_vals), tuple(float(p) for p in priors),
+        )
     if task == "classification":
         tokens = [str(v).strip() for v in y]
         uniq = sorted(set(tokens))

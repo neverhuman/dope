@@ -129,6 +129,46 @@ CatBoost `R=0.8810` (`D=0.8130 passes D80`, `rho=0.7036`, `top3=76.33%`, `acc_sy
 and XGBoost `R=0.8121` (`D=0.7221`). Generating `N_syn=5x` rows from the frozen encoding lifts
 CatBoost retention from `R_1x=0.8808` $\to$ `R_2x=0.9010` $\to$ **`R_5x=0.9070`**.
 
+- **Four-Tier Building-Block Landmark, Inter-Landmark Summary & Multi-Task Extension (`DOPE-MLC-v3`):**
+  Adds `bb_probes=16` mathematical building-block probes (`asinh`, `atan`, `erf`, `cbrt`, `log_p`,
+  `row_summaries`, `tanh_sat`, `expm_laplace`, `clamp_winsor`, `step_median`, `hinge_quartile`,
+  `sin_cos`, `fract_modular`, `hypot_radial`, `atan_angular`, `norm_diff_ratio`), `inter_stats=48`
+  inter-landmark summary statistics (`InterLandmarkAttentionBlock`), active per-column gating
+  (`col_gate_head` wired into `loss`, `encode_table`, and `generate_synthetic`), a fourth
+  `Small` (`cap=2,048B`) complete-envelope tier (`DML_v=3` header + `CSC_v=1` compact scaler sidecar),
+  and multiclass (`LR-VLOT` shared-split vector-leaf oblivious trees) across the reconciled
+  `catalog_datasets=3,859` manifest (`train_gradient=2,199`, `dev_val_ablation=112`,
+  `eval_v2_panel=1,000` [`untouched_sealed_confirmatory_test=false`],
+  `eval_multiclass_panel=69` [`unexposed_in_v2`], `excluded=479`, `sha256_cross_role_overlaps=0`
+  [exact SHA disjointness; upstream benchmark-family disjointness remains unverified]). In the
+  preserved `task-2354` ablation (`receipt_sha=ce58d6b8`, `ckpt_sha=a36510b9`, trained on
+  `train_episode_cells=677` [`reg_bin=480`, `multiclass=197`], evaluated on
+  `dev_val_evaluated=110/112` [`reg=40/41`, `bin=17/17`, `mc=53/54`], and probed on
+  `mc_probe_datasets=68/69` with two auditors without saving a per-dataset ledger), validation loss improves
+  monotonically from `A0_loss=0.83084` $\to$ `A1_loss=0.82908` $\to$ `A2_loss=0.82757` $\to$
+  **`A3_loss=0.82748`** (`driver_A0=0.04205` $\to$ **`driver_A3=0.03954`**, `col_gate_grad_norm=0.000721`).
+  In the separate **new frozen-checkpoint replay** (`task=2502`, `v3_per_dataset_multitask_ledger.jsonl.gz`
+  `sha=8574f2d7`, `measured_cells=724` over `measured_datasets=181` [`dev_val=112x4`, `eval_mc=69x4`] plus
+  `skip_records=4` for `total_rows=728`, **not** recovered original `task-2354` raw measurements),
+  complete wire envelopes achieve `within_cap=100.0%` at all four tiers (`Small`
+  `mean_B=1,300.8B` / `max_B=2,042B`, `Medium` `mean_B=2,404.2B` / `max_B=4,067B`, `High`
+  `mean_B=6,293.9B` / `max_B=14,909B`, `Ultra` `mean_B=13,146.8B` / `max_B=39,629B`), with
+  preliminary two-auditor (`RF+Logistic`) clipped/unclipped mean retention on `mc_2354=68`
+  `R_2aud_small=0.7966/0.8078`, `R_2aud_med=0.8393/0.8393`, `R_2aud_high=0.9120/0.9139`,
+  `R_2aud_ultra=0.9202/0.9422`, and six-auditor scikit-learn probe (`RF, Logistic, HistGBR, ExtraTrees, KNN, RidgeClassifier`)
+  clipped/unclipped retention `R_6aud_small=0.7940/0.7940`, `R_6aud_med=0.8370/0.8376`, `R_6aud_high=0.8982/0.8982`,
+  **`R_6aud_ultra=0.9156/0.9185`** (`all_69_clipped=0.9205`).
+  In the **bounded canonical six-auditor evaluation** (`run_id=canonical_v3_bounded_run_v2`,
+  `ledger_gz_sha=f9cca53e`, `elapsed=281.3s`, `completed_cells=596/596`, `failed_cells=0`,
+  `missing_or_error_rate=0.0` across `CatBoost`, `LightGBM`, `XGBoost`, `MLP`, `Linear/Logistic`, and
+  `LocalGatedAttentionAuditor` [`_LocalGatedAttentionNet`, `adamw_steps=12`, `hidden_dim=32` on CPU;
+  **not** official KumoTabular or TabPFN], using `CANONICAL_V3_AUDITOR_PROTOCOL_SPEC` with read-only
+  authentic targets and invertible contiguous label bijections; historical `v2` wrapper scores are not
+  compared directly against this bounded protocol):
+  - **Held-Out Multiclass Panel (`mc_datasets=69/69`, `within_cap=100.0%`):** Complete-case (`= zero-imputed sensitivity`, `missing_rate=0.0`) six-auditor clipped retention is `R_mc_scaled=0.7271/0.7767/0.8402/0.8362` (`D_mc_scaled=0.6462/0.6715/0.7157/0.7158`) and isolated-receiver `CSC_v=1` raw-domain retention is `R_mc_csc1_raw=0.7018/0.7789/0.8451/0.8404` (`D_mc_csc1_raw=0.6484/0.6734/0.7114/0.7147`; vs. diagnostic exact `dtype=fp64` inverse control `R_mc_fp64_ctrl=0.7248/0.7812/0.8470/0.8440`, `mean_abs_delta=0.03205/0.00510/0.00801/0.00917`) across `Small`/`Medium`/`High`/`Ultra`.
+  - **Stratified `v2`-Panel Reconciliation Slice (`v2_slice_datasets=80/80` [`reg=50`, `bin=30`], `within_cap=100.0%`):** Six-auditor clipped retention is `R_v2s_scaled=0.8297/0.8544/0.8708/0.8723` (`D_v2s_scaled=0.7654/0.7708/0.7786/0.7797`) and isolated-receiver `CSC_v=1` raw-domain retention is `R_v2s_csc1_raw=0.8379/0.8626/0.8768/0.8774` (`D_v2s_csc1_raw=0.7604/0.7677/0.7820/0.7789`; vs. diagnostic exact `dtype=fp64` inverse control `R_v2s_fp64_ctrl=0.8406/0.8640/0.8801/0.8809`, `mean_abs_delta=0.01224/0.00309/0.00557/0.00625`).
+  - **Equal-Wire Comparator Tournament & Paired Uncertainty (`bootstrap_reps=200`):** Across `paired_cells=1,788`, `DOPE-MLC-v3` (`Elo=1474.8`, `CI=[1453.4, 1494.8]`, `SE=11.31`) records positive retention delta over equal-wire Gaussian/low-rank copula (`copula_wire` `Elo=1371.3`, `CI=[1348.1, 1396.1]`, `mean_delta_R=+0.1488`, `CI=[+0.1351, +0.1616]`, `W/T_010/L=749/877/162`), differs from `DOPE-MLC-v2` by `mean_delta_R=-0.0116` (`CI=[-0.0156, -0.0056]`, `W/T_010/L=27/654/39` across the `paired_v2_cells=720` regression/binary `Medium`/`High`/`Ultra` cells supported by `v2`; `v2` `Elo=1542.0`, `CI=[1522.2, 1560.2]`) while adding `Small` and `multiclass` support, and trails raw quantized training-row subsampling (`rows_wire` `Elo=1611.8`, `CI=[1585.7, 1639.2]`, `mean_delta_R=-0.0528`, `CI=[-0.0651, -0.0411]`, `W/T_010/L=249/965/574`). The remaining `unmeasured_v2_panel=920/1,000` datasets under `v3`, upstream source-family disjointness beyond exact `train_sha256`, and untouched confirmatory generalization remain open.
+
 </details>
 
 ## Quick start

@@ -854,8 +854,16 @@
     "research/levels/strata_audit.py": "external-evidence",
     "research/levels/disjoint_reconcile.py": "external-evidence",
     "research/levels/render_multilevel_evidence.py": "external-evidence",
+    "research/levels/building_block_landmarks.py": "external-evidence",
+    "research/levels/multiclass_head.py": "external-evidence",
+    "research/levels/budget_planner.py": "external-evidence",
+    "research/levels/v3_ablation_and_eval.py": "external-evidence",
+    "research/levels/v3_ledger_replay.py": "external-evidence",
+    "research/levels/v3_canonical_roster_eval.py": "external-evidence",
+    "research/levels/v3_canonical_runner.py": "external-evidence",
     "research/levels/tests/test_scaling_and_descriptors.py": "external-evidence",
-    "research/levels/tests/test_multilevel_model.py": "external-evidence"
+    "research/levels/tests/test_multilevel_model.py": "external-evidence",
+    "research/levels/tests/test_dope_mlc_v3.py": "external-evidence"
   },
   "workspace": "dope"
 }
