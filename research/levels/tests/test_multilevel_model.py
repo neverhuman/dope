@@ -181,21 +181,69 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
         report = _mock_report(n_rows=n_tr, n_features=7, task="regression")
         for level in ("medium", "high", "ultra"):
             enc_mem = sender_model.encode_table(X_tr, y_tr, report, task="regression", level=level)
-            raw_wire = serialize_dope_latent_wire_bytes(enc_mem)
-            z_wire = zlib.compress(raw_wire, level=9)
-            dec_wire = deserialize_dope_latent_wire_bytes(zlib.decompress(z_wire))
+            # Legacy version=1 (lossy fp16 scalars/thresholds) side-by-side with version=2 (exact replay)
+            raw_v1 = serialize_dope_latent_wire_bytes(enc_mem, version=1)
+            dec_v1 = deserialize_dope_latent_wire_bytes(zlib.decompress(zlib.compress(raw_v1, level=9)))
+            self.assertEqual(serialize_dope_latent_wire_bytes(dec_v1, version=1), raw_v1)
 
-            # Verify bit-exact roundtrip of serialized wire bytes
-            self.assertEqual(serialize_dope_latent_wire_bytes(dec_wire), raw_wire)
+            raw_v2 = serialize_dope_latent_wire_bytes(enc_mem, version=2)
+            dec_v2 = deserialize_dope_latent_wire_bytes(zlib.decompress(zlib.compress(raw_v2, level=9)))
+            self.assertEqual(serialize_dope_latent_wire_bytes(dec_v2, version=2), raw_v2)
+            self.assertEqual(len(raw_v2) - len(raw_v1), 22)
 
             X_mem, y_mem = sender_model.generate_synthetic(enc_mem, n_rows=n_tr, seed=20261023)
-            X_dec, y_dec = receiver_model.generate_synthetic(dec_wire, n_rows=n_tr, seed=20261023)
+            X_v1, y_v1 = receiver_model.generate_synthetic(dec_v1, n_rows=n_tr, seed=20261023)
+            X_v2, y_v2 = receiver_model.generate_synthetic(dec_v2, n_rows=n_tr, seed=20261023)
 
-            # X_syn depends only on fp16/bool tensors already quantized in encode_table -> bit-exact match
-            self.assertEqual(float(np.max(np.abs(X_mem - X_dec))), 0.0)
-            # y_syn differs only by fp16 quantization of 11 target_bundle scalars & tree thresholds
-            corr_y = float(np.corrcoef(y_mem, y_dec)[0, 1])
-            self.assertGreater(corr_y, 0.999)
+            # Version 1: X_syn exact, y_syn has minor fp16 drift
+            self.assertTrue(np.array_equal(X_mem, X_v1))
+            self.assertGreater(float(np.corrcoef(y_mem, y_v1)[0, 1]), 0.999)
+            # Version 2: BOTH X_syn and y_syn are bit-for-bit identical in isolated receiver
+            self.assertTrue(np.array_equal(X_mem, X_v2))
+            self.assertTrue(np.array_equal(y_mem, y_v2))
+
+    def test_wire_v1_threshold_and_classification_drift_vs_v2_exact_parity(self):
+        rng = np.random.default_rng(20261024)
+        n_tr = 160
+        X_tr = rng.normal(size=(n_tr, 6))
+        y_cls = (X_tr[:, 0] + 0.6 * X_tr[:, 1] > 0.25).astype(np.float64)
+
+        sender_model = MultiLevelLandmarkModel().eval()
+        receiver_model = MultiLevelLandmarkModel().eval()
+        receiver_model.load_state_dict(sender_model.state_dict())
+        report = _mock_report(n_rows=n_tr, n_features=6, task="classification")
+
+        enc = sender_model.encode_table(X_tr, y_cls, report, task="classification", level="ultra")
+        X_mem, _ = sender_model.generate_synthetic(enc, n_rows=n_tr, seed=20261023)
+        # Set tree 0 split threshold to a 4-decimal value near synthetic X_mem[:, f] where fp16 rounding crosses a sample
+        f0 = enc["target_bundle"]["trees"][0]["features"][0]
+        target_val = float(np.sort(X_mem[:, f0])[n_tr // 2])
+        th_exact = round(target_val, 4)
+        if float(np.float16(th_exact)) == th_exact:
+            th_exact = round(target_val + 0.0003, 4)
+        enc["target_bundle"]["trees"][0]["thresholds"][0] = th_exact
+        enc["target_bundle"]["trees"][0]["leaf_values"] = np.array([-2.5, 2.5] * (1 << (len(enc["target_bundle"]["trees"][0]["features"]) - 1)), dtype=np.float16)
+
+        X_orig, y_orig = sender_model.generate_synthetic(enc, n_rows=n_tr, seed=20261023)
+        dec_v1 = deserialize_dope_latent_wire_bytes(serialize_dope_latent_wire_bytes(enc, version=1))
+        dec_v2 = deserialize_dope_latent_wire_bytes(serialize_dope_latent_wire_bytes(enc, version=2))
+        X_v1, y_v1 = receiver_model.generate_synthetic(dec_v1, n_rows=n_tr, seed=20261023)
+        X_v2, y_v2 = receiver_model.generate_synthetic(dec_v2, n_rows=n_tr, seed=20261023)
+
+        self.assertNotEqual(dec_v1["target_bundle"]["trees"][0]["thresholds"][0], th_exact)
+        self.assertEqual(dec_v2["target_bundle"]["trees"][0]["thresholds"][0], th_exact)
+        self.assertTrue(np.array_equal(X_orig, X_v2))
+        self.assertTrue(np.array_equal(y_orig, y_v2))
+
+        # Verify Mode 1 (int32 threshold > 3.2767) and Mode 2 (unrounded float64 threshold + scalar fallback)
+        enc["target_bundle"]["trees"][0]["thresholds"][0] = 14.5678
+        enc["target_bundle"]["trees"][1]["thresholds"][0] = 0.123456789
+        enc["target_bundle"]["res_net_mean"] = 0.123456789123
+        dec_fb = deserialize_dope_latent_wire_bytes(serialize_dope_latent_wire_bytes(enc, version=2))
+        X_fb0, y_fb0 = sender_model.generate_synthetic(enc, n_rows=n_tr, seed=20261023)
+        X_fb1, y_fb1 = receiver_model.generate_synthetic(dec_fb, n_rows=n_tr, seed=20261023)
+        self.assertTrue(np.array_equal(X_fb0, X_fb1))
+        self.assertTrue(np.array_equal(y_fb0, y_fb1))
 
 
 if __name__ == "__main__":
