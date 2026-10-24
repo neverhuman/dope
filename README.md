@@ -129,6 +129,42 @@ CatBoost `R=0.8810` (`D=0.8130 passes D80`, `rho=0.7036`, `top3=76.33%`, `acc_sy
 and XGBoost `R=0.8121` (`D=0.7221`). Generating `N_syn=5x` rows from the frozen encoding lifts
 CatBoost retention from `R_1x=0.8808` $\to$ `R_2x=0.9010` $\to$ **`R_5x=0.9070`**.
 
+- **Four-Tier Building-Block Landmark, Inter-Landmark Summary & Multi-Task Extension (`DOPE-MLC-v3`):**
+  Adds `bb_probes=16` mathematical building-block probes (`asinh`, `atan`, `erf`, `cbrt`, `log_p`,
+  `row_summaries`, `tanh_sat`, `expm_laplace`, `clamp_winsor`, `step_median`, `hinge_quartile`,
+  `sin_cos`, `fract_modular`, `hypot_radial`, `atan_angular`, `norm_diff_ratio`), `inter_stats=48`
+  inter-landmark summary statistics (`InterLandmarkAttentionBlock`), active per-column gating
+  (`col_gate_head` wired into `loss`, `encode_table`, and `generate_synthetic`), a fourth
+  `Small` (`cap=2,048B`) complete-envelope tier (`DML_v=3` header + `CSC_v=1` compact scaler sidecar),
+  and multiclass (`LR-VLOT` shared-split vector-leaf oblivious trees) across the reconciled
+  `catalog_datasets=3,859` manifest (`train_gradient=2,199`, `dev_val_ablation=112`,
+  `eval_v2_panel=1,000` [`untouched_sealed_confirmatory_test=false`],
+  `eval_multiclass_panel=69` [`unexposed_in_v2`], `excluded=479`, `sha256_cross_role_overlaps=0`
+  [exact SHA disjointness; upstream benchmark-family disjointness remains unverified]). In the
+  preserved `task-2354` ablation (`receipt_sha=ce58d6b8`, `ckpt_sha=a36510b9`, trained on
+  `train_episode_cells=677` [`reg_bin=480`, `multiclass=197`], evaluated on
+  `dev_val_evaluated=110/112` [`reg=40/41`, `bin=17/17`, `mc=53/54`], and probed on
+  `mc_probe_datasets=68/69` with two auditors without saving a per-dataset ledger), validation loss improves
+  monotonically from `A0_loss=0.83084` $\to$ `A1_loss=0.82908` $\to$ `A2_loss=0.82757` $\to$
+  **`A3_loss=0.82748`** (`driver_A0=0.04205` $\to$ **`driver_A3=0.03954`**, `col_gate_grad_norm=0.000721`).
+  In the separate **new frozen-checkpoint replay** (`task=2502`, `v3_per_dataset_multitask_ledger.jsonl.gz`
+  `sha=8574f2d7`, `measured_cells=724` over `measured_datasets=181` [`dev_val=112x4`, `eval_mc=69x4`] plus
+  `skip_records=4` for `total_rows=728`, **not** recovered original `task-2354` raw measurements),
+  complete wire envelopes achieve `within_cap=100.0%` at all four tiers (`Small`
+  `mean_B=1,300.8B` / `max_B=2,042B`, `Medium` `mean_B=2,404.2B` / `max_B=4,067B`, `High`
+  `mean_B=6,293.9B` / `max_B=14,909B`, `Ultra` `mean_B=13,146.8B` / `max_B=39,629B`), with
+  preliminary two-auditor (`RF+Logistic`) clipped/unclipped mean retention on `mc_2354=68`
+  `R_2aud_small=0.7966/0.8078`, `R_2aud_med=0.8393/0.8393`, `R_2aud_high=0.9120/0.9139`,
+  `R_2aud_ultra=0.9202/0.9422`, six-auditor scikit-learn probe (`RF, Logistic, HistGBR, ExtraTrees, KNN, RidgeClassifier` —
+  distinct from the `v2` canonical `CatBoost/LightGBM/XGBoost/MLP/Linear/LocalAttention` roster)
+  clipped/unclipped retention `R_6aud_small=0.7940/0.7940`, `R_6aud_med=0.8370/0.8376`, `R_6aud_high=0.8982/0.8982`,
+  **`R_6aud_ultra=0.9156/0.9185`** (`all_69_clipped=0.9205`), and isolated-receiver `CSC_v=1` raw-domain inverse
+  retention (evaluated on `mc_raw_cells=492` multiclass cells only; `CSC_v=1` uses `dtype=fp16` approximate inverse scaling
+  with `max_test_diff=1.8005` at `High`/`Ultra`, not bit-exact `dtype=fp64` scaler parity)
+  `R_raw_small=0.7838`, `R_raw_med=0.8355`, `R_raw_high=0.8888`, **`R_raw_ultra=0.9071`**. Full `v3`
+  thousand-dataset transfer/Elo/driver-fidelity study, original `v2` canonical auditor roster, upstream
+  source-family disjointness, and untouched confirmatory generalization remain open.
+
 </details>
 
 ## Quick start

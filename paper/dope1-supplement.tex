@@ -287,10 +287,14 @@ Bradley--Terry Elo evaluation (reporting separate strictly dataset-disjoint held
 row-fold, and disjoint-trained reconciliation cohorts as selection-exposed development validation,
 together with full one-thousand-dataset exact wire round-trip qualification of the versioned
 \texttt{DOPE-MLC-v2} codec alongside preserved legacy lossy wire metrics, raw-domain scaler-sidecar
-byte accounting, and unqualified post-hoc baseline byte estimates) are
+byte accounting, and unqualified post-hoc baseline byte estimates) and its four-tier building-block
+landmark, inter-landmark summary, and multi-task extension (\texttt{DOPE-MLC-v3}, preserving the
+initial ablation receipt alongside a separate new frozen-checkpoint replay ledger across sender-scaled
+and multiclass-only approximate compact-scaler raw-domain protocols) are
 reproduced via \texttt{research/levels/rapid\_validate.py},
 \texttt{research/levels/s3\_multilevel\_trainer.py}, \texttt{research/levels/world\_class\_eval.py},
-\texttt{research/levels/strata\_audit.py}, \texttt{research/levels/disjoint\_reconcile.py}, and
+\texttt{research/levels/strata\_audit.py}, \texttt{research/levels/disjoint\_reconcile.py},
+\texttt{research/levels/v3\_ablation\_and\_eval.py}, \texttt{research/levels/v3\_ledger\_replay.py}, and
 \texttt{research/levels/render\_multilevel\_evidence.py}
 (see \texttt{docs/multilevel-landmark-dl-study.md}).
 

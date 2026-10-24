@@ -287,4 +287,71 @@ python3 -B -m research.levels.disjoint_reconcile --device cuda --epochs 8 --work
 
 # 6. Render all 5 publication figures (PNG + PDF)
 python3 -B -m research.levels.render_multilevel_evidence
+
+# 7. Run DOPE-MLC-v3 split/exposure manifest + A0..A3 ablation (initial task-2354 source)
+python3 -B -m research.levels.v3_ablation_and_eval
+
+# 8. Run bounded frozen-A3 per-dataset/per-tier/per-auditor ledger & targeted recovery pass
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 RAYON_NUM_THREADS=1 nice -n 10 python3 -B -m research.levels.v3_ledger_replay
 ```
+
+---
+
+## 7. `DOPE-MLC-v3` Building-Block Landmarks, Inter-Landmark Summary Statistics, 4-Tier Complete Envelope & Multi-Task Ledger (`task-2354` & `task-2502`)
+
+### 7.1 Architectural & Wire-Envelope Additions
+- **Building-Block Landmark Probes (`16` Global + `7` Per-Column + `8` Heteroscedastic/Tail + `20` Multiclass Simplex Probes)**: Implemented in [`research/levels/building_block_landmarks.py`](../research/levels/building_block_landmarks.py) (`compute_row_summary_features`, `compute_building_block_landmarks`) using first-principles mathematical building blocks (`asinh`, `atan`, `erf`, `cbrt`, `log1p`, invariant row summaries `row_mean/std/l1/l2/min/max/skew/missing_frac`, `tanh`, `expm1`, `clamp`, `step`, `hinge`, `sin/cos`, `fract`, `hypot`, `atan2`, and normalized difference ratio).
+- **Inter-Landmark Summary Statistics (`48` Features *Between* Landmarks + `InterLandmarkAttentionBlock`)**: Implemented in [`building_block_landmarks.py`](../research/levels/building_block_landmarks.py) (`compute_inter_landmark_summary_stats`) and [`multiclass_head.py`](../research/levels/multiclass_head.py) (`InterLandmarkAttentionBlock`), capturing functional-family moments, cross-landmark ratios/uplifts/velocities, precision-weighted `gain/SE` $t$-statistics, and 2D column $\times$ landmark spectrum alignment correlations (`vec256 = 140 + 48 + 68`).
+- **Active Per-Column Gate Head (`col_gate_head`)**: Fixed the previously inactive `col_gate_head` in [`multilevel_model.py`](../research/levels/multilevel_model.py) (`nn.Linear(latent_dim + 24, 1)`), wiring it into `forward_conditioning` (`loss`), `encode_table`, and `generate_synthetic` (`col_gate_head_mean_grad_norm = 0.000721 > 0`, `col_gate_head_mean_column_std = 0.003894 > 0` in `A3`).
+- **Four Complete-Envelope Byte Tiers (`Small` `2,048 B`, `Medium` `4,096 B`, `High` `16,384 B`, `Ultra` `65,536 B`) & Multiclass (`LR-VLOT`)**: Implemented in [`budget_planner.py`](../research/levels/budget_planner.py) (`DML3` envelope + `CSC1` compact scaler sidecar) and [`multiclass_head.py`](../research/levels/multiclass_head.py) (low-rank simplex logit basis + shared-split vector-leaf oblivious trees with minimum-quota class support preservation).
+
+### 7.2 Reconciled `3,859`-Dataset Catalog Split & Prior-Exposure Table (`v3_corpus_exposure_and_split_manifest.json`, `SHA-256: 66d2a63c...`)
+
+| Assigned `v3` Role | Prior `v2` Exposure Classification | Catalog Task Breakdown | Manifest Count | Evaluated in `task-2354` (`ce58d6b8...`) | Evaluated in New Frozen-`A3` Replay (`task-2502`, `8574f2d7...`) | Notes & Exact Skip / Subsample Disclosures |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **`train_gradient`** | `v2_train_2001_exposed` (`2,001`) + `unexposed_in_v2_multiclass_train` (`198`) | `1,623` regression, `378` binary, `198` `multi_label` (`multiclass`) | **`2,199`** | **`677`** (`480` reg/bin + `197` mc) | `1` historical skip record (`2f7cb79fa3035f03`) | `task-2354` subsampled `480/2,001` reg/bin `fit-iid-65-v1` cells for 4-epoch CPU turnaround; `2f7cb79fa3035f03` (`1,000` rows, class counts `[2,996,1,1]`) skipped by unstratified 384-row fit subsample (`sampled_fit_classes_1_lt_3_unstratified`). |
+| **`dev_val_ablation`** | `v2_dev_val_58_exposed` (`58`) + `unexposed_in_v2_multiclass_dev_val` (`54`) | `41` regression, `17` binary, `54` `multi_label` (`multiclass`) | **`112`** | **`110`** (`40` reg, `17` bin, `53` mc) | **`112` DS (`448` cells)** + `2` skip records | `task-2502` is a **new frozen-checkpoint replay** (not recovered `task-2354` raw measurements); `4f118539d1a4c08c` (`reg`, lacked `fit-iid-65-v1`) and `df23b8acc038703b` (`mc`, rare class `0.0`) were newly evaluated under fallback split/class-seeding rules. |
+| **`eval_gradient_disjoint_v2_panel`** | `v2_eval_1000_selection_and_error_analysis_exposed` (**`untouched_sealed_confirmatory_test = false`**) | `627` regression, `373` binary | **`1,000`** | Not re-run in `v3` | `OPEN_unmeasured` in `task-2502` | Evaluated under `v2` in `strata_1000_audit_receipt_v4_exact_wire_replay.json`; full `1,000`-dataset `v3` transfer/Elo/driver-fidelity re-scoring remains open. |
+| **`eval_gradient_disjoint_multiclass_panel`** | `unexposed_in_v2_multiclass_heldout_eval` (`0` prior `v2` exposure) | `69` `multi_label` (`multiclass`, $3 \le K \le 32$) | **`69`** | **`68`** (preliminary 2-auditor probe, no per-DS JSONL saved) | **`69` DS (`276` cells)** + `1` skip record | `task-2502` newly replays all `68` `task-2354` datasets + newly evaluates `ad55f22e74c051c2` (`19` train rows, skipped in `task-2354` by `arr_tr.shape[0] < 20`) with `min_rows=16`. |
+| **Explicit Exclusions** | `132` `v2` low-oracle + `261` unindexed/degenerate + `83` `timeseries` + `3` missing local blobs | `298` regression, `95` binary, `1` `multi_label`, `85` `timeseries` | **`479`** | `0` | `0` | Documented in `v3_corpus_exposure_and_split_manifest.json`. |
+| **Total Catalog** | **All 6 active cross-role `train_sha256` overlaps = `0`** *(proves exact file/table SHA disjointness, not upstream benchmark-family disjointness)* | `2,589` reg, `863` bin, `322` `multi_label`, `85` `timeseries` | **`3,859`** | — | **`724` measured cells (`181` DS) + `4` skip records = `728` rows** | Hash-bound scope & audit addendum: `target/s3-multilevel-training-20261023/v3/v3_task2354_task2502_scope_and_audit_addendum.json`. |
+
+### 7.3 Matched `A0 -> A1 -> A2 -> A3` Ablation Progression (`task-2354`, `v3_dev_val_ablation_and_multitask_receipt.json`, `SHA-256: ce58d6b8...`)
+- Trained for `4` epochs over the `677`-cell training pool (`480` reg/bin + `197` multiclass) warm-started from `dope_mlc_v2_disjoint1000_best.pt`, evaluated on the `110` `dev_val_ablation` cells (`40` regression, `17` binary, `53` multiclass; frozen `A3` checkpoint archived at `target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.pt`, `SHA-256: a36510b9...`):
+
+| Ablation Variant | Mean `dev_val` Total Loss (`110` Cells) | `cond_y` Loss | `driver` Loss | By-Tier Total Loss (`Small / Med / High / Ultra`) | By-Task Total Loss (`Reg / Bin / Multiclass`) | `col_gate_head` Grad Norm / Column Std |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`A0_v2_baseline_140`** | `0.83084` | `0.81326` | `0.04205` | `0.84642 / 0.84010 / 0.82212 / 0.81471` | `0.60803 / 0.51266 / 1.10105` | `0.000000 / 0.000000` |
+| **`A1_plus_16_building_blocks`** | `0.82908` | `0.81201` | `0.03969` | `0.84613 / 0.83950 / 0.82013 / 0.81056` | `0.61014 / 0.50964 / 1.09678` | `0.000000 / 0.000000` |
+| **`A2_plus_48_inter_landmark_stats`** | `0.82757` | `0.81048` | `0.03963` | `0.84582 / 0.83902 / 0.81792 / 0.80753` | `0.60769 / 0.50927 / 1.09562` | `0.000000 / 0.000000` |
+| **`A3_full_v3_with_col_gate_head`** | **`0.82748`** | **`0.81041`** | **`0.03954`** | **`0.84579 / 0.83900 / 0.81781 / 0.80732`** | **`0.60746 / 0.50920 / 1.09562`** | **`0.000721 / 0.003894`** |
+
+### 7.4 Held-Out Multiclass Panel (`68` Initial & `69` Total Datasets) — Complete `DML3` Wire Bytes, Preliminary 2-Auditor vs. 6-Auditor Probes & Isolated-Receiver `CSC1` Raw-Domain Qualification
+- Bound to `target/s3-multilevel-training-20261023/v3/v3_per_dataset_multitask_ledger.jsonl.gz` (`SHA-256: 8574f2d71afc2526f5134192c3d76dcd3e5b1a13e023469208529019065ad09a`, `724` measured dataset-tier cells across `181` datasets + `4` historical skip records = `728` rows, `measurement_provenance = "frozen_checkpoint_replay"` — a **new frozen-checkpoint replay**, not recovered `task-2354` raw measurements), `target/s3-multilevel-training-20261023/v3/v3_multitask_ledger_receipt.json` (`SHA-256: 44b22686...`), and `target/s3-multilevel-training-20261023/v3/v3_task2354_task2502_scope_and_audit_addendum.json`:
+- **Explicit Auditor Roster & Raw-Receiver Scope Notes**:
+  1. The `task-2502` 6-auditor probe (`RF40_d8, LogisticL2_iter200, HistGBR_MC, ExtraTrees32_d8, KNN5_dist, RidgeClassifier_L2` for multiclass; `Ridge_L2, HistGBR_Reg, RF32_d6, ExtraTrees32_d6, MLP32, KNN5_dist` for regression; `LogisticL2, HistGBR_Bin, RF32_d6, ExtraTrees32_d6, MLP32, KNN5_dist` for binary) uses fast scikit-learn estimators and is **not** the original `v2` canonical `CatBoost / LightGBM / XGBoost / MLP / Linear / LocalGatedAttention` roster (`_KumoTabularWrapper` / `_TabularKumoAttentionNet`, a local gated-attention neural network trained from scratch per table, **never** official pretrained KumoTabular or TabPFN).
+  2. In `task-2502`, isolated-receiver `CSC1` raw-domain evaluation (`isolated_receiver_csc1_raw_domain`) covers **multiclass cells only** (`69` held-out multiclass datasets $\times$ `4` tiers = `276` cells + `54` `dev_val` multiclass datasets $\times$ `4` tiers = `216` cells = `492` multiclass cells; regression and binary `dev_val` cells were evaluated in `sender_scaled_test_domain` only). Furthermore, `CSC1` (`float16` `location`, `scale`, `power_lambda`, `winsor_low`, `winsor_high`) is a compact approximate wire inverse-scaler (`max_abs_diff = 1.8005` on test features at `High`/`Ultra`), **not** bit-exact `float64` `FitOnlyTableTransform` scaler parity.
+
+| Tier (`Cap`) | Complete `DML3` Wire Bytes (`68` DS Mean / `CSC1` Sidecar / Max / `% <= Cap` on `69` DS) | `task-2354` Preliminary 2-Auditor (`RF40+LogReg`) Mean $R$ (`Clipped / Unclipped / Floor=0.03 Count / Clip>1.25 Count` on `68` DS) | `sklearn` 6-Auditor Probe (`Sender-Scaled Test`) Mean $R$ (`68 DS Clipped / Unclipped` \| `All 69 DS Clipped`) | `Isolated Receiver CSC1 Raw-Domain Inverse` 6-Auditor Mean $R$ (`68 DS Clipped / Unclipped` \| `Max CSC1 Test Diff`) | Mean Costs (`Fit+Prep / Encode / Ser+Deser / Gen` ms) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **`Small` (`2,048 B`)** | **`1,300.8 B`** (`944.3 B` sidecar + `346.5 B` payload, max `2,042 B`, **`100.0%`**) | `0.7966 / 0.8078` (`0` floor, `2` clip) | `0.7940 / 0.7940` \| `0.8007` | **`0.7838 / 0.7875`** \| `8.1437` | `10.4 / 23.9 / 1.59 / 9.9` ms |
+| **`Medium` (`4,096 B`)** | **`2,404.2 B`** (`944.3 B` sidecar + `1,449.9 B` payload, max `4,067 B`, **`100.0%`**) | `0.8393 / 0.8393` (`0` floor, `0` clip) | `0.8370 / 0.8376` \| `0.8429` | **`0.8355 / 0.8355`** \| `2.6884` | `10.4 / 32.5 / 1.35 / 10.0` ms |
+| **`High` (`16,384 B`)** | **`6,293.9 B`** (`944.3 B` sidecar + `5,339.6 B` payload, max `14,909 B`, **`100.0%`**) | `0.9120 / 0.9139` (`0` floor, `1` clip) | `0.8982 / 0.8982` \| `0.9033` | **`0.8888 / 0.8903`** \| `1.8005` | `10.4 / 90.5 / 1.92 / 11.1` ms |
+| **`Ultra` (`65,536 B`)** | **`13,146.8 B`** (`944.3 B` sidecar + `12,192.5 B` payload, max `39,629 B`, **`100.0%`**) | `0.9202 / 0.9422` (`0` floor, `2` clip) | **`0.9156 / 0.9185`** \| **`0.9205`** | **`0.9071 / 0.9148`** \| `1.8005` | `10.4 / 154.8 / 1.67 / 12.0` ms |
+
+- **Per-Auditor Held-Out Multiclass Breakdown at `Ultra` (`68` Initial Datasets, Clipped / Unclipped $R$ in `Sender-Scaled` \| `Receiver CSC1 Raw-Domain`)**:
+  - `RandomForest40_d8`: `0.9050 / 0.9114` \| `0.9060 / 0.9161` (`0` floor)
+  - `LogisticL2_iter200`: `0.9324 / 0.9780` \| `0.9011 / 0.9267` (`0` floor)
+  - `HistGBR_MC`: `0.8730 / 0.8797` \| `0.8639 / 0.8682` (`2` floor)
+  - `ExtraTrees32_d8`: `0.8925 / 0.8940` \| `0.8854 / 0.8925` (`0` floor)
+  - `KNN5_dist`: `0.9143 / 0.9905` \| `0.9272 / 0.9675` (`1` floor)
+  - `RidgeClassifier_L2`: `0.9007 / 0.9034` \| `0.9191 / 0.9284` (`0` floor)
+- **`dev_val_ablation` (`110` Initial + `2` Newly Evaluated Previously-Skipped = `112` Datasets) 6-Auditor Ledger Summary at `Ultra` (`Sender-Scaled` for Reg/Bin, Both Domains for MC)**:
+  - `multiclass` (`53` initial / `54` all, `100.0% <= cap`): mean wire `11,964.9 B`, `2/54` floor applied, all-dataset 6-auditor `clipped_R = 0.8998` (`unclipped_R = 0.9167`), non-floor (`52/54`) `clipped_R = 0.9021`.
+  - `regression` (`40` initial / `41` all, `100.0% <= cap`): mean wire `3,632.5 B`; because `world_class_eval.py` selected high-signal tables for the `1,000`-dataset panel (`cb_sig >= 0.025`), `30/41` residual `dev_val` regression cells have near-zero oracle signal (`real_score - chance < 0.05` floor; mean `real_score = 0.1000`, `syn_score = 0.0747`), yielding all-dataset `clipped_R = 0.2296` (`unclipped_R = 0.2296`) and non-floor (`11/41`) `clipped_R = 0.7241` (`0.7669` at `High`).
+  - `classification` (`17/17`, `100.0% <= cap`): mean wire `5,301.9 B`; `13/17` residual `dev_val` binary cells have `real_score - 0.5 < 0.03` floor (mean `real_score = 0.5132`, `syn_score = 0.5119`), yielding all-dataset `clipped_R = 0.5271` (`unclipped_R = 0.1782`) and non-floor (`4/17`) `clipped_R = 0.7250`.
+- **Visibly Open Obligations**:
+  1. `v2_canonical_gbdt_mlp_attention_6aud_roster_on_v3`: **OPEN** — `task-2502` evaluated the 6-auditor scikit-learn probe + `task-2354` 2-auditor pair, not `v2`'s canonical `CatBoost / LightGBM / XGBoost / MLP / Linear / LocalGatedAttention` roster (`_KumoTabularWrapper` — local gated attention, never official Kumo/TabPFN).
+  2. `v3_full_1000_panel_transfer_elo_and_driver_fidelity`: **OPEN** — the `1,000`-dataset `v2` panel (`eval_gradient_disjoint_v2_panel`) was evaluated under `v2`, not re-scored in full under `v3`.
+  3. `source_family_disjointness_audit`: **OPEN (unverified beyond exact SHA-256)** — `0` cross-role `train_sha256` and `canonical_sha256` overlaps are verified, which does not by itself prove upstream benchmark-family disjointness.
+  4. `untouched_sealed_confirmatory_generalization`: **OPEN** — all `v2` and `v3` panels are selection/development/reconciliation validation cohorts (`untouched_sealed_confirmatory_test = false`).
