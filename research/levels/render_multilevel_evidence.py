@@ -197,7 +197,7 @@ def _enrich_receipt_with_uncertainty_and_coverage(
             ev["official_kumo_or_tabpfn_evaluated"] = rec.get("official_kumo_or_tabpfn_evaluated", False)
     else:
         (eval_path.parent / "coverage_cost_and_separation_receipt.json").write_text(json.dumps(cov_receipt, indent=2), encoding="utf-8")
-    eval_path.write_text(json.dumps(ev, indent=2), encoding="utf-8")
+    (eval_path.parent / "world_class_transfer_and_elo_enriched_receipt.json").write_text(json.dumps(ev, indent=2), encoding="utf-8")
     return ev
 
 
@@ -343,18 +343,26 @@ def render_all(
     fig, axes = plt.subplots(1, 3, figsize=(13.8, 4.4))
     sizes_kib = [4.0, 16.0, 64.0]
     levels = ["medium", "high", "ultra"]
+    audit_v2_path = eval_path.parent / "measured_egress_bytes_and_provenance_audit_v2.json"
+    measured_kib_map: Dict[str, List[float]] = {}
+    if audit_v2_path.exists():
+        audit_v2 = json.loads(audit_v2_path.read_text(encoding="utf-8"))
+        b_mt = audit_v2["cohorts"]["reconciled_strictly_dataset_disjoint_1000"]["measured_egress_bytes_summary"]["by_method_and_tier"]
+        for m_k, lv_d in b_mt.items():
+            measured_kib_map[m_k] = [float(lv_d[lv]["measured_replay_raw_bytes"]["median"]) / 1024.0 for lv in levels]
     method_styles = {
-        "dope_mlc_v2": ("DOPE-MLC-v2 (Ours)", "#15803d", "o", 2.6),
-        "rows": ("Subsampled Rows", "#2a78d6", "s", 1.9),
-        "kernel": ("Kernel-Ridge Sketch", "#eb6834", "^", 1.9),
-        "arf": ("Adversarial RF (ARF)", "#8b5cf6", "d", 1.7),
-        "joint_diffusion_v1": ("Joint Diffusion v1", "#64748b", "v", 1.6),
-        "copula": ("Gaussian Copula", "#94a3b8", "x", 1.5),
+        "dope_mlc_v2": ("DOPE-MLC-v2 (Latent Wire Est.)", "#15803d", "o", 2.6),
+        "rows": ("Subsampled Rows (fp16 Est.)", "#2a78d6", "s", 1.9),
+        "kernel": ("Kernel Sketch (202B Est., Tier-Inv)", "#eb6834", "^", 1.9),
+        "arf": ("ARF (10.2KiB Full-Table, Tier-Inv)", "#8b5cf6", "d", 1.7),
+        "joint_diffusion_v1": ("Joint Diffusion v1 (9.4KiB Full-Table)", "#64748b", "v", 1.6),
+        "copula": ("Gaussian Copula (226B Est., Tier-Inv)", "#94a3b8", "x", 1.5),
     }
     cross_elo = ev.get("cross_size_elo_by_artifact_bytes", {})
     m_sum = ev["method_by_level_summary"]
 
     for m_key, (label, col, mk, lw) in method_styles.items():
+        x_kib = measured_kib_map.get(m_key, sizes_kib)
         elos_m = [cross_elo[m_key][lvl]["elo"] for lvl in levels]
         elo_ses = [cross_elo[m_key][lvl].get("elo_se", 4.0) * 1.96 for lvl in levels]
         rets_m = [m_sum[f"{m_key}_{lvl}"]["mean_retention_R"] for lvl in levels if f"{m_key}_{lvl}" in m_sum]
@@ -363,40 +371,44 @@ def render_all(
         drv_ses = [m_sum[f"{m_key}_{lvl}"].get("driver_D_se", 0.005) * 1.96 for lvl in levels if f"{m_key}_{lvl}" in m_sum]
 
         ls_style = "--" if m_key == "rows" else "-"
-        lbl_use = "Raw Row Subsample (Non-Anon Control)" if m_key == "rows" else label
-        axes[0].errorbar(sizes_kib, elos_m, yerr=elo_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
+        lbl_use = "Raw Row Subsample (fp16 Est.)" if m_key == "rows" else label
+        axes[0].errorbar(x_kib, elos_m, yerr=elo_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
         if len(rets_m) == 3:
-            axes[1].errorbar(sizes_kib, rets_m, yerr=ret_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
+            axes[1].errorbar(x_kib, rets_m, yerr=ret_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
             if m_key == "dope_mlc_v2":
                 p25 = [m_sum[f"{m_key}_{lvl}"].get("p25_retention_R", rets_m[i] - 0.05) for i, lvl in enumerate(levels)]
                 p75 = [m_sum[f"{m_key}_{lvl}"].get("p75_retention_R", rets_m[i] + 0.05) for i, lvl in enumerate(levels)]
-                axes[1].fill_between(sizes_kib, p25, p75, color=col, alpha=0.13, label="DOPE IQR (25–75%)")
+                axes[1].fill_between(x_kib, p25, p75, color=col, alpha=0.13, label="DOPE IQR (25–75%)")
         if len(drvs_m) == 3:
-            axes[2].errorbar(sizes_kib, drvs_m, yerr=drv_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
+            axes[2].errorbar(x_kib, drvs_m, yerr=drv_ses, marker=mk, lw=lw, linestyle=ls_style, color=col, capsize=3, label=lbl_use)
 
     strata = ev.get("cohort_strata_breakdown", {})
-    if "strictly_dataset_disjoint_heldout_242" in strata:
-        sh = strata["strictly_dataset_disjoint_heldout_242"]
+    dope_x = measured_kib_map.get("dope_mlc_v2", sizes_kib)
+    dope_full_x = [2009.0 / 1024.0, 3354.0 / 1024.0, 6376.0 / 1024.0]
+    if "strictly_dataset_disjoint_242" in strata:
+        sh = strata["strictly_dataset_disjoint_242"]
         sh_elo = [sh["cross_size_elo_by_artifact_bytes"]["dope_mlc_v2"][lvl]["elo"] for lvl in levels]
         sh_r = [sh["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_retention_R"] for lvl in levels]
         sh_d = [sh["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_driver_fidelity_D"] for lvl in levels]
-        axes[0].plot(sizes_kib, sh_elo, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Strictly Held-Out (242 DS)")
-        axes[1].plot(sizes_kib, sh_r, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Strictly Held-Out (242 DS)")
-        axes[2].plot(sizes_kib, sh_d, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Strictly Held-Out (242 DS)")
+        axes[0].plot(dope_x, sh_elo, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
+        axes[1].plot(dope_x, sh_r, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
+        axes[2].plot(dope_x, sh_d, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
     if "reconciled_strictly_dataset_disjoint_1000" in strata:
         sd = strata["reconciled_strictly_dataset_disjoint_1000"]
         sd_elo = [sd["cross_size_elo_by_artifact_bytes"]["dope_mlc_v2"][lvl]["elo"] for lvl in levels]
         sd_r = [sd["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_retention_R"] for lvl in levels]
         sd_d = [sd["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_driver_fidelity_D"] for lvl in levels]
-        axes[0].plot(sizes_kib, sd_elo, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint-Trained (1000 DS)")
-        axes[1].plot(sizes_kib, sd_r, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint-Trained (1000 DS)")
-        axes[2].plot(sizes_kib, sd_d, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint-Trained (1000 DS)")
+        axes[0].plot(dope_x, sd_elo, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
+        axes[1].plot(dope_x, sd_r, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
+        axes[2].plot(dope_x, sd_d, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
+        axes[0].plot(dope_full_x, sd_elo, marker="*", lw=1.4, linestyle="--", color="#10b981", label="DOPE +545B Scaler Sidecar (Full Est.)")
+        axes[0].plot(sizes_kib, sd_elo, marker="o", lw=1.2, linestyle=":", color="#86efac", label="DOPE Nominal Cap (4/16/64 KiB)")
 
     for ax_i in axes:
         ax_i.set_xscale("log", base=2)
-        ax_i.set_xticks(sizes_kib)
-        ax_i.set_xticklabels(["4,096 B (4 KiB)\nMedium Tier", "16,384 B (16 KiB)\nHigh Tier", "65,536 B (64 KiB)\nUltra Tier"], fontsize=8.0)
-        ax_i.set_xlabel("Minimal Artifact Leaving Network (Measured Bytes)")
+        ax_i.set_xticks([0.25, 1.0, 4.0, 16.0, 64.0])
+        ax_i.set_xticklabels(["256 B", "1 KiB", "4 KiB\n(Med Cap)", "16 KiB\n(High Cap)", "64 KiB\n(Ultra Cap)"], fontsize=7.8)
+        ax_i.set_xlabel("Estimated Wire Payload (Median Raw Bytes; In-Memory Eval)", fontsize=8.4)
 
     axes[0].axhline(1500.0, color="#62615d", linestyle="--", lw=0.9)
     axes[0].set_ylabel("Bradley–Terry Elo Rating (±95% CI)")

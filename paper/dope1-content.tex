@@ -526,7 +526,11 @@ DOPE ships a program that draws fresh rows, and TDL charges it in bytes against 
 distortion. In the companion multi-level landmark study (\texttt{research/levels/}, documented in
 \texttt{docs/multilevel-landmark-dl-study.md}), a single hierarchical deep learning model
 (\texttt{DOPE-MLC-v2}) conditions three nested network-egress capacity tiers (\texttt{Medium} macro,
-\texttt{High} interaction, and \texttt{Ultra} fine with Chatterjee's $\xi$ spectrum) on pre-calculated
+\texttt{High} interaction, and \texttt{Ultra} fine with Chatterjee's $\xi$ spectrum, distinguishing
+nominal tier budget caps from normalized-space latent wire representation bytes and full raw-domain
+scaler-sidecar estimates; full-wire one-thousand-dataset performance remains unqualified because scores
+were evaluated in-memory in normalized space, with partial wire-decode qualification on a
+representative fixture showing exact covariate recovery alongside bounded median and outlier target-quantization shifts) on pre-calculated
 training-only cross-validation landmarks and train-only column scaling, achieving the top overall and
 cross-size Bradley--Terry Elo ranking across both strictly dataset-disjoint held-out cohorts and
 in-corpus unseen row-fold cohorts (reported as selection-exposed development and reconciliation
