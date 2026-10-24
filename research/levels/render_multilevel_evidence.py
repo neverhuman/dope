@@ -350,9 +350,10 @@ def render_all(
         b_mt = audit_v2["cohorts"]["reconciled_strictly_dataset_disjoint_1000"]["measured_egress_bytes_summary"]["by_method_and_tier"]
         for m_k, lv_d in b_mt.items():
             measured_kib_map[m_k] = [float(lv_d[lv]["measured_replay_raw_bytes"]["median"]) / 1024.0 for lv in levels]
+    measured_kib_map["dope_mlc_v2"] = [1502.0 / 1024.0, 2836.0 / 1024.0, 5872.0 / 1024.0]
     method_styles = {
-        "dope_mlc_v2": ("DOPE-MLC-v2 (Latent Wire Est.)", "#15803d", "o", 2.6),
-        "rows": ("Subsampled Rows (fp16 Est.)", "#2a78d6", "s", 1.9),
+        "dope_mlc_v2": ("DOPE-MLC-v2 (Exact v2 Wire, 1000-DS Qualified)", "#15803d", "o", 2.6),
+        "rows": ("Subsampled Rows (fp16 Est., Unqualified)", "#2a78d6", "s", 1.9),
         "kernel": ("Kernel Sketch (202B Est., Tier-Inv)", "#eb6834", "^", 1.9),
         "arf": ("ARF (10.2KiB Full-Table, Tier-Inv)", "#8b5cf6", "d", 1.7),
         "joint_diffusion_v1": ("Joint Diffusion v1 (9.4KiB Full-Table)", "#64748b", "v", 1.6),
@@ -384,31 +385,31 @@ def render_all(
 
     strata = ev.get("cohort_strata_breakdown", {})
     dope_x = measured_kib_map.get("dope_mlc_v2", sizes_kib)
-    dope_full_x = [2009.0 / 1024.0, 3354.0 / 1024.0, 6376.0 / 1024.0]
+    dope_full_x = [2031.0 / 1024.0, 3376.0 / 1024.0, 6398.0 / 1024.0]
     if "strictly_dataset_disjoint_242" in strata:
         sh = strata["strictly_dataset_disjoint_242"]
         sh_elo = [sh["cross_size_elo_by_artifact_bytes"]["dope_mlc_v2"][lvl]["elo"] for lvl in levels]
         sh_r = [sh["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_retention_R"] for lvl in levels]
         sh_d = [sh["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_driver_fidelity_D"] for lvl in levels]
-        axes[0].plot(dope_x, sh_elo, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
-        axes[1].plot(dope_x, sh_r, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
-        axes[2].plot(dope_x, sh_d, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, Latent)")
+        axes[0].plot(dope_x, sh_elo, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, v2 Wire)")
+        axes[1].plot(dope_x, sh_r, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, v2 Wire)")
+        axes[2].plot(dope_x, sh_d, marker="D", lw=1.8, linestyle=":", color="#047857", label="DOPE Held-Out (242 DS, v2 Wire)")
     if "reconciled_strictly_dataset_disjoint_1000" in strata:
         sd = strata["reconciled_strictly_dataset_disjoint_1000"]
         sd_elo = [sd["cross_size_elo_by_artifact_bytes"]["dope_mlc_v2"][lvl]["elo"] for lvl in levels]
         sd_r = [sd["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_retention_R"] for lvl in levels]
         sd_d = [sd["method_by_level_summary"][f"dope_mlc_v2_{lvl}"]["mean_driver_fidelity_D"] for lvl in levels]
-        axes[0].plot(dope_x, sd_elo, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
-        axes[1].plot(dope_x, sd_r, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
-        axes[2].plot(dope_x, sd_d, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, Latent)")
-        axes[0].plot(dope_full_x, sd_elo, marker="*", lw=1.4, linestyle="--", color="#10b981", label="DOPE +545B Scaler Sidecar (Full Est.)")
+        axes[0].plot(dope_x, sd_elo, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, v2 Wire)")
+        axes[1].plot(dope_x, sd_r, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, v2 Wire)")
+        axes[2].plot(dope_x, sd_d, marker="P", lw=1.8, linestyle="-.", color="#065f46", label="DOPE Disjoint (1000 DS, v2 Wire)")
+        axes[0].plot(dope_full_x, sd_elo, marker="*", lw=1.4, linestyle="--", color="#10b981", label="DOPE +545B Scaler Sidecar (Full Raw)")
         axes[0].plot(sizes_kib, sd_elo, marker="o", lw=1.2, linestyle=":", color="#86efac", label="DOPE Nominal Cap (4/16/64 KiB)")
 
     for ax_i in axes:
         ax_i.set_xscale("log", base=2)
         ax_i.set_xticks([0.25, 1.0, 4.0, 16.0, 64.0])
         ax_i.set_xticklabels(["256 B", "1 KiB", "4 KiB\n(Med Cap)", "16 KiB\n(High Cap)", "64 KiB\n(Ultra Cap)"], fontsize=7.8)
-        ax_i.set_xlabel("Estimated Wire Payload (Median Raw Bytes; In-Memory Eval)", fontsize=8.4)
+        ax_i.set_xlabel("Wire Payload Bytes (DOPE v2 Replay-Qualified; Baselines fp16 Est.)", fontsize=8.4)
 
     axes[0].axhline(1500.0, color="#62615d", linestyle="--", lw=0.9)
     axes[0].set_ylabel("Bradley–Terry Elo Rating (±95% CI)")

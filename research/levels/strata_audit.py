@@ -299,25 +299,52 @@ def audit_filtered_candidates_and_auditors(
     }
 
 
-def serialize_dope_latent_wire_bytes(enc: Dict[str, Any]) -> bytes:
-    """Pack normalized-space DOPE-MLC-v2 encoding into the v2 compact binary wire representation (42B fixed prefix + fp16/uint8 tensors)."""
+_WIRE_SCALAR_DECIMALS = (6, 5, 6, 5, 6, 5, 5)
+_WIRE_SCALAR_KEYS = ("res_net_mean", "neural_w", "residual_std", "noise_scale", "class_prior", "y_min", "y_max")
+_WIRE_GATE_KEYS = ("monotone_w", "hinge_w", "pair_w", "tree_w")
+
+
+def serialize_dope_latent_wire_bytes(enc: Dict[str, Any], *, version: int = 2) -> bytes:
+    """Pack normalized-space DOPE-MLC-v2 encoding into versioned binary wire bytes (version=1 quantized fp16; version=2 exact replay)."""
+    if version not in (1, 2):
+        raise ValueError(f"unsupported_wire_version_{version}")
     buf = bytearray()
     lvl_map = {"medium": 0, "high": 1, "ultra": 2}
     task_map = {"regression": 0, "classification": 1}
     tb = enc["target_bundle"]
     trees, pairs, disc = tb["trees"], tb["pairs"], enc.get("discrete_support", {})
+    gates = tb["gates"]
+    ver_byte = version
+    sc_i32, gate_f32, exact_compact = [], [], (version == 2)
+    if version == 2:
+        for k, dec in zip(_WIRE_SCALAR_KEYS, _WIRE_SCALAR_DECIMALS):
+            v = float(tb[k])
+            q = int(round(v * (10 ** dec)))
+            if not (-2147483648 <= q <= 2147483647) or struct.pack("<d", round(q / float(10 ** dec), dec)) != struct.pack("<d", v):
+                exact_compact = False
+                break
+            sc_i32.append(q)
+        if exact_compact:
+            for k in _WIRE_GATE_KEYS:
+                v = float(gates[k])
+                vf = struct.unpack("<f", struct.pack("<f", v))[0]
+                if struct.pack("<d", float(vf)) != struct.pack("<d", v):
+                    exact_compact = False
+                    break
+                gate_f32.append(vf)
+        ver_byte = 2 if exact_compact else (2 | 0x10)
     buf.extend(struct.pack(
-        "<BBBBIIHHHHHH", 1, lvl_map[enc["level"]], task_map[enc["task"]], len(trees),
+        "<BBBBIIHHHHHH", ver_byte, lvl_map[enc["level"]], task_map[enc["task"]], len(trees),
         int(enc["n_train"]), int(enc["p_use"]), len(enc["regime_weights"]),
         int(enc["chol_factor"].shape[1]), len(enc["knot_grid"]), len(pairs), len(tb["w_basis"]), len(disc),
     ))
-    gates = tb["gates"]
-    scalars_fp16 = np.array([
-        tb["res_net_mean"], tb["neural_w"], tb["residual_std"], tb["noise_scale"],
-        tb["class_prior"], tb["y_min"], tb["y_max"],
-        gates["monotone_w"], gates["hinge_w"], gates["pair_w"], gates["tree_w"],
-    ], dtype=np.float16)
-    buf.extend(scalars_fp16.tobytes())
+    if version == 1:
+        scalars_fp16 = np.array([tb[k] for k in _WIRE_SCALAR_KEYS] + [gates[k] for k in _WIRE_GATE_KEYS], dtype=np.float16)
+        buf.extend(scalars_fp16.tobytes())
+    elif exact_compact:
+        buf.extend(struct.pack("<7i4f", *sc_i32, *gate_f32))
+    else:
+        buf.extend(struct.pack("<11d", *[float(tb[k]) for k in _WIRE_SCALAR_KEYS], *[float(gates[k]) for k in _WIRE_GATE_KEYS]))
     for k in ("regime_weights", "regime_means", "regime_scales", "chol_factor", "diag_res_std", "dist_latent", "task_latent", "col_knots", "binary_probs", "binary_low_high"):
         buf.extend(np.asarray(enc[k], dtype=np.float16).tobytes())
     buf.extend(np.packbits(np.asarray(enc["is_binary_col"], dtype=bool)).tobytes())
@@ -331,20 +358,38 @@ def serialize_dope_latent_wire_bytes(enc: Dict[str, Any]) -> bytes:
     buf.extend(np.asarray(tb["w_basis"], dtype=np.float16).tobytes())
     for t in trees:
         feats = np.asarray(t["features"], dtype=np.uint8)
-        thresh = np.asarray(t["thresholds"], dtype=np.float16)
+        depth = len(feats)
         leaf_v = np.asarray(t["leaf_values"], dtype=np.float16)
-        buf.extend(struct.pack("<B", len(feats)))
-        buf.extend(feats.tobytes())
-        buf.extend(thresh.tobytes())
+        if version == 1:
+            buf.extend(struct.pack("<B", depth))
+            buf.extend(feats.tobytes())
+            buf.extend(np.asarray(t["thresholds"], dtype=np.float16).tobytes())
+        else:
+            ths = [float(x) for x in t["thresholds"]]
+            qs = [int(round(x * 10000.0)) for x in ths]
+            exact_q = all(struct.pack("<d", round(q / 10000.0, 4)) == struct.pack("<d", x) for q, x in zip(qs, ths))
+            if exact_q and all(-32768 <= q <= 32767 for q in qs):
+                buf.extend(struct.pack("<B", depth))
+                buf.extend(feats.tobytes())
+                buf.extend(struct.pack(f"<{depth}h", *qs))
+            elif exact_q and all(-2147483648 <= q <= 2147483647 for q in qs):
+                buf.extend(struct.pack("<B", depth | (1 << 5)))
+                buf.extend(feats.tobytes())
+                buf.extend(struct.pack(f"<{depth}i", *qs))
+            else:
+                buf.extend(struct.pack("<B", depth | (2 << 5)))
+                buf.extend(feats.tobytes())
+                buf.extend(struct.pack(f"<{depth}d", *ths))
         buf.extend(leaf_v.tobytes())
     return bytes(buf)
 
 
 def deserialize_dope_latent_wire_bytes(payload: bytes) -> Dict[str, Any]:
-    """Isolated receiver decoder: reconstruct normalized-space DOPE-MLC-v2 encoding dict solely from wire bytes."""
+    """Isolated receiver decoder: reconstruct normalized-space DOPE-MLC-v2 encoding dict solely from wire bytes (versions 1 and 2)."""
     mv = memoryview(payload)
-    ver, lvl_id, task_id, n_trees, n_train, p_use, n_reg, rank_use, n_knots, n_pairs, n_w, n_disc = struct.unpack_from("<BBBBIIHHHHHH", mv, 0)
-    if ver != 1:
+    ver_byte, lvl_id, task_id, n_trees, n_train, p_use, n_reg, rank_use, n_knots, n_pairs, n_w, n_disc = struct.unpack_from("<BBBBIIHHHHHH", mv, 0)
+    ver = ver_byte & 0x0F
+    if ver not in (1, 2):
         raise ValueError(f"unsupported_wire_version_{ver}")
     off = struct.calcsize("<BBBBIIHHHHHH")
     level = ("medium", "high", "ultra")[lvl_id]
@@ -356,7 +401,15 @@ def deserialize_dope_latent_wire_bytes(payload: bytes) -> Dict[str, Any]:
         off += count * 2
         return arr
 
-    sc = [float(v) for v in _read_f16(11)]
+    if ver == 1:
+        sc = [float(v) for v in _read_f16(11)]
+    elif (ver_byte & 0x10) == 0:
+        vals = struct.unpack_from("<7i4f", mv, off)
+        off += struct.calcsize("<7i4f")
+        sc = [round(vals[i] / float(10 ** _WIRE_SCALAR_DECIMALS[i]), _WIRE_SCALAR_DECIMALS[i]) for i in range(7)] + [float(vals[7 + i]) for i in range(4)]
+    else:
+        sc = list(struct.unpack_from("<11d", mv, off))
+        off += struct.calcsize("<11d")
     reg_w = _read_f16(n_reg)
     reg_m = _read_f16(n_reg * p_use).reshape(n_reg, p_use)
     reg_s = _read_f16(n_reg * p_use).reshape(n_reg, p_use)
@@ -389,11 +442,25 @@ def deserialize_dope_latent_wire_bytes(payload: bytes) -> Dict[str, Any]:
     w_basis = _read_f16(n_w)
     trees: List[Dict[str, Any]] = []
     for _ in range(n_trees):
-        (depth,) = struct.unpack_from("<B", mv, off)
+        (hdr,) = struct.unpack_from("<B", mv, off)
         off += 1
+        depth = hdr if ver == 1 else (hdr & 0x1F)
+        mode = 0 if ver == 1 else (hdr >> 5)
         feats = [int(x) for x in np.frombuffer(mv, dtype=np.uint8, count=depth, offset=off)]
         off += depth
-        thresh = [float(x) for x in _read_f16(depth)]
+        if ver == 1:
+            thresh = [float(x) for x in _read_f16(depth)]
+        elif mode == 0:
+            qs = struct.unpack_from(f"<{depth}h", mv, off)
+            off += 2 * depth
+            thresh = [round(q / 10000.0, 4) for q in qs]
+        elif mode == 1:
+            qs = struct.unpack_from(f"<{depth}i", mv, off)
+            off += 4 * depth
+            thresh = [round(q / 10000.0, 4) for q in qs]
+        else:
+            thresh = list(struct.unpack_from(f"<{depth}d", mv, off))
+            off += 8 * depth
         leaf_v = _read_f16(1 << depth)
         trees.append({"features": feats, "thresholds": thresh, "leaf_values": leaf_v})
 
