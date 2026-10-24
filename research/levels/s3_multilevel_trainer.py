@@ -48,7 +48,7 @@ def _load_raw_csv_rows(args: Tuple[str, Path, bool]) -> Tuple[str, Optional[List
         if has_header and rows:
             rows = rows[1:]
         return sha, rows
-    except Exception:
+    except (OSError, csv.Error, ValueError):
         return sha, None
 
 
@@ -64,7 +64,7 @@ def _prepare_dataset_splits(
             rows = list(csv.reader(f))
         if has_header and rows:
             rows = rows[1:]
-    except Exception:
+    except (OSError, csv.Error, ValueError):
         return []
 
     n_total = len(rows)
@@ -81,7 +81,7 @@ def _prepare_dataset_splits(
         num_table = np.asarray(rows, dtype=np.float64)
         if num_table.shape[1] > MAX_COLS + 1:
             num_table = np.column_stack([num_table[:, :MAX_COLS], num_table[:, -1]])
-    except Exception:
+    except (ValueError, TypeError):
         num_table = None
 
     # Process all 6 splits using the exact physical row indices used by S3 precalculation:
@@ -92,7 +92,7 @@ def _prepare_dataset_splits(
         seed = int(rec["scope"].get("split_seed", 20261023))
         try:
             fit_idx = training_rows(n_total, physical, sp_name, seed)
-        except Exception:
+        except (ValueError, KeyError):
             continue
         fit_set = set(fit_idx)
         qry_idx = [i for i in range(n_total) if i not in fit_set]
@@ -119,7 +119,7 @@ def _prepare_dataset_splits(
             scaler = FitOnlyTableTransform.fit(X_fit_in, y_fit_in, task=task_name)
             X_fit, y_fit = scaler.transform(X_fit_in, y_fit_in)
             X_qry, y_qry = scaler.transform(X_qry_in, y_qry_in)
-        except Exception:
+        except (ValueError, TypeError, KeyError):
             continue
 
         if X_fit.shape[1] == 0:

@@ -335,7 +335,7 @@ def run_experiment_0b(
             scaler = FitOnlyTableTransform.fit(X_tr_raw, y_tr_raw, task=task_name)
             X_tr_opt, y_tr_opt = scaler.transform(X_tr_raw, y_tr_raw)
             X_te_opt, y_te_opt = scaler.transform(X_te_raw, y_te_raw)
-        except Exception:
+        except (ValueError, TypeError, KeyError):
             continue
 
         if task_name == "classification" and len(np.unique(y_tr_opt)) < 2 or len(np.unique(y_te_opt)) < 2:
@@ -431,7 +431,7 @@ def run_experiment_0b(
 def _try_float(v: Any) -> float:
     try:
         return float(v)
-    except Exception:
+    except (ValueError, TypeError):
         return float("nan")
 
 
