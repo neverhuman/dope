@@ -305,7 +305,7 @@ _WIRE_GATE_KEYS = ("monotone_w", "hinge_w", "pair_w", "tree_w")
 
 
 def serialize_dope_latent_wire_bytes(enc: Dict[str, Any], *, version: int = 2) -> bytes:
-    """Pack normalized-space DOPE-MLC-v2 encoding into versioned binary wire bytes (version=1 legacy lossy fp16; version=2 exact replay)."""
+    """Pack normalized-space DOPE-MLC-v2 encoding into versioned binary wire bytes (version=1 quantized fp16; version=2 exact replay)."""
     if version not in (1, 2):
         raise ValueError(f"unsupported_wire_version_{version}")
     buf = bytearray()

@@ -181,7 +181,7 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
         report = _mock_report(n_rows=n_tr, n_features=7, task="regression")
         for level in ("medium", "high", "ultra"):
             enc_mem = sender_model.encode_table(X_tr, y_tr, report, task="regression", level=level)
-            # Legacy version=1 (lossy fp16 scalars/thresholds) side-by-side with version=2 (exact replay)
+            # Compare version=1 (quantized fp16 scalars/thresholds) side-by-side with version=2 (exact replay)
             raw_v1 = serialize_dope_latent_wire_bytes(enc_mem, version=1)
             dec_v1 = deserialize_dope_latent_wire_bytes(zlib.decompress(zlib.compress(raw_v1, level=9)))
             self.assertEqual(serialize_dope_latent_wire_bytes(dec_v1, version=1), raw_v1)
@@ -235,7 +235,7 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
         self.assertTrue(np.array_equal(X_orig, X_v2))
         self.assertTrue(np.array_equal(y_orig, y_v2))
 
-        # Verify Mode 1 (int32 threshold > 3.2767) and Mode 2 (unrounded float64 threshold + scalar fallback)
+        # Verify Mode 1 (int32 threshold > 3.2767) and Mode 2 (unrounded float64 threshold and scalar precision)
         enc["target_bundle"]["trees"][0]["thresholds"][0] = 14.5678
         enc["target_bundle"]["trees"][1]["thresholds"][0] = 0.123456789
         enc["target_bundle"]["res_net_mean"] = 0.123456789123
