@@ -189,7 +189,8 @@ def _enrich_receipt_with_uncertainty_and_coverage(
     reconcile_path = eval_path.parent / "strata_and_disjoint_reconciliation_receipt.json"
     if reconcile_path.exists():
         rec = json.loads(reconcile_path.read_text(encoding="utf-8"))
-        ev["cohort_strata_breakdown"] = rec.get("cohorts", {})
+        cohort_keys = ("pooled_1000", "strictly_dataset_disjoint_242", "in_corpus_unseen_row_fold_758", "reconciled_strictly_dataset_disjoint_1000")
+        ev["cohort_strata_breakdown"] = rec.get("cohorts") or {k: rec[k] for k in cohort_keys if k in rec}
         ev["admission_and_filtered_132_audit"] = rec.get("admission_and_filtered_132_audit", {})
         if "auditor_key_alias_mapping" in rec:
             ev["auditor_key_alias_mapping"] = rec["auditor_key_alias_mapping"]

@@ -4,6 +4,8 @@ import torch
 
 from research.levels.multilevel_model import LEVEL_WIDTHS, MultiLevelLandmarkModel
 from research.levels.scaling import FitOnlyTableTransform
+from research.levels.strata_audit import AUDITORS, LEVELS, METHODS, summarize_cohort_records
+from research.levels.world_class_eval import _KumoTabularWrapper, _TabularKumoAttentionNet
 
 
 def _mock_report(n_rows: int = 240, n_features: int = 8, task: str = "regression"):
@@ -97,6 +99,60 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
             final_loss = float(tot.item())
 
         self.assertLess(final_loss, initial_loss)
+
+    def test_strata_summary_and_local_attention_auditor_attribution(self):
+        rng = np.random.default_rng(77)
+        X_toy = rng.normal(size=(40, 4)).astype(np.float32)
+        y_toy = (X_toy[:, 0] > 0.0).astype(np.int64)
+        wrapper = _KumoTabularWrapper(task="classification", seed=77).fit(X_toy[:30], y_toy[:30], X_toy[30:])
+        self.assertIsInstance(wrapper.model, _TabularKumoAttentionNet)
+        self.assertEqual(wrapper.get_feature_importance().shape, (4,))
+        self.assertAlmostEqual(float(wrapper.get_feature_importance().sum()), 1.0, places=5)
+
+        mock_records = []
+        for idx, is_val in enumerate((True, False, True, False)):
+            cells = {}
+            elo_cells = {}
+            for lvl_idx, lvl in enumerate(LEVELS):
+                sc = {}
+                for m_idx, m in enumerate(METHODS):
+                    r_val = 0.88 - 0.05 * m_idx + 0.02 * lvl_idx
+                    d_val = 0.81 - 0.04 * m_idx + 0.01 * lvl_idx
+                    btr_val = 100.0 * (0.75 * r_val + 0.25 * d_val)
+                    cells[f"{m}_{lvl}"] = {
+                        "R": r_val, "D": d_val, "rho": 0.65, "top3": 0.67, "btr": btr_val,
+                        "acc": 0.78 if idx % 2 == 0 else None,
+                        "bacc": 0.76 if idx % 2 == 0 else None,
+                        "roc_auc": 0.83 if idx % 2 == 0 else None,
+                        "r2": 0.54 if idx % 2 == 1 else None,
+                    }
+                    sc[m] = btr_val
+                for aud in ("catboost", "lightgbm", "linear"):
+                    elo_cells[f"{lvl}|{aud}"] = dict(sc)
+            auds = {
+                aud: {
+                    "R": 0.89, "D": 0.82, "rho": 0.68, "top3": 0.67,
+                    "real_score": 0.80, "syn_score": 0.74,
+                    "acc_real": 0.79 if idx % 2 == 0 else None,
+                    "acc_syn": 0.78 if idx % 2 == 0 else None,
+                }
+                for aud in AUDITORS
+            }
+            mock_records.append({
+                "dataset_id": f"ds_{idx}",
+                "task": "classification" if idx % 2 == 0 else "regression",
+                "is_val_dataset": is_val,
+                "cells": cells,
+                "elo_cells": elo_cells,
+                "auditors_ultra": auds,
+                "expansion": {"n1_R": 0.85, "n2_R": 0.87, "n5_R": 0.89},
+            })
+
+        summary = summarize_cohort_records(mock_records, n_boot=16, seed=42)
+        self.assertEqual(summary["datasets_evaluated"], 4)
+        self.assertEqual(summary["elo_leaderboard_overall"][0]["method"], "dope_mlc_v2")
+        self.assertGreater(summary["elo_leaderboard_overall"][0]["elo"], 1500.0)
+        self.assertEqual(len(summary["cross_size_elo_by_artifact_bytes"]), len(METHODS))
 
 
 if __name__ == "__main__":

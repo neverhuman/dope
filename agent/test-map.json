@@ -3327,6 +3327,8 @@
     "research/levels/multilevel_model.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify unified 3-level landmark model encoding, gradient convergence and unlimited synthetic sampling"},
     "research/levels/s3_multilevel_trainer.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify multi-level conditioning objective and gradient flow"},
     "research/levels/world_class_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify synthetic-to-real transfer and Bradley-Terry Elo solver"},
+    "research/levels/strata_audit.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify cohort strata decomposition, bootstrap CIs, and local-attention auditor alias attribution"},
+    "research/levels/disjoint_reconcile.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify strictly dataset-disjoint cohort reconciliation and dev-val checkpoint selection separation"},
     "research/levels/render_multilevel_evidence.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify multilevel evidence rendering"}
   },
   "workspace": "dope"
