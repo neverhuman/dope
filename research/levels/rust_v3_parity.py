@@ -41,10 +41,12 @@ LEVELS = ("small", "medium", "high", "ultra")
 TASKS = ("regression", "classification", "multiclass")
 
 
-def resolve_dope_binary() -> Optional[Path]:
+def resolve_dope_binary(build_if_missing: bool = False) -> Optional[Path]:
     for cand in (Path("engine/target/debug/dope"), Path("engine/target/release/dope")):
         if cand.is_file():
             return cand
+    if build_if_missing and subprocess.run(["cargo", "build", "--manifest-path", "engine/Cargo.toml", "--locked", "--bin", "dope"], capture_output=True).returncode == 0:
+        return Path("engine/target/debug/dope") if Path("engine/target/debug/dope").is_file() else None
     return None
 
 
@@ -485,12 +487,5 @@ if __name__ == "__main__":
     bin_path = resolve_dope_binary()
     if bin_path is None:
         raise SystemExit("FAIL: dope binary not built at engine/target/{debug,release}/dope")
-    rec = run_rust_v3_parity_verification(
-        dope_bin=bin_path,
-        pt_path=TRAINED_PT_PATH,
-        st_path=TRAINED_ST_PATH,
-        fixtures_dir=PARITY_FIXTURES_DIR,
-        receipt_path=PARITY_RECEIPT_PATH,
-        require_trained_hashes=True,
-    )
+    rec = run_rust_v3_parity_verification(bin_path, TRAINED_PT_PATH, TRAINED_ST_PATH, PARITY_FIXTURES_DIR, PARITY_RECEIPT_PATH, True)
     print(json.dumps({"status": "PASS", "max_observed_forward_abs_err": rec["max_observed_forward_abs_err"], "max_observed_fixed_draw_sample_abs_err": rec["max_observed_fixed_draw_sample_abs_err"], "receipt_path": str(PARITY_RECEIPT_PATH)}, indent=2))

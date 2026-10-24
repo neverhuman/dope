@@ -438,11 +438,9 @@ class DopeMlcV3Tests(unittest.TestCase):
         )
 
         require_strict = os.environ.get("DOPE_REQUIRE_RUST_PARITY") == "1"
-        dope_bin = resolve_dope_binary()
+        dope_bin = resolve_dope_binary(build_if_missing=not require_strict)
         if dope_bin is None:
-            if require_strict:
-                self.fail("DOPE_REQUIRE_RUST_PARITY=1 but dope binary is missing at engine/target/{debug,release}/dope")
-            self.skipTest("dope binary not built; run mandatory gate: python3 -m research.levels.rust_v3_parity")
+            self.fail("dope binary is missing at engine/target/{debug,release}/dope")
 
         if TRAINED_PT_PATH.is_file():
             rec = run_rust_v3_parity_verification(
