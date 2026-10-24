@@ -231,3 +231,23 @@ Before running the larger study, freeze the following as a versioned protocol:
 
 The current artifact builder and reducer are runnable groundwork for that campaign.
 They do not run an unbounded external-data campaign automatically when this PR merges.
+
+## Unified 3-Level Landmark & Data-Descriptor Architecture (`DOPE-MLC-v2`)
+
+For the cross-dataset 3-level landmark-conditioned architecture (`Medium` `4,096 B` /
+`4,096` coords, `High` `16,384 B` / `8,192` coords, `Ultra` `65,536 B` / `10,240` coords)
+trained across 19,079 regression and binary classification splits and evaluated across
+**1,000 stratified S3 datasets** (`627` regression + `373` binary classification; `65,874`
+downstream model fits) and 6 auditor families (CatBoost, Local Gated Attention Network
+`[raw ledger key: kumo_tabpfn, _TabularKumoAttentionNet trained from scratch per table;
+official pretrained KumoTabular/TabPFN evaluation is not performed]`, LightGBM, XGBoost,
+MLP, and Linear/Logistic) — reaching `#1` overall Bradley–Terry Elo across all four
+reported development/reconciliation cohorts (`strictly_dataset_disjoint_242`: Elo = `1671.1`
+`[1655.2, 1688.0]`, `Ultra` $R = 0.8493$, $D = 0.8034$; `in_corpus_unseen_row_fold_758`:
+Elo = `1645.4` `[1637.8, 1653.6]`, `Ultra` $R = 0.9129$, $D = 0.7851$; `pooled_1000`:
+Elo = `1651.3` `[1643.4, 1659.6]`, `Ultra` $R = 0.8975$, $D = 0.7896$; and
+`reconciled_strictly_dataset_disjoint_1000` trained on `2,001` completely disjoint S3
+datasets / `11,976` splits with `0` overlap against all `1,132` evaluation candidates and
+verified on `58` training-only `dev_val` datasets: Elo = `1650.7` `[1643.4, 1657.5]`,
+`Ultra` $R = 0.8998$, `Median = 0.9671`, $D = 0.7904$) — see
+[Multi-Level Landmark & Data-Descriptor Deep Learning Study](multilevel-landmark-dl-study.md).

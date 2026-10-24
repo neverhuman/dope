@@ -1,7 +1,7 @@
 """Research encoder/decoder composition. No product imports or release authority."""
 import torch
 from torch import nn
-from .contracts import LEVELS, require
+from .contracts import level_widths, require
 from .table_encoder import TableEncoder
 from .decoder import Decoder
 
@@ -11,7 +11,7 @@ class SharedModel(nn.Module):
         super().__init__()
         self.config = config.validate()
         self.encoder, self.decoder = TableEncoder(config), Decoder(config)
-        self.profiles = nn.ModuleDict({level: nn.Linear(width, 23) for level, width in LEVELS.items()})
+        self.profiles = nn.ModuleDict({level: nn.Linear(width, 23) for level, width in level_widths(config.layout).items()})
 
     def phase(self, phase):
         require(phase in ("ordinary", "ultra-residual"), "unknown_training_phase")
@@ -20,6 +20,7 @@ class SharedModel(nn.Module):
             for module in (self.encoder.distribution_heads[3], self.encoder.task_heads[3],
                            self.decoder.conditions[3], self.profiles["ultra"]):
                 for parameter in module.parameters(): parameter.requires_grad_(True)
+            if self.config.slot_readout(): self.encoder.residual_summaries.requires_grad_(True)
         return self
 
 

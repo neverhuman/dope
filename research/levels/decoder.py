@@ -3,7 +3,7 @@ import math
 import torch
 from torch import nn
 from .blocks import Block, Tokenizer, binding_vectors
-from .contracts import BLOCKS, LEVELS, require
+from .contracts import block_widths, level_widths, require
 
 
 class Decoder(nn.Module):
@@ -12,7 +12,7 @@ class Decoder(nn.Module):
         self.config = config.validate()
         w, h = config.width, config.heads
         self.tokenizer = Tokenizer(w, config.max_categories)
-        self.conditions = nn.ModuleList(nn.Linear(b, config.condition_slots*w) for b in BLOCKS)
+        self.conditions = nn.ModuleList(nn.Linear(b, config.condition_slots*w) for b in block_widths(config.layout))
         self.time = nn.Linear(8, w)
         self.self_blocks = nn.ModuleList(Block(w, h) for _ in range(config.decoder_blocks))
         self.cross_blocks = nn.ModuleList(Block(w, h) for _ in range(config.decoder_blocks))
@@ -20,7 +20,7 @@ class Decoder(nn.Module):
         self.numeric, self.categorical, self.missing = nn.Linear(w, 1), nn.Linear(w, config.max_categories), nn.Linear(w, 1)
 
     def forward(self, code, schema, noisy_values, noisy_observed, time):
-        require(code.ndim == 1 and code.numel() in LEVELS.values(), "decoder_code_layout")
+        require(code.ndim == 1 and code.numel() in level_widths(self.config.layout).values(), "decoder_code_layout")
         require(noisy_values.ndim == 2 and noisy_values.shape == noisy_observed.shape
                 and noisy_values.shape[1] == len(schema["columns"])
                 and len(schema["columns"]) <= self.config.max_features+1
@@ -28,7 +28,7 @@ class Decoder(nn.Module):
                 and noisy_values.numel()*self.config.width<=33554432,
                 "decoder_input_shape")
         conditions, start = [], 0
-        for width, projection in zip(BLOCKS, self.conditions):
+        for width, projection in zip(block_widths(self.config.layout), self.conditions):
             if start + width > code.numel(): break
             conditions.append(projection(code[start:start+width]).reshape(self.config.condition_slots, self.config.width))
             start += width

@@ -1,6 +1,6 @@
 //! Exact selected-code carrier. Private higher states are not serialized or hashed.
 use super::{
-    manifest::{bad, check, ModelManifest, Schema, LAYOUT, PREPROCESSING, WIDTHS},
+    manifest::{bad, check, ModelManifest, Schema, PREPROCESSING},
     table_encoder::TableEncoder,
 };
 use crate::{levels::Level, Result};
@@ -37,6 +37,11 @@ pub struct CodeManifest {
     pub evidence: String,
     pub certified: bool,
 }
+pub struct EncoderInputs<'a> {
+    pub target_included: bool,
+    pub through: Level,
+    pub landmarks: Option<&'a [f32; 46]>,
+}
 pub struct LocalEncoding {
     code: Tensor,
     schema: Schema,
@@ -70,24 +75,58 @@ impl View for &Stored {
         self.bytes.len()
     }
 }
-pub fn width(level: Level) -> usize {
-    WIDTHS[level as usize]
-}
 impl LocalEncoding {
     pub fn encode(
         encoder: &TableEncoder,
         model: ModelManifest,
         values: &Tensor,
         observed: &Tensor,
-        mut schema: Schema,
+        schema: Schema,
         target_included: bool,
         through: Level,
     ) -> Result<Self> {
+        Self::encode_inputs(
+            encoder,
+            model,
+            values,
+            observed,
+            schema,
+            EncoderInputs {
+                target_included,
+                through,
+                landmarks: None,
+            },
+        )
+    }
+    pub fn encode_inputs(
+        encoder: &TableEncoder,
+        model: ModelManifest,
+        values: &Tensor,
+        observed: &Tensor,
+        mut schema: Schema,
+        inputs: EncoderInputs<'_>,
+    ) -> Result<Self> {
+        let EncoderInputs {
+            target_included,
+            through,
+            landmarks,
+        } = inputs;
+        check(
+            model.graph == encoder.graph && model.layout == encoder.graph.layout,
+            "learned encoder model binding mismatch",
+        )?;
         check(
             model.trained_levels.iter().any(|l| l == through.name()),
             "requested learned level is untrained",
         )?;
-        let code = encoder.encode(values, observed, &schema, target_included, width(through))?;
+        let code = encoder.encode_with_landmarks(
+            values,
+            observed,
+            &schema,
+            target_included,
+            model.graph.widths()[through as usize],
+            landmarks,
+        )?;
         if !target_included {
             schema.columns.pop();
             schema.target_index = None;
@@ -108,7 +147,7 @@ impl LocalEncoding {
             "invalid learned export levels",
         )?;
         let selected: Vec<_> = set.into_iter().collect();
-        let size = width(*selected.last().unwrap());
+        let size = self.model.graph.widths()[*selected.last().unwrap() as usize];
         check(
             size <= self.code.dim(0)?
                 && selected.iter().all(|l| {
@@ -126,6 +165,10 @@ impl LocalEncoding {
                 .all(|v| v.is_finite() && f16::from_f32(*v).is_finite()),
             "learned code nonfinite",
         )?;
+        check(
+            !self.model.graph.bounded_code() || values.iter().all(|v| v.abs() <= 1.),
+            "bounded learned code range",
+        )?;
         let stored = Stored {
             bytes: values
                 .iter()
@@ -136,7 +179,7 @@ impl LocalEncoding {
         let manifest = CodeManifest {
             format: "dope-table-code-v1".into(),
             representation_kind: "table_code".into(),
-            layout: LAYOUT.into(),
+            layout: self.model.layout.clone(),
             preprocessing: PREPROCESSING.into(),
             coordinate_space_id: self.model.coordinate_space_id.clone(),
             exported_levels: selected.iter().map(|l| l.name().into()).collect(),
@@ -148,7 +191,7 @@ impl LocalEncoding {
                 .map(|l| CodeView {
                     level: l.name().into(),
                     offset: 0,
-                    length: width(*l),
+                    length: self.model.graph.widths()[*l as usize],
                 })
                 .collect(),
             normalization: "raw_generation_code".into(),
@@ -167,6 +210,11 @@ impl LocalEncoding {
 }
 
 pub fn read_code(bytes: &[u8], model: &ModelManifest) -> Result<(Tensor, CodeManifest)> {
+    model.graph.validate()?;
+    check(
+        model.layout == model.graph.layout,
+        "learned layout binding mismatch",
+    )?;
     check(
         (8..=1048576).contains(&bytes.len()),
         "learned code size limit",
@@ -187,7 +235,7 @@ pub fn read_code(bytes: &[u8], model: &ModelManifest) -> Result<(Tensor, CodeMan
     check(
         manifest.format == "dope-table-code-v1"
             && manifest.representation_kind == "table_code"
-            && manifest.layout == LAYOUT
+            && manifest.layout == model.layout
             && manifest.preprocessing == PREPROCESSING
             && manifest.coordinate_space_id == model.coordinate_space_id
             && manifest.dtype == "F16"
@@ -213,12 +261,12 @@ pub fn read_code(bytes: &[u8], model: &ModelManifest) -> Result<(Tensor, CodeMan
                     .map(|l| CodeView {
                         level: l.name().into(),
                         offset: 0,
-                        length: width(*l),
+                        length: model.graph.widths()[*l as usize],
                     })
                     .collect::<Vec<_>>(),
         "learned code views invalid",
     )?;
-    let size = width(*levels.last().unwrap());
+    let size = model.graph.widths()[*levels.last().unwrap() as usize];
     let st = SafeTensors::deserialize(bytes).map_err(|_| bad("learned code tensor table"))?;
     check(st.len() == 1, "unexpected learned code tensor")?;
     let tensor = st
@@ -238,6 +286,10 @@ pub fn read_code(bytes: &[u8], model: &ModelManifest) -> Result<(Tensor, CodeMan
     check(
         values.iter().all(|v| v.is_finite()),
         "learned code nonfinite",
+    )?;
+    check(
+        !model.graph.bounded_code() || values.iter().all(|v| v.abs() <= 1.),
+        "bounded learned code range",
     )?;
     Ok((Tensor::from_vec(values, size, &Device::Cpu)?, manifest))
 }

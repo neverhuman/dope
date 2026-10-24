@@ -591,3 +591,5 @@ The separate `shared-levels.yml` workflow runs independent CPU shards on the
 existing Linux general pool on trusted main/codex pushes and manual dispatch,
 including X64 and ARM64 native jobs. Required PR CI remains independent. It does not
 weaken the four existing required contexts or infer GPU availability from CI slots.
+
+Fit-CV cache safety and publication contracts: `python3 -B -m unittest research.levels.tests.test_precalc -v` (also an independent shared conformance shard). No private datasets or AWS credentials are needed.

@@ -279,7 +279,17 @@ bash paper/build.sh
 \end{verbatim}
 \noindent
 \texttt{run.py} appends one JSON record per cell and resumes where it stopped; \texttt{render.py --check}
-fails if any generated table, macro or README block differs from what the records imply.
+fails if any generated table, macro or README block differs from what the records imply. The companion
+three-level landmark-conditioned deep learning architecture (\texttt{DOPE-MLC-v2}) and its train-only
+scaling, rapid meta-feature probes, multi-epoch GPU convergence across all six split families, and
+stratified one-thousand-dataset multi-auditor transfer, driver-dynamics, and minimal-egress-artifact
+Bradley--Terry Elo evaluation (reporting separate strictly dataset-disjoint held-out, in-corpus unseen
+row-fold, and disjoint-trained reconciliation cohorts as selection-exposed development validation) are
+reproduced via \texttt{research/levels/rapid\_validate.py},
+\texttt{research/levels/s3\_multilevel\_trainer.py}, \texttt{research/levels/world\_class\_eval.py},
+\texttt{research/levels/strata\_audit.py}, \texttt{research/levels/disjoint\_reconcile.py}, and
+\texttt{research/levels/render\_multilevel\_evidence.py}
+(see \texttt{docs/multilevel-landmark-dl-study.md}).
 
 \bibliographystyle{plainnat}
 \bibliography{references,references-dope1}

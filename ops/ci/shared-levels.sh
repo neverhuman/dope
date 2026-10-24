@@ -14,7 +14,7 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training|test_comparison) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views) ;; *) exit 2;; esac
     "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest "research.levels.tests.$2" -v
     ;;
   prepare-native)
@@ -38,8 +38,8 @@ case "${1:-all}" in
   native)
     cargo +1.88.0 fmt --manifest-path engine/Cargo.toml --all -- --check
     cargo +1.88.0 clippy --manifest-path engine/Cargo.toml --locked -p dope-core -p dope-cli --all-targets -j2 -- -D warnings
-    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity -j2
-    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_cli -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2 --test learned_landmark_inputs -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_cli --test learned_v2_cli --test learned_landmark_cli -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-probes --test private_errors -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors -j2
     ;;
@@ -48,6 +48,12 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh torch test_models
     bash ops/ci/shared-levels.sh torch test_training
     bash ops/ci/shared-levels.sh torch test_comparison
+    bash ops/ci/shared-levels.sh torch test_validation
+    bash ops/ci/shared-levels.sh torch test_v2
+    bash ops/ci/shared-levels.sh torch test_landmark_inputs
+    bash ops/ci/shared-levels.sh torch test_precalc
+    bash ops/ci/shared-levels.sh torch test_observed_landmarks
+    bash ops/ci/shared-levels.sh torch test_landmark_views
     bash ops/ci/shared-levels.sh native
     ;;
   *) echo 'Usage: shared-levels.sh contracts|prepare-torch|torch SHARD|prepare-native|native|all' >&2;exit 2;;

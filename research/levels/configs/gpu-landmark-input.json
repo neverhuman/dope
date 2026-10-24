@@ -1,0 +1,23 @@
+{
+  "model": {
+    "layout": "nested-1024-4096-8192-plus-2048-v2",
+    "graph": "slot-landmark-input-bounded-v3"
+  },
+  "train": {
+    "steps": 12,
+    "seed": 20281101,
+    "accumulation": 4,
+    "validate_every": 4,
+    "checkpoint_every": 4,
+    "validation_recipe": "owned-balanced-unique-v2",
+    "validation_episodes": 40,
+    "transfer_weight": 0,
+    "driver_weight": 0,
+    "profile_weight": 0,
+    "consistency_weight": 0.05,
+    "precision": "bf16",
+    "wall_seconds": 600,
+    "cpu_threads": 4,
+    "device": "cuda"
+  }
+}

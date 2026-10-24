@@ -67,6 +67,68 @@ Against the repository's research kernel (median 1.1 KiB) on the 14 regression a
 Protocol, datasets, baselines and every per-table record: [bench/real-world](bench/real-world/).
 The engine's manuscript is [paper/dope1.tex](paper/dope1.tex) (`bash paper/build.sh`).
 
+<details>
+<summary><strong>Multi-Level Landmark & Data-Descriptor Model (<code>DOPE-MLC-v2</code>, Stratified <code>datasets=one-thousand</code> S3 Study, Rank #1 <code>Elo_top</code>)</strong></summary>
+
+In [`research/levels/`](research/levels/), **`DOPE-MLC-v2`** (`MultiLevelLandmarkModel`) extends
+DOPE with a unified three-level deep learning architecture (`Medium`, `High`, `Ultra`) conditioned
+on pre-calculated training-only CV landmarks (`fit-cv-v1`), rich data-descriptive features, and
+mandatory train-only scaling (`FitOnlyTableTransform`). Evaluated across **`datasets=1,000`**
+diverse, stratified S3 datasets (`regression=627`, `binary=373`, `downstream_fits=65,874`) and six
+world-class model families, `DOPE-MLC-v2` achieves **`Elo=1651.3`** (`Rank #1`, `CI=[1643.4, 1659.6]`,
+`games=44,369`, `win_share=70.58%`) and `Ultra` **`R=0.8975`** (`R_median=0.9658`), **`D=0.7896`**,
+**`BTR_AUC=86.97`** across CatBoost, Local Gated Attention Network (`raw_key=kumo_tabpfn`,
+`_TabularKumoAttentionNet` trained from scratch per table; official pretrained KumoTabular/TabPFN
+comparison is not performed), LightGBM, XGBoost, MLP, and Linear/Logistic auditors (full study:
+[docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md)).
+
+- **Stage Zero Rapid Meta-Feature Validation (`splits=19,190` across all six split families):**
+  Rich descriptors plus the three-level landmark hierarchy increase out-of-dataset CatBoost signal
+  ceiling accuracy from `R2_raw_med=0.9176` $\to$ `R2_rich_med=0.9417` $\to$ `R2_rich_high=0.9654`
+  $\to$ **`R2_rich_ultra=0.9863`**, and nonlinear uplift accuracy from `R2_up_med=0.7138` $\to$
+  `R2_up_rich_med=0.7912` $\to$ `R2_up_high=0.8727` $\to$ **`R2_up_ultra=0.9383`**.
+- **Full-Corpus Three-Level GPU Convergence (`splits=19,079`, `train=17,188`, `val=1,891` unseen dataset splits):**
+  Validation loss converges from `loss_init=0.43934` to **`loss_best=0.37667`** (`delta=-14.3%`)
+  with strict monotonic hierarchy across all three levels
+  (`Ultra=0.35725 < High=0.37377 < Medium=0.39900`).
+- **Stratified Thousand-Dataset Transfer, Driver Dynamics & Minimal Egress Artifact Elo (`Elo=1651.3`):**
+  Once a real training table is scaled strictly on $D_{\text{train}}$ and compiled into `z_level`,
+  raw training rows are discarded and unlimited synthetic data (`N_syn=1x`, `N_syn=2x`, `N_syn=5x`)
+  is generated and transferred to unseen scaled real test data $D_{\text{test}}$. Across all four
+  development/reconciliation evaluation cohorts (preserving the initial `task-797` `workers=40` run
+  with `val_datasets=242` strictly dataset-disjoint held-out tables and `unseen_fold_datasets=758`
+  in-corpus unseen row-fold tables, plus the reconciled `disjoint_datasets=1,000` run trained on
+  `train_datasets=2,001` / `train_splits=11,976` with `dataset_overlap=0` against all
+  `candidates=1,132` and verified on `dev_val_datasets=58` / `dev_val_splits=345`; all reported as
+  selection-exposed development/reconciliation evidence, not a sealed test):
+  - **Strictly Dataset-Disjoint Held-Out (`n=242`, `overlap_datasets=0`):** **`Elo=1671.1`**
+    (`CI=[1655.2, 1688.0]`, `win_share=73.06%`, `Rank #1`), `Ultra` **`R=0.8493`**
+    (`R_med=0.9275`), **`D=0.8034 (passes D80)`**.
+  - **In-Corpus Unseen Row-Fold (`n=758`, `overlap_rows=0`, row-disjoint not dataset-disjoint):**
+    **`Elo=1645.4`** (`CI=[1637.8, 1653.6]`, `win_share=69.81%`, `Rank #1`), `Ultra`
+    **`R=0.9129`** (`R_med=0.9716`), **`D=0.7851`**.
+  - **Reconciled Disjoint-Trained Cohort (`n=1,000`, `overlap_datasets=0` vs `candidates=1,132`):**
+    **`Elo=1650.7`** (`CI=[1643.4, 1657.5]`, `win_share=70.51%`, `Rank #1`), `Ultra`
+    **`R=0.8998`** (`R_med=0.9671`), **`D=0.7904`**.
+  - **Pooled Preserved Cohort (`n=1,000`, `filtered_low_oracle=132` with `cb_gain<0.025`):**
+    **`Elo=1651.3`** (`CI=[1643.4, 1659.6]`, `win_share=70.58%`, `Rank #1`):
+
+| Encoding Level | Minimal Egress Artifact | Holdout Retention $R$ | Driver Fidelity $D$ | Feature Spearman $\rho$ | BTR-AUC | Cross-Size & Overall Elo (`datasets=1,000`) |
+|---|---:|---:|---:|---:|---:|---:|
+| **`Medium` (Macro / Legal Tier)** | `bytes=4,096B (4KiB, comp=13.9x)` | `R=0.8620 (med=0.9335)` | `D=0.7566` | `rho=0.5985` | `BTR_AUC=83.11` | **`Elo_cross=1610.6`** (`vs rows=1415.3`, **`Elo_overall=1651.3 #1`**) |
+| **`High` (Larger / Interaction Tier)** | `bytes=16,384B (16KiB, comp=3.48x)` | `R=0.8971 (med=0.9642)` | `D=0.7821` | `rho=0.6331` | `BTR_AUC=86.82` | **`Elo_cross=1726.6`** (`vs rows=1648.3`, `Elo_tier=1669.6 #1`) |
+| **`Ultra` (Fine / Maximum Transfer Tier)** | `bytes=65,536B (64KiB, coords=10,240)` | **`R=0.8975 (med=0.9658)`** | **`D=0.7896`** | **`rho=0.6363`** | **`BTR_AUC=86.97`** | **`Elo_cross=1742.0`** (`kernel=1596.0, copula=1526.4, diff=1494.7, arf=1140.5`) |
+
+At `Ultra` across `datasets=1,000`, downstream models trained purely on synthetic data achieve
+CatBoost `R=0.8810` (`D=0.8130 passes D80`, `rho=0.7036`, `top3=76.33%`, `acc_syn=83.13%` vs
+`acc_real=85.88%`), Local Gated Attention Net (`raw_key=kumo_tabpfn`, not official Kumo/TabPFN)
+`R=0.9211` (`D=0.8781 passes D80`, `top3=73.56%`), LightGBM `R=0.8978` (`D=0.7703`), MLP
+`R=0.9143` (`D=0.8915 passes D80`, `rho=0.7740`, `top3=78.03%`), Linear `R=0.9297` (`D=0.7853`),
+and XGBoost `R=0.8121` (`D=0.7221`). Generating `N_syn=5x` rows from the frozen encoding lifts
+CatBoost retention from `R_1x=0.8808` $\to$ `R_2x=0.9010` $\to$ **`R_5x=0.9070`**.
+
+</details>
+
 ## Quick start
 
 ```bash

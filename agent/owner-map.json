@@ -834,8 +834,26 @@
     "ops/licenses/engine/": "release",
     "research/landmark_cache/": "external-evidence",
     "docs/landmark-precalculation.md": "governance",
+    "docs/fit-cv-landmark-cache.md": "external-evidence",
+    "engine/dope-core/tests/learned_v2.rs": "rust-core",
+    "engine/dope-cli/tests/learned_v2_cli.rs": "rust-core",
+    "docs/observed-landmark-inputs.md": "external-evidence",
     "research/levels/": "external-evidence",
-    "engine/dope-core/src/learned/": "rust-core"
+    "engine/dope-core/src/learned/landmark_features.rs": "rust-core",
+    "engine/dope-core/tests/learned_landmark_inputs.rs": "rust-core",
+    "engine/dope-cli/tests/learned_landmark_cli.rs": "rust-core",
+    "engine/dope-core/src/learned/": "rust-core",
+    "research/levels/precalc/": "external-evidence",
+    "docs/multilevel-landmark-dl-study.md": "external-evidence",
+    "research/levels/scaling.py": "external-evidence",
+    "research/levels/descriptors.py": "external-evidence",
+    "research/levels/rapid_validate.py": "external-evidence",
+    "research/levels/multilevel_model.py": "external-evidence",
+    "research/levels/s3_multilevel_trainer.py": "external-evidence",
+    "research/levels/world_class_eval.py": "external-evidence",
+    "research/levels/render_multilevel_evidence.py": "external-evidence",
+    "research/levels/tests/test_scaling_and_descriptors.py": "external-evidence",
+    "research/levels/tests/test_multilevel_model.py": "external-evidence"
   },
   "workspace": "dope"
 }

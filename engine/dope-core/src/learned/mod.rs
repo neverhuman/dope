@@ -4,6 +4,7 @@ mod blocks;
 mod carrier;
 pub mod decoder;
 pub mod intake;
+pub mod landmark_features;
 pub mod manifest;
 mod sampling;
 pub mod table_encoder;
@@ -14,8 +15,8 @@ use crate::{
     levels::{digest, Level},
     Result,
 };
-pub use carrier::{read_code, ExportedCode, LocalEncoding};
-use manifest::{bad, check, ModelManifest, LAYOUT, PREPROCESSING};
+pub use carrier::{read_code, EncoderInputs, ExportedCode, LocalEncoding};
+use manifest::{bad, check, ModelManifest, PREPROCESSING};
 pub use sampling::{sample, sample_with_schedule, CategoricalSchedule, LearnedSamples};
 use std::path::Path;
 
@@ -51,7 +52,7 @@ pub fn read_manifest(root: &Path) -> Result<ModelManifest> {
     }
     check(
         model.format == "dope-shared-model-v1"
-            && model.layout == LAYOUT
+            && model.layout == model.graph.layout
             && model.preprocessing == PREPROCESSING
             && model.quantization == "fixed-fp16-v1"
             && model.dtype == "F32"

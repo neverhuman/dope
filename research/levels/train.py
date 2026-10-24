@@ -1,5 +1,4 @@
 """Bounded, resumable shared-model optimization with fixed development episodes."""
-from dataclasses import asdict
 import json
 import hashlib
 import math
@@ -14,6 +13,7 @@ from .contracts import ResearchError, canonical, digest, require
 from .data import episode
 from .losses import objective
 from .model import SharedModel
+from .validation import observe
 
 
 def make_optimizer(model, config):
@@ -38,27 +38,12 @@ def prepared(corpus, role, cursor, model_config, *, with_provenance=False):
     context, query, identity = episode(**{k:source[k] for k in
         ('rows','kinds','slots','row_ids','task','roles')}, config=model_config,
         cursor=cursor,seed=corpus.seed)
-    result = (context,query,identity,source['landmarks'])
+    result = (context,query,identity,source['landmark_input'] if model_config.landmark_input() else source['landmarks'])
     return (*result,source['source_provenance']) if with_provenance else result
 
 
 def validation(model, corpus, config, step, *, phase='ordinary'):
-    device = next(model.parameters()).device
-    devices = [device.index or 0] if device.type == 'cuda' else []
-    records = []
-    model.eval()
-    with torch.random.fork_rng(devices=devices):
-        torch.manual_seed(config.seed+719)
-        with torch.no_grad():
-            for cursor in range(6):
-                context,query,_,profile = prepared(corpus,'development',cursor,model.config)
-                _, raw = objective(model,context,query,profile,config,step,phase=phase,differentiable=False)
-                records.append(raw)
-    model.train()
-    return {level:{key:sum(r[level][key] for r in records)/len(records)
-                   for key in ('total','generation','numeric','categorical','missing','transfer_proxy',
-                               'driver_proxy','profile','consistency')}
-            for level in records[0]}
+    return observe(model,corpus,config,step,phase=phase)[0]
 
 
 def append(path, value):
@@ -70,6 +55,12 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
           stop_after=None, phase='ordinary', resource_check=None, repair_reason=None, base_checkpoint=None):
     started=time.monotonic()
     model_config.validate();config.validate()
+    require(not model_config.landmark_input() or (config.profile_weight == 0 and corpus.input_cache is not None),
+            'cv_landmark_input_cache_and_zero_profile_weight_required')
+    require(not model_config.landmark_input() or corpus.input_cache.feature_recipe==model_config.landmark_recipe(),
+            'cv_landmark_model_cache_recipe_mismatch')
+    require(config.validation_recipe == 'fixed-six-v1' or corpus.prior_only,
+            'unique_validation_requires_owned_priors')
     require(phase != 'ultra-residual' or resume or base_checkpoint, 'ultra_requires_trained_ordinary_base')
     require(not (resume and base_checkpoint), 'resume_and_warm_start_are_exclusive')
     os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
@@ -90,7 +81,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
     model = SharedModel(model_config).to(config.device).phase(phase)
     optimizer = make_optimizer(model,config)
     recipe = dict(format='dope-shared-training-v1', model=model_config.manifest(),
-                  train=asdict(config),corpus_sha256=corpus.identity,source_sha256=source_sha256,
+                  train=config.manifest(),corpus_sha256=corpus.identity,source_sha256=source_sha256,
                   phase=phase, base_checkpoint_sha256=(json.loads((Path(resume)/'manifest.json').read_bytes())['recipe'].get('base_checkpoint_sha256') if resume else None) if base_checkpoint is None else hashlib.sha256((Path(base_checkpoint)/'manifest.json').read_bytes()).hexdigest(), evidence='synthetic_development_only' if corpus.prior_only else 'unqualified_development')
     private_json(out/'recipe.json',recipe)
     state = dict(step=0,cursor=0,episodes=0,processed_cells=0,wall_seconds_spent=0.,
@@ -110,10 +101,14 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
     stop_after=config.steps if stop_after is None else min(config.steps,stop_after)
     status='complete';last_saved=None
     try:
-        initial=validation(model,corpus,config,state['step'],phase=phase)
-        append(out/'metrics.jsonl',dict(step=state['step'],kind='validation',levels=initial,
-                                       optimizer_updates=state['optimizer_updates']))
-        while state['step'] < stop_after:
+        def monitor():
+            result,observer=observe(model,corpus,config,state['step'],phase=phase,resource_check=resource_check,
+                time_remaining=lambda:spent+time.monotonic()-started < config.wall_seconds)
+            append(out/'metrics.jsonl',dict(step=state['step'],kind='validation',levels=result or {},
+                observer=observer,optimizer_updates=state['optimizer_updates']))
+            return observer['state']
+        status=monitor()
+        while status == 'complete' and state['step'] < stop_after:
             if spent+time.monotonic()-started >= config.wall_seconds:
                 status='overbudget';break
             if resource_check and not resource_check():
@@ -153,6 +148,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                     source_provenance=provenance,
                     context_rows=len(context.values),query_rows=len(query.values),columns=len(context.columns),
                     proxy_rows=min(config.proxy_rows,len(context.values)),
+                    landmark_input_slots={level:record.get('landmark_input_slots',0) for level,record in raw.items()},
                     neural_unrolls={level:record.get('neural_unrolls') for level,record in raw.items()},
                     encoder_passes=1+sum(config.consistency_weight>0 and len(context.values)>=8 for _ in raw),
                     decoder_passes=len(raw)*(1+int(any(r['proxy_ramp']>0 for r in raw.values())
@@ -172,9 +168,7 @@ def train(model_config, config, corpus, out, *, source_sha256, resume=None,
                        cuda_peak_bytes=torch.cuda.max_memory_allocated() if config.device=='cuda' else None)
             append(out/'metrics.jsonl',event)
             if state['step']%config.validate_every==0:
-                result=validation(model,corpus,config,state['step'],phase=phase)
-                append(out/'metrics.jsonl',dict(step=state['step'],kind='validation',levels=result,
-                    optimizer_updates=state['optimizer_updates']))
+                status=monitor()
             if state['step']%config.checkpoint_every==0:
                 state['wall_seconds_spent']=spent+time.monotonic()-started
                 last_saved=save_checkpoint(out/'checkpoints',model,optimizer,recipe=recipe,state=state.copy())
