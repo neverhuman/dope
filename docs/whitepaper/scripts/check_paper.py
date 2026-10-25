@@ -90,7 +90,7 @@ def strip_tex_comments(text: str) -> str:
 
 def anonymous_leaks(text: str) -> list[str]:
     """Scan visible text and PDF metadata, including identifying repository URLs."""
-    patterns = (r"\bJepson\b", r"\bAlton\b", r"\bNEVERHUMAN\b", r"jepsontaylor",
+    patterns = (r"\bJepson\b", r"\bAlton\b", r"\bMorrow\b", r"\bNEVERHUMAN\b", r"jepsontaylor",
                 r"https?://[^\s<>]*(?:neverhuman|jepsontaylor)")
     return [pattern for pattern in patterns if re.search(pattern, text, re.IGNORECASE)]
 

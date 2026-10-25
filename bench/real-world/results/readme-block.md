@@ -13,6 +13,15 @@
 
 *Byte & baseline qualification:* `DOPE-MLC-v2` median wire bytes (`1,502 / 2,836 / 5,872 B` = `1.5 / 2.8 / 5.7 KiB`; zlib `1,238 / 2,351 / 4,616 B`) are bit-exact `version=2` latent payloads (`6,000/6,000` cells `max_abs_diff = 0.0`), excluding the `.dope` scaler sidecar (`+545 B` median; full raw `2,031 / 3,376 / 6,398 B`) and shared frozen decoder (`292,707 B` / `285.8 KiB`, amortized `0 B/dataset`), whereas `DOPE-MLC-v3` (`DML3+CSC1`) is self-contained inside `2 / 4 / 16 / 64 KiB` caps (`960.6 / 1,550.2 / 3,429.2 / 6,144.6 B` mean on `1,000` `v2`-panel tables; `1,418.0 / 2,510.7 / 6,435.3 / 9,877.5 B` mean on `69` multiclass tables; `0 B` external weights). Baseline byte tiers (`4 / 16 / 64 KiB`) reflect nominal caps and historical `fp16` byte estimates paired with `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`), not a common measured-wire byte qualification.
 
+| Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Nonlinearity Regime (`1,000` DS) | `Medium` (`1.5 KiB`) $R$ | `High` (`2.8 KiB`) $R$ | `Ultra` (`5.7 KiB`) $R$ |
+|---|---:|---:|---|---:|---:|---:|
+| **Linear / Logistic** (`n=969`) | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` | **Mostly Linear** (`< 0.05`, `687` DS) | `0.9467` | **`0.9585`** | `0.9477` (`D = 0.8190`) |
+| **Local Gated Attention Net** (`kumo_tabpfn` key, `n=962`) | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** | **Moderate Nonlinear** (`0.05–0.20`, `92` DS) | `0.7263` | `0.8180` | **`0.8318`** (`+10.55` pts) |
+| **MLP** (`n=965`) | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** | **Strongly Nonlinear** (`> 0.20`, `221` DS) | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
+| **LightGBM** (`n=989`) | **`0.8978 [0.8852, 0.9085]`** | `0.7703 [0.7615, 0.7793]` | **Stage-0 Signal Ceiling $R^2$** (`19,190` splits) | `0.9417` | `0.9654` | **`0.9863`** |
+| **CatBoost** (`n=1,000`) | **`0.8810 [0.8692, 0.8915]`** | **`0.8130 [0.8055, 0.8213]` (`D80` pass)** | **Stage-0 Nonlinear Uplift $R^2$** (`19,190` splits) | `0.7912` | `0.8727` | **`0.9383`** |
+| **XGBoost** (`n=989`) | **`0.8121 [0.7915, 0.8285]`** | `0.7221 [0.7131, 0.7310]` | **Unlimited Sampling Expansion** (`1× -> 2× -> 5× N_train`) | `0.8808` (`1×`) | `0.9010` (`2×`) | **`0.9070` (`5×`, `+2.62` pts)** |
+
 ![DOPE-MLC-v2 and DOPE-MLC-v3 deep learning training monitor vs. <5% full-population validation loss curves across Training Rounds R0..R8, holdout retention value vs. wire bytes across 1,000 and 1,069 datasets, and distinct non-summed testing campaign scale](bench/real-world/figures/convergence.png)
 
 | Track / Expansion Study | Corpus & `<5%` Validation Split Allocation | Effective Passes & Visits (`R0..R8`) | Train Monitor (`R0 -> Best`) | Full-Population Validation Loss `± 1 SE` or Holdout Transfer | Key Qualification & Tournament Result |

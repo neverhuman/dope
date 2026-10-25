@@ -31,41 +31,89 @@ selection-exposed validation on public tables, measured on CPU.
 \section{Introduction}
 \label{sec:intro}
 
-Most of an organization's experience is stored in tables, and most of those tables are locked
-behind security, privacy and legal boundaries. External researchers, benchmarks and foundation
-models cannot learn from them. Synthetic data is the usual answer, but it is judged mostly by how
-closely it resembles the source or by the accuracy of one downstream model, and the size of the
-generator that produced it goes uncounted. A multi-megabyte neural generator can memorize much of a
-table; it is expensive to audit, to ship and to reason about.
+Most of an organization's quantitative experience lives in tables, and most of those tables are locked
+behind security, regulatory, and operational boundaries. External researchers, cross-silo benchmarks,
+and downstream modeling teams cannot touch the raw records. Existing practices force an unsatisfactory
+choice among four compromises:
+(i)~\emph{raw-row subsampling and coresets} ship actual source records and, under kilobyte budgets,
+starve downstream learners of sample size;
+(ii)~\emph{classical parametric copulas and graphical models}
+\citep{sklar1959,nelsen2006copulas,chow1968dependence,aas2009paircopula,patki2016sdv} are compact
+and preserve low-order dependence, but miss the nonlinear thresholds and multi-way feature interactions
+that gradient-boosted trees and neural networks exploit \citep{grinsztajn2022trees};
+(iii)~\emph{deep tabular generators}---adversarial, variational, diffusion, forest-based, and
+prior-fitted networks
+\citep{xu2019ctgan,kotelnikov2023tabddpm,zhang2024tabsyn,shi2025tabdiff,watson2023arf,jolicoeurmartineau2024forestdiffusion,borisov2023great,hollmann2023tabpfn,hollmann2025tabpfn,fey2025kumo,borisov2024survey}---devote
+megabytes of parameters to modeling the full high-dimensional joint density while leaving artifact bytes
+uncounted; and
+(iv)~\emph{shipping a single fitted predictor} locks the receiver to one model family, preventing
+downstream feature engineering, multi-architecture ensembling, or independent re-auditing across
+gradient-boosted trees \citep{prokhorenkova2018catboost,chen2016xgboost,ke2017lightgbm}, neural
+networks, and linear models.
 
 We pose a sharper question: \emph{how few bytes does a table's predictive structure need?} We
-compile the training rows into a program, sample from the program, train independent learners on
-the samples, test them on untouched real rows, and count every byte the sampler reads. A small
-program that still trains good models has captured regularities that generalize: compressing the
-predictive regularities of a table is a test of modelling that copying rows cannot pass
-\citep{rissanen1978modeling,tishby2000bottleneck}. By itself it says nothing about privacy.
+compile the training rows into a small executable generative program, cross an explicit trust boundary
+where the receiver sees only the code and never the source table, sample fresh synthetic training rows on
+demand, train independent learners on those samples, test them on untouched real rows, and charge the
+compiler for every byte the sampler reads. A compact program that still trains strong models across
+disparate learner families has captured predictive regularities that generalize: compressing a table's
+input--output law is a test of modeling that memorizing or copying rows cannot pass
+\citep{rissanen1978modeling,blumer1987occam,tishby2000bottleneck,shannon1959coding,balle2017endtoend}.
+By itself, byte compression is an information-theoretic and systems property and makes no formal
+privacy claim.
+
+\paragraph{The ``so what'': why generative program compilation changes tabular transfer.}
+Viewing synthetic data generation as \emph{rate--distortion program compilation} yields three immediate
+practical shifts over standard practice:
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
+\item \textbf{Target-first byte allocation beats joint-density spending.} When a downstream learner is
+  trained on synthetic samples and evaluated on real holdout data, errors in the conditional law
+  $P(Y\mid X)$ enter downstream risk at first order, whereas covariate density mismatch $P(X)$ enters
+  only multiplicatively with the learner's finite-sample estimation error (\cref{thm:limit,prop:finite}).
+  Because the receiver can draw arbitrarily many synthetic rows $N$ at zero additional wire cost, bytes
+  spent on conditional thresholds, interactions, and heteroscedastic noise calibration buy far more
+  downstream utility per byte than bytes spent memorizing high-dimensional covariate noise.
+\item \textbf{Compact programs beat real rows at tight byte budgets.} Storing $k$ compressed real rows
+  incurs estimation error scaling as $O(1/k)$, whereas a compiled program amortizes its byte budget into
+  a smooth + tree conditional teacher from which the receiver draws thousands of variance-reducing
+  training rows (\cref{prop:crossover}). At sub-kilobyte and few-kilobyte budgets, compiled programs
+  preserve substantially more downstream predictive gain than the largest compressed subset of real
+  training rows that fits the same wire envelope.
+\item \textbf{From per-table compilation to amortized landmark-conditioned hypernetworks.} In classical
+  meta-learning, cheap learner probes (\emph{landmarks}) were used only to select algorithms or
+  hyperparameters \citep{pfahringer2000landmarking,bardenet2013collaborative,feurer2015autosklearn,vanschoren2018metalearning}.
+  We show that cross-validation landmarks, non-monotone rank dependence \citep{chatterjee2021xi}, and
+  mathematical building-block probes can instead condition a shared hypernetwork
+  \citep{ha2017hypernetworks,perez2018film,garnelo2018cnp} paired with closed-form ridge/Cholesky
+  estimators \citep{ledoit2004shrinkage,bertinetto2019closedform} and boosted oblivious trees
+  \citep{prokhorenkova2018catboost} to emit nested byte-budgeted programs (\texttt{Small},
+  \texttt{Medium}, \texttt{High}, \texttt{Ultra}) evaluated across six learner families via
+  Bradley--Terry and Elo tournaments \citep{bradley1952rank,hunter2004mm,elo1978rating}.
+\end{itemize}
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
-\item \textbf{A theory of retention} (\cref{sec:theory}). For learners that converge on the
-  synthetic distribution, retention equals the preserved share of $I(X;Y)$ under log-loss and of
-  $\operatorname{Var}\,\mathbb{E}[Y\mid X]$ under squared loss; a finite-sample bound shows that
-  covariate errors are multiplied by the learner's own estimation error, which more samples
-  remove. The bound explains retention above one and prescribes target-first byte allocation.
-\item \textbf{DOPE, a byte-budgeted generative program} (\cref{sec:method}): an ML-ready intake that
-  one-hot encodes categories and scales numeric columns robustly; marginals on a normal-score grid;
-  a regime mixture of Gaussian copulas that keeps every marginal exactly; a conditional model that
-  adds byte-coded oblivious trees to a residual tanh network trained by variable projection;
-  calibrated noise; measured rate--distortion bit allocation with error feedback; and a compile-time
-  self-audit that reports the retention of fast auditors on held-out training rows and uses it to pick
-  the byte split between dependence and target. The artifact is a standard safetensors file whose one
-  tensor is a brotli stream of the schema and every quantized section; one tensor program samples it on
-  CPU (CUDA and Metal builds exist but are not tested here).
-\item \textbf{An equal-byte evaluation} (\cref{sec:experiments}) on \G{OneTables} public tables with
-  three auditor families, against the real rows themselves compressed to the same budget, against
-  generators at their default sizes, and with ablations of every component.
-\item \textbf{Transfer Description Length} (\cref{sec:metric}), a single quantity to minimise, and an
-  open, pure-Rust engine with resumable benchmark records.
+\item \textbf{A theory of retention and equal-byte row crossover} (\cref{sec:theory}). For learners that
+  converge on the synthetic distribution, retention equals the preserved share of $I(X;Y)$ under log-loss
+  and of $\operatorname{Var}\,\mathbb{E}[Y\mid X]$ under squared loss (\cref{thm:limit}); a finite-sample
+  bound (\cref{prop:finite}) shows that covariate errors are multiplied by the learner's own estimation
+  error, explains retention above one via teacher regularization, and yields an explicit crossover law
+  (\cref{prop:crossover}) determining when a compiled program beats equal-byte real rows.
+\item \textbf{DOPE, a byte-budgeted generative program and compiler} (\cref{sec:method}): an ML-ready
+  intake that one-hot encodes categories and scales numeric columns robustly; marginals on a normal-score
+  grid; a regime mixture of Gaussian copulas that keeps every marginal exactly; a conditional model that
+  adds byte-coded oblivious trees to a residual tanh network trained by variable projection
+  \citep{golub1973varpro}; calibrated noise; measured rate--distortion bit allocation with error feedback
+  \citep{frantar2023gptq}; and a compile-time self-audit that picks the byte split between dependence and
+  target. Alongside per-table compilation, we detail the landmark-conditioned multi-level compiler family
+  (\texttt{DOPE-MLC-v2} and \texttt{DOPE-MLC-v3}) with pure-Rust \texttt{SafeTensors} decoding.
+\item \textbf{An equal-byte evaluation and mechanism audit} (\cref{sec:experiments}) on \G{OneTables}
+  public tables with three auditor families in the standalone engine track and across \G{MlcVTwoDatasets}
+  regression-and-binary tables plus \G{MlcVThreeDatasets} multiclass tables with six auditor families in
+  the landmark-conditioned multi-level track, tested against compressed real rows, parametric and neural
+  generators, and component ablations.
+\item \textbf{Transfer Description Length} (\cref{sec:metric}), a single operational byte complexity to
+  minimise, accompanied by an open, pure-Rust engine and reproducible benchmark receipts.
 \end{enumerate}
 
 \section{Retention and Transfer Description Length}
@@ -158,39 +206,93 @@ regularizing teacher \citep{hinton2015distilling}. Third, for a misspecified aud
 model, the limit is the $L^2(Q_X)$ projection of $f_A$, which depends on $Q_X$ at first order; joint
 covariate structure therefore still matters (supplement), which motivates the dependence model below. Replacing
 $f^\star$ by a strong real-trained predictor turns the first limit into a sampling-free estimate of
-retention (supplement).
+retention (supplement). Finally, \cref{prop:finite} explains why a compact program beats a compressed
+subset of real rows whenever the byte budget is tight.
+
+\begin{proposition}[Equal-byte row crossover]
+\label{prop:crossover}
+Suppose an auditor's estimation error on $k$ real rows scales as $e_P(k)=C/k$ for a capacity constant
+$C>0$, and the full training table has $n$ rows with $V>C/n$. A random subset of $k$ real rows achieves
+expected retention $R_{\mathrm{rows}}(k)=(V-C/k)/(V-C/n)$. Consequently, a program $A$ with retention $R$
+beats any subset of fewer than
+\begin{equation}
+  k(R) \;=\; \frac{C}{(1-R)V + R\,C/n}
+  \label{eq:crossover}
+\end{equation}
+real rows, which simplifies to $k(R)\approx (C/V)/(1-R)$ when $n$ is large. Whenever $|A|$ is smaller than
+the compressed byte size of $k(R)$ real rows, the program achieves higher retention per byte than storing
+source rows (proof in supplement).
+\end{proposition}
 
 \section{DOPE}
 \label{sec:method}
 
 \begin{figure}[t]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-  font=\footnotesize, node distance=0.42cm,
-  stage/.style={draw=stageline, rounded corners=2pt, fill=#1, inner sep=4pt},
-  stage/.default=stagefill,
-  io/.style={align=center, text width=1.5cm, inner sep=2pt},
-  arr/.style={-{Latex[length=1.6mm]}, draw=arrowink, line width=0.6pt}]
-  \node[io] (csv) {\textbf{CSV}\\ training rows};
-  \node[stage, right=of csv] (intake) {\stagebox{\textbf{Intake}\\ types; levels ordered by target, rare levels pooled; robust $[0,1]$ scaling}};
-  \node[stage, right=of intake] (cov) {\stagebox{\textbf{Covariates}\\ marginals on a normal-score grid; regime mixture of Gaussian copulas}};
-  \node[stage=targetfill, right=of cov] (tgt) {\stagebox{\textbf{Target}\\ residual network $+$ byte-coded oblivious trees; calibrated noise}};
-  \node[stage, right=of tgt] (bytes) {\stagebox{\textbf{Bytes}\\ rate--distortion bits with error feedback; self-audited split}};
-  \node[stage=artfill, below=0.5cm of bytes, align=center, text width=\stagewd] (art)
-    {\textbf{model.dope}\\ safetensors, a few KiB};
-  \node[stage, left=of art, align=left, text width=4.2cm] (smp)
-    {\textbf{Sampler}\\ one GEMM, gathers, a small network, tree lookups};
-  \node[io, left=of smp, text width=3.3cm] (out) {\textbf{rows} in original units, or ML-ready: one-hot and $[0,1]$};
+  font=\footnotesize\sffamily,
+  box/.style={draw=dopeSlate, rounded corners=3pt, fill=dopeSlateBg, inner sep=5pt, align=left},
+  bluebox/.style={draw=dopeBlue, rounded corners=3pt, fill=dopeBlueBg, inner sep=5pt, align=left},
+  tealbox/.style={draw=dopeTeal, rounded corners=3pt, fill=dopeTealBg, inner sep=5pt, align=left},
+  orangebox/.style={draw=dopeOrange, rounded corners=3pt, fill=dopeOrangeBg, inner sep=5pt, align=left},
+  purplebox/.style={draw=dopePurple, rounded corners=3pt, fill=dopePurpleBg, inner sep=5pt, align=left},
+  arr/.style={-{Latex[length=1.8mm,width=1.3mm]}, draw=dopeSlate, line width=0.75pt},
+  dasharr/.style={-{Latex[length=1.7mm,width=1.2mm]}, draw=dopeOrange, line width=0.75pt, densely dashed}]
+
+  % Top row: Sender / Compiler pipeline
+  \node[box] (csv)
+    {\stagebox[2.45cm]{\textbf{Source Table $D_{\mathrm{fit}}$}\\ raw training rows; explicit target $Y$; unseen $D_{\mathrm{test}}$ held out}};
+  \node[box, right=0.32cm of csv] (intake)
+    {\stagebox[2.85cm]{\textbf{Fit-Only Intake}\\ target-ordered levels; rare-level pooling; robust $[0,1]$ scaling; \texttt{CSC1} sidecar}};
+  \node[purplebox, right=0.32cm of intake] (probes)
+    {\stagebox[3.05cm]{\textbf{Landmarks \& Probes}\\ cross-validation probes, Chatterjee $\xi$ rank spectrum, math probes}};
+  \node[tealbox, right=0.32cm of probes] (cov)
+    {\stagebox[3.15cm]{\textbf{Covariate Program $Q_X$}\\ normal-score quantile grid; regime mixture of Gaussian copulas ($MM^\top=R$)}};
+  \node[bluebox, right=0.32cm of cov] (tgt)
+    {\stagebox[3.35cm]{\textbf{Target Program $Q_{Y\mid X}$}\\ variable-projection residual net $+$ boosted oblivious trees; calibrated noise}};
+  \node[orangebox, right=0.32cm of tgt] (bytes)
+    {\stagebox[2.95cm]{\textbf{Rate--Distortion \& Router}\\ error-feedback bit allocation $+$ self-audited or hyper-routed split}};
+
+  % Trust boundary banner
+  \node[draw=dopeOrange, fill=dopeOrangeBg, rounded corners=2pt, inner sep=3.5pt,
+        below=0.38cm of csv.south west, anchor=north west,
+        text width=16.6cm, align=center] (boundary)
+    {\textbf{EXPLICIT TRUST \& WIRE BOUNDARY}\quad --- \quad \textbf{Sender (above):} reads $D_{\mathrm{fit}}$ once \quad$\vert$\quad \textbf{Receiver (below):} sees only program $A$ (zero raw rows)};
+
+  % Bottom row: Artifact & Receiver pipeline
+  \node[bluebox, below=1.22cm of bytes.south east, anchor=north east] (art)
+    {\stagebox[3.85cm]{\textbf{Byte-Budgeted Program $A$}\\ \texttt{model.dope} (\texttt{SafeTensors} / \texttt{DML3})\\ nested tiers: \texttt{Small} $\subset$ \texttt{Medium} $\subset$ \texttt{High} $\subset$ \texttt{Ultra}}};
+  \node[tealbox, left=0.38cm of art] (smp)
+    {\stagebox[4.55cm]{\textbf{Shared / Pure-Rust Decoder}\\ single-GEMM copula draw, piecewise quantile gather, residual net $+$ oblivious-tree readout}};
+  \node[box, left=0.38cm of smp] (syn)
+    {\stagebox[4.35cm]{\textbf{Unlimited Synthetic Rows $N$}\\ draw $N\gg n$ fresh training rows in original or ML-ready units at zero extra wire bytes}};
+  \node[purplebox, left=0.38cm of syn] (aud)
+    {\stagebox[4.85cm]{\textbf{Independent Downstream Learners}\\ train CatBoost, LightGBM, XGBoost, MLP, Linear, Attention on synthetic rows; evaluate on real $D_{\mathrm{test}}$}};
+
+  % Forward edges (Sender)
   \draw[arr] (csv) -- (intake);
-  \draw[arr] (intake) -- (cov);
+  \draw[arr] (intake) -- (probes);
+  \draw[arr] (probes) -- (cov);
   \draw[arr] (cov) -- (tgt);
   \draw[arr] (tgt) -- (bytes);
-  \draw[arr] (bytes) -- (art);
+
+  % Cross-boundary edge
+  \draw[arr, draw=dopeBlue, line width=0.95pt] (bytes.south) -- node[midway, right, font=\scriptsize\sffamily, text=dopeBlue] {\textbf{wire egress}} (art.north -| bytes.south);
+
+  % Forward edges (Receiver)
   \draw[arr] (art) -- (smp);
-  \draw[arr] (smp) -- (out);
-\end{tikzpicture}
-\caption{\textbf{A DOPE program, compiled and sampled.} Compilation reads the training rows once; the
-artifact stores no rows; sampling reads only the artifact.}
+  \draw[arr] (smp) -- (syn);
+  \draw[arr] (syn) -- (aud);
+
+  % Compile-time self-audit / landmark routing feedback loop
+  \draw[dasharr] (probes.north) -- ++(0cm,0.28cm) -- ($(bytes.north)+(0cm,0.28cm)$)
+    node[midway, above, font=\scriptsize\sffamily, text=dopeOrange]
+    {\textbf{Compile-time self-audit \& landmark conditioning:} held-out training probes guide byte split $(B_X, B_{Y\mid X})$ and nested tier weights}
+    -- (bytes.north);
+\end{tikzpicture}%
+}
+\caption{\textbf{Network flow and explicit trust boundary of a DOPE generative program.} \emph{Above the boundary (Sender):} compilation reads the training table $D_{\mathrm{fit}}$ once, fits the intake scaling and categorical ordering, extracts cross-validation landmarks and non-monotone rank dependence ($\xi$), fits the regime-copula covariate law $Q_X$ and the hybrid neural + oblivious-tree conditional law $Q_{Y\mid X}$, and allocates bits via error-feedback rate--distortion and compile-time self-auditing (or amortized hypernetwork routing in \texttt{DOPE-MLC-v2/v3}). \emph{Below the boundary (Receiver):} only the compact byte-budgeted program $A$ crosses the wire; the receiver decodes $A$ on CPU to sample arbitrarily many synthetic training rows $N$ for any downstream learner without ever accessing $D_{\mathrm{fit}}$.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -596,7 +698,26 @@ scratch per table; official pretrained KumoTabular and TabPFN foundation models 
 \G{MlcVTwoDisjointElo} on the reconciled strictly dataset-disjoint cohort, and \G{MlcVTwoHeldoutElo}
 on the strictly dataset-disjoint held-out stratum, with \texttt{Ultra}-tier mean retention
 \G{MlcVTwoUltraR} (median \G{MlcVTwoUltraRMed}), driver fidelity \G{MlcVTwoUltraD}, and bit-exact
-versioned wire replay across all \G{MlcVTwoDatasets} datasets and both checkpoints. Extending the
+versioned wire replay across all \G{MlcVTwoDatasets} datasets and both checkpoints. At mean raw wire
+envelopes of \G{MlcMedBytes} (\G{MlcMedZlib} zlib), \G{MlcHighBytes} (\G{MlcHighZlib} zlib), and
+\G{MlcUltraBytes} (\G{MlcUltraZlib} zlib) alongside a shared once-shipped decoder of
+\G{MlcDecoderBytes}, \texttt{DOPE-MLC-v2} raises mean holdout retention from \G{MlcMedR}
+(\texttt{Medium}) to \G{MlcHighR} (\texttt{High}) and \G{MlcVTwoUltraR} (\texttt{Ultra}), compared
+with \G{MlcRowsMedR}, \G{MlcRowsHighR}, and \G{MlcRowsUltraR} for equal-wire real-row subsampling and
+\G{MlcCopulaR} for Gaussian copula. Mechanism audits confirm why: Stage-zero conditional teacher
+approximation $R^2$ climbs monotonically from \G{MlcStageZeroMedCeil} to \G{MlcStageZeroHighCeil} and
+\G{MlcStageZeroUltraCeil} overall (and from \G{MlcStageZeroMedNonlin} to \G{MlcStageZeroHighNonlin} and
+\G{MlcStageZeroUltraNonlin} on strongly nonlinear tables), driving a \G{MlcRegimeNonlinGain}
+percentage-point retention gain on strongly nonlinear tables (\G{MlcRegimeNonlinMed} to
+\G{MlcRegimeNonlinHigh} to \G{MlcRegimeNonlinUltra}) and a steady climb on moderately nonlinear tables
+(\G{MlcRegimeModMed} to \G{MlcRegimeModHigh} to \G{MlcRegimeModUltra}) while linear tables saturate at
+\texttt{Medium} (\G{MlcRegimeLinMed} to \G{MlcRegimeLinHigh} to \G{MlcRegimeLinUltra}). Because
+\texttt{DOPE-MLC-v2} ships a generative program rather than a fixed row subset, drawing onefold,
+twofold, and fivefold synthetic training sets raises mean retention from \G{MlcExpandOne} to
+\G{MlcExpandTwo} and \G{MlcExpandFive} (\G{MlcExpandGain} percentage points at zero additional wire
+cost), transferring across all six auditor families at \texttt{Ultra}: linear (\G{MlcAudLinR}), local
+gated attention (\G{MlcAudAttnR}), MLP (\G{MlcAudMlpR}), LightGBM (\G{MlcAudLgbmR}), CatBoost
+(\G{MlcAudCbR}), and XGBoost (\G{MlcAudXgbR}). Extending the
 architecture to four complete-envelope byte tiers (\texttt{Small}, \texttt{Medium}, \texttt{High},
 \texttt{Ultra} including the \texttt{CSC1} compact scaler sidecar), mathematical building-block
 probes, inter-landmark attention summaries, active per-column gating, and vector-leaf oblivious-tree
@@ -621,20 +742,28 @@ Python at inference time and matches PyTorch within \G{MlcRustFwdErr} on forward
 fit explicit, often small, joint models; adversarial and variational models \citep{xu2019ctgan},
 diffusion models \citep{kotelnikov2023tabddpm,zhang2024tabsyn,shi2025tabdiff}, forests
 \citep{watson2023arf,jolicoeurmartineau2024forestdiffusion}, language models \citep{borisov2023great} and
-prior-fitted networks \citep{hollmann2025tabpfn} model the joint table with many parameters
-\citep{borisov2024survey}. DOPE targets the conditional model explicitly, keeps the covariate model
-small, and is charged for every byte.
+prior-fitted and relational foundation networks \citep{hollmann2023tabpfn,hollmann2025tabpfn,fey2025kumo}
+model the joint table with many parameters \citep{borisov2024survey}. DOPE targets the conditional
+model explicitly, keeps the covariate model small, and is charged for every byte.
 
-\paragraph{Evaluation.} Train-on-synthetic, test-on-real evaluation goes back to \citet{esteban2017rcgan};
-\citet{jordon2018measuring} ask whether synthetic data preserve the ranking of learners, and utility and
-fidelity measures and suites broaden the picture \citep{snoke2018utility,alaa2022faithful,qian2023synthcity,erickson2026tabarena}.
-Retention is a null-normalized TSTR/TRTR ratio; what is new here is its information-theoretic reading,
-the worst case over model families, and the byte axis with an equal-byte real-row control.
+\paragraph{Evaluation and tournaments.} Train-on-synthetic, test-on-real evaluation goes back to
+\citet{esteban2017rcgan}; \citet{jordon2018measuring} ask whether synthetic data preserve the ranking of
+learners, and utility and fidelity measures and suites broaden the picture
+\citep{snoke2018utility,alaa2022faithful,qian2023synthcity,erickson2026tabarena}. Retention is a
+null-normalized TSTR/TRTR ratio; what is new here is its information-theoretic reading, the worst case
+over model families \citep{prokhorenkova2018catboost,chen2016xgboost,ke2017lightgbm}, Bradley--Terry
+and Elo tournament aggregation across auditors \citep{bradley1952rank,hunter2004mm,elo1978rating}, and
+the byte axis with an equal-byte real-row control.
 
-\paragraph{Compression and distillation.} Dataset distillation keeps a few training examples and model
-distillation keeps a model's behaviour \citep{wang2018distillation,hinton2015distilling}; generative
-compression names learned media codecs \citep{santurkar2017generative}; description-length and
-bottleneck ideas \citep{rissanen1978modeling,blumer1987occam,tishby2000bottleneck} motivate the framing.
+\paragraph{Compression, distillation, and landmark-conditioned hypernetworks.} Dataset distillation
+keeps a few training examples and model distillation keeps a model's behaviour
+\citep{wang2018distillation,hinton2015distilling}; generative compression names learned media codecs
+\citep{santurkar2017generative,balle2017endtoend}; description-length and bottleneck ideas
+\citep{rissanen1978modeling,blumer1987occam,tishby2000bottleneck} motivate the framing, while meta-learning
+landmarking \citep{pfahringer2000landmarking,bardenet2013collaborative,feurer2015autosklearn,vanschoren2018metalearning},
+hypernetworks and conditional neural modulation \citep{ha2017hypernetworks,perez2018film,garnelo2018cnp},
+and closed-form ridge/Cholesky base learners \citep{ledoit2004shrinkage,bertinetto2019closedform}
+underpin the multi-level compiler.
 DOPE ships a program that draws fresh rows, and TDL charges it in bytes against a downstream
 distortion. In the companion multi-level landmark study (\texttt{research/levels/}, documented in
 \texttt{docs/multilevel-landmark-dl-study.md}), a single hierarchical deep learning model
@@ -699,9 +828,17 @@ differential-privacy mechanism and not HIPAA de-identification.
 
 \section{Conclusion}
 
-A few kilobytes of the right structure train models nearly as well as the table they came from, and
-at the smallest budgets better than the same bytes spent on the rows themselves (wins, ties and losses
-\G{OneEqAWtl} at the smallest budget and \G{OneEqBWtl} at half the default). Retention measures how much of a table's
-predictive information survives, TDL measures what that costs in bytes, and DOPE is a program that
-spends its bytes where the theory says they count. The engine, the benchmark records and the scripts
-that regenerate every number in this paper are open.
+The predictive content of a real-world table weighs far less than the table itself---provided every
+byte is spent where downstream learners actually need it. Theory explains why: in the large-sample
+limit, holdout retention is governed by conditional distortion $D_A$, while covariate density error
+enters only multiplicatively with the learner's finite-sample estimation error, which shrinks as the
+receiver draws more synthetic rows (\cref{thm:limit,prop:finite,prop:crossover}). DOPE turns that
+asymmetry into a practical compiler architecture: both in standalone per-table compilation and in
+amortized landmark-conditioned multi-level compilation (\texttt{DOPE-MLC-v2} and \texttt{DOPE-MLC-v3}),
+a few kilobytes of executable generative code preserve the bulk of a table's predictive gain across
+gradient-boosted trees, neural networks, linear models, and attention auditors, beating equal-byte
+compressed source rows when budgets are tight (wins, ties and losses \G{OneEqAWtl} at the smallest
+standalone budget, \G{OneEqBWtl} at half the default, and top cross-tier Elo \G{MlcVTwoPooledElo} across
+the \G{MlcVTwoDatasets}-table multi-level panel). Retention measures how much of a table's predictive
+information survives, Transfer Description Length measures what that survival costs on the wire, and
+the pure-Rust engine, checkpoints, benchmark receipts, and regeneration scripts are open.

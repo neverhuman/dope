@@ -11,12 +11,12 @@
 % Labels of the main text, read from its build (paper/build.sh builds main.tex first).
 \externaldocument[M-]{../target/paper/dope1}
 \hypersetup{pdftitle={Supplement: D.O.P.E.: Downstream Objective-Preserving Encoding},
-  pdfauthor={Jepson Taylor; Alton Alexander}}
+  pdfauthor={Jepson Taylor; Alton Alexander; Jordan Morrow}}
 \renewcommand{\thesection}{\Alph{section}}
 \renewcommand{\thetheorem}{\thesection.\arabic{theorem}}
 
 \title{\textbf{Supplement to D.O.P.E.: Downstream Objective-Preserving Encoding}}
-\author{Jepson Taylor \and Alton Alexander\\[0.2em]\small NEVERHUMAN Research}
+\author{Jepson Taylor \and Alton Alexander \and Jordan Morrow\\[0.2em]\small NEVERHUMAN Research}
 \date{}
 
 \begin{document}
@@ -70,6 +70,16 @@ expectations and using $\mathbb{E}Z\le\sqrt{\mathbb{E}Z^2}$,
 $\mathbb{E}\lVert\hat h_{Q,N}-f^\star\rVert^2\le\bigl(\sqrt{D_A}+\sqrt{\lVert w\rVert_\infty e_Q(N)}\bigr)^2$. With
 retention defined on expected losses and the null at its population value, \cref{lem:decomp} gives the
 numerator $V-\mathbb{E}\lVert\hat h_{Q,N}-f^\star\rVert^2$ and the denominator $V-e_P(n)$.
+\end{proof}
+
+\begin{proof}[Proof of Proposition~\ref{M-prop:crossover}]
+A random subset of $k$ real training rows is an exact draw from $P$, so its conditional distortion is
+zero ($D_A=0$) and its covariate density ratio is identically one ($w\equiv 1$). Applying
+\cref{lem:decomp} with expected estimation error $e_P(k)=C/k$ on the $k$-row subset and $e_P(n)=C/n$ on
+the full $n$-row training table gives expected retention
+$R_{\mathrm{rows}}(k)=(V-C/k)/(V-C/n)$. Setting $R_{\mathrm{rows}}(k)\le R$ and solving for $k$ yields
+$V-C/k\le R(V-C/n)$, or equivalently $C/k\ge (1-R)V + R\,C/n$, which rearranges to
+\eqref{M-eq:crossover}.
 \end{proof}
 
 \begin{proposition}[Misspecified auditors]

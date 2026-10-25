@@ -54,6 +54,15 @@ automatically by [`bench/real-world/render.py`](bench/real-world/render.py).
 
 *Byte & baseline qualification:* `DOPE-MLC-v2` median wire bytes (`1,502 / 2,836 / 5,872 B` = `1.5 / 2.8 / 5.7 KiB`; zlib `1,238 / 2,351 / 4,616 B`) are bit-exact `version=2` latent payloads (`6,000/6,000` cells `max_abs_diff = 0.0`), excluding the `.dope` scaler sidecar (`+545 B` median; full raw `2,031 / 3,376 / 6,398 B`) and shared frozen decoder (`292,707 B` / `285.8 KiB`, amortized `0 B/dataset`), whereas `DOPE-MLC-v3` (`DML3+CSC1`) is self-contained inside `2 / 4 / 16 / 64 KiB` caps (`960.6 / 1,550.2 / 3,429.2 / 6,144.6 B` mean on `1,000` `v2`-panel tables; `1,418.0 / 2,510.7 / 6,435.3 / 9,877.5 B` mean on `69` multiclass tables; `0 B` external weights). Baseline byte tiers (`4 / 16 / 64 KiB`) reflect nominal caps and historical `fp16` byte estimates paired with `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`), not a common measured-wire byte qualification.
 
+| Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Nonlinearity Regime (`1,000` DS) | `Medium` (`1.5 KiB`) $R$ | `High` (`2.8 KiB`) $R$ | `Ultra` (`5.7 KiB`) $R$ |
+|---|---:|---:|---|---:|---:|---:|
+| **Linear / Logistic** (`n=969`) | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` | **Mostly Linear** (`< 0.05`, `687` DS) | `0.9467` | **`0.9585`** | `0.9477` (`D = 0.8190`) |
+| **Local Gated Attention Net** (`kumo_tabpfn` key, `n=962`) | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** | **Moderate Nonlinear** (`0.05–0.20`, `92` DS) | `0.7263` | `0.8180` | **`0.8318`** (`+10.55` pts) |
+| **MLP** (`n=965`) | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** | **Strongly Nonlinear** (`> 0.20`, `221` DS) | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
+| **LightGBM** (`n=989`) | **`0.8978 [0.8852, 0.9085]`** | `0.7703 [0.7615, 0.7793]` | **Stage-0 Signal Ceiling $R^2$** (`19,190` splits) | `0.9417` | `0.9654` | **`0.9863`** |
+| **CatBoost** (`n=1,000`) | **`0.8810 [0.8692, 0.8915]`** | **`0.8130 [0.8055, 0.8213]` (`D80` pass)** | **Stage-0 Nonlinear Uplift $R^2$** (`19,190` splits) | `0.7912` | `0.8727` | **`0.9383`** |
+| **XGBoost** (`n=989`) | **`0.8121 [0.7915, 0.8285]`** | `0.7221 [0.7131, 0.7310]` | **Unlimited Sampling Expansion** (`1× -> 2× -> 5× N_train`) | `0.8808` (`1×`) | `0.9010` (`2×`) | **`0.9070` (`5×`, `+2.62` pts)** |
+
 ![DOPE-MLC-v2 and DOPE-MLC-v3 deep learning training monitor vs. <5% full-population validation loss curves across Training Rounds R0..R8, holdout retention value vs. wire bytes across 1,000 and 1,069 datasets, and distinct non-summed testing campaign scale](bench/real-world/figures/convergence.png)
 
 | Track / Expansion Study | Corpus & `<5%` Validation Split Allocation | Effective Passes & Visits (`R0..R8`) | Train Monitor (`R0 -> Best`) | Full-Population Validation Loss `± 1 SE` or Holdout Transfer | Key Qualification & Tournament Result |
@@ -192,28 +201,44 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 <!-- END DOPE1 WALKTHROUGH -->
 </details>
 
+<details>
+<summary><strong>Why DOPE: The "So What" & Comparison to Best Practices</strong></summary>
+
+| Practice | What Crosses the Wire | Primary Limitation Under Tight Byte Caps | How DOPE Compares |
+| :--- | :--- | :--- | :--- |
+| **Raw-Row Subsampling / Coresets** | Actual training records (`xz` / `zlib` compressed) | Estimation error scales as `O(1/k)` with stored row count; starves learners at compact budgets | Ships **zero source rows**; receiver draws unlimited synthetic rows (`N >> n`) from a smooth + tree teacher, beating compressed rows at tight budgets |
+| **Parametric Copulas & Graphical Models** | Marginal knots + correlation matrix | Elliptical score-space dependence misses nonlinear thresholds and multi-way feature interactions | Pairs a **regime mixture of Gaussian copulas** (exact marginals) with a **variable-projection residual network + boosted oblivious trees** for `P(Y|X)` |
+| **Deep Tabular Generators** (`TabSyn`, `TabDDPM`, `CTGAN`, `ARF`) | Megabytes of neural or forest parameters | Spends vast byte budgets modeling high-dimensional covariate noise `P(X)` with uncounted artifact size | **Target-first byte allocation**: theory proves `P(Y|X)` distortion enters holdout retention directly while `P(X)` error is suppressed by `N` |
+| **Single Fitted Predictor** | Weights for one specific model family | Locks the receiver to one architecture; prevents retraining, feature engineering, or multi-model ensembling | Emits a **generative sampling program** that trains *any* downstream learner (`CatBoost`, `LightGBM`, `XGBoost`, `MLP`, linear, local attention, foundation models) |
+
+</details>
+
 ## How it works
 
 ```mermaid
 flowchart LR
-  T[(table)] --> I[intake: types, levels, robust scaling]
-  I --> C[covariates: marginals and a regime copula]
-  I --> Y[target: network, oblivious trees, noise]
-  C & Y --> Q[bits: rate-distortion, self-audited split]
-  Q --> A[[model.dope]]
-  A --> S[sampler]
+  subgraph SENDER["Sender / Compiler (reads D_fit once)"]
+    T[(table D_fit)] --> I[intake & CSC1]
+    I --> L[landmarks & xi]
+    L --> C[covariates Q_X: marginals + regime copula]
+    L --> Y[target Q_Y|X: net + oblivious trees + noise]
+    C & Y --> Q[bits: rate-distortion + self-audit split]
+  end
+  Q ==> B{{"TRUST BOUNDARY (receiver sees only program A)"}}
+  subgraph RECEIVER["Receiver / Sampler (zero raw rows)"]
+    A[[model.dope: Small/Med/High/Ultra]] --> S[Pure-Rust sampler]
+    S --> R[synthetic rows N]
+    R --> M[learners on D_test]
+  end
+  B ==> A
 ```
 
-- **Intake** infers types, orders categorical levels by target link, pools rare levels,
-  applies `log1p` to skewed counts and scales numbers onto `[0, 1]`.
-- **Covariates.** Quantile functions on a normal-score grid, joined by a regime mixture of
-  Gaussian copulas that reproduces every marginal.
-- **Target.** A residual tanh network for smooth structure, boosted byte-coded *oblivious
-  trees* for interactions, then calibrated noise or labels.
-- **Bytes.** A rate–distortion search sets bit depths; a *self-audit* on held-out training
-  rows picks the dependence/target split; schema and codes form one brotli stream.
+- **Intake & Landmarks** infer types, order categorical levels by target link, pool rare levels, scale numbers onto `[0, 1]`, and compute cross-validation landmarks and rank dependence (`xi`).
+- **Covariates (`Q_X`).** Quantile functions on a normal-score grid, joined by a regime mixture of Gaussian copulas that reproduces every marginal.
+- **Target (`Q_Y|X`).** A residual tanh network for smooth structure, boosted byte-coded *oblivious trees* for interactions, then calibrated noise or labels.
+- **Bytes.** A rate–distortion search sets bit depths; a *self-audit* picks the dependence/target split across nested `Small`, `Medium`, `High`, and `Ultra` envelopes.
 
-Details: [engine/README.md](engine/README.md) and the manuscript.
+Details: [engine/README.md](engine/README.md), [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md), and the manuscript.
 
 ## The KPI: Transfer Description Length
 
@@ -288,7 +313,7 @@ CPU; none is a sealed TDL result, and the TDL driver gate is not part of them
 ```bibtex
 @misc{taylor2026dope,
   title  = {{D.O.P.E.}: Downstream Objective-Preserving Encoding -- Generative Compression of Predictive Structure},
-  author = {Taylor, Jepson and Alexander, Alton},
+  author = {Taylor, Jepson and Alexander, Alton and Morrow, Jordan},
   year   = {2026},
   note   = {NEVERHUMAN Research. Source and receipts: https://github.com/neverhuman/dope}
 }

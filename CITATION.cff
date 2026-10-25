@@ -11,6 +11,9 @@ authors:
   - family-names: Alexander
     given-names: Alton
     affiliation: NEVERHUMAN Research
+  - family-names: Morrow
+    given-names: Jordan
+    affiliation: NEVERHUMAN Research
 preferred-citation:
   type: report
   title: "D.O.P.E.: Downstream Objective-Preserving Encoding -- Generative Compression of Predictive Structure"
@@ -19,6 +22,8 @@ preferred-citation:
       given-names: Jepson
     - family-names: Alexander
       given-names: Alton
+    - family-names: Morrow
+      given-names: Jordan
   institution:
     name: NEVERHUMAN Research
   year: 2026
