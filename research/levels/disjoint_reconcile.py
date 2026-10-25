@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
-import csv, gzip, json, math, multiprocessing, os, time, warnings
+import argparse, base64, csv, gzip, hashlib, json, math, multiprocessing, os, time, warnings, zlib
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -24,6 +24,31 @@ from .world_class_eval import (
 )
 
 _DISJOINT_MODEL: Optional[MultiLevelLandmarkModel] = None
+EXECUTED_TASK4221_SOURCE_SHA256 = "701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb"
+EXECUTED_TASK4221_SOURCE_BYTES = 36509
+EXECUTED_TASK4221_SOURCE_LINES = 608
+
+
+def verify_or_restore_executed_task4221_source(dest_path: Optional[Path] = None) -> Dict[str, Any]:
+    """Verify and optionally restore the exact 608-line task-4221 script from the tracked snapshot."""
+    snap_path = Path(__file__).resolve().parents[2] / "bench/real-world/results/multilevel-convergence-snapshot.json"
+    snap = json.loads(snap_path.read_text(encoding="utf-8"))
+    custody = snap["executed_source_custody"]
+    raw_bytes = zlib.decompress(base64.b64decode(custody["zlib_base64_payload"].encode("ascii")))
+    actual_sha = hashlib.sha256(raw_bytes).hexdigest()
+    actual_lines = len(raw_bytes.decode("utf-8").splitlines())
+    if actual_sha != EXECUTED_TASK4221_SOURCE_SHA256 or len(raw_bytes) != EXECUTED_TASK4221_SOURCE_BYTES or actual_lines != EXECUTED_TASK4221_SOURCE_LINES:
+        raise ValueError(f"Executed source custody mismatch: sha={actual_sha}, bytes={len(raw_bytes)}, lines={actual_lines}")
+    if dest_path is not None:
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        dest_path.write_bytes(raw_bytes)
+    return {
+        "verified": True,
+        "sha256": actual_sha,
+        "bytes": len(raw_bytes),
+        "lines": actual_lines,
+        "restored_to": str(dest_path) if dest_path is not None else None,
+    }
 
 
 def train_strictly_disjoint_1000_checkpoint(
@@ -374,6 +399,14 @@ def run_full_audit_and_disjoint_reconciliation(
 
 
 if __name__ == "__main__":
-    out = Path("/home/ubuntu/dope/target/s3-multilevel-training-20261023")
-    res = run_full_audit_and_disjoint_reconciliation(out, workers=28)
-    print(json.dumps({"status": "completed", "elapsed_s": res["reconciled_strictly_dataset_disjoint_1000_run"]["wall_clock_seconds"]}, indent=2))
+    parser = argparse.ArgumentParser(description="Dataset-disjoint reconciliation and task-4221 source custody verifier.")
+    parser.add_argument("--verify-executed-source", action="store_true", help="Verify embedded task-4221 source SHA-256.")
+    parser.add_argument("--restore-executed-source", type=Path, default=None, help="Restore exact 608-line task-4221 script.")
+    parser.add_argument("--output-dir", type=Path, default=Path("/home/ubuntu/dope/target/s3-multilevel-training-20261023"))
+    parser.add_argument("--workers", type=int, default=28)
+    args = parser.parse_args()
+    if args.verify_executed_source or args.restore_executed_source is not None:
+        print(json.dumps(verify_or_restore_executed_task4221_source(args.restore_executed_source), indent=2))
+    else:
+        res = run_full_audit_and_disjoint_reconciliation(args.output_dir, workers=args.workers)
+        print(json.dumps({"status": "completed", "elapsed_s": res["reconciled_strictly_dataset_disjoint_1000_run"]["wall_clock_seconds"]}, indent=2))

@@ -124,8 +124,13 @@ best checkpoint across **all `1,891` unseen-dataset validation splits**:
 ### 3.1 Maximized-Training (`~96.4%–97.2%` Train, `< 5%` Validation) Full-Validation-Per-Round Convergence & Dataset-Grouped Bootstrap SEs (`task-4221`, `maxtrain97_val_lt5pct`)
 
 To maximize training coverage while enforcing **`< 5%` validation share on both datasets and splits**
-and eliminating subsampled validation-monitor noise, [`research/levels/maxtrain_val_lt5pct.py`](../research/levels/maxtrain_val_lt5pct.py)
-(`SHA-256: 701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb`; pre-launch manifest
+and eliminating subsampled validation-monitor noise, the `task-4221` runner (`research/levels/maxtrain_val_lt5pct.py`,
+`608` lines, `36,509` bytes, `SHA-256: 701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb`;
+preserved untouched at `target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py`
+and embedded byte-for-byte with SHA-256 verification under `executed_source_custody` in
+[`bench/real-world/results/multilevel-convergence-snapshot.json`](../bench/real-world/results/multilevel-convergence-snapshot.json);
+tracked custody verifier and byte-for-byte restorer:
+[`research/levels/disjoint_reconcile.py`](../research/levels/disjoint_reconcile.py); pre-launch manifest
 `target/s3-multilevel-training-20261023/maxtrain97_val_lt5pct_split_and_dispatch_manifest.json`
 `SHA-256: 6ad04935...`; round/pass accounting addendum
 `target/s3-multilevel-training-20261023/maxtrain97_training_round_and_pass_accounting_addendum.json`)
@@ -136,7 +141,8 @@ all historical checkpoints (`dope_mlc_v2_s3_best.pt`, `dope_mlc_v2_disjoint1000_
 receipts untouched:
 
 - **Training-Round vs. Full-Population Pass Accounting (`R0..R8`)**:
-  In `maxtrain_val_lt5pct.py:363-402`, the loop index `ep = 1..8` iterates over 6 disjoint training
+  In the executed `task-4221` script (`maxtrain_val_lt5pct.py:363-402`, restorable via
+  [`disjoint_reconcile.py`](../research/levels/disjoint_reconcile.py)), the loop index `ep = 1..8` iterates over 6 disjoint training
   shards (`R1..R6`, completing **`1.000000×` full-population pass at `R6`**) followed by 2 additional
   refinement shard rounds (`R7..R8`, reaching **`1.333351×`** effective full-population passes in
   Track 1 and **`1.333333×`** in Track 2) and logs raw JSON receipt keys `"epoch": 0..8` and
@@ -390,8 +396,10 @@ python3 -B -m research.levels.rust_v3_parity
 DOPE_REQUIRE_RUST_PARITY=1 cargo test --manifest-path engine/Cargo.toml -p dope-core --test mlc_v3_safetensors
 DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dope_mlc_v3
 
-# 12. Run <5% validation (96.4%–97.2% train) 3-track convergence & v3 matched-budget A0..A3 ablation
-python3 -B -m research.levels.maxtrain_val_lt5pct
+# 12. Verify/restore exact task-4221 executed source (SHA-256: 701d9cca...) and run <5% validation reproduction
+python3 -B -m research.levels.disjoint_reconcile --verify-executed-source
+python3 -B -m research.levels.disjoint_reconcile --restore-executed-source target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py
+PYTHONPATH=. python3 -B target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py --workers 16
 ```
 
 ---

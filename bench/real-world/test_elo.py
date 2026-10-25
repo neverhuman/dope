@@ -121,8 +121,17 @@ class Elo(unittest.TestCase):
         self.assertEqual(len(cpu["common_datasets"]), 16)
 
     def test_multilevel_convergence_snapshot_matches_live_receipts(self):
+        import base64
+        import hashlib
+        import zlib
         from render_tex import ROOT, _multilevel_macro_items, multilevel_convergence_data
         snap = multilevel_convergence_data()
+        custody = snap["executed_source_custody"]
+        raw_exec = zlib.decompress(base64.b64decode(custody["zlib_base64_payload"].encode("ascii")))
+        self.assertEqual(hashlib.sha256(raw_exec).hexdigest(), "701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb")
+        self.assertEqual(len(raw_exec), 36509)
+        self.assertEqual(len(raw_exec.decode("utf-8").splitlines()), 608)
+        self.assertTrue((ROOT / custody["tracked_custody_verifier_module"]).is_file())
         t1 = snap["v2_full_corpus_maxtrain97_val3pct"]
         t2 = snap["v2_disjoint1000_maxtrain97_devval345"]
         t3 = snap["v3_maxtrain97_val3pct"]
