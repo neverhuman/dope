@@ -1,8 +1,8 @@
 {
   "allowlist": {
     "docs/whitepaper/generated/architecture-figure-hashes.json": {
-      "reason": "Updated source_sha256 for docs/whitepaper/generated/numbers.tex after adding hash-bound DOPE-MLC-v2 and DOPE-MLC-v3 multi-level landmark convergence and tournament macros from multilevel-convergence-snapshot.json.",
-      "sha256": "cfb725dc4b27dad6afa7af9ab1d91446e5b3535c2b5005e64d0508c780c9a80a"
+      "reason": "Updated source_sha256 and rendered_pdf_sha256 for docs/whitepaper/figures/architecture.tex and docs/whitepaper/generated/numbers.tex after upgrading the network-flow trust-boundary architecture diagram.",
+      "sha256": "b61219b2579697b5b5ee34f61b16f33b1ef1d1ed2cc2da7f46497e5bc0cda3e4"
     },
     "docs/whitepaper/generated/numbers.tex": {
       "reason": "Added hash-bound DOPE-MLC-v2 (1,000 datasets) and DOPE-MLC-v3 (1,069 datasets / 4,276 cells) multi-level landmark convergence, tournament Elo, and pure-Rust SafeTensors parity macros from multilevel-convergence-snapshot.json while preserving all existing historical macros byte-for-byte.",

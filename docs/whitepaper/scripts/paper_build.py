@@ -161,15 +161,20 @@ def anonymous_sources(root, *, paper):
     helper = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(helper)
     strip_journal_availability = helper.strip_journal_availability
-    old = ('\\author{Jepson Taylor$^1$, Alton Alexander$^1$\\\\[0.15cm]\n'
-           '$^1$NEVERHUMAN Research}')
+    candidates = (
+        '\\author{Jepson Taylor$^1$, Alton Alexander$^1$, Jordan Morrow$^1$\\\\[0.15cm]\n'
+        '$^1$NEVERHUMAN Research}',
+        '\\author{Jepson Taylor$^1$, Alton Alexander$^1$\\\\[0.15cm]\n'
+        '$^1$NEVERHUMAN Research}',
+    )
     new = '\\author{Anonymous\\\\[0.15cm]\nAffiliation withheld for review.}'
     paths = {}
     for stem in ('dope-mfs', 'supplement'):
         text = (paper / f'{stem}.tex').read_text()
-        if text.count(old) != 1:
+        matches = [old for old in candidates if text.count(old) == 1]
+        if len(matches) != 1:
             raise ValueError('paper author marker is not unique')
-        text = text.replace(old, new, 1)
+        text = text.replace(matches[0], new, 1)
         if stem == 'dope-mfs':
             text = strip_journal_availability(text)
         if 'neverhuman' in text.lower():
