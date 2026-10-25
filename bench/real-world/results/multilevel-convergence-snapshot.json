@@ -8593,5 +8593,480 @@
     "verification_command": "python3 -B -m research.levels.disjoint_reconcile --verify-executed-source",
     "tracked_custody_verifier_module": "research/levels/disjoint_reconcile.py",
     "distinction_note": "The exact 608-line (36,509-byte) task-4221 executed script (SHA-256: 701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb) exceeds the 500-line tracked-source cap in ops/merge_guard/source_limits.rs and is preserved byte-for-byte in this custody payload and in target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py. Tracked custody verification and byte-for-byte restoration are provided by research/levels/disjoint_reconcile.py (--verify-executed-source / --restore-executed-source)."
+  },
+  "value_and_testing_scale_summary": {
+    "schema": "dope.multilevel.value_and_testing_scale_summary/v1",
+    "source_receipts": {
+      "v2_pooled_1000": {
+        "path": "target/s3-multilevel-training-20261023/world_class_transfer_and_elo_receipt.json",
+        "sha256": "5686d9009db2c39202348c4e612169826f89a93a7ed35dbee3593e0ce042c350"
+      },
+      "v2_strictly_disjoint_1000": {
+        "path": "target/s3-multilevel-training-20261023/strictly_disjoint_1000_transfer_and_elo_receipt.json",
+        "sha256": "642709235d0fbfeaa07bc94dbf5f3bb81bba5a1dad8c20e7f3e8fe79258cb77a"
+      },
+      "v2_exact_wire_replay_6000": {
+        "path": "target/s3-multilevel-training-20261023/exact_wire_replay_1000ds_qualification_v4.json",
+        "sha256": "bc224eb4fb0b074541cfb832a73ed710c2546eed74752b9fc2d39224e678fe21"
+      },
+      "v3_canonical_1069_unified": {
+        "path": "target/s3-multilevel-training-20261023/v3/runs/canonical_v3_full_1069_unified_v1/receipt.json",
+        "sha256": "08474150304dfd796f8843ebdd78c8635421146891a05cf48e46bd261c5041c6"
+      }
+    },
+    "cohort_overlap_and_validation_disclosure": {
+      "untouched_sealed_confirmatory_test": false,
+      "evidence_class": "selection_exposed_development_and_reconciliation_validation",
+      "v2_eval_datasets_unique": 1000,
+      "v3_eval_v2_panel_datasets": 1000,
+      "v3_eval_multiclass_datasets": 69,
+      "unique_eval_datasets_union_v2_and_v3": 1069,
+      "overlap_between_v2_1000_and_v3_1069": 1000,
+      "non_summation_rule": "The 1,000 v2 evaluation datasets are the exact regression/binary panel reused in v3 eval_gradient_disjoint_v2_panel; they must never be summed with 1,069 into 2,069 unique datasets."
+    },
+    "v2_value_by_tier_1000ds": {
+      "medium": {
+        "nominal_cap_bytes": 4096,
+        "exact_v2_latent_wire_median_bytes": 1502,
+        "exact_v2_latent_wire_zlib_median_bytes": 1238,
+        "full_raw_with_scaler_sidecar_median_bytes": 2031,
+        "dope_mean_retention_R": 0.862,
+        "dope_median_retention_R": 0.9335,
+        "dope_retention_R_ci95": [
+          0.8503,
+          0.8722
+        ],
+        "dope_mean_driver_fidelity_D": 0.7566,
+        "dope_driver_D_ci95": [
+          0.7518,
+          0.7631
+        ],
+        "rows_mean_retention_R": 0.6743,
+        "rows_retention_R_ci95": [
+          0.6564,
+          0.6915
+        ],
+        "copula_mean_retention_R": 0.8046,
+        "copula_retention_R_ci95": [
+          0.7916,
+          0.8209
+        ]
+      },
+      "high": {
+        "nominal_cap_bytes": 16384,
+        "exact_v2_latent_wire_median_bytes": 2836,
+        "exact_v2_latent_wire_zlib_median_bytes": 2351,
+        "full_raw_with_scaler_sidecar_median_bytes": 3376,
+        "dope_mean_retention_R": 0.8971,
+        "dope_median_retention_R": 0.9642,
+        "dope_retention_R_ci95": [
+          0.8848,
+          0.908
+        ],
+        "dope_mean_driver_fidelity_D": 0.7821,
+        "dope_driver_D_ci95": [
+          0.7759,
+          0.7878
+        ],
+        "rows_mean_retention_R": 0.8526,
+        "rows_retention_R_ci95": [
+          0.8404,
+          0.8649
+        ],
+        "copula_mean_retention_R": 0.8046,
+        "copula_retention_R_ci95": [
+          0.791,
+          0.818
+        ]
+      },
+      "ultra": {
+        "nominal_cap_bytes": 65536,
+        "exact_v2_latent_wire_median_bytes": 5872,
+        "exact_v2_latent_wire_zlib_median_bytes": 4616,
+        "full_raw_with_scaler_sidecar_median_bytes": 6398,
+        "dope_mean_retention_R": 0.8975,
+        "dope_median_retention_R": 0.9658,
+        "dope_retention_R_ci95": [
+          0.8883,
+          0.9094
+        ],
+        "dope_mean_driver_fidelity_D": 0.7896,
+        "dope_driver_D_ci95": [
+          0.7831,
+          0.7959
+        ],
+        "rows_mean_retention_R": 0.923,
+        "rows_retention_R_ci95": [
+          0.9141,
+          0.9301
+        ],
+        "copula_mean_retention_R": 0.8046,
+        "copula_retention_R_ci95": [
+          0.7908,
+          0.82
+        ]
+      }
+    },
+    "v2_overall_elo_1000ds": [
+      {
+        "method": "dope_mlc_v2",
+        "elo": 1651.3,
+        "wins": 30959,
+        "draws": 717,
+        "losses": 12693,
+        "win_share": 0.7058,
+        "rank": 1,
+        "elo_ci95_low": 1643.4,
+        "elo_ci95_high": 1659.6,
+        "elo_se": 4.26
+      },
+      {
+        "method": "rows",
+        "elo": 1593.3,
+        "wins": 27150,
+        "draws": 993,
+        "losses": 16222,
+        "win_share": 0.6232,
+        "rank": 2,
+        "elo_ci95_low": 1584.4,
+        "elo_ci95_high": 1602.7,
+        "elo_se": 4.4
+      },
+      {
+        "method": "kernel",
+        "elo": 1592.5,
+        "wins": 27108,
+        "draws": 977,
+        "losses": 16284,
+        "win_share": 0.622,
+        "rank": 3,
+        "elo_ci95_low": 1583.0,
+        "elo_ci95_high": 1603.0,
+        "elo_se": 4.86
+      },
+      {
+        "method": "copula",
+        "elo": 1545.8,
+        "wins": 23905,
+        "draws": 1255,
+        "losses": 19209,
+        "win_share": 0.5529,
+        "rank": 4,
+        "elo_ci95_low": 1535.7,
+        "elo_ci95_high": 1553.5,
+        "elo_se": 4.42
+      },
+      {
+        "method": "joint_diffusion_v1",
+        "elo": 1432.4,
+        "wins": 16822,
+        "draws": 746,
+        "losses": 26801,
+        "win_share": 0.3875,
+        "rank": 5,
+        "elo_ci95_low": 1423.8,
+        "elo_ci95_high": 1440.8,
+        "elo_se": 4.58
+      },
+      {
+        "method": "arf",
+        "elo": 1184.7,
+        "wins": 4370,
+        "draws": 894,
+        "losses": 39105,
+        "win_share": 0.1086,
+        "rank": 6,
+        "elo_ci95_low": 1167.3,
+        "elo_ci95_high": 1202.3,
+        "elo_se": 9.37
+      }
+    ],
+    "v2_disjoint1000_ultra": {
+      "mean_retention_R": 0.8998,
+      "median_retention_R": 0.9671,
+      "retention_R_ci95": [
+        0.8904,
+        0.9106
+      ],
+      "elo": 1650.7,
+      "elo_ci95": [
+        1643.4,
+        1657.5
+      ]
+    },
+    "v3_value_by_role_and_tier_1069ds": {
+      "eval_gradient_disjoint_v2_panel": {
+        "small": {
+          "completed_datasets": 1000,
+          "mean_dml3_complete_wire_bytes": 960.6,
+          "max_dml3_complete_wire_bytes": 1472,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.808,
+          "sender_scaled_6aud_mean_driver_D": 0.7536,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8055,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "medium": {
+          "completed_datasets": 1000,
+          "mean_dml3_complete_wire_bytes": 1550.2,
+          "max_dml3_complete_wire_bytes": 2459,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.8286,
+          "sender_scaled_6aud_mean_driver_D": 0.7619,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8363,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "high": {
+          "completed_datasets": 1000,
+          "mean_dml3_complete_wire_bytes": 3429.2,
+          "max_dml3_complete_wire_bytes": 7203,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.8633,
+          "sender_scaled_6aud_mean_driver_D": 0.7793,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8706,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "ultra": {
+          "completed_datasets": 1000,
+          "mean_dml3_complete_wire_bytes": 6144.6,
+          "max_dml3_complete_wire_bytes": 13010,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.8517,
+          "sender_scaled_6aud_mean_driver_D": 0.7764,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8581,
+          "per_tier_bootstrap_ci_recorded": false
+        }
+      },
+      "eval_gradient_disjoint_multiclass_panel": {
+        "small": {
+          "completed_datasets": 69,
+          "mean_dml3_complete_wire_bytes": 1418.0,
+          "max_dml3_complete_wire_bytes": 2047,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.7271,
+          "sender_scaled_6aud_mean_driver_D": 0.6462,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.7018,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "medium": {
+          "completed_datasets": 69,
+          "mean_dml3_complete_wire_bytes": 2510.7,
+          "max_dml3_complete_wire_bytes": 3812,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.7767,
+          "sender_scaled_6aud_mean_driver_D": 0.6715,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.7789,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "high": {
+          "completed_datasets": 69,
+          "mean_dml3_complete_wire_bytes": 6435.3,
+          "max_dml3_complete_wire_bytes": 14048,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.8402,
+          "sender_scaled_6aud_mean_driver_D": 0.7157,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8451,
+          "per_tier_bootstrap_ci_recorded": false
+        },
+        "ultra": {
+          "completed_datasets": 69,
+          "mean_dml3_complete_wire_bytes": 9877.5,
+          "max_dml3_complete_wire_bytes": 24195,
+          "within_cap_pct": 100.0,
+          "sender_scaled_6aud_mean_clipped_R": 0.8362,
+          "sender_scaled_6aud_mean_driver_D": 0.7158,
+          "receiver_csc1_raw_6aud_mean_clipped_R": 0.8404,
+          "per_tier_bootstrap_ci_recorded": false
+        }
+      }
+    },
+    "v3_paired_elo_and_deltas": {
+      "overall_12828_cells_elo": [
+        {
+          "method": "rows_wire",
+          "elo": 1597.3,
+          "wins": 22664,
+          "draws": 2139,
+          "losses": 9853,
+          "win_share": 0.6848,
+          "rank": 1,
+          "ci95_low": 1589.7,
+          "ci95_high": 1606.1,
+          "bootstrap_se": 4.24
+        },
+        {
+          "method": "dope_mlc_v2_wire",
+          "elo": 1538.0,
+          "wins": 14334,
+          "draws": 2094,
+          "losses": 10572,
+          "win_share": 0.5697,
+          "rank": 2,
+          "ci95_low": 1531.8,
+          "ci95_high": 1543.2,
+          "bootstrap_se": 3.05
+        },
+        {
+          "method": "dope_mlc_v3_wire",
+          "elo": 1457.6,
+          "wins": 13548,
+          "draws": 2472,
+          "losses": 18636,
+          "win_share": 0.4266,
+          "rank": 3,
+          "ci95_low": 1449.5,
+          "ci95_high": 1464.3,
+          "bootstrap_se": 3.73
+        },
+        {
+          "method": "copula_wire",
+          "elo": 1407.1,
+          "wins": 10580,
+          "draws": 2011,
+          "losses": 22065,
+          "win_share": 0.3343,
+          "rank": 4,
+          "ci95_low": 1399.8,
+          "ci95_high": 1416.3,
+          "bootstrap_se": 4.32
+        }
+      ],
+      "overall_v3_minus_copula": {
+        "paired_complete_case_cell_count": 12828,
+        "mean_delta_R": 0.0941,
+        "median_delta_R": 0.0151,
+        "ci95_mean_delta_R": [
+          0.0897,
+          0.0997
+        ],
+        "wins": 3980,
+        "ties_001": 1911,
+        "ties_010": 7441,
+        "losses": 1407,
+        "failed_or_missing": 0
+      },
+      "overall_v3_minus_rows": {
+        "paired_complete_case_cell_count": 12828,
+        "mean_delta_R": -0.025,
+        "median_delta_R": -0.0255,
+        "ci95_mean_delta_R": [
+          -0.0297,
+          -0.0201
+        ],
+        "wins": 1919,
+        "ties_001": 1755,
+        "ties_010": 7481,
+        "losses": 3428,
+        "failed_or_missing": 0
+      },
+      "overall_v3_minus_v2_9000_cells": {
+        "paired_complete_case_cell_count": 9000,
+        "mean_delta_R": -0.0084,
+        "median_delta_R": -0.0093,
+        "ci95_mean_delta_R": [
+          -0.0104,
+          -0.0063
+        ],
+        "wins": 392,
+        "ties_001": 2843,
+        "ties_010": 8136,
+        "losses": 472,
+        "failed_or_missing": 0
+      },
+      "multiclass_828_cells_v3_minus_copula": {
+        "paired_complete_case_cell_count": 828,
+        "mean_delta_R": 0.2526,
+        "median_delta_R": 0.1701,
+        "ci95_mean_delta_R": [
+          0.2309,
+          0.2709
+        ],
+        "wins": 493,
+        "ties_001": 127,
+        "ties_010": 283,
+        "losses": 52,
+        "failed_or_missing": 0
+      },
+      "multiclass_828_cells_elo": [
+        {
+          "method": "rows_wire",
+          "elo": 1643.0,
+          "wins": 1170,
+          "draws": 165,
+          "losses": 321,
+          "win_share": 0.7563,
+          "rank": 1,
+          "ci95_low": 1615.8,
+          "ci95_high": 1693.0,
+          "bootstrap_se": 18.63
+        },
+        {
+          "method": "dope_mlc_v3_wire",
+          "elo": 1540.9,
+          "wins": 845,
+          "draws": 205,
+          "losses": 606,
+          "win_share": 0.5722,
+          "rank": 2,
+          "ci95_low": 1521.4,
+          "ci95_high": 1567.3,
+          "bootstrap_se": 11.78
+        },
+        {
+          "method": "dope_mlc_v2_wire",
+          "elo": 1502.3,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "win_share": 0.0,
+          "rank": 3,
+          "ci95_low": 1501.0,
+          "ci95_high": 1505.8,
+          "bootstrap_se": 1.12
+        },
+        {
+          "method": "copula_wire",
+          "elo": 1313.8,
+          "wins": 194,
+          "draws": 180,
+          "losses": 1282,
+          "win_share": 0.1715,
+          "rank": 4,
+          "ci95_low": 1263.9,
+          "ci95_high": 1345.2,
+          "bootstrap_se": 22.74
+        }
+      ]
+    },
+    "testing_scale_distinct_units": {
+      "reconciled_catalog_datasets_total": 3859,
+      "reconciled_catalog_breakdown": {
+        "train_gradient": 2199,
+        "dev_val_ablation": 112,
+        "eval_gradient_disjoint_v2_panel": 1000,
+        "eval_gradient_disjoint_multiclass_panel": 69,
+        "explicit_exclusions": 479
+      },
+      "v2_precalculated_cv_splits_total": 19079,
+      "v2_maxtrain97_train_splits": 18395,
+      "v2_maxtrain97_val_splits": 684,
+      "v2_downstream_auditor_fits_total": 65874,
+      "v2_exact_wire_replay_cells_verified": 6000,
+      "v2_exact_wire_replay_cells_total": 6000,
+      "v3_completed_dataset_tier_cells": 4276,
+      "v3_planned_dataset_tier_cells": 4276,
+      "v3_failed_or_missing_cells": 0,
+      "v3_six_auditor_evaluations_per_domain": 25656,
+      "ci_cpu_run_40159022870_test_assertions": {
+        "run_id": 40159022870,
+        "job_id": 121066451447,
+        "rust_passed_assertions": 656,
+        "rust_test_binaries": 109,
+        "python_ran_tests": 1801,
+        "python_test_invocations": 18,
+        "total_executed_assertions_in_job": 2457,
+        "unique_single_pass_tests_floor": 834
+      }
+    }
   }
 }
