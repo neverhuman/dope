@@ -18,8 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from render_tex import (  # noqa: E402
-    BUDGET_ORDER, ROOT, config_macros, kb, macros, ret, row, table_ablation, table_equal_bytes,
-    table_main, table_per_dataset, tdl_stats, throughput_tex,
+    BUDGET_ORDER, ROOT, config_macros, kb, macros, multilevel_convergence_data, multilevel_readme_lines,
+    ret, row, table_ablation, table_equal_bytes, table_main, table_multilevel, table_per_dataset,
+    tdl_stats, throughput_tex,
 )
 
 BEGIN, END = "<!-- BEGIN DOPE1 RESULTS -->", "<!-- END DOPE1 RESULTS -->"
@@ -233,6 +234,85 @@ def audit(summary: dict, plt):
     return fig
 
 
+def convergence(summary: dict, plt):
+    """DOPE-MLC-v2 and DOPE-MLC-v3 training and <5% full-validation loss curves across Training Rounds R0..R8."""
+    import numpy as np
+    snap = multilevel_convergence_data()
+    v2_old = snap["v2_full_corpus"]
+    eps_old, full_old = v2_old["epochs"], v2_old["full_1891_val_final_reloaded_ep7_best_state"]
+    t1 = snap["v2_full_corpus_maxtrain97_val3pct"]["rounds"]
+    t2 = snap["v2_disjoint1000_maxtrain97_devval345"]["rounds"]
+    t3_a3 = snap["v3_maxtrain97_val3pct"]["a3_rounds"]
+    t3_vars = snap["v3_maxtrain97_val3pct"]["matched_budget_ablation_progression_A0_to_A3"]
+    xs = np.array([r["raw_receipt_epoch_field"] for r in t1], dtype=float)
+    fig, axes = plt.subplots(2, 2, figsize=(9.2, 6.2))
+    ax_a, ax_b, ax_c, ax_d = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
+    # Panel A: Track 1 <5% Val (684/684 splits, 115/3,188 DS) vs Preserved 10%-Val
+    t1_val = np.array([r["val_full"]["mean_total_loss"] for r in t1])
+    t1_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t1])
+    t1_tr = np.array([r["train_monitor_600"]["mean_total_loss"] for r in t1])
+    old_val = np.array([e["val_monitor_600"]["mean_total_loss"] for e in eps_old])
+    xf = 8.85
+    ax_a.fill_between(xs, t1_val - t1_se, t1_val + t1_se, color=BLUE, alpha=0.16, lw=0)
+    ax_a.plot(xs, t1_val, marker="s", ms=4.2, lw=2.0, color=BLUE, label="Full 684/684 val ±1 SE (3.59% splits, R8* 0.34216, -16.5%)")
+    ax_a.plot(xs, t1_tr, marker="o", ms=3.8, lw=1.6, color="#15803d", ls="--", label="Train monitor (600/18,395 splits, R8 0.35175)")
+    ax_a.plot(xs, old_val, marker="^", ms=3.8, lw=1.5, color=GRAY, ls=":", label="Preserved 10%-val monitor (600/1,891, R7* 0.37667)")
+    ax_a.plot([xf], [full_old["mean_total_loss"]], marker="D", ms=5.5, color="#b91c1c", ls="none", label="Preserved full 1,891 eval (R7*: 0.37753)")
+    ax_a.axvline(8.42, color=GRAY, ls=":", lw=1.0)
+    ax_a.set_xticks(list(range(9)) + [xf], ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*", "Full\n1891"])
+    ax_a.set_xlabel("Training Round (R1..R8 = 24,527 visits, 1.333× passes)")
+    ax_a.set_ylabel("Multi-task objective loss")
+    ax_a.set_title("A. DOPE-MLC-v2 Full Corpus (<5% Val: 684 Splits / 115 DS)", loc="left", color=INK, fontsize=8.6)
+    ax_a.legend(frameon=False, fontsize=6.5, loc="upper right")
+    # Panel B: Track 1 Per-Tier Hierarchy (<5% Val, 684/684 splits)
+    for key, col, mk, lbl in (
+        ("medium", ORANGE, "^", "Val Medium (4 KiB, R8* 0.36407 ± 0.01608)"),
+        ("high", BLUE, "o", "Val High (16 KiB, R8* 0.33844 ± 0.01635)"),
+        ("ultra", "#15803d", "*", "Val Ultra (64 KiB, R8* 0.32396 ± 0.01672)"),
+    ):
+        ys = np.array([r["val_full"][key]["total_loss"] for r in t1])
+        se = np.array([r["val_full"][key]["dataset_grouped_se"] for r in t1])
+        ax_b.fill_between(xs, ys - se, ys + se, color=col, alpha=0.11, lw=0)
+        ax_b.plot(xs, ys, marker=mk, ms=5.5 if mk == "*" else 4.2, lw=1.9, color=col, label=lbl)
+    ax_b.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*"])
+    ax_b.set_xlabel("Training Round (100% of 684 unseen splits evaluated/round)")
+    ax_b.set_ylabel("Unseen-dataset validation loss (±1 SE)")
+    ax_b.set_title("B. DOPE-MLC-v2 Per-Tier Hierarchy (Ultra < High < Medium)", loc="left", color=INK, fontsize=8.6)
+    ax_b.legend(frameon=False, fontsize=6.7, loc="upper right")
+    # Panel C: Track 2 Strictly Disjoint-1,000 (<5% Val: 345/345 dev_val splits, 58 DS)
+    t2_val = np.array([r["val_full"]["mean_total_loss"] for r in t2])
+    t2_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t2])
+    t2_tr = np.array([r["train_monitor_600"]["mean_total_loss"] for r in t2])
+    ax_c.fill_between(xs, t2_val - t2_se, t2_val + t2_se, color=BLUE, alpha=0.16, lw=0)
+    ax_c.plot(xs, t2_val, marker="s", ms=4.2, lw=2.0, color=BLUE, label="Full 345/345 dev_val ±1 SE (2.80% splits, R5* 0.57363)")
+    ax_c.plot([5], [t2_val[5]], marker="o", ms=8.0, fillstyle="none", mew=1.6, color="#b91c1c", ls="none", label="Saved best_state (R5* 0.57363 ± 0.02131; R8 0.57371)")
+    ax_c.plot(xs, t2_tr, marker="o", ms=3.8, lw=1.6, color=ORANGE, ls="--", label="Train monitor (600/11,976 splits, R8 0.41492)")
+    ax_c.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5*", "R6", "R7", "R8"])
+    ax_c.set_xlabel("Training Round (R1..R8 = 15,968 visits, 1.333× passes)")
+    ax_c.set_ylabel("Disjoint-1,000 objective loss")
+    ax_c.set_title("C. DOPE-MLC-v2 Disjoint-1,000 (<5% Val: 345 Splits / 58 DS)", loc="left", color=INK, fontsize=8.6)
+    ax_c.legend(frameon=False, fontsize=6.5, loc="upper right")
+    # Panel D: Track 3 DOPE-MLC-v3 Disjoint-1,069 (<5% Val: 75/2,304 loaded cells = 3.26%)
+    a3_val = np.array([r["val_full"]["mean_total_loss"] for r in t3_a3])
+    a3_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t3_a3])
+    ax_d.fill_between(xs, a3_val - a3_se, a3_val + a3_se, color="#15803d", alpha=0.14, lw=0)
+    for vkey, col, ls, mk, lbl in (
+        ("A0_v2_baseline_140", GRAY, ":", "v", "A0 baseline (140-d, R5* 0.68700 | R8 0.68709)"),
+        ("A1_plus_16_building_blocks", ORANGE, "--", "^", "A1 +68 building blocks (R7* 0.68531 | R8 0.68547)"),
+        ("A2_plus_48_inter_landmark_stats", BLUE, "-.", "o", "A2 +48 inter-landmark+attn (R8* 0.68489)"),
+        ("A3_full_v3_with_col_gate_head", "#15803d", "-", "s", "A3 full v3 + col_gate ±1 SE (R8* 0.68492 ± 0.03877)"),
+    ):
+        ys = np.array([pt["val_mean_total_loss"] for pt in t3_vars[vkey]["round_val_loss_trajectory"]])
+        ax_d.plot(xs, ys, marker=mk, ms=4.0, lw=2.0 if vkey.startswith("A3") else 1.5, color=col, ls=ls, label=lbl)
+    ax_d.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*"])
+    ax_d.set_xlabel("Training Round (4,457 visits / 2,229 cells = 1.9996× passes)")
+    ax_d.set_ylabel("Full 75/75 loaded dev_val loss (3.26% pool)")
+    ax_d.set_title("D. DOPE-MLC-v3 Disjoint-1,069 A0..A3 (<5% Val: 75/2,304 Cells)", loc="left", color=INK, fontsize=8.6)
+    ax_d.legend(frameon=False, fontsize=6.4, loc="upper right")
+    fig.tight_layout()
+    return fig
+
+
 def figure_bytes(fig, fmt: str) -> bytes:
     buf = io.BytesIO()
     meta = {"Creator": "dope bench", "CreationDate": None} if fmt == "pdf" else {"Software": None}
@@ -295,7 +375,9 @@ def readme_block(summary: dict) -> str:
     lines += ["", "![Per table at 4 KiB: DOPE's robust retention against real rows xz-compressed to the same bytes]"
               "(bench/real-world/figures/tables.png)", "",
               "![TDL coverage: share of tables reaching the retention threshold within a byte budget]"
-              "(bench/real-world/figures/coverage.png)", END]
+              "(bench/real-world/figures/coverage.png)",
+              *multilevel_readme_lines(),
+              END]
     return "\n".join(lines)
 
 
@@ -305,7 +387,7 @@ def outputs(results: Path) -> dict[str, bytes]:
     plt = setup_matplotlib()
     files: dict[str, bytes] = {}
     for name, fn in (("hero", hero), ("coverage", coverage), ("families", families), ("tables", tables),
-                     ("audit", audit)):
+                     ("audit", audit), ("convergence", convergence)):
         fig = fn(summary, plt)
         files[f"bench/real-world/figures/{name}.png"] = figure_bytes(fig, "png")
         if name == "hero":  # the paper's caption carries the title
@@ -317,6 +399,7 @@ def outputs(results: Path) -> dict[str, bytes]:
     files["paper/generated/dope1-macros.tex"] = macros(summary).encode()
     files["paper/generated/dope1-config.tex"] = config_macros().encode()
     files["paper/generated/dope1-table.tex"] = table_main(summary).encode()
+    files["paper/generated/dope1-multilevel.tex"] = table_multilevel().encode()
     files["paper/generated/dope1-ablation.tex"] = table_ablation(summary).encode()
     files["paper/generated/dope1-equalbytes.tex"] = table_equal_bytes(summary).encode()
     files["paper/generated/dope1-pertable.tex"] = table_per_dataset(summary).encode()

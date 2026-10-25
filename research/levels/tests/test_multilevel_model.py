@@ -245,6 +245,107 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
         self.assertTrue(np.array_equal(X_fb0, X_fb1))
         self.assertTrue(np.array_equal(y_fb0, y_fb1))
 
+    def test_maxtrain_lt5pct_dataset_grouped_bootstrap_and_grouped_evaluation(self):
+        import importlib
+        import importlib.util
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from research.levels.disjoint_reconcile import (
+            EXECUTED_TASK4221_SOURCE_BYTES,
+            EXECUTED_TASK4221_SOURCE_LINES,
+            EXECUTED_TASK4221_SOURCE_SHA256,
+            verify_or_restore_executed_task4221_source,
+        )
+        from research.levels.s3_multilevel_trainer import _prestage_cell_on_device
+        from research.levels.v3_ablation_and_eval import _enrich_reg_bin_cell
+
+        with TemporaryDirectory() as tmpdir:
+            restored_file = Path(tmpdir) / "restored_maxtrain_val_lt5pct.py"
+            custody = verify_or_restore_executed_task4221_source(dest_path=restored_file)
+            self.assertTrue(custody["verified"])
+            self.assertEqual(custody["sha256"], EXECUTED_TASK4221_SOURCE_SHA256)
+            self.assertEqual(custody["bytes"], EXECUTED_TASK4221_SOURCE_BYTES)
+            self.assertEqual(custody["lines"], EXECUTED_TASK4221_SOURCE_LINES)
+            self.assertTrue(restored_file.is_file())
+            spec = importlib.util.spec_from_file_location(
+                "research.levels._restored_maxtrain_val_lt5pct",
+                restored_file,
+            )
+            self.assertIsNotNone(spec)
+            self.assertIsNotNone(spec.loader)
+            restored_mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = restored_mod
+            spec.loader.exec_module(restored_mod)
+
+        _dataset_grouped_bootstrap = restored_mod._dataset_grouped_bootstrap
+        _is_val_lt5_v2_full = restored_mod._is_val_lt5_v2_full
+        _prestage_v3_cell_on_device = restored_mod._prestage_v3_cell_on_device
+        evaluate_v2_grouped = restored_mod.evaluate_v2_grouped
+        evaluate_v3_grouped = restored_mod.evaluate_v3_grouped
+
+        ds_map = {
+            "ds_a": [0.30, 0.32, 0.31],
+            "ds_b": [0.40, 0.42, 0.41],
+            "ds_c": [0.50, 0.48, 0.52],
+            "ds_d": [0.35, 0.36, 0.34],
+        }
+        se, ci = _dataset_grouped_bootstrap(ds_map, n_boot=100, seed=20261025)
+        self.assertGreater(se, 0.0)
+        self.assertEqual(len(ci), 2)
+        self.assertLessEqual(ci[0], 0.3925)
+        self.assertGreaterEqual(ci[1], 0.3925)
+        self.assertIsInstance(_is_val_lt5_v2_full("0380f8df655797ba"), bool)
+
+        rng = np.random.default_rng(20261025)
+        model = MultiLevelLandmarkModel().eval()
+        raw_v2_cells = []
+        for idx, task in enumerate(("regression", "regression", "classification")):
+            X_f = rng.normal(size=(32, 5)).astype(np.float16)
+            y_f = (rng.integers(0, 2, size=32) if task == "classification" else rng.normal(size=32)).astype(np.float16)
+            X_q = rng.normal(size=(16, 5)).astype(np.float16)
+            y_q = (rng.integers(0, 2, size=16) if task == "classification" else rng.normal(size=16)).astype(np.float16)
+            vec140 = rng.normal(size=140).astype(np.float16)
+            emp_d = np.full(5, 0.2, dtype=np.float16)
+            raw_v2_cells.append({
+                "dataset_id": f"ds_{idx}",
+                "split": "fit-iid-65-v1",
+                "task": task,
+                "is_val": True,
+                "X_fit": X_f,
+                "y_fit": y_f,
+                "X_qry": X_q,
+                "y_qry": y_q,
+                "desc_medium": vec140,
+                "desc_high": vec140,
+                "desc_ultra": vec140,
+                "emp_drivers": emp_d,
+            })
+
+        v2_gpu = [_prestage_cell_on_device(c, torch.device("cpu")) for c in raw_v2_cells]
+        v2_res = evaluate_v2_grouped(model, v2_gpu, torch.device("cpu"), seed=20261025)
+        self.assertEqual(v2_res["n_datasets"], 3)
+        self.assertEqual(v2_res["n_splits"], 3)
+        self.assertIn("dataset_grouped_se", v2_res)
+        self.assertIn("regression", v2_res["by_task_stratum"])
+        self.assertIn("classification", v2_res["by_task_stratum"])
+
+        v3_enriched = [_enrich_reg_bin_cell(c) for c in raw_v2_cells]
+        v3_gpu = [_prestage_v3_cell_on_device(c, torch.device("cpu")) for c in v3_enriched]
+        v3_res = evaluate_v3_grouped(model, v3_gpu, torch.device("cpu"), seed=20261025)
+        self.assertEqual(v3_res["n_datasets"], 3)
+        self.assertEqual(v3_res["n_cells"], 3)
+        self.assertEqual(set(v3_res["by_tier"].keys()), {"small", "medium", "high", "ultra"})
+
+        try:
+            local_executed_mod = importlib.import_module("research.levels.maxtrain_val_lt5pct")
+        except ModuleNotFoundError as exc:
+            if exc.name not in {"research.levels.maxtrain_val_lt5pct", "maxtrain_val_lt5pct"}:
+                raise
+        else:
+            se_loc, ci_loc = local_executed_mod._dataset_grouped_bootstrap(ds_map, n_boot=100, seed=20261025)
+            self.assertEqual((se_loc, ci_loc), (se, ci))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -130,6 +130,8 @@ def macros(summary: dict) -> str:
         k, med = tdl_stats(summary, key)
         put(name + "N", str(k))
         put(name + "Median", kb(med).replace(" ", "~") if med else "not~reached")
+    for k, v in _multilevel_macro_items():
+        put(k, v)
     return "\n".join(out) + "\n"
 
 
@@ -148,37 +150,23 @@ def config_macros() -> str:
     vals = {
         "CfgBudget": str(int(_const(src + "compile.rs", r"DEFAULT_BUDGET: usize = ([\d_]+)")) // 1024),
         "CfgZGrid": _const(src + "marginal.rs", r"Z_GRID: f64 = ([\d.]+)").rstrip("0").rstrip("."),
-        "CfgMaxDiscrete": _const(src + "marginal.rs", r"MAX_DISCRETE: usize = (\d+)"),
-        "CfgAtomShare": str(round(100 * float(_const(src + "marginal.rs", r"ATOM_SHARE: f64 = ([\d.]+)")))),
-        "CfgResidualKnots": _const(src + "noise.rs", r"RESIDUAL_KNOTS: usize = (\d+)"),
-        "CfgMaxRegimes": _const(src + "regimes.rs", r"MAX_REGIMES: usize = (\d+)"),
+        "CfgMaxDiscrete": _const(src + "marginal.rs", r"MAX_DISCRETE: usize = (\d+)"), "CfgResidualKnots": _const(src + "noise.rs", r"RESIDUAL_KNOTS: usize = (\d+)"),
+        "CfgAtomShare": str(round(100 * float(_const(src + "marginal.rs", r"ATOM_SHARE: f64 = ([\d.]+)")))), "CfgMaxRegimes": _const(src + "regimes.rs", r"MAX_REGIMES: usize = (\d+)"),
         "CfgRegimeLadder": _const(src + "regimes.rs", r"REGIME_LADDER: \[usize; \d+\] = \[([^\]]+)\]").replace(" ", ""),
-        "CfgSteps": _const(src + "train.rs", r"max_steps: ([\d_]+),"),
-        "CfgLearningRate": _const(src + "train.rs", r"learning_rate: ([\de.-]+),"),
-        "CfgWeightDecay": _const(src + "train.rs", r"weight_decay: ([\de.-]+),"),
-        "CfgBatch": _const(src + "train.rs", r"batch: ([\d_]+),"),
-        "CfgEvalEvery": _const(src + "train.rs", r"eval_every: (\d+),"),
-        "CfgPatience": _const(src + "train.rs", r"patience: (\d+),"),
-        "CfgTolerance": str(round(1000 * float(_const(src + "compile.rs", r"tolerance: ([\d.]+),"))) / 10),
-        "CfgReadoutRows": _const(src + "target.rs", r"READOUT_ROWS: usize = ([\d_]+)"),
-        "CfgScoreTable": _const(src + "sample.rs", r"SCORE_TABLE: usize = (\d+)"),
-        "CfgMinLevel": _const(src + "schema.rs", r"min_level_count: (\d+)"),
-        "CfgMaxLevels": _const(src + "schema.rs", r"max_levels: (\d+)"),
-        "CfgLevels": _const(src + "forest.rs", r"LEVELS: usize = (\d+)"),
-        "CfgMaxTrees": _const(src + "compile.rs", r"MAX_TREES: usize = ([\d_]+)"),
-        "CfgLeafBits": _const(src + "compile.rs", r"TREE_LEAF_BITS: u8 = (\d+)"),
-        "CfgShares": ", ".join(str(round(100 * float(v))) for v in
-                               _const(src + "compile.rs", r"DEPENDENCE_SHARES: \[f64; \d+\] = \[([^\]]+)\]").split(",")),
+        "CfgSteps": _const(src + "train.rs", r"max_steps: ([\d_]+),"), "CfgLearningRate": _const(src + "train.rs", r"learning_rate: ([\de.-]+),"),
+        "CfgWeightDecay": _const(src + "train.rs", r"weight_decay: ([\de.-]+),"), "CfgBatch": _const(src + "train.rs", r"batch: ([\d_]+),"),
+        "CfgEvalEvery": _const(src + "train.rs", r"eval_every: (\d+),"), "CfgPatience": _const(src + "train.rs", r"patience: (\d+),"),
+        "CfgTolerance": str(round(1000 * float(_const(src + "compile.rs", r"tolerance: ([\d.]+),"))) / 10), "CfgReadoutRows": _const(src + "target.rs", r"READOUT_ROWS: usize = ([\d_]+)"),
+        "CfgScoreTable": _const(src + "sample.rs", r"SCORE_TABLE: usize = (\d+)"), "CfgMinLevel": _const(src + "schema.rs", r"min_level_count: (\d+)"),
+        "CfgMaxLevels": _const(src + "schema.rs", r"max_levels: (\d+)"), "CfgLevels": _const(src + "forest.rs", r"LEVELS: usize = (\d+)"),
+        "CfgMaxTrees": _const(src + "compile.rs", r"MAX_TREES: usize = ([\d_]+)"), "CfgLeafBits": _const(src + "compile.rs", r"TREE_LEAF_BITS: u8 = (\d+)"),
+        "CfgShares": ", ".join(str(round(100 * float(v))) for v in _const(src + "compile.rs", r"DEPENDENCE_SHARES: \[f64; \d+\] = \[([^\]]+)\]").split(",")),
         "CfgAuditRows": _const(src + "eval/audit.rs", r"SELF_AUDIT_ROWS: usize = ([\d_]+)"),
-        "CfgMaxTrain": _const("bench/real-world/datasets.py", r"MAX_TRAIN, MAX_TEST, SEED = ([\d_]+),"),
-        "CfgMaxTest": _const("bench/real-world/datasets.py", r"MAX_TRAIN, MAX_TEST, SEED = [\d_]+, ([\d_]+),"),
-        "CfgCatIters": _const("bench/real-world/auditors.py", r"iterations=(\d+)"),
-        "CfgCatDepth": _const("bench/real-world/auditors.py", r"depth=(\d+)"),
-        "CfgDraws": _const("bench/real-world/report.py", r"DRAWS, SEED = ([\d_]+),"),
+        "CfgMaxTrain": _const("bench/real-world/datasets.py", r"MAX_TRAIN, MAX_TEST, SEED = ([\d_]+),"), "CfgMaxTest": _const("bench/real-world/datasets.py", r"MAX_TRAIN, MAX_TEST, SEED = [\d_]+, ([\d_]+),"),
+        "CfgCatIters": _const("bench/real-world/auditors.py", r"iterations=(\d+)"), "CfgCatDepth": _const("bench/real-world/auditors.py", r"depth=(\d+)"),
+        "CfgDraws": _const("bench/real-world/report.py", r"DRAWS, SEED = ([\d_]+),"), "CfgPairedDraws": _const("bench/real-world/report.py", r"PAIRED_DRAWS = ([\d_]+)"),
         "CfgTimeoutMin": str(int(_const("bench/real-world/run.py", r"GEN_TIMEOUT = (\d+)")) // 60),
-        "CfgPairedDraws": _const("bench/real-world/report.py", r"PAIRED_DRAWS = ([\d_]+)"),
-        "CfgTau": _const("bench/real-world/report.py", r"TAU, TAU_LOW = ([\d.]+),"),
-        "CfgTauLow": _const("bench/real-world/report.py", r"TAU, TAU_LOW = [\d.]+, ([\d.]+)"),
+        "CfgTau": _const("bench/real-world/report.py", r"TAU, TAU_LOW = ([\d.]+),"), "CfgTauLow": _const("bench/real-world/report.py", r"TAU, TAU_LOW = [\d.]+, ([\d.]+)"),
         "CfgConf": str(round(100 * (1 - float(_const("bench/real-world/report.py", r"ALPHA = ([\d.]+)"))))),
     }
     plans = _const(src + "compile.rs", r"PLANS: \[\(usize, usize, usize\); \d+\] = \[([^;]+?)\];")
@@ -308,3 +296,189 @@ def throughput_tex(rows: list[dict]) -> tuple[str, str]:
                      f"{r['metadata']:,} & {r['features']} & {r['trees']} & {r['rows_per_second']:,} \\\\".replace(",", "{,}"))
     lines += ["\\bottomrule", "\\end{tabular}"]
     return macros, "\n".join(lines) + "\n"
+
+
+def _study_val(text: str, pattern: str) -> str:
+    import re
+    m = re.search(pattern, text, re.M)
+    if not m:
+        raise ValueError(f"study pattern {pattern!r} not found in docs/multilevel-landmark-dl-study.md")
+    return m.group(1)
+
+
+def multilevel_convergence_data() -> dict:
+    """Load canonical training convergence history from the tracked hash-bound receipt snapshot (and verify live receipts when present)."""
+    import hashlib, json
+    snap_path = ROOT / "bench/real-world/results/multilevel-convergence-snapshot.json"
+    snap = json.loads(snap_path.read_text(encoding="utf-8"))
+    for key in ("v2_full_corpus", "v2_full_corpus_maxtrain97_val3pct", "v2_disjoint1000_maxtrain97_devval345", "v3_maxtrain97_val3pct"):
+        sec = snap[key]
+        live = ROOT / sec["source_receipt"]
+        if live.is_file():
+            sha = hashlib.sha256(live.read_bytes()).hexdigest()
+            if sha != sec["source_receipt_sha256"]:
+                raise ValueError(f"live receipt SHA mismatch for {key}: {sha} != {sec['source_receipt_sha256']}")
+    if len(snap["v2_full_corpus"]["epochs"]) != 9 or len(snap["v2_full_corpus_maxtrain97_val3pct"]["rounds"]) != 9:
+        raise ValueError("expected all 9 canonical rounds 0..8 in multilevel-convergence-snapshot.json")
+    return snap
+
+
+def _multilevel_macro_items() -> list[tuple[str, str]]:
+    text = (ROOT / "docs/multilevel-landmark-dl-study.md").read_text()
+    snap = multilevel_convergence_data()
+    v2 = snap["v2_full_corpus"]
+    ep0, ep7, ep8 = v2["epochs"][0], v2["epochs"][7], v2["epochs"][8]
+    full = v2["full_1891_val_final_reloaded_ep7_best_state"]
+    a0 = snap["v3_ablation"]["ablation_variants"]["A0_v2_baseline_140"]
+    a3 = snap["v3_ablation"]["ablation_variants"]["A3_full_v3_with_col_gate_head"]
+    t1 = snap["v2_full_corpus_maxtrain97_val3pct"]
+    t1_r0, t1_r8 = t1["rounds"][0], t1["rounds"][8]
+    t2 = snap["v2_disjoint1000_maxtrain97_devval345"]
+    t2_r0, t2_r5, t2_r8 = t2["rounds"][0], t2["rounds"][5], t2["rounds"][8]
+    t3 = snap["v3_maxtrain97_val3pct"]
+    t3_a = t3["matched_budget_ablation_progression_A0_to_A3"]
+    t3_r0, t3_r8 = t3["a3_rounds"][0], t3["a3_rounds"][8]
+    s = lambda p: _study_val(text, p)
+    return [
+        ("MlcVTwoDatasets", s(r"across \*\*(\d+,\d+) diverse, stratified S3 datasets\*\*").replace(",", "{,}")),
+        ("MlcVTwoTrainLossInit", f"{ep0['train_monitor_600']['mean_total_loss']:.5f}"), ("MlcVTwoTrainLossBest", f"{ep7['train_monitor_600']['mean_total_loss']:.5f}"), ("MlcVTwoTrainLossFinal", f"{ep8['train_monitor_600']['mean_total_loss']:.5f}"),
+        ("MlcVTwoLossInit", f"{ep0['val_monitor_600']['mean_total_loss']:.5f}"), ("MlcVTwoLossBest", f"{ep7['val_monitor_600']['mean_total_loss']:.5f}"), ("MlcVTwoLossFinal", f"{ep8['val_monitor_600']['mean_total_loss']:.5f}"),
+        ("MlcVTwoFullValLoss", f"{full['mean_total_loss']:.5f}"),
+        ("MlcVTwoValMedBest", f"{ep7['val_monitor_600']['medium']:.5f}"), ("MlcVTwoValHighBest", f"{ep7['val_monitor_600']['high']:.5f}"), ("MlcVTwoValUltraBest", f"{ep7['val_monitor_600']['ultra']:.5f}"),
+        ("MlcVTwoFullValMed", f"{full['medium']:.5f}"), ("MlcVTwoFullValHigh", f"{full['high']:.5f}"), ("MlcVTwoFullValUltra", f"{full['ultra']:.5f}"),
+        ("MlcMaxTrainValDsFrac", f"{t1['val_dataset_pct']:.2f}\\%"), ("MlcMaxTrainValSplitFrac", f"{t1['val_split_pct']:.2f}\\%"), ("MlcMaxTrainTrainSplitFrac", f"{t1['train_split_pct']:.2f}\\%"),
+        ("MlcMaxTrainValSplits", f"{t1['val_population_splits']:,}".replace(",", "{,}")), ("MlcMaxTrainTrainSplits", f"{t1['train_population_splits']:,}".replace(",", "{,}")),
+        ("MlcMaxTrainVisits", f"{t1['attempted_visits_cumulative_total']:,}".replace(",", "{,}")), ("MlcMaxTrainEffPasses", f"{t1['effective_full_population_passes_total']:.6f}"),
+        ("MlcMaxTrainLossInit", f"{t1_r0['val_full']['mean_total_loss']:.5f}"), ("MlcMaxTrainLossInitSe", f"{t1_r0['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcMaxTrainLossBest", f"{t1_r8['val_full']['mean_total_loss']:.5f}"), ("MlcMaxTrainLossBestSe", f"{t1_r8['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcMaxTrainLossDropPct", f"{-100 * t1['full_val_relative_change_r0_to_best']:.2f}\\%"),
+        ("MlcMaxTrainTrainInit", f"{t1_r0['train_monitor_600']['mean_total_loss']:.5f}"), ("MlcMaxTrainTrainBest", f"{t1_r8['train_monitor_600']['mean_total_loss']:.5f}"),
+        ("MlcMaxTrainValMedBest", f"{t1_r8['val_full']['medium']['total_loss']:.5f}"), ("MlcMaxTrainValHighBest", f"{t1_r8['val_full']['high']['total_loss']:.5f}"), ("MlcMaxTrainValUltraBest", f"{t1_r8['val_full']['ultra']['total_loss']:.5f}"),
+        ("MlcDisjointValDsFrac", f"{t2['val_dataset_pct']:.2f}\\%"), ("MlcDisjointValSplitFrac", f"{t2['val_split_pct']:.2f}\\%"), ("MlcDisjointTrainSplitFrac", f"{t2['train_split_pct']:.2f}\\%"),
+        ("MlcDisjointVisits", f"{t2['attempted_visits_cumulative_total']:,}".replace(",", "{,}")), ("MlcDisjointEffPasses", f"{t2['effective_full_population_passes_total']:.6f}"),
+        ("MlcDisjointLossInit", f"{t2_r0['val_full']['mean_total_loss']:.5f}"), ("MlcDisjointLossInitSe", f"{t2_r0['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcDisjointLossBest", f"{t2_r5['val_full']['mean_total_loss']:.5f}"), ("MlcDisjointLossBestSe", f"{t2_r5['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcDisjointLossFinal", f"{t2_r8['val_full']['mean_total_loss']:.5f}"), ("MlcDisjointLossFinalSe", f"{t2_r8['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcDisjointTrainInit", f"{t2_r0['train_monitor_600']['mean_total_loss']:.5f}"), ("MlcDisjointTrainBest", f"{t2_r5['train_monitor_600']['mean_total_loss']:.5f}"), ("MlcDisjointTrainFinal", f"{t2_r8['train_monitor_600']['mean_total_loss']:.5f}"),
+        ("MlcVThreeMaxTrainLoadedTrain", f"{t3['loaded_episode_cells_train_total']:,}".replace(",", "{,}")), ("MlcVThreeMaxTrainLoadedVal", f"{t3['loaded_episode_cells_val_total']:,}".replace(",", "{,}")), ("MlcVThreeMaxTrainLoadedPool", f"{t3['loaded_episode_cells_pool_total']:,}".replace(",", "{,}")),
+        ("MlcVThreeMaxTrainLoadedValFrac", f"{t3['loaded_episode_cells_val_pct']:.2f}\\%"), ("MlcVThreeMaxTrainLoadedTrainFrac", f"{t3['loaded_episode_cells_train_pct']:.2f}\\%"), ("MlcVThreeMaxTrainCatalogValFrac", f"{t3['catalog_manifest_val_dataset_pct']:.2f}\\%"),
+        ("MlcVThreeMaxTrainVisits", f"{t3['attempted_visits_cumulative_total_per_variant']:,}".replace(",", "{,}")), ("MlcVThreeMaxTrainEffPasses", f"{t3['effective_full_population_passes_total_per_variant']:.6f}"),
+        ("MlcVThreeMaxTrainLossInit", f"{t3_r0['val_full']['mean_total_loss']:.5f}"), ("MlcVThreeMaxTrainLossInitSe", f"{t3_r0['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcVThreeMaxTrainLossBest", f"{t3_r8['val_full']['mean_total_loss']:.5f}"), ("MlcVThreeMaxTrainLossBestSe", f"{t3_r8['val_full']['dataset_grouped_se']:.5f}"),
+        ("MlcVThreeMaxTrainAZeroBest", f"{t3_a['A0_v2_baseline_140']['best_val_full']['mean_total_loss']:.5f}"), ("MlcVThreeMaxTrainAOneBest", f"{t3_a['A1_plus_16_building_blocks']['best_val_full']['mean_total_loss']:.5f}"), ("MlcVThreeMaxTrainATwoBest", f"{t3_a['A2_plus_48_inter_landmark_stats']['best_val_full']['mean_total_loss']:.5f}"),
+        ("MlcVTwoPooledElo", s(r"`dope_mlc_v2` \(Unified 3-Level Model\)\*\* \| \*\*`([\d.]+)`\*\*")), ("MlcVTwoDisjointElo", s(r"`reconciled_strictly_dataset_disjoint_1000`\*\* \| \*\*`1,000`\*\* \| .*? \| \*\*`([\d.]+)`")), ("MlcVTwoHeldoutElo", s(r"`strictly_dataset_disjoint_242`\*\* \| \*\*`242`\*\* \| .*? \| \*\*`([\d.]+)`")),
+        ("MlcVTwoUltraR", s(r"\*\*`Ultra` \(Fine / Max Transfer\)\*\* \| `65,536 B` \(`64 KiB`\) \| .*? \| \*\*`([\d.]+)`")), ("MlcVTwoUltraRMed", s(r"\*\*`Ultra` \(Fine / Max Transfer\)\*\* \| `65,536 B` \(`64 KiB`\) \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`")), ("MlcVTwoUltraD", s(r"\*\*`Ultra` \(Fine / Max Transfer\)\*\* \| `65,536 B` \(`64 KiB`\) \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`")),
+        ("MlcVThreeDatasets", s(r"### 7\.5 Unified `(\d+,\d+)`-Dataset").replace(",", "{,}")), ("MlcVThreeCells", s(r"completed_dataset_tier_cells = (\d+,\d+)/4,276").replace(",", "{,}")),
+        ("MlcVThreeLossAZero", f"{a0['dev_val_mean_total_loss']:.5f}"), ("MlcVThreeLossAThree", f"{a3['dev_val_mean_total_loss']:.5f}"), ("MlcVThreeDriverLossAZero", f"{a0['dev_val_driver_loss']:.5f}"), ("MlcVThreeDriverLossAThree", f"{a3['dev_val_driver_loss']:.5f}"),
+        ("MlcVThreeMcHighR", s(r"\*\*`Multiclass High` \(`16,384 B`\)\*\* \| `69 / 69` \(`0\.0%`\) \| `6,435\.3 B / 14,048 B` \(`100\.0%`\) \| \*\*`([\d.]+) /")), ("MlcVThreeMcHighCscR", s(r"\*\*`Multiclass High` \(`16,384 B`\)\*\* \| .*? \| `0\.7157` \| \*\*`([\d.]+) /")),
+        ("MlcVThreePanelHighR", s(r"\*\*`Full v2-Panel High` \(`16,384 B`\)\*\* \| `1,000 / 1,000` \(`0\.0%`\) \| `3,429\.2 B / 7,203 B` \(`100\.0%`\) \| \*\*`([\d.]+) /")), ("MlcVThreePanelHighCscR", s(r"\*\*`Full v2-Panel High` \(`16,384 B`\)\*\* \| .*? \| `0\.7793` \| \*\*`([\d.]+) /")),
+        ("MlcVThreeElo", s(r"\*\*Combined `1,069` DS: `dope_mlc_v3_wire` \(`DML3`\)\*\* \| .*? \| \*\*`([\d.]+)`\*\*")), ("MlcVThreeCopulaDeltaR", "+" + s(r"\*\*Combined `1,069` DS: `copula_wire` \(`CPW1`\)\*\* \| .*? \| \*\*`\+([\d.]+)`\*\*")), ("MlcVThreeMcCopulaDeltaR", "+" + s(r"`v3 - copula`: \*\*`\+([\d.]+)`\*\*")),
+        ("MlcRustParams", s(r"`56` `F32` tensors, `(\d+,\d+)` parameters").replace(",", "{,}")), ("MlcRustFwdErr", s(r"max absolute tensor difference is \*\*`([\de.-]+) < 1e-5`\*\*")), ("MlcRustSampleErr", s(r"max absolute difference across `x_scaled`, `y_scaled`, `x_raw`, and `y_raw` is \*\*`([\de.-]+) < 1e-5`\*\*")),
+    ]
+
+
+def table_multilevel() -> str:
+    """Generated LaTeX summary table of DOPE-MLC-v2 (1,000 datasets) and DOPE-MLC-v3 (1,069 datasets, 4,276 cells)."""
+    d = dict(_multilevel_macro_items())
+    lines = [
+        "% Generated by bench/real-world/render.py from docs/multilevel-landmark-dl-study.md; do not edit.",
+        "\\begin{tabular}{llrrrrr}", "\\toprule",
+        "Study \\& Cohort / Tier & Scope ($n$ DS / Cells) & Wire Bytes (Med or Mean / Cap) & Sender-Scaled $R$ [Med or Unclip] & Isolated `CSC1` Raw $R$ & Driver $D$ & Tournament Elo [95\\% CI] \\\\",
+        "\\midrule",
+        f"\\texttt{{DOPE-MLC-v2}} Held-Out (`Ultra`) & 242 DS (0 train overlap) & 5{{,}}872~B raw / 64~KiB & 0.8493 [med 0.9275] & 6{{,}}398~B (+sidecar) & 0.8034 & \\textbf{{{d['MlcVTwoHeldoutElo']}}} [1655.2, 1688.0] (\\#1) \\\\",
+        "\\texttt{DOPE-MLC-v2} Unseen Fold (`Ultra`) & 758 DS (row-disjoint) & 5{,}872~B raw / 64~KiB & 0.9129 [med 0.9716] & 6{,}398~B (+sidecar) & 0.7851 & \\textbf{1645.4} [1637.8, 1653.6] (\\#1) \\\\",
+        f"\\texttt{{DOPE-MLC-v2}} Disjoint-Trained (`Ultra`) & {d['MlcVTwoDatasets']} DS (0 train overlap) & 5{{,}}872~B raw / 64~KiB & 0.8998 [med 0.9671] & 6{{,}}398~B (+sidecar) & 0.7904 & \\textbf{{{d['MlcVTwoDisjointElo']}}} [1643.4, 1657.5] (\\#1) \\\\",
+        "\\texttt{DOPE-MLC-v2} Pooled `Medium` & 1{,}000 DS (3{,}000 cells) & 1{,}502~B (`1{,}238~B` zlib) / 4~KiB & 0.8620 [med 0.9335] & 2{,}031~B (+545~B) & 0.7566 & 1596.8 cross / \\textbf{1652.1} tier (\\#1) \\\\",
+        "\\texttt{DOPE-MLC-v2} Pooled `High` & 1{,}000 DS (3{,}000 cells) & 2{,}836~B (`2{,}351~B` zlib) / 16~KiB & 0.8971 [med 0.9642] & 3{,}376~B (+545~B) & 0.7821 & 1679.6 cross / \\textbf{1669.6} tier (\\#1) \\\\",
+        f"\\texttt{{DOPE-MLC-v2}} Pooled `Ultra` & {d['MlcVTwoDatasets']} DS (65{{,}}874 fits) & 5{{,}}872~B (`4{{,}}616~B` zlib) / 64~KiB & \\textbf{{{d['MlcVTwoUltraR']}}} [med {d['MlcVTwoUltraRMed']}] & 6{{,}}398~B (+545~B) & \\textbf{{{d['MlcVTwoUltraD']}}} & \\textbf{{{d['MlcVTwoPooledElo']}}} [1643.4, 1659.6] (\\#1) \\\\",
+        "\\midrule",
+        "\\texttt{DOPE-MLC-v3} Multiclass `Small` & 69 DS / 69 cells (100\\% $\\le$ cap) & 1{,}418.0~B (max 2{,}047~B) / 2~KiB & 0.7271 [unclip 0.7098] & 0.7018 (`fp64`: 0.7248) & 0.6462 & 1540.9 MC Elo vs \\\\",
+        "\\texttt{DOPE-MLC-v3} Multiclass `Medium` & 69 DS / 69 cells (100\\% $\\le$ cap) & 2{,}510.7~B (max 3{,}812~B) / 4~KiB & 0.7767 [unclip 0.7712] & 0.7789 (`fp64`: 0.7812) & 0.6715 & \\texttt{copula} 1313.8 \\\\",
+        f"\\texttt{{DOPE-MLC-v3}} Multiclass `High` & 69 DS / 69 cells (100\\% $\\le$ cap) & 6{{,}}435.3~B (max 14{{,}}048~B) / 16~KiB & \\textbf{{{d['MlcVThreeMcHighR']}}} [unclip 0.8355] & \\textbf{{{d['MlcVThreeMcHighCscR']}}} (`fp64`: 0.8470) & 0.7157 & ($\\Delta R = {d['MlcVThreeMcCopulaDeltaR']}$, \\\\",
+        "\\texttt{DOPE-MLC-v3} Multiclass `Ultra` & 69 DS / 69 cells (100\\% $\\le$ cap) & 9{,}877.5~B (max 24{,}195~B) / 64~KiB & 0.8362 [unclip 0.8415] & 0.8404 (`fp64`: 0.8440) & 0.7158 & W/T/L 493/283/52) \\\\",
+        "\\midrule",
+        "\\texttt{DOPE-MLC-v3} Disjoint `v2`-Panel `Small` & 1{,}000 DS / 1{,}000 cells (100\\% $\\le$ cap) & 960.6~B (max 1{,}472~B) / 2~KiB & 0.8080 [unclip 0.7119] & 0.8055 (`fp64`: 0.8151) & 0.7536 & \\textbf{1457.6} [1449.5, 1464.3] \\\\",
+        "\\texttt{DOPE-MLC-v3} Disjoint `v2`-Panel `Medium` & 1{,}000 DS / 1{,}000 cells (100\\% $\\le$ cap) & 1{,}550.2~B (max 2{,}459~B) / 4~KiB & 0.8286 [unclip 0.7325] & 0.8363 (`fp64`: 0.8363) & 0.7619 & across 12{,}828 cells \\\\",
+        f"\\texttt{{DOPE-MLC-v3}} Disjoint `v2`-Panel `High` & 1{{,}}000 DS / 1{{,}}000 cells (100\\% $\\le$ cap) & 3{{,}}429.2~B (max 7{{,}}203~B) / 16~KiB & \\textbf{{{d['MlcVThreePanelHighR']}}} [unclip 0.7502] & \\textbf{{{d['MlcVThreePanelHighCscR']}}} (`fp64`: 0.8699) & 0.7793 & (vs \\texttt{{copula}} 1407.1, \\\\",
+        "\\texttt{DOPE-MLC-v3} Disjoint `v2`-Panel `Ultra` & 1{,}000 DS / 1{,}000 cells (100\\% $\\le$ cap) & 6{,}144.6~B (max 13{,}010~B) / 64~KiB & 0.8517 [unclip 0.7283] & 0.8581 (`fp64`: 0.8581) & 0.7764 & $\\Delta R = +0.0941$; \\texttt{v2} 1538.0; \\texttt{rows} 1597.3) \\\\",
+        "\\midrule",
+        f"\\texttt{{dope mlc-v3}} Pure-Rust \\texttt{{SafeTensors}} & 56 F32 tensors ({d['MlcRustParams']} params) & 1{{,}}781{{,}}800~B (\\texttt{{d0b69603...}}) & fwd $|\\Delta|\\le {d['MlcRustFwdErr']}$ & sample $|\\Delta|\\le {d['MlcRustSampleErr']}$ & 12/12 tier$\\times$task & 0 Python deps at inference \\\\",
+        "\\bottomrule", "\\end{tabular}",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def multilevel_readme_lines() -> list[str]:
+    """Uncollapsed README Markdown for DOPE-MLC-v2 (1,000 datasets), DOPE-MLC-v3 (1,069 datasets / 4,276 cells), and pure-Rust SafeTensors parity."""
+    d = {k: v.replace("{,}", ",") for k, v in _multilevel_macro_items()}
+    snap = multilevel_convergence_data()
+    v2 = snap["v2_full_corpus"]
+    full = v2["full_1891_val_final_reloaded_ep7_best_state"]
+    t1 = snap["v2_full_corpus_maxtrain97_val3pct"]
+    t2 = snap["v2_disjoint1000_maxtrain97_devval345"]
+    t3 = snap["v3_maxtrain97_val3pct"]
+    conv_table = [
+        "| Training Round (`R0..R8`) | Track 1 `<5%` Val (`18,395` Train Splits): Visits / Eff. Passes | Track 1 `600`-Split Train Monitor | Track 1 Full `684/684` Unseen Val Loss `± 1 SE` (`Medium / High / Ultra`) | Track 2 Disjoint-1,000 `<5%` Val (`345/345` `dev_val` Splits) Loss `± 1 SE` (Train Mon.) | Track 3 `v3` `A3` `<5%` Val (`75/75` Loaded `dev_val` Cells, `1.999551×` Passes) Loss `± 1 SE` | Preserved `10%`-Val (`600`-Split Train / Val Monitors) |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    for idx in range(9):
+        r1, r2, r3, e0 = t1["rounds"][idx], t2["rounds"][idx], t3["a3_rounds"][idx], v2["epochs"][idx]
+        vf1, vf2, vf3 = r1["val_full"], r2["val_full"], r3["val_full"]
+        r_lbl = "**`R8*` (Best Track 1 & `v3` `A3`)**" if idx == 8 else ("**`R7*` (Best `10%`-Val Mon.)**" if idx == 7 else ("**`R5*` (Best Track 2 `dev_val`)**" if idx == 5 else f"`R{idx}`" + (" (Init)" if idx == 0 else "")))
+        conv_table.append(
+            f"| {r_lbl} | `{r1['attempted_visits_cumulative']:,} / {r1['effective_full_population_passes']:.6f}×` | `{r1['train_monitor_600']['mean_total_loss']:.5f}` | **`{vf1['mean_total_loss']:.5f} ± {vf1['dataset_grouped_se']:.5f}`** (`{vf1['medium']['total_loss']:.5f} / {vf1['high']['total_loss']:.5f} / {vf1['ultra']['total_loss']:.5f}`) | **`{vf2['mean_total_loss']:.5f} ± {vf2['dataset_grouped_se']:.5f}`** (`{r2['train_monitor_600']['mean_total_loss']:.5f}`) | **`{vf3['mean_total_loss']:.5f} ± {vf3['dataset_grouped_se']:.5f}`** (`{r3['attempted_visits_cumulative']:,}` vis.) | `{e0['train_monitor_600']['mean_total_loss']:.5f} / {e0['val_monitor_600']['mean_total_loss']:.5f}` |"
+        )
+    conv_table.append(
+        f"| **Post-Train Full `1,891` Val (`full_1891_val_final`, Reloaded `R7*` on `10%`-Val Run)** | `22,918 / 1.333372×` | `—` | `—` | `—` | `—` | **`{full['mean_total_loss']:.5f}`** (`{full['medium']:.5f} / {full['high']:.5f} / {full['ultra']:.5f}`) |"
+    )
+    return [
+        "\n### Multi-Level Landmark & Data-Descriptor Benchmarks (`DOPE-MLC-v2` on 1,000 Datasets & `DOPE-MLC-v3` on 1,069 Datasets / 4,276 Cells) + Pure-Rust `SafeTensors` Engine (`dope mlc-v3`)\n",
+        "> **Evaluation Dataset Coverage vs. Automated Software Test Counts:**",
+        f"> - **Dataset Evaluation Coverage (`1,000` & `1,069` Datasets):** `DOPE-MLC-v2` is evaluated across **`{d['MlcVTwoDatasets']}` stratified S3 datasets** (`627` regression + `373` binary classification; `65,874` downstream auditor fits; `6,000/6,000` exact `version=2` wire replay cells). `DOPE-MLC-v3` is evaluated across **`{d['MlcVThreeDatasets']}` unique datasets (`{d['MlcVThreeCells']}/4,276` completed dataset-tier cells, `25,656` six-auditor evaluations per domain, `0` failed/missing/duplicate cells)**: `1,000` gradient-disjoint `v2`-panel datasets (`628` regression + `372` binary, `4,000` cells) plus `69` held-out multiclass datasets (`276` cells), within a reconciled `3,859`-dataset catalog (`2,199` `train_gradient`, `112` `dev_val_ablation`, `1,000` `eval_gradient_disjoint_v2_panel`, `69` `eval_gradient_disjoint_multiclass_panel`, `479` explicit exclusions; `0` cross-role `train_sha256` overlaps).",
+        "> - **Automated Software Test Suite (`834+` Tests):** Distinct from dataset evaluation panels, the repository's automated CI test suite executes `834+` Rust and Python unit, integration, wire-format, and fail-closed trained-checkpoint parity tests (`cargo test` across `engine/` and root crates, `python3 -B -m unittest discover -s research/levels/tests`, `just fast`, and `just check`).\n",
+        "#### 1. `DOPE-MLC-v2`: Deep Learning Training & Validation Loss Convergence (`< 5%` Validation Split & Dataset Allocation with `100%` Full-Validation-Per-Round Evaluation vs. Preserved `10%`-Validation Checkpoint) and 1,000-Dataset Three-Tier Study (`Medium` 4 KiB, `High` 16 KiB, `Ultra` 64 KiB)\n",
+        f"In [`research/levels/`](research/levels/) (full study: [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md); canonical receipt snapshot: [bench/real-world/results/multilevel-convergence-snapshot.json](bench/real-world/results/multilevel-convergence-snapshot.json)), **`DOPE-MLC-v2`** (`MultiLevelLandmarkModel`) conditions three nested network-egress capacity tiers (`Medium` `4,096 B`, `High` `16,384 B`, `Ultra` `65,536 B`) on `23` pre-calculated training-only CV landmarks (`fit-cv-v1`), `93` report descriptors, `24` fast train-only table descriptors (`140` dimensions total), and mandatory train-only column scaling (`FitOnlyTableTransform`). Stage 0 validation across `19,190` splits increases out-of-dataset CatBoost signal ceiling $R^2$ from `0.9176` (raw `Medium`) $\\to$ `0.9417` (rich `Medium`) $\\to$ `0.9654` (rich `High`) $\\to$ **`0.9863`** (rich `Ultra` + Chatterjee $\\xi$) and nonlinear uplift $R^2$ from `0.7138` $\\to$ `0.7912` $\\to$ `0.8727` $\\to$ **`0.9383`**. In the maximized-training (`< 5%` validation) convergence study (tracked custody verifier & restorer: [`research/levels/disjoint_reconcile.py`](research/levels/disjoint_reconcile.py); exact `608`-line `36,509`-byte `task-4221` executed source `research/levels/maxtrain_val_lt5pct.py` `SHA-256: 701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb` preserved in `target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py` and embedded byte-for-byte with SHA-256 verification in [bench/real-world/results/multilevel-convergence-snapshot.json](bench/real-world/results/multilevel-convergence-snapshot.json) `executed_source_custody`, restorable via `python3 -B -m research.levels.disjoint_reconcile --restore-executed-source target/s3-multilevel-training-20261023/source_maxtrain_val_lt5pct_at_task4221.py`; pre-launch manifest `maxtrain97_val_lt5pct_split_and_dispatch_manifest.json` `6ad04935...`), training data are maximized to **`96.41%–97.20%` of splits** while keeping unseen-dataset validation strictly **`< 5%` on both datasets and splits** and evaluating **100% of the validation split population at every training round `R0..R8`** with `200×` dataset-grouped bootstrap standard errors (`seed=20261025`). Because the trainer iterates across `6` disjoint shard rounds (`R1..R6` = `1.0` full pass) plus `2` refinement shard rounds (`R7..R8` = `1/3` pass), `R1..R8` are **`8` shard-rounds (`1.333351×` and `1.333333×` effective full-population passes)** rather than `8` complete epochs:",
+        "- **Track 1 — Full-Corpus `< 5%` Validation (`s3_training_maxtrain97_val3pct_convergence_receipt.json` `3025e025...`, `dope_mlc_v2_s3_maxtrain97_best.pt` `11e64c63...`):** `18,395 / 19,079` training splits (**`96.41%`**) across `3,073 / 3,188` datasets (**`96.39%`**) and **`684 / 19,079` unseen-dataset validation splits (`3.59% < 5%`) across `115 / 3,188` datasets (`3.61% < 5%`)** (`0` dataset overlap; `24,527` cumulative split visits, `batch_accum = 32`, `768` scheduled optimizer updates, **`24,527 / 18,395 = 1.333351×` effective full-population passes**). Across `R0..R8`, `100%` (`684/684`) full-validation mean loss drops by **`-16.52%`** (`-0.06772 > 4.0× SE`) from `0.40988 ± 0.01767 [0.38301, 0.45101]` (`R0`) $\\to$ **`0.34216 ± 0.01621 [0.31104, 0.36990]`** (`R8*`), while the `600`-split training monitor drops from `0.41216` $\\to$ **`0.35175`**, maintaining strict monotonic tier ordering at every round (`Ultra 0.32396 ± 0.01672 < High 0.33844 ± 0.01635 < Medium 0.36407 ± 0.01608` at `R8*`).",
+        "- **Track 2 — Strictly Disjoint-1,000 `< 5%` Validation (`s3_training_disjoint1000_devval345_convergence_receipt.json` `e510a630...`, `dope_mlc_v2_disjoint1000_maxtrain97_best.pt` `3886676a...`):** `11,976 / 12,321` training splits (**`97.20%`**) across `2,001 / 2,059` datasets (**`97.18%`**) and **`345 / 12,321` `dev_val_only` splits (`2.80% < 5%`) across `58 / 2,059` datasets (`2.82% < 5%`)** (`1,000` evaluation datasets strictly excluded from training and checkpoint selection; `15,968` cumulative split visits, `batch_accum = 32`, `504` scheduled optimizer updates, **`15,968 / 11,976 = 1.333333×` effective full-population passes**). Full `345/345` `dev_val` loss drops by **`-5.48%`** from `0.60691 ± 0.01915 [0.57115, 0.64344]` (`R0`) $\\to$ **`0.57363 ± 0.02131 [0.52561, 0.61162]`** at `R5*` (`best_state`, `Ultra 0.56909 < High 0.57383 < Medium 0.57798`; `0.57371 ± 0.02074 [0.53669, 0.61258]` at `R8`), with `600`-split training monitor `0.47854` $\\to$ `0.41521` (`R5*`) $\\to$ **`0.41492`** (`R8`).",
+        f"- **Preserved Historical `10%`-Validation Checkpoint (`s3_training_convergence_receipt.json` `e026225c...`, `dope_mlc_v2_s3_best.pt` `1d5db98f...`):** Trained on `17,188` splits (`22,918` cumulative visits = `1.333372×` effective passes) with `1,891` unseen validation splits (`319` datasets), monitored per round on `600`-split subsets (`{d['MlcVTwoTrainLossInit']}` $\\to$ **`{d['MlcVTwoTrainLossBest']}`** train monitor and `{d['MlcVTwoLossInit']}` $\\to$ **`{d['MlcVTwoLossBest']}`** val monitor at `R7*`, `{d['MlcVTwoLossFinal']}` at `R8`), and evaluated post-training across all `1,891` unseen splits (`full_1891_val_final`) at **`{d['MlcVTwoFullValLoss']}`** (`Ultra {d['MlcVTwoFullValUltra']} < High {d['MlcVTwoFullValHigh']} < Medium {d['MlcVTwoFullValMed']}`). All `1,000`-dataset `DOPE-MLC-v2` downstream auditor tables below are measured on the preserved `dope_mlc_v2_s3_best.pt` and `dope_mlc_v2_disjoint1000_best.pt` checkpoints and are not transferred onto the new `maxtrain97` checkpoints prior to dedicated `1,000`-dataset re-evaluation.\n",
+        "![DOPE-MLC-v2 and DOPE-MLC-v3 training and unseen-dataset validation loss curves across Training Rounds R0..R8 (<5% validation full-population evaluations with dataset-grouped bootstrap SE bands alongside preserved 10%-validation monitors)](bench/real-world/figures/convergence.png)\n",
+        *conv_table,
+        f"\nAcross `{d['MlcVTwoDatasets']}` completed datasets (`1,132` candidates dispatched; `132` filtered strictly where real CatBoost holdout oracle gain $S_{{\\text{{real}}}} - S_{{\\text{{null}}}} < 0.025$ or degenerate split; `0` worker exceptions; all four cohorts reported as selection-exposed development/reconciliation validation, `untouched_sealed_confirmatory_test = false`), `DOPE-MLC-v2` ranks **#1 in every cohort**:\n",
+        "| `DOPE-MLC-v2` Cohort / Tier | Datasets ($n$) & Separation Status | Exact `v2` Latent Wire Med (Raw / Zlib) \\| Full Raw (+`545 B` Med Scaler Sidecar) | Holdout Retention $R$ (Mean `[95% CI]` / Med) | Driver Fidelity $D$ `[95% CI]` | Spearman $\\rho$ / BTR-AUC | Overall or Cross-Size Elo `[95% CI]` (Win Share) |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+        f"| **`strictly_dataset_disjoint_242` (`Ultra`)** | `242` (`0` train overlap, `10%` val hash split) | `5,872 B / 4,616 B` \\| `6,398 B` (`cap 64 KiB`) | `0.8493 [0.8226, 0.8732]` / `0.9275` | **`0.8034 [0.7905, 0.8147]` (`D80` pass)** | `0.636` / `84.8` | **`{d['MlcVTwoHeldoutElo']} [1655.2, 1688.0]` (`#1`, `73.06%`)** |",
+        "| **`in_corpus_unseen_row_fold_758` (`Ultra`)** | `758` (`0` row overlap, unseen `outer5-iid-fold0-v1`) | `5,872 B / 4,616 B` \\| `6,398 B` (`cap 64 KiB`) | `0.9129 [0.9037, 0.9222]` / `0.9716` | `0.7851 [0.7779, 0.7918]` | `0.636` / `87.7` | **`1645.4 [1637.8, 1653.6]` (`#1`, `69.81%`)** |",
+        f"| **`reconciled_strictly_dataset_disjoint_1000` (`Ultra`)** | `1,000` (`0` overlap vs `2,001` train DS / `11,976` splits; `58` `dev_val` DS) | `5,872 B / 4,616 B` \\| `6,398 B` (`cap 64 KiB`) | `0.8998 [0.8913, 0.9094]` / `0.9671` | `0.7904 [0.7844, 0.7972]` | `0.637` / `87.1` | **`{d['MlcVTwoDisjointElo']} [1643.4, 1657.5]` (`#1`, `70.51%`)** |",
+        "| **Pooled `1,000` — `Medium` (Macro / Legal Tier)** | `1,000` (`242` held-out + `758` unseen fold) | `1,502 B / 1,238 B` \\| `2,031 B` (`cap 4,096 B`; `v1=1,480 B`) | `0.8620 [0.8521, 0.8726]` / `0.9335` | `0.7566 [0.7512, 0.7624]` | `0.5985` / `83.11` | `1596.8` cross / `1610.6` DS-mean (`vs rows 1415.3`; tier **`1652.1 #1`**) |",
+        "| **Pooled `1,000` — `High` (Interaction Tier)** | `1,000` (`100.0% <= 16 KiB` under all 4 byte defs) | `2,836 B / 2,351 B` \\| `3,376 B` (`cap 16,384 B`; `v1=2,814 B`) | `0.8971 [0.8846, 0.9090]` / `0.9642` | `0.7821 [0.7759, 0.7877]` | `0.6331` / `86.82` | `1679.6` cross / `1726.6` DS-mean (`vs rows 1648.3`; tier **`1669.6 #1`**) |",
+        f"| **Pooled `1,000` — `Ultra` (Fine / Max Transfer)** | `1,000` (`44,369` matches/method, `65,874` fits) | `5,872 B / 4,616 B` \\| `6,398 B` (`cap 65,536 B`; `v1=5,850 B`) | **`{d['MlcVTwoUltraR']} [0.8883, 0.9095]` / `{d['MlcVTwoUltraRMed']}`** | **`{d['MlcVTwoUltraD']} [0.7831, 0.7959]`** | **`0.6363` / `86.97`** | **`{d['MlcVTwoPooledElo']} [1643.4, 1659.6]` (`#1`, `70.58%` win; cross `1687.2 / 1742.0`)** |\n",
+        "- **Overall 1,000-Dataset Leaderboard & Per-Auditor Transfer at `Ultra`:** `DOPE-MLC-v2` (`1651.3 [1643.4, 1659.6]`, `#1`, `30,959W/717D/12,693L`) leads `rows` (`1593.3 [1582.1, 1603.4]`), `kernel` (`1592.5 [1585.8, 1600.2]`), `copula` (`1545.8 [1538.9, 1553.0]`), `joint_diffusion_v1` (`1432.4 [1424.0, 1440.7]`), and `arf` (`1184.7 [1170.7, 1200.6]`). At `Ultra`, synthetic-trained models achieve CatBoost $R=0.8810$ ($D=0.8130$ passes `D80`, $\\rho=0.7036$, binary acc `83.13%` vs `85.88%` real; $1\\times\\to 2\\times\\to 5\\times N_{{\\text{{train}}}}$ expansion lifts CatBoost $R$ from `0.8808` $\\to$ `0.9010` $\\to$ **`0.9070`**), Local Gated Attention Net (`raw_key=kumo_tabpfn`, `_TabularKumoAttentionNet` trained from scratch per table; official pretrained KumoTabular/TabPFN is not evaluated) $R=0.9211$ ($D=0.8781$ passes `D80`), LightGBM $R=0.8978$ ($D=0.7703$), MLP $R=0.9143$ ($D=0.8915$ passes `D80`, $\\rho=0.7740$), Linear/Logistic $R=0.9297$ ($D=0.7853$), and XGBoost $R=0.8121$ ($D=0.7221$).",
+        "- **Exact `version=2` Wire Replay Qualification (`6,000/6,000` Cells):** In `exact_wire_replay_1000ds_qualification_v4.json`, `serialize_dope_latent_wire_bytes` (`version=2`, `dope.latent_wire.v3_exact`, `+22 B` raw over prior `version=1` lossy `fp16`) achieves **`100.0%` (`6,000/6,000`) decode success with bit-exact `X_syn` (`max_abs_diff = 0.0`) and bit-exact `y_syn` (`max_abs_diff = 0.0`)** across all `1,000` datasets, `3` tiers, and `2` checkpoints using only the wire payload plus the frozen `292,707 B` decoder (`dope_mlc_v2_wire_1000ds_qualified = true`, 24-DS CatBoost fixture `max |ΔR| = 0.0000` vs prior `version=1` `max |ΔR| = 0.6283`; `v1_wire_1000ds_qualified = false`). Competing baseline byte tallies remain post-hoc `fp16` estimates paired with historical `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`).\n",
+        "#### 2. `DOPE-MLC-v3`: 1,069-Dataset (4,276-Cell) Four-Tier Multi-Task Study (`Small` 2 KiB, `Medium` 4 KiB, `High` 16 KiB, `Ultra` 64 KiB)\n",
+        "**`DOPE-MLC-v3`** adds `16` global + `7` per-column + `8` heteroscedastic/tail + `20` multiclass simplex mathematical building-block probes (`asinh`, `atan`, `erf`, `cbrt`, `log1p`, invariant row summaries, `tanh`, `expm1`, `clamp`, `step`, `hinge`, `sin/cos`, `fract`, `hypot`, `atan2`, normalized difference ratio), `48` inter-landmark summary statistics + `InterLandmarkAttentionBlock` (`vec256 = 140 + 48 + 68`), an active per-column gate head (`col_gate_head` wired into loss, encoding, and generation; `grad_norm = 0.000721`), a fourth **`Small` (`2,048 B`)** complete-envelope byte tier (`DML3` header + `CSC1` compact scaler sidecar included in cap), and native multiclass synthesis (`LR-VLOT` shared-split vector-leaf oblivious trees).",
+        f"- **Maximized-Training (`96.74%` Loaded Train, `< 5%` Validation) Disjoint-1,069 Convergence & Matched-Budget `A0..A3` Ablation (`task-4221`, `v3_maxtrain97_val3pct_convergence_receipt.json` `9e218519...`, `v3_maxtrain97_corpus_exposure_and_split_manifest.json` `1c75ff09...`):** Because `load_v3_episode_pool` loads `1` cell (`splits[0]`) per dataset passing `20 <= n_tr <= 1,800` and `p <= 80`, the actual loaded episode pool comprises **`{d['MlcVThreeMaxTrainLoadedTrain']}` loaded training cells (`96.7448%`, `1,997` reg/bin + `232` mc) and `{d['MlcVThreeMaxTrainLoadedVal']}` loaded `dev_val` cells (`3.2552% < 5%`, `40` reg + `17` bin + `18` mc) = `{d['MlcVThreeMaxTrainLoadedPool']}` loaded episode cells** (`76 / 2,311 = 3.2886% < 5%` on the catalog manifest before `n_tr`/`p` filter [`6` train + `1` `dev_val` skipped]; `2.8876%` is a 6-split reference ratio not loaded by `v3`; `1,000` `v2`-panel + `69` multiclass eval datasets strictly excluded with `0` overlap). Across `8` training rounds (`R1: 558` visits + `R2..R8: 557` visits/round = **`{d['MlcVThreeMaxTrainVisits']}` cumulative episode visits**, `batch_accum = 16`, `280` scheduled optimizer updates, **`4,457 / 2,229 = {d['MlcVThreeMaxTrainEffPasses']}×` effective full-population passes** per variant), `100%` (`75/75`) `dev_val` loss for `A3` improves from `{d['MlcVThreeMaxTrainLossInit']} ± {d['MlcVThreeMaxTrainLossInitSe']} [0.62909, 0.76794]` (`R0`) $\\to$ **`{d['MlcVThreeMaxTrainLossBest']} ± {d['MlcVThreeMaxTrainLossBestSe']} [0.60885, 0.76099]`** (`R8*`, `-1.77%`; `Small 0.69473 / Med 0.69128 / High 0.67958 / Ultra 0.67408`; driver `0.04143`; `600`-cell train monitor `0.47454 -> 0.46132`). Under matched `{d['MlcVThreeMaxTrainVisits']}`-visit budgets (`200×` dataset-grouped bootstrap across `75` datasets), `A0` reaches `{d['MlcVThreeMaxTrainAZeroBest']} ± 0.04276` (`R5`; `0.68709` at `R8`), `A1` reaches `{d['MlcVThreeMaxTrainAOneBest']} ± 0.03433` (`R7`; `0.68547` at `R8`), `A2` reaches `{d['MlcVThreeMaxTrainATwoBest']} ± 0.03877` (`R8`), and `A3` reaches `{d['MlcVThreeMaxTrainLossBest']} ± {d['MlcVThreeMaxTrainLossBestSe']}` (`R8`, `dope_mlc_v3_maxtrain97_best.pt` `77ffb94f...`, with `A2` and `A3` within `0.00003` — `< 0.001× SE` — on the 75-dataset `dev_val` set while `A3` provides active `col_gate_head` gradient flow `0.001014`).",
+        "- **Preserved `task-2354` Architectural Ablation (`A0..A3`, Post-Training `dev_val` Loss) vs. `task-2502` Frozen-Checkpoint Replay:** In the preserved `task-2354` ablation (`v3_dev_val_ablation_and_multitask_receipt.json` `ce58d6b8...`, where each architectural variant `A0..A3` was warm-started from `dope_mlc_v2_disjoint1000_best.pt` and trained for `4` rounds on `677` episode cells [`480` reg/bin + `197` mc], then evaluated post-training on `110/112` `dev_val_ablation` cells and probed on `68/69` multiclass datasets with 2 auditors), post-training `dev_val` loss improves across variants from `A0 = 0.83084` (`Small 0.84642 / Med 0.84010 / High 0.82212 / Ultra 0.81471`) $\\to$ `A1 = 0.82908` $\\to$ `A2 = 0.82757` $\\to$ **`A3 = 0.82748`** (`Small 0.84579 / Med 0.83900 / High 0.81781 / Ultra 0.80732`; `driver` loss `0.04205` $\\to$ **`0.03954`**). In the separate frozen-checkpoint replay (`task-2502`, `v3_per_dataset_multitask_ledger.jsonl.gz` `8574f2d7...`, `724` measured cells across `181` datasets + `4` skip records = `728` rows), complete wire envelopes achieve `100.0% <= cap` at all 4 tiers with 6-auditor scikit-learn multiclass retention `0.7940 / 0.8370 / 0.8982 / 0.9156` (`0.9205` across all `69` DS at `Ultra`).",
+        f"- **Unified `{d['MlcVThreeDatasets']}`-Dataset (`{d['MlcVThreeCells']}`-Cell) Canonical 6-Auditor Evaluation (`canonical_v3_full_1069_unified_v1`, Bound to Preserved `dope_mlc_v3_multitask_best.pt` `bd50533b...`):** Aggregates `canonical_v3_bounded_run_v2` (`596` cells) plus 4 disjoint `230`-dataset `v2`-panel shards (`920` cells each; `ledger.jsonl.gz` `ce017e21...`, `1,877.0s` total wall clock, `4,276/4,276` completed cells, `0` duplicates, `0` failures) across `CatBoost`, `LightGBM`, `XGBoost`, `MLP`, `Linear/Logistic`, and `LocalGatedAttentionAuditor` (`_LocalGatedAttentionNet`, `12` AdamW steps, `hidden=32` on CPU; **not** official KumoTabular or TabPFN) under `CANONICAL_V3_AUDITOR_PROTOCOL_SPEC` (`max 340` train / `160` test rows / `36` features, read-only authentic targets `label_sha256_verified = True`, invertible contiguous label bijections; historical `v2` wrapper scores are not compared directly against this bounded protocol, and `1,069`-dataset downstream claims are not transferred onto `dope_mlc_v3_maxtrain97_best.pt` prior to dedicated `4,276`-cell evaluation):\n",
+        "| `DOPE-MLC-v3` Cohort & Tier (`Cap`) | Completed DS / Cells (`% <= Cap`) | Mean / Max Complete `DML3+CSC1` Wire Bytes | `Sender-Scaled` 6-Aud Clipped / Unclipped $R$ | `Sender-Scaled` Driver $D$ | `Isolated Receiver CSC1 Raw` Clipped / Unclipped $R$ (`D`) | `Diagnostic Exact fp64 Inverse Control` Clipped $R$ (`Mean \\|Δ vs CSC1\\|`) |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+        "| **`Multiclass Small` (`2,048 B`)** | `69 / 69` (`100.0%`) | `1,418.0 B / 2,047 B` | **`0.7271 / 0.7098`** | `0.6462` | **`0.7018 / 0.6939`** (`0.6484`) | `0.7248` (`0.03205`) |",
+        "| **`Multiclass Medium` (`4,096 B`)** | `69 / 69` (`100.0%`) | `2,510.7 B / 3,812 B` | **`0.7767 / 0.7712`** | `0.6715` | **`0.7789 / 0.7554`** (`0.6734`) | `0.7812` (`0.00510`) |",
+        f"| **`Multiclass High` (`16,384 B`)** | `69 / 69` (`100.0%`) | `6,435.3 B / 14,048 B` | **`{d['MlcVThreeMcHighR']} / 0.8355`** | `0.7157` | **`{d['MlcVThreeMcHighCscR']} / 0.8423`** (`0.7114`) | `0.8470` (`0.00801`) |",
+        "| **`Multiclass Ultra` (`65,536 B`)** | `69 / 69` (`100.0%`) | `9,877.5 B / 24,195 B` | **`0.8362 / 0.8415`** | `0.7158` | **`0.8404 / 0.8340`** (`0.7147`) | `0.8440` (`0.00917`) |",
+        "| **`Full v2-Panel Small` (`2,048 B`)** | `1,000 / 1,000` (`100.0%`) | `960.6 B / 1,472 B` | **`0.8080 / 0.7119`** | `0.7536` | **`0.8055 / 0.6912`** (`0.7531`) | `0.8151` (`0.01780`) |",
+        "| **`Full v2-Panel Medium` (`4,096 B`)** | `1,000 / 1,000` (`100.0%`) | `1,550.2 B / 2,459 B` | **`0.8286 / 0.7325`** | `0.7619` | **`0.8363 / 0.7371`** (`0.7619`) | `0.8363` (`0.00348`) |",
+        f"| **`Full v2-Panel High` (`16,384 B`)** | `1,000 / 1,000` (`100.0%`) | `3,429.2 B / 7,203 B` | **`{d['MlcVThreePanelHighR']} / 0.7502`** | `0.7793` | **`{d['MlcVThreePanelHighCscR']} / 0.7529`** (`0.7791`) | `0.8699` (`0.00566`) |",
+        "| **`Full v2-Panel Ultra` (`65,536 B`)** | `1,000 / 1,000` (`100.0%`) | `6,144.6 B / 13,010 B` | **`0.8517 / 0.7283`** | `0.7764` | **`0.8581 / 0.7244`** (`0.7763`) | `0.8581` (`0.00655`) |\n",
+        "- **Equal-Wire Comparator Tournament & Paired Uncertainty (`200x` Dataset-Cluster Bootstrap on Sender-Scaled Core Comparator Auditors = `CatBoost`, `LightGBM`, `Linear/Logistic`, `12,828` Paired Cells):**",
+        f"  - **`DOPE-MLC-v3` (`dope_mlc_v3_wire`, `Elo = {d['MlcVThreeElo']} [1449.5, 1464.3]`, `SE = 3.73`) vs. `copula_wire` (`Elo = 1407.1 [1399.8, 1416.3]`):** `DOPE-MLC-v3` beats equal-wire Gaussian/low-rank copula by **`mean ΔR = {d['MlcVThreeCopulaDeltaR']} [+0.0897, +0.0997]`** (`median ΔR = +0.0151`, `W/T_010/L = 3,980 / 7,441 / 1,407` across all `12,828` cells; on `69` multiclass datasets / `828` cells, `v3` `Elo = 1540.9` vs `copula` `1313.8`, **`mean ΔR = {d['MlcVThreeMcCopulaDeltaR']} [+0.2309, +0.2709]`**, `W/T_010/L = 493 / 283 / 52`).",
+        "  - **`DOPE-MLC-v3` vs. `DOPE-MLC-v2` (`dope_mlc_v2_wire`, `Elo = 1538.0 [1531.8, 1543.2]` on `9,000` Supported Cells):** On the `1,000` regression/binary datasets at `Medium`/`High`/`Ultra` (`9,000` cells; `v2` lacks a `Small` `2 KiB` tier or native `multiclass` head), `v3` and `v2` tie within `0.10` on `8,136 / 9,000` cells (`2,843` within `0.01`), with `v3` trailing `v2` by `mean ΔR = -0.0084 [-0.0104, -0.0063]` (`W/T_010/L = 392 / 8,136 / 472`) because `v3` allocates budget to the `CSC1` raw-domain sidecar and multi-task head inside the wire cap.",
+        "  - **`DOPE-MLC-v3` vs. `rows_wire` (`RWW1`, `Elo = 1597.3 [1589.7, 1606.1]`):** Across all `12,828` cells under the bounded `340`-row CPU protocol (where a few kilobytes of quantized real rows already cover a substantial fraction of the `340`-row training cap), `v3` trails raw quantized row subsampling by `mean ΔR = -0.0250 [-0.0297, -0.0201]` (`W/T_010/L = 1,919 / 7,481 / 3,428`). Upstream benchmark-family disjointness beyond exact `train_sha256` and untouched sealed confirmatory generalization remain open.\n",
+        "#### 3. 100% Pure-Rust `SafeTensors` Inference & `DML3`/`CSC1` Receiver Sampling Engine (`dope mlc-v3`)\n",
+        "| Pure-Rust `dope mlc-v3` Component | Artifact / Scope | Verified Metric & Tolerance | Source / Receipt Locator |",
+        "|---|---|---|---|",
+        f"| **Trained Weight Loading (`MlcV3Model::load_safetensors`)** | `dope_mlc_v3_multitask_best.safetensors` (`56` `F32` tensors, `{d['MlcRustParams']}` params, `1,781,800 B`, `SHA-256: d0b69603...`) | `100%` pure Rust (`safetensors` + `candle-core`, `0` Python/LibTorch deps at inference time) | [`engine/dope-core/src/mlc_v3/`](engine/dope-core/src/mlc_v3/), [`engine/dope-cli/src/mlc_v3.rs`](engine/dope-cli/src/mlc_v3.rs) |",
+        f"| **Forward Router, Target & Covariate Nets (`route`)** | All `4` tiers (`Small`, `Medium`, `High`, `Ultra`) on trained checkpoint (`gates`, `task_latent`, `dist_latent`, `landmark_pred`, `bb_pred`, `col_gates`, `target_net`, `cov_net`) | **`max_forward_abs_err = {d['MlcRustFwdErr']} < 1e-5`** vs. PyTorch reference | [`research/levels/rust_v3_parity.py`](research/levels/rust_v3_parity.py), [`engine/dope-core/tests/mlc_v3_safetensors.rs`](engine/dope-core/tests/mlc_v3_safetensors.rs) |",
+        f"| **Compressed `DML3` + `CSC1` Decoding & Fixed-Draw Sampling (`sample`)** | All `12` `(tier, task)` cells (`4` tiers $\\times$ `regression` / `classification` / `multiclass` `LR-VLOT`, `zlib` / `brotli` / raw, CRC32-verified) | **`max_fixed_draw_sample_abs_err = {d['MlcRustSampleErr']} < 1e-5`** across `x_scaled`, `y_scaled`, `x_raw`, `y_raw` | `dope mlc-v3 {{inspect-weights,inspect-wire,route,sample}}` |",
+        "| **Standalone `--seed` Sampling & Fail-Closed Security Gates** | Standalone Rust PRNG sampling, `DML2` v1/v2 backward compatibility, and `8` tamper/malformed/oversized (`> 262,144 B`) refusal checks | `12/12` standalone cells finite & quota-valid; `8/8` tamper checks fail closed (`DOPE_REQUIRE_RUST_PARITY=1`) | [`research/levels/tests/test_dope_mlc_v3.py`](research/levels/tests/test_dope_mlc_v3.py) |\n",
+        "*Qualification boundary:* All `1,000`-dataset `DOPE-MLC-v2` and `1,069`-dataset (`4,276`-cell) `DOPE-MLC-v3` downstream auditor retention, driver-fidelity, and Elo benchmarks above were measured in the Python reference pipeline (`research/levels/`) on the preserved `dope_mlc_v2_s3_best.pt`, `dope_mlc_v2_disjoint1000_best.pt`, and `dope_mlc_v3_multitask_best.pt` checkpoints; while `dope mlc-v3` is verified for `< 1e-5` trained-checkpoint forward and fixed-draw `DML3`/`CSC1` sampling parity, Python study Elo claims are not transferred to standalone Rust `--seed` statistical sampling or to the new `maxtrain97` convergence checkpoints prior to dedicated end-to-end campaign measurement.",
+    ]

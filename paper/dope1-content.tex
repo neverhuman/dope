@@ -501,6 +501,120 @@ robust score. For compressed real rows at the same budget the limiting family is
 (\G{OneRowsCMlp}, against \G{OneRowsCCb} for CatBoost): a network trained on a few hundred rows
 overfits, and its log-loss on test rows can be far worse than the null.
 
+\begin{figure}[t]
+  \centering
+  \GeneratedFigure[\linewidth]{dope1-convergence.pdf}{multi-level deep learning training and validation loss curves}
+  \caption{\textbf{Multi-level deep learning training and unseen-dataset validation loss curves across
+  training rounds \texttt{R0..R8}} (bound to \texttt{multilevel-convergence-snapshot.json}).
+  \textbf{A:} Full-corpus \texttt{DOPE-MLC-v2} maximized-training run (\G{MlcMaxTrainTrainSplits}
+  training splits = \G{MlcMaxTrainTrainSplitFrac}, \G{MlcMaxTrainValSplits} unseen-dataset validation
+  splits = \G{MlcMaxTrainValSplitFrac}, \G{MlcMaxTrainValDsFrac} of datasets; \G{MlcMaxTrainVisits}
+  cumulative split visits across six disjoint shard rounds plus two refinement shard rounds =
+  \G{MlcMaxTrainEffPasses} effective full-population passes), showing full-population validation loss
+  with dataset-grouped bootstrap standard-error bands (\G{MlcMaxTrainLossInit} $\pm$
+  \G{MlcMaxTrainLossInitSe} at \texttt{R0} to \G{MlcMaxTrainLossBest} $\pm$ \G{MlcMaxTrainLossBestSe}
+  at \texttt{R8*}, a \G{MlcMaxTrainLossDropPct} reduction) and six-hundred-split training monitor
+  (\G{MlcMaxTrainTrainInit} to \G{MlcMaxTrainTrainBest}), alongside the preserved ten-percent-validation
+  run (\G{MlcVTwoLossInit} to \G{MlcVTwoLossBest} at \texttt{R7*}, \G{MlcVTwoLossFinal} at \texttt{R8},
+  and post-training full unseen-split evaluation \G{MlcVTwoFullValLoss}, diamond). \textbf{B:}
+  Per-tier full-validation loss across \texttt{R0..R8} on all \G{MlcMaxTrainValSplits} unseen splits
+  (\texttt{Ultra} \G{MlcMaxTrainValUltraBest}, \texttt{High} \G{MlcMaxTrainValHighBest},
+  \texttt{Medium} \G{MlcMaxTrainValMedBest} at \texttt{R8*}), maintaining strict monotonic hierarchy at
+  every round. \textbf{C:} Strictly dataset-disjoint \texttt{DOPE-MLC-v2} convergence
+  (\G{MlcDisjointTrainSplitFrac} training splits, \G{MlcDisjointValSplitFrac} \texttt{dev\_val} splits =
+  \G{MlcDisjointValDsFrac} of datasets; \G{MlcDisjointVisits} visits = \G{MlcDisjointEffPasses}
+  effective passes), lowering full \texttt{dev\_val} loss from \G{MlcDisjointLossInit} $\pm$
+  \G{MlcDisjointLossInitSe} to \G{MlcDisjointLossBest} $\pm$ \G{MlcDisjointLossBestSe} at \texttt{R5*}
+  (\G{MlcDisjointLossFinal} $\pm$ \G{MlcDisjointLossFinalSe} at \texttt{R8}; training monitor
+  \G{MlcDisjointTrainInit} to \G{MlcDisjointTrainFinal}). \textbf{D:} Disjoint
+  \texttt{DOPE-MLC-v3} multi-task convergence and matched-budget \texttt{A0..A3} ablation across
+  \texttt{R0..R8} on all \G{MlcVThreeMaxTrainLoadedVal} loaded \texttt{dev\_val} episode cells
+  (\G{MlcVThreeMaxTrainLoadedValFrac} of \G{MlcVThreeMaxTrainLoadedPool} loaded one-cell-per-dataset
+  episodes; \G{MlcVThreeMaxTrainVisits} visits / \G{MlcVThreeMaxTrainLoadedTrain} loaded training cells
+  = \G{MlcVThreeMaxTrainEffPasses} effective passes per variant), lowering \texttt{A3} loss from
+  \G{MlcVThreeMaxTrainLossInit} $\pm$ \G{MlcVThreeMaxTrainLossInitSe} to \G{MlcVThreeMaxTrainLossBest}
+  $\pm$ \G{MlcVThreeMaxTrainLossBestSe} at \texttt{R8*} (versus \texttt{A0} \G{MlcVThreeMaxTrainAZeroBest},
+  \texttt{A1} \G{MlcVThreeMaxTrainAOneBest}, and \texttt{A2} \G{MlcVThreeMaxTrainATwoBest}).}
+  \label{fig:convergence}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Multi-level landmark and multi-task study summary} (\texttt{DOPE-MLC-v2} over
+\G{MlcVTwoDatasets} datasets and \texttt{DOPE-MLC-v3} over \G{MlcVThreeDatasets} datasets and
+\G{MlcVThreeCells} dataset--tier cells, plus pure-Rust \texttt{SafeTensors} parity for
+\texttt{dope mlc-v3}; full receipts in \texttt{docs/multilevel-landmark-dl-study.md}).}
+\label{tab:multilevel}
+\small
+\IfFileExists{generated/dope1-multilevel.tex}{\resizebox{\linewidth}{!}{\input{generated/dope1-multilevel.tex}}}{\pending{multilevel table}}
+\end{table}
+
+\paragraph{Multi-level landmark and multi-task scaling (\texttt{DOPE-MLC-v2} and \texttt{DOPE-MLC-v3}).}
+\Cref{fig:convergence,tab:multilevel} summarize the companion large-scale multi-level landmark studies in
+\texttt{research/levels/} (\texttt{docs/multilevel-landmark-dl-study.md}). In the maximized-training
+convergence study (\texttt{research/levels/maxtrain\_val\_lt5pct.py}), unseen-dataset validation is
+kept strictly below five percent of both datasets and splits while evaluating the entire unseen
+validation split population at every training round \texttt{R0..R8} with dataset-grouped bootstrap
+standard errors: full-corpus \texttt{DOPE-MLC-v2} (\G{MlcMaxTrainTrainSplitFrac} training splits,
+\G{MlcMaxTrainValSplitFrac} unseen validation splits across \G{MlcMaxTrainValDsFrac} of datasets;
+\G{MlcMaxTrainVisits} cumulative split visits = \G{MlcMaxTrainEffPasses} effective full-population
+passes across six disjoint shard rounds plus two refinement shard rounds) lowers full-population
+unseen validation loss by \G{MlcMaxTrainLossDropPct} from \G{MlcMaxTrainLossInit} $\pm$
+\G{MlcMaxTrainLossInitSe} at \texttt{R0} to \G{MlcMaxTrainLossBest} $\pm$ \G{MlcMaxTrainLossBestSe} at
+\texttt{R8*} (\texttt{Ultra} \G{MlcMaxTrainValUltraBest} below \texttt{High}
+\G{MlcMaxTrainValHighBest} below \texttt{Medium} \G{MlcMaxTrainValMedBest}; six-hundred-split training
+monitor \G{MlcMaxTrainTrainInit} to \G{MlcMaxTrainTrainBest}), strictly dataset-disjoint
+\texttt{DOPE-MLC-v2} (\G{MlcDisjointTrainSplitFrac} training splits, \G{MlcDisjointValSplitFrac}
+\texttt{dev\_val} splits across \G{MlcDisjointValDsFrac} of datasets; \G{MlcDisjointVisits} visits =
+\G{MlcDisjointEffPasses} effective passes) lowers full \texttt{dev\_val} loss from
+\G{MlcDisjointLossInit} $\pm$ \G{MlcDisjointLossInitSe} to \G{MlcDisjointLossBest} $\pm$
+\G{MlcDisjointLossBestSe} at \texttt{R5*} (\G{MlcDisjointLossFinal} $\pm$ \G{MlcDisjointLossFinalSe} at
+\texttt{R8}; training monitor \G{MlcDisjointTrainInit} to \G{MlcDisjointTrainFinal}), and disjoint
+\texttt{DOPE-MLC-v3} across the loaded one-cell-per-dataset episode pool (\G{MlcVThreeMaxTrainLoadedTrain}
+training cells = \G{MlcVThreeMaxTrainLoadedTrainFrac} and \G{MlcVThreeMaxTrainLoadedVal}
+\texttt{dev\_val} cells = \G{MlcVThreeMaxTrainLoadedValFrac} of \G{MlcVThreeMaxTrainLoadedPool} loaded
+cells, corresponding to \G{MlcVThreeMaxTrainCatalogValFrac} on the catalog manifest;
+\G{MlcVThreeMaxTrainVisits} cumulative visits = \G{MlcVThreeMaxTrainEffPasses} effective passes per
+variant) lowers full \texttt{dev\_val} loss for \texttt{A3} from \G{MlcVThreeMaxTrainLossInit} $\pm$
+\G{MlcVThreeMaxTrainLossInitSe} to \G{MlcVThreeMaxTrainLossBest} $\pm$ \G{MlcVThreeMaxTrainLossBestSe} at
+\texttt{R8*} (with matched-budget \texttt{A0} reaching \G{MlcVThreeMaxTrainAZeroBest}, \texttt{A1}
+\G{MlcVThreeMaxTrainAOneBest}, and \texttt{A2} \G{MlcVThreeMaxTrainATwoBest}). In the preserved
+ten-percent-validation \texttt{DOPE-MLC-v2} run that produced the frozen checkpoints evaluated below,
+six-hundred-split monitored training loss drops from \G{MlcVTwoTrainLossInit} to
+\G{MlcVTwoTrainLossBest} (\G{MlcVTwoTrainLossFinal} at \texttt{R8}) and monitored validation loss from
+\G{MlcVTwoLossInit} to \G{MlcVTwoLossBest} at \texttt{R7*} (\G{MlcVTwoLossFinal} at \texttt{R8};
+\texttt{Ultra} \G{MlcVTwoValUltraBest} below \texttt{High} \G{MlcVTwoValHighBest} below
+\texttt{Medium} \G{MlcVTwoValMedBest}), with post-training full unseen-split evaluation reaching
+\G{MlcVTwoFullValLoss} (\texttt{Ultra} \G{MlcVTwoFullValUltra} below \texttt{High}
+\G{MlcVTwoFullValHigh} below \texttt{Medium} \G{MlcVTwoFullValMed}), while the preserved
+four-round \texttt{DOPE-MLC-v3} architectural ablation lowers post-training \texttt{dev\_val} loss
+from \G{MlcVThreeLossAZero} to \G{MlcVThreeLossAThree} (driver loss \G{MlcVThreeDriverLossAZero} to
+\G{MlcVThreeDriverLossAThree}). Across
+\G{MlcVTwoDatasets} stratified regression and binary datasets and six auditor families (CatBoost,
+LightGBM, XGBoost, MLP, linear or logistic, and a local gated-attention network trained from
+scratch per table; official pretrained KumoTabular and TabPFN foundation models are not evaluated),
+\texttt{DOPE-MLC-v2} reaches an overall Elo of \G{MlcVTwoPooledElo} on the pooled cohort,
+\G{MlcVTwoDisjointElo} on the reconciled strictly dataset-disjoint cohort, and \G{MlcVTwoHeldoutElo}
+on the strictly dataset-disjoint held-out stratum, with \texttt{Ultra}-tier mean retention
+\G{MlcVTwoUltraR} (median \G{MlcVTwoUltraRMed}), driver fidelity \G{MlcVTwoUltraD}, and bit-exact
+versioned wire replay across all \G{MlcVTwoDatasets} datasets and both checkpoints. Extending the
+architecture to four complete-envelope byte tiers (\texttt{Small}, \texttt{Medium}, \texttt{High},
+\texttt{Ultra} including the \texttt{CSC1} compact scaler sidecar), mathematical building-block
+probes, inter-landmark attention summaries, active per-column gating, and vector-leaf oblivious-tree
+multiclass synthesis, \texttt{DOPE-MLC-v3} completes all \G{MlcVThreeCells} dataset--tier cells across
+\G{MlcVThreeDatasets} unique datasets with zero failed or missing cells, reaching \texttt{High}-tier
+six-auditor clipped retention \G{MlcVThreeMcHighR} (\G{MlcVThreeMcHighCscR} under isolated-receiver
+\texttt{CSC1} raw-domain inverse scaling) on the held-out multiclass panel and
+\G{MlcVThreePanelHighR} (\G{MlcVThreePanelHighCscR} under \texttt{CSC1}) on the complete
+\G{MlcVTwoDatasets}-dataset regression-and-binary panel, while beating equal-wire Gaussian copula by
+mean retention delta \G{MlcVThreeCopulaDeltaR} overall (\G{MlcVThreeMcCopulaDeltaR} on multiclass;
+overall three-core-auditor tournament Elo \G{MlcVThreeElo}; downstream evaluations remain bound to the
+preserved checkpoints prior to full-panel re-evaluation of the maximized-training checkpoints). The
+pure-Rust \texttt{dope mlc-v3}
+engine loads all \G{MlcRustParams} single-precision parameters from \texttt{SafeTensors} without
+Python at inference time and matches PyTorch within \G{MlcRustFwdErr} on forward routing and
+\G{MlcRustSampleErr} on fixed-draw \texttt{DML3}/\texttt{CSC1} packet sampling.
+
 \section{Related work}
 \label{sec:related}
 
