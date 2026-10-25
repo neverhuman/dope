@@ -18,21 +18,19 @@ declared target. It stores no source rows. Train downstream learners only on row
 the program, score them on held-out *real* rows, and across public regression, binary, and
 multiclass tables the sampled rows preserve the predictive structure that learners need.
 
-- **Top-ranked across diverse learners.** In multi-auditor tournaments across regression and
-  classification tables (`CatBoost`, local gated attention, `LightGBM`, `XGBoost`, `MLP`, and
-  linear/logistic auditors), **`DOPE-MLC-v2`** ranks first overall in Bradley–Terry Elo and
-  beats both parametric generators and raw row subsampling at compact byte caps.
-- **Multi-level byte-budgeted capacity (`DOPE-MLC-v2` & `DOPE-MLC-v3`).** A single forward pass
-  emits nested byte-budgeted tiers (`Small`, `Medium`, `High`, and `Ultra`) conditioned on
-  train-only cross-validation landmarks, mathematical building-block probes, and inter-landmark
-  attention ([full study & receipts](docs/multilevel-landmark-dl-study.md)).
-- **Self-contained wire envelopes & bit-exact replay.** `DOPE-MLC-v2` (`version=2` exact wire)
-  and `DOPE-MLC-v3` (`DML3` header + `CSC1` compact scaler sidecar) decode synthetic covariates
-  and targets deterministically inside strict byte caps.
+- **Top-ranked across diverse learners.** Across regression and classification tables
+  (`CatBoost`, local gated attention, `LightGBM`, `XGBoost`, `MLP`, and linear/logistic
+  auditors), **`DOPE-MLC-v2`** ranks first overall in Bradley–Terry Elo and beats both
+  parametric generators and raw row subsampling at compact byte caps.
+- **Multi-level byte-budgeted capacity (`DOPE-MLC-v2` & `DOPE-MLC-v3`).** One forward pass
+  emits nested tiers (`Small`, `Medium`, `High`, `Ultra`) conditioned on train-only CV
+  landmarks, probe features, and inter-landmark attention ([study](docs/multilevel-landmark-dl-study.md)).
+- **Self-contained wire envelopes & bit-exact replay.** `DOPE-MLC-v2` (`version=2` wire)
+  and `DOPE-MLC-v3` (`DML3+CSC1`) decode synthetic rows deterministically inside strict byte caps.
 - **One number to chase: TDL.** *Transfer Description Length* is the smallest tested
   artifact whose samples keep a target share of the predictive gain for every model family.
 - **Pure-Rust inference (`dope` & `dope mlc-v3`).** Fitting, inspection, and `SafeTensors`
-  receiver sampling run natively on CPU in pure Rust without Python at inference time.
+  sampling run natively on CPU in pure Rust without Python.
 
 Every number below comes from committed, hash-bound benchmark receipts and is regenerated
 automatically by [`bench/real-world/render.py`](bench/real-world/render.py).
@@ -82,34 +80,27 @@ The engine's manuscript is [paper/dope1.tex](paper/dope1.tex) (`bash paper/build
 ## Quick start
 
 ```bash
-# Build the CLI (Rust toolchain from rustup; add --features cuda or metal for a GPU)
-cargo install --locked --path engine/dope-cli
+# 1. Install on Linux x86-64 (standalone Rust binary; or: cargo install --locked --path engine/dope-cli)
+curl -fsSL https://github.com/neverhuman/dope/releases/latest/download/dope-linux-x86_64 -o dope
+curl -fsSL https://github.com/neverhuman/dope/releases/latest/download/SHA256SUMS -o SHA256SUMS
+grep dope-linux-x86_64 SHA256SUMS | sed 's/dope-linux-x86_64/dope/' | sha256sum -c -
+chmod +x dope && sudo mv dope /usr/local/bin/dope
 
-dope fit train.csv --target income -o model.dope        # compile (default budget 4 KiB) and self-audit
-dope inspect model.dope                                  # what is stored, byte by byte
-dope sample model.dope -n 10000 -o synthetic.csv        # original units and labels
-dope sample model.dope -n 10000 --space ml -o ml.csv    # one-hot + [0,1], ML-ready
-dope eval -m model.dope --train train.csv --test test.csv   # retention per model family
-dope frontier --train train.csv --test test.csv -t income   # bytes vs retention, and TDL
-
-# Pure-Rust SafeTensors inference & DML3/CSC1 receiver sampling (DOPE-MLC-v3)
-dope mlc-v3 sample --weights dope_mlc_v3_multitask_best.safetensors --wire packet.dml3 -n 1024 --seed 42 -o syn.csv
+# 2. Try in seconds: generate train/test CSVs (y = 2*x1 + x2^2), compile (764 B, 0 rows stored), sample & audit
+awk 'BEGIN{print "x1,x2,y";for(i=0;i<300;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a","b","2*a+b*b}}' > train.csv
+awk 'BEGIN{print "x1,x2,y";for(i=300;i<400;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a","b","2*a+b*b}}' > test.csv
+dope fit train.csv --target y -o model.dope
+dope inspect model.dope
+dope sample model.dope -n 1000 -o synthetic.csv
+dope eval -m model.dope --train train.csv --test test.csv
 ```
 
-`--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
-with positional codes; `--device cuda` runs on a GPU.
+### Real-World Example: UCI Adult Census Income
 
-`--size small|medium|large` picks a preset cap; `--max-parameters N` caps stored values;
-`dope fit-tiers` builds all three sizes ([details, Elo ranking](docs/model-sizes-and-elo.md)).
-Scripting flags and signed Linux binaries: [engine/README.md](engine/README.md#recipes),
-[docs/signed-engine-release.md](docs/signed-engine-release.md).
-
-<details>
-<summary><strong>Walkthrough: UCI Adult census income (reproducible CLI transcript)</strong></summary>
-
-A real public table (UCI Adult, `CC-BY-4.0`) with eight categorical columns and a binary
-target, from download to retention. Reproduce it with
-[`examples/adult/walkthrough.py`](examples/adult/walkthrough.py).
+A real public table (UCI Adult, `CC-BY-4.0`, eight categorical columns, binary target
+`income`), from download to holdout retention — showing how a compact `.dope` program with
+**no stored source rows** trains `linear`, `gbdt`, and `mlp` models that recover nearly all
+real-data lift ([`examples/adult/walkthrough.py`](examples/adult/walkthrough.py)):
 
 <!-- BEGIN DOPE1 WALKTHROUGH -->
 <!-- Generated by examples/adult/walkthrough.py --record; do not edit. -->
@@ -199,6 +190,23 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
   robust retention (min over families): 0.941
 ```
 <!-- END DOPE1 WALKTHROUGH -->
+
+<details>
+<summary><strong>Additional CLI subcommands, tier presets & SafeTensors DML3 sampling</strong></summary>
+
+```bash
+dope sample adult.dope -n 10000 --space ml -o ml.csv                     # one-hot + [0,1], ML-ready
+dope frontier --train train.csv --test test.csv -t income                # bytes vs retention, and TDL
+dope mlc-v3 sample --weights dope_mlc_v3_multitask_best.safetensors \
+  --wire packet.dml3 -n 1024 --seed 42 -o syn.csv                        # DOPE-MLC-v3 SafeTensors receiver
+```
+
+`--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
+with positional codes; `--device cuda` runs on a GPU. `--size small|medium|large` picks a
+preset cap; `--max-parameters N` caps stored values; `dope fit-tiers` builds all three sizes
+([details, Elo ranking](docs/model-sizes-and-elo.md)). Scripting flags and signed Linux
+binaries: [engine/README.md](engine/README.md#recipes),
+[docs/signed-engine-release.md](docs/signed-engine-release.md).
 </details>
 
 <details>
