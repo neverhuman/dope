@@ -120,6 +120,39 @@ class Elo(unittest.TestCase):
         self.assertEqual(len(all_methods["common_datasets"]), 7)
         self.assertEqual(len(cpu["common_datasets"]), 16)
 
+    def test_multilevel_convergence_snapshot_matches_live_receipts(self):
+        from render_tex import ROOT, _multilevel_macro_items, multilevel_convergence_data
+        snap = multilevel_convergence_data()
+        t1 = snap["v2_full_corpus_maxtrain97_val3pct"]
+        t2 = snap["v2_disjoint1000_maxtrain97_devval345"]
+        t3 = snap["v3_maxtrain97_val3pct"]
+        self.assertLess(t1["val_dataset_pct"], 5.0)
+        self.assertLess(t1["val_split_pct"], 5.0)
+        self.assertLess(t2["val_dataset_pct"], 5.0)
+        self.assertLess(t2["val_split_pct"], 5.0)
+        self.assertLess(t3["loaded_episode_cells_val_pct"], 5.0)
+        self.assertLess(t3["catalog_manifest_val_dataset_pct"], 5.0)
+        self.assertEqual((t1["train_population_splits"], t1["val_population_splits"], t1["attempted_visits_cumulative_total"]), (18395, 684, 24527))
+        self.assertAlmostEqual(t1["effective_full_population_passes_total"], 24527 / 18395, places=6)
+        self.assertEqual((t2["train_population_splits"], t2["val_population_splits"], t2["attempted_visits_cumulative_total"]), (11976, 345, 15968))
+        self.assertAlmostEqual(t2["effective_full_population_passes_total"], 15968 / 11976, places=6)
+        self.assertEqual(
+            (t3["loaded_episode_cells_train_total"], t3["loaded_episode_cells_val_total"], t3["loaded_episode_cells_pool_total"]),
+            (2229, 75, 2304),
+        )
+        self.assertAlmostEqual(t3["loaded_episode_cells_val_pct"], 100 * 75 / 2304, places=4)
+        self.assertEqual(t3["attempted_visits_cumulative_total_per_variant"], 4457)
+        self.assertAlmostEqual(t3["effective_full_population_passes_total_per_variant"], 4457 / 2229, places=6)
+        macros = dict(_multilevel_macro_items())
+        self.assertEqual(macros["MlcMaxTrainLossInit"], "0.40988")
+        self.assertEqual(macros["MlcMaxTrainLossBest"], "0.34216")
+        self.assertEqual(macros["MlcDisjointLossBest"], "0.57363")
+        self.assertEqual(macros["MlcVThreeMaxTrainLossBest"], "0.68492")
+        self.assertEqual(macros["MlcVThreeMaxTrainLoadedPool"], "2{,}304")
+        readme_block = (ROOT / "bench/real-world/results/readme-block.md").read_text(encoding="utf-8")
+        for needle in ("0.34216 ± 0.01621", "1.333351×", "0.57363 ± 0.02131", "0.68492 ± 0.03877", "1.999551×", "3.2552% < 5%"):
+            self.assertIn(needle, readme_block)
+
 
 if __name__ == "__main__":
     unittest.main()

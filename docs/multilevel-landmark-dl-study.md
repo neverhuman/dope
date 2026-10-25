@@ -75,26 +75,106 @@ train splits, `1,900` unseen dataset holdout splits):
 
 ---
 
-## 3. Full-Corpus 3-Level GPU Deep Learning Convergence (19,079 Splits)
+## 3. Full-Corpus 3-Level GPU Deep Learning Convergence (19,079 Splits; 600-Split Per-Epoch Monitors + Full 1,891-Split Final Evaluation)
 
-`research/levels/s3_multilevel_trainer.py` trained `DOPE-MLC-v2` on GPU (`cuda`) across all
-**19,079 matched splits** (`14,295` regression + `4,784` binary classification across all 6 split
-families; `17,188` training splits and `1,891` unseen dataset validation splits grouped by
-`dataset_id` so zero splits of any validation dataset appear in training):
+`research/levels/s3_multilevel_trainer.py` trained `DOPE-MLC-v2` on GPU (`cuda`) across
+**19,079 matched splits** (`3,188` unique datasets; `14,295` regression + `4,784` binary
+classification across all 6 split families; **`17,188` training splits** partitioned into 6
+disjoint shards of `~2,865` splits for Epochs `1..6` plus 2 refinement shards for Epochs `7..8`
+[`22,918` cumulative splits visited] and **`1,891` unseen-dataset validation splits** grouped by
+`dataset_id` so zero splits of any validation dataset appear in training). Per
+`research/levels/s3_multilevel_trainer.py:319-321,396-397` and canonical receipt
+`target/s3-multilevel-training-20261023/s3_training_convergence_receipt.json`
+(`SHA-256: e026225c7a0ee496d788888f152a81b9c4a0cbba7775d46cc8639dacd04083ab`, tracked snapshot:
+[`bench/real-world/results/multilevel-convergence-snapshot.json`](../bench/real-world/results/multilevel-convergence-snapshot.json)),
+each epoch `0..8` is monitored on deterministic **`600`-split subsets** (`train_eval_subset` of
+`600 / 17,188` training splits and `val_eval_subset` of `600 / 1,891` unseen-dataset validation
+splits), followed by a separate post-training evaluation (`full_1891_val_final`) of the reloaded
+best checkpoint across **all `1,891` unseen-dataset validation splits**:
 
-| Epoch | Splits Visited | Train Loss (Mean) | Val `Medium` Loss | Val `High` Loss | Val `Ultra` Loss | Val Mean Loss |
-|---:|---:|---:|---:|---:|---:|---:|
-| 0 (Init) | 0 | `0.42415` | `0.45188` | `0.44037` | `0.42577` | `0.43934` |
-| 1 | 2,865 | `0.36522` | `0.40084` | `0.37728` | `0.36168` | `0.37993` |
-| 2 | 5,730 | `0.36325` | `0.40026` | `0.37525` | `0.35898` | `0.37817` |
-| 3 | 8,595 | `0.36279` | `0.39962` | `0.37502` | `0.35847` | `0.37770` |
-| 4 | 11,460 | `0.36268` | `0.39926` | `0.37447` | `0.35867` | `0.37747` |
-| 6 | 17,190 | `0.36210` | `0.39899` | `0.37412` | `0.35804` | `0.37705` |
-| **7 (Best)** | **20,055** | **`0.36186`** | **`0.39900`** | **`0.37377`** | **`0.35725`** | **`0.37667`** |
-| **Full 1,891 Val** | **22,920** | **`0.36201`** | **`0.39744`** | **`0.37456`** | **`0.36060`** | **`0.37753`** |
+| Checkpoint / Evaluation Scope | Cumulative Splits Visited | Monitored Sample (`train / val`) | Train Loss (`600`-Split Mean) | Val `Medium` (`4 KiB`) Loss | Val `High` (`16 KiB`) Loss | Val `Ultra` (`64 KiB`) Loss | Val Mean Loss |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Epoch `0` (Init) | `0` | `600 / 600` | `0.42415` | `0.45188` | `0.44037` | `0.42577` | `0.43934` |
+| Epoch `1` | `2,865` | `600 / 600` | `0.36515` | `0.40085` | `0.37730` | `0.36162` | `0.37992` |
+| Epoch `2` | `5,730` | `600 / 600` | `0.36322` | `0.40030` | `0.37515` | `0.35890` | `0.37812` |
+| Epoch `3` | `8,595` | `600 / 600` | `0.36279` | `0.39961` | `0.37489` | `0.35850` | `0.37767` |
+| Epoch `4` | `11,460` | `600 / 600` | `0.36272` | `0.39919` | `0.37430` | `0.35865` | `0.37738` |
+| Epoch `5` | `14,324` | `600 / 600` | `0.36273` | `0.39927` | `0.37469` | `0.35917` | `0.37771` |
+| Epoch `6` (`100%` of `17,188` train splits visited) | `17,188` | `600 / 600` | `0.36217` | `0.39899` | `0.37401` | `0.35791` | `0.37697` |
+| **Epoch `7` (Best Monitored `val_eval_subset`, Saved `best_state`)** | **`20,053`** | **`600 / 600`** | **`0.36193`** | **`0.39900`** | **`0.37377`** | **`0.35725`** | **`0.37667`** |
+| Epoch `8` (Final Epoch; Receipt `final_best_val` Field) | `22,918` | `600 / 600` | `0.36201` | `0.39893` | `0.37394` | `0.35770` | `0.37686` |
+| **Post-Train Full `1,891` Unseen Val (`full_1891_val_final`, Reloaded Ep `7` `best_state`)** | **`22,918`** | **`— / 1,891`** | **`—`** | **`0.39744`** | **`0.37456`** | **`0.36060`** | **`0.37753`** |
 
-Validation loss decreases by **`-14.3%`** on unseen datasets while maintaining strict monotonic
-ordering `Loss(Ultra) < Loss(High) < Loss(Medium)` at every epoch.
+- **Monitored Endpoint Reduction (`-14.3%`) vs. Full `1,891`-Split Final Evaluation**:
+  On the matching `600`-split unseen-dataset validation monitor (`val_eval_subset`), mean validation
+  loss decreases by **`-14.3%` (`-14.27%`, `0.43934 -> 0.37667` at Epoch `7`, or `-14.22%`,
+  `0.43934 -> 0.37686` at Epoch `8`)** while maintaining strict monotonic tier ordering
+  `Loss(Ultra) < Loss(High) < Loss(Medium)` at every single epoch `0..8`. After Epoch `8`,
+  reloading `best_state` (Epoch `7`) and evaluating across all `1,891` unseen-dataset validation
+  splits (`full_1891_val_final`, a distinct `1,891`-split sample for which no Epoch `0` full-panel
+  baseline was recorded) yields **`0.37753`** (`Ultra = 0.36060 < High = 0.37456 < Medium = 0.39744`).
+- **Checkpoint Selection & Receipt-Field Binding (`dope_mlc_v2_s3_best.pt`)**:
+  In `s3_multilevel_trainer.py:409-416`, `best_state` is updated only when
+  `val_ep["mean_total_loss"] <= best_val_loss`; thus `dope_mlc_v2_s3_best.pt`
+  (`SHA-256: 1d5db98ffa438a0be1c61dabf235972cd400d1010f023705bea983f96e660a98`) stores the
+  **Epoch `7`** weights (`0.37667` on the `600`-split monitor) and `full_1891_val_final` (`0.37753`)
+  is evaluated on those reloaded Epoch `7` weights, whereas line `431` wrote
+  `"final_best_val": history[-1]["val"]` (recording the Epoch `8` `600`-split monitor entry `0.37686`).
+
+### 3.1 Maximized-Training (`~96.4%–97.2%` Train, `< 5%` Validation) Full-Validation-Per-Round Convergence & Dataset-Grouped Bootstrap SEs (`task-4221`, `maxtrain97_val_lt5pct`)
+
+To maximize training coverage while enforcing **`< 5%` validation share on both datasets and splits**
+and eliminating subsampled validation-monitor noise, [`research/levels/maxtrain_val_lt5pct.py`](../research/levels/maxtrain_val_lt5pct.py)
+(`SHA-256: 701d9cca26c2f8101802448974febbe12fcc21892734da208123a3b2fa4023fb`; pre-launch manifest
+`target/s3-multilevel-training-20261023/maxtrain97_val_lt5pct_split_and_dispatch_manifest.json`
+`SHA-256: 6ad04935...`; round/pass accounting addendum
+`target/s3-multilevel-training-20261023/maxtrain97_training_round_and_pass_accounting_addendum.json`)
+evaluates **`100%` of the validation split population at every training round `R0..R8`** and computes
+`200x` **dataset-grouped bootstrap standard errors (`SE`) and 95% CIs** (`_dataset_grouped_bootstrap`,
+aggregating splits to dataset means before resampling datasets with replacement), while preserving
+all historical checkpoints (`dope_mlc_v2_s3_best.pt`, `dope_mlc_v2_disjoint1000_best.pt`) and
+receipts untouched:
+
+- **Training-Round vs. Full-Population Pass Accounting (`R0..R8`)**:
+  In `maxtrain_val_lt5pct.py:363-402`, the loop index `ep = 1..8` iterates over 6 disjoint training
+  shards (`R1..R6`, completing **`1.000000×` full-population pass at `R6`**) followed by 2 additional
+  refinement shard rounds (`R7..R8`, reaching **`1.333351×`** effective full-population passes in
+  Track 1 and **`1.333333×`** in Track 2) and logs raw JSON receipt keys `"epoch": 0..8` and
+  `"splits_visited_cumulative"`. Accordingly, `R0..R8` are reported as **Training Rounds (`R0..R8`)**
+  alongside **Attempted Cumulative Split Visits**, **Effective Full-Population Passes**, and
+  **Scheduled Optimizer Updates** (`batch_accum = 32`; actual finite-gradient accumulation counts
+  were not separately logged in the raw receipts).
+- **Track 1 — Full-Corpus `DOPE-MLC-v2` (`v2_full_corpus_maxtrain97_val3pct`, `s3_training_maxtrain97_val3pct_convergence_receipt.json` `SHA-256: 3025e025...`, Checkpoint `dope_mlc_v2_s3_maxtrain97_best.pt` `SHA-256: 11e64c63...`)**:
+  - **Dataset & Split Partition (`int(sha256(dataset_id)[:8], 16) % 32 == 0`)**: **`3,073 / 3,188` training datasets (`96.3927%`)** and **`18,395 / 19,079` training splits (`96.4149%`, `+1,207` splits vs. historical `17,188`)** vs. **`115 / 3,188` unseen validation datasets (`3.6073% < 5%`)** and **`684 / 19,079` validation splits (`3.5851% < 5%`: `87` regression DS / `519` splits, `28` binary DS / `165` splits; `0` dataset overlap with training)**. Because `295` former `10%`-validation datasets from `s3_training_convergence_receipt.json` are reassigned into the `3,073`-dataset training pool, Track 1 is explicitly classified as `in_corpus_full_s3_track_with_295_reused_v2_dev_val_datasets_not_disjoint_from_1000_eval` (`unqualified_for_historical_1000_v2_or_1069_v3_benchmark_claims_until_dedicated_full_panel_evaluation`).
+  - **Trajectory Summary (`100%` Full `684`-Split Validation Every Round)**: Across `R0..R8` (`24,527` cumulative split visits = `1.333351×` passes, `768` scheduled updates), `600`-split training monitor loss decreases from `0.41216 ± 0.00866` (`R0`) to **`0.35175 ± 0.01022`** (`R8*`), and **full `684/684`-split unseen validation loss** decreases by **`-16.52%`** from `0.40988 ± 0.01767` (`R0`, 95% CI `[0.38301, 0.45101]`) to **`0.34216 ± 0.01621`** (`R8*`, selected best & final round, `reevaluated_best_state_val_loss = 0.34216`, 95% CI `[0.31104, 0.36990]`), maintaining strict monotonic tier ordering `Loss(Ultra) < Loss(High) < Loss(Medium)` at every round `R0..R8`:
+
+| Training Round (`raw epoch`) | Cumulative Splits Visited | Effective Full-Pop Passes (`18,395` Train Splits) | Scheduled Updates (`batch=32`) | Train Monitor (`600` Splits) Mean $\pm$ SE | Full Val (`684/684` Splits, `115` DS) Mean $\pm$ SE `[95% CI]` | Val `Medium` (`4 KiB`) $\pm$ SE | Val `High` (`16 KiB`) $\pm$ SE | Val `Ultra` (`64 KiB`) $\pm$ SE | Reg (`87` DS) / Bin (`28` DS) Mean $\pm$ SE |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `R0` (`epoch=0`) | `0` | `0.000000×` | `0` | `0.41216 ± 0.00866` | **`0.40988 ± 0.01767`** `[0.38301, 0.45101]` | `0.42542 ± 0.01727` | `0.40850 ± 0.01779` | **`0.39572 ± 0.01807`** | `0.40301 ± 0.02227` / `0.43147 ± 0.02139` |
+| `R1` (`epoch=1`) | `3,066` | `0.166676×` | `96` | `0.35967 ± 0.00960` | **`0.34878 ± 0.01894`** `[0.32026, 0.39003]` | `0.37269 ± 0.01876` | `0.34477 ± 0.01910` | **`0.32889 ± 0.01936`** | `0.33254 ± 0.02337` / `0.39986 ± 0.02419` |
+| `R2` (`epoch=2`) | `6,132` | `0.333351×` | `192` | `0.35359 ± 0.00960` | **`0.34308 ± 0.01846`** `[0.31038, 0.38084]` | `0.36488 ± 0.01819` | `0.33930 ± 0.01858` | **`0.32506 ± 0.01906`** | `0.32709 ± 0.02469` / `0.39338 ± 0.02437` |
+| `R3` (`epoch=3`) | `9,198` | `0.500027×` | `288` | `0.35331 ± 0.01000` | **`0.34256 ± 0.01995`** `[0.30593, 0.38080]` | `0.36464 ± 0.01947` | `0.33854 ± 0.02015` | **`0.32450 ± 0.02067`** | `0.32642 ± 0.02406` / `0.39333 ± 0.02311` |
+| `R4` (`epoch=4`) | `12,264` | `0.666703×` | `384` | `0.35324 ± 0.00999` | **`0.34379 ± 0.01804`** `[0.31376, 0.37975]` | `0.36459 ± 0.01772` | `0.34017 ± 0.01812` | **`0.32661 ± 0.01867`** | `0.32800 ± 0.02454` / `0.39345 ± 0.02331` |
+| `R5` (`epoch=5`) | `15,330` | `0.833379×` | `480` | `0.35250 ± 0.00946` | **`0.34230 ± 0.01946`** `[0.30710, 0.37750]` | `0.36442 ± 0.01940` | `0.33843 ± 0.01959` | **`0.32404 ± 0.01982`** | `0.32600 ± 0.02202` / `0.39356 ± 0.02422` |
+| `R6` (`epoch=6`, `1.00×` Pass) | `18,395` | `1.000000×` | `576` | `0.35238 ± 0.01092` | **`0.34264 ± 0.01976`** `[0.30282, 0.37724]` | `0.36432 ± 0.01962` | `0.33912 ± 0.02002` | **`0.32448 ± 0.02001`** | `0.32661 ± 0.02547` / `0.39305 ± 0.02202` |
+| `R7` (`epoch=7`) | `21,461` | `1.166676×` | `672` | `0.35208 ± 0.00981` | **`0.34216 ± 0.01779`** `[0.30806, 0.37548]` | `0.36417 ± 0.01737` | `0.33839 ± 0.01801` | **`0.32391 ± 0.01849`** | `0.32609 ± 0.02143` / `0.39269 ± 0.02452` |
+| **`R8*` (`epoch=8`, Selected Best & Final)** | `24,527` | `1.333351×` | `768` | `0.35175 ± 0.01022` | **`0.34216 ± 0.01621`** `[0.31104, 0.36990]` | `0.36407 ± 0.01608` | `0.33844 ± 0.01635` | **`0.32396 ± 0.01672`** | `0.32614 ± 0.02142` / `0.39255 ± 0.02317` |
+
+- **Track 2 — Strictly Disjoint-1,000 `DOPE-MLC-v2` (`v2_disjoint1000_maxtrain97_devval345`, `s3_training_disjoint1000_devval345_convergence_receipt.json` `SHA-256: e510a630...`, Checkpoint `dope_mlc_v2_disjoint1000_maxtrain97_best.pt` `SHA-256: 3886676a...`)**:
+  - **Dataset & Split Partition (`0` Overlap with `1,132` Evaluation Candidates)**: **`2,001 / 2,059` training datasets (`97.1831%`)** and **`11,976 / 12,321` training splits (`97.1999%`)** vs. **`58 / 2,059` `dev_val` datasets (`2.8169% < 5%`)** and **`345 / 12,321` `dev_val` splits (`2.8001% < 5%`: `41` regression DS / `243` splits, `17` binary DS / `102` splits)**, eliminating the historical `val_sub` evaluation-candidate monitor during training.
+  - **Trajectory Summary (`100%` Full `345`-Split `dev_val` Every Round)**: Across `R0..R8` (`15,968` cumulative split visits = `1.333333×` passes, `504` scheduled updates), `600`-split training monitor loss decreases from `0.47854 ± 0.00904` (`R0`) to **`0.41492 ± 0.00937`** (`R8`), and **full `345/345`-split `dev_val` loss** decreases by **`-5.48%`** from `0.60691 ± 0.01915` (`R0`) to **`0.57363 ± 0.02131`** at selected best round **`R5*`** (`0.833333×` passes, `reevaluated_best_state_val_loss = 0.57363`, 95% CI `[0.52561, 0.61162]`; `Ultra 0.56909 ± 0.02190 < High 0.57383 ± 0.02155 < Medium 0.57798 ± 0.02078`) and **`0.57371 ± 0.02074`** at final round `R8` (`1.333333×` passes; `Ultra 0.56935 ± 0.02174 < High 0.57394 ± 0.02098 < Medium 0.57784 ± 0.01980`):
+
+| Training Round (`raw epoch`) | Cumulative Splits Visited | Effective Full-Pop Passes (`11,976` Train Splits) | Scheduled Updates (`batch=32`) | Train Monitor (`600` Splits) Mean $\pm$ SE | Full `dev_val` (`345/345` Splits, `58` DS) Mean $\pm$ SE `[95% CI]` | `dev_val` `Medium` $\pm$ SE | `dev_val` `High` $\pm$ SE | `dev_val` `Ultra` $\pm$ SE | Reg (`41` DS) / Bin (`17` DS) Mean $\pm$ SE |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `R0` (`epoch=0`) | `0` | `0.000000×` | `0` | `0.47854 ± 0.00904` | **`0.60691 ± 0.01915`** `[0.57115, 0.64344]` | `0.61345 ± 0.01834` | `0.60194 ± 0.01932` | **`0.60535 ± 0.01990`** | `0.63276 ± 0.02228` / `0.54533 ± 0.02556` |
+| `R1` (`epoch=1`) | `1,996` | `0.166667×` | `63` | `0.42499 ± 0.00864` | **`0.58960 ± 0.02298`** `[0.54024, 0.63502]` | `0.59437 ± 0.02193` | `0.58906 ± 0.02347` | **`0.58536 ± 0.02392`** | `0.61660 ± 0.03024` / `0.52527 ± 0.02387` |
+| `R2` (`epoch=2`) | `3,992` | `0.333333×` | `126` | `0.41636 ± 0.00953` | **`0.57558 ± 0.02163`** `[0.53243, 0.61414]` | `0.57933 ± 0.02115` | `0.57586 ± 0.02199` | **`0.57154 ± 0.02211`** | `0.60058 ± 0.02545` / `0.51602 ± 0.02636` |
+| `R3` (`epoch=3`) | `5,988` | `0.500000×` | `189` | `0.41625 ± 0.00967` | **`0.57433 ± 0.02170`** `[0.52461, 0.61121]` | `0.57829 ± 0.02114` | `0.57432 ± 0.02195` | **`0.57037 ± 0.02231`** | `0.59927 ± 0.02549` / `0.51490 ± 0.02468` |
+| `R4` (`epoch=4`) | `7,984` | `0.666667×` | `252` | `0.41548 ± 0.00925` | **`0.57652 ± 0.02030`** `[0.52820, 0.61198]` | `0.57867 ± 0.01976` | `0.57719 ± 0.02076` | **`0.57370 ± 0.02078`** | `0.60250 ± 0.02715` / `0.51463 ± 0.02272` |
+| **`R5*` (`epoch=5`, Selected Best `best_state`)** | `9,980` | `0.833333×` | `315` | `0.41521 ± 0.00932` | **`0.57363 ± 0.02131`** `[0.52561, 0.61162]` | `0.57798 ± 0.02078` | `0.57383 ± 0.02155` | **`0.56909 ± 0.02190`** | `0.59855 ± 0.02632` / `0.51428 ± 0.02442` |
+| `R6` (`epoch=6`, `1.00×` Pass) | `11,976` | `1.000000×` | `378` | `0.41516 ± 0.00942` | **`0.57493 ± 0.02208`** `[0.52872, 0.61125]` | `0.57829 ± 0.02157` | `0.57536 ± 0.02237` | **`0.57113 ± 0.02268`** | `0.60052 ± 0.02879` / `0.51396 ± 0.02258` |
+| `R7` (`epoch=7`) | `13,972` | `1.166667×` | `441` | `0.41506 ± 0.00906` | **`0.57402 ± 0.01972`** `[0.52692, 0.61484]` | `0.57796 ± 0.01927` | `0.57429 ± 0.01999` | **`0.56982 ± 0.02027`** | `0.59934 ± 0.02630` / `0.51371 ± 0.02432` |
+| `R8` (`epoch=8`, Final Round) | `15,968` | `1.333333×` | `504` | `0.41492 ± 0.00937` | **`0.57371 ± 0.02074`** `[0.53669, 0.61258]` | `0.57784 ± 0.01980` | `0.57394 ± 0.02098` | **`0.56935 ± 0.02174`** | `0.59890 ± 0.02657` / `0.51370 ± 0.02233` |
 
 ---
 
@@ -141,9 +221,9 @@ official pretrained KumoTabular/TabPFN foundation-model comparison is not perfor
     `d181d4da916c742b` excluded during tensor cache build due to degenerate binary target splits;
     `0` in the completed `1,000`) and holding out the **`58` training-family validation datasets
     (`dev_val_only`, `345` splits; `0` overlap with both the `2,001` training datasets and the
-    `1,132` evaluation candidates)**. On `dev_val_only` (`58` datasets, `345` splits), validation
+    `1,132` evaluation candidates)**. On `dev_val_only` (`58` datasets, `345` splits; `dev_val_only_convergence` in `s3_training_disjoint1000_convergence_receipt.json`, `SHA-256: 60e8081bc23c210294558881eb3fd7eabb04e0a0bd5a574b0c47288cf1a7078a`), validation
     loss converged from `0.60288` (`Epoch 0`) to **`0.57414` (`Epoch 8`)** with strict monotonic
-    tier ordering (`Ultra = 0.57053 < High = 0.57397 < Medium = 0.57791`). Because `Epoch 8` was
+    tier ordering (`Ultra = 0.57053 < High = 0.57397 < Medium = 0.57791`), while the receipt's per-epoch `convergence_history` (`Epochs 0..8`, `15,968` cumulative splits) recorded the `600`-split training monitor (`0.45380 -> 0.39686`) and the prior `600`-split `val_sub` monitor drawn from the `6,758` held-out evaluation splits in cache (`0.32574 -> 0.24904` at `Epochs 5` and `8`, `selected_epoch = 8`). Because `Epoch 8` was
     also monitored on `val_sub` during the initial reconciliation pass, all four cohorts are
     reported as **development/reconciliation validation evidence** (never claimed as an untouched
     sealed confirmatory test).
@@ -154,7 +234,7 @@ official pretrained KumoTabular/TabPFN foundation-model comparison is not perfor
 |---|---:|---|---:|---:|---|---:|---:|---:|---:|
 | **`strictly_dataset_disjoint_242`** | **`242`** | `0` splits in gradient training (`10%` val hash split, dev-selected) | **`1671.1` `[1655.2, 1688.0]` (`#1`)** | **`73.06%`** | **`1626.7` $\to$ `1690.5` $\to$ `1703.7`** | `0.8122` / `0.8991` | `0.8464` / `0.9327` | **`0.8493` / `0.9275`** | **`0.8034` `[0.7905, 0.8147]` (`D80` pass)** |
 | **`in_corpus_unseen_row_fold_758`** | **`758`** | In-corpus dataset IDs, unseen `outer5-iid-fold0-v1` test rows (`row-disjoint`) | **`1645.4` `[1637.8, 1653.6]` (`#1`)** | **`69.81%`** | **`1587.6` $\to$ `1676.4` $\to$ `1682.3`** | `0.8779` / `0.9439` | `0.9133` / `0.9692` | **`0.9129` / `0.9716`** | **`0.7851` `[0.7779, 0.7918]`** |
-| **`pooled_1000` (Preserved Initial)** | **`1,000`** | `242` strictly held-out + `758` in-corpus unseen test folds (`task-797`, ckpt `1d5db98f...` Epoch 8) | **`1651.3` `[1643.4, 1659.3]` (`#1`)** | **`70.58%`** | **`1596.8` $\to$ `1679.6` $\to$ `1687.2`** *(per-auditor)* / `1610.6` $\to$ `1726.6` $\to$ `1742.0` *(DS-mean)* | `0.8620` / `0.9335` | `0.8971` / `0.9642` | **`0.8975` / `0.9658`** | **`0.7896` `[0.7831, 0.7959]`** |
+| **`pooled_1000` (Preserved Initial)** | **`1,000`** | `242` strictly held-out + `758` in-corpus unseen test folds (`task-797`, ckpt `1d5db98f...` Epoch 7 `best_state`; receipt `final_best_val` field = Epoch 8) | **`1651.3` `[1643.4, 1659.3]` (`#1`)** | **`70.58%`** | **`1596.8` $\to$ `1679.6` $\to$ `1687.2`** *(per-auditor)* / `1610.6` $\to$ `1726.6` $\to$ `1742.0` *(DS-mean)* | `0.8620` / `0.9335` | `0.8971` / `0.9642` | **`0.8975` / `0.9658`** | **`0.7896` `[0.7831, 0.7959]`** |
 | **`reconciled_strictly_dataset_disjoint_1000`** | **`1,000`** | **`0` overlap** between `2,001` gradient-training datasets and all `1,132` eval candidates (`ckpt 6fcc191a...`, fixed `Epoch 8` verified on `58` `dev_val` datasets; prior `val_sub` monitoring disclosed) | **`1650.7` `[1643.4, 1657.5]` (`#1`)** | **`70.51%`** | **`1596.1` $\to$ `1675.5` $\to$ `1690.1`** | `0.8620` / `0.9349` | `0.8946` / `0.9624` | **`0.8998` / `0.9671`** | **`0.7904` `[0.7844, 0.7972]`** |
 
 ### 4.3 Overall 1,000-Dataset Multi-Auditor Bradley–Terry Elo Leaderboard (Preserved Pooled & Reconciled 100% Disjoint)
@@ -309,6 +389,9 @@ cargo build --manifest-path engine/Cargo.toml --bin dope
 python3 -B -m research.levels.rust_v3_parity
 DOPE_REQUIRE_RUST_PARITY=1 cargo test --manifest-path engine/Cargo.toml -p dope-core --test mlc_v3_safetensors
 DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dope_mlc_v3
+
+# 12. Run <5% validation (96.4%–97.2% train) 3-track convergence & v3 matched-budget A0..A3 ablation
+python3 -B -m research.levels.maxtrain_val_lt5pct
 ```
 
 ---
@@ -333,7 +416,7 @@ DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dop
 | **Total Catalog** | **All 6 active cross-role `train_sha256` overlaps = `0`** *(proves exact file/table SHA disjointness, not upstream benchmark-family disjointness)* | `2,589` reg, `863` bin, `322` `multi_label`, `85` `timeseries` | **`3,859`** | — | **`724` measured cells (`181` DS) + `4` skip records = `728` rows** | Hash-bound scope & audit addendum: `target/s3-multilevel-training-20261023/v3/v3_task2354_task2502_scope_and_audit_addendum.json`. |
 
 ### 7.3 Matched `A0 -> A1 -> A2 -> A3` Ablation Progression (`task-2354`, `v3_dev_val_ablation_and_multitask_receipt.json`, `SHA-256: ce58d6b8...`)
-- Trained for `4` epochs over the `677`-cell training pool (`480` reg/bin + `197` multiclass) warm-started from `dope_mlc_v2_disjoint1000_best.pt`, evaluated on the `110` `dev_val_ablation` cells (`40` regression, `17` binary, `53` multiclass; frozen `A3` checkpoint archived at `target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.pt`, `SHA-256: a36510b9...`):
+- Trained for `4` epochs over the `677`-cell training pool (`480` reg/bin + `197` multiclass) warm-started from `dope_mlc_v2_disjoint1000_best.pt`, evaluated on the `110` `dev_val_ablation` cells (`40` regression, `17` binary, `53` multiclass; frozen `A3` checkpoint archived at `target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.pt`, `SHA-256: a36510b9...`). Note that `A0..A3` are **architectural ablation variants** evaluated post-training (not temporal training epochs), and per-epoch `DOPE-MLC-v3` training/validation loss histories were not recorded in `v3_dev_val_ablation_and_multitask_receipt.json`:
 
 | Ablation Variant | Mean `dev_val` Total Loss (`110` Cells) | `cond_y` Loss | `driver` Loss | By-Tier Total Loss (`Small / Med / High / Ultra`) | By-Task Total Loss (`Reg / Bin / Multiclass`) | `col_gate_head` Grad Norm / Column Std |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -341,6 +424,36 @@ DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dop
 | **`A1_plus_16_building_blocks`** | `0.82908` | `0.81201` | `0.03969` | `0.84613 / 0.83950 / 0.82013 / 0.81056` | `0.61014 / 0.50964 / 1.09678` | `0.000000 / 0.000000` |
 | **`A2_plus_48_inter_landmark_stats`** | `0.82757` | `0.81048` | `0.03963` | `0.84582 / 0.83902 / 0.81792 / 0.80753` | `0.60769 / 0.50927 / 1.09562` | `0.000000 / 0.000000` |
 | **`A3_full_v3_with_col_gate_head`** | **`0.82748`** | **`0.81041`** | **`0.03954`** | **`0.84579 / 0.83900 / 0.81781 / 0.80732`** | **`0.60746 / 0.50920 / 1.09562`** | **`0.000721 / 0.003894`** |
+
+#### 7.3.1 Maximized-Training (`96.74%` Loaded Train, `< 5%` Validation) Disjoint-1,069 `DOPE-MLC-v3` Multi-Task Convergence & Matched-Budget `A0..A3` Ablation (`task-4221`, `v3_maxtrain97_val3pct`)
+- Bound to `target/s3-multilevel-training-20261023/v3/v3_maxtrain97_val3pct_convergence_receipt.json` (`SHA-256: 9e21851914fbaf6133fe4c4c87cc9eea2a802154d8b806a5cdf4958abe858b3f`), `target/s3-multilevel-training-20261023/v3/v3_maxtrain97_corpus_exposure_and_split_manifest.json` (`SHA-256: 1c75ff09...`), and checkpoint `target/s3-multilevel-training-20261023/v3/dope_mlc_v3_maxtrain97_best.pt` (`SHA-256: 77ffb94f50060bfe147b6c5bb6d3b91f9e2099e0a5cfa8a1a7e34dbecb8e1dc0`; preserved `dope_mlc_v3_multitask_best.pt` remains the canonical checkpoint for Sections 7.4–9.6):
+- **Loaded 1-Episode-Cell-Per-Dataset Pool (`2,304` Cells) vs. Pre-Load Catalog Manifest (`2,311` Datasets) & 6-Split Catalog Reference**:
+  - In the pre-load catalog manifest (`v3_maxtrain97_corpus_exposure_and_split_manifest.json`), `2,235 / 2,311` non-evaluation datasets (`96.7114%`: `2,001` reg/bin + `234` multiclass, including `36` former `v3` `dev_val` multiclass datasets flagged `v3_mc_dev_val_54_development_exposed`) are assigned to `train_gradient`, and `76 / 2,311` datasets (`3.2886% < 5%`: `58` reg/bin `dev_val_58` + `18` multiclass `71 <= sha256(canonical_sha256) % 100 < 75`) are assigned to `dev_val_ablation`, with **`0` overlap** against the `1,000` `v2` evaluation datasets and `69` held-out multiclass evaluation datasets (`1,069` evaluation datasets).
+  - The `v3` training loader uses **1 episode cell per dataset** (`fit-iid-65-v1` for regression/binary and 1 inner train-blob split for multiclass), yielding **`2,229 / 2,304` loaded training episode cells (`96.7448%`: `1,997` reg/bin + `232` multiclass, `+1,552` unique cells vs. `677` in `task-2354`)** and **`75 / 2,304` loaded `dev_val` episode cells (`3.2552% < 5%`: `40` regression, `17` binary, `18` multiclass across `k=3..10` classes)** (`7` datasets lack an admitted `fit-iid-65-v1` or non-degenerate 3-class inner split). The raw receipt field `val_split_pct_across_all_6_reg_bin_splits_plus_mc = 2.8876%` (`363 / (12,208 + 363)`) is a 6-split catalog reference denominator, not the loaded 1-cell-per-dataset `v3_maxtrain97` episode pool.
+- **Training-Round Schedule (`R0..R8`) & `A3_full_v3_with_col_gate_head` Full-Validation Trajectory**:
+  - Each variant (`A0..A3`, warm-started from `dope_mlc_v2_disjoint1000_maxtrain97_best.pt`) is trained for **`8` quarter-pool shard rounds (`R1..R8`)**, visiting `4,457` cumulative episode cells across `2,229` unique training cells (**`1.999551×` effective full-population passes**, completing `1.000000×` pass at `R4` and `2.00×` at `R8`, with `280` scheduled optimizer updates at `batch_accum = 16`).
+  - Evaluating **`100%` of the `75` loaded `dev_val` episode cells across all 4 tiers (`Small`, `Medium`, `High`, `Ultra`) at every round `R0..R8`** reduces `A3` full `dev_val` loss by **`-1.77%`** from `0.69727 ± 0.03888` (`R0`, 95% CI `[0.62909, 0.76794]`) to **`0.68492 ± 0.03877`** (`R8*`, selected best & final round, 95% CI `[0.60885, 0.76099]`) and `600`-cell training monitor loss from `0.47454 ± 0.01122` (`R0`) to **`0.46132 ± 0.01064`** (`R8*`), with strict monotonic 4-tier hierarchy `Loss(Ultra) < Loss(High) < Loss(Medium) < Loss(Small)` at `R0` and `R4..R8`:
+
+| Training Round (`raw epoch`) | Cumulative Cells Visited | Effective Full-Pop Passes (`2,229` Loaded Cells) | Scheduled Updates (`batch=16`) | Train Monitor (`600` Cells) Mean $\pm$ SE | Full `dev_val` (`75/75` Cells) Mean $\pm$ SE `[95% CI]` | `Small` / `Med` / `High` / `Ultra` Mean Loss | Reg (`40`) / Bin (`17`) / MC (`18`) Mean $\pm$ SE |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `R0` (`epoch=0`) | `0` | `0.000000×` | `0` | `0.47454 ± 0.01122` | **`0.69727 ± 0.03888`** `[0.62909, 0.76794]` | `0.70427 / 0.70162 / 0.69407 / 0.68914` | `0.61072±0.03144` / `0.52099±0.02344` / `1.05611±0.10857` |
+| `R1` (`epoch=1`) | `558` | `0.250336×` | `35` | `0.46372 ± 0.01182` | **`0.68797 ± 0.03728`** `[0.61932, 0.76691]` | `0.69614 / 0.69264 / 0.68287 / 0.68022` | `0.60274±0.03265` / `0.51215±0.02634` / `1.04342±0.09998` |
+| `R2` (`epoch=2`) | `1,115` | `0.500224×` | `70` | `0.46344 ± 0.01130` | **`0.68909 ± 0.04013`** `[0.61742, 0.75956]` | `0.69600 / 0.69252 / 0.68368 / 0.68415` | `0.60409±0.02954` / `0.51263±0.02510` / `1.04462±0.10873` |
+| `R3` (`epoch=3`) | `1,672` | `0.750112×` | `105` | `0.46390 ± 0.01148` | **`0.69066 ± 0.03868`** `[0.61668, 0.76062]` | `0.69583 / 0.69262 / 0.68649 / 0.68770` | `0.60644±0.03563` / `0.51271±0.02268` / `1.04588±0.10235` |
+| `R4` (`epoch=4`, `1.00×` Pass) | `2,229` | `1.000000×` | `140` | `0.46225 ± 0.01191` | **`0.68548 ± 0.03923`** `[0.60666, 0.76152]` | `0.69526 / 0.69169 / 0.68020 / 0.67475` | `0.60078±0.03067` / `0.50922±0.02428` / `1.04015±0.10534` |
+| `R5` (`epoch=5`) | `2,786` | `1.249888×` | `175` | `0.46198 ± 0.01211` | **`0.68542 ± 0.04251`** `[0.59961, 0.76024]` | `0.69491 / 0.69146 / 0.67993 / 0.67537` | `0.60163±0.03530` / `0.50943±0.02264` / `1.03782±0.09778` |
+| `R6` (`epoch=6`) | `3,343` | `1.499776×` | `210` | `0.46155 ± 0.00991` | **`0.68583 ± 0.04117`** `[0.60148, 0.76176]` | `0.69479 / 0.69143 / 0.68024 / 0.67686` | `0.60171±0.03245` / `0.50938±0.02433` / `1.03941±0.09458` |
+| `R7` (`epoch=7`) | `3,900` | `1.749664×` | `245` | `0.46140 ± 0.01067` | **`0.68493 ± 0.03435`** `[0.62129, 0.75603]` | `0.69478 / 0.69128 / 0.67956 / 0.67411` | `0.60088±0.03063` / `0.50879±0.02202` / `1.03806±0.10444` |
+| **`R8*` (`epoch=8`, Selected Best & Final)** | `4,457` | `1.999551×` | `280` | `0.46132 ± 0.01064` | **`0.68492 ± 0.03877`** `[0.60885, 0.76099]` | `0.69473 / 0.69128 / 0.67958 / 0.67408` | `0.60091±0.03066` / `0.50884±0.02333` / `1.03791±0.10093` |
+
+- **Matched-Budget `A0 -> A1 -> A2 -> A3` Ablation Under `< 5%` Validation (`8` Rounds / `4,457` Visits = `1.999551×` Passes Each)**:
+
+| Ablation Variant (`8` Rounds, `4,457` Visits = `1.999551×` Passes) | Best Round (`raw epoch`) | Best Full `dev_val` (`75/75` Cells) Mean $\pm$ SE `[95% CI]` | Final `R8` Full `dev_val` Mean $\pm$ SE | `R8` `cond_y` / `driver` Loss | `R8` By-Tier Loss (`Small / Med / High / Ultra`) | `R8` By-Task Loss (`Reg / Bin / MC`) | `col_gate_head` Grad Norm / Col Std |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`A0_v2_baseline_140`** | `R5` (`5`) | **`0.68700 ± 0.04276`** `[0.59970, 0.76184]` | `0.68709 ± 0.03910` | `0.66769 / 0.04572` | `0.69578 / 0.69233 / 0.68186 / 0.67837` | `0.60132 / 0.51169 / 1.04331` | `0.000000 / 0.000000` |
+| **`A1_plus_16_building_blocks`** | `R7` (`7`) | **`0.68531 ± 0.03433`** `[0.62170, 0.75654]` | `0.68547 ± 0.03877` | `0.66684 / 0.04168` | `0.69480 / 0.69146 / 0.68003 / 0.67560` | `0.60170 / 0.50893 / 1.03837` | `0.000000 / 0.000000` |
+| **`A2_plus_48_inter_landmark_stats`** | `R8` (`8`) | **`0.68489 ± 0.03877`** `[0.60873, 0.76098]` | `0.68489 ± 0.03877` | `0.66630 / 0.04160` | `0.69474 / 0.69126 / 0.67960 / 0.67395` | `0.60087 / 0.50896 / 1.03773` | `0.000000 / 0.000000` |
+| **`A3_full_v3_with_col_gate_head`** | `R8` (`8`) | **`0.68492 ± 0.03877`** `[0.60885, 0.76099]` | `0.68492 ± 0.03877` | `0.66636 / 0.04143` | `0.69473 / 0.69128 / 0.67958 / 0.67408` | `0.60091 / 0.50884 / 1.03791` | `0.001014 / 0.005489` |
 
 ### 7.4 Held-Out Multiclass Panel (`68` Initial & `69` Total Datasets) — Complete `DML3` Wire Bytes, Preliminary 2-Auditor vs. 6-Auditor Probes & Isolated-Receiver `CSC1` Raw-Domain Qualification
 - Bound to `target/s3-multilevel-training-20261023/v3/v3_per_dataset_multitask_ledger.jsonl.gz` (`SHA-256: 8574f2d71afc2526f5134192c3d76dcd3e5b1a13e023469208529019065ad09a`, `724` measured dataset-tier cells across `181` datasets + `4` historical skip records = `728` rows, `measurement_provenance = "frozen_checkpoint_replay"` — a **new frozen-checkpoint replay**, not recovered `task-2354` raw measurements), `target/s3-multilevel-training-20261023/v3/v3_multitask_ledger_receipt.json` (`SHA-256: 44b22686...`), and `target/s3-multilevel-training-20261023/v3/v3_task2354_task2502_scope_and_audit_addendum.json`:
