@@ -159,8 +159,25 @@ class Elo(unittest.TestCase):
         self.assertEqual(macros["MlcVThreeMaxTrainLossBest"], "0.68492")
         self.assertEqual(macros["MlcVThreeMaxTrainLoadedPool"], "2{,}304")
         readme_block = (ROOT / "bench/real-world/results/readme-block.md").read_text(encoding="utf-8")
-        for needle in ("0.34216 ± 0.01621", "1.333351×", "0.57363 ± 0.02131", "0.68492 ± 0.03877", "1.999551×", "3.2552% < 5%"):
+        for needle in (
+            "0.34216 ± 0.01621",
+            "1.333351×",
+            "0.57363 ± 0.02131",
+            "0.68492 ± 0.03877",
+            "1.999551×",
+            "3.2552% < 5%",
+            "(bench/real-world/figures/convergence.png)",
+        ):
             self.assertIn(needle, readme_block)
+        vts = snap["value_and_testing_scale_summary"]
+        cov = vts["cohort_overlap_and_validation_disclosure"]
+        scale = vts["testing_scale_distinct_units"]
+        self.assertEqual(cov["unique_eval_datasets_union_v2_and_v3"], 1069)
+        self.assertEqual(cov["overlap_between_v2_1000_and_v3_1069"], 1000)
+        self.assertEqual(scale["reconciled_catalog_datasets_total"], 3859)
+        self.assertEqual(scale["v2_downstream_auditor_fits_total"], 65874)
+        self.assertEqual(scale["v3_six_auditor_evaluations_per_domain"], 25656)
+        self.assertEqual(scale["ci_cpu_run_40159022870_test_assertions"]["total_executed_assertions_in_job"], 2457)
 
 
 if __name__ == "__main__":

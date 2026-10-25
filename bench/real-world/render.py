@@ -235,7 +235,7 @@ def audit(summary: dict, plt):
 
 
 def convergence(summary: dict, plt):
-    """DOPE-MLC-v2 and DOPE-MLC-v3 training and <5% full-validation loss curves across Training Rounds R0..R8."""
+    """2x2 dashboard: (A-B) v2 & v3 train monitor vs <5% full-val loss; (C) value vs wire bytes; (D) testing scale."""
     import numpy as np
     snap = multilevel_convergence_data()
     v2_old = snap["v2_full_corpus"]
@@ -243,73 +243,115 @@ def convergence(summary: dict, plt):
     t1 = snap["v2_full_corpus_maxtrain97_val3pct"]["rounds"]
     t2 = snap["v2_disjoint1000_maxtrain97_devval345"]["rounds"]
     t3_a3 = snap["v3_maxtrain97_val3pct"]["a3_rounds"]
-    t3_vars = snap["v3_maxtrain97_val3pct"]["matched_budget_ablation_progression_A0_to_A3"]
+    t3_a0 = snap["v3_maxtrain97_val3pct"]["matched_budget_ablation_progression_A0_to_A3"]["A0_v2_baseline_140"]
+    vs = snap["value_and_testing_scale_summary"]
     xs = np.array([r["raw_receipt_epoch_field"] for r in t1], dtype=float)
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 6.2))
+    fig, axes = plt.subplots(2, 2, figsize=(10.2, 6.8))
     ax_a, ax_b, ax_c, ax_d = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
-    # Panel A: Track 1 <5% Val (684/684 splits, 115/3,188 DS) vs Preserved 10%-Val
+    # Panel A: Track 1 DOPE-MLC-v2 Full Corpus (<5% Val: 684/684 splits, 115 DS) + Per-Tier Hierarchy
     t1_val = np.array([r["val_full"]["mean_total_loss"] for r in t1])
     t1_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t1])
     t1_tr = np.array([r["train_monitor_600"]["mean_total_loss"] for r in t1])
+    t1_ult = np.array([r["val_full"]["ultra"]["total_loss"] for r in t1])
+    t1_med = np.array([r["val_full"]["medium"]["total_loss"] for r in t1])
     old_val = np.array([e["val_monitor_600"]["mean_total_loss"] for e in eps_old])
     xf = 8.85
     ax_a.fill_between(xs, t1_val - t1_se, t1_val + t1_se, color=BLUE, alpha=0.16, lw=0)
-    ax_a.plot(xs, t1_val, marker="s", ms=4.2, lw=2.0, color=BLUE, label="Full 684/684 val ±1 SE (3.59% splits, R8* 0.34216, -16.5%)")
-    ax_a.plot(xs, t1_tr, marker="o", ms=3.8, lw=1.6, color="#15803d", ls="--", label="Train monitor (600/18,395 splits, R8 0.35175)")
-    ax_a.plot(xs, old_val, marker="^", ms=3.8, lw=1.5, color=GRAY, ls=":", label="Preserved 10%-val monitor (600/1,891, R7* 0.37667)")
-    ax_a.plot([xf], [full_old["mean_total_loss"]], marker="D", ms=5.5, color="#b91c1c", ls="none", label="Preserved full 1,891 eval (R7*: 0.37753)")
-    ax_a.axvline(8.42, color=GRAY, ls=":", lw=1.0)
+    ax_a.plot(xs, t1_val, marker="s", ms=4.2, lw=2.1, color=BLUE, label="Full 684/684 val mean ±1 SE (3.59% splits, R8* 0.34216, -16.5%)")
+    ax_a.plot(xs, t1_tr, marker="o", ms=3.8, lw=1.7, color="#15803d", ls="--", label="600/18,395 train monitor (subsampled, R0 0.41216 → R8 0.35175)")
+    ax_a.plot(xs, t1_ult, marker="*", ms=5.0, lw=1.4, color="#0f766e", ls="-.", label="Full 684/684 val Ultra 64 KiB (R8* 0.32396 ± 0.01672)")
+    ax_a.plot(xs, t1_med, marker="^", ms=3.6, lw=1.3, color=ORANGE, ls="-.", label="Full 684/684 val Medium 4 KiB (R8* 0.36407 ± 0.01608)")
+    ax_a.plot(xs, old_val, marker="d", ms=3.5, lw=1.3, color=GRAY, ls=":", label="Preserved 10%-val monitor (600/1,891, R7* 0.37667 | full 0.37753)")
+    ax_a.plot([xf], [full_old["mean_total_loss"]], marker="D", ms=5.5, color="#b91c1c", ls="none")
+    ax_a.axvline(8.42, color=GRAY, ls=":", lw=0.9)
     ax_a.set_xticks(list(range(9)) + [xf], ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*", "Full\n1891"])
-    ax_a.set_xlabel("Training Round (R1..R8 = 24,527 visits, 1.333× passes)")
-    ax_a.set_ylabel("Multi-task objective loss")
-    ax_a.set_title("A. DOPE-MLC-v2 Full Corpus (<5% Val: 684 Splits / 115 DS)", loc="left", color=INK, fontsize=8.6)
-    ax_a.legend(frameon=False, fontsize=6.5, loc="upper right")
-    # Panel B: Track 1 Per-Tier Hierarchy (<5% Val, 684/684 splits)
-    for key, col, mk, lbl in (
-        ("medium", ORANGE, "^", "Val Medium (4 KiB, R8* 0.36407 ± 0.01608)"),
-        ("high", BLUE, "o", "Val High (16 KiB, R8* 0.33844 ± 0.01635)"),
-        ("ultra", "#15803d", "*", "Val Ultra (64 KiB, R8* 0.32396 ± 0.01672)"),
-    ):
-        ys = np.array([r["val_full"][key]["total_loss"] for r in t1])
-        se = np.array([r["val_full"][key]["dataset_grouped_se"] for r in t1])
-        ax_b.fill_between(xs, ys - se, ys + se, color=col, alpha=0.11, lw=0)
-        ax_b.plot(xs, ys, marker=mk, ms=5.5 if mk == "*" else 4.2, lw=1.9, color=col, label=lbl)
-    ax_b.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*"])
-    ax_b.set_xlabel("Training Round (100% of 684 unseen splits evaluated/round)")
-    ax_b.set_ylabel("Unseen-dataset validation loss (±1 SE)")
-    ax_b.set_title("B. DOPE-MLC-v2 Per-Tier Hierarchy (Ultra < High < Medium)", loc="left", color=INK, fontsize=8.6)
-    ax_b.legend(frameon=False, fontsize=6.7, loc="upper right")
-    # Panel C: Track 2 Strictly Disjoint-1,000 (<5% Val: 345/345 dev_val splits, 58 DS)
+    ax_a.set_ylim(0.312, 0.455)
+    ax_a.set_xlabel("Training Round (24,527 visits / 18,395 splits = 1.333× passes)")
+    ax_a.set_ylabel("DOPE-MLC-v2 multi-task loss")
+    ax_a.set_title("A. DOPE-MLC-v2 Train Monitor vs. Full <5% Unseen Val Loss (3,188 DS)", loc="left", color=INK, fontsize=8.3)
+    ax_a.legend(frameon=False, fontsize=5.8, loc="upper right")
+    # Panel B: Disjoint-1,000 (v2) & Disjoint-1,069 (v3) Train Monitor vs Full <5% dev_val Loss
     t2_val = np.array([r["val_full"]["mean_total_loss"] for r in t2])
     t2_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t2])
     t2_tr = np.array([r["train_monitor_600"]["mean_total_loss"] for r in t2])
-    ax_c.fill_between(xs, t2_val - t2_se, t2_val + t2_se, color=BLUE, alpha=0.16, lw=0)
-    ax_c.plot(xs, t2_val, marker="s", ms=4.2, lw=2.0, color=BLUE, label="Full 345/345 dev_val ±1 SE (2.80% splits, R5* 0.57363)")
-    ax_c.plot([5], [t2_val[5]], marker="o", ms=8.0, fillstyle="none", mew=1.6, color="#b91c1c", ls="none", label="Saved best_state (R5* 0.57363 ± 0.02131; R8 0.57371)")
-    ax_c.plot(xs, t2_tr, marker="o", ms=3.8, lw=1.6, color=ORANGE, ls="--", label="Train monitor (600/11,976 splits, R8 0.41492)")
-    ax_c.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5*", "R6", "R7", "R8"])
-    ax_c.set_xlabel("Training Round (R1..R8 = 15,968 visits, 1.333× passes)")
-    ax_c.set_ylabel("Disjoint-1,000 objective loss")
-    ax_c.set_title("C. DOPE-MLC-v2 Disjoint-1,000 (<5% Val: 345 Splits / 58 DS)", loc="left", color=INK, fontsize=8.6)
-    ax_c.legend(frameon=False, fontsize=6.5, loc="upper right")
-    # Panel D: Track 3 DOPE-MLC-v3 Disjoint-1,069 (<5% Val: 75/2,304 loaded cells = 3.26%)
     a3_val = np.array([r["val_full"]["mean_total_loss"] for r in t3_a3])
     a3_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t3_a3])
-    ax_d.fill_between(xs, a3_val - a3_se, a3_val + a3_se, color="#15803d", alpha=0.14, lw=0)
-    for vkey, col, ls, mk, lbl in (
-        ("A0_v2_baseline_140", GRAY, ":", "v", "A0 baseline (140-d, R5* 0.68700 | R8 0.68709)"),
-        ("A1_plus_16_building_blocks", ORANGE, "--", "^", "A1 +68 building blocks (R7* 0.68531 | R8 0.68547)"),
-        ("A2_plus_48_inter_landmark_stats", BLUE, "-.", "o", "A2 +48 inter-landmark+attn (R8* 0.68489)"),
-        ("A3_full_v3_with_col_gate_head", "#15803d", "-", "s", "A3 full v3 + col_gate ±1 SE (R8* 0.68492 ± 0.03877)"),
+    a3_tr = np.array([r["train_monitor_600"]["mean_total_loss"] for r in t3_a3])
+    a0_val = np.array([pt["val_mean_total_loss"] for pt in t3_a0["round_val_loss_trajectory"]])
+    ax_b.fill_between(xs, a3_val - a3_se, a3_val + a3_se, color="#15803d", alpha=0.13, lw=0)
+    ax_b.fill_between(xs, t2_val - t2_se, t2_val + t2_se, color=BLUE, alpha=0.14, lw=0)
+    ax_b.plot(xs, a3_val, marker="s", ms=4.0, lw=2.0, color="#15803d", label="v3 A3 full 75/75 dev_val ±1 SE (3.26% of 2,304 pool, R8* 0.68492)")
+    ax_b.plot(xs, a0_val, marker="v", ms=3.5, lw=1.3, color=GRAY, ls=":", label="v3 A0 baseline 75/75 dev_val (140-d, R5* 0.68700 | R8 0.68709)")
+    ax_b.plot(xs, t2_val, marker="s", ms=4.0, lw=2.0, color=BLUE, label="v2 Disjoint-1k full 345/345 dev_val ±1 SE (2.80%, R5* 0.57363)")
+    ax_b.plot([5], [t2_val[5]], marker="o", ms=7.5, fillstyle="none", mew=1.5, color="#b91c1c", ls="none")
+    ax_b.plot(xs, a3_tr, marker="o", ms=3.6, lw=1.6, color="#15803d", ls="--", label="v3 A3 600/2,229 train monitor (1.9996× passes, R8 0.46132)")
+    ax_b.plot(xs, t2_tr, marker="o", ms=3.6, lw=1.6, color=ORANGE, ls="--", label="v2 Disjoint-1k 600/11,976 train monitor (1.333× passes, R8 0.41492)")
+    ax_b.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5*", "R6", "R7", "R8*"])
+    ax_b.set_ylim(0.395, 0.855)
+    ax_b.set_xlabel("Training Round (v2: 15,968 / 1.333×; v3: 4,457 / 2.00×)")
+    ax_b.set_ylabel("Multi-task objective loss")
+    ax_b.set_title("B. Disjoint-1,000 (v2) & 1,069 (v3) Train vs. <5% Val Loss", loc="left", color=INK, fontsize=8.3)
+    ax_b.legend(frameon=False, fontsize=5.8, loc="upper right")
+    # Panel C: Value vs Measured Wire Bytes Across 1,000 (v2) & 1,069 (v3) Selection-Exposed Datasets
+    ax_c.set_xscale("log")
+    v2_t = vs["v2_value_by_tier_1000ds"]
+    v3_t = vs["v3_value_by_role_and_tier_1069ds"]
+    tiers_v2 = ("medium", "high", "ultra")
+    tiers_v3 = ("small", "medium", "high", "ultra")
+    x_v2 = [v2_t[t]["exact_v2_latent_wire_median_bytes"] for t in tiers_v2]
+    y_v2 = [v2_t[t]["dope_mean_retention_R"] for t in tiers_v2]
+    lo_v2 = [y_v2[i] - v2_t[t]["dope_retention_R_ci95"][0] for i, t in enumerate(tiers_v2)]
+    hi_v2 = [v2_t[t]["dope_retention_R_ci95"][1] - y_v2[i] for i, t in enumerate(tiers_v2)]
+    ax_c.errorbar(x_v2, y_v2, yerr=[lo_v2, hi_v2], marker="o", ms=5.2, lw=2.1, color=BLUE, capsize=2.5,
+                  label="DOPE-MLC-v2 (1,000 DS, exact v2 med wire, 95% CI; Elo 1651.3 #1)")
+    for m_key, col, ls, mk, lbl in (
+        ("rows", ORANGE, "--", "s", "Rows @ nominal 4/16/64 KiB cap (1,000 DS, 95% CI; Elo 1593.3)"),
+        ("copula", GRAY, ":", "^", "Copula @ nominal 4/16/64 KiB cap (1,000 DS, 95% CI; Elo 1545.8)"),
     ):
-        ys = np.array([pt["val_mean_total_loss"] for pt in t3_vars[vkey]["round_val_loss_trajectory"]])
-        ax_d.plot(xs, ys, marker=mk, ms=4.0, lw=2.0 if vkey.startswith("A3") else 1.5, color=col, ls=ls, label=lbl)
-    ax_d.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*"])
-    ax_d.set_xlabel("Training Round (4,457 visits / 2,229 cells = 1.9996× passes)")
-    ax_d.set_ylabel("Full 75/75 loaded dev_val loss (3.26% pool)")
-    ax_d.set_title("D. DOPE-MLC-v3 Disjoint-1,069 A0..A3 (<5% Val: 75/2,304 Cells)", loc="left", color=INK, fontsize=8.6)
-    ax_d.legend(frameon=False, fontsize=6.4, loc="upper right")
-    fig.tight_layout()
+        xm = [v2_t[t]["nominal_cap_bytes"] for t in tiers_v2]
+        ym = [v2_t[t][f"{m_key}_mean_retention_R"] for t in tiers_v2]
+        lom = [ym[i] - v2_t[t][f"{m_key}_retention_R_ci95"][0] for i, t in enumerate(tiers_v2)]
+        him = [v2_t[t][f"{m_key}_retention_R_ci95"][1] - ym[i] for i, t in enumerate(tiers_v2)]
+        ax_c.errorbar(xm, ym, yerr=[lom, him], marker=mk, ms=4.2, lw=1.5, color=col, ls=ls, capsize=2.0, label=lbl)
+    x_v3p = [v3_t["eval_gradient_disjoint_v2_panel"][t]["mean_dml3_complete_wire_bytes"] for t in tiers_v3]
+    y_v3p = [v3_t["eval_gradient_disjoint_v2_panel"][t]["sender_scaled_6aud_mean_clipped_R"] for t in tiers_v3]
+    x_v3m = [v3_t["eval_gradient_disjoint_multiclass_panel"][t]["mean_dml3_complete_wire_bytes"] for t in tiers_v3]
+    y_v3m = [v3_t["eval_gradient_disjoint_multiclass_panel"][t]["sender_scaled_6aud_mean_clipped_R"] for t in tiers_v3]
+    ax_c.plot(x_v3p, y_v3p, marker="D", ms=4.4, lw=1.8, color="#15803d", ls="-.",
+              label="DOPE-MLC-v3 1,000-DS panel (mean DML3+CSC1 wire, 340-row 6-aud R)")
+    ax_c.plot(x_v3m, y_v3m, marker="P", ms=5.0, lw=1.7, color="#7c3aed", ls="-.",
+              label="DOPE-MLC-v3 69-DS multiclass (+0.253 ΔR vs copula, Elo 1540.9)")
+    kib_ticks(ax_c, 800.0, 65536.0)
+    ax_c.set_xlim(700.0, 82000.0)
+    ax_c.set_ylim(0.64, 0.94)
+    ax_c.set_xlabel("Wire bytes (v2: exact median wire; v3: mean DML3+CSC1; baselines: cap)")
+    ax_c.set_ylabel("Mean holdout retention R (6 auditors)")
+    ax_c.set_title("C. Value vs. Wire Bytes Across 1,000 (v2) & 1,069 (v3) Datasets", loc="left", color=INK, fontsize=8.3)
+    ax_c.legend(frameon=False, fontsize=5.8, loc="lower right")
+    # Panel D: Distinct Testing & Verification Scale (No Overlapping-Cohort Summation)
+    sc = vs["testing_scale_distinct_units"]
+    bars = [
+        ("CI/cpu test assertions\n(656 Rust + 1,801 Py; 834+ unique)", sc["ci_cpu_run_40159022870_test_assertions"]["total_executed_assertions_in_job"], "#475569"),
+        ("Reconciled catalog datasets\n(1,069 unique eval; 1,000 shared)", sc["reconciled_catalog_datasets_total"], "#0f766e"),
+        ("v3 completed DS-tier cells\n(1,069 DS × 4 tiers, 0 failed)", sc["v3_completed_dataset_tier_cells"], "#15803d"),
+        ("v2 bit-exact wire replay cells\n(1,000 DS × 3 tiers × 2 ckpts)", sc["v2_exact_wire_replay_cells_verified"], BLUE),
+        ("v2 pre-calculated CV splits\n(18,395 train + 684 <5% val)", sc["v2_precalculated_cv_splits_total"], "#1d4ed8"),
+        ("v3 6-auditor cell evaluations\n(4,276 cells × 6 auditors/domain)", sc["v3_six_auditor_evaluations_per_domain"], "#7c3aed"),
+        ("v2 downstream auditor fits\n(1,000 reg/bin DS × 6 auditors)", sc["v2_downstream_auditor_fits_total"], ORANGE),
+    ]
+    y_pos = np.arange(len(bars))
+    vals = [b[1] for b in bars]
+    cols = [b[2] for b in bars]
+    ax_d.barh(y_pos, vals, height=0.62, color=cols, alpha=0.88)
+    ax_d.set_xscale("log")
+    ax_d.set_xlim(1000.0, 260000.0)
+    ax_d.set_yticks(y_pos, [b[0] for b in bars], fontsize=6.7)
+    ax_d.grid(axis="y", visible=False)
+    for idx_b, val_b in enumerate(vals):
+        ax_d.text(val_b * 1.12, idx_b, f"{val_b:,}", va="center", ha="left", fontsize=7.2, fontweight="bold", color=INK)
+    ax_d.set_xlabel("Verified count (log scale; distinct non-summed receipt units)")
+    ax_d.set_title("D. Testing & Verification Scale (1,069 Unique Eval DS)", loc="left", color=INK, fontsize=8.3)
+    fig.tight_layout(rect=(0.01, 0.01, 0.99, 0.99))
     return fig
 
 
