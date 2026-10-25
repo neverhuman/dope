@@ -192,13 +192,37 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 <!-- END DOPE1 WALKTHROUGH -->
 
 <details>
-<summary><strong>Additional CLI subcommands, tier presets & SafeTensors DML3 sampling</strong></summary>
+<summary><strong>Download Pre-Trained DOPE-MLC-v3 & DOPE-MLC-v2 Models (`v1.0.0` Release), SafeTensors DML3 Sampling & CLI Options</strong></summary>
+
+All pre-trained `DOPE-MLC-v3` and `DOPE-MLC-v2` neural checkpoints, the sample `High`-tier `DML3+CSC1` wire packet (`packet_high_regression.dml3`), `MODEL_MANIFEST.json`, and `SHA256SUMS` are published as direct download assets on [GitHub Release `v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0):
 
 ```bash
+# 1. Download & verify pre-trained DOPE-MLC-v3 SafeTensors weights (1.70 MiB) + sample DML3 wire packet
+curl -fsSLO https://github.com/neverhuman/dope/releases/latest/download/dope_mlc_v3_multitask_best.safetensors
+curl -fsSLO https://github.com/neverhuman/dope/releases/latest/download/packet_high_regression.dml3
+curl -fsSLO https://github.com/neverhuman/dope/releases/latest/download/MODEL_MANIFEST.json
+curl -fsSLO https://github.com/neverhuman/dope/releases/latest/download/SHA256SUMS
+grep -E " (dope_mlc_v3_multitask_best\.safetensors|packet_high_regression\.dml3|MODEL_MANIFEST\.json)$" SHA256SUMS | sha256sum -c -
+
+# 2. Inspect weights & sample synthetic CSV rows in 100% pure Rust (zero Python/LibTorch required)
+dope mlc-v3 inspect-weights --weights dope_mlc_v3_multitask_best.safetensors
+dope mlc-v3 inspect-wire --wire packet_high_regression.dml3
+dope mlc-v3 sample --weights dope_mlc_v3_multitask_best.safetensors \
+  --wire packet_high_regression.dml3 -n 1024 --seed 42 -o syn.csv
+
+# 3. Pre-trained model catalog on https://github.com/neverhuman/dope/releases/latest/download/<Asset>:
+# - dope_mlc_v3_multitask_best.safetensors  (1.70 MiB, sha256 d0b6960328d1...): Primary DOPE-MLC-v3 (A3, 56 F32 tensors, 444,168 params, 256-d router); pure-Rust `dope mlc-v3` & Python `MultiLevelLandmarkModel`; verified 0.8184 mean val score on 288 canonical 6-auditor cells.
+# - dope_mlc_v3_maxtrain97_best.safetensors (1.70 MiB, sha256 9f7b5560e930...): DOPE-MLC-v3 <5%-Val MaxTrain (R8*, 2,229/2,304 train cells, 3.26% val, 0 eval overlap); pure-Rust `dope mlc-v3` & Python `MultiLevelLandmarkModel`; verified 0.8407 val retention.
+# - dope_mlc_v3_multitask_best.pt           (1.72 MiB, sha256 a36510b9e630...): PyTorch state_dict for DOPE-MLC-v3 (A3, 256-d router `MultiLevelLandmarkModel`).
+# - dope_mlc_v3_maxtrain97_best.pt          (1.73 MiB, sha256 77ffb94f5006...): PyTorch state_dict for DOPE-MLC-v3 <5%-Val MaxTrain (R8*, 256-d router `MultiLevelLandmarkModel`).
+# - dope_mlc_v2_disjoint1000_maxtrain97_best.pt (1.74 MiB, sha256 3886676a1f86...): DOPE-MLC-v2 Disjoint-1,000 <5%-Val (R5*, 256-d router `MultiLevelLandmarkModel`, 1,930 train / 71 val DS, 0 eval overlap); verified 0.8698 val retention.
+# - dope_mlc_v2_s3_maxtrain97_best.pt       (1.74 MiB, sha256 11e64c63270a...): DOPE-MLC-v2 Full-Corpus <5%-Val (R8*, 256-d router `MultiLevelLandmarkModel`, 2,980 train / 93 val DS); verified 0.8926 val retention.
+# - dope_mlc_v2_disjoint1000_best.pt        (1.05 MiB, sha256 6fcc191a244f...): DOPE-MLC-v2 Strictly Disjoint-1,000 (legacy 3-level 140-d router / 145-d col_gate_head, 275,929 params); independently verified v2 exact-wire DML2 replay: 1629.5 Elo (#1), 98.27% retention across 1,000 DS (historical v1 descriptor-replay: 1650.7 Elo, 98.80% retention).
+# - dope_mlc_v2_s3_best.pt                  (1.05 MiB, sha256 1d5db98ffa43...): DOPE-MLC-v2 Pooled-1,000 Ep 7 (legacy 3-level 140-d router / 145-d col_gate_head, 275,929 params); independently verified v2 exact-wire DML2 replay: 1629.5 Elo (#1), 98.27% retention across 1,000 DS (historical v1 descriptor-replay: 1651.3 Elo, 98.81% retention).
+
+# 4. Additional engine subcommands
 dope sample adult.dope -n 10000 --space ml -o ml.csv                     # one-hot + [0,1], ML-ready
 dope frontier --train train.csv --test test.csv -t income                # bytes vs retention, and TDL
-dope mlc-v3 sample --weights dope_mlc_v3_multitask_best.safetensors \
-  --wire packet.dml3 -n 1024 --seed 42 -o syn.csv                        # DOPE-MLC-v3 SafeTensors receiver
 ```
 
 `--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
