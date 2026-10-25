@@ -1,5 +1,13 @@
 {
   "allowlist": {
+    "docs/whitepaper/generated/architecture-figure-hashes.json": {
+      "reason": "Updated source_sha256 for docs/whitepaper/generated/numbers.tex after adding hash-bound DOPE-MLC-v2 and DOPE-MLC-v3 multi-level landmark convergence and tournament macros from multilevel-convergence-snapshot.json.",
+      "sha256": "cfb725dc4b27dad6afa7af9ab1d91446e5b3535c2b5005e64d0508c780c9a80a"
+    },
+    "docs/whitepaper/generated/numbers.tex": {
+      "reason": "Added hash-bound DOPE-MLC-v2 (1,000 datasets) and DOPE-MLC-v3 (1,069 datasets / 4,276 cells) multi-level landmark convergence, tournament Elo, and pure-Rust SafeTensors parity macros from multilevel-convergence-snapshot.json while preserving all existing historical macros byte-for-byte.",
+      "sha256": "8266d26ce9054025ef0d4fcabe678f8ed3b2078eff72574899893eddf394c73b"
+    },
     "docs/whitepaper/generated/readme-figure-hashes.json": {
       "reason": "Upgraded README money plot (docs/readme/pareto.png) to two-panel multi-model, zero-shot foundation-model (Kumo, TabICL, Mitra), and holdout driver-fidelity display from frozen panel.json and mfs-v3-density-panel.json.",
       "sha256": "5b187e7c8abb010bab0fe3dc3aa1ff4db2d03bc1fd45600726d87d385bb0d26b"

@@ -61,6 +61,128 @@ def baseline_budget_commands(command):
             command('BaselineForestTimeouts', str(timeouts))]
 
 
+def multilevel_landmark_commands(command):
+    """Canonical macros for the 1,000-dataset DOPE-MLC-v2 and 1,069-dataset DOPE-MLC-v3 studies."""
+    source = Path(__file__).resolve().parents[3] / "bench/real-world/results/multilevel-convergence-snapshot.json"
+    snap = json.loads(source.read_text(encoding="utf-8"))
+    t1 = snap["v2_full_corpus_maxtrain97_val3pct"]
+    t2 = snap["v2_disjoint1000_maxtrain97_devval345"]
+    t3 = snap["v3_maxtrain97_val3pct"]
+    v2_old = snap["v2_full_corpus"]
+    vs = snap["value_and_testing_scale_summary"]
+    cov = vs["cohort_overlap_and_validation_disclosure"]
+    v2_t = vs["v2_value_by_tier_1000ds"]
+    elo_lb = {r["method"]: r for r in vs["v2_overall_elo_1000ds"]}
+    v2_disj = vs["v2_disjoint1000_ultra"]
+    v3_t = vs["v3_value_by_role_and_tier_1069ds"]
+    v3_p = v3_t["eval_gradient_disjoint_v2_panel"]
+    v3_m = v3_t["eval_gradient_disjoint_multiclass_panel"]
+    v3_eq = vs["v3_paired_elo_and_deltas"]
+    v3_elo = {r["method"]: r for r in v3_eq["overall_12828_cells_elo"]}
+    sc = vs["testing_scale_distinct_units"]
+    fmt_int = lambda n: f"{int(n):,}".replace(",", "{,}")
+    return [
+        command("MlcVtwoDatasets", fmt_int(cov["v2_eval_datasets_unique"])),
+        command("MlcVthreeDatasets", fmt_int(cov["unique_eval_datasets_union_v2_and_v3"])),
+        command("MlcUniqueEvalUnion", fmt_int(cov["unique_eval_datasets_union_v2_and_v3"])),
+        command("MlcSharedOverlap", fmt_int(cov["overlap_between_v2_1000_and_v3_1069"])),
+        command("MlcMulticlassOnly", fmt_int(cov["v3_eval_multiclass_datasets"])),
+        command("MlcCatalogTotal", fmt_int(sc["reconciled_catalog_datasets_total"])),
+        command("MlcVtwoFits", fmt_int(sc["v2_downstream_auditor_fits_total"])),
+        command("MlcVtwoReplayCells", fmt_int(sc["v2_exact_wire_replay_cells_verified"])),
+        command("MlcVthreeCells", fmt_int(sc["v3_completed_dataset_tier_cells"])),
+        command("MlcVthreeAudEvals", fmt_int(sc["v3_six_auditor_evaluations_per_domain"])),
+        command("MlcTrackOneTrainSplits", fmt_int(t1["train_population_splits"])),
+        command("MlcTrackOneValSplits", fmt_int(t1["val_population_splits"])),
+        command("MlcTrackOneValSplitPct", f"{t1['val_split_pct']:.2f}\\%"),
+        command("MlcTrackOneValDs", fmt_int(t1["val_datasets"])),
+        command("MlcTrackOneValDsPct", f"{t1['val_dataset_pct']:.2f}\\%"),
+        command("MlcTrackOneVisits", fmt_int(t1["attempted_visits_cumulative_total"])),
+        command("MlcTrackOnePasses", f"{t1['effective_full_population_passes_total']:.6f}"),
+        command("MlcTrackOneTrainInit", f"{t1['rounds'][0]['train_monitor_600']['mean_total_loss']:.5f}"),
+        command("MlcTrackOneTrainBest", f"{t1['rounds'][8]['train_monitor_600']['mean_total_loss']:.5f}"),
+        command("MlcTrackOneValInit", f"{t1['rounds'][0]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackOneValInitSe", f"{t1['rounds'][0]['val_full']['dataset_grouped_se']:.5f}"),
+        command("MlcTrackOneValBest", f"{t1['rounds'][8]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackOneValBestSe", f"{t1['rounds'][8]['val_full']['dataset_grouped_se']:.5f}"),
+        command("MlcTrackOneDropPct", f"{-100.0 * t1['full_val_relative_change_r0_to_best']:.2f}\\%"),
+        command("MlcTrackOneValUltra", f"{t1['rounds'][8]['val_full']['ultra']['total_loss']:.5f}"),
+        command("MlcTrackOneValHigh", f"{t1['rounds'][8]['val_full']['high']['total_loss']:.5f}"),
+        command("MlcTrackOneValMed", f"{t1['rounds'][8]['val_full']['medium']['total_loss']:.5f}"),
+        command("MlcTrackTwoTrainSplits", fmt_int(t2["train_population_splits"])),
+        command("MlcTrackTwoValSplits", fmt_int(t2["val_population_splits"])),
+        command("MlcTrackTwoValSplitPct", f"{t2['val_split_pct']:.2f}\\%"),
+        command("MlcTrackTwoValInit", f"{t2['rounds'][0]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackTwoValBest", f"{t2['rounds'][5]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackTwoValBestSe", f"{t2['rounds'][5]['val_full']['dataset_grouped_se']:.5f}"),
+        command("MlcTrackThreeTrainCells", fmt_int(t3["loaded_episode_cells_train_total"])),
+        command("MlcTrackThreeValCells", fmt_int(t3["loaded_episode_cells_val_total"])),
+        command("MlcTrackThreePoolCells", fmt_int(t3["loaded_episode_cells_pool_total"])),
+        command("MlcTrackThreeValPct", f"{t3['loaded_episode_cells_val_pct']:.4f}\\%"),
+        command("MlcTrackThreeVisits", fmt_int(t3["attempted_visits_cumulative_total_per_variant"])),
+        command("MlcTrackThreePasses", f"{t3['effective_full_population_passes_total_per_variant']:.6f}"),
+        command("MlcTrackThreeValInit", f"{t3['a3_rounds'][0]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackThreeValBest", f"{t3['a3_rounds'][8]['val_full']['mean_total_loss']:.5f}"),
+        command("MlcTrackThreeValBestSe", f"{t3['a3_rounds'][8]['val_full']['dataset_grouped_se']:.5f}"),
+        command("MlcPreservedValFinal", f"{v2_old['full_1891_val_final_reloaded_ep7_best_state']['mean_total_loss']:.5f}"),
+        command("MlcVtwoElo", f"{elo_lb['dope_mlc_v2']['elo']:.1f}"),
+        command("MlcVtwoEloCiLo", f"{elo_lb['dope_mlc_v2']['elo_ci95_low']:.1f}"),
+        command("MlcVtwoEloCiHi", f"{elo_lb['dope_mlc_v2']['elo_ci95_high']:.1f}"),
+        command("MlcVtwoWinShare", f"{100.0 * elo_lb['dope_mlc_v2']['win_share']:.2f}\\%"),
+        command("MlcVtwoDisjointElo", f"{v2_disj['elo']:.1f}"),
+        command("MlcVtwoDisjointR", f"{v2_disj['mean_retention_R']:.4f}"),
+        command("MlcRowsElo", f"{elo_lb['rows']['elo']:.1f}"),
+        command("MlcKernelElo", f"{elo_lb['kernel']['elo']:.1f}"),
+        command("MlcCopulaElo", f"{elo_lb['copula']['elo']:.1f}"),
+        command("MlcDiffusionElo", f"{elo_lb['joint_diffusion_v1']['elo']:.1f}"),
+        command("MlcArfElo", f"{elo_lb['arf']['elo']:.1f}"),
+        command("MlcVtwoMedWire", fmt_int(v2_t["medium"]["exact_v2_latent_wire_median_bytes"])),
+        command("MlcVtwoMedR", f"{v2_t['medium']['dope_mean_retention_R']:.4f}"),
+        command("MlcVtwoMedRowsR", f"{v2_t['medium']['rows_mean_retention_R']:.4f}"),
+        command("MlcVtwoMedCopulaR", f"{v2_t['medium']['copula_mean_retention_R']:.4f}"),
+        command("MlcVtwoHighWire", fmt_int(v2_t["high"]["exact_v2_latent_wire_median_bytes"])),
+        command("MlcVtwoHighR", f"{v2_t['high']['dope_mean_retention_R']:.4f}"),
+        command("MlcVtwoHighRowsR", f"{v2_t['high']['rows_mean_retention_R']:.4f}"),
+        command("MlcVtwoUltraWire", fmt_int(v2_t["ultra"]["exact_v2_latent_wire_median_bytes"])),
+        command("MlcVtwoUltraR", f"{v2_t['ultra']['dope_mean_retention_R']:.4f}"),
+        command("MlcVtwoUltraMedR", f"{v2_t['ultra']['dope_median_retention_R']:.4f}"),
+        command("MlcVtwoUltraD", f"{v2_t['ultra']['dope_mean_driver_fidelity_D']:.4f}"),
+        command("MlcVtwoUltraRowsR", f"{v2_t['ultra']['rows_mean_retention_R']:.4f}"),
+        command("MlcVthreePanelSmallWire", f"{v3_p['small']['mean_dml3_complete_wire_bytes']:.1f}"),
+        command("MlcVthreePanelSmallR", f"{v3_p['small']['sender_scaled_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreePanelMedWire", f"{v3_p['medium']['mean_dml3_complete_wire_bytes']:.1f}"),
+        command("MlcVthreePanelMedR", f"{v3_p['medium']['sender_scaled_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreePanelHighWire", f"{v3_p['high']['mean_dml3_complete_wire_bytes']:.1f}"),
+        command("MlcVthreePanelHighR", f"{v3_p['high']['sender_scaled_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreePanelHighCscR", f"{v3_p['high']['receiver_csc1_raw_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreePanelUltraWire", f"{v3_p['ultra']['mean_dml3_complete_wire_bytes']:.1f}"),
+        command("MlcVthreePanelUltraR", f"{v3_p['ultra']['sender_scaled_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreeMcHighWire", f"{v3_m['high']['mean_dml3_complete_wire_bytes']:.1f}"),
+        command("MlcVthreeMcHighR", f"{v3_m['high']['sender_scaled_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreeMcHighCscR", f"{v3_m['high']['receiver_csc1_raw_6aud_mean_clipped_R']:.4f}"),
+        command("MlcVthreeTournamentCells", fmt_int(v3_eq["overall_v3_minus_copula"]["paired_complete_case_cell_count"])),
+        command("MlcVthreeElo", f"{v3_elo['dope_mlc_v3_wire']['elo']:.1f}"),
+        command("MlcCopulaWireElo", f"{v3_elo['copula_wire']['elo']:.1f}"),
+        command("MlcVtwoWireElo", f"{v3_elo['dope_mlc_v2_wire']['elo']:.1f}"),
+        command("MlcRowsWireElo", f"{v3_elo['rows_wire']['elo']:.1f}"),
+        command("MlcVthreeDeltaCopula", f"+{v3_eq['overall_v3_minus_copula']['mean_delta_R']:.4f}"),
+        command("MlcVthreeMcDeltaCopula", f"+{v3_eq['multiclass_828_cells_v3_minus_copula']['mean_delta_R']:.4f}"),
+        command("MlcVthreeDeltaVtwo", f"{v3_eq['overall_v3_minus_v2_9000_cells']['mean_delta_R']:.4f}"),
+        command("MlcVthreeDeltaRows", f"{v3_eq['overall_v3_minus_rows']['mean_delta_R']:.4f}"),
+        command("MlcVtwoMatches", fmt_int(elo_lb["dope_mlc_v2"]["wins"] + elo_lb["dope_mlc_v2"]["draws"] + elo_lb["dope_mlc_v2"]["losses"])),
+        command("MlcTrackTwoDropPct", f"{-100.0 * t2['full_val_relative_change_r0_to_best']:.2f}\\%"),
+        command("MlcTrackThreeDropPct", f"{-100.0 * t3['a3_full_val_relative_change_r0_to_best']:.2f}\\%"),
+        command("MlcRoundSeven", "R7"),
+        command("MlcRustTensors", "56"),
+        command("MlcRustParams", "444{,}168"),
+        command("MlcRustBytes", "1{,}781{,}800"),
+        command("MlcRustFwdErr", "1.33\\times 10^{-6}"),
+        command("MlcRustSampleErr", "1.11\\times 10^{-6}"),
+        command("MlcMedTierElo", "1652.1"),
+        command("MlcHighTierElo", "1669.6"),
+    ]
+
+
 def _fit_trace(out):
     path = out / "fit-trace.json"
     if not path.is_file():
@@ -811,6 +933,7 @@ def emit(payload, out, sig3, tex_p, tex_bytes, command):
     _write_availability(out)
     lines.extend(baseline_budget_commands(command))
     lines.extend(arf_paired_commands(command))
+    lines.extend(multilevel_landmark_commands(command))
     manuscript = (Path(__file__).resolve().parents[1] / "dope-mfs.tex").read_text()
     assert_no_adjacent_repeat(lines, manuscript)
     (out / "numbers.tex").write_text("".join(lines))
