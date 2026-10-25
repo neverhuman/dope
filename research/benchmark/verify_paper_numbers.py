@@ -252,6 +252,13 @@ def check_macros(evidence, numbers_text):
     _require(bodies, "LossValEndA", _sig3(loss["final_validation"]), failures)
     _require(bodies, "LossTrainEndB", _sig3(loss_b["final_train"]), failures)
     _require(bodies, "LossValEndB", _sig3(loss_b["final_validation"]), failures)
+    mlc_snap = json.loads((REPO / "bench/real-world/results/multilevel-convergence-snapshot.json").read_text())
+    t1 = mlc_snap["v2_full_corpus_maxtrain97_val3pct"]
+    vs = mlc_snap["value_and_testing_scale_summary"]
+    _require(bodies, "MlcVtwoDatasets", f"{vs['cohort_overlap_and_validation_disclosure']['v2_eval_datasets_unique']:,}".replace(",", "{,}"), failures)
+    _require(bodies, "MlcVthreeDatasets", f"{vs['cohort_overlap_and_validation_disclosure']['unique_eval_datasets_union_v2_and_v3']:,}".replace(",", "{,}"), failures)
+    _require(bodies, "MlcTrackOneValBest", f"{t1['rounds'][8]['val_full']['mean_total_loss']:.5f}", failures)
+    _require(bodies, "MlcVtwoElo", f"{vs['v2_overall_elo_1000ds'][0]['elo']:.1f}", failures)
     failures.extend(check_architecture(bodies))
     if "ForestEvalSec" in bodies:
         failures.append("ForestEvalSec is not a sum of fit.json fields")
