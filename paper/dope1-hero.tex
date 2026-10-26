@@ -3,8 +3,7 @@
 \captionof{figure}{\textbf{Predictive structure per byte.} Median over \G{OneTables} public tables of
 the \emph{robust retention} (the worst of linear, CatBoost and MLP auditors, each trained only on
 the method's rows and scored on held-out real rows) against every byte that sampling reads. Blue: DOPE
-programs at increasing byte budgets; the hollow diamond is the repository's earlier research kernel at
-its fixed program shape. Orange: the information-compression control, the largest
+(\texttt{\G{ReleaseTag}}) programs at increasing byte budgets. Orange: the information-compression control, the largest
 random subset of real training rows whose CSV fits the same budget after xz. Grey: generators at
 their default sizes. Bands and bars are \CfgConf\% bootstrap intervals over tables; the dotted line
 is the retention threshold $\tau=\CfgTau$ of Transfer Description Length.}

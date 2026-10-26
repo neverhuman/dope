@@ -1,7 +1,9 @@
 //! `dope mlc-v3` CLI commands: 100% pure-Rust SafeTensors inference, pinned SHA-256 weight
 //! resolution, and `DML3`/`CSC1` synthetic sampling.
 
-use crate::style::Style;
+use crate::style::{
+    print_mlc_v3_sample_report, print_mlc_v3_weights_report, print_mlc_v3_wire_report, Style,
+};
 use clap::{Args, Subcommand};
 use dope_core::mlc_v3::{
     sample_synthetic_table_with_draws, Dml3Envelope, FixedSampleDraws, MlcV3ForwardCheckInput,
@@ -51,62 +53,56 @@ pub(crate) const PINNED_SAMPLE_WIRE: PinnedAsset = PinnedAsset {
 
 #[derive(Subcommand)]
 pub(crate) enum MlcV3Command {
-    /// Fetch and verify pinned DOPE-MLC-v3 .safetensors weights (and optional sample .dml3 packet) into local cache.
+    /// Fetch and verify pinned DOPE-MLC-v3 .safetensors weights into local cache.
     FetchWeights(FetchWeightsArgs),
-    /// Verify and inspect a DOPE-MLC-v3 .safetensors weight file (56 F32 tensors, 444,168 parameters).
+    /// Verify and inspect a DOPE-MLC-v3 .safetensors weight file.
     InspectWeights(InspectWeightsArgs),
     /// Verify and inspect a DML3/CSC1 or DML2 wire packet.
     InspectWire(InspectWireArgs),
-    /// Run LandmarkHyperRouter (and optional TargetNet/CovNet forward check) using .safetensors weights.
+    /// Run LandmarkHyperRouter (and optional TargetNet/CovNet forward check).
     Route(RouteArgs),
-    /// Sample a synthetic CSV table from a DML3/CSC1 wire packet and .safetensors weights in 100% Rust.
+    /// Sample a synthetic CSV table from a DML3/CSC1 wire packet and .safetensors weights.
     Sample(SampleV3Args),
 }
 
 #[derive(Args)]
 pub(crate) struct FetchWeightsArgs {
-    /// Weight preset to fetch: multitask, maxtrain97, or all.
     #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97", "all"])]
     pub(crate) preset: String,
-    /// Concrete release tag resolved once for all assets (never floating 'latest').
     #[arg(long, default_value = DEFAULT_RELEASE_TAG)]
     pub(crate) tag: String,
-    /// Copy and verify from a local staged release directory instead of downloading over HTTPS.
     #[arg(long)]
     pub(crate) from_dir: Option<PathBuf>,
-    /// Destination directory for verified weights (defaults to $DOPE_WEIGHTS_DIR or ~/.cache/dope/weights).
     #[arg(long)]
     pub(crate) out_dir: Option<PathBuf>,
-    /// Skip fetching the companion 2,327-byte packet_high_regression.dml3 example wire packet.
     #[arg(long)]
     pub(crate) no_sample_wire: bool,
-    /// Emit structured JSON summary on stdout.
     #[arg(long)]
     pub(crate) json: bool,
 }
 
 #[derive(Args)]
 pub(crate) struct InspectWeightsArgs {
-    /// Path to .safetensors weights; if omitted, resolves pinned preset from local cache/install.
     #[arg(long)]
     pub(crate) weights: Option<PathBuf>,
-    /// Preset when --weights is omitted: multitask or maxtrain97.
     #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97"])]
     pub(crate) preset: String,
+    #[arg(long)]
+    pub(crate) json: bool,
 }
 
 #[derive(Args)]
 pub(crate) struct InspectWireArgs {
     #[arg(long)]
     pub(crate) wire: PathBuf,
+    #[arg(long)]
+    pub(crate) json: bool,
 }
 
 #[derive(Args)]
 pub(crate) struct RouteArgs {
-    /// Path to .safetensors weights; if omitted, resolves pinned preset from local cache/install.
     #[arg(long)]
     pub(crate) weights: Option<PathBuf>,
-    /// Preset when --weights is omitted: multitask or maxtrain97.
     #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97"])]
     pub(crate) preset: String,
     #[arg(long, value_parser = ["low", "small", "medium", "high", "ultra"])]
@@ -119,10 +115,8 @@ pub(crate) struct RouteArgs {
 
 #[derive(Args)]
 pub(crate) struct SampleV3Args {
-    /// Path to .safetensors weights; if omitted, resolves pinned preset from local cache/install.
     #[arg(long)]
     pub(crate) weights: Option<PathBuf>,
-    /// Preset when --weights is omitted: multitask or maxtrain97.
     #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97"])]
     pub(crate) preset: String,
     #[arg(long)]
@@ -141,104 +135,100 @@ pub(crate) struct SampleV3Args {
     pub(crate) out: Option<PathBuf>,
 }
 
+fn non_empty_env(name: &str) -> Option<PathBuf> {
+    std::env::var_os(name)
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
 fn default_weights_dir() -> Result<PathBuf, String> {
-    if let Some(dir) = std::env::var_os("DOPE_WEIGHTS_DIR").filter(|v| !v.is_empty()) {
-        return Ok(PathBuf::from(dir));
+    if let Some(dir) = non_empty_env("DOPE_WEIGHTS_DIR") {
+        return Ok(dir);
     }
-    if let Some(xdg) = std::env::var_os("XDG_CACHE_HOME").filter(|v| !v.is_empty()) {
-        return Ok(PathBuf::from(xdg).join("dope").join("weights"));
+    if let Some(xdg) = non_empty_env("XDG_CACHE_HOME") {
+        return Ok(xdg.join("dope/weights"));
     }
-    if let Some(home) = std::env::var_os("HOME").filter(|v| !v.is_empty()) {
-        return Ok(PathBuf::from(home).join(".cache/dope/weights"));
+    if let Some(home) = non_empty_env("HOME") {
+        return Ok(home.join(".cache/dope/weights"));
     }
-    Err(
-        "could not determine weights cache directory; set DOPE_WEIGHTS_DIR or pass --weights"
-            .into(),
-    )
+    Err("could not determine weights cache directory; set DOPE_WEIGHTS_DIR".into())
+}
+
+fn require_regular_file(path: &Path, label: &str) -> Result<(), String> {
+    let d = path.display();
+    let meta = std::fs::symlink_metadata(path).map_err(|e| format!("cannot stat {d}: {e}"))?;
+    if meta.file_type().is_symlink() || !meta.file_type().is_file() {
+        return Err(format!("refusing non-regular or symlinked {label}: {d}"));
+    }
+    Ok(())
 }
 
 fn verify_regular_file_digest(
     path: &Path,
-    expected_bytes: usize,
-    expected_sha256: &str,
+    exp_len: usize,
+    exp_sha: &str,
 ) -> Result<String, String> {
-    let meta = std::fs::symlink_metadata(path)
-        .map_err(|e| format!("cannot stat {}: {e}", path.display()))?;
-    if meta.file_type().is_symlink() || !meta.file_type().is_file() {
+    require_regular_file(path, "asset path")?;
+    let d = path.display();
+    let data = std::fs::read(path).map_err(|e| format!("cannot read {d}: {e}"))?;
+    if data.len() != exp_len {
+        let n = data.len();
         return Err(format!(
-            "refusing non-regular or symlinked asset path: {}",
-            path.display()
+            "asset byte length mismatch for {d}: expected {exp_len} B, got {n} B"
         ));
     }
-    let data = std::fs::read(path).map_err(|e| format!("cannot read {}: {e}", path.display()))?;
-    if data.len() != expected_bytes {
+    let sha = format!("{:x}", Sha256::digest(&data));
+    if sha != exp_sha {
         return Err(format!(
-            "asset byte length mismatch for {}: expected {} B, got {} B",
-            path.display(),
-            expected_bytes,
-            data.len()
+            "asset SHA-256 mismatch for {d}: expected {exp_sha}, got {sha}"
         ));
     }
-    let actual_sha = format!("{:x}", Sha256::digest(&data));
-    if actual_sha != expected_sha256 {
-        return Err(format!(
-            "asset SHA-256 mismatch for {}: expected {}, got {}",
-            path.display(),
-            expected_sha256,
-            actual_sha
-        ));
-    }
-    Ok(actual_sha)
+    Ok(sha)
 }
 
 fn resolve_weights_path(explicit: &Option<PathBuf>, preset: &str) -> Result<PathBuf, String> {
     if let Some(p) = explicit {
         return Ok(p.clone());
     }
-    let spec = PINNED_WEIGHTS
-        .iter()
-        .find(|w| w.preset == preset)
-        .ok_or_else(|| format!("unknown preset `{preset}`"))?;
-    let mut candidates = Vec::new();
-    if let Some(dir) = std::env::var_os("DOPE_WEIGHTS_DIR").filter(|v| !v.is_empty()) {
-        candidates.push(PathBuf::from(dir).join(spec.filename));
+    let spec = PINNED_WEIGHTS.iter().find(|w| w.preset == preset);
+    let spec = spec.ok_or_else(|| format!("unknown preset `{preset}`"))?;
+    let mut cands = Vec::new();
+    if let Some(dir) = non_empty_env("DOPE_WEIGHTS_DIR") {
+        cands.push(dir.join(spec.filename));
     }
     if let Ok(cache_dir) = default_weights_dir() {
-        candidates.push(cache_dir.join(spec.filename));
+        cands.push(cache_dir.join(spec.filename));
     }
-    if let Ok(exe) = std::env::current_exe() {
-        if let Some(parent) = exe.parent() {
-            candidates.push(parent.join(spec.filename));
-            if let Some(prefix) = parent.parent() {
-                candidates.push(prefix.join("share/dope/weights").join(spec.filename));
-            }
+    if let Some(parent) = std::env::current_exe()
+        .ok()
+        .and_then(|e| e.parent().map(Path::to_path_buf))
+    {
+        cands.push(parent.join(spec.filename));
+        if let Some(prefix) = parent.parent() {
+            cands.push(prefix.join("share/dope/weights").join(spec.filename));
         }
     }
-    candidates.push(PathBuf::from(spec.filename));
-    candidates.push(PathBuf::from("target/model-release-v1").join(spec.filename));
-    for cand in candidates {
+    cands.push(PathBuf::from(spec.filename));
+    cands.push(PathBuf::from("target/model-release-v1").join(spec.filename));
+    for cand in cands {
         if cand.exists() {
             verify_regular_file_digest(&cand, spec.bytes, spec.sha256)?;
             return Ok(cand);
         }
     }
-    Err(format!(
-        "pinned DOPE-MLC-v3 weights `{}` ({} B, sha256: {}…) not found in local cache.\n  hint: run `dope mlc-v3 fetch-weights --preset {}` or pass `--weights <PATH>`",
-        spec.filename, spec.bytes, &spec.sha256[..16], preset
-    ))
+    let (f, b, h) = (spec.filename, spec.bytes, &spec.sha256[..16]);
+    Err(format!("pinned DOPE-MLC-v3 weights `{f}` ({b} B, sha256: {h}…) not found in local cache.\n  hint: run `dope mlc-v3 fetch-weights --preset {preset}` or pass `--weights <PATH>`"))
 }
 
 fn validate_release_tag(tag: &str) -> Result<(), String> {
     let t = tag.trim();
-    if t.is_empty()
-        || t.eq_ignore_ascii_case("latest")
-        || t.contains('/')
-        || t.contains("..")
-        || !t
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_'))
-    {
-        return Err("release tag must be a concrete version tag (e.g. v1.0.0 or dope-engine-v1.0.0), not 'latest'".into());
+    let ok_chars = t
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_'));
+    if t.is_empty() || t.eq_ignore_ascii_case("latest") || t.contains("..") || !ok_chars {
+        return Err(
+            "release tag must be a concrete version tag (e.g. v1.0.0), not 'latest'".into(),
+        );
     }
     Ok(())
 }
@@ -252,59 +242,49 @@ fn fetch_one_asset(
     std::fs::create_dir_all(out_dir)
         .map_err(|e| format!("cannot create {}: {e}", out_dir.display()))?;
     let dest = out_dir.join(asset.filename);
-    if std::fs::symlink_metadata(&dest)
-        .map(|m| m.file_type().is_symlink())
-        .unwrap_or(false)
-    {
+    if std::fs::symlink_metadata(&dest).is_ok_and(|m| m.file_type().is_symlink()) {
         return Err(format!(
             "refusing to overwrite symlink at destination: {}",
             dest.display()
         ));
     }
-    let nanos = std::time::SystemTime::now()
+    let ns = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_nanos())
-        .unwrap_or(0);
+        .unwrap_or_default();
     let tmp = out_dir.join(format!(
-        ".{}.tmp.{}.{nanos}",
+        ".{}.tmp.{}.{}",
         asset.filename,
-        std::process::id()
+        std::process::id(),
+        ns.as_nanos()
     ));
     let source_desc = if let Some(src_dir) = from_dir {
         let src = src_dir.join(asset.filename);
-        let meta = std::fs::symlink_metadata(&src)
-            .map_err(|e| format!("missing source asset {}: {e}", src.display()))?;
-        if meta.file_type().is_symlink() || !meta.file_type().is_file() {
-            return Err(format!(
-                "refusing non-regular or symlinked source asset: {}",
-                src.display()
-            ));
-        }
-        std::fs::copy(&src, &tmp)
-            .map_err(|e| format!("failed copying {} to {}: {e}", src.display(), tmp.display()))?;
+        require_regular_file(&src, "source asset")?;
+        std::fs::copy(&src, &tmp).map_err(|e| format!("failed copying {}: {e}", src.display()))?;
         format!("local-dir:{}", src.display())
     } else {
         let url = format!(
             "https://github.com/{REPO_SLUG}/releases/download/{tag}/{}",
             asset.filename
         );
-        let status = Command::new("curl")
-            .args([
-                "-fsSL",
-                "--proto",
-                "=https",
-                "--tlsv1.2",
-                "--retry",
-                "2",
-                "-o",
-            ])
+        let flags = [
+            "-fsSL",
+            "--proto",
+            "=https",
+            "--tlsv1.2",
+            "--retry",
+            "2",
+            "-o",
+        ];
+        let st = Command::new("curl")
+            .args(flags)
             .arg(&tmp)
             .arg(&url)
-            .status()
-            .map_err(|e| format!("failed to launch curl for {url}: {e}"))?;
-        if !status.success() {
+            .status();
+        let st = st.map_err(|e| format!("failed to launch curl for {url}: {e}"))?;
+        if !st.success() {
             let _ = std::fs::remove_file(&tmp);
-            return Err(format!("download failed for {url} (exit {status})"));
+            return Err(format!("download failed for {url} (exit {st})"));
         }
         url
     };
@@ -313,18 +293,18 @@ fn fetch_one_asset(
         return Err(err);
     }
     if asset.kind == "safetensors-weights" {
-        if let Err(err) = MlcV3Model::load_safetensors(&tmp) {
+        if let Err(e) = MlcV3Model::load_safetensors(&tmp) {
             let _ = std::fs::remove_file(&tmp);
             return Err(format!(
-                "downloaded weights failed SafeTensors structural verification: {err}"
+                "downloaded weights failed SafeTensors structural verification: {e}"
             ));
         }
     } else if asset.kind == "dml3-wire-fixture" {
         let raw = std::fs::read(&tmp).map_err(|e| e.to_string())?;
-        if let Err(err) = Dml3Envelope::from_bytes(&raw) {
+        if let Err(e) = Dml3Envelope::from_bytes(&raw) {
             let _ = std::fs::remove_file(&tmp);
             return Err(format!(
-                "downloaded wire packet failed DML3 verification: {err}"
+                "downloaded wire packet failed DML3 verification: {e}"
             ));
         }
     }
@@ -369,32 +349,29 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
                 .map(|asset| fetch_one_asset(asset, &a.tag, a.from_dir.as_deref(), &out_dir))
                 .collect::<Result<_, _>>()?;
             if a.json {
-                let report = serde_json::json!({
+                let note = "SHA-256 checksums and SafeTensors/DML3 structural checks verify content integrity against the pinned release manifest; cryptographic publisher provenance requires Sigstore OIDC attestation verification.";
+                print_json(&serde_json::json!({
                     "schema": "dope-mlc-v3-weights-fetch-v1", "release_tag": a.tag,
-                    "out_dir": out_dir.display().to_string(), "verification_level": "sha256-content-integrity",
-                    "provenance_note": "SHA-256 checksums and SafeTensors/DML3 structural checks verify content integrity against the pinned release manifest; cryptographic publisher provenance requires Sigstore OIDC attestation verification.",
-                    "assets": results,
-                });
-                print_json(&report)?;
+                    "out_dir": out_dir.display().to_string(),
+                    "verification_level": "sha256-content-integrity",
+                    "provenance_note": note, "assets": results,
+                }))?;
             } else {
+                let ok = style.green_bold("✓");
+                let tg = style.cyan_bold(&a.tag);
+                let dir = style.bold(out_dir.display().to_string());
                 println!(
-                    "{} verified {} asset(s) for release tag {} -> {}",
-                    style.green_bold("✓"),
-                    results.len(),
-                    style.cyan_bold(&a.tag),
-                    style.bold(out_dir.display().to_string())
+                    "{ok} verified {} asset(s) for release tag {tg} -> {dir}",
+                    results.len()
                 );
                 for item in &results {
-                    println!(
-                        "  {} {:<42} {:>9} B  sha256:{}…",
-                        style.green("•"),
-                        item["filename"].as_str().unwrap_or(""),
-                        item["bytes"].as_u64().unwrap_or(0),
-                        &item["sha256"].as_str().unwrap_or("")[..16]
-                    );
+                    let f = item["filename"].as_str().unwrap_or("");
+                    let b = item["bytes"].as_u64().unwrap_or(0);
+                    let h = &item["sha256"].as_str().unwrap_or("")[..16];
+                    println!("  {} {f:<42} {b:>9} B  sha256:{h}…", style.green("•"));
                 }
-                let note = "verification: sha256-content-integrity + SafeTensors/DML3 structural check (not a cryptographic signature/attestation)";
-                println!("  {}", style.dim(note));
+                let vnote = "verification: sha256-content-integrity + SafeTensors/DML3 structural check (not a cryptographic signature/attestation)";
+                println!("  {}", style.dim(vnote));
             }
         }
         MlcV3Command::InspectWeights(a) => {
@@ -402,25 +379,33 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             let m = MlcV3Model::load_safetensors(&weights_path)
                 .map_err(map_err)?
                 .inventory;
-            print_json(&serde_json::json!({
-                "format": "dope-mlc-v3-safetensors", "tensor_count": m.tensor_count,
-                "parameter_count": m.parameter_count, "byte_len": m.byte_len,
-                "sha256": m.sha256, "runtime": "rust-candle-cpu",
-            }))?;
+            if !style.enabled || a.json {
+                print_json(&serde_json::json!({
+                    "format": "dope-mlc-v3-safetensors", "tensor_count": m.tensor_count,
+                    "parameter_count": m.parameter_count, "byte_len": m.byte_len,
+                    "sha256": m.sha256, "runtime": "rust-candle-cpu",
+                }))?;
+            } else {
+                print_mlc_v3_weights_report(&weights_path, &m, style);
+            }
         }
         MlcV3Command::InspectWire(a) => {
             let raw = std::fs::read(&a.wire).map_err(|e| e.to_string())?;
             let env = Dml3Envelope::from_bytes(&raw).map_err(map_err)?;
             let enc = &env.encoding;
-            print_json(&serde_json::json!({
-                "wire_format": env.wire_format, "wire_bytes": env.wire_bytes,
-                "tier_cap_bytes": env.tier_cap_bytes, "within_tier_cap": env.within_tier_cap,
-                "crc32": env.crc32, "compressed_flags": env.compressed_flags,
-                "level": enc.level, "task": enc.task, "code_width": enc.code_width,
-                "n_train": enc.n_train, "p_use": enc.p_use,
-                "include_v3_primitives": enc.target_bundle.include_v3_primitives,
-                "has_csc1_scaler": env.scaler.is_some(), "k_classes": enc.target_bundle.k_classes,
-            }))?;
+            if !style.enabled || a.json {
+                print_json(&serde_json::json!({
+                    "wire_format": env.wire_format, "wire_bytes": env.wire_bytes,
+                    "tier_cap_bytes": env.tier_cap_bytes, "within_tier_cap": env.within_tier_cap,
+                    "crc32": env.crc32, "compressed_flags": env.compressed_flags,
+                    "level": enc.level, "task": enc.task, "code_width": enc.code_width,
+                    "n_train": enc.n_train, "p_use": enc.p_use,
+                    "include_v3_primitives": enc.target_bundle.include_v3_primitives,
+                    "has_csc1_scaler": env.scaler.is_some(), "k_classes": enc.target_bundle.k_classes,
+                }))?;
+            } else {
+                print_mlc_v3_wire_report(&a.wire, &env, style);
+            }
         }
         MlcV3Command::Route(a) => {
             let weights_path = resolve_weights_path(&a.weights, &a.preset)?;
@@ -457,21 +442,18 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             let wire_bytes = std::fs::read(&a.wire).map_err(|e| e.to_string())?;
             let env = Dml3Envelope::from_bytes(&wire_bytes).map_err(map_err)?;
             let draws: Option<FixedSampleDraws> = match &a.draws_json {
-                Some(p) => Some(
-                    serde_json::from_str(&std::fs::read_to_string(p).map_err(|e| e.to_string())?)
-                        .map_err(|e| e.to_string())?,
-                ),
+                Some(p) => {
+                    let s = std::fs::read_to_string(p).map_err(|e| e.to_string())?;
+                    Some(serde_json::from_str(&s).map_err(|e| e.to_string())?)
+                }
                 None => None,
             };
             let sampled =
                 sample_synthetic_table_with_draws(&model, &env, a.rows, a.seed, draws.as_ref())
                     .map_err(map_err)?;
             if let Some(jp) = &a.json_out {
-                std::fs::write(
-                    jp,
-                    serde_json::to_vec_pretty(&sampled).map_err(|e| e.to_string())?,
-                )
-                .map_err(|e| e.to_string())?;
+                let bytes = serde_json::to_vec_pretty(&sampled).map_err(|e| e.to_string())?;
+                std::fs::write(jp, bytes).map_err(|e| e.to_string())?;
             }
             let (xs, ys) = if a.space == "scaled" {
                 (&sampled.x_scaled, &sampled.y_scaled)
@@ -484,7 +466,11 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             })
             .map_err(map_err)?;
             match &a.out {
-                Some(p) => std::fs::write(p, &csv_bytes).map_err(|e| e.to_string())?,
+                Some(p) => {
+                    std::fs::write(p, &csv_bytes).map_err(|e| e.to_string())?;
+                    let nf = sampled.headers.len().saturating_sub(1);
+                    print_mlc_v3_sample_report(&a.wire, p, ys.len(), nf, &a.space, &env, style);
+                }
                 None => std::io::stdout()
                     .write_all(&csv_bytes)
                     .map_err(|e| e.to_string())?,

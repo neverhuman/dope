@@ -20,7 +20,10 @@ mod runtime;
 mod style;
 mod tiers;
 use args::*;
-use style::{print_eval_report, print_fit_report, print_inspect_report, ColorChoice, Style};
+use style::{
+    print_eval_report, print_fit_report, print_frontier_report, print_inspect_report,
+    print_sample_saved_report, ColorChoice, Style,
+};
 
 fn parse_bytes(s: &str) -> Result<usize, String> {
     let t = s.trim().to_ascii_lowercase();
@@ -148,6 +151,17 @@ fn run(cli: Cli) -> Result<(), String> {
                 }
                 _ => return Err("--space must be raw or ml".into()),
             }
+            if let Some(p) = &a.out {
+                print_sample_saved_report(
+                    &a.model,
+                    p,
+                    a.rows,
+                    program.features(),
+                    &program.schema.target.name,
+                    &a.space,
+                    style,
+                );
+            }
         }
         Command::Predict(a) => {
             let program =
@@ -272,7 +286,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 },
             };
             let result = frontier(&train, target, &test, &opts).map_err(e)?;
-            println!("{}", result.render());
+            print_frontier_report(&result, style);
             if let Some(p) = &a.json {
                 std::fs::write(p, serde_json::to_string_pretty(&result).unwrap_or_default())
                     .map_err(|x| x.to_string())?;

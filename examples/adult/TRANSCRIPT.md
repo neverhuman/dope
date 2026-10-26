@@ -92,12 +92,11 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 
 | Method & Evaluation Protocol on UCI Adult (`income`) | Charged Artifact Bytes | Source Rows Stored | Linear / Logistic $R$ | Boosted Trees (GBDT) $R$ | Neural MLP $R$ | Robust Retention $R$ (`min` over families) |
 |---|---:|---|---:|---:|---:|---|
-| **`dope` CLI above (`adult.dope`, `seed=0`, `50,000` synth rows, built-in Rust auditors)** | **`4,079 B` (`4.0 KiB`)** | **`0` rows** | **`0.962`** | **`0.941`** | **`0.985`** | **`0.941` (`seed=0`, $4\times$ cap)** |
-| **`DOPE` @ `4 KiB` (`dope-4x@-`, external Python harness, $4\times N_{\text{train}}$ = `80,000` rows)** | **`4,079 B` (`4.0 KiB`)** | **`0` rows** | **`0.957`** | **`0.946`** | **`0.975`** | **`0.946` (`seed=0`)** |
-| `DOPE` @ `4 KiB` (`dope-seed0@-`, external Python harness, $1\times N_{\text{train}}$ = `20,000` rows) | `4,079 B` (`4.0 KiB`) | `0` rows | `0.964` | `0.907` | `0.907` | `0.907` (`seed=0`) |
-| **`DOPE` @ `4 KiB` (`dope@4k`, 3-seed median `seed=0,1,2`, $1\times N_{\text{train}}$)** | **`4,077 B` (`4.0 KiB`)** | **`0` rows** | **`0.946`** | **`0.907`** | **`0.933`** | **`0.907` (seeds `0.901..0.914`)** |
+| **`dope` (`v1.0.0`) CLI above (`adult.dope`, `seed=0`, `50,000` synth rows, built-in Rust auditors)** | **`4,079 B` (`4.0 KiB`)** | **`0` rows** | **`0.962`** | **`0.941`** | **`0.985`** | **`0.941` (`seed=0`, $4\times$ cap)** |
+| **`DOPE` (`v1.0.0`) @ `4 KiB` (`dope-4x@-`, external Python harness, $4\times N_{\text{train}}$ = `80,000` rows)** | **`4,079 B` (`4.0 KiB`)** | **`0` rows** | **`0.957`** | **`0.946`** | **`0.975`** | **`0.946` (`seed=0`)** |
+| `DOPE` (`v1.0.0`) @ `4 KiB` (`dope-seed0@-`, external Python harness, $1\times N_{\text{train}}$ = `20,000` rows) | `4,079 B` (`4.0 KiB`) | `0` rows | `0.964` | `0.907` | `0.907` | `0.907` (`seed=0`) |
+| **`DOPE` (`v1.0.0`) @ `4 KiB` (`dope@4k`, 3-seed median `seed=0,1,2`, $1\times N_{\text{train}}$)** | **`4,077 B` (`4.0 KiB`)** | **`0` rows** | **`0.946`** | **`0.907`** | **`0.933`** | **`0.907` (seeds `0.901..0.914`)** |
 | `Raw Rows Subsample` @ `4 KiB` (`rows@4k`, 3-seed median, `xz`-compressed real rows) | `4,088 B` (`4.0 KiB`) | `xz` real-row subset | `0.870` | `0.777` | `-7.813` | `-7.813` (seeds `-8.311..-5.695`) |
-| `DOPE v1 Research Kernel` (`kernel@-`, 3-seed median, $1\times N_{\text{train}}$) | `1,821 B` (`1.8 KiB`) | `0` rows | `0.940` | `0.851` | `0.943` | `0.851` (seeds `0.848..0.871`) |
 | `Adversarial Random Forests` (`arf@-`, 3-seed median, `1,578×` larger) | `6,431,472 B` (`6.13 MiB`) | `0` rows | `0.932` | `0.874` | `0.955` | `0.866` (seeds `0.857..0.888`; $\min_f \text{med}_s = 0.874$) |
 | `Gaussian Copula` (`copula@-`, 3-seed median, `22×` larger) | `91,476 B` (`89.3 KiB`) | `0` rows | `0.408` | `0.196` | `0.333` | `0.196` (seeds `0.184..0.211`) |
 | `Real Rows Resampled` (`bootstrap@-`, 3-seed median, full `20,000`-row bootstrap) | `112,240 B` (`109.6 KiB`) | `20,000` real rows | `0.994` | `0.973` | `-0.036` | `-0.036` (`seed=0`) |
