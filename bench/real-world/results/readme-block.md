@@ -4,20 +4,20 @@
 
 | Rank & Method (`1,000` Datasets, `6` Downstream Auditors, `44,369` Matches/Method) | Tournament Elo `[95% CI]` (Win Share) | `Medium` (`4 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE 1,502 B / 1.5 KiB`) | `High` (`16 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE 2,836 B / 2.8 KiB`) | `Ultra` (`64 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE 5,872 B / 5.7 KiB`) |
 |---|---:|---:|---:|---:|
-| **`#1 DOPE-MLC-v2` (Unified 3-Level Encoder)** | **`1651.3 [1643.4, 1659.6]` (`70.58%` win; Disjoint-1k: `1650.7 #1`)** | **`0.8620 [0.8503, 0.8722]` (`#1` Elo `1652.1`)** | **`0.8971 [0.8848, 0.9080]` (`#1` Elo `1669.6`)** | **`0.8975 [0.8883, 0.9094]` (`#1` Encoder Elo `1658.4`)** |
+| **`#1 DOPE-MLC-v2` (Unified 3-Level Encoder)** | **`1651.3 [1643.4, 1659.6]` (`70.58%` win; Disjoint-1k: `1650.7 #1`)** | **`0.8620 [0.8503, 0.8722]` (`#1` Elo `1652.1`)** | **`0.8971 [0.8848, 0.9080]` (`#1` Elo `1669.6`)** | **`0.8975 [0.8883, 0.9094]` (`#1` Encoder Elo `1640.1`)** |
 | `#2 Raw Rows Subsample` (`rows`, raw-row subset control) | `1593.3 [1584.4, 1602.7]` (`62.32%` win) | `0.6743 [0.6564, 0.6915]` | `0.8526 [0.8404, 0.8649]` | `0.9230 [0.9141, 0.9301]` (`copies 88% raw rows`) |
-| `#3 DOPE v1 Kernel` (`kernel`, research sketch) | `1592.5 [1583.0, 1603.0]` (`62.20%` win) | `—` (fixed sketch) | `—` (fixed sketch) | `0.8511 [0.8396, 0.8626]` |
-| `#4 Gaussian Copula` (`copula`, parametric baseline) | `1545.8 [1535.7, 1553.5]` (`55.29%` win) | `0.8046 [0.7916, 0.8209]` | `0.8046 [0.7910, 0.8180]` | `0.8046 [0.7905, 0.8190]` |
-| `#5 Joint Diffusion` (`joint_diffusion_v1`) | `1432.4 [1423.8, 1440.8]` (`38.75%` win) | `—` | `—` | `0.6929 [0.6766, 0.7092]` |
-| `#6 Adversarial Random Forests` (`arf`) | `1184.7 [1167.3, 1202.3]` (`10.86%` win) | `—` | `—` | `0.3358 [0.3125, 0.3592]` |
+| `#3 DOPE v1 Kernel` (`kernel`, research sketch) | `1592.5 [1583.0, 1603.0]` (`62.20%` win) | `0.8379 [0.8272, 0.8520]` | `0.8379 [0.8241, 0.8497]` | `0.8379 [0.8244, 0.8500]` |
+| `#4 Gaussian Copula` (`copula`, parametric baseline) | `1545.8 [1535.7, 1553.5]` (`55.29%` win) | `0.8046 [0.7916, 0.8209]` | `0.8046 [0.7910, 0.8180]` | `0.8046 [0.7908, 0.8200]` |
+| `#5 Joint Diffusion` (`joint_diffusion_v1`) | `1432.4 [1423.8, 1440.8]` (`38.75%` win) | `0.7034 [0.6880, 0.7184]` | `0.7541 [0.7407, 0.7702]` | `0.7886 [0.7747, 0.8033]` |
+| `#6 Adversarial Random Forests` (`arf`) | `1184.7 [1167.3, 1202.3]` (`10.86%` win) | `0.4113 [0.3936, 0.4321]` | `0.4113 [0.3898, 0.4319]` | `0.4113 [0.3902, 0.4309]` |
 
 *Byte & baseline qualification:* `DOPE-MLC-v2` median wire bytes (`1,502 / 2,836 / 5,872 B` = `1.5 / 2.8 / 5.7 KiB`; zlib `1,238 / 2,351 / 4,616 B`) are bit-exact `version=2` latent payloads (`6,000/6,000` cells `max_abs_diff = 0.0`), excluding the `.dope` scaler sidecar (`+545 B` median; full raw `2,031 / 3,376 / 6,398 B`) and shared frozen decoder (`292,707 B` / `285.8 KiB`, amortized `0 B/dataset`), whereas `DOPE-MLC-v3` (`DML3+CSC1`) is self-contained inside `2 / 4 / 16 / 64 KiB` caps (`960.6 / 1,550.2 / 3,429.2 / 6,144.6 B` mean on `1,000` `v2`-panel tables; `1,418.0 / 2,510.7 / 6,435.3 / 9,877.5 B` mean on `69` multiclass tables; `0 B` external weights). Baseline byte tiers (`4 / 16 / 64 KiB`) reflect nominal caps and historical `fp16` byte estimates paired with `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`), not a common measured-wire byte qualification.
 
 | Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Nonlinearity Regime (`1,000` DS) | `Medium` (`1.5 KiB`) $R$ | `High` (`2.8 KiB`) $R$ | `Ultra` (`5.7 KiB`) $R$ |
 |---|---:|---:|---|---:|---:|---:|
-| **Linear / Logistic** (`n=969`) | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` | **Mostly Linear** (`< 0.05`, `687` DS) | `0.9467` | **`0.9585`** | `0.9477` (`D = 0.8190`) |
-| **Local Gated Attention Net** (`kumo_tabpfn` key, `n=962`) | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** | **Moderate Nonlinear** (`0.05–0.20`, `92` DS) | `0.7263` | `0.8180` | **`0.8318`** (`+10.55` pts) |
-| **MLP** (`n=965`) | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** | **Strongly Nonlinear** (`> 0.20`, `221` DS) | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
+| **Linear / Logistic** (`n=969`) | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` | **Mostly Linear** (`<= 0.04`, `581` DS) | `0.9401` | **`0.9579`** | `0.9459` (`D = 0.7836`) |
+| **Local Gated Attention Net** (`kumo_tabpfn` key, `n=962`) | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** | **Moderate Nonlinear** (`0.04–0.14`, `198` DS) | `0.8637` | `0.8953` | **`0.8990`** (`+3.53` pts) |
+| **MLP** (`n=965`) | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** | **Strongly Nonlinear** (`> 0.14`, `221` DS) | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
 | **LightGBM** (`n=989`) | **`0.8978 [0.8852, 0.9085]`** | `0.7703 [0.7615, 0.7793]` | **Stage-0 Signal Ceiling $R^2$** (`19,190` splits) | `0.9417` | `0.9654` | **`0.9863`** |
 | **CatBoost** (`n=1,000`) | **`0.8810 [0.8692, 0.8915]`** | **`0.8130 [0.8055, 0.8213]` (`D80` pass)** | **Stage-0 Nonlinear Uplift $R^2$** (`19,190` splits) | `0.7912` | `0.8727` | **`0.9383`** |
 | **XGBoost** (`n=989`) | **`0.8121 [0.7915, 0.8285]`** | `0.7221 [0.7131, 0.7310]` | **Unlimited Sampling Expansion** (`1× -> 2× -> 5× N_train`) | `0.8808` (`1×`) | `0.9010` (`2×`) | **`0.9070` (`5×`, `+2.62` pts)** |
