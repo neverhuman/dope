@@ -358,7 +358,7 @@ pub(crate) fn print_frontier_report(result: &dope_core::eval::FrontierResult, st
 
 pub(crate) fn print_mlc_v3_weights_report(
     weights_path: &Path,
-    m: &dope_core::mlc_v3::WeightInventory,
+    m: &dope_core::mlc_v3::MlcV3WeightInventory,
     style: Style,
 ) {
     let p = style.bold(weights_path.display().to_string());
