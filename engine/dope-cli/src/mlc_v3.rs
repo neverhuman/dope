@@ -93,12 +93,18 @@ pub(crate) struct InspectWeightsArgs {
     /// Preset when --weights is omitted: multitask or maxtrain97.
     #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97"])]
     pub(crate) preset: String,
+    /// Emit structured JSON summary on stdout even in an interactive terminal.
+    #[arg(long)]
+    pub(crate) json: bool,
 }
 
 #[derive(Args)]
 pub(crate) struct InspectWireArgs {
     #[arg(long)]
     pub(crate) wire: PathBuf,
+    /// Emit structured JSON summary on stdout even in an interactive terminal.
+    #[arg(long)]
+    pub(crate) json: bool,
 }
 
 #[derive(Args)]
@@ -402,25 +408,86 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             let m = MlcV3Model::load_safetensors(&weights_path)
                 .map_err(map_err)?
                 .inventory;
-            print_json(&serde_json::json!({
-                "format": "dope-mlc-v3-safetensors", "tensor_count": m.tensor_count,
-                "parameter_count": m.parameter_count, "byte_len": m.byte_len,
-                "sha256": m.sha256, "runtime": "rust-candle-cpu",
-            }))?;
+            if !style.enabled || a.json {
+                print_json(&serde_json::json!({
+                    "format": "dope-mlc-v3-safetensors", "tensor_count": m.tensor_count,
+                    "parameter_count": m.parameter_count, "byte_len": m.byte_len,
+                    "sha256": m.sha256, "runtime": "rust-candle-cpu",
+                }))?;
+            } else {
+                println!(
+                    "{} {}  {} bytes ({} tensors · {} parameters)",
+                    style.cyan_bold("●"),
+                    style.bold(weights_path.display().to_string()),
+                    style.green_bold(crate::style::group(m.byte_len)),
+                    style.bold(crate::style::group(m.tensor_count)),
+                    style.bold(crate::style::group(m.parameter_count)),
+                );
+                println!("  {}       dope-mlc-v3-safetensors", style.dim("format"));
+                println!(
+                    "  {}      {}",
+                    style.dim("runtime"),
+                    style.green_bold("rust-candle-cpu · 0 Python/LibTorch deps")
+                );
+                println!("  {}       {}", style.dim("sha256"), m.sha256);
+            }
         }
         MlcV3Command::InspectWire(a) => {
             let raw = std::fs::read(&a.wire).map_err(|e| e.to_string())?;
             let env = Dml3Envelope::from_bytes(&raw).map_err(map_err)?;
             let enc = &env.encoding;
-            print_json(&serde_json::json!({
-                "wire_format": env.wire_format, "wire_bytes": env.wire_bytes,
-                "tier_cap_bytes": env.tier_cap_bytes, "within_tier_cap": env.within_tier_cap,
-                "crc32": env.crc32, "compressed_flags": env.compressed_flags,
-                "level": enc.level, "task": enc.task, "code_width": enc.code_width,
-                "n_train": enc.n_train, "p_use": enc.p_use,
-                "include_v3_primitives": enc.target_bundle.include_v3_primitives,
-                "has_csc1_scaler": env.scaler.is_some(), "k_classes": enc.target_bundle.k_classes,
-            }))?;
+            if !style.enabled || a.json {
+                print_json(&serde_json::json!({
+                    "wire_format": env.wire_format, "wire_bytes": env.wire_bytes,
+                    "tier_cap_bytes": env.tier_cap_bytes, "within_tier_cap": env.within_tier_cap,
+                    "crc32": env.crc32, "compressed_flags": env.compressed_flags,
+                    "level": enc.level, "task": enc.task, "code_width": enc.code_width,
+                    "n_train": enc.n_train, "p_use": enc.p_use,
+                    "include_v3_primitives": enc.target_bundle.include_v3_primitives,
+                    "has_csc1_scaler": env.scaler.is_some(), "k_classes": enc.target_bundle.k_classes,
+                }))?;
+            } else {
+                println!(
+                    "{} {}  {} / {} bytes ({} · tier `{}`) {}",
+                    style.cyan_bold("●"),
+                    style.bold(a.wire.display().to_string()),
+                    style.green_bold(crate::style::group(env.wire_bytes)),
+                    crate::style::group(env.tier_cap_bytes),
+                    style.bold(&env.wire_format),
+                    style.cyan_bold(&enc.level),
+                    style.budget_bar(env.wire_bytes, env.tier_cap_bytes, 12),
+                );
+                println!(
+                    "  {}         {} (k_classes = {}) · {} train rows × {} features · {}",
+                    style.dim("task"),
+                    style.bold(&enc.task),
+                    enc.target_bundle.k_classes,
+                    crate::style::group(enc.n_train),
+                    enc.p_use,
+                    style.green("0 source rows stored"),
+                );
+                println!(
+                    "  {}     code_width = {} · v3_primitives = {} · csc1_scaler = {}",
+                    style.dim("encoding"),
+                    enc.code_width,
+                    enc.target_bundle.include_v3_primitives,
+                    env.scaler.is_some(),
+                );
+                let crc_str = env
+                    .crc32
+                    .map_or_else(|| "none".to_string(), |c| format!("0x{c:08x}"));
+                println!(
+                    "  {}    within_tier_cap = {} · crc32 = {} · flags = 0x{:02x}",
+                    style.dim("integrity"),
+                    if env.within_tier_cap {
+                        style.green_bold("true")
+                    } else {
+                        style.red_bold("false")
+                    },
+                    crc_str,
+                    env.compressed_flags,
+                );
+            }
         }
         MlcV3Command::Route(a) => {
             let weights_path = resolve_weights_path(&a.weights, &a.preset)?;
@@ -484,7 +551,23 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             })
             .map_err(map_err)?;
             match &a.out {
-                Some(p) => std::fs::write(p, &csv_bytes).map_err(|e| e.to_string())?,
+                Some(p) => {
+                    std::fs::write(p, &csv_bytes).map_err(|e| e.to_string())?;
+                    if style.enabled {
+                        println!(
+                            "{} sampled {} synthetic rows ({} features + target, {} space) from {} ({} · {} · {} B) -> {}",
+                            style.green_bold("✓"),
+                            style.bold(crate::style::group(ys.len())),
+                            sampled.headers.len().saturating_sub(1),
+                            style.bold(&a.space),
+                            style.bold(a.wire.display().to_string()),
+                            &env.wire_format,
+                            style.cyan_bold(&env.encoding.level),
+                            crate::style::group(env.wire_bytes),
+                            style.cyan_bold(p.display().to_string()),
+                        );
+                    }
+                }
                 None => std::io::stdout()
                     .write_all(&csv_bytes)
                     .map_err(|e| e.to_string())?,

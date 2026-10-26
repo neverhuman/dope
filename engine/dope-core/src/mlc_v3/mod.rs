@@ -82,12 +82,13 @@ impl MlcV3Weights {
         if parameters != MLC_V3_EXPECTED_PARAMETERS {
             return Err(bad("mlc_v3 safetensors parameter count mismatch"));
         }
+        let tensor_count = st.len();
         let tensors = candle_core::safetensors::load_buffer(raw, &Device::Cpu)?;
         Ok(Self {
             tensors,
             used: BTreeSet::new(),
             inventory: MlcV3WeightInventory {
-                tensor_count: MLC_V3_EXPECTED_TENSORS,
+                tensor_count,
                 parameter_count: parameters,
                 byte_len: raw.len(),
                 sha256: digest(raw),

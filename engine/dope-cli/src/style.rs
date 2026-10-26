@@ -370,3 +370,73 @@ pub(crate) fn print_eval_report(result: &dope_core::eval::EvalResult, style: Sty
         }
     }
 }
+
+pub(crate) fn print_sample_saved_report(
+    model_path: &std::path::Path,
+    out_path: &std::path::Path,
+    rows: usize,
+    features: usize,
+    target_name: &str,
+    space: &str,
+    style: Style,
+) {
+    if style.enabled {
+        println!(
+            "{} sampled {} synthetic rows ({} features, target `{}`, {} space) from {} -> {}",
+            style.green_bold("✓"),
+            style.bold(group(rows)),
+            features,
+            style.cyan_bold(target_name),
+            style.bold(space),
+            style.bold(model_path.display().to_string()),
+            style.cyan_bold(out_path.display().to_string()),
+        );
+    }
+}
+
+pub(crate) fn print_frontier_report(result: &dope_core::eval::FrontierResult, style: Style) {
+    if !style.enabled {
+        println!("{}", result.render());
+    } else {
+        println!(
+            "{} retention-vs-bytes frontier (threshold τ = {:.0}%)",
+            style.cyan_bold("●"),
+            result.tau * 100.0
+        );
+        println!(
+            "  {}",
+            style.dim("budget     bytes   budget bar         robust retention   per auditor")
+        );
+        for p in &result.points {
+            let per: Vec<String> = p
+                .retention
+                .iter()
+                .map(|(a, r)| format!("{} {:.3}", style.bold(a), r))
+                .collect();
+            let rob = p
+                .robust_retention
+                .map_or_else(|| style.dim("n/a"), |r| style.retention_badge(r));
+            println!(
+                "  {:>7} {:>8}   {}   {:>16}   {}",
+                group(p.budget),
+                style.bold(group(p.bytes)),
+                style.budget_bar(p.bytes, p.budget, 10),
+                rob,
+                per.join(" · ")
+            );
+        }
+        match result.tdl_bytes {
+            Some(b) => println!(
+                "  {} TDL@{:.0}% = {} bytes (smallest tested budget reaching the threshold)",
+                style.green_bold("✓"),
+                result.tau * 100.0,
+                style.green_bold(group(b))
+            ),
+            None => println!(
+                "  {} TDL@{:.0}% not reached in the tested range",
+                style.yellow_bold("!"),
+                result.tau * 100.0
+            ),
+        }
+    }
+}
