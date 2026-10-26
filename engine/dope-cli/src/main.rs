@@ -17,8 +17,10 @@ mod learned;
 mod levels;
 mod mlc_v3;
 mod runtime;
+mod style;
 mod tiers;
 use args::*;
+use style::{print_eval_report, print_fit_report, print_inspect_report, ColorChoice, Style};
 
 fn parse_bytes(s: &str) -> Result<usize, String> {
     let t = s.trim().to_ascii_lowercase();
@@ -50,20 +52,9 @@ fn writer(path: &Option<PathBuf>) -> Result<Box<dyn Write>, String> {
     })
 }
 
-fn group(n: usize) -> String {
-    let s = n.to_string();
-    let mut out = String::new();
-    for (i, c) in s.chars().enumerate() {
-        if i > 0 && (s.len() - i) % 3 == 0 {
-            out.push(',');
-        }
-        out.push(c);
-    }
-    out
-}
-
 fn run(cli: Cli) -> Result<(), String> {
     runtime::configure(cli.threads)?;
+    let style = Style::from_choice(ColorChoice::parse(&cli.color)?);
     let e = |err: dope_core::DopeError| {
         format!(
             "{err}\n  hint: {}\n  docs: {}",
@@ -74,7 +65,7 @@ fn run(cli: Cli) -> Result<(), String> {
     match cli.command {
         Command::Landmarks(a) => landmarks::run(a)?,
         Command::Learned(a) => learned::run(a)?,
-        Command::MlcV3(a) => mlc_v3::run(a)?,
+        Command::MlcV3(a) => mlc_v3::run(a, style)?,
         Command::FitLevels(a) => levels::run(a)?,
         Command::Fit(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
@@ -127,52 +118,12 @@ fn run(cli: Cli) -> Result<(), String> {
                     serde_json::to_string(&fitted.report).map_err(|e| e.to_string())?
                 );
             } else if !a.quiet {
-                let r = &fitted.report;
-                println!(
-                    "compiled {} -> {}  ({} bytes, budget {})",
-                    a.csv.display(),
-                    a.out.display(),
-                    group(r.bytes),
-                    group(r.budget)
-                );
-                println!(
-                    "  task         {} · {} rows × {} features",
-                    r.task,
-                    group(r.rows),
-                    r.features
-                );
-                println!(
-                    "  program      {} knots · {} dependence × {} regime(s) · net {}→{} (bits w{} b{} β{} v{}) · {} trees of depth {}",
-                    r.knots, r.dependence, r.regimes, r.inputs, r.hidden, r.bits[0], r.bits[1], r.bits[2], r.bits[3], r.trees, r.depth
-                );
-                println!(
-                    "  parameters   {} total scalar slots ({} network, {} forest)",
-                    group(r.parameters.total),
-                    group(r.parameters.network),
-                    group(r.parameters.forest)
-                );
-                println!(
-                    "  stored gain  {:.3} of the null loss explained on held-out rows",
-                    r.stored_gain
-                );
-                if let Some(a) = r.self_audit {
-                    println!(
-                        "  self-audit   robust retention {a:.3} (linear and tree auditors trained on samples, scored on held-out training rows)"
-                    );
-                }
-                println!(
-                    "  drivers      {}",
-                    r.screened
-                        .iter()
-                        .take(6)
-                        .cloned()
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                );
-                println!(
-                    "  time         {:.1} s on {}",
-                    r.seconds,
-                    device::describe(&opts.device)
+                print_fit_report(
+                    &a.csv,
+                    &a.out,
+                    &fitted.report,
+                    &device::describe(&opts.device),
+                    style,
                 );
             }
         }
@@ -244,49 +195,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 });
                 println!("{}", serde_json::to_string_pretty(&v).unwrap_or_default());
             } else {
-                println!(
-                    "{}  {} bytes ({} brotli program + {} safetensors framing)",
-                    a.model.display(),
-                    group(report.total),
-                    group(report.stored),
-                    group(report.header)
-                );
-                println!("  inflated, the program holds:");
-                println!("  {:<18} {:>7} bytes", "metadata", group(report.metadata));
-                for (name, b) in &report.tensors {
-                    println!("  {:<18} {:>7} bytes", name, group(*b));
-                }
-                println!(
-                    "  task         {:?}, target `{}`",
-                    program.schema.task, program.schema.target.name
-                );
-                println!("  features     {}", program.features());
-                println!(
-                    "  parameters   {} total scalar slots",
-                    group(program.parameters().total)
-                );
-                println!(
-                    "  dependence   {} × {} regime(s)",
-                    program.dependence.name(),
-                    program.regimes.k()
-                );
-                println!(
-                    "  net          {} inputs → {} hidden → {} outputs",
-                    program.net.inputs, program.net.hidden, program.net.outputs
-                );
-                println!(
-                    "  trees        {} oblivious trees of depth {} ({}-bit leaves)",
-                    program.forest.trees(),
-                    program.forest.depth,
-                    program.forest.bits
-                );
-                if !program.schema.dropped.is_empty() {
-                    println!(
-                        "  dropped      {} identifier-like column(s)",
-                        program.schema.dropped.len()
-                    );
-                }
-                println!("  rows stored  none");
+                print_inspect_report(&a.model, &program, &report, style);
             }
         }
         Command::Encode(a) => {
@@ -334,7 +243,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 .transpose()
                 .map_err(e)?;
             let result = evaluate(&model, &train, &test, synth.as_ref(), &opts).map_err(e)?;
-            println!("{}", result.render());
+            print_eval_report(&result, style);
             if let Some(p) = &a.json {
                 std::fs::write(p, serde_json::to_string_pretty(&result).unwrap_or_default())
                     .map_err(|x| x.to_string())?;
@@ -394,7 +303,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 device::describe(&dev)
             );
         }
-        Command::Doctor(a) => runtime::doctor(a.json)?,
+        Command::Doctor(a) => runtime::doctor(a.json, style)?,
     }
     Ok(())
 }

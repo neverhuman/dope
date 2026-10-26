@@ -276,3 +276,22 @@ fn size_parameter_caps_and_tier_catalog() {
     assert_ne!(p.schema.target.name, "score");
     std::fs::remove_dir_all(dir).ok();
 }
+
+#[test]
+fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
+    let dir = workdir("color-flags");
+    let plain = dope(&dir, &["doctor"]);
+    assert!(!plain.contains("\x1b["));
+    assert_eq!(plain, dope(&dir, &["--color", "never", "doctor"]));
+    let colored = dope(&dir, &["--color", "always", "doctor"]);
+    assert!(colored.contains("\x1b["));
+    assert!(colored.contains("native Rust"));
+    let reject = Command::new(env!("CARGO_BIN_EXE_dope"))
+        .current_dir(&dir)
+        .args(["mlc-v3", "fetch-weights", "--tag", "latest"])
+        .output()
+        .unwrap();
+    assert!(!reject.status.success());
+    assert!(String::from_utf8_lossy(&reject.stderr).contains("concrete version tag"));
+    std::fs::remove_dir_all(dir).ok();
+}

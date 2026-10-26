@@ -62,7 +62,7 @@ def kib_ticks(ax, lo: float, hi: float) -> None:
 
 
 def hero_readme(plt):
-    """3-panel publication hero on 1,000 datasets for README hero.png: (A) Elo leaderboard, (B) retention by byte tier, (C) 6-auditor transfer & 1x->5x expansion."""
+    """3-panel publication hero on 1,000 datasets for README hero.png: (A) Elo leaderboard, (B) retention by byte tier, (C) 6-auditor transfer & 150-DS 1x->5x expansion."""
     import numpy as np
     snap = multilevel_convergence_data()
     vs = snap["value_and_testing_scale_summary"]
@@ -71,29 +71,31 @@ def hero_readme(plt):
     med_b = [int(v2_t[t]["exact_v2_latent_wire_median_bytes"]) for t in tiers]
     med_kib = [b / 1024.0 for b in med_b]
     study_txt = (ROOT / "docs/multilevel-landmark-dl-study.md").read_text()
-    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(13.2, 4.55), gridspec_kw={"width_ratios": [1.14, 1.04, 0.96]})
-    names = [f"DOPE-MLC-v2 (#1)\n({med_b[0]:,}–{med_b[2]:,} B / {med_kib[0]:.1f}–{med_kib[2]:.1f} KiB latent)",
-             "Raw Rows Subsample\n(raw-row subset control)", "DOPE v1 Kernel\n(research kernel)",
-             "Gaussian Copula\n(parametric baseline)", "Joint Diffusion\n(tabular diffusion)", "ARF\n(adversarial forest)"]
+    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(14.4, 4.95), gridspec_kw={"width_ratios": [1.14, 1.05, 1.01]})
+    fig.suptitle("DOPE at a Glance — 1,000-Dataset Benchmark (6 Downstream ML Learner Families, 65,874 Fits)", fontsize=10.8, fontweight="bold", color=INK, y=0.985)
+    names = [f"#1 DOPE-MLC-v2\n({med_kib[0]:.1f}–{med_kib[2]:.1f} KiB latent wire)",
+             "#2 Raw Rows Subsample\n(raw-row subset control)", "#3 DOPE v1 Kernel\n(research kernel)",
+             "#4 Gaussian Copula\n(parametric baseline)", "#5 Joint Diffusion\n(tabular diffusion)", "#6 ARF\n(adversarial forest)"]
     colors = [BLUE, ORANGE, TEAL, SLATE, GRAY, "#a8a29e"]
     y_pos = np.arange(len(lb))[::-1]
     elos = [r["elo"] for r in lb]
     bars = ax_a.barh(y_pos, elos, xerr=[[r["elo"] - r["elo_ci95_low"] for r in lb], [r["elo_ci95_high"] - r["elo"] for r in lb]],
-                     height=0.62, color=colors, alpha=0.92, error_kw=dict(ecolor=INK, lw=1.2, capsize=2.5))
+                     height=0.60, color=colors, alpha=0.92, error_kw=dict(ecolor=INK, lw=1.2, capsize=2.5))
     bars[0].set_edgecolor(INK)
-    bars[0].set_linewidth(1.2)
+    bars[0].set_linewidth(1.3)
     ax_a.axvline(1500.0, color=INK2, lw=1.0, ls="--", zorder=1)
-    ax_a.text(1503.0, 0.12, "Neutral (1500)", color=INK2, fontsize=7.2, va="bottom")
-    ax_a.set_yticks(y_pos, names, fontsize=7.5)
-    ax_a.set_xlim(1100.0, 1810.0)
+    ax_a.set_yticks(y_pos, names, fontsize=7.8)
+    ax_a.set_xlim(1100.0, 1865.0)
+    ax_a.set_ylim(-0.65, 5.65)
     ax_a.grid(axis="y", visible=False)
     for i, r in enumerate(lb):
-        ax_a.text(r["elo_ci95_high"] + 8.0, y_pos[i], f"{r['elo']:.1f} ({100.0 * r['win_share']:.1f}% win)", va="center", ha="left", fontsize=7.5, fontweight="bold" if i == 0 else "normal", color=BLUE if i == 0 else INK)
-    ax_a.set_xlabel("Bradley–Terry Elo across 1,000 datasets & 6 auditors (95% CI)", fontsize=8.2)
-    ax_a.set_title("A. Multi-Auditor Method Ranking (1,000 DS, 65,874 Fits)", loc="left", color=INK, fontsize=8.8, fontweight="bold")
+        ax_a.text(r["elo_ci95_high"] + 8.0, y_pos[i], f"{r['elo']:.1f} ({100.0 * r['win_share']:.1f}% win)", va="center", ha="left", fontsize=7.6, fontweight="bold" if i == 0 else "normal", color=BLUE if i == 0 else INK)
+    ax_a.text(0.98, 0.04, "Disjoint-1k ckpt: 1650.7 (#1)\n242 held-out DS: 1671.6 (#1)\n758 unseen-fold: 1645.4 (#1)", transform=ax_a.transAxes, ha="right", va="bottom", fontsize=6.4, color=INK, bbox=dict(boxstyle="round,pad=0.24", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.75))
+    ax_a.set_xlabel("Bradley–Terry Elo (95% CI; dashed = 1500 neutral)", fontsize=8.3)
+    ax_a.set_title("A. Multi-Learner Ranking (1,000 DS, 65,874 Fits)", loc="left", color=INK, fontsize=9.0, fontweight="bold")
     x, w = np.arange(len(tiers)), 0.25
     dope_lbl = f"DOPE-MLC-v2 ({med_b[0]:,}/{med_b[1]:,}/{med_b[2]:,} B = {med_kib[0]:.1f}/{med_kib[1]:.1f}/{med_kib[2]:.1f} KiB latent med)"
-    for key, label, col, offset in (("dope", dope_lbl, BLUE, -w), ("rows", "Raw Rows Subsample (4 / 16 / 64 KiB nominal cap)", ORANGE, 0.0), ("copula", "Gaussian Copula (4 / 16 / 64 KiB nominal cap)", SLATE, w)):
+    for key, label, col, offset in (("dope", dope_lbl, BLUE, -w), ("rows", "Raw Rows Subsample (4 / 16 / 64 KiB cap; Med CB 999/1k)", ORANGE, 0.0), ("copula", "Gaussian Copula (4 / 16 / 64 KiB nominal cap)", SLATE, w)):
         means = [v2_t[t][f"{key}_mean_retention_R"] for t in tiers]
         lo = [means[i] - v2_t[t][f"{key}_retention_R_ci95"][0] for i, t in enumerate(tiers)]
         hi = [v2_t[t][f"{key}_retention_R_ci95"][1] - means[i] for i, t in enumerate(tiers)]
@@ -102,47 +104,47 @@ def hero_readme(plt):
             rect.set_edgecolor(INK)
             rect.set_linewidth(1.0)
         for i, m in enumerate(means):
-            ax_b.text(x[i] + offset, m + hi[i] + 0.007, f"{m + 1e-9:.3f}", ha="center", va="bottom", fontsize=6.8, fontweight="bold" if key == "dope" else "normal", color=BLUE if key == "dope" else INK2)
-    ax_b.text(-0.10, 0.918, "+18.8 pts vs. Rows\n(#1 Elo 1652)", ha="center", va="bottom", fontsize=6.3, fontweight="bold", color=BLUE)
-    ax_b.text(0.82, 0.946, "+4.5 pts vs. Rows\n(#1 Elo 1670)", ha="center", va="bottom", fontsize=6.3, fontweight="bold", color=BLUE)
-    ax_b.text(2.06, 0.964, "#1 Encoder (Elo 1658)\nRows: 88% raw copy", ha="center", va="bottom", fontsize=6.1, color=INK2)
-    ax_b.set_xticks(x, [f"Medium (4 KiB)\n{med_kib[0]:.1f} KiB ({med_b[0]:,} B)", f"High (16 KiB)\n{med_kib[1]:.1f} KiB ({med_b[1]:,} B)", f"Ultra (64 KiB)\n{med_kib[2]:.1f} KiB ({med_b[2]:,} B)"], fontsize=6.6)
+            ax_b.text(x[i] + offset, m + hi[i] + 0.008, f"{m + 1e-9:.3f}", ha="center", va="bottom", fontsize=7.0, fontweight="bold" if key == "dope" else "normal", color=BLUE if key == "dope" else INK2)
+    ax_b.text(0.0, 0.922, "+18.8 pts vs. Rows\n(#1 Tier Elo 1652.1)", ha="center", va="bottom", fontsize=6.5, fontweight="bold", color=BLUE, bbox=dict(boxstyle="round,pad=0.18", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.65))
+    ax_b.text(1.0, 0.952, "+4.5 pts vs. Rows\n(#1 Tier Elo 1669.6)", ha="center", va="bottom", fontsize=6.5, fontweight="bold", color=BLUE, bbox=dict(boxstyle="round,pad=0.18", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.65))
+    ax_b.text(2.0, 0.978, "#1 Encoder (Elo 1640.1)\nRows: 88% raw copy", ha="center", va="bottom", fontsize=6.3, color=INK2, bbox=dict(boxstyle="round,pad=0.18", facecolor=SURFACE, edgecolor=GRID, lw=0.65))
+    ax_b.set_xticks(x, [f"Medium (4 KiB cap)\nDOPE: {med_kib[0]:.1f} KiB", f"High (16 KiB cap)\nDOPE: {med_kib[1]:.1f} KiB", f"Ultra (64 KiB cap)\nDOPE: {med_kib[2]:.1f} KiB"], fontsize=7.5)
     ax_b.set_xlim(-0.56, 2.56)
-    ax_b.set_ylim(0.58, 1.13)
+    ax_b.set_ylim(0.55, 1.21)
     ax_b.grid(axis="x", visible=False)
-    ax_b.set_ylabel("Mean holdout retention R (6 auditors, 95% CI)", fontsize=8.2)
-    ax_b.set_title("B. Holdout Retention R by Byte Tier (1,000 DS)", loc="left", color=INK, fontsize=8.8, fontweight="bold")
-    ax_b.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.2, loc="upper left")
+    ax_b.set_ylabel("Mean holdout retention R (6 learners, 95% CI)", fontsize=8.3)
+    ax_b.set_title("B. Holdout Retention R by Byte Tier (1,000 DS)", loc="left", color=INK, fontsize=9.0, fontweight="bold")
+    ax_b.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.4, loc="upper left")
     aud_specs = [
         ("Linear / Logistic\n(n=969)", r"\| \*\*Linear / Logistic\*\* \| `969` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*Linear / Logistic\*\* \| `969` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
-        ("Local Gated Attention\n(n=962, kumo_tabpfn key)", r"\| \*\*Local Gated Attention Net \(`kumo_tabpfn` key\)\*\* \| `962` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*Local Gated Attention Net \(`kumo_tabpfn` key\)\*\* \| `962` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
-        ("MLP\n(n=965)", r"\| \*\*MLP\*\* \| `965` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*MLP\*\* \| `965` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
+        ("Local Gated Attention\n(n=962, from scratch)", r"\| \*\*Local Gated Attention Net \(`kumo_tabpfn` key\)\*\* \| `962` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*Local Gated Attention Net \(`kumo_tabpfn` key\)\*\* \| `962` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
+        ("Neural MLP\n(n=965)", r"\| \*\*MLP\*\* \| `965` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*MLP\*\* \| `965` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
         ("LightGBM\n(n=989)", r"\| \*\*LightGBM\*\* \| `989` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*LightGBM\*\* \| `989` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
         ("CatBoost\n(n=1,000)", r"\| \*\*CatBoost\*\* \| `1,000` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*CatBoost\*\* \| `1,000` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
         ("XGBoost\n(n=989)", r"\| \*\*XGBoost\*\* \| `989` \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`", r"\| \*\*XGBoost\*\* \| `989` \| .*? \| \*\*`[\d.]+` `\[[^\]]+\]`\*\* \| \*\*`([\d.]+)`"),
     ]
     yc, r_vals, d_vals = np.arange(len(aud_specs))[::-1], [float(_study_val(study_txt, p_r)) for _, p_r, _ in aud_specs], [float(_study_val(study_txt, p_d)) for _, _, p_d in aud_specs]
-    ax_c.barh(yc + 0.14, r_vals, height=0.31, color=BLUE, alpha=0.92, label="Holdout retention R (T90 = 0.90)")
-    ax_c.barh(yc - 0.14, d_vals, height=0.31, color=TEAL, alpha=0.88, label="Driver attribution fidelity D (D80 = 0.80)")
+    ax_c.barh(yc + 0.15, r_vals, height=0.30, color=BLUE, alpha=0.92, label="Holdout retention R (T90 = 0.90)")
+    ax_c.barh(yc - 0.15, d_vals, height=0.30, color=TEAL, alpha=0.88, label="Driver fidelity D (D80 = 0.80)")
     ax_c.axvline(0.90, color=BLUE, lw=0.9, ls="--", alpha=0.7)
     ax_c.axvline(0.80, color=TEAL, lw=0.9, ls=":", alpha=0.7)
     for i, (rv, dv) in enumerate(zip(r_vals, d_vals)):
-        ax_c.text(rv + 0.006, yc[i] + 0.14, f"{rv:.3f}", va="center", ha="left", fontsize=6.7, fontweight="bold", color=BLUE)
-        ax_c.text(dv + 0.006, yc[i] - 0.14, f"{dv:.3f}", va="center", ha="left", fontsize=6.5, color=TEAL)
+        ax_c.text(rv + 0.006, yc[i] + 0.15, f"{rv:.3f}", va="center", ha="left", fontsize=6.9, fontweight="bold", color=BLUE)
+        ax_c.text(dv + 0.006, yc[i] - 0.15, f"{dv:.3f}", va="center", ha="left", fontsize=6.7, color=TEAL)
     exp1 = _study_val(study_txt, r"monotonically from \*\*`([\d.]+)`\*\* \(\$1\\times N_\{\\text\{train\}\}\$\)")
     exp2 = _study_val(study_txt, r"\$\\to\$ \*\*`([\d.]+)`\*\*\s+\(\$2\\times N_\{\\text\{train\}\}\$\)")
     exp5 = _study_val(study_txt, r"\$\\to\$ \*\*`([\d.]+)`\*\* \(\$5\\times N_\{\\text\{train\}\}\$")
-    ax_c.text(0.50, 0.015, f"1×→2×→5× N_train sampling expansion:\nCatBoost R: {exp1} → {exp2} → {exp5} (+2.6 pts)", transform=ax_c.transAxes, ha="center", va="bottom", fontsize=5.8, color=INK, bbox=dict(boxstyle="round,pad=0.22", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.75))
-    ax_c.set_yticks(yc, [a[0] for a in aud_specs], fontsize=7.1)
-    ax_c.set_xlim(0.62, 1.03)
-    ax_c.set_ylim(-1.18, 6.25)
+    ax_c.text(0.50, 0.015, f"1×→2×→5× N_train expansion (n=150 DS subset, ds_rank<150):\nCatBoost R: {exp1} → {exp2} → {exp5} (+2.62 pts, 0 extra wire B)", transform=ax_c.transAxes, ha="center", va="bottom", fontsize=6.1, color=INK, bbox=dict(boxstyle="round,pad=0.22", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.75))
+    ax_c.set_yticks(yc, [a[0] for a in aud_specs], fontsize=7.4)
+    ax_c.set_xlim(0.62, 1.04)
+    ax_c.set_ylim(-1.42, 6.55)
     ax_c.grid(axis="y", visible=False)
-    ax_c.set_xlabel("Holdout retention R & driver fidelity D (Ultra)", fontsize=8.2)
-    ax_c.set_title("C. 6-Learner Transfer (Ultra)", loc="left", color=INK, fontsize=8.6, fontweight="bold")
-    ax_c.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.1, loc="upper left")
+    ax_c.set_xlabel("Holdout retention R & driver fidelity D (Ultra)", fontsize=8.3)
+    ax_c.set_title("C. 6-Learner Transfer (Ultra)", loc="left", color=INK, fontsize=9.0, fontweight="bold")
+    ax_c.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.4, loc="upper left")
     dec_b = int(_study_val(study_txt, r"frozen `(\d+,\d+) B` decoder").replace(",", ""))
-    fig.text(0.5, 0.006, f"Byte qualification: DOPE-MLC-v2 medians ({med_b[0]:,} / {med_b[1]:,} / {med_b[2]:,} B = {med_kib[0]:.1f} / {med_kib[1]:.1f} / {med_kib[2]:.1f} KiB) are exact v2 latent payloads (+545 B med scaler sidecar; shared {dec_b:,} B / {dec_b / 1024.0:.1f} KiB decoder).\nBaseline tiers (4 / 16 / 64 KiB) reflect nominal budget caps and historical receipt byte estimates, not a common measured-wire byte qualification.", ha="center", va="bottom", fontsize=6.5, color=INK2)
-    fig.tight_layout(rect=(0.0, 0.055, 0.992, 1.0))
+    fig.text(0.5, 0.006, f"Byte & cohort qualification: DOPE-MLC-v2 medians ({med_b[0]:,} / {med_b[1]:,} / {med_b[2]:,} B = {med_kib[0]:.1f} / {med_kib[1]:.1f} / {med_kib[2]:.1f} KiB) are exact v2 latent payloads (+545 B med scaler sidecar; shared {dec_b:,} B / {dec_b / 1024.0:.1f} KiB decoder; 242 dataset-disjoint + 758 unseen-fold = 1,000 DS).\nBaseline tiers (4 / 16 / 64 KiB) reflect nominal budget caps and historical receipt byte estimates (rows medium|catboost: 999/1,000 observed), not a common measured-wire byte qualification.", ha="center", va="bottom", fontsize=6.6, color=INK2)
+    fig.tight_layout(rect=(0.0, 0.055, 0.995, 0.955))
     return fig
 
 
@@ -315,7 +317,7 @@ def convergence(summary: dict, plt):
     t3_a0 = snap["v3_maxtrain97_val3pct"]["matched_budget_ablation_progression_A0_to_A3"]["A0_v2_baseline_140"]
     vs = snap["value_and_testing_scale_summary"]
     xs = np.array([r["raw_receipt_epoch_field"] for r in t1], dtype=float)
-    fig, axes = plt.subplots(2, 2, figsize=(10.2, 6.8))
+    fig, axes = plt.subplots(2, 2, figsize=(12.6, 7.6))
     ax_a, ax_b, ax_c, ax_d = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
     # Panel A: Track 1 DOPE-MLC-v2 Full Corpus (<5% Val: 684/684 splits, 115 DS) + Per-Tier Hierarchy
     t1_val = np.array([r["val_full"]["mean_total_loss"] for r in t1])
@@ -326,19 +328,19 @@ def convergence(summary: dict, plt):
     old_val = np.array([e["val_monitor_600"]["mean_total_loss"] for e in eps_old])
     xf = 8.85
     ax_a.fill_between(xs, t1_val - t1_se, t1_val + t1_se, color=BLUE, alpha=0.16, lw=0)
-    ax_a.plot(xs, t1_val, marker="s", ms=4.2, lw=2.1, color=BLUE, label="Full 684/684 val mean ±1 SE (3.59% splits, R8* 0.34216, -16.5%)")
+    ax_a.plot(xs, t1_val, marker="s", ms=4.4, lw=2.2, color=BLUE, label="Full 684/684 val mean ±1 SE (3.59% splits, R8* 0.34216, -16.52%)")
     ax_a.plot(xs, t1_tr, marker="o", ms=3.8, lw=1.7, color=TEAL, ls="--", label="600/18,395 train monitor (subsampled, R0 0.41216 → R8 0.35175)")
-    ax_a.plot(xs, t1_ult, marker="*", ms=5.0, lw=1.4, color=PURPLE, ls="-.", label="Full 684/684 val Ultra 64 KiB (R8* 0.32396 ± 0.01672)")
-    ax_a.plot(xs, t1_med, marker="^", ms=3.6, lw=1.3, color=ORANGE, ls="-.", label="Full 684/684 val Medium 4 KiB (R8* 0.36407 ± 0.01608)")
+    ax_a.plot(xs, t1_ult, marker="*", ms=5.2, lw=1.5, color=PURPLE, ls="-.", label="Full 684/684 val Ultra 64 KiB (R8* 0.32396 ± 0.01672)")
+    ax_a.plot(xs, t1_med, marker="^", ms=3.8, lw=1.4, color=ORANGE, ls="-.", label="Full 684/684 val Medium 4 KiB (R8* 0.36407 ± 0.01608)")
     ax_a.plot(xs, old_val, marker="d", ms=3.5, lw=1.3, color=SLATE, ls=":", label="Preserved 10%-val monitor (600/1,891, R7* 0.37667 | full 0.37753)")
     ax_a.plot([xf], [full_old["mean_total_loss"]], marker="D", ms=5.5, color=ORANGE, ls="none")
     ax_a.axvline(8.42, color=GRAY, ls=":", lw=0.9)
     ax_a.set_xticks(list(range(9)) + [xf], ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8*", "Full\n1891"])
-    ax_a.set_ylim(0.312, 0.455)
+    ax_a.set_ylim(0.305, 0.488)
     ax_a.set_xlabel("Training Round (24,527 visits / 18,395 splits = 1.333× passes)")
     ax_a.set_ylabel("DOPE-MLC-v2 multi-task loss")
-    ax_a.set_title("A. DOPE-MLC-v2 Train Monitor vs. Full <5% Unseen Val Loss (3,188 DS)", loc="left", color=INK, fontsize=8.3, fontweight="bold")
-    ax_a.legend(frameon=False, fontsize=5.8, loc="upper right")
+    ax_a.set_title("A. DOPE-MLC-v2 Train Monitor vs. Full <5% Unseen Val Loss (3,188 DS)", loc="left", color=INK, fontsize=8.8, fontweight="bold")
+    ax_a.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.2, loc="upper right")
     # Panel B: Disjoint-1,000 (v2) & Disjoint-1,069 (v3) Train Monitor vs Full <5% dev_val Loss
     t2_val = np.array([r["val_full"]["mean_total_loss"] for r in t2])
     t2_se = np.array([r["val_full"]["dataset_grouped_se"] for r in t2])
@@ -349,18 +351,18 @@ def convergence(summary: dict, plt):
     a0_val = np.array([pt["val_mean_total_loss"] for pt in t3_a0["round_val_loss_trajectory"]])
     ax_b.fill_between(xs, a3_val - a3_se, a3_val + a3_se, color=TEAL, alpha=0.14, lw=0)
     ax_b.fill_between(xs, t2_val - t2_se, t2_val + t2_se, color=BLUE, alpha=0.15, lw=0)
-    ax_b.plot(xs, a3_val, marker="s", ms=4.0, lw=2.0, color=TEAL, label="v3 A3 full 75/75 dev_val ±1 SE (3.26% of 2,304 pool, R8* 0.68492)")
+    ax_b.plot(xs, a3_val, marker="s", ms=4.2, lw=2.1, color=TEAL, label="v3 A3 full 75/75 dev_val ±1 SE (3.26% of 2,304 pool, R8* 0.68492)")
     ax_b.plot(xs, a0_val, marker="v", ms=3.5, lw=1.3, color=SLATE, ls=":", label="v3 A0 baseline 75/75 dev_val (140-d, R5* 0.68700 | R8 0.68709)")
-    ax_b.plot(xs, t2_val, marker="s", ms=4.0, lw=2.0, color=BLUE, label="v2 Disjoint-1k full 345/345 dev_val ±1 SE (2.80%, R5* 0.57363)")
-    ax_b.plot([5], [t2_val[5]], marker="o", ms=7.5, fillstyle="none", mew=1.5, color=ORANGE, ls="none")
+    ax_b.plot(xs, t2_val, marker="s", ms=4.2, lw=2.1, color=BLUE, label="v2 Disjoint-1k full 345/345 dev_val ±1 SE (2.80%, R5* 0.57363)")
+    ax_b.plot([5], [t2_val[5]], marker="o", ms=7.8, fillstyle="none", mew=1.6, color=ORANGE, ls="none")
     ax_b.plot(xs, a3_tr, marker="o", ms=3.6, lw=1.6, color=TEAL, ls="--", label="v3 A3 600/2,229 train monitor (1.9996× passes, R8 0.46132)")
     ax_b.plot(xs, t2_tr, marker="o", ms=3.6, lw=1.6, color=ORANGE, ls="--", label="v2 Disjoint-1k 600/11,976 train monitor (1.333× passes, R8 0.41492)")
     ax_b.set_xticks(range(9), ["R0", "R1", "R2", "R3", "R4", "R5*", "R6", "R7", "R8*"])
-    ax_b.set_ylim(0.395, 0.855)
+    ax_b.set_ylim(0.385, 0.915)
     ax_b.set_xlabel("Training Round (v2: 15,968 / 1.333×; v3: 4,457 / 2.00×)")
     ax_b.set_ylabel("Multi-task objective loss")
-    ax_b.set_title("B. Disjoint-1,000 (v2) & 1,069 (v3) Train vs. <5% Val Loss", loc="left", color=INK, fontsize=8.3, fontweight="bold")
-    ax_b.legend(frameon=False, fontsize=5.8, loc="upper right")
+    ax_b.set_title("B. Disjoint-1,000 (v2) & 1,069 (v3) Train vs. <5% Val Loss", loc="left", color=INK, fontsize=8.8, fontweight="bold")
+    ax_b.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.2, loc="upper right")
     # Panel C: Value vs Measured Wire Bytes Across 1,000 (v2) & 1,069 (v3) Selection-Exposed Datasets
     ax_c.set_xscale("log")
     v2_t, v3_t = vs["v2_value_by_tier_1000ds"], vs["v3_value_by_role_and_tier_1069ds"]
@@ -369,31 +371,32 @@ def convergence(summary: dict, plt):
     y_v2 = [v2_t[t]["dope_mean_retention_R"] for t in tiers_v2]
     lo_v2 = [y_v2[i] - v2_t[t]["dope_retention_R_ci95"][0] for i, t in enumerate(tiers_v2)]
     hi_v2 = [v2_t[t]["dope_retention_R_ci95"][1] - y_v2[i] for i, t in enumerate(tiers_v2)]
-    ax_c.axvspan(700.0, 8192.0, color=BLUE, alpha=0.04, zorder=0)
-    ax_c.errorbar(x_v2, y_v2, yerr=[lo_v2, hi_v2], marker="o", ms=5.2, lw=2.1, color=BLUE, capsize=2.5, label="DOPE-MLC-v2 (1,000 DS, exact v2 med wire, 95% CI; Elo 1651.3 #1)")
-    for m_key, col, ls, mk, lbl in (("rows", ORANGE, "--", "s", "Rows @ nominal 4/16/64 KiB cap (1,000 DS, 95% CI; Elo 1593.3)"), ("copula", SLATE, ":", "^", "Copula @ nominal 4/16/64 KiB cap (1,000 DS, 95% CI; Elo 1545.8)")):
+    ax_c.axvspan(700.0, 8192.0, color=BLUE, alpha=0.045, zorder=0)
+    ax_c.text(780.0, 0.625, "Compact-Program\nZone (≤ 8 KiB)", color=BLUE, fontsize=6.7, fontweight="bold", ha="left", va="bottom")
+    ax_c.errorbar(x_v2, y_v2, yerr=[lo_v2, hi_v2], marker="o", ms=5.4, lw=2.2, color=BLUE, capsize=2.5, label="DOPE-MLC-v2 (1,000 DS: 242 disj + 758 fold, exact med wire; Elo 1651.3 #1)")
+    for m_key, col, ls, mk, lbl in (("rows", ORANGE, "--", "s", "Rows @ nominal 4/16/64 KiB cap (1,000 DS, Med CB 999/1k; Elo 1593.3)"), ("copula", SLATE, ":", "^", "Copula @ nominal 4/16/64 KiB cap (1,000 DS, 95% CI; Elo 1545.8)")):
         xm, ym = [v2_t[t]["nominal_cap_bytes"] for t in tiers_v2], [v2_t[t][f"{m_key}_mean_retention_R"] for t in tiers_v2]
         lom, him = [ym[i] - v2_t[t][f"{m_key}_retention_R_ci95"][0] for i, t in enumerate(tiers_v2)], [v2_t[t][f"{m_key}_retention_R_ci95"][1] - ym[i] for i, t in enumerate(tiers_v2)]
-        ax_c.errorbar(xm, ym, yerr=[lom, him], marker=mk, ms=4.2, lw=1.5, color=col, ls=ls, capsize=2.0, label=lbl)
+        ax_c.errorbar(xm, ym, yerr=[lom, him], marker=mk, ms=4.4, lw=1.6, color=col, ls=ls, capsize=2.0, label=lbl)
     x_v3p = [v3_t["eval_gradient_disjoint_v2_panel"][t]["mean_dml3_complete_wire_bytes"] for t in tiers_v3]
     y_v3p = [v3_t["eval_gradient_disjoint_v2_panel"][t]["sender_scaled_6aud_mean_clipped_R"] for t in tiers_v3]
     x_v3m = [v3_t["eval_gradient_disjoint_multiclass_panel"][t]["mean_dml3_complete_wire_bytes"] for t in tiers_v3]
     y_v3m = [v3_t["eval_gradient_disjoint_multiclass_panel"][t]["sender_scaled_6aud_mean_clipped_R"] for t in tiers_v3]
-    ax_c.plot(x_v3p, y_v3p, marker="D", ms=4.4, lw=1.8, color=TEAL, ls="-.", label="DOPE-MLC-v3 1,000-DS panel (mean DML3+CSC1 wire, 340-row 6-aud R)")
-    ax_c.plot(x_v3m, y_v3m, marker="P", ms=5.0, lw=1.7, color=PURPLE, ls="-.", label="DOPE-MLC-v3 69-DS multiclass (+0.253 ΔR vs copula, Elo 1540.9)")
+    ax_c.plot(x_v3p, y_v3p, marker="D", ms=4.6, lw=1.9, color=TEAL, ls="-.", label="DOPE-MLC-v3 1,000-DS panel (mean DML3+CSC1 wire, 340-row 6-aud R)")
+    ax_c.plot(x_v3m, y_v3m, marker="P", ms=5.2, lw=1.8, color=PURPLE, ls="-.", label="DOPE-MLC-v3 69-DS multiclass (+0.253 ΔR vs copula, Elo 1540.9)")
     study_txt = (ROOT / "docs/multilevel-landmark-dl-study.md").read_text()
     nl_med = float(_study_val(study_txt, r"\| \*\*`Strong Nonlinear \(>0\.14\)`\*\* \| \*\*`221`\*\* \| `([\d.]+)`"))
     nl_ult = float(_study_val(study_txt, r"\| \*\*`Strong Nonlinear \(>0\.14\)`\*\* \| \*\*`221`\*\* \| `[\d.]+` \| `[\d.]+` \| \*\*`([\d.]+)`"))
     s0_ceil = float(_study_val(study_txt, r"\| \*\*`Ultra` \(\+ Rich Fine & Chatterjee \$\\xi\$ Spectrum\)\*\* \| \*\*116\*\* \| \*\*`[\d.]+`\*\* \| \*\*`([\d.]+)`\*\*"))
     s0_nonlin = float(_study_val(study_txt, r"\| \*\*`Ultra` \(\+ Rich Fine & Chatterjee \$\\xi\$ Spectrum\)\*\* \| \*\*116\*\* \| \*\*`[\d.]+`\*\* \| \*\*`[\d.]+`\*\* \| \*\*`([\d.]+)`\*\*"))
-    ax_c.text(0.02, 0.96, f"Strongly nonlinear (>0.14, 221 DS): Med {nl_med:.3f} → Ultra {nl_ult:.3f} (+{100*(nl_ult-nl_med):.1f} pts)\nStage-0 (19,190 splits): ceiling R² = {s0_ceil:.3f} | nonlin uplift R² = {s0_nonlin:.3f}", transform=ax_c.transAxes, ha="left", va="top", fontsize=5.8, color=INK, bbox=dict(boxstyle="round,pad=0.22", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.7))
+    ax_c.text(0.02, 0.97, f"Strongly nonlinear (>0.14, 221 DS): Med {nl_med:.3f} → Ultra {nl_ult:.3f} (+{100*(nl_ult-nl_med):.1f} pts)\nStage-0 (19,190 splits): ceiling R² = {s0_ceil:.3f} | nonlin uplift R² = {s0_nonlin:.3f}", transform=ax_c.transAxes, ha="left", va="top", fontsize=6.1, color=INK, bbox=dict(boxstyle="round,pad=0.22", facecolor="#f0f9ff", edgecolor=BLUE, lw=0.7))
     kib_ticks(ax_c, 800.0, 65536.0)
     ax_c.set_xlim(700.0, 82000.0)
-    ax_c.set_ylim(0.56, 0.98)
+    ax_c.set_ylim(0.51, 1.05)
     ax_c.set_xlabel("Wire bytes (v2: exact median wire; v3: mean DML3+CSC1; baselines: cap)")
-    ax_c.set_ylabel("Mean holdout retention R (6 auditors)")
-    ax_c.set_title("C. Value vs. Wire Bytes Across 1,000 (v2) & 1,069 (v3) Datasets", loc="left", color=INK, fontsize=8.3, fontweight="bold")
-    ax_c.legend(frameon=False, fontsize=5.7, loc="lower right")
+    ax_c.set_ylabel("Mean holdout retention R (6 learners)")
+    ax_c.set_title("C. Value vs. Wire Bytes Across 1,000 (v2) & 1,069 (v3) Datasets", loc="left", color=INK, fontsize=8.8, fontweight="bold")
+    ax_c.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.0, loc="lower right")
     sc = vs["testing_scale_distinct_units"]
     bars = [
         ("CI/cpu test assertions\n(656 Rust + 1,801 Py; 834+ unique)", sc["ci_cpu_run_40159022870_test_assertions"]["total_executed_assertions_in_job"], SLATE),
@@ -405,16 +408,17 @@ def convergence(summary: dict, plt):
         ("v2 downstream auditor fits\n(1,000 reg/bin DS × 6 auditors)", sc["v2_downstream_auditor_fits_total"], ORANGE),
     ]
     y_pos, vals, cols = np.arange(len(bars)), [b[1] for b in bars], [b[2] for b in bars]
-    ax_d.barh(y_pos, vals, height=0.62, color=cols, alpha=0.88)
+    ax_d.barh(y_pos, vals, height=0.60, color=cols, alpha=0.88)
     ax_d.set_xscale("log")
-    ax_d.set_xlim(1000.0, 260000.0)
-    ax_d.set_yticks(y_pos, [b[0] for b in bars], fontsize=6.7)
+    ax_d.set_xlim(1000.0, 420000.0)
+    ax_d.set_ylim(-0.65, 6.65)
+    ax_d.set_yticks(y_pos, [b[0] for b in bars], fontsize=7.0)
     ax_d.grid(axis="y", visible=False)
     for idx_b, val_b in enumerate(vals):
-        ax_d.text(val_b * 1.12, idx_b, f"{val_b:,}", va="center", ha="left", fontsize=7.2, fontweight="bold", color=INK)
+        ax_d.text(val_b * 1.12, idx_b, f"{val_b:,}", va="center", ha="left", fontsize=7.4, fontweight="bold", color=INK)
     ax_d.set_xlabel("Verified count (log scale; distinct non-summed receipt units)")
-    ax_d.set_title("D. Testing & Verification Scale (1,069 Unique Eval DS)", loc="left", color=INK, fontsize=8.3, fontweight="bold")
-    fig.tight_layout(rect=(0.01, 0.01, 0.99, 0.99))
+    ax_d.set_title("D. Testing & Verification Scale (1,069 Unique Eval DS)", loc="left", color=INK, fontsize=8.8, fontweight="bold")
+    fig.tight_layout(rect=(0.008, 0.008, 0.992, 0.992))
     return fig
 
 

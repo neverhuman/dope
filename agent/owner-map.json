@@ -871,7 +871,9 @@
     "research/levels/tests/test_dope_mlc_v3.py": "external-evidence",
     "engine/dope-core/src/mlc_v3/": "rust-core",
     "engine/dope-cli/src/mlc_v3.rs": "rust-core",
-    "engine/dope-core/tests/mlc_v3_safetensors.rs": "rust-core"
+    "engine/dope-cli/src/style.rs": "rust-core",
+    "engine/dope-core/tests/mlc_v3_safetensors.rs": "rust-core",
+    "scripts/install.sh": "release"
   },
   "workspace": "dope"
 }
