@@ -1,4 +1,5 @@
 //! Runtime diagnostics and explicit CPU worker configuration.
+use crate::style::Style;
 use dope_core::device;
 use sha2::{Digest, Sha256};
 use std::io::Read;
@@ -13,7 +14,7 @@ pub(crate) fn configure(threads: Option<u16>) -> Result<(), String> {
     Ok(())
 }
 
-pub(crate) fn doctor(json: bool) -> Result<(), String> {
+pub(crate) fn doctor(json: bool, style: Style) -> Result<(), String> {
     let default = device::describe(&device::parse("auto").map_err(|e| e.to_string())?);
     if json {
         let path = std::env::current_exe().map_err(|e| e.to_string())?;
@@ -39,12 +40,34 @@ pub(crate) fn doctor(json: bool) -> Result<(), String> {
             "{}",
             serde_json::to_string_pretty(&identity).map_err(|e| e.to_string())?
         );
-    } else {
+    } else if !style.enabled {
         println!("dope {}", env!("CARGO_PKG_VERSION"));
         println!("  runtime    native Rust · Python not required");
         println!("  backends   {}", device::backends().join(", "));
         println!("  default    {default}");
         println!("  threads    {}", rayon::current_num_threads());
+    } else {
+        println!(
+            "{} {}",
+            style.cyan_bold("● dope"),
+            style.bold(env!("CARGO_PKG_VERSION"))
+        );
+        println!(
+            "  {}    {}",
+            style.dim("runtime"),
+            style.green_bold("native Rust · Python not required · LibTorch not required")
+        );
+        println!(
+            "  {}   {}",
+            style.dim("backends"),
+            style.bold(device::backends().join(", "))
+        );
+        println!("  {}    {}", style.dim("default"), default);
+        println!(
+            "  {}    {}",
+            style.dim("threads"),
+            rayon::current_num_threads()
+        );
     }
     Ok(())
 }

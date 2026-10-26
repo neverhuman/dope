@@ -317,8 +317,8 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         self.assertIn("cross-model feature-driver preservation: not yet measured", " ".join(readme_text.split()))
         self.assertIn("Feature-Target Correlation Proxy", history_text)
         self.assertIn("strongest measured comparator on this historical block", history_text)
-        self.assertIn("paper/main.tex", readme_text)
-        self.assertIn("HISTORY.md", readme_text)
+        self.assertIn("paper/dope1.tex", readme_text)
+        self.assertIn("paper/dope1-supplement.tex", readme_text)
         # The landing page is the prose outside generated blocks and collapsed <details>
         # sections; the historical and kernel blocks stay verbatim inside them.
         stripped = re.sub(r"<!-- BEGIN (DOPE1 \w+|BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART|EQUAL BYTES) -->.*?<!-- END \1 -->", "", readme_text, flags=re.S)

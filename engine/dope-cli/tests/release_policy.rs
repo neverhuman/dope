@@ -160,3 +160,141 @@ fn rust_application_gate_does_not_launch_research_python() {
     );
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
+    let dir = std::env::temp_dir().join(format!("dope-installer-test-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("stage")).unwrap();
+    std::fs::create_dir_all(dir.join("tools")).unwrap();
+    let gh = dir.join("tools/gh");
+    std::fs::write(
+        &gh,
+        "#!/bin/bash\nprintf '%s\\n' \"$@\" >> \"$GH_TEST_LOG\"\n[[ \"${GH_TEST_MODE:-ok}\" == ok ]]\n",
+    )
+    .unwrap();
+    std::fs::set_permissions(&gh, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+    let bin_bytes = std::fs::read(env!("CARGO_BIN_EXE_dope")).unwrap();
+    let bin_sha = format!("{:x}", Sha256::digest(&bin_bytes));
+    let buildinfo = serde_json::json!({
+        "schema_version": 1,
+        "product": "dope-engine",
+        "version": "1.0.0",
+        "source_commit": SHA,
+        "binary_sha256": bin_sha,
+        "signature": "external-sigstore-attestation-required"
+    })
+    .to_string();
+    std::fs::write(dir.join("stage/dope-linux-x86_64"), &bin_bytes).unwrap();
+    std::fs::write(dir.join("stage/BUILDINFO.json"), &buildinfo).unwrap();
+    std::fs::write(dir.join("stage/LICENSE"), "MIT").unwrap();
+    std::fs::write(dir.join("stage/THIRD_PARTY_NOTICES"), "notices").unwrap();
+    let mut sums = String::new();
+    for name in [
+        "BUILDINFO.json",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES",
+        "dope-linux-x86_64",
+    ] {
+        let bytes = std::fs::read(dir.join("stage").join(name)).unwrap();
+        sums.push_str(&format!("{:x}  {name}\n", Sha256::digest(&bytes)));
+    }
+    std::fs::write(dir.join("stage/SHA256SUMS"), sums).unwrap();
+
+    // 1. Refuse floating 'latest' tag.
+    let bad_tag = Command::new("/bin/bash")
+        .arg(root().join("scripts/install.sh"))
+        .args([
+            "--tag",
+            "latest",
+            "--from-dir",
+            dir.join("stage").to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(!bad_tag.status.success());
+
+    // 2. Unsigned research tag v1.0.0 installs with explicit sha256-content-integrity-only disclosure.
+    let ok_unsigned = Command::new("/bin/bash")
+        .arg(root().join("scripts/install.sh"))
+        .args([
+            "--tag",
+            "v1.0.0",
+            "--from-dir",
+            dir.join("stage").to_str().unwrap(),
+            "--install-dir",
+            dir.join("bin").to_str().unwrap(),
+            "--share-dir",
+            dir.join("share").to_str().unwrap(),
+            "--no-weights",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        ok_unsigned.status.success(),
+        "{}",
+        String::from_utf8_lossy(&ok_unsigned.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&ok_unsigned.stdout);
+    assert!(stdout.contains("sha256-content-integrity-only"));
+
+    // 3. Signed dope-engine-v1.0.0 tag requires OIDC attestation and fails closed on reject.
+    let reject_att = Command::new("/bin/bash")
+        .arg(root().join("scripts/install.sh"))
+        .args([
+            "--tag",
+            TAG,
+            "--source-digest",
+            SHA,
+            "--from-dir",
+            dir.join("stage").to_str().unwrap(),
+            "--install-dir",
+            dir.join("bin2").to_str().unwrap(),
+            "--share-dir",
+            dir.join("share2").to_str().unwrap(),
+            "--no-weights",
+        ])
+        .env(
+            "PATH",
+            format!("{}:/usr/bin:/bin", dir.join("tools").display()),
+        )
+        .env("GH_TEST_LOG", dir.join("gh.log"))
+        .env("GH_TEST_MODE", "reject")
+        .output()
+        .unwrap();
+    assert!(!reject_att.status.success());
+    assert!(!dir.join("bin2/dope").exists());
+
+    // 4. Signed dope-engine-v1.0.0 tag succeeds when OIDC attestation passes.
+    let ok_att = Command::new("/bin/bash")
+        .arg(root().join("scripts/install.sh"))
+        .args([
+            "--tag",
+            TAG,
+            "--source-digest",
+            SHA,
+            "--from-dir",
+            dir.join("stage").to_str().unwrap(),
+            "--install-dir",
+            dir.join("bin3").to_str().unwrap(),
+            "--share-dir",
+            dir.join("share3").to_str().unwrap(),
+            "--no-weights",
+        ])
+        .env(
+            "PATH",
+            format!("{}:/usr/bin:/bin", dir.join("tools").display()),
+        )
+        .env("GH_TEST_LOG", dir.join("gh_ok.log"))
+        .env("GH_TEST_MODE", "ok")
+        .output()
+        .unwrap();
+    assert!(
+        ok_att.status.success(),
+        "{}",
+        String::from_utf8_lossy(&ok_att.stderr)
+    );
+    let stdout_att = String::from_utf8_lossy(&ok_att.stdout);
+    assert!(stdout_att.contains("sigstore-oidc-attestation + sha256-content-integrity"));
+    std::fs::remove_dir_all(dir).unwrap();
+}

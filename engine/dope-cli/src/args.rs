@@ -13,6 +13,9 @@ pub(crate) struct Cli {
     /// Number of CPU worker threads (1–1024); otherwise use Rayon's default.
     #[arg(long, global = true, value_parser = clap::value_parser!(u16).range(1..=1024))]
     pub(crate) threads: Option<u16>,
+    /// Terminal color output: auto (TTY-detected, honors NO_COLOR), always, or never.
+    #[arg(long, global = true, default_value = "auto", value_parser = ["auto", "always", "never"])]
+    pub(crate) color: String,
     #[command(subcommand)]
     pub(crate) command: Command,
 }

@@ -653,7 +653,7 @@ overfits, and its log-loss on test rows can be far worse than the null.
 \paragraph{Multi-level landmark and multi-task scaling (\texttt{DOPE-MLC-v2} and \texttt{DOPE-MLC-v3}).}
 \Cref{fig:convergence,tab:multilevel} summarize the companion large-scale multi-level landmark studies in
 \texttt{research/levels/} (\texttt{docs/\allowbreak multilevel-\allowbreak landmark-\allowbreak dl-\allowbreak study.md}). In the maximized-training
-convergence study (\texttt{research/levels/maxtrain\_val\_lt5pct.py}), unseen-dataset validation is
+convergence study (\texttt{research/\allowbreak levels/\allowbreak maxtrain\_\allowbreak val\_\allowbreak lt5pct.py}), unseen-dataset validation is
 kept strictly below five percent of both datasets and splits while evaluating the entire unseen
 validation split population at every training round \texttt{R0..R8} with dataset-grouped bootstrap
 standard errors: full-corpus \texttt{DOPE-MLC-v2} (\G{MlcMaxTrainTrainSplitFrac} training splits,
@@ -713,9 +713,11 @@ percentage-point retention gain on strongly nonlinear tables (\G{MlcRegimeNonlin
 (\G{MlcRegimeModMed} to \G{MlcRegimeModHigh} to \G{MlcRegimeModUltra}) while linear tables saturate at
 \texttt{Medium} (\G{MlcRegimeLinMed} to \G{MlcRegimeLinHigh} to \G{MlcRegimeLinUltra}). Because
 \texttt{DOPE-MLC-v2} ships a generative program rather than a fixed row subset, drawing onefold,
-twofold, and fivefold synthetic training sets raises mean retention from \G{MlcExpandOne} to
-\G{MlcExpandTwo} and \G{MlcExpandFive} (\G{MlcExpandGain} percentage points at zero additional wire
-cost), transferring across all six auditor families at \texttt{Ultra}: linear (\G{MlcAudLinR}), local
+twofold, and fivefold synthetic training sets across the \G{MlcExpandSubset}-dataset expansion subset
+(\texttt{ds\_rank} below \G{MlcExpandSubset}, with the remaining datasets unmeasured) raises mean
+CatBoost retention from \G{MlcExpandOne} to \G{MlcExpandTwo} and \G{MlcExpandFive} (\G{MlcExpandGain}
+percentage points at zero additional wire cost), while single-fold transfer across all \G{MlcVTwoDatasets}
+datasets reaches \texttt{Ultra}-tier retention for linear (\G{MlcAudLinR}), local
 gated attention (\G{MlcAudAttnR}), MLP (\G{MlcAudMlpR}), LightGBM (\G{MlcAudLgbmR}), CatBoost
 (\G{MlcAudCbR}), and XGBoost (\G{MlcAudXgbR}). Extending the
 architecture to four complete-envelope byte tiers (\texttt{Small}, \texttt{Medium}, \texttt{High},
