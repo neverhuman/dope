@@ -149,59 +149,54 @@ pub(crate) fn print_fit_report(
         group(r.parameters.forest),
     );
     let [w0, w1, w2, w3] = r.bits;
+    let cd = style.bold(csv.display().to_string());
+    let od = style.cyan_bold(out.display().to_string());
     if !style.enabled {
-        let (cd, od, tk, nf) = (csv.display(), out.display(), &r.task, r.features);
         println!("compiled {cd} -> {od}  ({b_str} bytes, budget {bud_str})");
-        println!("  task         {tk} · {rows_str} rows × {nf} features");
-        println!("  program      {} knots · {} dependence × {} regime(s) · net {}→{} (bits w{w0} b{w1} β{w2} v{w3}) · {} trees of depth {}", r.knots, r.dependence, r.regimes, r.inputs, r.hidden, r.trees, r.depth);
-        println!("  parameters   {pt} total scalar slots ({pn} network, {pf} forest)");
         println!(
-            "  stored gain  {:.3} of the null loss explained on held-out rows",
-            r.stored_gain
+            "  task         {} · {rows_str} rows × {} features",
+            r.task, r.features
         );
-        if let Some(a) = r.self_audit {
-            println!("  self-audit   robust retention {a:.3} (linear and tree auditors trained on samples, scored on held-out training rows)");
-        }
-        println!("  drivers      {drv}");
-        println!("  time         {:.1} s on {dev_desc}", r.seconds);
     } else {
-        let (ok, cd, od) = (
-            style.green_bold("✓"),
-            style.bold(csv.display().to_string()),
-            style.cyan_bold(out.display().to_string()),
-        );
-        let (bb, bar) = (style.bold(&b_str), style.budget_bar(r.bytes, r.budget, 12));
+        let ok = style.green_bold("✓");
+        let bb = style.bold(&b_str);
+        let bar = style.budget_bar(r.bytes, r.budget, 12);
         println!("{ok} compiled {cd} -> {od}  ({bb} / {bud_str} bytes) {bar}");
-        let (tk, zr, nf) = (
-            style.bold(&r.task),
-            style.green("0 source rows stored"),
-            r.features,
-        );
+        let tk = style.bold(&r.task);
+        let zr = style.green("0 source rows stored");
         println!(
-            "  {}         {tk} · {rows_str} rows × {nf} features · {zr}",
-            style.dim("task")
-        );
-        println!("  {}      {} knots · {} dependence × {} regime(s) · net {}→{} (bits w{w0} b{w1} β{w2} v{w3}) · {} trees of depth {}", style.dim("program"), r.knots, r.dependence, r.regimes, r.inputs, r.hidden, r.trees, r.depth);
-        println!(
-            "  {}   {} total scalar slots ({pn} network, {pf} forest)",
-            style.dim("parameters"),
-            style.bold(&pt)
-        );
-        println!(
-            "  {}  {} of the null loss explained on held-out rows",
-            style.dim("stored gain"),
-            style.bold(format!("{:.3}", r.stored_gain))
-        );
-        if let Some(a) = r.self_audit {
-            println!("  {}   robust retention {} (linear and tree auditors trained on samples, scored on held-out training rows)", style.dim("self-audit"), style.retention_badge(a));
-        }
-        println!("  {}      {}", style.dim("drivers"), style.cyan_bold(drv));
-        println!(
-            "  {}         {:.1} s on {dev_desc}",
-            style.dim("time"),
-            r.seconds
+            "  {}         {tk} · {rows_str} rows × {} features · {zr}",
+            style.dim("task"),
+            r.features
         );
     }
+    println!(
+        "  {}      {} knots · {} dependence × {} regime(s) · net {}→{} (bits w{w0} b{w1} β{w2} v{w3}) · {} trees of depth {}",
+        style.dim("program"), r.knots, r.dependence, r.regimes, r.inputs, r.hidden, r.trees, r.depth
+    );
+    println!(
+        "  {}   {} total scalar slots ({pn} network, {pf} forest)",
+        style.dim("parameters"),
+        style.bold(&pt)
+    );
+    println!(
+        "  {}  {} of the null loss explained on held-out rows",
+        style.dim("stored gain"),
+        style.bold(format!("{:.3}", r.stored_gain))
+    );
+    if let Some(a) = r.self_audit {
+        println!(
+            "  {}   robust retention {} (linear and tree auditors trained on samples, scored on held-out training rows)",
+            style.dim("self-audit"),
+            style.retention_badge(a)
+        );
+    }
+    println!("  {}      {}", style.dim("drivers"), style.cyan_bold(drv));
+    println!(
+        "  {}         {:.1} s on {dev_desc}",
+        style.dim("time"),
+        r.seconds
+    );
 }
 
 pub(crate) fn print_inspect_report(
@@ -210,99 +205,76 @@ pub(crate) fn print_inspect_report(
     report: &dope_core::ByteReport,
     style: Style,
 ) {
-    let (tot, sto, hdr, meta) = (
-        group(report.total),
+    let pfx = if style.enabled {
+        format!("{} ", style.cyan_bold("●"))
+    } else {
+        String::new()
+    };
+    let mp = style.bold(model_path.display().to_string());
+    let tb_col = style.green_bold(group(report.total));
+    let (sto, hdr, meta) = (
         group(report.stored),
         group(report.header),
         group(report.metadata),
     );
-    let pt = group(program.parameters().total);
+    println!("{pfx}{mp}  {tb_col} bytes ({sto} brotli program + {hdr} safetensors framing)");
+    println!("  {}", style.dim("inflated, the program holds:"));
+    println!("  {:<18} {:>7} bytes", style.dim("metadata"), meta);
+    for (name, b) in &report.tensors {
+        println!("  {:<18} {:>7} bytes", style.blue(name), group(*b));
+    }
+    let tgt = style.cyan_bold(&program.schema.target.name);
+    println!(
+        "  {}         {:?}, target `{tgt}`",
+        style.dim("task"),
+        program.schema.task
+    );
+    println!("  {}     {}", style.dim("features"), program.features());
+    let pt = style.bold(group(program.parameters().total));
+    println!("  {}   {pt} total scalar slots", style.dim("parameters"));
     let (dep, rk) = (program.dependence.name(), program.regimes.k());
+    println!("  {}   {dep} × {rk} regime(s)", style.dim("dependence"));
     let (ni, nh, no) = (program.net.inputs, program.net.hidden, program.net.outputs);
+    println!(
+        "  {}          {ni} inputs → {nh} hidden → {no} outputs",
+        style.dim("net")
+    );
     let (nt, td, tb) = (
         program.forest.trees(),
         program.forest.depth,
         program.forest.bits,
     );
-    if !style.enabled {
+    println!(
+        "  {}        {nt} oblivious trees of depth {td} ({tb}-bit leaves)",
+        style.dim("trees")
+    );
+    if !program.schema.dropped.is_empty() {
+        let nd = program.schema.dropped.len();
         println!(
-            "{}  {tot} bytes ({sto} brotli program + {hdr} safetensors framing)",
-            model_path.display()
-        );
-        println!("  inflated, the program holds:");
-        println!("  {:<18} {:>7} bytes", "metadata", meta);
-        for (name, b) in &report.tensors {
-            println!("  {:<18} {:>7} bytes", name, group(*b));
-        }
-        println!(
-            "  task         {:?}, target `{}`",
-            program.schema.task, program.schema.target.name
-        );
-        println!("  features     {}", program.features());
-        println!("  parameters   {pt} total scalar slots");
-        println!("  dependence   {dep} × {rk} regime(s)");
-        println!("  net          {ni} inputs → {nh} hidden → {no} outputs");
-        println!("  trees        {nt} oblivious trees of depth {td} ({tb}-bit leaves)");
-        if !program.schema.dropped.is_empty() {
-            println!(
-                "  dropped      {} identifier-like column(s)",
-                program.schema.dropped.len()
-            );
-        }
-        println!("  rows stored  none");
-    } else {
-        let (dot, mp, tb_col) = (
-            style.cyan_bold("●"),
-            style.bold(model_path.display().to_string()),
-            style.green_bold(&tot),
-        );
-        println!("{dot} {mp}  {tb_col} bytes ({sto} brotli program + {hdr} safetensors framing)");
-        println!("  {}", style.dim("inflated, the program holds:"));
-        println!("  {:<18} {:>7} bytes", style.dim("metadata"), meta);
-        for (name, b) in &report.tensors {
-            println!("  {:<18} {:>7} bytes", style.blue(name), group(*b));
-        }
-        println!(
-            "  {}         {:?}, target `{}`",
-            style.dim("task"),
-            program.schema.task,
-            style.cyan_bold(&program.schema.target.name)
-        );
-        println!("  {}     {}", style.dim("features"), program.features());
-        println!(
-            "  {}   {} total scalar slots",
-            style.dim("parameters"),
-            style.bold(&pt)
-        );
-        println!("  {}   {dep} × {rk} regime(s)", style.dim("dependence"));
-        println!(
-            "  {}          {ni} inputs → {nh} hidden → {no} outputs",
-            style.dim("net")
-        );
-        println!(
-            "  {}        {nt} oblivious trees of depth {td} ({tb}-bit leaves)",
-            style.dim("trees")
-        );
-        if !program.schema.dropped.is_empty() {
-            println!(
-                "  {}      {} identifier-like column(s)",
-                style.dim("dropped"),
-                program.schema.dropped.len()
-            );
-        }
-        println!(
-            "  {}  {}",
-            style.dim("rows stored"),
-            style.green_bold("none")
+            "  {}      {nd} identifier-like column(s)",
+            style.dim("dropped")
         );
     }
+    println!(
+        "  {}  {}",
+        style.dim("rows stored"),
+        style.green_bold("none")
+    );
 }
 
 pub(crate) fn print_eval_report(result: &dope_core::eval::EvalResult, style: Style) {
     if !style.enabled {
         println!("{}", result.render());
     } else {
-        println!("{} retention on {} held-out real rows ({} task, artifact {} bytes, {} synthetic vs {} real training rows)", style.cyan_bold("●"), style.bold(result.test_rows.to_string()), style.bold(&result.task), style.green_bold(group(result.artifact_bytes)), group(result.synth_rows), group(result.train_rows));
+        println!(
+            "{} retention on {} held-out real rows ({} task, artifact {} bytes, {} synthetic vs {} real training rows)",
+            style.cyan_bold("●"),
+            style.bold(result.test_rows.to_string()),
+            style.bold(&result.task),
+            style.green_bold(group(result.artifact_bytes)),
+            group(result.synth_rows),
+            group(result.train_rows)
+        );
         println!(
             "  {}",
             style.dim("auditor   null loss   real loss  synth loss  retention")
@@ -313,20 +285,13 @@ pub(crate) fn print_eval_report(result: &dope_core::eval::EvalResult, style: Sty
             } else {
                 style.dim("n/a")
             };
-            let (nm, nl, rl, sl) = (
-                style.bold(&aud.auditor),
-                aud.null_loss,
-                aud.real_loss,
-                aud.synth_loss,
-            );
+            let nm = style.bold(&aud.auditor);
+            let (nl, rl, sl) = (aud.null_loss, aud.real_loss, aud.synth_loss);
             println!("  {nm:<8} {nl:>10.5} {rl:>11.5} {sl:>11.5}  {ret_str}");
         }
         if let Some(r) = result.robust_retention {
-            println!(
-                "  {} {}",
-                style.bold("robust retention (min over families):"),
-                style.retention_badge(r)
-            );
+            let lbl = style.bold("robust retention (min over families):");
+            println!("  {lbl} {}", style.retention_badge(r));
         }
     }
 }
@@ -341,16 +306,10 @@ pub(crate) fn print_sample_saved_report(
     style: Style,
 ) {
     if style.enabled {
-        let (ok, nr, tg, sp) = (
-            style.green_bold("✓"),
-            style.bold(group(rows)),
-            style.cyan_bold(target_name),
-            style.bold(space),
-        );
-        let (mp, op) = (
-            style.bold(model_path.display().to_string()),
-            style.cyan_bold(out_path.display().to_string()),
-        );
+        let (ok, nr) = (style.green_bold("✓"), style.bold(group(rows)));
+        let (tg, sp) = (style.cyan_bold(target_name), style.bold(space));
+        let mp = style.bold(model_path.display().to_string());
+        let op = style.cyan_bold(out_path.display().to_string());
         println!("{ok} sampled {nr} synthetic rows ({features} features, target `{tg}`, {sp} space) from {mp} -> {op}");
     }
 }
@@ -359,9 +318,9 @@ pub(crate) fn print_frontier_report(result: &dope_core::eval::FrontierResult, st
     if !style.enabled {
         println!("{}", result.render());
     } else {
+        let dot = style.cyan_bold("●");
         println!(
-            "{} retention-vs-bytes frontier (threshold τ = {:.0}%)",
-            style.cyan_bold("●"),
+            "{dot} retention-vs-bytes frontier (threshold τ = {:.0}%)",
             result.tau * 100.0
         );
         println!(
@@ -377,26 +336,22 @@ pub(crate) fn print_frontier_report(result: &dope_core::eval::FrontierResult, st
             let rob = p
                 .robust_retention
                 .map_or_else(|| style.dim("n/a"), |r| style.retention_badge(r));
-            let (bud, b_col, bar, pj) = (
-                group(p.budget),
-                style.bold(group(p.bytes)),
-                style.budget_bar(p.bytes, p.budget, 10),
-                per.join(" · "),
-            );
+            let (bud, b_col) = (group(p.budget), style.bold(group(p.bytes)));
+            let (bar, pj) = (style.budget_bar(p.bytes, p.budget, 10), per.join(" · "));
             println!("  {bud:>7} {b_col:>8}   {bar}   {rob:>16}   {pj}");
         }
         match result.tdl_bytes {
-            Some(b) => println!(
-                "  {} TDL@{:.0}% = {} bytes (smallest tested budget reaching the threshold)",
-                style.green_bold("✓"),
-                result.tau * 100.0,
-                style.green_bold(group(b))
-            ),
-            None => println!(
-                "  {} TDL@{:.0}% not reached in the tested range",
-                style.yellow_bold("!"),
-                result.tau * 100.0
-            ),
+            Some(b) => {
+                let (ok, gb) = (style.green_bold("✓"), style.green_bold(group(b)));
+                println!("  {ok} TDL@{:.0}% = {gb} bytes (smallest tested budget reaching the threshold)", result.tau * 100.0);
+            }
+            None => {
+                let wn = style.yellow_bold("!");
+                println!(
+                    "  {wn} TDL@{:.0}% not reached in the tested range",
+                    result.tau * 100.0
+                );
+            }
         }
     }
 }
@@ -407,8 +362,8 @@ pub(crate) fn print_mlc_v3_weights_report(
     style: Style,
 ) {
     let p = style.bold(weights_path.display().to_string());
-    let (b, tc, pc) = (
-        style.green_bold(group(m.byte_len)),
+    let b = style.green_bold(group(m.byte_len));
+    let (tc, pc) = (
         style.bold(group(m.tensor_count)),
         style.bold(group(m.parameter_count)),
     );
@@ -417,11 +372,8 @@ pub(crate) fn print_mlc_v3_weights_report(
         style.cyan_bold("●")
     );
     println!("  {}       dope-mlc-v3-safetensors", style.dim("format"));
-    println!(
-        "  {}      {}",
-        style.dim("runtime"),
-        style.green_bold("rust-candle-cpu · 0 Python/LibTorch deps")
-    );
+    let rt = style.green_bold("rust-candle-cpu · 0 Python/LibTorch deps");
+    println!("  {}      {rt}", style.dim("runtime"));
     println!("  {}       {}", style.dim("sha256"), m.sha256);
 }
 
@@ -431,23 +383,19 @@ pub(crate) fn print_mlc_v3_wire_report(
     style: Style,
 ) {
     let enc = &env.encoding;
-    let (p, wb, cb) = (
-        style.bold(wire_path.display().to_string()),
+    let p = style.bold(wire_path.display().to_string());
+    let (wb, cb) = (
         style.green_bold(group(env.wire_bytes)),
         group(env.tier_cap_bytes),
     );
-    let (wf, lv, bar) = (
-        style.bold(&env.wire_format),
-        style.cyan_bold(&enc.level),
-        style.budget_bar(env.wire_bytes, env.tier_cap_bytes, 12),
-    );
+    let (wf, lv) = (style.bold(&env.wire_format), style.cyan_bold(&enc.level));
+    let bar = style.budget_bar(env.wire_bytes, env.tier_cap_bytes, 12);
     println!(
         "{} {p}  {wb} / {cb} bytes ({wf} · tier `{lv}`) {bar}",
         style.cyan_bold("●")
     );
-    let (tk, kc, nt, pu, zr) = (
-        style.bold(&enc.task),
-        enc.target_bundle.k_classes,
+    let (tk, kc) = (style.bold(&enc.task), enc.target_bundle.k_classes);
+    let (nt, pu, zr) = (
         group(enc.n_train),
         enc.p_use,
         style.green("0 source rows stored"),
@@ -495,13 +443,13 @@ pub(crate) fn print_mlc_v3_sample_report(
             style.bold(group(rows)),
             style.bold(space),
         );
-        let (wp, wf, lv, wb, op) = (
-            style.bold(wire_path.display().to_string()),
+        let wp = style.bold(wire_path.display().to_string());
+        let (wf, lv, wb) = (
             &env.wire_format,
             style.cyan_bold(&env.encoding.level),
             group(env.wire_bytes),
-            style.cyan_bold(out_path.display().to_string()),
         );
+        let op = style.cyan_bold(out_path.display().to_string());
         println!("{ok} sampled {nr} synthetic rows ({features} features + target, {sp} space) from {wp} ({wf} · {lv} · {wb} B) -> {op}");
     }
 }
