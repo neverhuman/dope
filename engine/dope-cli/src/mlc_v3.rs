@@ -209,7 +209,9 @@ fn resolve_weights_path(explicit: &Option<PathBuf>, preset: &str) -> Result<Path
     if let Ok(exe) = std::env::current_exe() {
         if let Some(parent) = exe.parent() {
             candidates.push(parent.join(spec.filename));
-            candidates.push(parent.join("../share/dope/weights").join(spec.filename));
+            if let Some(prefix) = parent.parent() {
+                candidates.push(prefix.join("share/dope/weights").join(spec.filename));
+            }
         }
     }
     candidates.push(PathBuf::from(spec.filename));
