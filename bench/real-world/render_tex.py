@@ -57,6 +57,7 @@ def macros(summary: dict) -> str:
     def put(name: str, value: str):
         out.append(f"\\newcommand{{\\{name}}}{{{value}}}")
     put("OneTables", str(len(summary["datasets"])))
+    put("ReleaseTag", "v1.0.0")
     names = {"dope": "Dope", "kernel": "Kernel", "rows": "Rows", "copula": "Copula", "arf": "Arf", "ctgan": "Ctgan", "tvae": "Tvae",
              "bootstrap": "Boot", "dope-independent": "DopeIndep", "dope-linear": "DopeLinear", "dope-8bit": "DopeEight",
              "dope-1regime": "DopeOneRegime", "dope-4x": "DopeFour", "dope-notrees": "DopeNoTrees",
@@ -196,8 +197,8 @@ def _cell(r: dict | None, fam: str | None = None) -> str:
 
 def table_main(summary: dict) -> str:
     n = len(summary["datasets"])
-    order = [("dope", "2k", "DOPE, 2 KiB"), ("dope", "4k", "\\textbf{DOPE, 4 KiB (default)}"), ("dope", "16k", "DOPE, 16 KiB"),
-             ("dope", "64k", "DOPE, 64 KiB"), ("kernel", "-", "DOPE research kernel"),
+    order = [("dope", "2k", "DOPE (v1.0.0), 2 KiB"), ("dope", "4k", "\\textbf{DOPE (v1.0.0), 4 KiB (default)}"), ("dope", "16k", "DOPE (v1.0.0), 16 KiB"),
+             ("dope", "64k", "DOPE (v1.0.0), 64 KiB"),
              ("rows", "4k", "Real rows (xz), 4 KiB"), ("rows", "64k", "Real rows (xz), 64 KiB"),
              ("rows", "full", "Real rows (xz), all"), ("copula", "-", "Gaussian copula (SDV)"), ("arf", "-", "ARF"),
              ("tvae", "-", "TVAE (SDV)"), ("ctgan", "-", "CTGAN (SDV)"), ("bootstrap", "-", "Real rows, resampled")]
@@ -210,7 +211,7 @@ def table_main(summary: dict) -> str:
         tables = "" if r["datasets"] == n else f"$^{{{r['datasets']}}}$"
         lines.append(f"{label}{tables} & {kb(r['bytes']['median']).replace(' ', '~')} & {_cell(r)} & {_cell(r, 'linear')} & "
                      f"{_cell(r, 'gbdt')} & {_cell(r, 'mlp')} & {r['reach90']}/{r['datasets']} \\\\")
-        if (m, b) in (("kernel", "-"), ("rows", "full")):
+        if (m, b) in (("dope", "64k"), ("rows", "full")):
             lines.append("\\midrule")
     lines += ["\\bottomrule", "\\end{tabular}"]
     return "\n".join(lines) + "\n"
@@ -254,8 +255,8 @@ def table_ablation(summary: dict) -> str:
 def table_per_dataset(summary: dict) -> str:
     pd_ = summary["per_dataset"]
     meta = summary.get("meta", {})
-    lines = ["\\begin{tabular}{llrrrrrrrrr}", "\\toprule",
-             "Table & Task & Train & Cols & DOPE bytes & DOPE & Kernel & Rows 4 KiB & Copula & ARF & TDL$_{0.9}$ \\\\",
+    lines = ["\\begin{tabular}{llrrrrrrrr}", "\\toprule",
+             "Table & Task & Train & Cols & DOPE bytes & DOPE (v1.0.0) & Rows 4 KiB & Copula & ARF & TDL$_{0.9}$ \\\\",
              "\\midrule"]
     def r(key, ds):
         c = pd_.get(key, {}).get(ds)
@@ -267,7 +268,7 @@ def table_per_dataset(summary: dict) -> str:
         dope = pd_.get("dope@4k", {}).get(ds) or {}
         t = summary["tdl"]["dope@0.9"].get(ds)
         lines.append(f"{ds} & {m.get('task', '')[:5]}. & {m.get('train_rows', '')} & {m.get('features', '')} & "
-                     f"{kb(dope.get('bytes')).replace(' ', '~')} & {r('dope@4k', ds)} & {r('kernel@-', ds)} & {r('rows@4k', ds)} & "
+                     f"{kb(dope.get('bytes')).replace(' ', '~')} & {r('dope@4k', ds)} & {r('rows@4k', ds)} & "
                      f"{r('copula@-', ds)} & {r('arf@-', ds)} & {kb(t).replace(' ', '~') if t else 'n.r.'} \\\\")
     lines += ["\\bottomrule", "\\end{tabular}"]
     return "\n".join(lines) + "\n"
@@ -456,15 +457,14 @@ def multilevel_readme_lines() -> list[str]:
     mb, hb, ub = (int(v2_b[t]["exact_v2_latent_wire_median_bytes"]) for t in ("medium", "high", "ultra"))
     mk, hk, uk = mb / 1024.0, hb / 1024.0, ub / 1024.0
     return [
-        "### 1,000-Dataset Method Comparison (`DOPE-MLC-v2`) & 1,069-Dataset Multi-Task Expansion (`DOPE-MLC-v3`)\n",
+        "### 1,000-Dataset Method Comparison (`DOPE-MLC-v2`, `v1.0.0`) & 1,069-Dataset Multi-Task Expansion (`DOPE-MLC-v3`, `v1.0.0`)\n",
         f"| Rank & Method (`1,000` Datasets, `6` Downstream Auditors, `44,369` Matches/Method) | Tournament Elo `[95% CI]` (Win Share) | `Medium` (`4 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE {mb:,} B / {mk:.1f} KiB`) | `High` (`16 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE {hb:,} B / {hk:.1f} KiB`) | `Ultra` (`64 KiB` Cap) Mean $R$ `[95% CI]` (`DOPE {ub:,} B / {uk:.1f} KiB`) |",
         "|---|---:|---:|---:|---:|",
-        f"| **`#1 DOPE-MLC-v2` (Unified 3-Level Encoder)** | **`{d['MlcVTwoPooledElo']} [1643.4, 1659.6]` (`70.58%` win; Disjoint-1k: `{d['MlcVTwoDisjointElo']} #1`)** | **`0.8620 [0.8503, 0.8722]` (`#1` Elo `1652.1`)** | **`0.8971 [0.8848, 0.9080]` (`#1` Elo `1669.6`)** | **`{d['MlcVTwoUltraR']} [0.8883, 0.9094]` (`#1` Encoder Elo `1640.1`)** |",
+        f"| **`#1 DOPE-MLC-v2` (`v1.0.0`, Unified 3-Level Encoder)** | **`{d['MlcVTwoPooledElo']} [1643.4, 1659.6]` (`70.58%` win; Disjoint-1k: `{d['MlcVTwoDisjointElo']} #1`)** | **`0.8620 [0.8503, 0.8722]` (`#1` Elo `1652.1`)** | **`0.8971 [0.8848, 0.9080]` (`#1` Elo `1669.6`)** | **`{d['MlcVTwoUltraR']} [0.8883, 0.9094]` (`#1` Encoder Elo `1640.1`)** |",
         "| `#2 Raw Rows Subsample` (`rows`, raw-row subset control) | `1593.3 [1584.4, 1602.7]` (`62.32%` win) | `0.6743 [0.6564, 0.6915]` | `0.8526 [0.8404, 0.8649]` | `0.9230 [0.9141, 0.9301]` (`copies 88% raw rows`) |",
-        "| `#3 DOPE v1 Kernel` (`kernel`, research sketch) | `1592.5 [1583.0, 1603.0]` (`62.20%` win) | `0.8379 [0.8272, 0.8520]` | `0.8379 [0.8241, 0.8497]` | `0.8379 [0.8244, 0.8500]` |",
-        "| `#4 Gaussian Copula` (`copula`, parametric baseline) | `1545.8 [1535.7, 1553.5]` (`55.29%` win) | `0.8046 [0.7916, 0.8209]` | `0.8046 [0.7910, 0.8180]` | `0.8046 [0.7908, 0.8200]` |",
-        "| `#5 Joint Diffusion` (`joint_diffusion_v1`) | `1432.4 [1423.8, 1440.8]` (`38.75%` win) | `0.7034 [0.6880, 0.7184]` | `0.7541 [0.7407, 0.7702]` | `0.7886 [0.7747, 0.8033]` |",
-        "| `#6 Adversarial Random Forests` (`arf`) | `1184.7 [1167.3, 1202.3]` (`10.86%` win) | `0.4113 [0.3936, 0.4321]` | `0.4113 [0.3898, 0.4319]` | `0.4113 [0.3902, 0.4309]` |\n",
+        "| `#3 Gaussian Copula` (`copula`, parametric baseline) | `1545.8 [1535.7, 1553.5]` (`55.29%` win) | `0.8046 [0.7916, 0.8209]` | `0.8046 [0.7910, 0.8180]` | `0.8046 [0.7908, 0.8200]` |",
+        "| `#4 Joint Diffusion` (`joint_diffusion_v1`) | `1432.4 [1423.8, 1440.8]` (`38.75%` win) | `0.7034 [0.6880, 0.7184]` | `0.7541 [0.7407, 0.7702]` | `0.7886 [0.7747, 0.8033]` |",
+        "| `#5 Adversarial Random Forests` (`arf`) | `1184.7 [1167.3, 1202.3]` (`10.86%` win) | `0.4113 [0.3936, 0.4321]` | `0.4113 [0.3898, 0.4319]` | `0.4113 [0.3902, 0.4309]` |\n",
         f"*Byte, cohort & coverage qualification (`v8` canonical index):* The `1,000`-dataset `DOPE-MLC-v2` pooled panel (`dope_mlc_v2_s3_best.pt`) comprises **`242` strictly dataset-disjoint datasets** (`0` train overlap, `Ultra` $R = 0.8493$, `#1` Elo `1671.6 [1655.2, 1688.0]`) and **`758` in-corpus unseen-fold datasets** (row-disjoint, `Ultra` $R = 0.9129$, `#1` Elo `1645.4 [1637.8, 1653.6]`), while the strictly dataset-disjoint checkpoint (`dope_mlc_v2_disjoint1000_best.pt`, `0` train overlap across all `1,000` eval DS) reaches `Ultra` $R = 0.8998$ and **`#1` Elo `1650.7 [1643.4, 1657.5]`**. `DOPE-MLC-v2` median wire bytes (`{mb:,} / {hb:,} / {ub:,} B` = `{mk:.1f} / {hk:.1f} / {uk:.1f} KiB`; zlib `{int(v2_b['medium']['exact_v2_latent_wire_zlib_median_bytes']):,} / {int(v2_b['high']['exact_v2_latent_wire_zlib_median_bytes']):,} / {int(v2_b['ultra']['exact_v2_latent_wire_zlib_median_bytes']):,} B`) are bit-exact `version=2` latent payloads (`6,000/6,000` cells `max_abs_diff = 0.0`), excluding the `.dope` scaler sidecar (`+545 B` median; full raw `{int(v2_b['medium']['full_raw_with_scaler_sidecar_median_bytes']):,} / {int(v2_b['high']['full_raw_with_scaler_sidecar_median_bytes']):,} / {int(v2_b['ultra']['full_raw_with_scaler_sidecar_median_bytes']):,} B`) and shared frozen decoder (`{dec_b:,} B` / `{dec_b / 1024.0:.1f} KiB`, amortized `0 B/dataset`), whereas `DOPE-MLC-v3` (`DML3+CSC1`) is self-contained inside `2 / 4 / 16 / 64 KiB` caps (`960.6 / 1,550.2 / 3,429.2 / 6,144.6 B` mean on `1,000` `v2`-panel tables; `1,418.0 / 2,510.7 / 6,435.3 / 9,877.5 B` mean on `69` multiclass tables; `1,781,800 B` shared SafeTensors hypernetwork). Baseline byte tiers (`4 / 16 / 64 KiB`) reflect nominal caps and historical `fp16` byte estimates paired with `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`; `rows` `medium|catboost` observed on `999/1,000` DS with `17cd766e7ec82f1e` omitted; `65,874` evaluated `v2` auditor fits alongside `1,303` `real_gain < 0.01` skips and `500` `arf` multiclass exclusions).\n",
         "| Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Nonlinearity Regime / Mechanism Audit | `Medium` (`1.5 KiB`) $R$ | `High` (`2.8 KiB`) $R$ | `Ultra` (`5.7 KiB`) $R$ |",
         "|---|---:|---:|---|---:|---:|---:|",

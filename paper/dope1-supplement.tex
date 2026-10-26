@@ -16,7 +16,7 @@
 \renewcommand{\thetheorem}{\thesection.\arabic{theorem}}
 
 \title{\textbf{Supplement to D.O.P.E.: Downstream Objective-Preserving Encoding}}
-\author{Jepson Taylor \and Alton Alexander \and Jordan Morrow\\[0.2em]\small NEVERHUMAN Research}
+\author{Jepson Taylor \and Alton Alexander \and Jordan Morrow\\[0.2em]\small NEVERHUMAN Research \quad (\texttt{\G{ReleaseTag}})}
 \date{}
 
 \begin{document}
@@ -230,8 +230,8 @@ the outcome. Splits are stratified for classification and fixed by seed.
 
 \begin{table}[h]
 \centering
-\caption{\textbf{Per-table results} at the default budget: robust retention (median over seeds) of DOPE,
-of the research kernel, of real rows xz-compressed to the same budget, and of the generators at default
+\caption{\textbf{Per-table results} at the default budget: robust retention (median over seeds) of DOPE
+(\texttt{\G{ReleaseTag}}), of real rows xz-compressed to the same budget, and of the generators at default
 size, with DOPE's TDL at
 $\tau=\CfgTau$ (n.r.: not reached on the tested grid).}
 \label{tab:pertable}
@@ -257,9 +257,7 @@ benefit from seeing the real table's encodings.
 
 \paragraph{Comparators.} SDV's Gaussian copula, CTGAN and TVAE use the library's detected metadata and
 default hyperparameters; ARF uses arfpy defaults. Their bytes are the xz-compressed pickle of the fitted
-object, which is smaller than what a deployment would ship. The research kernel runs
-\texttt{dope-kernel fit-table} and \texttt{sample-table} at their defaults with the cell's seed; its bytes
-are its artifact file. Every fit-and-sample call, DOPE's included,
+object, which is smaller than what a deployment would ship. Every fit-and-sample call, DOPE's included,
 runs under a wall-clock limit of \CfgTimeoutMin{} minutes; a call that exceeds it is recorded as a failed
 cell, as are the remaining seeds of that method on that table. The compressed-rows control samples rows
 without replacement and binary-searches the largest subset whose CSV fits the budget after

@@ -459,7 +459,7 @@ regression, CatBoost \citep{prokhorenkova2018catboost} with \CfgCatIters{} trees
 and a two-layer MLP \citep{pedregosa2011sklearn}, each fitted with its own one-hot encoding and scaling.
 A fit that fails, for instance because a table's schema alone exceeds the budget, or that exceeds the
 wall-clock limit counts as robust retention zero, the null fallback. Per table we take the median over
-three seeds for DOPE and compressed rows at the default budget, the research kernel, the Gaussian
+three seeds for DOPE (\texttt{\G{ReleaseTag}}) and compressed rows at the default budget, the Gaussian
 copula and ARF; every other cell, including the other budgets and the ablations, has one seed. Across tables we report medians with percentile bootstrap
 intervals (\CfgDraws{} draws over tables) and paired differences as Hodges--Lehmann estimates.
 
@@ -469,18 +469,15 @@ ship the data? For each budget it keeps the largest random subset of real traini
 compressed with xz at its strongest preset, fits the budget; auditors train on those real rows as
 they are. We also run the SDV Gaussian copula \citep{patki2016sdv}, ARF \citep{watson2023arf}, and on the
 tables with at most a few thousand training rows CTGAN and TVAE \citep{xu2019ctgan}, all at their
-defaults; their bytes are the xz-compressed pickles of the fitted objects, which favours them. The
-repository's \emph{research kernel}, an earlier DOPE engine with a fixed program shape
-(\texttt{dope-kernel fit-table} at its defaults), is run on every table; it accepts regression and
-binary targets only, so it refuses one multiclass table and fits the other's class codes as a
-regression, and both count as measured. Real rows resampled with replacement are a row-count control,
+defaults; their bytes are the xz-compressed pickles of the fitted objects, which favours them.
+Real rows resampled with replacement are a row-count control,
 not a generator and not a ceiling.
 
 \begin{table}[t]
 \centering
 \caption{\textbf{Main results.} Median over tables of robust retention with its \CfgConf\% bootstrap
 interval, the median retention of each auditor family, and the number of tables whose robust retention
-reaches $\tau$. Bytes are medians of everything sampling reads (DOPE and the kernel: the artifact file;
+reaches $\tau$. Bytes are medians of everything sampling reads (DOPE: the artifact file;
 real rows: the xz stream; generators: xz-compressed pickles). A superscript gives the table count when a method
 covers fewer tables.}
 \label{tab:main}
@@ -506,17 +503,6 @@ DOPE once the budget holds a large share of a table: they need \G{OneRowsFBytes}
 \G{OneRowsFRet}, and the whole table (\G{OneRowsFullBytes}) to reach \G{OneRowsFullRet}.
 The generators sit far to the right: the Gaussian copula reaches \G{OneCopulaRet} at
 \G{OneCopulaBytes} and ARF \G{OneArfRet} at \G{OneArfBytes}.
-
-\paragraph{Against the research kernel.}
-The repository's earlier engine compiles programs of one fixed shape, a median \G{OneKernelBytes},
-and reaches \G{OneKernelRet} [\G{OneKernelLo}, \G{OneKernelHi}]. Its linear auditors keep
-\G{OneKernelLin} but CatBoost only \G{OneKernelCb}: without trees its program misses the thresholds
-and interactions that tree auditors exploit, as the no-trees ablation below shows for DOPE. On the
-\G{OneKernelSupported} regression and binary tables it supports, DOPE at the smallest budget, about the
-kernel's size, cannot be separated from it (wins, ties and losses \G{OneKernelVsAWtl}; Hodges--Lehmann difference
-\G{OneKernelVsAHl} [\G{OneKernelVsALo}, \G{OneKernelVsAHi}]); at half the default budget it is ahead
-(\G{OneKernelVsBWtl}; \G{OneKernelVsBHl} [\G{OneKernelVsBLo}, \G{OneKernelVsBHi}]), and at the
-default budget \G{OneKernelVsCWtl}.
 
 \begin{table}[t]
 \centering

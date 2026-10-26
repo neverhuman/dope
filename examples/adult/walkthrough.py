@@ -102,15 +102,14 @@ def adult_comparison_lines(eval_text: str) -> list[str]:
         "| Method & Evaluation Protocol on UCI Adult (`income`) | Charged Artifact Bytes | Source Rows Stored | Linear / Logistic $R$ | Boosted Trees (GBDT) $R$ | Neural MLP $R$ | Robust Retention $R$ (`min` over families) |",
         "|---|---:|---|---:|---:|---:|---|",
         (
-            f"| **`dope` CLI above (`adult.dope`, `seed=0`, `{cli_syn:,}` synth rows, built-in Rust auditors)** | "
+            f"| **`dope` (`v1.0.0`) CLI above (`adult.dope`, `seed=0`, `{cli_syn:,}` synth rows, built-in Rust auditors)** | "
             f"**{_fmt_bytes(cli_bytes)}** | **`0` rows** | **`{cli_fams['linear']:.3f}`** | "
             f"**`{cli_fams['gbdt']:.3f}`** | **`{cli_fams['mlp']:.3f}`** | **`{cli_rob:.3f}` (`seed=0`, $4\\times$ cap)** |"
         ),
-        row_entry("`DOPE` @ `4 KiB` (`dope-4x@-`, external Python harness, $4\\times N_{\\text{train}}$ = `80,000` rows)", "dope-4x@-", "`0` rows", bold=True),
-        row_entry("`DOPE` @ `4 KiB` (`dope-seed0@-`, external Python harness, $1\\times N_{\\text{train}}$ = `20,000` rows)", "dope-seed0@-", "`0` rows"),
-        row_entry("`DOPE` @ `4 KiB` (`dope@4k`, 3-seed median `seed=0,1,2`, $1\\times N_{\\text{train}}$)", "dope@4k", "`0` rows", bold=True),
+        row_entry("`DOPE` (`v1.0.0`) @ `4 KiB` (`dope-4x@-`, external Python harness, $4\\times N_{\\text{train}}$ = `80,000` rows)", "dope-4x@-", "`0` rows", bold=True),
+        row_entry("`DOPE` (`v1.0.0`) @ `4 KiB` (`dope-seed0@-`, external Python harness, $1\\times N_{\\text{train}}$ = `20,000` rows)", "dope-seed0@-", "`0` rows"),
+        row_entry("`DOPE` (`v1.0.0`) @ `4 KiB` (`dope@4k`, 3-seed median `seed=0,1,2`, $1\\times N_{\\text{train}}$)", "dope@4k", "`0` rows", bold=True),
         row_entry("`Raw Rows Subsample` @ `4 KiB` (`rows@4k`, 3-seed median, `xz`-compressed real rows)", "rows@4k", "`xz` real-row subset"),
-        row_entry("`DOPE v1 Research Kernel` (`kernel@-`, 3-seed median, $1\\times N_{\\text{train}}$)", "kernel@-", "`0` rows"),
         row_entry("`Adversarial Random Forests` (`arf@-`, 3-seed median, `1,578×` larger)", "arf@-", "`0` rows"),
         row_entry("`Gaussian Copula` (`copula@-`, 3-seed median, `22×` larger)", "copula@-", "`0` rows"),
         row_entry("`Real Rows Resampled` (`bootstrap@-`, 3-seed median, full `20,000`-row bootstrap)", "bootstrap@-", "`20,000` real rows"),

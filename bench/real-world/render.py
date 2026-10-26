@@ -66,17 +66,18 @@ def hero_readme(plt):
     import numpy as np
     snap = multilevel_convergence_data()
     vs = snap["value_and_testing_scale_summary"]
-    lb, v2_t = vs["v2_overall_elo_1000ds"], vs["v2_value_by_tier_1000ds"]
+    lb = [r for r in vs["v2_overall_elo_1000ds"] if r["method"] != "kernel"]
+    v2_t = vs["v2_value_by_tier_1000ds"]
     tiers = ("medium", "high", "ultra")
     med_b = [int(v2_t[t]["exact_v2_latent_wire_median_bytes"]) for t in tiers]
     med_kib = [b / 1024.0 for b in med_b]
     study_txt = (ROOT / "docs/multilevel-landmark-dl-study.md").read_text()
     fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(14.4, 4.95), gridspec_kw={"width_ratios": [1.14, 1.05, 1.01]})
-    fig.suptitle("DOPE at a Glance — 1,000-Dataset Benchmark (6 Downstream ML Learner Families, 65,874 Fits)", fontsize=10.8, fontweight="bold", color=INK, y=0.985)
-    names = [f"#1 DOPE-MLC-v2\n({med_kib[0]:.1f}–{med_kib[2]:.1f} KiB latent wire)",
-             "#2 Raw Rows Subsample\n(raw-row subset control)", "#3 DOPE v1 Kernel\n(research kernel)",
-             "#4 Gaussian Copula\n(parametric baseline)", "#5 Joint Diffusion\n(tabular diffusion)", "#6 ARF\n(adversarial forest)"]
-    colors = [BLUE, ORANGE, TEAL, SLATE, GRAY, "#a8a29e"]
+    fig.suptitle("DOPE (v1.0.0) at a Glance — 1,000-Dataset Benchmark (6 Downstream ML Learner Families, 65,874 Fits)", fontsize=10.8, fontweight="bold", color=INK, y=0.985)
+    names = [f"#1 DOPE v1.0.0 (DOPE-MLC-v2)\n({med_kib[0]:.1f}–{med_kib[2]:.1f} KiB latent wire)",
+             "#2 Raw Rows Subsample\n(raw-row subset control)",
+             "#3 Gaussian Copula\n(parametric baseline)", "#4 Joint Diffusion\n(tabular diffusion)", "#5 ARF\n(adversarial forest)"]
+    colors = [BLUE, ORANGE, SLATE, GRAY, "#a8a29e"]
     y_pos = np.arange(len(lb))[::-1]
     elos = [r["elo"] for r in lb]
     bars = ax_a.barh(y_pos, elos, xerr=[[r["elo"] - r["elo_ci95_low"] for r in lb], [r["elo_ci95_high"] - r["elo"] for r in lb]],
@@ -86,7 +87,7 @@ def hero_readme(plt):
     ax_a.axvline(1500.0, color=INK2, lw=1.0, ls="--", zorder=1)
     ax_a.set_yticks(y_pos, names, fontsize=7.8)
     ax_a.set_xlim(1100.0, 1865.0)
-    ax_a.set_ylim(-0.65, 5.65)
+    ax_a.set_ylim(-0.65, len(lb) - 0.35)
     ax_a.grid(axis="y", visible=False)
     for i, r in enumerate(lb):
         ax_a.text(r["elo_ci95_high"] + 8.0, y_pos[i], f"{r['elo']:.1f} ({100.0 * r['win_share']:.1f}% win)", va="center", ha="left", fontsize=7.6, fontweight="bold" if i == 0 else "normal", color=BLUE if i == 0 else INK)
@@ -94,7 +95,7 @@ def hero_readme(plt):
     ax_a.set_xlabel("Bradley–Terry Elo (95% CI; dashed = 1500 neutral)", fontsize=8.3)
     ax_a.set_title("A. Multi-Learner Ranking (1,000 DS, 65,874 Fits)", loc="left", color=INK, fontsize=9.0, fontweight="bold")
     x, w = np.arange(len(tiers)), 0.25
-    dope_lbl = f"DOPE-MLC-v2 ({med_b[0]:,}/{med_b[1]:,}/{med_b[2]:,} B = {med_kib[0]:.1f}/{med_kib[1]:.1f}/{med_kib[2]:.1f} KiB latent med)"
+    dope_lbl = f"DOPE v1.0.0 ({med_b[0]:,}/{med_b[1]:,}/{med_b[2]:,} B = {med_kib[0]:.1f}/{med_kib[1]:.1f}/{med_kib[2]:.1f} KiB latent med)"
     for key, label, col, offset in (("dope", dope_lbl, BLUE, -w), ("rows", "Raw Rows Subsample (4 / 16 / 64 KiB cap; Med CB 999/1k)", ORANGE, 0.0), ("copula", "Gaussian Copula (4 / 16 / 64 KiB nominal cap)", SLATE, w)):
         means = [v2_t[t][f"{key}_mean_retention_R"] for t in tiers]
         lo = [means[i] - v2_t[t][f"{key}_retention_R_ci95"][0] for i, t in enumerate(tiers)]
@@ -143,7 +144,7 @@ def hero_readme(plt):
     ax_c.set_title("C. 6-Learner Transfer (Ultra)", loc="left", color=INK, fontsize=9.0, fontweight="bold")
     ax_c.legend(frameon=True, facecolor=SURFACE, edgecolor=GRID, fontsize=6.4, loc="upper left")
     dec_b = int(_study_val(study_txt, r"frozen `(\d+,\d+) B` decoder").replace(",", ""))
-    fig.text(0.5, 0.006, f"Byte & cohort qualification: DOPE-MLC-v2 medians ({med_b[0]:,} / {med_b[1]:,} / {med_b[2]:,} B = {med_kib[0]:.1f} / {med_kib[1]:.1f} / {med_kib[2]:.1f} KiB) are exact v2 latent payloads (+545 B med scaler sidecar; shared {dec_b:,} B / {dec_b / 1024.0:.1f} KiB decoder; 242 dataset-disjoint + 758 unseen-fold = 1,000 DS).\nBaseline tiers (4 / 16 / 64 KiB) reflect nominal budget caps and historical receipt byte estimates (rows medium|catboost: 999/1,000 observed), not a common measured-wire byte qualification.", ha="center", va="bottom", fontsize=6.6, color=INK2)
+    fig.text(0.5, 0.006, f"Byte & cohort qualification (git tag v1.0.0): DOPE-MLC-v2 medians ({med_b[0]:,} / {med_b[1]:,} / {med_b[2]:,} B = {med_kib[0]:.1f} / {med_kib[1]:.1f} / {med_kib[2]:.1f} KiB) are exact v2 latent payloads (+545 B med scaler sidecar; shared {dec_b:,} B / {dec_b / 1024.0:.1f} KiB decoder; 242 dataset-disjoint + 758 unseen-fold = 1,000 DS).\nBaseline tiers (4 / 16 / 64 KiB) reflect nominal budget caps and historical receipt byte estimates (rows medium|catboost: 999/1,000 observed), not a common measured-wire byte qualification.", ha="center", va="bottom", fontsize=6.6, color=INK2)
     fig.tight_layout(rect=(0.0, 0.055, 0.995, 0.955))
     return fig
 
@@ -154,7 +155,7 @@ def hero(summary: dict, plt, title: bool = True):
     fig, ax = plt.subplots(figsize=(6.4, 3.65))
     ax.set_xscale("log")
     xs_all, ends, clipped = [], {}, 0
-    for method, color, label in (("rows", ORANGE, "Real rows, xz-compressed\nto the same bytes"), ("dope", BLUE, "DOPE")):
+    for method, color, label in (("rows", ORANGE, "Real rows, xz-compressed\nto the same bytes"), ("dope", BLUE, "DOPE (v1.0.0)")):
         pts = frontier(summary, method)
         xs, ys = [p["bytes"]["median"] for p in pts], [p["robust"]["median"] for p in pts]
         lo, hi = [max(p["robust"]["lo"], FLOOR) for p in pts], [max(p["robust"]["hi"], FLOOR) for p in pts]
@@ -167,12 +168,14 @@ def hero(summary: dict, plt, title: bool = True):
             if y < FLOOR:
                 ax.annotate(f"{y:.1f}".replace("-", "−"), (x, c), xytext=(0, 7), textcoords="offset points", ha="center", color=INK2, fontsize=7.5)
         if xs:
-            ends[method] = (xs[-1], yc[-1], color, label)
+            ends[method] = (xs[1] if method == "dope" and len(xs) > 1 else xs[-1],
+                            yc[1] if method == "dope" and len(yc) > 1 else yc[-1], color, label)
     if xs_all:
         ax.axvspan(min(xs_all) / 3.2, 8192.0, color=BLUE, alpha=0.04, zorder=0)
         ax.text(1650.0, 0.06, "Compact-program\nzone (≤ 8 KiB)", color=BLUE, fontsize=7.3, fontweight="bold", ha="center", va="bottom")
     for method, (x, y, color, label) in ends.items():
-        ax.annotate(label, (x, y), xytext=(8, -2 if method == "dope" else -14), textcoords="offset points", color=color, fontsize=9, fontweight="bold", va="center")
+        ax.annotate(label, (x, y), xytext=(-8, 2) if method == "dope" else (8, -14), textcoords="offset points",
+                    color=color, fontsize=9, fontweight="bold", ha="right" if method == "dope" else "left", va="center")
     head = row(summary, "dope", "4k")
     if head and head["datasets"]:
         x, y = head["bytes"]["median"], head["robust"]["median"]
@@ -192,13 +195,6 @@ def hero(summary: dict, plt, title: bool = True):
             ax.annotate(f"{name}{suffix}: {y:.2f}".replace("-", "−"), (x, yc), xytext=(-7 if left else 7, 9), textcoords="offset points", ha="right" if left else "left", color=INK2, fontsize=8)
         else:
             ax.annotate(f"{name}{suffix}", (x, yc), xytext=(7, 4), textcoords="offset points", color=INK2, fontsize=8)
-    k = row(summary, "kernel", "-")
-    if k and k["datasets"]:
-        x, y = k["bytes"]["median"], k["robust"]["median"]
-        xs_all.append(x)
-        yc = max(y, FLOOR)
-        ax.errorbar([x], [yc], yerr=[[max(0, yc - max(k["robust"]["lo"], FLOOR))], [max(0, max(k["robust"]["hi"], FLOOR) - yc)]], fmt="D", color=TEAL, mfc=SURFACE, mec=TEAL, ms=6.5, mew=1.6, elinewidth=1.2, capsize=0, zorder=4)
-        ax.annotate("research kernel\n(dope-kernel)", (x, yc), xytext=(-8, -4), textcoords="offset points", ha="right", va="top", color=TEAL, fontsize=8)
     ax.axhline(0.9, color=INK2, linewidth=0.9, linestyle=(0, (1, 2.5)), zorder=1)
     ax.text(0.995, 0.9, "τ = 0.9", transform=ax.get_yaxis_transform(), va="bottom", ha="right", color=INK2, fontsize=8)
     ax.text(0.015, 0.97, "↖ better: more retention, fewer bytes", transform=ax.transAxes, ha="left", va="top", color=INK2, fontsize=8)
@@ -217,7 +213,7 @@ def coverage(summary: dict, plt):
     fig, ax = plt.subplots(figsize=(6.0, 3.4))
     ax.set_xscale("log")
     n = len(summary["datasets"])
-    for method, color, name in (("dope", BLUE, "DOPE"), ("rows", ORANGE, "Real rows (xz)")):
+    for method, color, name in (("dope", BLUE, "DOPE (v1.0.0)"), ("rows", ORANGE, "Real rows (xz)")):
         for tau, style in ((0.9, "-"), (0.8, (0, (4, 2)))):
             vals = sorted(v for v in summary["tdl"][f"{method}@{tau}"].values() if v is not None)
             xs = np.array([256.0] + vals + [vals[-1] * 4 if vals else 1e7])
@@ -238,7 +234,7 @@ def families(summary: dict, plt):
     head = row(summary, "dope", "4k")
     rows4 = row(summary, "rows", "4k")
     others = [(m, n) for m, n in GENERATORS if row(summary, m, "-")]
-    groups = [("DOPE @ 4 KiB", head, BLUE), ("Rows @ 4 KiB", rows4, ORANGE)] + [(n, row(summary, m, "-"), GRAY) for m, n in others]
+    groups = [("DOPE (v1.0.0) @ 4 KiB", head, BLUE), ("Rows @ 4 KiB", rows4, ORANGE)] + [(n, row(summary, m, "-"), GRAY) for m, n in others]
     fams = ["linear", "gbdt", "mlp"]
     fig, ax = plt.subplots(figsize=(7.0, 3.2))
     width = 0.8 / len(groups)
@@ -281,7 +277,7 @@ def tables(summary: dict, plt):
     ax.set_xlim(FLOOR - 0.04, 1.08)
     ax.set_xlabel("Robust retention at 4 KiB (worst of linear, CatBoost, MLP)")
     ax.grid(axis="y", visible=False)
-    ax.scatter([], [], color=BLUE, s=36, label="DOPE")
+    ax.scatter([], [], color=BLUE, s=36, label="DOPE (v1.0.0)")
     ax.scatter([], [], color=ORANGE, s=36, label="Real rows, xz-compressed to the same bytes")
     ax.legend(loc="lower left", frameon=False, fontsize=8, bbox_to_anchor=(0, 1.0), ncol=2)
     fig.tight_layout()
