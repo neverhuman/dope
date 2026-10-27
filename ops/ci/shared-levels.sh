@@ -14,7 +14,7 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629|test_optional_landmarks) ;; *) exit 2;; esac
     if [[ "$2" == test_encoder_629 ]]; then
       mkdir -p target/encoder-629
       export DOPE_ENCODER_WEIGHTS="$PWD/target/encoder-629/dope_mlc_v3_multitask_best.safetensors"
@@ -63,6 +63,7 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh torch test_observed_landmarks
     bash ops/ci/shared-levels.sh torch test_landmark_views
     bash ops/ci/shared-levels.sh torch test_encoder_629
+    bash ops/ci/shared-levels.sh torch test_optional_landmarks
     bash ops/ci/shared-levels.sh native
     ;;
   *) echo 'Usage: shared-levels.sh contracts|prepare-torch|torch SHARD|prepare-native|native|all' >&2;exit 2;;

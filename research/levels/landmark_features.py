@@ -231,3 +231,47 @@ class InputCache:
         data['source_provenance']=dict(data['source_provenance'],landmark_input_manifest_sha256=pin['manifest_sha256'],
                                        landmark_feature_sha256=digest(data['landmark_input']))
         return data
+
+
+# Optional (non-raising) siblings for progressive/optional landmarks. The strict functions
+# above are unchanged; these never accept anything the strict path would reinterpret.
+def validate_optional(features):
+    """Sanitize ``(values, mask)`` raw gains or a ``LandmarkBundle`` into a bundle.
+
+    Non-finite values become missing (+0.0); an empty mask is allowed (zero bundle).
+    Raises only on wrong shape/types (``cv_landmark_optional_shape``).
+    """
+    from .optional_landmarks import LandmarkBundle
+    if isinstance(features, LandmarkBundle):
+        return features.sanitize()
+    require(isinstance(features,(tuple,list)) and len(features)==2, 'cv_landmark_optional_shape')
+    values,mask=features
+    require(len(values)==23 and len(mask)==23 and all(type(v)is bool for v in mask), 'cv_landmark_optional_shape')
+    gains=[]
+    for value,present in zip(values,mask):
+        ok=present and not isinstance(value,bool) and isinstance(value,(int,float)) and math.isfinite(float(value))
+        gains.append(float(value) if ok else None)
+    return LandmarkBundle.from_raw_gains(gains)
+
+
+def feature_tensor_optional(features, device):
+    """46-d ``cat(squashed values, mask)`` for a bundle or raw ``(values, mask)``.
+
+    For a full finite input this equals ``feature_tensor`` bit-for-bit.
+    """
+    return validate_optional(features).features46(device)
+
+
+def report_bundle(report, rows, task, *, subsample_n=None, include_uninformative=True, complete_only=False):
+    """Non-raising sibling of ``report_features``: native report -> ``LandmarkBundle``.
+
+    Panel/rows/task mismatches yield the zero bundle instead of raising; cell admission
+    defaults to ``complete`` + ``uninformative`` with finite gain (so measured ``0.0``
+    gains remain present), or ``complete``-only when ``complete_only=True``.
+    """
+    from .optional_landmarks import LandmarkBundle
+    if not isinstance(report,dict) or report.get('panel')!=OPTIONS['panel'] \
+            or report.get('rows')!=rows or report.get('task')!=task:
+        return LandmarkBundle.zero()
+    return LandmarkBundle.from_report(report,subsample_n,include_uninformative=include_uninformative,
+                                      complete_only=complete_only)

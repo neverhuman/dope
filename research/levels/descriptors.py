@@ -149,8 +149,31 @@ def extract_report_descriptors(
     report: Dict[str, Any],
     *,
     level: str = "ultra",
+    rows: Optional[int] = None,
+    features: Optional[int] = None,
+    classes: Optional[int] = None,
+    task: Optional[str] = None,
+    target_stats: Optional[Sequence[Optional[float]]] = None,
 ) -> Dict[str, Any]:
-    """Extract level-filtered landmark & data descriptive features from S3 report.json."""
+    """Extract level-filtered landmark & data descriptive features from S3 report.json.
+
+    ``rows``/``features``/``classes``/``task``/``target_stats`` optionally override the
+    report's shape and target summary fields (the optional-landmark path passes them from
+    the TABLE so an empty, partial or subsampled report uses the full table's base metadata).
+    ``None`` keeps the historical behaviour.
+    """
+    if (rows is not None or features is not None or classes is not None
+            or task is not None or target_stats is not None):
+        report = dict(report)
+        for key, value in (
+            ("rows", rows),
+            ("features", features),
+            ("classes", classes),
+            ("task", task),
+            ("target_stats", list(target_stats) if target_stats is not None else None),
+        ):
+            if value is not None:
+                report[key] = value
     lvl_mask = level_landmark_mask(level)
     cells = report.get("cells", [])
 

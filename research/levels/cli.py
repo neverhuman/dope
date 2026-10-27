@@ -53,7 +53,24 @@ def main(argv=None):
     derived.add_argument('--expected-manifest-sha256',required=True)
     derived.add_argument('--expected-engine-sha256',required=True)
     derived.add_argument('--out',type=Path,required=True)
+    enc=sub.add_parser('encode',help='Pinned Encoder629 features with optional/progressive landmarks')
+    enc.add_argument('--csv',type=Path,required=True)
+    enc.add_argument('--target',required=True,help='Target column name or 0-based index')
+    enc.add_argument('--task',choices=('regression','binary','classification','multiclass'),required=True)
+    enc.add_argument('--weights',type=Path,required=True)
+    from .encoder import PINNED_MULTITASK_SAFETENSORS_SHA256
+    enc.add_argument('--weights-sha256',default=PINNED_MULTITASK_SAFETENSORS_SHA256)
+    enc.add_argument('--landmark-mode',choices=('none','fast','progressive','full'),default='full')
+    enc.add_argument('--landmark-subsample',type=int,
+                     help='Stratified training-row subsample for native CV (progressive default 300)')
+    enc.add_argument('--bundle-json',type=Path,help='Cached LandmarkBundle v1 JSON (progressive start / full check)')
+    enc.add_argument('--report-json',type=Path,help='Existing native landmarks report (full mode)')
+    enc.add_argument('--engine',type=Path,help='Native dope binary for landmark CV (full/progressive)')
+    enc.add_argument('--device',default='cpu')
+    enc.add_argument('--json',action='store_true')
     args=parser.parse_args(argv)
+    if args.command=='encode':
+        return run_encode(args)
     if args.command=='derive-landmark-inputs':
         from .landmark_features import derive_observed
         print(json.dumps(derive_observed(args.input,args.expected_manifest_sha256,args.expected_engine_sha256,args.out)))
@@ -113,6 +130,83 @@ def main(argv=None):
         phase=args.phase,base_checkpoint=args.ordinary_base,stop_after=args.stop_after,
         resource_check=guard,repair_reason=args.repair_reason)
     print(json.dumps(terminal));return 0 if terminal['state']=='complete' else 2
+
+
+def _read_csv_table(path, target):
+    import csv
+    with Path(path).open(newline='') as stream:
+        rows=list(csv.reader(stream))
+    require(len(rows)>=2,'encode_csv_empty')
+    header,body=rows[0],rows[1:]
+    idx=header.index(target) if target in header else int(target)
+    require(0<=idx<len(header) and all(len(r)==len(header) for r in body),'encode_csv_shape')
+    X=[[v for j,v in enumerate(r) if j!=idx] for r in body]
+    y=[r[idx] for r in body]
+    return X,y,idx
+
+
+def run_encode(args):
+    """``encode``: none/fast/full -> one JSON record; progressive -> NDJSON per update."""
+    import time
+    import numpy as np
+    import torch
+    from .encoder import DopeEncoder629
+    from .multilevel_model import build_conditioning
+    from .optional_landmarks import (DEFAULT_PROGRESSIVE_SUBSAMPLE, LandmarkBundle, native_group_runner,
+                                     progressive_steps, report_task)
+    from .scaling import FitOnlyTableTransform
+    mode=args.landmark_mode
+    task={'binary':'classification'}.get(args.task,args.task)
+    X_raw,y_raw,target_idx=_read_csv_table(args.csv,args.target)
+    transform=FitOnlyTableTransform.fit(X_raw,y_raw,task=task)
+    X,y=transform.transform(X_raw,y_raw)
+    y_train_raw=y_raw if task=='regression' else None
+    encoder=DopeEncoder629.from_pretrained(args.weights,expected_sha256=args.weights_sha256,device=args.device)
+    cached=None if args.bundle_json is None else LandmarkBundle.from_json(args.bundle_json.read_bytes())
+
+    def emit(seq,bundle,native_report,started,subsample_n=None):
+        out=build_conditioning(X,y,task=task,bundle=bundle,mode=mode,native_report=native_report,
+                               level='high',subsample_n=subsample_n,y_train_raw=y_train_raw)
+        dev=torch.device(args.device)
+        with torch.no_grad():
+            feats=encoder(torch.from_numpy(out['vec256'][None].copy()).to(dev),
+                          torch.from_numpy(out['col_landmarks'][None].copy()).to(dev))
+        raw=feats.detach().to('cpu').contiguous().numpy().astype('<f4').tobytes()
+        shown=bundle if bundle is not None else LandmarkBundle.from_report(native_report,subsample_n=subsample_n)
+        record=dict(seq=seq,status=shown.status,conditioning_digest=shown.conditioning_digest(),
+                    features629_sha256=hashlib.sha256(raw).hexdigest(),
+                    latency_ms=round((time.perf_counter()-started)*1000.0,3),
+                    mode=mode,recipe=out['recipe'],effective_conditioning_digest=out['digest'])
+        print(json.dumps(record,sort_keys=True) if args.json else
+              f"seq={seq} status={record['status']} features629_sha256={record['features629_sha256']}",flush=True)
+
+    started=time.perf_counter()
+    if mode in ('none','fast'):
+        emit(0,LandmarkBundle.zero() if cached is None else cached,None,started);return 0
+    if mode=='full':
+        if args.report_json is not None:
+            report=json.loads(args.report_json.read_bytes())
+        else:
+            require(args.engine is not None,'encode_full_requires_report_or_engine')
+            from .landmark_features import OPTIONS
+            import subprocess
+            cmd=[str(args.engine),'--threads','4','landmarks','real',str(args.csv),'--target',str(target_idx),
+                 '--task',report_task(task),'--json']
+            for name,value in OPTIONS.items():cmd+=['--'+name.replace('_','-'),str(value)]
+            if args.landmark_subsample is not None:cmd+=['--subsample',str(args.landmark_subsample)]
+            result=subprocess.run(cmd,capture_output=True,check=False)
+            require(result.returncode==0,'encode_native_failed')
+            report=json.loads(result.stdout)
+        emit(0,cached,report,started,subsample_n=args.landmark_subsample);return 0
+    require(args.engine is not None,'encode_progressive_requires_engine')
+    n=DEFAULT_PROGRESSIVE_SUBSAMPLE if args.landmark_subsample is None else args.landmark_subsample
+    runner=native_group_runner(args.engine,args.csv,target=target_idx,task=task,subsample_n=n)
+    source=hashlib.sha256(Path(args.csv).read_bytes()+f'\0{target_idx}\0{n}'.encode()).hexdigest()
+    if cached is not None and not cached.is_zero():
+        require(cached.subsample_n==n and cached.source_digest==source,'encode_cached_bundle_scope')
+    for seq,_,bundle,_ in progressive_steps(runner,subsample_n=n,source_digest=source,start=cached):
+        emit(seq,bundle,None,started);started=time.perf_counter()
+    return 0
 
 
 if __name__=='__main__':
