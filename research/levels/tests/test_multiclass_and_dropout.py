@@ -204,6 +204,52 @@ class TestMulticlassAndDropoutSupervision(unittest.TestCase):
                     np.testing.assert_array_equal(v_np, c_ref["vec256"])
                     np.testing.assert_array_equal(c_np, c_ref["col_landmarks"])
 
+    def test_numeric_scaler_ieee754_tanh_tail_parity(self) -> None:
+        import math
+        from research.levels.scaling import NumericColumnScaler
+
+        scaler = NumericColumnScaler(
+            slot=0,
+            anonymous_name="f_000",
+            transform_kind="linear",
+            missing_rate=0.0,
+            center=0.0,
+            scale=1.0,
+            post_mean=0.0,
+            post_std=1.0,
+            quantiles=(0.0,) * 9,
+            skewness=0.0,
+            kurtosis=0.0,
+            blend_quantile_weight=0.35,
+        )
+        # u = z / 6.0 = 19.040037931519883 falls in [18.9903411, 19.0615475) where
+        # numpy.tanh saturates to 1.0 early while IEEE-754 f64::tanh (and math.tanh)
+        # stays strictly < 1.0, preserving exact rank/tie order with Rust dope-core.
+        u = 19.040037931519883
+        vals = np.array([-u * 6.0, 18.2 * 6.0, u * 6.0, 20.0 * 6.0], dtype=np.float64)
+        scaled, _ = scaler.transform(vals)
+        self.assertEqual(float(scaled[0]), 6.0 * math.tanh(-u))
+        self.assertEqual(float(scaled[1]), 6.0 * math.tanh(18.2))
+        self.assertEqual(float(scaled[2]), 6.0 * math.tanh(u))
+        self.assertLess(abs(float(scaled[2])), 6.0)
+        self.assertEqual(float(scaled[3]), 6.0)
+
+        # Verify end-to-end none-mode conditioning spearman_r rank order when a column has
+        # a cell at u=19.040037931519883 alongside saturated cells at u=22.0.
+        n = 32
+        x_raw = np.linspace(-2.0, 2.0, n, dtype=np.float64).reshape(n, 1)
+        x_raw[-3:, 0] = 22.0 * 6.0
+        x_raw[-4, 0] = u * 6.0
+        x_sc, _ = scaler.transform(x_raw[:, 0])
+        x_sc = x_sc.reshape(n, 1)
+        y_sc = np.array([float(i % 4) for i in range(n)], dtype=np.float64)
+        cond = build_conditioning(x_sc, y_sc, task="multiclass", bundle=None, mode="none")
+        self.assertTrue(np.all(np.isfinite(cond["vec256"])))
+        self.assertTrue(np.all(np.isfinite(cond["col_landmarks"])))
+        # Row n-4 is strictly < 6.0 so its ordinal rank is n-4 (28), not tied with the top 3 rows.
+        rx = np.argsort(np.argsort(x_sc[:, 0]))
+        self.assertEqual(int(rx[-4]), n - 4)
+
 
 if __name__ == "__main__":
     unittest.main()
