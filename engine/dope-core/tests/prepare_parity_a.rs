@@ -1,11 +1,13 @@
-use dope_core::landmark::{LandmarkBundle, LandmarkGroup, LandmarkMode, LandmarkOptions};
+use dope_core::landmark::{
+    LandmarkBundle, LandmarkGroup, LandmarkMode, LandmarkOptions, SubsampleSpec,
+};
 use dope_core::prepare::scaling::TargetValue;
 use dope_core::prepare::{
-    build_conditioning, compute_table_descriptors, extract_report_descriptors, prepare_table,
-    prepare_table_cells, prepare_table_cells_with_ids, prepare_table_cells_with_policy,
-    prepare_table_lossless, prepare_table_mixed, prepare_table_with_ids, prepare_table_with_policy,
-    progressive_landmarks_for_table, ClassVocabPolicy, ColumnKind, Level, NativeReportView,
-    PrepTask, ShapeOverride,
+    build_conditioning, build_conditioning_sampled, compute_table_descriptors,
+    extract_report_descriptors, prepare_table, prepare_table_cells, prepare_table_cells_with_ids,
+    prepare_table_cells_with_policy, prepare_table_lossless, prepare_table_mixed,
+    prepare_table_with_ids, prepare_table_with_policy, progressive_landmarks_for_table,
+    ClassVocabPolicy, ColumnKind, Level, NativeReportView, PrepTask, ShapeOverride,
 };
 use safetensors::tensor::Dtype;
 use safetensors::SafeTensors;
@@ -604,4 +606,58 @@ fn lossless_multiclass_k36_progressive_and_conditioning_modes_e2e() {
     let cond_prog = build_conditioning(&tbl, &bun_macro, None, LandmarkMode::Progressive).unwrap();
     assert!(cond_prog.vec256.iter().all(|v| v.is_finite()));
     assert_ne!(cond_prog.digest(), cond_none.digest());
+
+    // Subsampled (N=72 out of 108 rows) Fast & Full conditioning on K=36 LosslessV1
+    let n_big = k_classes * 3;
+    let x_big: Vec<Vec<f64>> = (0..n_big)
+        .map(|i| vec![(i as f64) * 0.11 - 3.0, ((i % 13) as f64) * 0.25 - 1.5])
+        .collect();
+    let y_big: Vec<f64> = (0..n_big).map(|i| (i / 3) as f64 * 0.25).collect();
+    let tbl_big = prepare_table_lossless(&x_big, &y_big, PrepTask::Multiclass).unwrap();
+    assert_eq!(tbl_big.classes, 36);
+    let mut prog_sub = progressive_landmarks_for_table(
+        &tbl_big,
+        &LandmarkOptions::default(),
+        Some(SubsampleSpec::new(72, 42)),
+    )
+    .unwrap();
+    let sel_pos: Vec<usize> = prog_sub
+        .selection()
+        .expect("subsampled selection")
+        .positions
+        .clone();
+    assert_eq!(sel_pos.len(), 72);
+    let (bun_fast, _) = prog_sub.next_group(LandmarkGroup::Macro).unwrap();
+    assert_eq!(bun_fast.subsample_n, Some(72));
+    assert!(build_conditioning(&tbl_big, &bun_fast, None, LandmarkMode::Fast).is_err());
+    let cond_fast = build_conditioning(&tbl_big, &zero, None, LandmarkMode::Fast).unwrap();
+    assert!(cond_fast.vec256.iter().all(|v| v.is_finite()));
+    let cond_sub_prog =
+        build_conditioning(&tbl_big, &bun_fast, None, LandmarkMode::Progressive).unwrap();
+    assert!(cond_sub_prog.vec256.iter().all(|v| v.is_finite()));
+
+    let _ = prog_sub.next_group(LandmarkGroup::Larger).unwrap();
+    let (bun_full, _) = prog_sub.next_group(LandmarkGroup::Fine).unwrap();
+    let rep_json = prog_sub.report().private_report();
+    let rep_view = NativeReportView::from_json(&rep_json).unwrap();
+    let cond_full_sampled = build_conditioning_sampled(
+        &tbl_big,
+        &bun_full,
+        Some(&rep_view),
+        LandmarkMode::Full,
+        Some(&sel_pos),
+    )
+    .unwrap();
+    let cond_full_unsampled_bb =
+        build_conditioning(&tbl_big, &bun_full, Some(&rep_view), LandmarkMode::Full).unwrap();
+    assert!(cond_full_sampled.vec256.iter().all(|v| v.is_finite()));
+    // Full-table descriptors [116..140] stay identical while building blocks [188..256] reflect measured rows
+    assert_eq!(
+        &cond_full_sampled.vec256[116..140],
+        &cond_full_unsampled_bb.vec256[116..140]
+    );
+    assert_ne!(
+        &cond_full_sampled.vec256[188..256],
+        &cond_full_unsampled_bb.vec256[188..256]
+    );
 }

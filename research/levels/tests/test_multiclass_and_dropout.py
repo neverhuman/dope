@@ -250,6 +250,42 @@ class TestMulticlassAndDropoutSupervision(unittest.TestCase):
         rx = np.argsort(np.argsort(x_sc[:, 0]))
         self.assertEqual(int(rx[-4]), n - 4)
 
+    def test_lossless_k36_sampled_full_report_evidence_positions_parity(self) -> None:
+        from research.levels.optional_landmarks import LandmarkBundle
+
+        k_cls = 36
+        n = k_cls * 3
+        rng = np.random.default_rng(2026)
+        x_raw = rng.normal(size=(n, 3)).astype(np.float64)
+        y_raw = np.array([(i // 3) * 0.25 for i in range(n)], dtype=np.float64)
+        sc = FitOnlyTableTransform.fit(x_raw, y_raw, task="multiclass", max_multiclass_classes=None)
+        x_sc, y_sc = sc.transform(x_raw, y_raw, strict_unknown=True)
+        self.assertEqual(len(sc.target_scaler.class_labels), 36)
+
+        cells = [
+            {"id": i + 1, "state": "complete", "gain": 0.02 * (i + 1), "se": 0.005, "stable": True, "lambda_indices": [1, 1, 1, 1, 1]}
+            for i in range(23)
+        ]
+        spec = [{"slot": j, "values": [0.1 * (j + 1)] * 9} for j in range(3)]
+        rep = {
+            "panel": "landmarks-native-v1", "kind": "real", "privacy": "private",
+            "task": "classification", "classes": 36, "rows": 72, "features": 3,
+            "cells": cells, "target_stats": [1.0, 1.0 / 36.0, None], "spectrum": spec,
+        }
+        bun = LandmarkBundle.from_report(rep, subsample_n=72, source_digest="b" * 64)
+        sel_pos = np.array([i for i in range(n) if i % 3 != 2], dtype=np.int64)
+        c_sampled = build_conditioning(
+            x_sc, y_sc, task="multiclass", bundle=bun, mode="full",
+            native_report=rep, y_train_raw=y_raw, evidence_positions=sel_pos,
+        )
+        c_all_rows = build_conditioning(
+            x_sc, y_sc, task="multiclass", bundle=bun, mode="full",
+            native_report=rep, y_train_raw=y_raw, evidence_positions=None,
+        )
+        self.assertTrue(np.all(np.isfinite(c_sampled["vec256"])))
+        np.testing.assert_array_equal(c_sampled["vec256"][116:140], c_all_rows["vec256"][116:140])
+        self.assertFalse(np.array_equal(c_sampled["vec256"][188:256], c_all_rows["vec256"][188:256]))
+
 
 if __name__ == "__main__":
     unittest.main()
