@@ -723,6 +723,22 @@ engine loads all \G{MlcRustParams} single-precision parameters from \texttt{Safe
 Python at inference time and matches PyTorch within \G{MlcRustFwdErr} on forward routing and
 \G{MlcRustSampleErr} on fixed-draw \texttt{DML3}/\texttt{CSC1} packet sampling.
 
+\paragraph{Optional and progressive landmarks.} Landmark conditioning is optional at inference. The
+same pinned encoder accepts a landmark bundle with none, some or all landmark gains present, each
+absent gain masked rather than imputed, and always returns the same fixed-width encoding.
+\texttt{dope mlc-v3 encode -{}-landmark-mode none} runs no cross-validated probe and pays only table
+preparation and one forward pass; \texttt{progressive} emits one encoding per landmark group (zero,
+then macro, larger and fine) as the groups finish on a stratified subsample of the fit rows; and
+\texttt{full} reproduces the released full-report conditioning. Building blocks and the spectrum are
+never synthesized when they were not measured: the observed-only recipe zeroes and masks them, and a
+recipe-tagged digest binds each conditioning vector to the mode that produced it. A landmark-dropout
+fine-tune of the released checkpoint trains on none, random-partial, structured-partial, subsampled
+and full views of the same training tables. The optional-landmarks qualification record
+(\texttt{docs/\allowbreak optional-\allowbreak landmarks-\allowbreak qualification.md}) reports
+retention at every mask level for the released and fine-tuned checkpoints, the subsample-size study
+and cold and warm latency, all measured with the served Rust conditioning on dataset-disjoint
+development tables.
+
 \section{Related work}
 \label{sec:related}
 
