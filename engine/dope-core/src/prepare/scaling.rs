@@ -28,8 +28,6 @@ pub const NORMAL_GRID: [f64; 9] = [
     2.32634787,
 ];
 
-const MISSING_TOKENS: [&str; 5] = ["nan", "null", "none", "?", "na"];
-
 fn err(msg: &str) -> DopeError {
     DopeError::Input(msg.to_string())
 }
@@ -851,15 +849,16 @@ fn prepare_cells_with_yv(
     let raw_cells_sha256 = Some(hash_raw_cells(x, yv));
     let min_level_count = 5usize;
     let prior_smoothing = 10.0f64;
-    let kinds = match declared_kinds {
-        Some(dk) => {
-            if dk.len() != p {
-                return Err(err("prepare_kinds_length_mismatch"));
+    let (kinds, mut parsed_numeric_cols): (Vec<ColumnKind>, Vec<Option<Vec<f64>>>) =
+        match declared_kinds {
+            Some(dk) => {
+                if dk.len() != p {
+                    return Err(err("prepare_kinds_length_mismatch"));
+                }
+                (dk.to_vec(), vec![None; p])
             }
-            dk.to_vec()
-        }
-        None => infer_feature_kinds(x, p),
-    };
+            None => infer_feature_kinds_and_parse(x, p),
+        };
     let target = fit_target_scaler(yv, task)?;
     let y_num = target.transform(yv)?;
     let y_global_mean = if y_num.is_empty() {
@@ -872,8 +871,9 @@ fn prepare_cells_with_yv(
     for (j, kind) in kinds.iter().enumerate() {
         match kind {
             ColumnKind::Numeric => {
-                let col: Vec<f64> = x.iter().map(|r| parse_float_cell(&r[j])).collect();
-                numeric[j] = Some(fit_numeric_column(j, &col));
+                let col = parsed_numeric_cols[j]
+                    .get_or_insert_with(|| x.iter().map(|r| parse_float_cell(&r[j])).collect());
+                numeric[j] = Some(fit_numeric_column(j, col));
             }
             ColumnKind::Categorical => {
                 let col: Vec<&str> = x.iter().map(|r| r[j].as_str()).collect();
@@ -895,8 +895,8 @@ fn prepare_cells_with_yv(
         match kinds[j] {
             ColumnKind::Numeric => {
                 let sc = numeric[j].as_ref().expect("numeric");
-                for i in 0..n {
-                    let raw = parse_float_cell(&x[i][j]);
+                let col = parsed_numeric_cols[j].as_ref().expect("parsed numeric");
+                for (i, &raw) in col.iter().enumerate() {
                     xs[i * p + j] = sc.transform_value(raw).0;
                     frame_columns[j][i] = if raw.is_finite() { raw } else { f64::NAN };
                 }
@@ -1016,36 +1016,46 @@ fn py_strip(s: &str) -> &str {
     s.trim_matches(|c: char| c.is_whitespace() || ('\u{1c}'..='\u{1f}').contains(&c))
 }
 
+#[inline]
 fn is_missing_token(s: &str) -> bool {
-    s.is_empty() || MISSING_TOKENS.contains(&s.to_lowercase().as_str())
+    matches!(s.len(), 0..=4)
+        && (s.is_empty()
+            || s == "?"
+            || s.eq_ignore_ascii_case("na")
+            || s.eq_ignore_ascii_case("nan")
+            || s.eq_ignore_ascii_case("null")
+            || s.eq_ignore_ascii_case("none"))
 }
 
 /// Python `float(s)` on an already-stripped string. Python additionally
 /// accepts `_` digit separators; these are not supported here.
+#[inline]
 fn py_float(s: &str) -> Option<f64> {
     if s.is_empty() {
         return None;
     }
-    let l = s.to_ascii_lowercase();
-    let body = l.trim_start_matches(['+', '-']);
-    if body.len() + 1 < l.len() {
-        return None; // more than one sign
+    let b = s.as_bytes();
+    let body = match b[0] {
+        b'+' | b'-' => &s[1..],
+        _ => s,
+    };
+    if body.is_empty() || matches!(body.as_bytes()[0], b'+' | b'-') {
+        return None; // empty after sign or more than one sign
     }
-    match body {
-        "inf" | "infinity" | "nan" => {}
-        _ => {
-            if !body
-                .chars()
-                .all(|c| c.is_ascii_digit() || matches!(c, '.' | 'e' | '+' | '-'))
-            {
-                return None;
-            }
-        }
+    if !(body.eq_ignore_ascii_case("inf")
+        || body.eq_ignore_ascii_case("infinity")
+        || body.eq_ignore_ascii_case("nan")
+        || body
+            .bytes()
+            .all(|c| c.is_ascii_digit() || matches!(c, b'.' | b'e' | b'E' | b'+' | b'-')))
+    {
+        return None;
     }
-    l.parse::<f64>().ok()
+    s.parse::<f64>().ok()
 }
 
 /// `scaling._parse_float` for a string cell.
+#[inline]
 pub fn parse_float_cell(cell: &str) -> f64 {
     let s = py_strip(cell);
     if is_missing_token(s) {
@@ -1066,27 +1076,38 @@ fn regression_array(y: &[TargetValue<'_>]) -> Result<Vec<f64>> {
         .collect()
 }
 
-fn infer_feature_kinds(rows: &[Vec<String>], p: usize) -> Vec<ColumnKind> {
-    (0..p)
-        .map(|j| {
-            let (mut numeric_ok, mut non_empty) = (0usize, 0usize);
-            for r in rows {
-                let s = py_strip(&r[j]);
-                if is_missing_token(s) {
-                    continue;
-                }
-                non_empty += 1;
-                if py_float(s).is_some() {
-                    numeric_ok += 1;
-                }
+fn infer_feature_kinds_and_parse(
+    rows: &[Vec<String>],
+    p: usize,
+) -> (Vec<ColumnKind>, Vec<Option<Vec<f64>>>) {
+    let n = rows.len();
+    let mut kinds = Vec::with_capacity(p);
+    let mut parsed_cols = Vec::with_capacity(p);
+    for j in 0..p {
+        let mut col = Vec::with_capacity(n);
+        let mut is_numeric = true;
+        for r in rows {
+            let s = py_strip(&r[j]);
+            if is_missing_token(s) {
+                col.push(f64::NAN);
+                continue;
             }
-            if non_empty == 0 || numeric_ok == non_empty {
-                ColumnKind::Numeric
+            if let Some(v) = py_float(s) {
+                col.push(v);
             } else {
-                ColumnKind::Categorical
+                is_numeric = false;
+                break;
             }
-        })
-        .collect()
+        }
+        if is_numeric {
+            kinds.push(ColumnKind::Numeric);
+            parsed_cols.push(Some(col));
+        } else {
+            kinds.push(ColumnKind::Categorical);
+            parsed_cols.push(None);
+        }
+    }
+    (kinds, parsed_cols)
 }
 
 fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {

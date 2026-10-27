@@ -514,11 +514,20 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
 fn encode_cond_on_model(
     model: &MlcV3Model,
     cond: &dope_core::prepare::DopeConditioning,
+    cpu_pool: Option<&rayon::ThreadPool>,
 ) -> Result<(Vec<f32>, String), String> {
-    let col_vecs: Vec<Vec<f32>> = cond.col_landmarks.iter().map(|r| r.to_vec()).collect();
-    let feat = model
-        .encode_features_629(&cond.vec256, &col_vecs, "high")
-        .map_err(|e| e.to_string())?;
+    let feat = if model.device().is_cpu() {
+        let col_vecs: Vec<Vec<f32>> = cond.col_landmarks.iter().map(|r| r.to_vec()).collect();
+        let run = || model.encode_features_629(&cond.vec256, &col_vecs, "high");
+        match cpu_pool {
+            Some(pool) => pool.install(run).map_err(|e| e.to_string())?,
+            None => run().map_err(|e| e.to_string())?,
+        }
+    } else {
+        model
+            .encode_conditioning_629(&cond.vec256, &cond.col_landmarks, "high")
+            .map_err(|e| e.to_string())?
+    };
     let mut h = Sha256::new();
     for v in &feat {
         h.update(v.to_le_bytes());
@@ -542,6 +551,20 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
     let map_err = |e: dope_core::DopeError| e.to_string();
     let mode: LandmarkMode = a.landmark_mode.parse().map_err(map_err)?;
     let dev = dope_core::device::parse(&a.device).map_err(map_err)?;
+    let cpu_pool = if dev.is_cpu() {
+        Some(
+            rayon::ThreadPoolBuilder::new()
+                .num_threads(1)
+                .build()
+                .map_err(|_| "could not configure 1-thread CPU reference pool".to_string())?,
+        )
+    } else {
+        None
+    };
+    let dev_desc = match &cpu_pool {
+        Some(pool) => pool.install(|| dope_core::device::describe(&dev)),
+        None => dope_core::device::describe(&dev),
+    };
     let weights_path = resolve_weights_path(&a.weights, &a.preset)?;
     let model = MlcV3Model::load_safetensors_on_device(&weights_path, &dev).map_err(map_err)?;
 
@@ -620,10 +643,11 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
         LandmarkMode::None | LandmarkMode::Fast => {
             let b = supplied_bundle.unwrap_or_else(LandmarkBundle::zero);
             let cond = build_conditioning(&prepared, &b, None, mode).map_err(map_err)?;
-            let (feat, feat_sha) = encode_cond_on_model(&model, &cond)?;
+            let (feat, feat_sha) = encode_cond_on_model(&model, &cond, cpu_pool.as_ref())?;
             let doc = serde_json::json!({
                 "seq": 0,
                 "mode": mode.as_str(),
+                "device": dev_desc,
                 "recipe": cond.recipe,
                 "status": cond.bundle.status,
                 "subsample_n": cond.bundle.subsample_n,
@@ -637,18 +661,26 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
             emit_line(&mut out_w, &doc, !a.json)?;
         }
         LandmarkMode::Progressive => {
+            let opts = LandmarkOptions {
+                seed: a.seed,
+                ..LandmarkOptions::mlc_v3_training()
+            };
+            let opts_digest = dope_core::landmark::bundle::options_digest(&opts);
             let zero = LandmarkBundle::zero();
             let cond0 =
                 build_conditioning(&prepared, &zero, None, LandmarkMode::None).map_err(map_err)?;
-            let (feat0, sha0) = encode_cond_on_model(&model, &cond0)?;
+            let (feat0, sha0) = encode_cond_on_model(&model, &cond0, cpu_pool.as_ref())?;
             let doc0 = serde_json::json!({
                 "seq": 0,
                 "mode": "progressive",
                 "group": "none",
+                "device": dev_desc,
                 "recipe": cond0.recipe,
                 "status": cond0.bundle.status,
                 "subsample_n": cond0.bundle.subsample_n,
                 "source_digest": cond0.bundle.source_digest,
+                "options_digest": opts_digest,
+                "work_budget": opts.work_budget,
                 "bundle_digest": cond0.bundle.conditioning_digest(),
                 "conditioning_digest": cond0.digest(),
                 "features629_sha256": sha0,
@@ -657,10 +689,6 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
             });
             emit_line(&mut out_w, &doc0, false)?;
 
-            let opts = LandmarkOptions {
-                seed: a.seed,
-                ..Default::default()
-            };
             let sub_n = a
                 .landmark_subsample
                 .unwrap_or(SubsampleSpec::PROGRESSIVE_DEFAULT.n);
@@ -688,15 +716,18 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                     sample_pos.as_deref(),
                 )
                 .map_err(map_err)?;
-                let (feat, sha) = encode_cond_on_model(&model, &cond)?;
+                let (feat, sha) = encode_cond_on_model(&model, &cond, cpu_pool.as_ref())?;
                 let doc = serde_json::json!({
                     "seq": idx + 1,
                     "mode": "progressive",
                     "group": group.as_str(),
+                    "device": dev_desc,
                     "recipe": cond.recipe,
                     "status": cond.bundle.status,
                     "subsample_n": cond.bundle.subsample_n,
                     "source_digest": cond.bundle.source_digest,
+                    "options_digest": opts_digest,
+                    "work_budget": opts.work_budget,
                     "bundle_digest": cond.bundle.conditioning_digest(),
                     "conditioning_digest": cond.digest(),
                     "features629_sha256": sha,
@@ -709,8 +740,9 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
         LandmarkMode::Full => {
             let opts = LandmarkOptions {
                 seed: a.seed,
-                ..Default::default()
+                ..LandmarkOptions::mlc_v3_training()
             };
+            let opts_digest = dope_core::landmark::bundle::options_digest(&opts);
             let sub = a
                 .landmark_subsample
                 .filter(|&n| n > 0)
@@ -730,14 +762,17 @@ fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                 sample_pos.as_deref(),
             )
             .map_err(map_err)?;
-            let (feat, sha) = encode_cond_on_model(&model, &cond)?;
+            let (feat, sha) = encode_cond_on_model(&model, &cond, cpu_pool.as_ref())?;
             let doc = serde_json::json!({
                 "seq": 0,
                 "mode": "full",
+                "device": dev_desc,
                 "recipe": cond.recipe,
                 "status": cond.bundle.status,
                 "subsample_n": cond.bundle.subsample_n,
                 "source_digest": cond.bundle.source_digest,
+                "options_digest": opts_digest,
+                "work_budget": opts.work_budget,
                 "bundle_digest": cond.bundle.conditioning_digest(),
                 "conditioning_digest": cond.digest(),
                 "features629_sha256": sha,

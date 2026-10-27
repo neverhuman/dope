@@ -668,6 +668,18 @@ def progressive_bundles(compute_group: Callable[[Tuple[int, ...]], Dict[str, Any
         yield bundle
 
 
+MLC_V3_TRAINING_WORK_BUDGET = 2_000_000_000_000
+
+
+def mlc_v3_training_options(seed: int = 0) -> Dict[str, Any]:
+    """Canonical native landmark options for DOPE-MLC-v3 training and product encoding (work_budget = 2e12)."""
+    from .landmark_features import OPTIONS
+    opts = dict(OPTIONS)
+    opts["work_budget"] = MLC_V3_TRAINING_WORK_BUDGET
+    opts["seed"] = int(seed)
+    return opts
+
+
 def native_group_runner(engine: str | Path, csv_path: str | Path, *, target: int, task: str,
                         subsample_n: Optional[int] = DEFAULT_PROGRESSIVE_SUBSAMPLE, seed: int = 0,
                         options: Optional[Dict[str, Any]] = None, threads: int = 4,
@@ -678,8 +690,7 @@ def native_group_runner(engine: str | Path, csv_path: str | Path, *, target: int
     CLI by the ol-contract lane; an engine without them fails with a non-zero exit, which
     is raised as ``RuntimeError("native_group_runner_failed")``. Tests inject fake runners.
     """
-    from .landmark_features import OPTIONS
-    opts = dict(OPTIONS if options is None else options)
+    opts = dict(mlc_v3_training_options(seed=seed) if options is None else options)
     names = {tuple(sorted(slots)): name for name, slots in PROGRESSIVE_GROUPS}
 
     def run(slots: Tuple[int, ...]) -> Dict[str, Any]:

@@ -188,11 +188,11 @@ def run_encode(args):
             report=json.loads(args.report_json.read_bytes())
         else:
             require(args.engine is not None,'encode_full_requires_report_or_engine')
-            from .landmark_features import OPTIONS
+            from .optional_landmarks import mlc_v3_training_options
             import subprocess
             cmd=[str(args.engine),'--threads','4','landmarks','real',str(args.csv),'--target',str(target_idx),
                  '--task',report_task(task),'--json']
-            for name,value in OPTIONS.items():cmd+=['--'+name.replace('_','-'),str(value)]
+            for name,value in mlc_v3_training_options().items():cmd+=['--'+name.replace('_','-'),str(value)]
             if args.landmark_subsample is not None:cmd+=['--subsample',str(args.landmark_subsample)]
             result=subprocess.run(cmd,capture_output=True,check=False)
             require(result.returncode==0,'encode_native_failed')

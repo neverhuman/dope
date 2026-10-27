@@ -67,7 +67,23 @@ impl Default for LandmarkOptions {
     }
 }
 
+/// Work budget used across the DOPE-MLC-v3 training corpus and product encoding (`2e12`).
+pub const MLC_V3_TRAINING_WORK_BUDGET: u64 = 2_000_000_000_000;
+
 impl LandmarkOptions {
+    /// Canonical `LandmarkOptions` used when precalculating DOPE-MLC-v3 training
+    /// landmarks and when running product `DopeEncoder` / `dope mlc-v3 encode`
+    /// (`work_budget = 2_000_000_000_000`, all other fields equal to [`Default::default`]).
+    ///
+    /// [`LandmarkOptions::default`] remains `work_budget = 2_000_000_000` so standalone
+    /// `dope landmarks real` CLI calls stay bit-identical.
+    pub fn mlc_v3_training() -> Self {
+        Self {
+            work_budget: MLC_V3_TRAINING_WORK_BUDGET,
+            ..Self::default()
+        }
+    }
+
     pub(crate) fn validate(&self) -> Result<()> {
         if self.panel != PANEL_V1 {
             return Err(DopeError::Input("unsupported landmark panel".into()));
