@@ -1,4 +1,4 @@
-"""H7: which landmark slots/blocks influence MLC-v3 High conditioning (legacy full builder)?
+"""H7: which landmark slots/blocks influence MLC-v3 High conditioning (full-report builder)?
 
 For real native reports (run_ablation full arm), perturb one cell at a time (gain +0.05,
 or cell made absent) and the spectrum (removed), rebuild

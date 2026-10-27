@@ -9,7 +9,7 @@ and absolute deltas. Every progressive transition is paired too.
 import argparse, hashlib, json
 import numpy as np
 
-ARMS = ['zero', 'macro', 'larger', 'full', 'full_2e9', 'sub100', 'sub200', 'sub300', 'sub500', 'sub1000']
+ARMS = ['zero', 'macro', 'larger', 'random_sparse', 'random_dense', 'full', 'full_2e9', 'sub100', 'sub200', 'sub300', 'sub500', 'sub1000']
 TRANSITIONS = [('zero', 'macro'), ('macro', 'larger'), ('larger', 'full')]
 
 
@@ -67,6 +67,10 @@ def main():
     roster_sha = hashlib.sha256('\n'.join(ids).encode()).hexdigest()
     seeds_idx = [int(s) for s in a.seeds.split(',')]
     tabs = [per_table(r, seeds_idx, a.key) for r in rows if 'arms' in r]
+    by_task = {}
+    for task in sorted({r['catalog_task'] for r in rows}):
+        t_tabs = [per_table(r, seeds_idx, a.key) for r in rows if 'arms' in r and r['catalog_task'] == task]
+        by_task[task] = {arm: compare(t_tabs, arm, 'full') for arm in ARMS if arm != 'full'}
     avail = {arm: sum(1 for t in tabs if arm in t) for arm in ARMS}
     errors = [dict(dataset_id=r['dataset_id'], error=r['error']) for r in rows if 'error' in r]
     report = dict(schema='dope.optional-landmarks-retention/v1', run=a.run, roster_size=len(rows),
@@ -75,6 +79,7 @@ def main():
                   vs_full={arm: compare(tabs, arm, 'full') for arm in ARMS if arm != 'full'},
                   fi_vs_full={arm: compare(tabs, arm, 'full', 'FI') for arm in ARMS if arm != 'full'},
                   transitions={f'{x}->{y}': compare(tabs, y, x) for x, y in TRANSITIONS},
+                  vs_full_by_task=by_task,
                   enc629_cos_to_full={arm: med([t[arm]['enc629_cos'] for t in tabs if arm in t]) for arm in ARMS})
     print(json.dumps(report, indent=1))
 

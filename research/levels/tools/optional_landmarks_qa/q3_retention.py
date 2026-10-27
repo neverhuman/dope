@@ -8,8 +8,8 @@ Arms (level High, the Encoder629 tier):
   zero        landmark_mode none
   macro       progressive, bundle = native full report restricted to MACRO cells
   larger      progressive, MACRO+LARGER cells
-  full        legacy full (unchanged historical path) on the 2e12 report
-  full_2e9    legacy full on the 2e9 (product default) report
+  full        unchanged historical full-report conditioning on the 2e12 report
+  full_2e9    the same full-report conditioning on the 2e9 (product default) report
   sub300      sampled full on the --subsample 300 report
 Per arm: vec256 / Encoder629 cosine to `full`, then wire -> generate_synthetic (2 seeds)
 -> 6-auditor sklearn probe retention R (v3_ledger_replay recipe) on the real test split.
@@ -31,6 +31,10 @@ OPTS = ['--folds', '5', '--knn-reference', '2048', '--ridge-rows', '8192', '--se
 ROLES = ('dev_val_ablation',)
 SIZES = (100, 200, 300, 500, 1000)
 TASK = {'regression': 'regression', 'binary': 'classification', 'multi_label': 'multiclass'}
+# Per-table failures the evaluation records explicitly instead of aborting the roster: native CLI
+# refusals (RuntimeError), unreadable or malformed splits (OSError, ValueError, IndexError, KeyError)
+# and singular numerics (ArithmeticError, numpy.linalg.LinAlgError is a ValueError subclass).
+TABLE_ERRORS = (RuntimeError, OSError, ValueError, IndexError, KeyError, ArithmeticError)
 
 
 def restrict(report, keep):
@@ -61,7 +65,7 @@ def cos(a, b):
 
 
 def run_table(job):
-    repo, binary, e, workdir, seeds, verify = job
+    repo, binary, e, workdir, seeds, verify, ckpt, ckpt_sha = job
     sys.path.insert(0, repo)
     import torch
     torch.set_num_threads(1)
@@ -73,7 +77,6 @@ def run_table(job):
     from research.levels.v3_ledger_replay import (evaluate_reg_bin_dev_cell, evaluate_multiclass_auditors,
                                                   score_multiclass_syn_against_real)
     from safetensors.torch import load_file
-    ckpt = '/home/ubuntu/dope/target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.safetensors'
     out = dict(dataset_id=e['dataset_id'], role=e['v3_role'], catalog_task=e['catalog_task'])
     try:
         task = TASK[e['catalog_task']]
@@ -127,13 +130,21 @@ def run_table(job):
         Xs, ys = scaler.transform(Xf, yf)
         Xts, yts = scaler.transform(Xt, yt)
         model = MultiLevelLandmarkModel().eval(); model.load_state_dict(load_file(ckpt), strict=True)
-        enc629 = DopeEncoder629.from_pretrained(ckpt)
+        enc629 = DopeEncoder629.from_pretrained(ckpt, expected_sha256=ckpt_sha)
         mkb = lambda rp, n=None: LandmarkBundle.from_report(rp, n)
         arms = {'zero': dict(mode='none')}
         if rep_full is not None:
             arms.update(macro=dict(mode='progressive', bundle=mkb(restrict(rep_full, MACRO))),
                         larger=dict(mode='progressive', bundle=mkb(restrict(rep_full, MACRO + LARGER))),
                         full=dict(mode='full', report=rep_full))
+            # Random partial views of the observed High cells (keep prob .25 / .75), seeded per table
+            # so the pretraining baseline and a mask-trained candidate see the same masks.
+            observed = [i for i in MACRO + LARGER if rep_full['cells'][i].get('gain') is not None]
+            seed = int(hashlib.sha256(e['dataset_id'].encode()).hexdigest()[:8], 16)
+            for name, keep in (('random_sparse', 0.25), ('random_dense', 0.75)):
+                rng = np.random.default_rng([seed, int(keep * 100)])
+                kept = tuple(i for i in observed if rng.random() < keep)
+                arms[name] = dict(mode='progressive', bundle=mkb(restrict(rep_full, kept)), kept=len(kept))
         if rep_2e9 is not None:
             arms['full_2e9'] = dict(mode='full', report=rep_2e9)
         for n_sub, rep_sub in subs.items():
@@ -184,7 +195,7 @@ def run_table(job):
                 except ValueError:
                     rho = float('nan')
                 fis.append(None if rho != rho else float(rho))
-            res[name] = dict(retention=rs, fi_spearman=fis, wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
+            res[name] = dict(retention=rs, fi_spearman=fis, kept_cells=a.get('kept'), wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
                              status=(a['bundle'].status if a.get('bundle') is not None else None))
         for name in res:
             if 'full' not in feats:
@@ -195,7 +206,7 @@ def run_table(job):
         out['arms'] = res
         out['cells_full_2e12'] = None if rep_full is None else sum(1 for c in rep_full['cells'] if c.get('gain') is not None)
         out['cells_full_2e9'] = None if rep_2e9 is None else sum(1 for c in rep_2e9['cells'] if c.get('gain') is not None)
-    except Exception as ex:  # recorded, never silently dropped
+    except TABLE_ERRORS as ex:  # a table that cannot be evaluated is recorded with its error type
         out['error'] = f'{type(ex).__name__}: {str(ex)[:200]}'
     return out
 
@@ -206,6 +217,9 @@ def main():
     ap.add_argument('--out', required=True); ap.add_argument('--tables', type=int, default=112)
     ap.add_argument('--jobs', type=int, default=48); ap.add_argument('--verify-ids', type=int, default=6)
     ap.add_argument('--seeds', default='20261024,20261025')
+    ap.add_argument('--ckpt', default='/home/ubuntu/dope/target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.safetensors')
+    ap.add_argument('--ckpt-sha', default='d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c',
+                    help='SHA-256 the checkpoint must match (the released pin by default)')
     a = ap.parse_args()
     sys.path.insert(0, a.repo)
     from pathlib import Path
@@ -227,8 +241,11 @@ def main():
     rng.shuffle(pool)
     picked = sorted(pool[: a.tables], key=lambda p: p['dataset_id'])
     seeds = [int(s) for s in a.seeds.split(',')]
-    jobs = [(a.repo, a.bin, e, os.path.join(a.out, 'work'), seeds, i < a.verify_ids) for i, e in enumerate(picked)]
-    meta = dict(pool=len(pool), picked=len(picked), excluded=excluded, roles=ROLES, seeds=seeds, bin=a.bin,
+    if hashlib.sha256(open(a.ckpt, 'rb').read()).hexdigest() != a.ckpt_sha:
+        raise SystemExit('checkpoint SHA-256 mismatch')
+    jobs = [(a.repo, a.bin, e, os.path.join(a.out, 'work'), seeds, i < a.verify_ids, a.ckpt, a.ckpt_sha)
+            for i, e in enumerate(picked)]
+    meta = dict(pool=len(pool), picked=len(picked), excluded=excluded, ckpt=a.ckpt, ckpt_sha256=a.ckpt_sha, roles=ROLES, seeds=seeds, bin=a.bin,
                 bin_sha256=hashlib.sha256(open(a.bin, 'rb').read()).hexdigest(), started=time.time(), loadavg=os.getloadavg())
     json.dump(meta, open(os.path.join(a.out, 'meta.json'), 'w'), indent=1)
     with cf.ProcessPoolExecutor(a.jobs) as ex, open(os.path.join(a.out, 'results.jsonl'), 'a') as fh:
