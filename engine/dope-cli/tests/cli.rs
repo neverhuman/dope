@@ -436,87 +436,7 @@ fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
     assert!(wire_col.contains("0 source rows stored"));
 
     // Build a valid 56-tensor SafeTensors fixture and verify inspect-weights & mlc-v3 sample across modes.
-    let specs: &[(&str, &[usize])] = &[
-        ("router.level_embed.weight", &[3, 256]),
-        ("router.small_embed", &[256]),
-        ("router.input_norm.weight", &[140]),
-        ("router.input_norm.bias", &[140]),
-        ("router.v3_inter_norm.weight", &[116]),
-        ("router.v3_inter_norm.bias", &[116]),
-        ("router.backbone.0.weight", &[256, 140]),
-        ("router.backbone.0.bias", &[256]),
-        ("router.backbone.2.weight", &[256]),
-        ("router.backbone.2.bias", &[256]),
-        ("router.backbone.3.weight", &[256, 256]),
-        ("router.backbone.3.bias", &[256]),
-        ("router.backbone.5.weight", &[256]),
-        ("router.backbone.5.bias", &[256]),
-        ("router.inter_attn.token_proj.weight", &[32, 32]),
-        ("router.inter_attn.token_proj.bias", &[32]),
-        ("router.inter_attn.qkv.weight", &[96, 32]),
-        ("router.inter_attn.qkv.bias", &[96]),
-        ("router.inter_attn.bilinear_u.weight", &[128, 256]),
-        ("router.inter_attn.bilinear_u.bias", &[128]),
-        ("router.inter_attn.bilinear_v.weight", &[128, 256]),
-        ("router.inter_attn.bilinear_v.bias", &[128]),
-        ("router.inter_attn.out_proj.weight", &[256, 384]),
-        ("router.inter_attn.out_proj.bias", &[256]),
-        ("router.inter_attn.norm.weight", &[256]),
-        ("router.inter_attn.norm.bias", &[256]),
-        ("router.gate_head.weight", &[10, 256]),
-        ("router.gate_head.bias", &[10]),
-        ("router.v3_gate_head.weight", &[4, 256]),
-        ("router.v3_gate_head.bias", &[4]),
-        ("router.task_latent_head.weight", &[128, 256]),
-        ("router.task_latent_head.bias", &[128]),
-        ("router.dist_latent_head.weight", &[128, 256]),
-        ("router.dist_latent_head.bias", &[128]),
-        ("router.landmark_recon_head.weight", &[23, 256]),
-        ("router.landmark_recon_head.bias", &[23]),
-        ("router.bb_recon_head.weight", &[16, 256]),
-        ("router.bb_recon_head.bias", &[16]),
-        ("target_net.film_gamma.weight", &[64, 128]),
-        ("target_net.film_gamma.bias", &[64]),
-        ("target_net.film_beta.weight", &[64, 128]),
-        ("target_net.film_beta.bias", &[64]),
-        ("target_net.fc1.weight", &[128, 192]),
-        ("target_net.fc1.bias", &[128]),
-        ("target_net.fc2.weight", &[128, 128]),
-        ("target_net.fc2.bias", &[128]),
-        ("target_net.out_head.weight", &[1, 128]),
-        ("target_net.out_head.bias", &[1]),
-        ("target_net.col_gate_head.weight", &[1, 145]),
-        ("target_net.col_gate_head.bias", &[1]),
-        ("cov_net.net.0.weight", &[128, 192]),
-        ("cov_net.net.0.bias", &[128]),
-        ("cov_net.net.2.weight", &[128]),
-        ("cov_net.net.2.bias", &[128]),
-        ("cov_net.net.3.weight", &[64, 128]),
-        ("cov_net.net.3.bias", &[64]),
-    ];
-    let mut header_map = serde_json::Map::new();
-    let mut offset = 0usize;
-    for &(name, shape) in specs {
-        let len_bytes = shape.iter().product::<usize>() * 4;
-        header_map.insert(
-            name.to_string(),
-            serde_json::json!({
-                "dtype": "F32",
-                "shape": shape,
-                "data_offsets": [offset, offset + len_bytes],
-            }),
-        );
-        offset += len_bytes;
-    }
-    let mut header_bytes = serde_json::to_vec(&header_map).unwrap();
-    while header_bytes.len() % 8 != 0 {
-        header_bytes.push(b' ');
-    }
-    let mut st_bytes = Vec::with_capacity(8 + header_bytes.len() + offset);
-    st_bytes.extend_from_slice(&(header_bytes.len() as u64).to_le_bytes());
-    st_bytes.extend_from_slice(&header_bytes);
-    st_bytes.resize(8 + header_bytes.len() + offset, 0u8);
-    std::fs::write(dir.join("test.safetensors"), &st_bytes).unwrap();
+    let st_bytes = write_test_safetensors(&dir);
 
     let st_plain = dope(
         &dir,
@@ -601,6 +521,83 @@ fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
     let v3_disk = std::fs::read_to_string(dir.join("v3_syn.csv")).unwrap();
     assert!(!v3_disk.contains("\x1b[") && v3_disk.lines().count() == 5);
 
+    let enc_fast_raw = dope(
+        &dir,
+        &[
+            "mlc-v3",
+            "encode",
+            "--weights",
+            "test.safetensors",
+            "--csv",
+            "train.csv",
+            "--target",
+            "score",
+            "--landmark-mode",
+            "fast",
+            "--json",
+        ],
+    );
+    let enc_fast: serde_json::Value = serde_json::from_str(enc_fast_raw.trim()).unwrap();
+    assert_eq!(enc_fast["mode"], "fast");
+    assert_eq!(enc_fast["device"], "cpu (1 threads)");
+    assert_eq!(enc_fast["recipe"], "observed-only-v1");
+    assert_eq!(enc_fast["status"], "none");
+    assert_eq!(enc_fast["features629"].as_array().unwrap().len(), 629);
+
+    let enc_prog_raw = dope(
+        &dir,
+        &[
+            "mlc-v3",
+            "encode",
+            "--weights",
+            "test.safetensors",
+            "--csv",
+            "train.csv",
+            "--target",
+            "score",
+            "--landmark-mode",
+            "progressive",
+            "--landmark-subsample",
+            "0",
+            "--json",
+        ],
+    );
+    let prog_docs: Vec<serde_json::Value> = enc_prog_raw
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect();
+    assert_eq!(prog_docs.len(), 4);
+    assert_eq!(prog_docs[0]["group"], "none");
+    assert_eq!(prog_docs[0]["work_budget"], 2_000_000_000_000u64);
+    assert_eq!(prog_docs[0]["options_digest"].as_str().unwrap().len(), 64);
+    assert_eq!(prog_docs[3]["group"], "fine");
+    assert_eq!(prog_docs[3]["recipe"], "legacy-full-v1");
+
+    let enc_full_raw = dope(
+        &dir,
+        &[
+            "mlc-v3",
+            "encode",
+            "--weights",
+            "test.safetensors",
+            "--csv",
+            "train.csv",
+            "--target",
+            "score",
+            "--landmark-mode",
+            "full",
+            "--json",
+        ],
+    );
+    let enc_full: serde_json::Value = serde_json::from_str(enc_full_raw.trim()).unwrap();
+    assert_eq!(enc_full["mode"], "full");
+    assert_eq!(enc_full["work_budget"], 2_000_000_000_000u64);
+    assert_eq!(enc_full["options_digest"], prog_docs[3]["options_digest"]);
+    assert_eq!(
+        enc_full["features629_sha256"],
+        prog_docs[3]["features629_sha256"]
+    );
+
     // Unsupported inputs fail clearly on stderr.
     for bad_args in [
         vec!["--color", "bogus", "doctor"],
@@ -617,6 +614,175 @@ fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
         assert!(
             !reject.stderr.is_empty(),
             "empty stderr on failure: {bad_args:?}"
+        );
+    }
+    std::fs::remove_dir_all(dir).ok();
+}
+
+fn write_test_safetensors(dir: &Path) -> Vec<u8> {
+    let specs: &[(&str, &[usize])] = &[
+        ("router.level_embed.weight", &[3, 256]),
+        ("router.small_embed", &[256]),
+        ("router.input_norm.weight", &[140]),
+        ("router.input_norm.bias", &[140]),
+        ("router.v3_inter_norm.weight", &[116]),
+        ("router.v3_inter_norm.bias", &[116]),
+        ("router.backbone.0.weight", &[256, 140]),
+        ("router.backbone.0.bias", &[256]),
+        ("router.backbone.2.weight", &[256]),
+        ("router.backbone.2.bias", &[256]),
+        ("router.backbone.3.weight", &[256, 256]),
+        ("router.backbone.3.bias", &[256]),
+        ("router.backbone.5.weight", &[256]),
+        ("router.backbone.5.bias", &[256]),
+        ("router.inter_attn.token_proj.weight", &[32, 32]),
+        ("router.inter_attn.token_proj.bias", &[32]),
+        ("router.inter_attn.qkv.weight", &[96, 32]),
+        ("router.inter_attn.qkv.bias", &[96]),
+        ("router.inter_attn.bilinear_u.weight", &[128, 256]),
+        ("router.inter_attn.bilinear_u.bias", &[128]),
+        ("router.inter_attn.bilinear_v.weight", &[128, 256]),
+        ("router.inter_attn.bilinear_v.bias", &[128]),
+        ("router.inter_attn.out_proj.weight", &[256, 384]),
+        ("router.inter_attn.out_proj.bias", &[256]),
+        ("router.inter_attn.norm.weight", &[256]),
+        ("router.inter_attn.norm.bias", &[256]),
+        ("router.gate_head.weight", &[10, 256]),
+        ("router.gate_head.bias", &[10]),
+        ("router.v3_gate_head.weight", &[4, 256]),
+        ("router.v3_gate_head.bias", &[4]),
+        ("router.task_latent_head.weight", &[128, 256]),
+        ("router.task_latent_head.bias", &[128]),
+        ("router.dist_latent_head.weight", &[128, 256]),
+        ("router.dist_latent_head.bias", &[128]),
+        ("router.landmark_recon_head.weight", &[23, 256]),
+        ("router.landmark_recon_head.bias", &[23]),
+        ("router.bb_recon_head.weight", &[16, 256]),
+        ("router.bb_recon_head.bias", &[16]),
+        ("target_net.film_gamma.weight", &[64, 128]),
+        ("target_net.film_gamma.bias", &[64]),
+        ("target_net.film_beta.weight", &[64, 128]),
+        ("target_net.film_beta.bias", &[64]),
+        ("target_net.fc1.weight", &[128, 192]),
+        ("target_net.fc1.bias", &[128]),
+        ("target_net.fc2.weight", &[128, 128]),
+        ("target_net.fc2.bias", &[128]),
+        ("target_net.out_head.weight", &[1, 128]),
+        ("target_net.out_head.bias", &[1]),
+        ("target_net.col_gate_head.weight", &[1, 145]),
+        ("target_net.col_gate_head.bias", &[1]),
+        ("cov_net.net.0.weight", &[128, 192]),
+        ("cov_net.net.0.bias", &[128]),
+        ("cov_net.net.2.weight", &[128]),
+        ("cov_net.net.2.bias", &[128]),
+        ("cov_net.net.3.weight", &[64, 128]),
+        ("cov_net.net.3.bias", &[64]),
+    ];
+    let mut header_map = serde_json::Map::new();
+    let mut offset = 0usize;
+    for &(name, shape) in specs {
+        let len_bytes = shape.iter().product::<usize>() * 4;
+        header_map.insert(
+            name.to_string(),
+            serde_json::json!({
+                "dtype": "F32",
+                "shape": shape,
+                "data_offsets": [offset, offset + len_bytes],
+            }),
+        );
+        offset += len_bytes;
+    }
+    let mut header_bytes = serde_json::to_vec(&header_map).unwrap();
+    while header_bytes.len() % 8 != 0 {
+        header_bytes.push(b' ');
+    }
+    let mut st_bytes = Vec::with_capacity(8 + header_bytes.len() + offset);
+    st_bytes.extend_from_slice(&(header_bytes.len() as u64).to_le_bytes());
+    st_bytes.extend_from_slice(&header_bytes);
+    st_bytes.resize(8 + header_bytes.len() + offset, 0u8);
+    std::fs::write(dir.join("test.safetensors"), &st_bytes).unwrap();
+    st_bytes
+}
+
+#[cfg(feature = "cuda")]
+#[test]
+#[ignore = "requires an NVIDIA GPU; run explicitly to qualify CUDA CLI"]
+fn cuda_cli_mlc_v3_encode_matches_cpu() {
+    let dir = workdir("cuda-encode");
+    let _ = write_test_safetensors(&dir);
+    let weights_arg = std::env::var("DOPE_ENCODER_WEIGHTS")
+        .ok()
+        .filter(|p| Path::new(p).exists())
+        .unwrap_or_else(|| "test.safetensors".to_string());
+
+    for mode in ["fast", "full"] {
+        let cpu_raw = dope(
+            &dir,
+            &[
+                "mlc-v3",
+                "encode",
+                "--weights",
+                &weights_arg,
+                "--csv",
+                "train.csv",
+                "--target",
+                "score",
+                "--landmark-mode",
+                mode,
+                "--device",
+                "cpu",
+                "--json",
+            ],
+        );
+        let cuda_raw = dope(
+            &dir,
+            &[
+                "mlc-v3",
+                "encode",
+                "--weights",
+                &weights_arg,
+                "--csv",
+                "train.csv",
+                "--target",
+                "score",
+                "--landmark-mode",
+                mode,
+                "--device",
+                "cuda:0",
+                "--json",
+            ],
+        );
+        let cpu_doc: serde_json::Value = serde_json::from_str(cpu_raw.trim()).unwrap();
+        let cuda_doc: serde_json::Value = serde_json::from_str(cuda_raw.trim()).unwrap();
+        assert_eq!(cpu_doc["device"], "cpu (1 threads)");
+        assert_eq!(cuda_doc["device"], "cuda");
+        assert_eq!(
+            cpu_doc["conditioning_digest"],
+            cuda_doc["conditioning_digest"]
+        );
+        let cpu_feat: Vec<f32> = cpu_doc["features629"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_f64().unwrap() as f32)
+            .collect();
+        let cuda_feat: Vec<f32> = cuda_doc["features629"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_f64().unwrap() as f32)
+            .collect();
+        assert_eq!(cpu_feat.len(), 629);
+        assert_eq!(cuda_feat.len(), 629);
+        assert!(cuda_feat.iter().all(|v| v.is_finite()));
+        let max_diff = cpu_feat
+            .iter()
+            .zip(&cuda_feat)
+            .map(|(a, b)| (a - b).abs())
+            .fold(0.0f32, f32::max);
+        assert!(
+            max_diff < 1e-5,
+            "mode={mode}: CUDA CLI vs CPU max_abs_diff={max_diff}"
         );
     }
     std::fs::remove_dir_all(dir).ok();

@@ -139,4 +139,30 @@ impl MlcV3Model {
         let finite = output.abs()?.le(f32::MAX as f64)?;
         Ok(finite.where_cond(&output, &output.zeros_like()?)?)
     }
+
+    /// Upload `dataset_features: [1, 256]` and `col_landmarks: [1, 64, 17]` onto `self.device()`,
+    /// execute resident [`Self::encode_features_629_tensor`], and copy the final `[629]` vector
+    /// back to the host once.
+    pub fn encode_conditioning_629(
+        &self,
+        dataset_features: &[f32],
+        col_landmarks: &[[f32; 17]],
+        level: &str,
+    ) -> Result<Vec<f32>> {
+        if dataset_features.len() != 256 || col_landmarks.len() != 64 {
+            return Err(bad("conditioning requires [256] and [64, 17] inputs"));
+        }
+        let dev = self.device();
+        let descriptor = Tensor::from_slice(dataset_features, (1, 256), dev)?;
+        let mut columns = Vec::with_capacity(64 * 17);
+        for row in col_landmarks {
+            columns.extend_from_slice(row);
+        }
+        let columns = Tensor::from_vec(columns, (1, 64, 17), dev)?;
+        let out = self.encode_features_629_tensor(&descriptor, &columns, level)?;
+        Ok(out
+            .to_device(&candle_core::Device::Cpu)?
+            .squeeze(0)?
+            .to_vec1::<f32>()?)
+    }
 }
