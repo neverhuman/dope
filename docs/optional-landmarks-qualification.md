@@ -7,6 +7,8 @@ Rust 1.88.0, numpy 1.26.4. All numbers below come from the evidence files in
 `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`. This page records measurements only. It
 authorizes no default change, and N=300 stays the progressive default.
 
+**Recipe identifier.** The full-report conditioning recipe was renamed from `legacy-full-v1` to `full-report-v1`. Inputs and the 629-D features are unchanged; full-mode effective-conditioning digests change. Evidence below that predates the rename keeps the old label; every old-to-new golden digest is listed in [`recipe-transition.json`](evidence/optional-landmarks/recipe-transition.json).
+
 **Status: pre-training baseline.** The binding mission addendum requires a landmark-dropout-trained encoder.
 Everything below measures the released pin as it is, and is the baseline that a mask-trained candidate will be
 compared against with the same harness and the same masks.
