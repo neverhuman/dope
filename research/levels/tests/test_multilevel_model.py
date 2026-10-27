@@ -347,5 +347,24 @@ class MultiLevelLandmarkModelTests(unittest.TestCase):
             self.assertEqual((se_loc, ci_loc), (se, ci))
 
 
+    def test_evidence_positions_build_blocks_on_measured_rows_only(self) -> None:
+        from research.levels.building_block_landmarks import compute_building_block_landmarks
+        from research.levels.optional_landmarks import build_conditioning
+        from research.levels.tests.test_optional_landmarks import _make_full_report
+        rng = np.random.default_rng(11)
+        X = rng.normal(size=(120, 4))
+        y = X[:, 0] + 0.5 * np.sin(X[:, 1]) + 0.1 * rng.normal(size=120)
+        rep = _make_full_report(rows=40, features=4, task="regression", classes=0, target_stats=[0.2, 0.1, None])
+        pos = list(range(0, 120, 3))
+        kw = dict(task="regression", mode="full", native_report=rep, subsample_n=40, y_train_raw=y)
+        base, sampled = build_conditioning(X, y, **kw), build_conditioning(X, y, evidence_positions=pos, **kw)
+        bb = compute_building_block_landmarks(X[pos], y[pos], level="high")
+        np.testing.assert_array_equal(sampled["vec256"][188:], bb["building_block_vec68"])
+        np.testing.assert_array_equal(sampled["vec256"][116:140], base["vec256"][116:140])  # full-FIT table descriptors
+        self.assertFalse(np.array_equal(sampled["vec256"][188:], base["vec256"][188:]))
+        self.assertEqual(build_conditioning(X, y, evidence_positions=None, **kw)["digest"], base["digest"])
+        with self.assertRaises(ValueError):
+            build_conditioning(X, y, evidence_positions=[0, 120], **kw)
+
 if __name__ == "__main__":
     unittest.main()
