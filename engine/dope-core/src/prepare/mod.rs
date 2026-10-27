@@ -12,12 +12,21 @@
 //! * [`np`] — numpy-1.26-exact numerical helpers shared by the port.
 
 pub mod building_blocks;
+pub mod building_blocks_np;
+mod building_blocks_simplex;
 pub mod conditioning;
+mod conditioning_builder;
+mod conditioning_observed;
 pub mod descriptors;
+mod descriptors_table;
 pub mod inter_landmark;
 pub mod np;
+mod np_linalg;
 pub mod report_view;
 pub mod scaling;
+mod scaling_fit;
+mod scaling_prepare;
+mod scaling_table;
 
 pub use building_blocks::{compute_building_block_landmarks, BuildingBlockDescriptors};
 pub use conditioning::{

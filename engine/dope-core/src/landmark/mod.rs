@@ -4,6 +4,7 @@
 
 mod basis;
 pub mod bundle;
+mod bundle_scope;
 mod cost;
 mod folds;
 mod frame;

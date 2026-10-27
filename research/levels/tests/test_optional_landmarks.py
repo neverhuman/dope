@@ -11,113 +11,43 @@ import unittest
 import numpy as np
 
 from research.levels import cli, landmark_features
-from research.levels.descriptors import extract_report_descriptors
+from research.levels.descriptors import extract_report_descriptors  # noqa: F401
 from research.levels.multilevel_model import (
-    MultiLevelLandmarkModel,
-    build_conditioning,
-    build_conditioning_inputs,
-    build_v3_conditioning_bundle,
+    MultiLevelLandmarkModel, build_conditioning, build_conditioning_inputs, build_v3_conditioning_bundle,  # noqa: F401
 )
-from research.levels.optional_landmarks import (
-    FINE_INDICES,
-    LANDMARK_NAMES,
-    LARGER_INDICES,
-    LEGACY_FULL_RECIPE,
-    LandmarkBundle,
-    MACRO_INDICES,
-    OBSERVED_RECIPE,
-    bundle_to_report,
-    effective_conditioning_digest,
-    observed_report_descriptors,
-    observed_target_stats,
-    progressive_bundles,
-    progressive_steps,
-    squash_f32,
-    stratified_subsample,
-    table_target_stats,
-    unsquash,
+from research.levels.optional_landmarks import (  # noqa: F401
+    FINE_INDICES, LANDMARK_NAMES, LARGER_INDICES, LEGACY_FULL_RECIPE, LandmarkBundle,
+    MACRO_INDICES, OBSERVED_RECIPE, bundle_to_report, effective_conditioning_digest,
+    observed_report_descriptors, observed_target_stats, progressive_bundles, progressive_steps,
+    squash_f32, stratified_subsample, table_target_stats, unsquash,
 )
 from research.levels.scaling import FitOnlyTableTransform
 
-
 GOLDEN_ZERO_DIGEST = "3b80a6af433fd746af93fd3c65fe0cfd85f5b887a1a9acecdb3d2748c6658ed5"
 GOLDEN_MACRO_PARTIAL_300_DIGEST = "4eaedd68a5239fdf3542e93cec1d7bffa4a7143e7c23f53be5a3c8716a53806b"
-FIXTURE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "engine"
-    / "dope-core"
-    / "tests"
-    / "fixtures"
-    / "landmark_bundle_v1.json"
-)
+FIXTURE_PATH = Path(__file__).resolve().parents[3] / "engine" / "dope-core" / "tests" / "fixtures" / "landmark_bundle_v1.json"
 
 
 def _make_full_report(
-    *,
-    rows: int = 120,
-    features: int = 6,
-    task: str = "regression",
-    classes: int = 0,
-    target_stats: list[float | None] | None = None,
-    uninformative_slots: tuple[int, ...] = (),
+    *, rows: int = 120, features: int = 6, task: str = "regression", classes: int = 0,
+    target_stats: list[float | None] | None = None, uninformative_slots: tuple[int, ...] = (),
     failed_slots: tuple[int, ...] = (),
 ) -> dict:
-    cells = []
-    tr_rows = [max(1, rows - max(1, rows // 5))] * 5
+    cells, tr_rows = [], [max(1, rows - max(1, rows // 5))] * 5
     for idx, name in enumerate(LANDMARK_NAMES):
         cid = idx + 1
         qr_rows = landmark_features.expected_query_rows(cid, rows, landmark_features.OPTIONS)
         if idx in failed_slots:
-            cells.append({
-                "id": cid,
-                "name": name,
-                "state": "failed",
-                "gain": None,
-                "se": None,
-                "stable": False,
-                "lambda_indices": [],
-                "train_rows": [],
-                "query_rows": 0,
-            })
+            cells.append({"id": cid, "name": name, "state": "failed", "gain": None, "se": None, "stable": False, "lambda_indices": [], "train_rows": [], "query_rows": 0})
         elif idx in uninformative_slots:
-            cells.append({
-                "id": cid,
-                "name": name,
-                "state": "uninformative",
-                "gain": 0.0,
-                "se": 0.01,
-                "stable": False,
-                "lambda_indices": [1],
-                "train_rows": list(tr_rows),
-                "query_rows": qr_rows,
-            })
+            cells.append({"id": cid, "name": name, "state": "uninformative", "gain": 0.0, "se": 0.01, "stable": False, "lambda_indices": [1], "train_rows": list(tr_rows), "query_rows": qr_rows})
         else:
-            gain = 0.04 * (idx + 1)
-            cells.append({
-                "id": cid,
-                "name": name,
-                "state": "complete",
-                "gain": gain,
-                "se": 0.005 * ((idx % 4) + 1),
-                "stable": (idx % 2 == 0),
-                "lambda_indices": [idx % 5, (idx + 2) % 5],
-                "train_rows": list(tr_rows),
-                "query_rows": qr_rows,
-            })
+            cells.append({"id": cid, "name": name, "state": "complete", "gain": 0.04 * (idx + 1), "se": 0.005 * ((idx % 4) + 1), "stable": (idx % 2 == 0), "lambda_indices": [idx % 5, (idx + 2) % 5], "train_rows": list(tr_rows), "query_rows": qr_rows})
     return {
-        "panel": landmark_features.OPTIONS["panel"],
-        "kind": "real",
-        "privacy": "private",
-        "options": dict(landmark_features.OPTIONS),
-        "rows": rows,
-        "features": features,
-        "task": task,
-        "classes": classes,
-        "cells": cells,
-        "spectrum": [
-            {"slot": j, "values": [0.05 * (k + 1) + 0.02 * j for k in range(9)]}
-            for j in range(features)
-        ],
+        "panel": landmark_features.OPTIONS["panel"], "kind": "real", "privacy": "private",
+        "options": dict(landmark_features.OPTIONS), "rows": rows, "features": features,
+        "task": task, "classes": classes, "cells": cells,
+        "spectrum": [{"slot": j, "values": [0.05 * (k + 1) + 0.02 * j for k in range(9)]} for j in range(features)],
         "target_stats": [0.42, 1.25, None] if target_stats is None else list(target_stats),
     }
 
@@ -413,98 +343,30 @@ class TestOptionalLandmarks(unittest.TestCase):
     def test_sampled_full_mode_overrides_base_shape_and_target_stats(self) -> None:
         rng = np.random.default_rng(7)
         X = rng.normal(size=(200, 5))
-        # Skewed raw regression target
         y_raw = np.exp(0.8 * X[:, 0] + rng.normal(scale=0.3, size=200))
         tf = FitOnlyTableTransform.fit(X, y_raw, task="regression")
         X_scaled, y_scaled = tf.transform(X, y_raw)
+        rep_n80 = _make_full_report(rows=80, features=5, task="regression", classes=0, target_stats=[0.91, 0.55, None])
+        rep_n140 = _make_full_report(rows=140, features=5, task="regression", classes=0, target_stats=[1.44, 2.80, None])
 
-        # Subsampled native reports with different N (and perturbed subsample target_stats)
-        rep_n80 = _make_full_report(
-            rows=80, features=5, task="regression", classes=0, target_stats=[0.91, 0.55, None]
-        )
-        rep_n140 = _make_full_report(
-            rows=140, features=5, task="regression", classes=0, target_stats=[1.44, 2.80, None]
-        )
+        cond_none = build_conditioning(X_scaled, y_scaled, task="regression", mode="none", y_train_raw=y_raw)
+        cond_prog = build_conditioning(X_scaled, y_scaled, task="regression", mode="progressive", bundle=LandmarkBundle.from_report(rep_n80, subsample_n=80), y_train_raw=y_raw)
+        cond_full_80 = build_conditioning(X_scaled, y_scaled, task="regression", mode="full", native_report=rep_n80, subsample_n=80, y_train_raw=y_raw)
+        cond_full_140 = build_conditioning(X_scaled, y_scaled, task="regression", mode="full", native_report=rep_n140, subsample_n=140, y_train_raw=y_raw)
 
-        cond_none = build_conditioning(
-            X_scaled, y_scaled, task="regression", mode="none", y_train_raw=y_raw
-        )
-        cond_prog = build_conditioning(
-            X_scaled,
-            y_scaled,
-            task="regression",
-            mode="progressive",
-            bundle=LandmarkBundle.from_report(rep_n80, subsample_n=80),
-            y_train_raw=y_raw,
-        )
-        cond_full_80 = build_conditioning(
-            X_scaled,
-            y_scaled,
-            task="regression",
-            mode="full",
-            native_report=rep_n80,
-            subsample_n=80,
-            y_train_raw=y_raw,
-        )
-        cond_full_140 = build_conditioning(
-            X_scaled,
-            y_scaled,
-            task="regression",
-            mode="full",
-            native_report=rep_n140,
-            subsample_n=140,
-            y_train_raw=y_raw,
-        )
-
-        # Base target_stats [85:87] and shape [87:91] must reflect the FULL 200-row table
-        # across none, progressive, and sampled full arms!
-        np.testing.assert_allclose(
-            cond_full_80["vec256"][85:91], cond_none["vec256"][85:91], rtol=0, atol=1e-6
-        )
-        np.testing.assert_allclose(
-            cond_full_80["vec256"][85:91], cond_prog["vec256"][85:91], rtol=0, atol=1e-6
-        )
-        np.testing.assert_array_equal(
-            cond_full_80["vec256"][85:91], cond_full_140["vec256"][85:91]
-        )
-        # While native landmark evidence [0:85] and [91:116] and col_landmarks are retained
+        np.testing.assert_allclose(cond_full_80["vec256"][85:91], cond_none["vec256"][85:91], rtol=0, atol=1e-6)
+        np.testing.assert_allclose(cond_full_80["vec256"][85:91], cond_prog["vec256"][85:91], rtol=0, atol=1e-6)
+        np.testing.assert_array_equal(cond_full_80["vec256"][85:91], cond_full_140["vec256"][85:91])
         self.assertTrue(np.any(cond_full_80["vec256"][:23] != 0.0))
         self.assertTrue(np.any(cond_full_80["col_landmarks"][:5, :9] != 0.0))
 
-        # Terminal progressive / bounded-budget partial report in full mode is accepted
-        rep_partial = _make_full_report(
-            rows=80,
-            features=5,
-            task="regression",
-            classes=0,
-            uninformative_slots=(1, 3),
-            failed_slots=(18, 22),
-        )
+        rep_partial = _make_full_report(rows=80, features=5, task="regression", classes=0, uninformative_slots=(1, 3), failed_slots=(18, 22))
         b_inc = LandmarkBundle.from_report(rep_partial, subsample_n=80)
         b_comp = LandmarkBundle.from_report_complete(rep_partial, subsample_n=80)
         self.assertEqual(b_inc.status, {"partial": 21})
         self.assertEqual(b_comp.status, {"partial": 19})
-
-        out_inc = build_conditioning(
-            X_scaled,
-            y_scaled,
-            task="regression",
-            mode="full",
-            bundle=b_inc,
-            native_report=rep_partial,
-            subsample_n=80,
-            y_train_raw=y_raw,
-        )
-        out_comp = build_conditioning(
-            X_scaled,
-            y_scaled,
-            task="regression",
-            mode="full",
-            bundle=b_comp,
-            native_report=rep_partial,
-            subsample_n=80,
-            y_train_raw=y_raw,
-        )
+        out_inc = build_conditioning(X_scaled, y_scaled, task="regression", mode="full", bundle=b_inc, native_report=rep_partial, subsample_n=80, y_train_raw=y_raw)
+        out_comp = build_conditioning(X_scaled, y_scaled, task="regression", mode="full", bundle=b_comp, native_report=rep_partial, subsample_n=80, y_train_raw=y_raw)
         np.testing.assert_array_equal(out_inc["vec256"], out_comp["vec256"])
 
     def test_none_fast_and_progressive_modes(self) -> None:
@@ -518,58 +380,35 @@ class TestOptionalLandmarks(unittest.TestCase):
         np.testing.assert_array_equal(cond_none["vec256"], cond_fast["vec256"])
         np.testing.assert_array_equal(cond_none["col_landmarks"], cond_fast["col_landmarks"])
         self.assertEqual(cond_none["digest"], cond_fast["digest"])
-
-        # All landmark-derived regions in vec256 are 0 in none/fast mode
         np.testing.assert_array_equal(cond_none["vec256"][0:85], np.zeros(85, dtype=np.float32))
         np.testing.assert_array_equal(cond_none["vec256"][91:116], np.zeros(25, dtype=np.float32))
-        # While target_stats [85:87], shape [87:91], table_vec24 [116:140], and col_desc8 are non-zero
         self.assertGreater(float(cond_none["vec256"][85]), 0.0)
         self.assertGreater(float(cond_none["vec256"][86]), 0.0)
         self.assertTrue(np.any(cond_none["vec256"][87:91] != 0.0))
         self.assertTrue(np.any(cond_none["vec256"][116:140] != 0.0))
-        np.testing.assert_array_equal(
-            cond_none["col_landmarks"][:, :9],
-            np.zeros((cond_none["col_landmarks"].shape[0], 9), dtype=np.float32),
-        )
+        np.testing.assert_array_equal(cond_none["col_landmarks"][:, :9], np.zeros((cond_none["col_landmarks"].shape[0], 9), dtype=np.float32))
         self.assertTrue(np.any(cond_none["col_landmarks"][:4, 9:17] != 0.0))
 
-        # Regression: when y_train_raw is provided, target_stats [85:87] are non-zero T0 skew/kurtosis;
-        # when only scaled y is provided without y_train_raw, target_stats [85:87] are 0.0.
         y_reg_raw = np.exp(X[:, 0])
         y_reg_scaled = 8.0 * np.tanh((y_reg_raw - np.mean(y_reg_raw)) / np.std(y_reg_raw) / 8.0)
-        reg_with_raw = build_conditioning(
-            X, y_reg_scaled, task="regression", mode="none", y_train_raw=y_reg_raw
-        )
-        reg_scaled_only = build_conditioning(
-            X, y_reg_scaled, task="regression", mode="none"
-        )
+        reg_with_raw = build_conditioning(X, y_reg_scaled, task="regression", mode="none", y_train_raw=y_reg_raw)
+        reg_scaled_only = build_conditioning(X, y_reg_scaled, task="regression", mode="none")
         self.assertTrue(np.any(reg_with_raw["vec256"][85:87] != 0.0))
-        np.testing.assert_array_equal(
-            reg_scaled_only["vec256"][85:87], np.zeros(2, dtype=np.float32)
-        )
+        np.testing.assert_array_equal(reg_scaled_only["vec256"][85:87], np.zeros(2, dtype=np.float32))
 
-        # Reject non-empty bundle in none/fast mode
-        macro_b = LandmarkBundle.from_raw_gains(
-            [0.2 if i in MACRO_INDICES else None for i in range(23)], subsample_n=90
-        )
+        macro_b = LandmarkBundle.from_raw_gains([0.2 if i in MACRO_INDICES else None for i in range(23)], subsample_n=90)
         with self.assertRaises(ValueError):
             build_conditioning(X, y_cls, task="multiclass", mode="none", bundle=macro_b)
         with self.assertRaises(ValueError):
             build_conditioning(X, y_cls, task="multiclass", mode="fast", bundle=macro_b)
 
-        # Progressive sequence monotonicity
         full_rep = _make_full_report(rows=90, features=4, task="multiclass", classes=3)
 
         def fake_runner(slots: tuple[int, ...]) -> dict:
             allowed = {s + 1 for s in slots}
-            return dict(
-                full_rep,
-                cells=[c for c in full_rep["cells"] if int(c["id"]) in allowed],
-            )
+            return dict(full_rep, cells=[c for c in full_rep["cells"] if int(c["id"]) in allowed])
 
-        steps = list(
-            progressive_steps(fake_runner, subsample_n=90, source_digest="prog_scope")
-        )
+        steps = list(progressive_steps(fake_runner, subsample_n=90, source_digest="prog_scope"))
         self.assertEqual([name for _, name, _, _ in steps], ["zero", "macro", "larger", "fine"])
         self.assertEqual(steps[0][2].status, "none")
         self.assertTrue(steps[0][2].is_zero())
@@ -577,15 +416,10 @@ class TestOptionalLandmarks(unittest.TestCase):
         self.assertEqual(steps[2][2].status, {"partial": 18})
         self.assertEqual(steps[3][2].status, "full")
 
-        # Even if a group returns all failed cells, progressive_steps still merges scope onto zero
         def empty_first_runner(slots: tuple[int, ...]) -> dict:
-            if set(slots) == set(MACRO_INDICES):
-                return dict(full_rep, cells=[])
-            return fake_runner(slots)
+            return dict(full_rep, cells=[]) if set(slots) == set(MACRO_INDICES) else fake_runner(slots)
 
-        steps_empty_first = list(
-            progressive_steps(empty_first_runner, subsample_n=90, source_digest="prog_scope")
-        )
+        steps_empty_first = list(progressive_steps(empty_first_runner, subsample_n=90, source_digest="prog_scope"))
         self.assertEqual(steps_empty_first[1][2].status, "none")
         self.assertFalse(steps_empty_first[1][2].is_zero())
         self.assertEqual(steps_empty_first[1][2].subsample_n, 90)
@@ -600,121 +434,54 @@ class TestOptionalLandmarks(unittest.TestCase):
         idx2 = stratified_subsample(y_cls, "multiclass", 160, seed=42)
         np.testing.assert_array_equal(idx1, idx2)
         self.assertEqual(idx1.size, 160)
-        # All 3 classes have >= 2 samples
         for c in (0, 1, 2):
             self.assertGreaterEqual(int(np.sum(y_cls[idx1] == c)), 2)
 
-        # Physical row_ids invariance under row permutation (both classification and regression)
         perm = rng.permutation(y_cls.size)
         row_ids = np.arange(y_cls.size, dtype=np.int64)
-        sel_orig = stratified_subsample(
-            y_cls, "multiclass", 160, seed=42, row_ids=row_ids
-        )
-        sel_perm = stratified_subsample(
-            y_cls[perm], "multiclass", 160, seed=42, row_ids=row_ids[perm]
-        )
-        np.testing.assert_array_equal(
-            np.sort(row_ids[sel_orig]), np.sort(row_ids[perm][sel_perm])
-        )
+        sel_orig = stratified_subsample(y_cls, "multiclass", 160, seed=42, row_ids=row_ids)
+        sel_perm = stratified_subsample(y_cls[perm], "multiclass", 160, seed=42, row_ids=row_ids[perm])
+        np.testing.assert_array_equal(np.sort(row_ids[sel_orig]), np.sort(row_ids[perm][sel_perm]))
 
         y_reg = np.linspace(-10.0, 100.0, 600) + rng.normal(scale=0.01, size=600)
         perm_r = rng.permutation(y_reg.size)
         rids_r = np.arange(y_reg.size, dtype=np.int64)
-        sel_r_orig = stratified_subsample(
-            y_reg, "regression", 150, seed=17, row_ids=rids_r
-        )
-        sel_r_perm = stratified_subsample(
-            y_reg[perm_r], "regression", 150, seed=17, row_ids=rids_r[perm_r]
-        )
-        np.testing.assert_array_equal(
-            np.sort(rids_r[sel_r_orig]), np.sort(rids_r[perm_r][sel_r_perm])
-        )
+        sel_r_orig = stratified_subsample(y_reg, "regression", 150, seed=17, row_ids=rids_r)
+        sel_r_perm = stratified_subsample(y_reg[perm_r], "regression", 150, seed=17, row_ids=rids_r[perm_r])
+        np.testing.assert_array_equal(np.sort(rids_r[sel_r_orig]), np.sort(rids_r[perm_r][sel_r_perm]))
 
     def test_cli_encode_modes(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
-            csv_path = tmp / "table.csv"
+            csv_path, rep_path, weights_path = tmp / "table.csv", tmp / "report.json", tmp / "dummy.safetensors"
             rng = np.random.default_rng(11)
             with csv_path.open("w", newline="", encoding="utf-8") as f:
                 w = csv.writer(f)
                 w.writerow(["f0", "f1", "f2", "target"])
-                for i in range(40):
-                    x0 = float(rng.normal())
-                    x1 = float(rng.normal())
-                    x2 = float(rng.normal())
-                    t = float(np.exp(0.5 * x0 - 0.3 * x1))
-                    w.writerow([x0, x1, x2, t])
-
-            rep = _make_full_report(rows=25, features=3, task="regression", classes=0)
-            rep_path = tmp / "report.json"
-            rep_path.write_text(json.dumps(rep), encoding="utf-8")
-
-            # Use a tiny dummy weights file only if DopeEncoder629 weights are not present;
-            # mock DopeEncoder629.from_pretrained so CLI test is fast and self-contained.
+                for _ in range(40):
+                    x0, x1, x2 = float(rng.normal()), float(rng.normal()), float(rng.normal())
+                    w.writerow([x0, x1, x2, float(np.exp(0.5 * x0 - 0.3 * x1))])
+            rep_path.write_text(json.dumps(_make_full_report(rows=25, features=3, task="regression", classes=0)), encoding="utf-8")
+            weights_path.write_bytes(b"dummy")
             from unittest import mock
             import torch
 
             class _DummyEncoder(torch.nn.Module):
                 def forward(self, vec256: torch.Tensor, col_lm: torch.Tensor) -> torch.Tensor:
-                    b = vec256.shape[0]
-                    out = torch.zeros((b, 629), dtype=torch.float32, device=vec256.device)
-                    out[:, :256] = vec256
-                    out[:, 256:273] = col_lm[:, 0, :]
+                    out = torch.zeros((vec256.shape[0], 629), dtype=torch.float32, device=vec256.device)
+                    out[:, :256], out[:, 256:273] = vec256, col_lm[:, 0, :]
                     return out
 
-            weights_path = tmp / "dummy.safetensors"
-            weights_path.write_bytes(b"dummy")
-
-            with mock.patch(
-                "research.levels.encoder.DopeEncoder629.from_pretrained",
-                return_value=_DummyEncoder(),
-            ):
-                buf_none = io.StringIO()
+            with mock.patch("research.levels.encoder.DopeEncoder629.from_pretrained", return_value=_DummyEncoder()):
+                buf_none, buf_full = io.StringIO(), io.StringIO()
                 with mock.patch("sys.stdout", buf_none):
-                    rc = cli.main([
-                        "encode",
-                        "--csv",
-                        str(csv_path),
-                        "--target",
-                        "target",
-                        "--task",
-                        "regression",
-                        "--weights",
-                        str(weights_path),
-                        "--landmark-mode",
-                        "none",
-                        "--json",
-                    ])
-                self.assertEqual(rc, 0)
+                    self.assertEqual(cli.main(["encode", "--csv", str(csv_path), "--target", "target", "--task", "regression", "--weights", str(weights_path), "--landmark-mode", "none", "--json"]), 0)
                 rec_none = json.loads(buf_none.getvalue().strip())
-                self.assertEqual(rec_none["status"], "none")
-                self.assertEqual(rec_none["conditioning_digest"], GOLDEN_ZERO_DIGEST)
-                self.assertEqual(rec_none["recipe"], OBSERVED_RECIPE)
-
-                buf_full = io.StringIO()
+                self.assertEqual((rec_none["status"], rec_none["conditioning_digest"], rec_none["recipe"]), ("none", GOLDEN_ZERO_DIGEST, OBSERVED_RECIPE))
                 with mock.patch("sys.stdout", buf_full):
-                    rc = cli.main([
-                        "encode",
-                        "--csv",
-                        str(csv_path),
-                        "--target",
-                        "target",
-                        "--task",
-                        "regression",
-                        "--weights",
-                        str(weights_path),
-                        "--landmark-mode",
-                        "full",
-                        "--report-json",
-                        str(rep_path),
-                        "--landmark-subsample",
-                        "25",
-                        "--json",
-                    ])
-                self.assertEqual(rc, 0)
+                    self.assertEqual(cli.main(["encode", "--csv", str(csv_path), "--target", "target", "--task", "regression", "--weights", str(weights_path), "--landmark-mode", "full", "--report-json", str(rep_path), "--landmark-subsample", "25", "--json"]), 0)
                 rec_full = json.loads(buf_full.getvalue().strip())
-                self.assertEqual(rec_full["status"], "full")
-                self.assertEqual(rec_full["recipe"], LEGACY_FULL_RECIPE)
+                self.assertEqual((rec_full["status"], rec_full["recipe"]), ("full", LEGACY_FULL_RECIPE))
                 self.assertNotEqual(rec_full["features629_sha256"], rec_none["features629_sha256"])
 
 

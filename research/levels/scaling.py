@@ -446,9 +446,7 @@ def _fit_target_scaler(y: Sequence[Any], *, task: str) -> TargetScaler:
             return TargetScaler("multiclass", 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, None, 0.5, (0.0, 0.5, 1.0), (0.34, 0.33, 0.33))
         u_vals, u_counts = np.unique(np.round(finite, 6), return_counts=True)
         if u_vals.size > 32:
-            order = np.argsort(u_counts)[::-1][:32]
-            u_vals = np.sort(u_vals[order])
-            u_counts = np.array([np.sum(np.abs(finite - v) <= 1e-5) for v in u_vals], dtype=np.float64)
+            u_vals, u_counts = u_vals[:32], u_counts[:32]
         priors = u_counts.astype(np.float64) / max(float(np.sum(u_counts)), 1.0)
         return TargetScaler(
             "multiclass", float(np.mean(finite)), max(float(np.std(finite)), 1e-6),
