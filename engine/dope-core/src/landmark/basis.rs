@@ -6,6 +6,7 @@ use crate::{
     rng::Rng,
     stats::{chatterjee_xi, quantile_sorted},
 };
+use rayon::prelude::*;
 
 #[derive(Clone)]
 enum Term {
@@ -28,12 +29,18 @@ impl Basis {
     pub fn fit(id: usize, z: &Encoded, y: &[f64], seed: u64) -> Option<Self> {
         let mut numeric = z.numeric.clone();
         if numeric.len() > 64 || id == 12 {
-            numeric.sort_by(|&a, &b| {
-                let col = |j| (0..z.x.rows).map(|r| z.x.at(r, j)).collect::<Vec<_>>();
-                chatterjee_xi(&col(b), y)
-                    .total_cmp(&chatterjee_xi(&col(a), y))
-                    .then(a.cmp(&b))
-            });
+            // One xi per column (pure, so caching keeps the comparator's order):
+            // descending xi, ties by column index.
+            let xi: Vec<(f64, usize)> = numeric
+                .par_iter()
+                .map(|&j| {
+                    let col: Vec<f64> = (0..z.x.rows).map(|r| z.x.at(r, j)).collect();
+                    (chatterjee_xi(&col, y), j)
+                })
+                .collect();
+            let mut ranked = xi;
+            ranked.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.cmp(&b.1)));
+            numeric = ranked.into_iter().map(|(_, j)| j).collect();
         }
         numeric.truncate(if id == 12 { 8 } else { 64 });
         let mut terms: Vec<Term> = (0..z.x.cols).map(Term::Raw).collect();
