@@ -407,9 +407,9 @@ def build_conditioning(
     native_report: Optional[Dict[str, Any]] = None,
     level: str = "high", subsample_n: Optional[int] = None,
     y_train_raw: Optional[np.ndarray] = None,
-    target_stats: Optional[Sequence[Optional[float]]] = None,
+    target_stats: Optional[Sequence[Optional[float]]] = None, evidence_positions: Optional[Sequence[int]] = None,
 ) -> Dict[str, Any]:
-    """Select and run the V3 conditioning recipe for an optional-landmark mode."""
+    """Select and run the V3 conditioning recipe; ``evidence_positions`` = the native report's selected rows."""
     from .building_block_landmarks import build_v3_conditioning_bundle
     if mode not in LANDMARK_MODES:
         raise ValueError(f"unknown_landmark_mode_{mode}")
@@ -432,7 +432,8 @@ def build_conditioning(
         recipe = FULL_REPORT_RECIPE
         eff_sub = subsample_n if subsample_n is not None else (bundle.subsample_n if bundle is not None else None)
         rep_rows = native_report.get("rows")
-        is_sampled = (eff_sub is not None and eff_sub < table_rows) or (isinstance(rep_rows, int) and rep_rows < table_rows)
+        is_sampled = ((eff_sub is not None and eff_sub < table_rows) or (isinstance(rep_rows, int) and rep_rows < table_rows)
+                      or evidence_positions is not None)
         overrides: Optional[Dict[str, Any]] = None
         if is_sampled or target_stats is not None or y_train_raw is not None:
             overrides = {
@@ -442,6 +443,7 @@ def build_conditioning(
             }
         cond = build_v3_conditioning_bundle(
             native_report, X_train_scaled, y_train_scaled, level=level, report_overrides=overrides,
+            evidence_positions=evidence_positions,
         )
     else:
         if mode in ("none", "fast") and bundle is not None and any(bundle.mask):

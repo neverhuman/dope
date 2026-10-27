@@ -269,7 +269,7 @@ class MultiLevelLandmarkModel(nn.Module):
         include_v3_primitives: bool = False, landmarks: Optional[LandmarkBundle] = None,
         landmark_mode: str = "full", subsample_n: Optional[int] = None,
         y_train_raw: Optional[np.ndarray] = None,
-        target_stats: Optional[Sequence[Optional[float]]] = None,
+        target_stats: Optional[Sequence[Optional[float]]] = None, evidence_positions: Optional[Sequence[int]] = None,
     ) -> Dict[str, Any]:
         """Encode a scaled training table.
 
@@ -280,7 +280,7 @@ class MultiLevelLandmarkModel(nn.Module):
         """
         device = next(self.parameters()).device
         if (landmarks is None and landmark_mode == "full" and subsample_n is None
-                and y_train_raw is None and target_stats is None):
+                and y_train_raw is None and target_stats is None and evidence_positions is None):
             if report is None:
                 raise ValueError("landmark_full_requires_native_report")
             vec256, rep_desc, tab_desc = self.build_conditioning_vector(report, X_train_scaled, y_train_scaled, level=level, device=device)
@@ -288,7 +288,7 @@ class MultiLevelLandmarkModel(nn.Module):
             cond = build_conditioning(
                 X_train_scaled, y_train_scaled, task=task, bundle=landmarks, mode=landmark_mode,
                 native_report=report, level=level, subsample_n=subsample_n,
-                y_train_raw=y_train_raw, target_stats=target_stats,
+                y_train_raw=y_train_raw, target_stats=target_stats, evidence_positions=evidence_positions,
             )["cond"]
             rep_desc, tab_desc = cond["rep_desc"], dict(cond["tab_desc"])
             for key in ("col_landmarks24", "v3_driver_weights", "inter_landmark_vec48", "building_block_vec68"):

@@ -10,6 +10,9 @@ Covers both conditioning recipes defined in `research/levels`:
    `build_observed_conditioning_bundle`, `col_landmarks17x64`, and
    `effective_conditioning_digest` across `none` (zero bundle),
    `partial_macro`, `partial_macro_larger`, and `full_as_observed`.
+3. Sampled full report (`sampled`): the served contract for a subsampled native report.
+   Building blocks use exactly the measured rows (`evidence_positions`, every third row
+   here); table descriptors, shape and target statistics stay on the full table.
 
 Usage (from the repository root):
     python3 -B -m research.levels.tools.export_prepare_goldens_b \
@@ -47,6 +50,7 @@ from research.levels.optional_landmarks import (
     CONDITIONING_DOMAIN,
     FULL_REPORT_RECIPE,
     OBSERVED_RECIPE,
+    build_conditioning,
     effective_conditioning_digest,
     report_task,
     squash_f32,
@@ -323,6 +327,16 @@ def _observed_bundles() -> List[Tuple[str, str, List[float], List[bool]]]:
     ]
 
 
+def _sampled(X: np.ndarray, y: np.ndarray, task: str, report: Dict[str, Any], level: str,
+             raw_ts2: Sequence[float]) -> Dict[str, Any]:
+    positions = list(range(0, len(y), 3)) if len(y) >= 6 else list(range(len(y)))
+    s = build_conditioning(X, y, task=task, mode="full", native_report=report, level=level,
+                           subsample_n=len(positions), target_stats=[raw_ts2[0], raw_ts2[1], None],
+                           evidence_positions=positions)
+    return {"positions": positions, "subsample_n": len(positions), "vec256": _f(s["vec256"]),
+            "col_landmarks17x64": _f(s["col_landmarks"].reshape(-1)), "conditioning_digest": s["digest"]}
+
+
 CASES = [
     # name, n, p, flavour, level, report-kind
     ("reg_high", 180, 10, "regression", "high", "full"),
@@ -439,6 +453,7 @@ def build() -> Dict[str, Any]:
             "v3_driver_weights": _f(bundle["v3_driver_weights"]),
             "conditioning_digest": legacy_digest,
             "observed": obs_entries,
+            "sampled": _sampled(X, y, task, report, level, raw_ts2),
         })
     return {"schema": SCHEMA, "numpy": np.__version__, "cases": out_cases}
 

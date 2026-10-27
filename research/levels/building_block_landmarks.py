@@ -12,7 +12,7 @@ D_train to compute:
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple
 import numpy as np
 
 LEVEL_RANK = {"low": 0, "small": 0, "medium": 1, "high": 2, "ultra": 3}
@@ -442,14 +442,25 @@ def compute_observed_inter_landmark_stats(rep_desc: Dict[str, Any], *, level: st
 def build_v3_conditioning_bundle(
     report: Dict[str, Any], X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *,
     level: str = "ultra", building_blocks: bool = True, report_overrides: Optional[Dict[str, Any]] = None,
+    evidence_positions: Optional[Sequence[int]] = None,
 ) -> Dict[str, Any]:
-    """Assemble full 256-dim hierarchical landmark + inter-landmark summary vector & (p, 24) column matrix."""
+    """Assemble full 256-dim hierarchical landmark + inter-landmark summary vector & (p, 24) column matrix.
+
+    ``evidence_positions``: rows the native report measured. Building blocks (and blocks derived from them)
+    use exactly those rows; table descriptors stay on full FIT (Rust ``sample_positions`` contract).
+    """
     from .descriptors import compute_table_descriptors, extract_report_descriptors
 
     rep_desc = extract_report_descriptors(report, level=level, **(report_overrides or {}))
     tab_desc = compute_table_descriptors(X_train_scaled, y_train_scaled, level=level)
     if building_blocks:
-        bb_desc = compute_building_block_landmarks(X_train_scaled, y_train_scaled, level=level)
+        bb_X, bb_y = X_train_scaled, y_train_scaled
+        if evidence_positions is not None:
+            pos, bb_y = np.asarray(evidence_positions, dtype=np.int64), np.asarray(y_train_scaled, dtype=np.float64).reshape(-1)
+            if pos.size and (int(pos.min()) < 0 or int(pos.max()) >= bb_y.shape[0]):
+                raise ValueError("prepare_subsample_position_out_of_bounds")
+            bb_X, bb_y = np.asarray(X_train_scaled, dtype=np.float64)[pos], bb_y[pos]
+        bb_desc = compute_building_block_landmarks(bb_X, bb_y, level=level)
     else:
         X_arr = np.asarray(X_train_scaled)
         bb_desc = zero_building_block_landmarks(X_arr.shape[1] if X_arr.ndim == 2 else 1)

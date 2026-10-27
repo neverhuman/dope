@@ -44,6 +44,17 @@ struct GoldenCase {
     v3_driver_weights: Vec<f32>,
     conditioning_digest: String,
     observed: Vec<GoldenObserved>,
+    sampled: GoldenSampled,
+}
+
+/// Python `build_conditioning(mode="full", subsample_n, target_stats, evidence_positions)`.
+#[derive(Deserialize)]
+struct GoldenSampled {
+    positions: Vec<usize>,
+    subsample_n: usize,
+    vec256: Vec<f32>,
+    col_landmarks17x64: Vec<f32>,
+    conditioning_digest: String,
 }
 
 #[derive(Deserialize)]
@@ -855,5 +866,92 @@ fn mode_validation_and_recipe_selection_rules() {
     assert_eq!(
         cond_mc_cached.digest(),
         mc_obs.conditioning_digest_with_raw_target_stats
+    );
+}
+
+/// A subsampled native report: building blocks use exactly the measured rows, table
+/// descriptors, shape and target statistics stay on the full table (the served
+/// `build_conditioning_at_level(sample_positions)` contract), matching the Python reference.
+#[test]
+fn sampled_full_report_builds_blocks_on_measured_rows_parity() {
+    let goldens = load_goldens();
+    let (mut exact, mut moved) = (0usize, 0usize);
+    for c in &goldens.cases {
+        let s = &c.sampled;
+        let col_desc: Vec<[f32; 8]> = unflatten(&c.tab.column_desc);
+        let col_spec: Vec<[f32; 9]> = unflatten(&c.rep.column_spectrum);
+        let rep_vec116: [f32; 116] = c.rep.vector116.as_slice().try_into().unwrap();
+        let (sx, s_rows, sy) =
+            subsample_scaled_rows(&c.x, c.n, c.p, &c.y, &s.positions).expect("subsample rows");
+        let raw = LegacyReportConditioningInput {
+            vector116: &rep_vec116,
+            rep: ReportLandmarkView {
+                gains23: &c.rep.gains23,
+                mask23: &c.rep.mask23,
+                ses23: &c.rep.ses23,
+                lambdas23: &c.rep.lambdas23,
+                column_spectrum: &col_spec,
+            },
+            column_prior_importance: &c.rep.column_prior_importance,
+            complete_values23: c.rep.complete_values23,
+            complete_mask23: c.rep.complete_mask23,
+            observed_values23: c.rep.observed_values23,
+            observed_mask23: c.rep.observed_mask23,
+            full_table_target_stats: None,
+            evidence_sample: Some((&sx, s_rows, &sy)),
+        };
+        let cond = build_conditioning_with_full_table_stats(
+            &c.x,
+            c.n,
+            c.p,
+            &c.y,
+            &c.task,
+            Some(c.raw_target_stats2),
+            &c.tab.table_vec24,
+            &col_desc,
+            &c.tab.empirical_driver_weights,
+            Some(BundleConditioningInput {
+                values: &c.rep.observed_values23,
+                mask: &c.rep.observed_mask23,
+                subsample_n: Some(s.subsample_n),
+            }),
+            Some(raw),
+            "full",
+            &c.level,
+        )
+        .expect("sampled full conditioning succeeds");
+        let v_bits = assert_close(
+            &format!("{}:sampled.vec256", c.name),
+            &cond.vec256,
+            &s.vec256,
+            1e-6,
+        );
+        let c_bits = assert_close(
+            &format!("{}:sampled.col_landmarks17x64", c.name),
+            &flatten(&cond.col_landmarks),
+            &s.col_landmarks17x64,
+            1e-6,
+        );
+        if v_bits == 0 && c_bits == 0 {
+            assert_eq!(
+                cond.digest(),
+                s.conditioning_digest,
+                "{}: sampled digest",
+                c.name
+            );
+            exact += 1;
+        }
+        let bb_moved = cond.vec256[188..]
+            .iter()
+            .zip(&c.vec256[188..])
+            .any(|(a, b)| (a - b).abs() > 1e-6);
+        moved += usize::from(bb_moved);
+    }
+    assert!(exact > 0, "expected at least one bit-exact sampled case");
+    // The golden must discriminate the partition: on genuine reductions the measured-row
+    // building blocks differ from the full-table ones.
+    assert!(
+        moved >= 10,
+        "only {moved} cases moved the building blocks under sampling"
     );
 }
