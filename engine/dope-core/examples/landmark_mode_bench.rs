@@ -1,11 +1,13 @@
 //! Stage-timed latency of `mlc-v3 encode` landmark modes, in one warm process.
 //!
 //! `cargo run --release --example landmark_mode_bench [--features cuda] -- \
-//!   CHECKPOINT CSV TARGET TASK DEVICE REPS [WORK_BUDGET]`
+//!   CHECKPOINT CSV TARGET TASK DEVICE REPS [WORK_BUDGET] [MODES]`
 //! TASK is regression|classification|multiclass, DEVICE cpu|cuda:N. Prints one JSON
 //! object: cold model load, then per repetition the stage timings (ms) of none,
 //! progressive (zero, macro, larger, fine; N=300) and full (unsampled and N=300),
-//! each split into landmarks, conditioning and forward. Measurements only.
+//! each split into landmarks, conditioning and forward. MODES (comma list of
+//! none,progressive,full_sub300,full; default all) selects what is timed.
+//! Measurements only.
 use candle_core::{Device, Tensor};
 use dope_core::landmark::{LandmarkBundle, LandmarkMode, LandmarkOptions, SubsampleSpec};
 use dope_core::landmark::{LandmarkGroup, PROGRESSIVE_ORDER};
@@ -73,7 +75,7 @@ fn landmark_run(
 fn main() -> Res<()> {
     let a: Vec<String> = std::env::args().collect();
     let [_, ckpt, csv, target, task, device, reps, ..] = a.as_slice() else {
-        return Err("usage: CHECKPOINT CSV TARGET TASK DEVICE REPS [WORK_BUDGET]".into());
+        return Err("usage: CHECKPOINT CSV TARGET TASK DEVICE REPS [WORK_BUDGET] [MODES]".into());
     };
     let reps: usize = reps.parse()?;
     let dev = dope_core::device::parse(device)?;
@@ -81,6 +83,10 @@ fn main() -> Res<()> {
     if let Some(budget) = a.get(7) {
         opts.work_budget = budget.parse()?;
     }
+    let modes = a
+        .get(8)
+        .map_or("none,progressive,full_sub300,full", String::as_str);
+    let want = |m: &str| modes.split(',').any(|x| x == m);
     let task = match task.as_str() {
         "regression" => PrepTask::Regression,
         "classification" => PrepTask::Classification,
@@ -111,30 +117,27 @@ fn main() -> Res<()> {
         let t = Instant::now();
         let table = prepare_table_cells(&x, &y, task)?;
         let prepare_ms = ms(t);
-        let t = Instant::now();
-        let cond = build_conditioning(&table, &LandmarkBundle::zero(), None, LandmarkMode::None)?;
-        let none = json!({"conditioning_ms": ms(t), "forward_ms": forward(&model, &cond, &dev)?});
-        let progressive = landmark_run(
-            &model,
-            &table,
-            &opts,
-            Some(SubsampleSpec::PROGRESSIVE_DEFAULT),
-            &dev,
-            &PROGRESSIVE_ORDER,
-        )?;
-        let full_sub = landmark_run(
-            &model,
-            &table,
-            &opts,
-            Some(SubsampleSpec::new(300, 0)),
-            &dev,
-            &full_groups,
-        )?;
-        let full = landmark_run(&model, &table, &opts, None, &dev, &full_groups)?;
-        runs.push(
-            json!({"prepare_ms": prepare_ms, "none": none, "progressive": progressive,
-            "full_sub300": full_sub, "full": full}),
-        );
+        let mut run = json!({"prepare_ms": prepare_ms});
+        if want("none") {
+            let t = Instant::now();
+            let cond =
+                build_conditioning(&table, &LandmarkBundle::zero(), None, LandmarkMode::None)?;
+            run["none"] =
+                json!({"conditioning_ms": ms(t), "forward_ms": forward(&model, &cond, &dev)?});
+        }
+        if want("progressive") {
+            let sub = Some(SubsampleSpec::PROGRESSIVE_DEFAULT);
+            run["progressive"] =
+                landmark_run(&model, &table, &opts, sub, &dev, &PROGRESSIVE_ORDER)?;
+        }
+        if want("full_sub300") {
+            let sub = Some(SubsampleSpec::new(300, 0));
+            run["full_sub300"] = landmark_run(&model, &table, &opts, sub, &dev, &full_groups)?;
+        }
+        if want("full") {
+            run["full"] = landmark_run(&model, &table, &opts, None, &dev, &full_groups)?;
+        }
+        runs.push(run);
     }
     println!(
         "{}",
