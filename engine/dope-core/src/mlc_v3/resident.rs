@@ -13,8 +13,7 @@ pub struct MlcV3RoutedTensors {
 }
 
 impl LandmarkHyperRouter {
-    /// Route `[B,256]` FP32 conditioning without synchronizing or copying outputs to the host.
-    pub fn forward_tensor(&self, conditioning: &Tensor, level: &str) -> Result<MlcV3RoutedTensors> {
+    fn forward_hidden_tensor(&self, conditioning: &Tensor, level: &str) -> Result<Tensor> {
         let (batch, width) = conditioning.dims2()?;
         if batch == 0
             || width != 256
@@ -30,22 +29,6 @@ impl LandmarkHyperRouter {
             _ => return Err(bad("unsupported mlc_v3 level")),
         };
         let small = matches!(level, "low" | "small");
-        let select = |sm, md, hi, ul| {
-            if small {
-                sm
-            } else if level == "medium" {
-                md
-            } else if level == "high" {
-                hi
-            } else {
-                ul
-            }
-        };
-        let high = if matches!(level, "high" | "ultra") {
-            1.0
-        } else {
-            0.0
-        };
         let x140 = self
             .input_norm
             .forward(&conditioning.narrow(1, 0, 140)?.contiguous()?)?;
@@ -63,7 +46,43 @@ impl LandmarkHyperRouter {
         }
         let h0 = self.bb_ln2.forward(&self.bb_fc0.forward(&x140)?.silu()?)?;
         let backbone = self.bb_ln5.forward(&self.bb_fc3.forward(&h0)?.silu()?)?;
-        let hidden = ((backbone + embedding)? + self.inter_attn.forward(&x256)?)?;
+        Ok(((backbone + embedding)? + self.inter_attn.forward(&x256)?)?)
+    }
+
+    /// Route `[B,256]` FP32 conditioning to `(task_latent, dist_latent)` (`([B,128], [B,128])`)
+    /// without evaluating the gate or reconstruction heads.
+    pub fn forward_latents_tensor(
+        &self,
+        conditioning: &Tensor,
+        level: &str,
+    ) -> Result<(Tensor, Tensor)> {
+        let hidden = self.forward_hidden_tensor(conditioning, level)?;
+        Ok((
+            self.task_latent_head.forward(&hidden)?.tanh()?,
+            self.dist_latent_head.forward(&hidden)?.tanh()?,
+        ))
+    }
+
+    /// Route `[B,256]` FP32 conditioning without synchronizing or copying outputs to the host.
+    pub fn forward_tensor(&self, conditioning: &Tensor, level: &str) -> Result<MlcV3RoutedTensors> {
+        let hidden = self.forward_hidden_tensor(conditioning, level)?;
+        let small = matches!(level, "low" | "small");
+        let select = |sm, md, hi, ul| {
+            if small {
+                sm
+            } else if level == "medium" {
+                md
+            } else if level == "high" {
+                hi
+            } else {
+                ul
+            }
+        };
+        let high = if matches!(level, "high" | "ultra") {
+            1.0
+        } else {
+            0.0
+        };
         let raw = self.gate_head.forward(&hidden)?;
         let raw_v3 = self.v3_gate_head.forward(&hidden)?;
         let sig = candle_nn::ops::sigmoid(&raw)?;
@@ -106,6 +125,84 @@ impl LandmarkHyperRouter {
 }
 
 impl MlcV3Model {
+    /// `[B,256] -> [B,512]`, FP32/High only, on the model device.
+    ///
+    /// Computes the canonical 512-coordinate prefix
+    /// (`[dataset_features (256), task_latent (128), dist_latent (128)]`) bit-identically to
+    /// `&encode_features_629_tensor(...)[.., ..512]`, without evaluating the router
+    /// gate/reconstruction heads or `target_net` column attention.
+    pub fn encode_descriptor_512_tensor(
+        &self,
+        dataset_features: &Tensor,
+        level: &str,
+    ) -> Result<Tensor> {
+        if level != "high" {
+            return Err(bad("512D encoding requires High tier"));
+        }
+        let (task_latent, dist_latent) = self
+            .router
+            .forward_latents_tensor(dataset_features, level)?;
+        let output = Tensor::cat(&[dataset_features, &task_latent, &dist_latent], 1)?;
+        let finite = output.abs()?.le(f32::MAX as f64)?;
+        Ok(finite.where_cond(&output, &output.zeros_like()?)?)
+    }
+
+    /// `([B,256], [B,64,17]) -> [B,512]`, FP32/High only, on the model device.
+    ///
+    /// Validates the exact two-input `[B,256]` and `[B,64,17]` contract of
+    /// [`Self::encode_features_629_tensor`] and returns the `[B,512]` prefix
+    /// (`[dataset_features (256), task_latent (128), dist_latent (128)]`) without evaluating
+    /// the discarded trailing 117 coordinates.
+    pub fn encode_features_512_tensor(
+        &self,
+        dataset_features: &Tensor,
+        col_landmarks: &Tensor,
+        level: &str,
+    ) -> Result<Tensor> {
+        if level != "high" {
+            return Err(bad("512D encoding requires High tier"));
+        }
+        let (batch, width) = dataset_features.dims2()?;
+        if batch == 0
+            || width != 256
+            || dataset_features.dtype() != DType::F32
+            || !dataset_features.device().same_device(self.device())
+        {
+            return Err(bad("routing requires FP32 [B,256] on the model device"));
+        }
+        if col_landmarks.dims() != [batch, 64, 17]
+            || col_landmarks.dtype() != DType::F32
+            || !col_landmarks
+                .device()
+                .same_device(dataset_features.device())
+        {
+            return Err(bad(
+                "column attention requires matching FP32 [B,128] and [B,64,17] tensors on the model device",
+            ));
+        }
+        self.encode_descriptor_512_tensor(dataset_features, level)
+    }
+
+    /// Validate `dataset_features: [256]` and `col_landmarks: [64, 17]`, upload only
+    /// `dataset_features: [1, 256]` onto `self.device()`, execute resident
+    /// [`Self::encode_descriptor_512_tensor`], and copy the final `[512]` vector back to the host.
+    pub fn encode_conditioning_512(
+        &self,
+        dataset_features: &[f32],
+        col_landmarks: &[[f32; 17]],
+        level: &str,
+    ) -> Result<Vec<f32>> {
+        if dataset_features.len() != 256 || col_landmarks.len() != 64 {
+            return Err(bad("conditioning requires [256] and [64, 17] inputs"));
+        }
+        let descriptor = Tensor::from_slice(dataset_features, (1, 256), self.device())?;
+        let out = self.encode_descriptor_512_tensor(&descriptor, level)?;
+        Ok(out
+            .to_device(&candle_core::Device::Cpu)?
+            .squeeze(0)?
+            .to_vec1::<f32>()?)
+    }
+
     /// `([B,256], [B,64,17]) -> [B,629]`, FP32/High only, on the model device.
     ///
     /// Inputs and all routing/column-attention intermediates stay on that device. Callers

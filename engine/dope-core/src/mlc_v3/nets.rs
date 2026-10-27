@@ -7,6 +7,7 @@ use candle_nn::{LayerNorm, Linear};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+pub const MLC_V3_FEATURES_512_DIM: usize = 512;
 pub const MLC_V3_FEATURES_629_DIM: usize = 629;
 pub const MLC_V3_GATE_KEYS_14: [&str; 14] = [
     "asinh_atan_w",
