@@ -18,6 +18,11 @@ Arms (level High, the Encoder629 tier):
 Per arm: vec256 / Encoder629 cosine to `full`, then wire -> generate_synthetic (2 seeds)
 -> 6-auditor sklearn probe retention R (v3_ledger_replay recipe) on the real test split.
 Each seed's per-auditor failure map is kept, so a score that fell back to chance is visible.
+Every arm except the unsampled full report gets the served Rust inputs: raw-target moments for
+regression (y_train_raw), and for sub-N arms the native stratified selection as evidence_positions,
+cross-checked against the target_stats the native report computed on the rows it measured.
+The zero arm's conditioning digest is compared with the served `dope mlc-v3 encode --landmark-mode none`
+on the same fit.csv; a table whose evaluator preparation differs from the served one is recorded.
 Restricting a full report to MACRO/LARGER cells equals a native `--ids` run (cells are
 independent given folds); `--verify-ids K` checks that on K tables.
 """
@@ -36,6 +41,7 @@ OPTS = ['--folds', '5', '--knn-reference', '2048', '--ridge-rows', '8192', '--se
 ROLES = ('dev_val_ablation',)
 SIZES = (100, 200, 300, 500, 1000)
 GENERATOR_WIDTH = 64  # MultiLevelLandmarkModel.max_cols: columns emitted by generate_synthetic
+RELEASED_CKPT = '/home/ubuntu/dope/target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.safetensors'
 TASK = {'regression': 'regression', 'binary': 'classification', 'multi_label': 'multiclass'}
 # Per-table failures the evaluation records explicitly instead of aborting the roster: native CLI
 # refusals (RuntimeError), unreadable or malformed splits (OSError, ValueError, IndexError, KeyError)
@@ -64,6 +70,29 @@ def native(binary, csv_path, target, task, extra, out):
     return json.load(open(out)), time.perf_counter() - t
 
 
+def served_none_digest(binary, fit_csv, target, task):
+    """Effective-conditioning digest of the served none-mode encoding (weight-independent)."""
+    cmd = [binary, 'mlc-v3', 'encode', '--weights', RELEASED_CKPT, '--csv', fit_csv, '--target', target,
+           '--task', {'regression': 'regression', 'classification': 'classification'}.get(task, 'multiclass'),
+           '--landmark-mode', 'none', '--json', '--threads', '1']
+    p = subprocess.run(cmd, capture_output=True, env=dict(os.environ, RAYON_NUM_THREADS='1'))
+    recs = [json.loads(l) for l in p.stdout.decode(errors='replace').splitlines() if l.startswith('{')]
+    if p.returncode or not recs:
+        raise RuntimeError('served encode: ' + p.stderr.decode(errors='replace').strip()[-160:])
+    return recs[-1]['conditioning_digest']
+
+
+def selection_reproduced(y, pos, task, report, table_target_stats):
+    """The native report measured exactly len(pos) rows; for regression its raw-target moments on those
+    rows also agree (to summation-order rounding) with the moments of y[pos]."""
+    if report.get('rows') != len(pos):
+        return False
+    if task != 'regression':
+        return True
+    nat, py = report.get('target_stats') or [None, None], table_target_stats(y[pos], task)
+    return all((a is None) == (b is None) and (a is None or abs(a - b) <= 1e-9 * max(1.0, abs(a))) for a, b in zip(nat[:2], py[:2]))
+
+
 def cos(a, b):
     a, b = np.asarray(a, np.float64).ravel(), np.asarray(b, np.float64).ravel()
     d = np.linalg.norm(a) * np.linalg.norm(b)
@@ -77,7 +106,8 @@ def run_table(job):
     torch.set_num_threads(1)
     from research.levels.multilevel_model import MultiLevelLandmarkModel, build_conditioning
     from research.levels.encoder import DopeEncoder629
-    from research.levels.optional_landmarks import LandmarkBundle
+    from research.levels.optional_landmarks import LandmarkBundle, table_target_stats
+    from research.levels.observed_conditioning import stratified_subsample
     from research.levels.scaling import FitOnlyTableTransform
     from research.levels.budget_planner import serialize_dope_v3_envelope, deserialize_dope_v3_envelope
     from research.levels.v3_ledger_replay import (evaluate_reg_bin_dev_cell, evaluate_multiclass_auditors,
@@ -157,7 +187,12 @@ def run_table(job):
         if rep_2e9 is not None:
             arms['full_2e9'] = dict(mode='full', report=rep_2e9)
         for n_sub, rep_sub in subs.items():
-            arms[f'sub{n_sub}'] = dict(mode='full', report=rep_sub, subsample_n=n_sub, bundle=mkb(rep_sub, n_sub))
+            pos = stratified_subsample(yf, task, n_sub, seed=0)
+            if not selection_reproduced(yf, pos, task, rep_sub, table_target_stats):
+                unavailable[f'sub{n_sub}'] = 'native selection not reproduced'
+                continue
+            arms[f'sub{n_sub}'] = dict(mode='full', report=rep_sub, subsample_n=n_sub, bundle=mkb(rep_sub, n_sub),
+                                       evidence_positions=[int(i) for i in pos])
         if task == 'multiclass':
             k = int(len(np.unique(np.rint(ys))))
             real_info = evaluate_multiclass_auditors(Xs, ys, Xts, yts, k)
@@ -175,8 +210,11 @@ def run_table(job):
         res = {}
         feats = {}
         for name, a in arms.items():
+            observed_or_sampled = a['mode'] != 'full' or a.get('evidence_positions') is not None
+            served = dict(y_train_raw=yf if task == 'regression' and observed_or_sampled else None,
+                          evidence_positions=a.get('evidence_positions'))
             kw = dict(task=task, bundle=a.get('bundle'), mode=a['mode'], native_report=a.get('report'), level='high',
-                      subsample_n=a.get('subsample_n'))
+                      subsample_n=a.get('subsample_n'), **served)
             cond = build_conditioning(Xs, ys, **kw)
             with torch.no_grad():
                 f = enc629(torch.tensor(cond['vec256'])[None], torch.tensor(cond['col_landmarks'])[None])[0].numpy()
@@ -186,7 +224,7 @@ def run_table(job):
             else:
                 enc = model.encode_table(Xs, ys, a.get('report'), task=task, level='high', adaptive_budget=True,
                                          include_v3_primitives=True, landmarks=a.get('bundle'), landmark_mode=a['mode'],
-                                         subsample_n=a.get('subsample_n'))
+                                         subsample_n=a.get('subsample_n'), **served)
             wire = serialize_dope_v3_envelope(enc, scaler=scaler, compress=True)
             dec, _ = deserialize_dope_v3_envelope(wire)
             rs, fis, fails = [], [], []
@@ -214,6 +252,7 @@ def run_table(job):
             res[name]['enc629_cos_full'] = cos(feats[name][1], feats['full'][1])
             res[name]['enc629_maxabs_full'] = float(np.max(np.abs(feats[name][1] - feats['full'][1])))
         out['arms'] = res
+        out['served_zero_digest_equal'] = served_none_digest(binary, fit_csv, f'c{tgt}', task) == res['zero']['digest']
         out['cells_full_2e12'] = None if rep_full is None else sum(1 for c in rep_full['cells'] if c.get('gain') is not None)
         out['cells_full_2e9'] = None if rep_2e9 is None else sum(1 for c in rep_2e9['cells'] if c.get('gain') is not None)
     except TABLE_ERRORS as ex:  # a table that cannot be evaluated is recorded with its error type
