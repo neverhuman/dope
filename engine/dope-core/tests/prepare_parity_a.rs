@@ -37,30 +37,42 @@ fn read_f32_tensor(st: &SafeTensors<'_>, name: &str) -> Vec<f32> {
 
 fn max_abs_diff_f64(a: &[f64], b: &[f64], label: &str) -> f64 {
     assert_eq!(a.len(), b.len(), "length mismatch for {label}");
-    a.iter()
-        .zip(b.iter())
-        .map(|(&x, &y)| {
-            if x.is_nan() && y.is_nan() {
-                0.0
-            } else {
-                (x - y).abs()
-            }
-        })
-        .fold(0.0f64, f64::max)
+    let mut max_diff = 0.0f64;
+    for (idx, (&x, &y)) in a.iter().zip(b.iter()).enumerate() {
+        assert!(
+            x.is_finite() && y.is_finite(),
+            "non-finite value at {label}[{idx}]: actual={x} expected={y}"
+        );
+        let d = (x - y).abs();
+        assert!(
+            d.is_finite(),
+            "non-finite diff at {label}[{idx}]: actual={x} expected={y}"
+        );
+        if d > max_diff {
+            max_diff = d;
+        }
+    }
+    max_diff
 }
 
 fn max_abs_diff_f32(a: &[f32], b: &[f32], label: &str) -> f32 {
     assert_eq!(a.len(), b.len(), "length mismatch for {label}");
-    a.iter()
-        .zip(b.iter())
-        .map(|(&x, &y)| {
-            if x.is_nan() && y.is_nan() {
-                0.0
-            } else {
-                (x - y).abs()
-            }
-        })
-        .fold(0.0f32, f32::max)
+    let mut max_diff = 0.0f32;
+    for (idx, (&x, &y)) in a.iter().zip(b.iter()).enumerate() {
+        assert!(
+            x.is_finite() && y.is_finite(),
+            "non-finite value at {label}[{idx}]: actual={x} expected={y}"
+        );
+        let d = (x - y).abs();
+        assert!(
+            d.is_finite(),
+            "non-finite diff at {label}[{idx}]: actual={x} expected={y}"
+        );
+        if d > max_diff {
+            max_diff = d;
+        }
+    }
+    max_diff
 }
 
 #[test]
@@ -382,4 +394,16 @@ fn prepared_table_row_ids_and_categories_validation() {
     assert!((rd_full_ovr.vector116[85] - sq_ts[0] as f32).abs() <= 1e-6);
     assert!((rd_full_ovr.vector116[86] - sq_ts[1] as f32).abs() <= 1e-6);
     assert_eq!(rd_full_ovr.vector116[87], 1.0); // is_clf
+}
+
+#[test]
+#[should_panic(expected = "non-finite value")]
+fn max_abs_diff_f64_rejects_one_sided_nan() {
+    let _ = max_abs_diff_f64(&[0.0, f64::NAN], &[0.0, 1.0], "nan_check");
+}
+
+#[test]
+#[should_panic(expected = "non-finite value")]
+fn max_abs_diff_f32_rejects_one_sided_nan() {
+    let _ = max_abs_diff_f32(&[0.0, f32::NAN], &[0.0, 1.0], "nan_check32");
 }
