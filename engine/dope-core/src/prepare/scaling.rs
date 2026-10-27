@@ -341,6 +341,11 @@ pub struct PreparedTable {
     /// Cached static `TableDescriptors` for [`Level::High`] so progressive updates
     /// never rescan or sort training columns.
     pub high_table_descriptors: TableDescriptors,
+    /// Optional SHA-256 of the raw string cells + target values when constructed via
+    /// [`prepare_table_cells`], [`prepare_table_cells_with_ids`], or [`prepare_table_mixed`].
+    pub raw_cells_sha256: Option<[u8; 32]>,
+    /// Optional caller-supplied source digest override returned by [`PreparedTable::source_rows_digest`].
+    pub source_digest_override: Option<String>,
 }
 
 fn validate_row_ids(row_ids: &[u64], rows: usize) -> Result<()> {
@@ -561,6 +566,19 @@ impl PreparedTable {
         Ok(self)
     }
 
+    /// Override the digest returned by [`PreparedTable::source_rows_digest`] with an
+    /// explicit caller-computed source digest (builder pattern).
+    pub fn with_source_digest(mut self, digest: impl Into<String>) -> Self {
+        self.set_source_digest(digest);
+        self
+    }
+
+    /// Mutably set an explicit caller-computed source digest override.
+    pub fn set_source_digest(&mut self, digest: impl Into<String>) {
+        let d = digest.into();
+        self.source_digest_override = if d.is_empty() { None } else { Some(d) };
+    }
+
     /// Native [`crate::target::Head`] corresponding to this prepared table.
     pub fn head(&self) -> crate::target::Head {
         match self.task {
@@ -596,9 +614,20 @@ impl PreparedTable {
         )
     }
 
-    /// Deterministic SHA-256 hex digest binding task, shape, classes, physical `row_ids`,
-    /// per-column categories, and both scaled and raw/frame table contents.
+    /// Returns the explicit `source_digest_override` if set via [`PreparedTable::with_source_digest`],
+    /// otherwise computes a deterministic SHA-256 hex digest binding task, shape, classes,
+    /// physical `row_ids`, per-column kinds/categories/vocabularies, target label metadata,
+    /// raw cells (when present), and both scaled and raw/frame table contents.
     pub fn source_rows_digest(&self) -> String {
+        if let Some(ref d) = self.source_digest_override {
+            return d.clone();
+        }
+        self.computed_source_rows_digest()
+    }
+
+    /// Deterministic SHA-256 hex digest over all prepared table identity fields (ignoring
+    /// `source_digest_override`).
+    pub fn computed_source_rows_digest(&self) -> String {
         let mut h = Sha256::new();
         h.update(b"dope.prepared-table/v1\0");
         h.update(self.task.as_str().as_bytes());
@@ -611,6 +640,58 @@ impl PreparedTable {
         }
         for &c in &self.categories {
             h.update(c.map_or(u64::MAX, |k| k as u64).to_le_bytes());
+        }
+        for &k in &self.transform.kinds {
+            h.update([match k {
+                ColumnKind::Numeric => 0u8,
+                ColumnKind::Categorical => 1u8,
+            }]);
+        }
+        match &self.category_tokens {
+            None => h.update([0u8]),
+            Some(cols) => {
+                h.update([1u8]);
+                h.update((cols.len() as u64).to_le_bytes());
+                for col in cols {
+                    h.update((col.len() as u64).to_le_bytes());
+                    for tok in col {
+                        h.update((tok.len() as u64).to_le_bytes());
+                        h.update(tok.as_bytes());
+                    }
+                }
+            }
+        }
+        for opt_ce in &self.transform.categorical {
+            match opt_ce {
+                None => h.update([0u8]),
+                Some(ce) => {
+                    h.update([1u8]);
+                    h.update((ce.vocab_tokens.len() as u64).to_le_bytes());
+                    for tok in &ce.vocab_tokens {
+                        h.update((tok.len() as u64).to_le_bytes());
+                        h.update(tok.as_bytes());
+                    }
+                }
+            }
+        }
+        match &self.transform.target.positive_label {
+            None => h.update([0u8]),
+            Some(pos) => {
+                h.update([1u8]);
+                h.update((pos.len() as u64).to_le_bytes());
+                h.update(pos.as_bytes());
+            }
+        }
+        h.update((self.transform.target.class_labels.len() as u64).to_le_bytes());
+        for &lbl in &self.transform.target.class_labels {
+            h.update(canonical_f64_bits(lbl).to_le_bytes());
+        }
+        match &self.raw_cells_sha256 {
+            None => h.update([0u8]),
+            Some(raw) => {
+                h.update([1u8]);
+                h.update(raw);
+            }
         }
         for &v in self
             .x_scaled
@@ -711,6 +792,8 @@ pub fn prepare_table_with_ids(
         target_stats,
         observed_target_stats,
         high_table_descriptors,
+        raw_cells_sha256: None,
+        source_digest_override: None,
     })
 }
 
@@ -719,6 +802,34 @@ pub fn prepare_table_with_ids(
 pub fn prepare_table(x: &[Vec<f64>], y: &[f64], task: PrepTask) -> Result<PreparedTable> {
     let row_ids = (0..x.len() as u64).collect();
     prepare_table_with_ids(x, y, task, row_ids)
+}
+
+fn hash_raw_cells(x: &[Vec<String>], yv: &[TargetValue<'_>]) -> [u8; 32] {
+    let mut h = Sha256::new();
+    h.update(b"dope.prepared-cells/v1\0");
+    h.update((x.len() as u64).to_le_bytes());
+    for row in x {
+        h.update((row.len() as u64).to_le_bytes());
+        for cell in row {
+            h.update((cell.len() as u64).to_le_bytes());
+            h.update(cell.as_bytes());
+        }
+    }
+    h.update((yv.len() as u64).to_le_bytes());
+    for v in yv {
+        match v {
+            TargetValue::Num(f) => {
+                h.update([0u8]);
+                h.update(canonical_f64_bits(*f).to_le_bytes());
+            }
+            TargetValue::Str(s) => {
+                h.update([1u8]);
+                h.update((s.len() as u64).to_le_bytes());
+                h.update(s.as_bytes());
+            }
+        }
+    }
+    h.finalize().into()
 }
 
 fn prepare_cells_with_yv(
@@ -737,6 +848,7 @@ fn prepare_cells_with_yv(
         return Err(err("prepare_target_length_mismatch"));
     }
     validate_row_ids(&row_ids, n)?;
+    let raw_cells_sha256 = Some(hash_raw_cells(x, yv));
     let min_level_count = 5usize;
     let prior_smoothing = 10.0f64;
     let kinds = match declared_kinds {
@@ -855,6 +967,8 @@ fn prepare_cells_with_yv(
         target_stats,
         observed_target_stats,
         high_table_descriptors,
+        raw_cells_sha256,
+        source_digest_override: None,
     })
 }
 

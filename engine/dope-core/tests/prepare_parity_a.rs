@@ -407,3 +407,106 @@ fn max_abs_diff_f64_rejects_one_sided_nan() {
 fn max_abs_diff_f32_rejects_one_sided_nan() {
     let _ = max_abs_diff_f32(&[0.0, f32::NAN], &[0.0, 1.0], "nan_check32");
 }
+
+#[test]
+fn source_rows_digest_binds_category_tokens_target_labels_and_override() {
+    let x_a: Vec<Vec<String>> = (0..24)
+        .map(|i| {
+            vec![
+                if i % 2 == 0 {
+                    "alpha".into()
+                } else {
+                    "beta".into()
+                },
+                format!("{}", i as f64),
+            ]
+        })
+        .collect();
+    let x_b: Vec<Vec<String>> = (0..24)
+        .map(|i| {
+            vec![
+                if i % 2 == 0 {
+                    "gamma".into()
+                } else {
+                    "delta".into()
+                },
+                format!("{}", i as f64),
+            ]
+        })
+        .collect();
+    let y_yes: Vec<String> = (0..24)
+        .map(|i| {
+            if i % 2 == 0 {
+                "yes".into()
+            } else {
+                "no".into()
+            }
+        })
+        .collect();
+    let y_pos: Vec<String> = (0..24)
+        .map(|i| {
+            if i % 2 == 0 {
+                "pos".into()
+            } else {
+                "neg".into()
+            }
+        })
+        .collect();
+
+    let t_a = prepare_table_cells(&x_a, &y_yes, PrepTask::Classification).unwrap();
+    let t_b = prepare_table_cells(&x_b, &y_yes, PrepTask::Classification).unwrap();
+    let t_pos = prepare_table_cells(&x_a, &y_pos, PrepTask::Classification).unwrap();
+    assert_ne!(
+        t_a.source_rows_digest(),
+        t_b.source_rows_digest(),
+        "renaming categorical tokens must change source_rows_digest"
+    );
+    assert_ne!(
+        t_a.source_rows_digest(),
+        t_pos.source_rows_digest(),
+        "renaming target positive_label must change source_rows_digest"
+    );
+
+    // Multiclass class_labels vocabulary difference with identical scaled codes 0..3.
+    let x_num: Vec<Vec<f64>> = (0..24).map(|i| vec![i as f64, (i % 4) as f64]).collect();
+    let y_mc1: Vec<f64> = (0..24).map(|i| (i % 3) as f64).collect();
+    let y_mc2: Vec<f64> = (0..24).map(|i| ((i % 3) * 10 + 10) as f64).collect();
+    let mc1 = prepare_table(&x_num, &y_mc1, PrepTask::Multiclass).unwrap();
+    let mc2 = prepare_table(&x_num, &y_mc2, PrepTask::Multiclass).unwrap();
+    assert_eq!(mc1.y_scaled, mc2.y_scaled);
+    assert_ne!(
+        mc1.source_rows_digest(),
+        mc2.source_rows_digest(),
+        "different multiclass class_labels must change source_rows_digest"
+    );
+
+    // Explicit with_category_tokens token renaming with same cardinality.
+    let c1 = mc1
+        .clone()
+        .with_category_tokens(vec![
+            Vec::new(),
+            vec!["u".into(), "v".into(), "w".into(), "z".into()],
+        ])
+        .unwrap();
+    let c2 = mc1
+        .clone()
+        .with_category_tokens(vec![
+            Vec::new(),
+            vec!["p".into(), "q".into(), "r".into(), "s".into()],
+        ])
+        .unwrap();
+    assert_ne!(
+        c1.source_rows_digest(),
+        c2.source_rows_digest(),
+        "renaming category_tokens must change source_rows_digest"
+    );
+
+    // Explicit source_digest override.
+    let computed = t_a.computed_source_rows_digest();
+    let overridden = t_a.with_source_digest("explicit-source-sha256-1234");
+    assert_eq!(
+        overridden.source_rows_digest(),
+        "explicit-source-sha256-1234"
+    );
+    assert_eq!(overridden.computed_source_rows_digest(), computed);
+}
