@@ -14,7 +14,15 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629) ;; *) exit 2;; esac
+    if [[ "$2" == test_encoder_629 ]]; then
+      mkdir -p target/encoder-629
+      export DOPE_ENCODER_WEIGHTS="$PWD/target/encoder-629/dope_mlc_v3_multitask_best.safetensors"
+      curl --fail --location --silent --show-error --max-time 60 \
+        https://github.com/neverhuman/dope/releases/download/v1.0.0/dope_mlc_v3_multitask_best.safetensors \
+        --output "$DOPE_ENCODER_WEIGHTS"
+      printf '%s  %s\n' d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c "$DOPE_ENCODER_WEIGHTS" | sha256sum --check -
+    fi
     "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest "research.levels.tests.$2" -v
     ;;
   prepare-native)
@@ -54,6 +62,7 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh torch test_precalc
     bash ops/ci/shared-levels.sh torch test_observed_landmarks
     bash ops/ci/shared-levels.sh torch test_landmark_views
+    bash ops/ci/shared-levels.sh torch test_encoder_629
     bash ops/ci/shared-levels.sh native
     ;;
   *) echo 'Usage: shared-levels.sh contracts|prepare-torch|torch SHARD|prepare-native|native|all' >&2;exit 2;;

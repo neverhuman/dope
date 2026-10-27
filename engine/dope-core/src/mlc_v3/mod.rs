@@ -13,7 +13,7 @@ pub mod wire;
 
 pub use nets::{
     ConditionalHyperTargetNet, CovariateRefinementNet, MlcV3ForwardCheckInput,
-    MlcV3ForwardCheckOutput,
+    MlcV3ForwardCheckOutput, MLC_V3_FEATURES_629_DIM, MLC_V3_GATE_KEYS_14,
 };
 pub use sample::{
     build_enriched_basis, sample_synthetic_table, sample_synthetic_table_with_draws,
