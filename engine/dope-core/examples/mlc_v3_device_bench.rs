@@ -93,6 +93,16 @@ fn main() -> Res<()> {
     report["cold"]["load_cpu_us"] = (t.elapsed().as_secs_f64() * 1e6).into();
     let (d1, c1) = inputs(1);
     let cols: Vec<Vec<f32>> = c1.chunks(17).map(<[f32]>::to_vec).collect();
+    // A tiny matmul before the model: separates candle's one-time CPU setup from model work.
+    let t = Instant::now();
+    let m = Tensor::ones((8, 8), candle_core::DType::F32, &Device::Cpu)?;
+    m.matmul(&m)?.to_vec2::<f32>()?;
+    report["cold"]["first_cpu_matmul8_us"] = (t.elapsed().as_secs_f64() * 1e6).into();
+    for key in ["first_cpu_forward_us", "second_cpu_forward_us"] {
+        let t = Instant::now();
+        cpu.encode_features_629(&d1, &cols, "high")?;
+        report["cold"][key] = (t.elapsed().as_secs_f64() * 1e6).into();
+    }
     report["cpu"] = device_report(&cpu, &Device::Cpu, reps)?;
     report["cpu"]["b1_host_api"] = time(reps, || {
         cpu.encode_features_629(&d1, &cols, "high")?;

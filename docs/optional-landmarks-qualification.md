@@ -7,6 +7,10 @@ Rust 1.88.0, numpy 1.26.4. All numbers below come from the evidence files in
 `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`. This page records measurements only. It
 authorizes no default change, and N=300 stays the progressive default.
 
+**Status: pre-training baseline.** The binding mission addendum requires a landmark-dropout-trained encoder.
+Everything below measures the released pin as it is, and is the baseline that a mask-trained candidate will be
+compared against with the same harness and the same masks.
+
 ## 1. Full-path byte identity
 
 `dope landmarks real --json` ran over 285 tables. All runs used `work_budget` 2e12; every other option was left at its default.
@@ -48,7 +52,7 @@ On every Rust change the effective-conditioning digest was also unchanged on rea
 | zero (`none`) | 110 | 0.983 | 0.940–1.028 | 0.608 / 0.655 |
 | macro | 110 | 1.005 | 0.980–1.031 | 0.640 / 0.655 |
 | macro + larger | 110 | 1.001 | 0.973–1.031 | 0.653 / 0.655 |
-| full at the legacy 2e9 budget | 109 | 1.007 | 0.989–1.029 | 0.653 / 0.655 |
+| full at the former default 2e9 budget | 109 | 1.007 | 0.989–1.029 | 0.653 / 0.655 |
 | N=100 | 106 | 1.004 | 0.985–1.024 | 0.668 / 0.651 |
 | N=300 | 107 | 1.002 | 0.989–1.016 | 0.653 / 0.651 |
 | N=1000 | 109 | 1.000 | 0.999–1.000 | 0.655 / 0.655 |
@@ -71,8 +75,26 @@ On every Rust change the effective-conditioning digest was also unchanged on rea
 
 Nineteen tables have full R ≤ 0. Excluding them, zero comes to 0.983 (0.938–1.027) on 91 tables.
 
+**By task.** The pooled zero-landmark ratio is carried by the high-R multiclass tables:
+
+| task | tables | zero vs full | 95% CI | macro vs full |
+|---|---|---|---|---|
+| regression | 41 | 0.913 | 0.793–1.017 | 1.007 |
+| binary | 17 | 0.923 | 0.797–1.048 | 1.048 |
+| multiclass | 52 | 1.026 | 0.986–1.081 | 0.995 |
+
+**Random partial masks.** These keep each observed High cell with probability 0.25 (sparse) or 0.75 (dense), seeded per table so a candidate sees the same masks. They are worse than the structured MACRO group on regression:
+
+| task | random sparse | random dense |
+|---|---|---|
+| regression | 0.941 (0.839–1.030) | 0.946 (0.854–1.024) |
+| binary | 0.982 (0.892–1.085) | 1.027 (0.934–1.132) |
+| multiclass | 1.014 (0.972–1.068) | 1.012 (0.966–1.070) |
+
 **Against the targets:**
-- Zero-landmark loss is 1.7% at the point estimate. That is within the 8% and 5% targets, but the CI does not exclude a loss above 5%.
+- Pooled, zero-landmark loss is 1.7% at the point estimate, and the CI does not exclude a loss above 5%.
+- On regression the loss is 8.7% (binary 7.7%). That is outside the 5% target on both, and outside the 8% target on regression.
+- The MACRO group alone restores both to full.
 - N=300 keeps at least 95% of full retention.
 - N=100 is the smallest tested size that meets 95%.
 
@@ -92,13 +114,39 @@ Subsampling changes the landmark ranking well beyond CV noise, even where downst
 
 ## 4. Level-High dependency
 
-The legacy High builder was run on 24 native reports, raising each cell by 0.05 or dropping it. The FINE cells (gbdt, knn1, knn16, net, gbdt_quarter) changed no coordinate of `vec256` or of the 64×17 column input. Every MACRO and LARGER cell, and the spectrum, did change them.
+The full-report High builder was run on 24 native reports, raising each cell by 0.05 or dropping it. The FINE cells (gbdt, knn1, knn16, net, gbdt_quarter) changed no coordinate of `vec256` or of the 64×17 column input. Every MACRO and LARGER cell, and the spectrum, did change them.
 
 FINE costs 43–78% of single-thread native time on 10k×64 tables. It sits on the critical path of the final High encoding only because the spectrum is computed after the whole panel.
 
 ## 5. Latency
 
-These measurements are provisional; the matched cold public-call matrix is pending.
+**Cold public calls** ([`latency-public-cold.json`](evidence/optional-landmarks/latency-public-cold.json)): fresh
+`dope mlc-v3 encode` processes at Dope head `82cea8c4`, with:
+
+- `--threads 8`, pinned to cores 64–71, under the shared qualification lock;
+- work_budget 2e12;
+- 15 repetitions, or 5 where a cold full call takes over 3 s.
+
+Values are p50 wall times in seconds, fast (`none`) / full.
+
+| cell | CUDA fast / full | ratio | CPU fast / full | ratio |
+|---|---|---|---|---|
+| real fixtures (≤1k fit rows) | 0.55–0.60 / 0.62–0.77 | 1.1–1.3× | 0.21–0.42 / 0.25–0.60 | 1.2–2.0× |
+| regression 1k × 10/64/200 | not measured | — | 0.27–0.74 / 0.67–2.09 | 2.5–2.9× |
+| regression 10k × 10/64 | not measured | — | 0.37 / 2.06 and 1.03 / 6.25 | 5.6×, 6.1× |
+| regression 10k × 200 | 2.89 / 12.0 | 4.2× | 2.67 / 12.4 | 4.6× |
+| regression 50k × 10/64/200 | 1.19 / 3.58 to 11.9 / 28.5 | 2.4–3.3× | 0.85 / 2.68 to 11.8 / 30.4 | 2.6–3.1× |
+| binary 1k / 10k / 50k × 64 | 0.70 / 1.42, 1.39 / 6.73, 5.59 / 12.5 | 2.0×, 4.9×, 2.2× | 0.32 / 1.10, 0.99 / 5.90, 5.21 / 11.1 | 3.4×, 6.0×, 2.1× |
+| multiclass 1k / 10k / 50k × 64 | not measured | — | 0.27 / 1.65, 0.87 / 8.91, 5.40 / 16.0 | 6.0×, 10.3×, 3.0× |
+
+**Against the target.** Every measured synthetic cold CUDA cell fails the per-cell ≥5× fast-versus-full target (7 of 7; descriptive geomean 3.0×). The quarantined and not-yet-run cells are listed in the evidence file.
+
+**Why it fails:**
+- A cold CUDA call has a floor of about 0.55–0.60 s: process and CUDA library start (about 0.26 s) plus context and first forward.
+- On large tables, fast mode is dominated by `prepare_table_cells` (about 4 s at 50k × 64 on this head).
+- Genuine full evidence at 8 threads is bounded by the native row caps, so it grows slowly with n.
+
+The `[Gemini]` H1 phase-2 preparation work (`551575e5`) targets the second cause; this matrix predates it.
 
 **Device study** (`examples/mlc_v3_device_bench.rs`, warm, p50):
 
@@ -115,12 +163,11 @@ These measurements are provisional; the matched cold public-call matrix is pendi
 |---|---|
 | CUDA context | 0.40 s |
 | first CUDA forward | 0.27 s |
-| first CPU forward | 0.11 s |
+| first CPU op (any size; candle one-time setup) | 0.085 s |
+| CUDA-build process start (shared CUDA libraries) | 0.12 s |
 | checkpoint SHA-256 | 0.9 ms |
 
 **Stage-timed resident encode** (`examples/landmark_mode_bench.rs`, one thread):
 - At 10k×64, `prepare_table_cells` takes 0.5–0.7 s and conditioning plus forward under 1 ms.
 - Genuine full landmarks at 2e12 take 25 s, so fast versus full is 38×.
 - At 1k×19 the ratio is 123×.
-
-The matched public-call matrix (real fixtures plus synthetic 1k/10k/50k; CPU and CUDA; p50/p95; reserved window) will be added to this file.
