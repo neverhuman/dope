@@ -1,6 +1,8 @@
+use dope_core::prepare::scaling::TargetValue;
 use dope_core::prepare::{
     compute_table_descriptors, extract_report_descriptors, prepare_table, prepare_table_cells,
-    prepare_table_cells_with_ids, prepare_table_mixed, prepare_table_with_ids, ColumnKind, Level,
+    prepare_table_cells_with_ids, prepare_table_lossless, prepare_table_mixed,
+    prepare_table_with_ids, prepare_table_with_policy, ClassVocabPolicy, ColumnKind, Level,
     NativeReportView, PrepTask, ShapeOverride,
 };
 use safetensors::tensor::Dtype;
@@ -413,11 +415,7 @@ fn source_rows_digest_binds_category_tokens_target_labels_and_override() {
     let x_a: Vec<Vec<String>> = (0..24)
         .map(|i| {
             vec![
-                if i % 2 == 0 {
-                    "alpha".into()
-                } else {
-                    "beta".into()
-                },
+                if i % 2 == 0 { "alpha" } else { "beta" }.into(),
                 format!("{}", i as f64),
             ]
         })
@@ -425,62 +423,32 @@ fn source_rows_digest_binds_category_tokens_target_labels_and_override() {
     let x_b: Vec<Vec<String>> = (0..24)
         .map(|i| {
             vec![
-                if i % 2 == 0 {
-                    "gamma".into()
-                } else {
-                    "delta".into()
-                },
+                if i % 2 == 0 { "gamma" } else { "delta" }.into(),
                 format!("{}", i as f64),
             ]
         })
         .collect();
     let y_yes: Vec<String> = (0..24)
-        .map(|i| {
-            if i % 2 == 0 {
-                "yes".into()
-            } else {
-                "no".into()
-            }
-        })
+        .map(|i| if i % 2 == 0 { "yes" } else { "no" }.into())
         .collect();
     let y_pos: Vec<String> = (0..24)
-        .map(|i| {
-            if i % 2 == 0 {
-                "pos".into()
-            } else {
-                "neg".into()
-            }
-        })
+        .map(|i| if i % 2 == 0 { "pos" } else { "neg" }.into())
         .collect();
 
     let t_a = prepare_table_cells(&x_a, &y_yes, PrepTask::Classification).unwrap();
     let t_b = prepare_table_cells(&x_b, &y_yes, PrepTask::Classification).unwrap();
     let t_pos = prepare_table_cells(&x_a, &y_pos, PrepTask::Classification).unwrap();
-    assert_ne!(
-        t_a.source_rows_digest(),
-        t_b.source_rows_digest(),
-        "renaming categorical tokens must change source_rows_digest"
-    );
-    assert_ne!(
-        t_a.source_rows_digest(),
-        t_pos.source_rows_digest(),
-        "renaming target positive_label must change source_rows_digest"
-    );
+    assert_ne!(t_a.source_rows_digest(), t_b.source_rows_digest());
+    assert_ne!(t_a.source_rows_digest(), t_pos.source_rows_digest());
 
-    // Multiclass class_labels vocabulary difference with identical scaled codes 0..3.
     let x_num: Vec<Vec<f64>> = (0..24).map(|i| vec![i as f64, (i % 4) as f64]).collect();
     let y_mc1: Vec<f64> = (0..24).map(|i| (i % 3) as f64).collect();
     let y_mc2: Vec<f64> = (0..24).map(|i| ((i % 3) * 10 + 10) as f64).collect();
     let mc1 = prepare_table(&x_num, &y_mc1, PrepTask::Multiclass).unwrap();
     let mc2 = prepare_table(&x_num, &y_mc2, PrepTask::Multiclass).unwrap();
     assert_eq!(mc1.y_scaled, mc2.y_scaled);
-    assert_ne!(
-        mc1.source_rows_digest(),
-        mc2.source_rows_digest(),
-        "different multiclass class_labels must change source_rows_digest"
-    );
+    assert_ne!(mc1.source_rows_digest(), mc2.source_rows_digest());
 
-    // Explicit with_category_tokens token renaming with same cardinality.
     let c1 = mc1
         .clone()
         .with_category_tokens(vec![
@@ -495,13 +463,8 @@ fn source_rows_digest_binds_category_tokens_target_labels_and_override() {
             vec!["p".into(), "q".into(), "r".into(), "s".into()],
         ])
         .unwrap();
-    assert_ne!(
-        c1.source_rows_digest(),
-        c2.source_rows_digest(),
-        "renaming category_tokens must change source_rows_digest"
-    );
+    assert_ne!(c1.source_rows_digest(), c2.source_rows_digest());
 
-    // Explicit source_digest override.
     let computed = t_a.computed_source_rows_digest();
     let overridden = t_a.with_source_digest("explicit-source-sha256-1234");
     assert_eq!(
@@ -509,4 +472,82 @@ fn source_rows_digest_binds_category_tokens_target_labels_and_override() {
         "explicit-source-sha256-1234"
     );
     assert_eq!(overridden.computed_source_rows_digest(), computed);
+}
+
+#[test]
+fn multiclass_lossless_k3_k32_k36_and_cap32_lineage_preserved() {
+    for k_classes in [3usize, 32, 36] {
+        let n = k_classes * 4;
+        let x: Vec<Vec<f64>> = (0..n)
+            .map(|i| vec![(i as f64) * 0.1, ((i % 7) as f64) - 3.0])
+            .collect();
+        let vocab: Vec<f64> = (0..k_classes).map(|c| (c as f64) * 0.5 - 5.0).collect();
+        let y: Vec<f64> = (0..n).map(|i| vocab[i / 4]).collect();
+
+        let cap_tbl = prepare_table(&x, &y, PrepTask::Multiclass).unwrap();
+        let loss_tbl = prepare_table_lossless(&x, &y, PrepTask::Multiclass).unwrap();
+        assert_eq!(
+            cap_tbl.transform.class_vocab_policy,
+            ClassVocabPolicy::Cap32V1
+        );
+        assert_eq!(
+            loss_tbl.transform.class_vocab_policy,
+            ClassVocabPolicy::LosslessV1
+        );
+        assert_ne!(cap_tbl.source_rows_digest(), loss_tbl.source_rows_digest());
+
+        if k_classes <= 32 {
+            assert_eq!(cap_tbl.classes, k_classes);
+            assert_eq!(cap_tbl.y_scaled, loss_tbl.y_scaled);
+        } else {
+            assert_eq!(cap_tbl.classes, 32);
+        }
+        assert_eq!(loss_tbl.classes, k_classes);
+        assert_eq!(loss_tbl.transform.target.class_labels, vocab);
+        for (i, &code) in loss_tbl.y_scaled.iter().enumerate() {
+            assert_eq!(code, (i / 4) as f64);
+        }
+        assert_eq!(
+            loss_tbl
+                .transform
+                .target
+                .inverse_transform(&loss_tbl.y_scaled),
+            y
+        );
+        let ts = loss_tbl
+            .observed_target_stats
+            .expect("multiclass target_stats");
+        assert!((ts[0] - 1.0).abs() <= 1e-12);
+        assert!((ts[1] - 1.0 / (k_classes as f64)).abs() <= 1e-12);
+
+        // Permuted label values preserve target_stats exactly; strict transform rejects unseen labels
+        let y_perm: Vec<f64> = (0..n).map(|i| vocab[(k_classes - 1) - (i / 4)]).collect();
+        let perm_tbl = prepare_table_with_policy(
+            &x,
+            &y_perm,
+            PrepTask::Multiclass,
+            (0..n as u64).collect(),
+            ClassVocabPolicy::LosslessV1,
+        )
+        .unwrap();
+        assert_eq!(
+            perm_tbl.observed_target_stats,
+            loss_tbl.observed_target_stats
+        );
+        assert!(loss_tbl
+            .transform
+            .target
+            .transform_strict(&[TargetValue::Num(vocab[0])])
+            .is_ok());
+        assert!(loss_tbl
+            .transform
+            .target
+            .transform_strict(&[TargetValue::Num(999.0)])
+            .is_err());
+        assert!(loss_tbl
+            .transform
+            .target
+            .transform_strict(&[TargetValue::Num(f64::NAN)])
+            .is_err());
+    }
 }

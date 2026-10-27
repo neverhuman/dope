@@ -419,7 +419,7 @@ def table_classes(y: np.ndarray, task: str) -> int:
         return 0
     if task in ("classification", "binary"):
         return 2
-    return int(len(np.unique(np.rint(np.asarray(y, dtype=np.float64).reshape(-1)))))
+    return int(len(np.unique(np.round(np.asarray(y, dtype=np.float64).reshape(-1), 6))))
 
 
 def table_target_stats(y: Any, task: str) -> List[Optional[float]]:
@@ -444,13 +444,18 @@ def table_target_stats(y: Any, task: str) -> List[Optional[float]]:
         if v <= 1e-24:
             return [None, None, None]
         return [float(np.sum(d ** 3) / n / v ** 1.5), float(np.sum(d ** 4) / n / v ** 2 - 3.0), None]
-    labels = np.rint(arr).astype(np.int64)
-    classes = [0, 1] if task in ("classification", "binary") else sorted(set(int(v) for v in labels))
+    if task in ("classification", "binary"):
+        labels = np.rint(arr).astype(np.int64)
+        classes = [0, 1]
+    else:
+        labels = np.round(arr, 6)
+        classes = sorted(set(float(v) for v in labels))
     slot = {c: i for i, c in enumerate(classes)}
     counts = np.zeros(len(classes), dtype=np.float64)
     for lab in labels:  # accumulate 1/rows like the native loop
-        if int(lab) in slot:
-            counts[slot[int(lab)]] += 1.0 / n
+        key = int(lab) if task in ("classification", "binary") else float(lab)
+        if key in slot:
+            counts[slot[key]] += 1.0 / n
     if counts.size < 2:
         return [None, None, None]
     pos = counts[counts > 0.0]

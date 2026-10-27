@@ -306,7 +306,7 @@ def observed_target_stats(
 ) -> List[Optional[float]]:
     if target_stats is not None:
         return (list(target_stats) + [None, None, None])[:3]
-    if y_raw is not None:
+    if y_raw is not None and task == "regression":
         return table_target_stats(y_raw, task)
     if task == "regression":
         return [None, None, None]

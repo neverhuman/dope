@@ -146,10 +146,17 @@ class TargetScaler:
     class_labels: Tuple[float, ...] = ()
     class_priors: Tuple[float, ...] = ()
 
-    def transform(self, y: Sequence[Any]) -> np.ndarray:
+    def transform(self, y: Sequence[Any], *, strict_unknown: bool = False) -> np.ndarray:
         if self.task == "multiclass" and self.class_labels:
             labels = np.asarray(self.class_labels, dtype=np.float64)
             arr = np.array([_parse_float(v) for v in y], dtype=np.float64)
+            if strict_unknown:
+                if not np.all(np.isfinite(arr)):
+                    raise ValueError("unknown_multiclass_label")
+                dists = np.abs(np.round(arr, 6)[:, None] - labels[None, :])
+                if np.any(np.min(dists, axis=1) > 1e-6):
+                    raise ValueError("unknown_multiclass_label")
+                return np.argmin(dists, axis=1).astype(np.float64)
             arr = np.nan_to_num(arr, nan=float(labels[0]))
             idx = np.argmin(np.abs(arr[:, None] - labels[None, :]), axis=1)
             return idx.astype(np.float64)
@@ -189,6 +196,7 @@ class FitOnlyTableTransform:
     target_scaler: Optional[TargetScaler] = None
     min_level_count: int = 5
     prior_smoothing: float = 10.0
+    max_multiclass_classes: Optional[int] = 32
 
     @classmethod
     def fit(
@@ -200,6 +208,7 @@ class FitOnlyTableTransform:
         task: str = "regression",
         min_level_count: int = 5,
         prior_smoothing: float = 10.0,
+        max_multiclass_classes: Optional[int] = 32,
     ) -> "FitOnlyTableTransform":
         if isinstance(X_train, np.ndarray) and X_train.dtype.kind in ("f", "i", "u"):
             arr = np.asarray(X_train, dtype=np.float64)
@@ -209,9 +218,10 @@ class FitOnlyTableTransform:
             if len(inferred) != p:
                 raise ValueError("scaling_feature_kinds_length_mismatch")
             if all(k == "numeric" for k in inferred):
-                target_scaler = _fit_target_scaler(y_train, task=task)
+                target_scaler = _fit_target_scaler(y_train, task=task, max_multiclass_classes=max_multiclass_classes)
                 inst = cls(task=task, kinds=inferred, min_level_count=min_level_count,
-                           prior_smoothing=prior_smoothing, target_scaler=target_scaler)
+                           prior_smoothing=prior_smoothing, target_scaler=target_scaler,
+                           max_multiclass_classes=max_multiclass_classes)
                 for j in range(p):
                     inst.numeric_scalers[j] = _fit_numeric_column(j, f"f_{j:03d}", arr[:, j])
                 return inst
@@ -221,11 +231,12 @@ class FitOnlyTableTransform:
         if len(inferred) != p:
             raise ValueError("scaling_feature_kinds_length_mismatch")
 
-        target_scaler = _fit_target_scaler(y_train, task=task)
+        target_scaler = _fit_target_scaler(y_train, task=task, max_multiclass_classes=max_multiclass_classes)
         y_num = target_scaler.transform(y_train)
         y_global_mean = float(np.mean(y_num)) if y_num.size > 0 else 0.0
         inst = cls(task=task, kinds=inferred, min_level_count=min_level_count,
-                   prior_smoothing=prior_smoothing, target_scaler=target_scaler)
+                   prior_smoothing=prior_smoothing, target_scaler=target_scaler,
+                   max_multiclass_classes=max_multiclass_classes)
         for j, kind in enumerate(inferred):
             anon = f"f_{j:03d}"
             if kind == "numeric":
@@ -277,16 +288,17 @@ class FitOnlyTableTransform:
             return np.zeros((n, 0), dtype=np.float64)
         return np.column_stack(cols_out + miss_out if include_missing_indicators else cols_out).astype(np.float64)
 
-    def transform_target(self, y: Sequence[Any]) -> np.ndarray:
+    def transform_target(self, y: Sequence[Any], *, strict_unknown: bool = False) -> np.ndarray:
         if self.target_scaler is None:
             raise ValueError("scaling_target_not_fitted")
-        return self.target_scaler.transform(y)
+        return self.target_scaler.transform(y, strict_unknown=strict_unknown)
 
     def transform(
-        self, X: Any, y: Optional[Sequence[Any]] = None, *, include_missing_indicators: bool = False
+        self, X: Any, y: Optional[Sequence[Any]] = None, *,
+        include_missing_indicators: bool = False, strict_unknown: bool = False,
     ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         X_scaled = self.transform_features(X, include_missing_indicators=include_missing_indicators)
-        y_scaled = self.transform_target(y) if y is not None else None
+        y_scaled = self.transform_target(y, strict_unknown=strict_unknown) if y is not None else None
         return X_scaled, y_scaled
 
     def inverse_transform(
@@ -438,15 +450,17 @@ def _fit_categorical_column(
     )
 
 
-def _fit_target_scaler(y: Sequence[Any], *, task: str) -> TargetScaler:
+def _fit_target_scaler(
+    y: Sequence[Any], *, task: str, max_multiclass_classes: Optional[int] = 32
+) -> TargetScaler:
     if task == "multiclass":
         raw = np.array([_parse_float(v) for v in y], dtype=np.float64)
         finite = raw[np.isfinite(raw)]
         if finite.size == 0:
             return TargetScaler("multiclass", 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, None, 0.5, (0.0, 0.5, 1.0), (0.34, 0.33, 0.33))
         u_vals, u_counts = np.unique(np.round(finite, 6), return_counts=True)
-        if u_vals.size > 32:
-            order = np.argsort(u_counts)[::-1][:32]
+        if max_multiclass_classes is not None and u_vals.size > max_multiclass_classes:
+            order = np.argsort(u_counts)[::-1][:max_multiclass_classes]
             u_vals = np.sort(u_vals[order])
             u_counts = np.array([np.sum(np.abs(finite - v) <= 1e-5) for v in u_vals], dtype=np.float64)
         priors = u_counts.astype(np.float64) / max(float(np.sum(u_counts)), 1.0)
