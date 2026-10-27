@@ -42,6 +42,7 @@ pub mod marginal;
 pub mod mlc_v3;
 pub mod noise;
 pub mod output;
+pub mod prepare;
 pub mod program;
 pub mod quant;
 pub mod regimes;
