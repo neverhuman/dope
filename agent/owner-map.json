@@ -45,6 +45,7 @@
     "docs/governance/PYTHON_EXCEPTIONS.md": "governance",
     "docs/governance/PY_TO_RUST_PLAN.md": "governance",
     "HISTORY.md": "governance",
+    "docs/jopedime-integration.md": "governance",
     "docs/install.md": "release-lead",
     "docs/internal/": "governance",
     "docs/internal/PYTHON_EXCEPTIONS.md": "governance",

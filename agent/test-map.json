@@ -184,6 +184,10 @@
       "command": "cargo test --locked --test vnext_dope_install",
       "purpose": "verify facade executable/build identity, real installed artifact-only 100-row workflow, pinned legal inputs, no-overwrite installation and fixed-owned-member uninstall/refusal preservation"
     },
+    "docs/jopedime-integration.md": {
+      "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
+      "purpose": "verify the pinned encoder contract, Micro parity, CPU export, downstream composition and CUDA replay documented by the integration guide"
+    },
     "docs/internal/": {
       "command": "just score",
       "purpose": "internal planning records kept for provenance"
