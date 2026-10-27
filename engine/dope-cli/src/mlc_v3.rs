@@ -323,12 +323,15 @@ fn fetch_one_asset(
     }))
 }
 
-fn print_json<T: serde::Serialize>(v: &T) -> Result<(), String> {
-    println!(
-        "{}",
-        serde_json::to_string_pretty(v).map_err(|e| e.to_string())?
-    );
-    Ok(())
+/// Pretty-prints any `Serialize` value as the CLI always has (field order kept).
+macro_rules! print_json {
+    ($v:expr) => {{
+        println!(
+            "{}",
+            serde_json::to_string_pretty($v).map_err(|e| e.to_string())?
+        );
+        Ok::<(), String>(())
+    }};
 }
 
 pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
@@ -355,7 +358,7 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
                 .collect::<Result<_, _>>()?;
             if a.json {
                 let note = "SHA-256 checksums and SafeTensors/DML3 structural checks verify content integrity against the pinned release manifest; cryptographic publisher provenance requires Sigstore OIDC attestation verification.";
-                print_json(&serde_json::json!({
+                print_json!(&serde_json::json!({
                     "schema": "dope-mlc-v3-weights-fetch-v1", "release_tag": a.tag,
                     "out_dir": out_dir.display().to_string(),
                     "verification_level": "sha256-content-integrity",
@@ -385,7 +388,7 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
                 .map_err(map_err)?
                 .inventory;
             if !style.enabled || a.json {
-                print_json(&serde_json::json!({
+                print_json!(&serde_json::json!({
                     "format": "dope-mlc-v3-safetensors", "tensor_count": m.tensor_count,
                     "parameter_count": m.parameter_count, "byte_len": m.byte_len,
                     "sha256": m.sha256, "runtime": "rust-candle-cpu",
@@ -399,7 +402,7 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
             let env = Dml3Envelope::from_bytes(&raw).map_err(map_err)?;
             let enc = &env.encoding;
             if !style.enabled || a.json {
-                print_json(&serde_json::json!({
+                print_json!(&serde_json::json!({
                     "wire_format": env.wire_format, "wire_bytes": env.wire_bytes,
                     "tier_cap_bytes": env.tier_cap_bytes, "within_tier_cap": env.within_tier_cap,
                     "crc32": env.crc32, "compressed_flags": env.compressed_flags,
@@ -430,9 +433,9 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
                     &fwd_in,
                 )
                 .map_err(map_err)?;
-                print_json(&fwd_out)?;
+                print_json!(&fwd_out)?;
             } else {
-                print_json(&routed)?;
+                print_json!(&routed)?;
             }
         }
         MlcV3Command::Sample(a) => {

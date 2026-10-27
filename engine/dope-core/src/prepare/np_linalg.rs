@@ -219,6 +219,7 @@ pub fn linspace(start: f64, stop: f64, num: usize) -> Vec<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::prepare::np::{aheapsort, argsort};
 
     #[test]
     fn argsort_matches_stable_without_ties() {

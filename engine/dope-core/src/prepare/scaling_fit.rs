@@ -118,7 +118,7 @@ pub(crate) fn infer_feature_kinds_and_parse(
     (kinds, parsed_cols)
 }
 
-fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {
+pub(super) fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {
     if x.len() < 4 {
         return (0.0, 0.0);
     }

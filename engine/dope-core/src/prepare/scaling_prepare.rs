@@ -2,7 +2,7 @@
 //! for constructing a [`PreparedTable`].
 
 use super::descriptors::{compute_table_descriptors, Level};
-use super::np::{mean1d, median, pairwise_sum, quantiles, round6, sorted, std1d};
+use super::np::{argsort_i64, mean1d, median, pairwise_sum, quantiles, round6, sorted, std1d};
 use super::scaling::{err, ColumnKind, FitOnlyTableTransform, PrepTask, TargetScaler, TargetValue};
 use super::scaling_fit::{
     fit_categorical_column, fit_numeric_column, infer_feature_kinds_and_parse, parse_float_cell,
@@ -359,7 +359,17 @@ pub(crate) fn fit_target_scaler(y: &[TargetValue<'_>], task: PrepTask) -> Result
                     u_counts.push(1);
                 }
             }
-            let counts_f: Vec<f64> = u_counts.iter().map(|&c| c as f64).collect();
+            let counts_f: Vec<f64> = if u_vals.len() > 32 {
+                let order = argsort_i64(&u_counts);
+                let top: Vec<f64> = order.iter().rev().take(32).map(|&i| u_vals[i]).collect();
+                u_vals = sorted(&top);
+                u_vals
+                    .iter()
+                    .map(|&v| finite.iter().filter(|&&f| (f - v).abs() <= 1e-5).count() as f64)
+                    .collect()
+            } else {
+                u_counts.iter().map(|&c| c as f64).collect()
+            };
             let total = pairwise_sum(&counts_f).max(1.0);
             let priors: Vec<f64> = counts_f.iter().map(|c| c / total).collect();
             Ok(TargetScaler {

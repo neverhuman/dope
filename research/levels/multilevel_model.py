@@ -218,7 +218,7 @@ class MultiLevelLandmarkModel(nn.Module):
         alpha_mat = gram + gates["ridge_alpha"].clamp(1e-3, 50.0) * eye
 
         if task == "multiclass":
-            y_tr_int, y_qr_int = y_train.round().long().clamp(0, 31), y_query.round().long().clamp(0, 31)
+            y_tr_int, y_qr_int = y_train.long().clamp(0, 31), y_query.long().clamp(0, 31)
             k_cls = max(int(max(y_tr_int.max().item(), y_qr_int.max().item())) + 1, 3)
             Y_oh = F.one_hot(y_tr_int, num_classes=k_cls).to(dtype=X_tr.dtype)
             priors = Y_oh.mean(dim=0, keepdim=True).clamp(1e-3, 1.0)
@@ -250,11 +250,10 @@ class MultiLevelLandmarkModel(nn.Module):
         pred_imp = lin_w * film_g * torch.abs(c_gate)
         driver_loss = F.l1_loss(pred_imp / (pred_imp.sum() + 1e-8), emp_drivers[:p_use] / (emp_drivers[:p_use].sum() + 1e-8))
 
-        sup_vec = supervision_desc_vec if supervision_desc_vec is not None else desc_vec
-        true_gains, true_mask = sup_vec[:23], sup_vec[23:46] > 0.5
+        true_gains, true_mask = desc_vec[:23], desc_vec[23:46] > 0.5
         lm_loss = F.huber_loss(lm_pred[true_mask], true_gains[true_mask]) if true_mask.any() else lm_pred.sum() * 0.0
-        if sup_vec.shape[-1] >= 204:
-            true_bb = sup_vec[188:204]
+        if desc_vec.shape[-1] >= 204:
+            true_bb = desc_vec[188:204]
             lm_loss = lm_loss + 0.5 * F.huber_loss(bb_pred, true_bb)
         total_loss = cond_loss + 0.25 * dist_loss + 0.20 * driver_loss + 0.10 * lm_loss
         return {
