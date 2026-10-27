@@ -46,7 +46,7 @@ case "${1:-all}" in
   native)
     cargo +1.88.0 fmt --manifest-path engine/Cargo.toml --all -- --check
     cargo +1.88.0 clippy --manifest-path engine/Cargo.toml --locked -p dope-core -p dope-cli --all-targets -j2 -- -D warnings
-    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2 --test learned_landmark_inputs -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2 --test learned_landmark_inputs --test landmark_bundle --test prepare_parity_a --test prepare_parity_b -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_cli --test learned_v2_cli --test learned_landmark_cli -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-probes --test private_errors -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors -j2
