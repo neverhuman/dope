@@ -236,9 +236,7 @@ pub fn compute_inter_landmark_summary_stats(
             .collect();
         align_vec[5] = np::clip(np::mean(&col_ent), 0.0, 1.0);
         align_vec[6] = squash(gini(&s_nonlin) / (gini(&s_lin) + 0.05));
-        align_vec[7] = squash(
-            bb16[5] / pmax(&[np::max(&s_nonlin), np::max(&s_lin), 0.02]),
-        );
+        align_vec[7] = squash(bb16[5] / pmax(&[np::max(&s_nonlin), np::max(&s_lin), 0.02]));
     }
 
     let mut out = [0.0f32; 48];
@@ -318,7 +316,11 @@ pub fn compute_observed_inter_landmark_stats(
 
     let clip1 = |v: f64| np::clip(v, -1.0, 1.0);
     let mut r = [0.0f64; 12];
-    let lin = if m[0] { Some(np::py_max(g[0], 0.0)) } else { None };
+    let lin = if m[0] {
+        Some(np::py_max(g[0], 0.0))
+    } else {
+        None
+    };
     let b1 = mp(&[0, 14]);
     let best1 = b1.map(|v| np::py_max(v, 0.01));
     let tail = mp(&[1, 2]);

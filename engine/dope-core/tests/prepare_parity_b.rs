@@ -522,8 +522,7 @@ fn base_target_and_shape_invariant_across_none_partial_and_sampled_full() {
         };
 
         // Simulate a subsampled report whose internal vector116[85..91] had different subsample N stats:
-        let mut subsampled_rep_vec116: [f32; 116] =
-            c.rep.vector116.as_slice().try_into().unwrap();
+        let mut subsampled_rep_vec116: [f32; 116] = c.rep.vector116.as_slice().try_into().unwrap();
         subsampled_rep_vec116[85] = -0.777;
         subsampled_rep_vec116[86] = 0.888;
         subsampled_rep_vec116[87] = 0.0;
@@ -685,7 +684,9 @@ fn mode_validation_and_recipe_selection_rules() {
         &c.level,
     )
     .unwrap_err();
-    assert!(err.to_string().contains("landmark_full_requires_native_report"));
+    assert!(err
+        .to_string()
+        .contains("landmark_full_requires_native_report"));
 
     // 2. Full mode with mismatched bundle -> error `landmark_bundle_report_mismatch`
     let mut bad_vals = c.rep.complete_values23;
@@ -732,7 +733,9 @@ fn mode_validation_and_recipe_selection_rules() {
             &c.level,
         )
         .unwrap_err();
-        assert!(err.to_string().contains("landmark_mode_none_rejects_bundle"));
+        assert!(err
+            .to_string()
+            .contains("landmark_mode_none_rejects_bundle"));
     }
 
     // 4. Uninformative cells (gain = 0.0) are preserved as present in report_observed_landmarks

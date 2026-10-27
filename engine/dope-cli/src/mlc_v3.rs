@@ -63,6 +63,8 @@ pub(crate) enum MlcV3Command {
     Route(RouteArgs),
     /// Sample a synthetic CSV table from a DML3/CSC1 wire packet and .safetensors weights.
     Sample(SampleV3Args),
+    /// Encode a CSV table into 629-D DOPE-MLC-v3 features with optional/progressive landmarks.
+    Encode(EncodeV3Args),
 }
 
 #[derive(Args)]
@@ -131,6 +133,34 @@ pub(crate) struct SampleV3Args {
     pub(crate) draws_json: Option<PathBuf>,
     #[arg(long)]
     pub(crate) json_out: Option<PathBuf>,
+    #[arg(short, long)]
+    pub(crate) out: Option<PathBuf>,
+}
+
+#[derive(Args)]
+pub(crate) struct EncodeV3Args {
+    #[arg(long)]
+    pub(crate) weights: Option<PathBuf>,
+    #[arg(long, default_value = "multitask", value_parser = ["multitask", "maxtrain97"])]
+    pub(crate) preset: String,
+    #[arg(long)]
+    pub(crate) csv: PathBuf,
+    #[arg(short, long)]
+    pub(crate) target: String,
+    #[arg(long, value_parser = ["regression", "classification", "multiclass"])]
+    pub(crate) task: Option<String>,
+    #[arg(long, default_value = "full", value_parser = ["none", "fast", "progressive", "full"])]
+    pub(crate) landmark_mode: String,
+    #[arg(long)]
+    pub(crate) landmark_subsample: Option<usize>,
+    #[arg(long, default_value_t = 0)]
+    pub(crate) seed: u64,
+    #[arg(long)]
+    pub(crate) bundle_json: Option<PathBuf>,
+    #[arg(long, default_value = "cpu")]
+    pub(crate) device: String,
+    #[arg(long)]
+    pub(crate) json: bool,
     #[arg(short, long)]
     pub(crate) out: Option<PathBuf>,
 }
@@ -475,6 +505,246 @@ pub(crate) fn run(cmd: MlcV3Command, style: Style) -> Result<(), String> {
                     .write_all(&csv_bytes)
                     .map_err(|e| e.to_string())?,
             }
+        }
+        MlcV3Command::Encode(a) => run_encode(a)?,
+    }
+    Ok(())
+}
+
+fn encode_cond_on_model(
+    model: &MlcV3Model,
+    cond: &dope_core::prepare::DopeConditioning,
+) -> Result<(Vec<f32>, String), String> {
+    let col_vecs: Vec<Vec<f32>> = cond.col_landmarks.iter().map(|r| r.to_vec()).collect();
+    let feat = model
+        .encode_features_629(&cond.vec256, &col_vecs, "high")
+        .map_err(|e| e.to_string())?;
+    let mut h = Sha256::new();
+    for v in &feat {
+        h.update(v.to_le_bytes());
+    }
+    let sha = format!("{:x}", h.finalize());
+    Ok((feat, sha))
+}
+
+fn run_encode(a: EncodeV3Args) -> Result<(), String> {
+    use dope_core::landmark::{
+        LandmarkBundle, LandmarkMode, LandmarkOptions, SubsampleSpec, PROGRESSIVE_ORDER,
+    };
+    use dope_core::prepare::{
+        build_conditioning, build_conditioning_sampled, prepare_table_cells,
+        progressive_landmarks_for_table, NativeReportView, PrepTask,
+    };
+    use dope_core::schema::{infer, IntakeOptions, Task};
+    use dope_core::RawTable;
+
+    let t0 = std::time::Instant::now();
+    let map_err = |e: dope_core::DopeError| e.to_string();
+    let mode: LandmarkMode = a.landmark_mode.parse().map_err(map_err)?;
+    let dev = dope_core::device::parse(&a.device).map_err(map_err)?;
+    let weights_path = resolve_weights_path(&a.weights, &a.preset)?;
+    let model = MlcV3Model::load_safetensors_on_device(&weights_path, &dev).map_err(map_err)?;
+
+    let raw = RawTable::read(&a.csv).map_err(map_err)?;
+    let target_idx = raw.column_index(&a.target).map_err(map_err)?;
+    let nrows = raw.rows();
+    let ncols = raw.columns.len();
+    let mut x_cells = vec![Vec::with_capacity(ncols.saturating_sub(1)); nrows];
+    for (col_idx, col) in raw.columns.iter().enumerate() {
+        if col_idx == target_idx {
+            continue;
+        }
+        for (r, val) in col.iter().enumerate() {
+            x_cells[r].push(val.clone());
+        }
+    }
+    let y_cells = raw.columns[target_idx].clone();
+    let prep_task = match a.task.as_deref() {
+        Some("regression") => PrepTask::Regression,
+        Some("multiclass") => PrepTask::Multiclass,
+        Some("classification") => {
+            let uniq: std::collections::BTreeSet<&str> = y_cells
+                .iter()
+                .map(|s| s.trim())
+                .filter(|s| !s.is_empty())
+                .collect();
+            if uniq.len() > 2 {
+                PrepTask::Multiclass
+            } else {
+                PrepTask::Classification
+            }
+        }
+        None => {
+            let schema = infer(&raw, target_idx, &IntakeOptions::default()).map_err(map_err)?;
+            match schema.task {
+                Task::Regression => PrepTask::Regression,
+                Task::Classification => {
+                    let uniq: std::collections::BTreeSet<&str> = y_cells
+                        .iter()
+                        .map(|s| s.trim())
+                        .filter(|s| !s.is_empty())
+                        .collect();
+                    if uniq.len() > 2 {
+                        PrepTask::Multiclass
+                    } else {
+                        PrepTask::Classification
+                    }
+                }
+            }
+        }
+        Some(other) => return Err(format!("unsupported task `{other}`")),
+    };
+
+    let prepared = prepare_table_cells(&x_cells, &y_cells, prep_task).map_err(map_err)?;
+    let supplied_bundle: Option<LandmarkBundle> = match &a.bundle_json {
+        Some(p) => {
+            let s = std::fs::read_to_string(p).map_err(|e| e.to_string())?;
+            Some(serde_json::from_str(&s).map_err(|e| e.to_string())?)
+        }
+        None => None,
+    };
+
+    let mut out_w = crate::writer(&a.out)?;
+    let emit_line =
+        |w: &mut Box<dyn Write>, val: &serde_json::Value, pretty: bool| -> Result<(), String> {
+            let s = if pretty {
+                serde_json::to_string_pretty(val).map_err(|e| e.to_string())?
+            } else {
+                serde_json::to_string(val).map_err(|e| e.to_string())?
+            };
+            writeln!(w, "{s}").map_err(|e| e.to_string())?;
+            w.flush().map_err(|e| e.to_string())
+        };
+
+    match mode {
+        LandmarkMode::None | LandmarkMode::Fast => {
+            let b = supplied_bundle.unwrap_or_else(LandmarkBundle::zero);
+            let cond = build_conditioning(&prepared, &b, None, mode).map_err(map_err)?;
+            let (feat, feat_sha) = encode_cond_on_model(&model, &cond)?;
+            let doc = serde_json::json!({
+                "seq": 0,
+                "mode": mode.as_str(),
+                "recipe": cond.recipe,
+                "status": cond.bundle.status,
+                "subsample_n": cond.bundle.subsample_n,
+                "source_digest": cond.bundle.source_digest,
+                "bundle_digest": cond.bundle.conditioning_digest(),
+                "conditioning_digest": cond.digest(),
+                "features629_sha256": feat_sha,
+                "features629": feat,
+                "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
+            });
+            emit_line(&mut out_w, &doc, !a.json)?;
+        }
+        LandmarkMode::Progressive => {
+            let zero = LandmarkBundle::zero();
+            let cond0 =
+                build_conditioning(&prepared, &zero, None, LandmarkMode::None).map_err(map_err)?;
+            let (feat0, sha0) = encode_cond_on_model(&model, &cond0)?;
+            let doc0 = serde_json::json!({
+                "seq": 0,
+                "mode": "progressive",
+                "group": "none",
+                "recipe": cond0.recipe,
+                "status": cond0.bundle.status,
+                "subsample_n": cond0.bundle.subsample_n,
+                "source_digest": cond0.bundle.source_digest,
+                "bundle_digest": cond0.bundle.conditioning_digest(),
+                "conditioning_digest": cond0.digest(),
+                "features629_sha256": sha0,
+                "features629": feat0,
+                "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
+            });
+            emit_line(&mut out_w, &doc0, false)?;
+
+            let opts = LandmarkOptions {
+                seed: a.seed,
+                ..Default::default()
+            };
+            let sub_n = a
+                .landmark_subsample
+                .unwrap_or(SubsampleSpec::PROGRESSIVE_DEFAULT.n);
+            let sub = if sub_n == 0 {
+                None
+            } else {
+                Some(SubsampleSpec::new(sub_n, a.seed))
+            };
+            let mut driver =
+                progressive_landmarks_for_table(&prepared, &opts, sub).map_err(map_err)?;
+            let sample_pos = driver.selection().map(|s| s.positions.clone());
+            for (idx, &group) in PROGRESSIVE_ORDER.iter().enumerate() {
+                let (bundle, sig) = driver.next_group(group).map_err(map_err)?;
+                let rep_view = NativeReportView::from_signature(sig);
+                let step_mode = if group == dope_core::landmark::LandmarkGroup::Fine {
+                    LandmarkMode::Full
+                } else {
+                    LandmarkMode::Progressive
+                };
+                let cond = build_conditioning_sampled(
+                    &prepared,
+                    &bundle,
+                    Some(&rep_view),
+                    step_mode,
+                    sample_pos.as_deref(),
+                )
+                .map_err(map_err)?;
+                let (feat, sha) = encode_cond_on_model(&model, &cond)?;
+                let doc = serde_json::json!({
+                    "seq": idx + 1,
+                    "mode": "progressive",
+                    "group": group.as_str(),
+                    "recipe": cond.recipe,
+                    "status": cond.bundle.status,
+                    "subsample_n": cond.bundle.subsample_n,
+                    "source_digest": cond.bundle.source_digest,
+                    "bundle_digest": cond.bundle.conditioning_digest(),
+                    "conditioning_digest": cond.digest(),
+                    "features629_sha256": sha,
+                    "features629": feat,
+                    "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
+                });
+                emit_line(&mut out_w, &doc, false)?;
+            }
+        }
+        LandmarkMode::Full => {
+            let opts = LandmarkOptions {
+                seed: a.seed,
+                ..Default::default()
+            };
+            let sub = a
+                .landmark_subsample
+                .filter(|&n| n > 0)
+                .map(|n| SubsampleSpec::new(n, a.seed));
+            let mut driver =
+                progressive_landmarks_for_table(&prepared, &opts, sub).map_err(map_err)?;
+            let sample_pos = driver.selection().map(|s| s.positions.clone());
+            let all_ids: Vec<u8> = (1..=23).collect();
+            let (computed_bundle, sig) = driver.run_ids(&all_ids).map_err(map_err)?;
+            let rep_view = NativeReportView::from_signature(sig);
+            let b = supplied_bundle.unwrap_or(computed_bundle);
+            let cond = build_conditioning_sampled(
+                &prepared,
+                &b,
+                Some(&rep_view),
+                LandmarkMode::Full,
+                sample_pos.as_deref(),
+            )
+            .map_err(map_err)?;
+            let (feat, sha) = encode_cond_on_model(&model, &cond)?;
+            let doc = serde_json::json!({
+                "seq": 0,
+                "mode": "full",
+                "recipe": cond.recipe,
+                "status": cond.bundle.status,
+                "subsample_n": cond.bundle.subsample_n,
+                "source_digest": cond.bundle.source_digest,
+                "bundle_digest": cond.bundle.conditioning_digest(),
+                "conditioning_digest": cond.digest(),
+                "features629_sha256": sha,
+                "features629": feat,
+                "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
+            });
+            emit_line(&mut out_w, &doc, !a.json)?;
         }
     }
     Ok(())
