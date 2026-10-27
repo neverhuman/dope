@@ -174,7 +174,7 @@ def fit_multiclass_target_bundle(
 ) -> Dict[str, Any]:
     """Fit Low-Rank Simplex Logit Basis + Vector-Leaf Oblivious Trees (LR-VLOT) on multiclass y_idx."""
     n, p = X.shape
-    y_int = np.clip(np.rint(y_idx).astype(np.int64), 0, 31)
+    y_int = np.maximum(np.rint(y_idx).astype(np.int64), 0)
     u_classes = np.unique(y_int)
     k_classes = max(int(np.max(u_classes)) + 1 if u_classes.size else 3, 3)
     counts = np.bincount(y_int, minlength=k_classes).astype(np.float64)

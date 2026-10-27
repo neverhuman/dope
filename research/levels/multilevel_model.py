@@ -194,8 +194,9 @@ class MultiLevelLandmarkModel(nn.Module):
 
     def forward_conditioning(
         self, X_train: torch.Tensor, y_train: torch.Tensor, X_query: torch.Tensor, y_query: torch.Tensor,
-        desc_vec: torch.Tensor, emp_drivers: torch.Tensor, task: str, level: str,
-        *, col_landmarks: Optional[torch.Tensor] = None,
+        desc_vec: torch.Tensor, emp_drivers: torch.Tensor, task: str, level: str, *,
+        col_landmarks: Optional[torch.Tensor] = None, supervision_desc_vec: Optional[torch.Tensor] = None,
+        k_categories: Optional[int] = None,
     ) -> Dict[str, torch.Tensor]:
         device = X_train.device
         n_tr, p = X_train.shape
@@ -218,14 +219,16 @@ class MultiLevelLandmarkModel(nn.Module):
         alpha_mat = gram + gates["ridge_alpha"].clamp(1e-3, 50.0) * eye
 
         if task == "multiclass":
-            y_tr_int, y_qr_int = y_train.long().clamp(0, 31), y_query.long().clamp(0, 31)
-            k_cls = max(int(max(y_tr_int.max().item(), y_qr_int.max().item())) + 1, 3)
-            Y_oh = F.one_hot(y_tr_int, num_classes=k_cls).to(dtype=X_tr.dtype)
+            y_tr_int, y_qr_int = y_train.round().long().clamp_min(0), y_query.round().long()
+            k_cls = max(int(k_categories if k_categories is not None else (int(y_tr_int.max().item()) + 1)), 3)
+            Y_oh = F.one_hot(y_tr_int.clamp(0, k_cls - 1), num_classes=k_cls).to(dtype=X_tr.dtype)
             priors = Y_oh.mean(dim=0, keepdim=True).clamp(1e-3, 1.0)
             W_mc = torch.linalg.solve(alpha_mat, (phi_tr.T @ (Y_oh - priors)) / float(max(n_tr, 1)))
             res_qr = self.target_net(X_qr_pad, task_lat, col_mask, col_landmarks=col_landmarks).unsqueeze(-1)
             logits_qr = torch.log(priors) + 3.0 * (phi_qr @ W_mc) + 0.25 * gates["neural_w"] * res_qr
-            cond_loss, lin_w = F.cross_entropy(logits_qr, y_qr_int), torch.mean(torch.abs(W_mc[1 : 1 + p_use]), dim=1)
+            valid_q = (y_qr_int >= 0) & (y_qr_int < k_cls)
+            cond_loss = F.cross_entropy(logits_qr[valid_q], y_qr_int[valid_q]) if valid_q.any() else (logits_qr.sum() * 0.0)
+            lin_w = torch.mean(torch.abs(W_mc[1 : 1 + p_use]), dim=1)
         else:
             w_basis = torch.linalg.solve(alpha_mat, (phi_tr.T @ y_train) / float(max(n_tr, 1)))
             res_tr = self.target_net(X_tr_pad, task_lat, col_mask, col_landmarks=col_landmarks)
@@ -250,10 +253,11 @@ class MultiLevelLandmarkModel(nn.Module):
         pred_imp = lin_w * film_g * torch.abs(c_gate)
         driver_loss = F.l1_loss(pred_imp / (pred_imp.sum() + 1e-8), emp_drivers[:p_use] / (emp_drivers[:p_use].sum() + 1e-8))
 
-        true_gains, true_mask = desc_vec[:23], desc_vec[23:46] > 0.5
+        sup_vec = supervision_desc_vec if supervision_desc_vec is not None else desc_vec
+        true_gains, true_mask = sup_vec[:23], sup_vec[23:46] > 0.5
         lm_loss = F.huber_loss(lm_pred[true_mask], true_gains[true_mask]) if true_mask.any() else lm_pred.sum() * 0.0
-        if desc_vec.shape[-1] >= 204:
-            true_bb = desc_vec[188:204]
+        if sup_vec.shape[-1] >= 204:
+            true_bb = sup_vec[188:204]
             lm_loss = lm_loss + 0.5 * F.huber_loss(bb_pred, true_bb)
         total_loss = cond_loss + 0.25 * dist_loss + 0.20 * driver_loss + 0.10 * lm_loss
         return {

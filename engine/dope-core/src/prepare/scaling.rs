@@ -66,6 +66,18 @@ impl From<crate::schema::Task> for PrepTask {
     }
 }
 
+/// Multiclass target vocabulary retention policy during train-only preparation.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum ClassVocabPolicy {
+    /// Legacy `prepare-v1` / `full-report-v1` policy: retain at most the 32 most
+    /// frequent `round6` classes (`mc_many` compatibility).
+    #[default]
+    Cap32V1,
+    /// Lossless FIT-vocabulary policy: retain all distinct finite `round6` classes
+    /// (`K >= 33` supported without truncation).
+    LosslessV1,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ColumnKind {
     Numeric,
@@ -208,6 +220,30 @@ pub enum TargetValue<'a> {
 }
 
 impl TargetScaler {
+    pub(crate) fn base(
+        task: PrepTask,
+        mean: f64,
+        std: f64,
+        median: f64,
+        iqr: f64,
+        skewness: f64,
+        kurtosis: f64,
+    ) -> Self {
+        Self {
+            task,
+            mean,
+            std,
+            median,
+            iqr,
+            skewness,
+            kurtosis,
+            positive_label: None,
+            class_prior: 0.5,
+            class_labels: Vec::new(),
+            class_priors: Vec::new(),
+        }
+    }
+
     pub(crate) fn transform(&self, y: &[TargetValue<'_>]) -> Result<Vec<f64>> {
         if self.task == PrepTask::Multiclass && !self.class_labels.is_empty() {
             let labels = &self.class_labels;
@@ -272,6 +308,69 @@ impl TargetScaler {
             })
             .collect())
     }
+
+    /// Strict target transform that rejects non-finite or unseen multiclass query labels
+    /// outside the fitted `round6` FIT vocabulary (`1e-6` tolerance).
+    pub fn transform_strict(&self, y: &[TargetValue<'_>]) -> Result<Vec<f64>> {
+        if self.task == PrepTask::Multiclass && !self.class_labels.is_empty() {
+            let labels = &self.class_labels;
+            return y
+                .iter()
+                .map(|v| {
+                    let a = match v {
+                        TargetValue::Num(x) => *x,
+                        TargetValue::Str(s) => parse_float_cell(s),
+                    };
+                    if !a.is_finite() {
+                        return Err(err("unknown_multiclass_label"));
+                    }
+                    let r = super::np::round6(a);
+                    let mut best = 0usize;
+                    let mut bd = (r - labels[0]).abs();
+                    for (k, l) in labels.iter().enumerate().skip(1) {
+                        let d = (r - l).abs();
+                        if d < bd {
+                            bd = d;
+                            best = k;
+                        }
+                    }
+                    if bd > 1e-6 {
+                        return Err(err("unknown_multiclass_label"));
+                    }
+                    Ok(best as f64)
+                })
+                .collect();
+        }
+        self.transform(y)
+    }
+
+    /// Map scaled target codes back to fitted raw class labels (multiclass), `{0.0, 1.0}`
+    /// (binary classification), or raw regression scale.
+    pub fn inverse_transform(&self, y_scaled: &[f64]) -> Vec<f64> {
+        if self.task == PrepTask::Multiclass && !self.class_labels.is_empty() {
+            let max_idx = self.class_labels.len() - 1;
+            return y_scaled
+                .iter()
+                .map(|&v| {
+                    let idx = (v.round() as isize).clamp(0, max_idx as isize) as usize;
+                    self.class_labels[idx]
+                })
+                .collect();
+        }
+        if self.task == PrepTask::Classification {
+            return y_scaled
+                .iter()
+                .map(|&v| if v >= 0.5 { 1.0 } else { 0.0 })
+                .collect();
+        }
+        y_scaled
+            .iter()
+            .map(|&v| {
+                let u = clip(v / 8.0, -0.999999, 0.999999);
+                self.mean + self.std * 8.0 * u.atanh()
+            })
+            .collect()
+    }
 }
 
 /// `scaling.FitOnlyTableTransform` (fitted state).
@@ -284,4 +383,5 @@ pub struct FitOnlyTableTransform {
     pub target: TargetScaler,
     pub min_level_count: usize,
     pub prior_smoothing: f64,
+    pub class_vocab_policy: ClassVocabPolicy,
 }

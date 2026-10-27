@@ -874,6 +874,8 @@
     "research/levels/tests/test_encoder_629.py": "external-evidence",
     "research/levels/optional_landmarks.py": "external-evidence",
     "research/levels/observed_conditioning.py": "external-evidence",
+    "research/levels/train_landmark_dropout.py": "external-evidence",
+    "research/levels/tests/test_multiclass_and_dropout.py": "external-evidence",
     "research/levels/tests/test_optional_landmarks.py": "external-evidence",
     "engine/dope-core/tests/fixtures/landmark_bundle_v1.json": "rust-core",
     "engine/dope-core/src/prepare/": "rust-core",

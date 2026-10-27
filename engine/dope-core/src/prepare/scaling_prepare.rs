@@ -3,17 +3,18 @@
 
 use super::descriptors::{compute_table_descriptors, Level};
 use super::np::{argsort_i64, mean1d, median, pairwise_sum, quantiles, round6, sorted, std1d};
-use super::scaling::{err, ColumnKind, FitOnlyTableTransform, PrepTask, TargetScaler, TargetValue};
+use super::scaling::{
+    err, ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, PrepTask, TargetScaler, TargetValue,
+};
 use super::scaling_fit::{
     fit_categorical_column, fit_numeric_column, infer_feature_kinds_and_parse, parse_float_cell,
     py_float_repr, py_strip, regression_array, safe_skew_kurt,
 };
 use super::scaling_table::{
-    canonical_f64_bits, compute_native_target_stats, compute_observed_target_stats,
-    validate_row_ids, PreparedTable,
+    compute_native_target_stats, compute_observed_target_stats, hash_raw_cells, validate_row_ids,
+    PreparedTable,
 };
 use crate::error::Result;
-use sha2::{Digest, Sha256};
 
 fn classes_of(t: &TargetScaler) -> usize {
     match t.task {
@@ -23,13 +24,13 @@ fn classes_of(t: &TargetScaler) -> usize {
     }
 }
 
-/// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
-/// (all-numeric ndarray path) with explicit physical `row_ids`.
-pub fn prepare_table_with_ids(
+/// Numeric-matrix preparation with explicit physical `row_ids` and [`ClassVocabPolicy`].
+pub fn prepare_table_with_policy(
     x: &[Vec<f64>],
     y: &[f64],
     task: PrepTask,
     row_ids: Vec<u64>,
+    class_vocab_policy: ClassVocabPolicy,
 ) -> Result<PreparedTable> {
     let n = x.len();
     let p = x.first().map_or(0, Vec::len);
@@ -41,7 +42,7 @@ pub fn prepare_table_with_ids(
     }
     validate_row_ids(&row_ids, n)?;
     let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
-    let target = fit_target_scaler(&yv, task)?;
+    let target = fit_target_scaler_with_policy(&yv, task, class_vocab_policy)?;
     let mut numeric = Vec::with_capacity(p);
     let mut frame_columns = Vec::with_capacity(p);
     for j in 0..p {
@@ -84,6 +85,7 @@ pub fn prepare_table_with_ids(
         target,
         min_level_count: 5,
         prior_smoothing: 10.0,
+        class_vocab_policy,
     };
     Ok(PreparedTable {
         task,
@@ -107,38 +109,27 @@ pub fn prepare_table_with_ids(
 }
 
 /// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
-/// (all-numeric ndarray path) using sequential `0..n as u64` row IDs.
-pub fn prepare_table(x: &[Vec<f64>], y: &[f64], task: PrepTask) -> Result<PreparedTable> {
-    let row_ids = (0..x.len() as u64).collect();
-    prepare_table_with_ids(x, y, task, row_ids)
+/// (all-numeric ndarray path) with explicit physical `row_ids` (`Cap32V1`).
+pub fn prepare_table_with_ids(
+    x: &[Vec<f64>],
+    y: &[f64],
+    task: PrepTask,
+    row_ids: Vec<u64>,
+) -> Result<PreparedTable> {
+    prepare_table_with_policy(x, y, task, row_ids, ClassVocabPolicy::Cap32V1)
 }
 
-fn hash_raw_cells(x: &[Vec<String>], yv: &[TargetValue<'_>]) -> [u8; 32] {
-    let mut h = Sha256::new();
-    h.update(b"dope.prepared-cells/v1\0");
-    h.update((x.len() as u64).to_le_bytes());
-    for row in x {
-        h.update((row.len() as u64).to_le_bytes());
-        for cell in row {
-            h.update((cell.len() as u64).to_le_bytes());
-            h.update(cell.as_bytes());
-        }
-    }
-    h.update((yv.len() as u64).to_le_bytes());
-    for v in yv {
-        match v {
-            TargetValue::Num(f) => {
-                h.update([0u8]);
-                h.update(canonical_f64_bits(*f).to_le_bytes());
-            }
-            TargetValue::Str(s) => {
-                h.update([1u8]);
-                h.update((s.len() as u64).to_le_bytes());
-                h.update(s.as_bytes());
-            }
-        }
-    }
-    h.finalize().into()
+/// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
+/// (all-numeric ndarray path) using sequential `0..n as u64` row IDs (`Cap32V1`).
+pub fn prepare_table(x: &[Vec<f64>], y: &[f64], task: PrepTask) -> Result<PreparedTable> {
+    let row_ids = (0..x.len() as u64).collect();
+    prepare_table_with_policy(x, y, task, row_ids, ClassVocabPolicy::Cap32V1)
+}
+
+/// Lossless FIT-vocabulary (`K >= 33` preserved) numeric table preparation.
+pub fn prepare_table_lossless(x: &[Vec<f64>], y: &[f64], task: PrepTask) -> Result<PreparedTable> {
+    let row_ids = (0..x.len() as u64).collect();
+    prepare_table_with_policy(x, y, task, row_ids, ClassVocabPolicy::LosslessV1)
 }
 
 fn prepare_cells_with_yv(
@@ -147,6 +138,7 @@ fn prepare_cells_with_yv(
     declared_kinds: Option<&[ColumnKind]>,
     task: PrepTask,
     row_ids: Vec<u64>,
+    class_vocab_policy: ClassVocabPolicy,
 ) -> Result<PreparedTable> {
     let n = x.len();
     let p = x.first().map_or(0, Vec::len);
@@ -170,7 +162,7 @@ fn prepare_cells_with_yv(
             }
             None => infer_feature_kinds_and_parse(x, p),
         };
-    let target = fit_target_scaler(yv, task)?;
+    let target = fit_target_scaler_with_policy(yv, task, class_vocab_policy)?;
     let y_num = target.transform(yv)?;
     let y_global_mean = if y_num.is_empty() {
         0.0
@@ -261,6 +253,7 @@ fn prepare_cells_with_yv(
         target,
         min_level_count,
         prior_smoothing,
+        class_vocab_policy,
     };
     Ok(PreparedTable {
         task,
@@ -283,6 +276,18 @@ fn prepare_cells_with_yv(
     })
 }
 
+/// String-cell table preparation with explicit `row_ids` and [`ClassVocabPolicy`].
+pub fn prepare_table_cells_with_policy(
+    x: &[Vec<String>],
+    y: &[String],
+    task: PrepTask,
+    row_ids: Vec<u64>,
+    class_vocab_policy: ClassVocabPolicy,
+) -> Result<PreparedTable> {
+    let yv: Vec<TargetValue<'_>> = y.iter().map(|s| TargetValue::Str(s.as_str())).collect();
+    prepare_cells_with_yv(x, &yv, None, task, row_ids, class_vocab_policy)
+}
+
 /// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
 /// (kind inference + Bayesian-shrunk categorical encoding) with explicit physical `row_ids`.
 pub fn prepare_table_cells_with_ids(
@@ -291,14 +296,31 @@ pub fn prepare_table_cells_with_ids(
     task: PrepTask,
     row_ids: Vec<u64>,
 ) -> Result<PreparedTable> {
-    let yv: Vec<TargetValue<'_>> = y.iter().map(|s| TargetValue::Str(s.as_str())).collect();
-    prepare_cells_with_yv(x, &yv, None, task, row_ids)
+    prepare_table_cells_with_policy(x, y, task, row_ids, ClassVocabPolicy::Cap32V1)
 }
 
-/// Mixed-column table preparation for typed/cell consumers: accepts string feature
-/// cells `x_cells`, numeric target `y`, optional explicit per-column `declared_kinds`
-/// (`None` infers kinds from `x_cells`), `task`, and optional physical `row_ids`
-/// (`None` uses sequential `0..n as u64`).
+/// Mixed-column table preparation with explicit [`ClassVocabPolicy`].
+pub fn prepare_table_mixed_with_policy(
+    x_cells: &[Vec<String>],
+    y: &[f64],
+    declared_kinds: Option<&[ColumnKind]>,
+    task: PrepTask,
+    row_ids: Option<Vec<u64>>,
+    class_vocab_policy: ClassVocabPolicy,
+) -> Result<PreparedTable> {
+    let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
+    let row_ids = row_ids.unwrap_or_else(|| (0..x_cells.len() as u64).collect());
+    prepare_cells_with_yv(
+        x_cells,
+        &yv,
+        declared_kinds,
+        task,
+        row_ids,
+        class_vocab_policy,
+    )
+}
+
+/// Mixed-column table preparation (`Cap32V1` default).
 pub fn prepare_table_mixed(
     x_cells: &[Vec<String>],
     y: &[f64],
@@ -306,13 +328,18 @@ pub fn prepare_table_mixed(
     task: PrepTask,
     row_ids: Option<Vec<u64>>,
 ) -> Result<PreparedTable> {
-    let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
-    let row_ids = row_ids.unwrap_or_else(|| (0..x_cells.len() as u64).collect());
-    prepare_cells_with_yv(x_cells, &yv, declared_kinds, task, row_ids)
+    prepare_table_mixed_with_policy(
+        x_cells,
+        y,
+        declared_kinds,
+        task,
+        row_ids,
+        ClassVocabPolicy::Cap32V1,
+    )
 }
 
 /// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
-/// (kind inference + Bayesian-shrunk categorical encoding) using sequential `0..n as u64` row IDs.
+/// using sequential `0..n as u64` row IDs (`Cap32V1`).
 pub fn prepare_table_cells(
     x: &[Vec<String>],
     y: &[String],
@@ -322,7 +349,11 @@ pub fn prepare_table_cells(
     prepare_table_cells_with_ids(x, y, task, row_ids)
 }
 
-pub(crate) fn fit_target_scaler(y: &[TargetValue<'_>], task: PrepTask) -> Result<TargetScaler> {
+pub(crate) fn fit_target_scaler_with_policy(
+    y: &[TargetValue<'_>],
+    task: PrepTask,
+    class_vocab_policy: ClassVocabPolicy,
+) -> Result<TargetScaler> {
     match task {
         PrepTask::Multiclass => {
             let raw: Vec<f64> = y
@@ -334,19 +365,10 @@ pub(crate) fn fit_target_scaler(y: &[TargetValue<'_>], task: PrepTask) -> Result
                 .collect();
             let finite: Vec<f64> = raw.into_iter().filter(|v| v.is_finite()).collect();
             if finite.is_empty() {
-                return Ok(TargetScaler {
-                    task,
-                    mean: 0.0,
-                    std: 1.0,
-                    median: 0.0,
-                    iqr: 1.0,
-                    skewness: 0.0,
-                    kurtosis: 0.0,
-                    positive_label: None,
-                    class_prior: 0.5,
-                    class_labels: vec![0.0, 0.5, 1.0],
-                    class_priors: vec![0.34, 0.33, 0.33],
-                });
+                let mut ts = TargetScaler::base(task, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0);
+                ts.class_labels = vec![0.0, 0.5, 1.0];
+                ts.class_priors = vec![0.34, 0.33, 0.33];
+                return Ok(ts);
             }
             let rounded = sorted(&finite.iter().map(|&v| round6(v)).collect::<Vec<_>>());
             let mut u_vals: Vec<f64> = Vec::new();
@@ -359,32 +381,33 @@ pub(crate) fn fit_target_scaler(y: &[TargetValue<'_>], task: PrepTask) -> Result
                     u_counts.push(1);
                 }
             }
-            let counts_f: Vec<f64> = if u_vals.len() > 32 {
-                let order = argsort_i64(&u_counts);
-                let top: Vec<f64> = order.iter().rev().take(32).map(|&i| u_vals[i]).collect();
-                u_vals = sorted(&top);
-                u_vals
-                    .iter()
-                    .map(|&v| finite.iter().filter(|&&f| (f - v).abs() <= 1e-5).count() as f64)
-                    .collect()
-            } else {
-                u_counts.iter().map(|&c| c as f64).collect()
-            };
+            let counts_f: Vec<f64> =
+                if class_vocab_policy == ClassVocabPolicy::Cap32V1 && u_vals.len() > 32 {
+                    let order = argsort_i64(&u_counts);
+                    let top: Vec<f64> = order.iter().rev().take(32).map(|&i| u_vals[i]).collect();
+                    u_vals = sorted(&top);
+                    u_vals
+                        .iter()
+                        .map(|&v| finite.iter().filter(|&&f| (f - v).abs() <= 1e-5).count() as f64)
+                        .collect()
+                } else {
+                    u_counts.iter().map(|&c| c as f64).collect()
+                };
             let total = pairwise_sum(&counts_f).max(1.0);
             let priors: Vec<f64> = counts_f.iter().map(|c| c / total).collect();
-            Ok(TargetScaler {
+            let mut ts = TargetScaler::base(
                 task,
-                mean: mean1d(&finite),
-                std: std1d(&finite).max(1e-6),
-                median: median(&finite),
-                iqr: 1.0,
-                skewness: 0.0,
-                kurtosis: 0.0,
-                positive_label: None,
-                class_prior: priors[0],
-                class_labels: u_vals,
-                class_priors: priors,
-            })
+                mean1d(&finite),
+                std1d(&finite).max(1e-6),
+                median(&finite),
+                1.0,
+                0.0,
+                0.0,
+            );
+            ts.class_prior = priors[0];
+            ts.class_labels = u_vals;
+            ts.class_priors = priors;
+            Ok(ts)
         }
         PrepTask::Classification => {
             let tokens: Vec<String> = y
@@ -413,55 +436,38 @@ pub(crate) fn fit_target_scaler(y: &[TargetValue<'_>], task: PrepTask) -> Result
                 .map(|t| if *t == pos { 1.0 } else { 0.0 })
                 .collect();
             let prior = if bin.is_empty() { 0.5 } else { mean1d(&bin) };
-            Ok(TargetScaler {
+            let mut ts = TargetScaler::base(
                 task,
-                mean: prior,
-                std: (prior * (1.0 - prior)).sqrt().max(1e-6),
-                median: if prior >= 0.5 { 1.0 } else { 0.0 },
-                iqr: 1.0,
-                skewness: 0.0,
-                kurtosis: 0.0,
-                positive_label: Some(pos),
-                class_prior: prior,
-                class_labels: Vec::new(),
-                class_priors: Vec::new(),
-            })
+                prior,
+                (prior * (1.0 - prior)).sqrt().max(1e-6),
+                if prior >= 0.5 { 1.0 } else { 0.0 },
+                1.0,
+                0.0,
+                0.0,
+            );
+            ts.positive_label = Some(pos);
+            ts.class_prior = prior;
+            Ok(ts)
         }
         PrepTask::Regression => {
             let arr = regression_array(y)?;
             let finite: Vec<f64> = arr.into_iter().filter(|v| v.is_finite()).collect();
             if finite.is_empty() {
-                return Ok(TargetScaler {
-                    task,
-                    mean: 0.0,
-                    std: 1.0,
-                    median: 0.0,
-                    iqr: 1.0,
-                    skewness: 0.0,
-                    kurtosis: 0.0,
-                    positive_label: None,
-                    class_prior: 0.5,
-                    class_labels: Vec::new(),
-                    class_priors: Vec::new(),
-                });
+                return Ok(TargetScaler::base(task, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0));
             }
             let m = mean1d(&finite);
             let s = std1d(&finite).max(1e-6);
             let q = quantiles(&finite, &[0.25, 0.5, 0.75]);
             let (skew, kurt) = safe_skew_kurt(&finite);
-            Ok(TargetScaler {
+            Ok(TargetScaler::base(
                 task,
-                mean: m,
-                std: s,
-                median: q[1],
-                iqr: (q[2] - q[0]).max(1e-6),
-                skewness: skew,
-                kurtosis: kurt,
-                positive_label: None,
-                class_prior: 0.5,
-                class_labels: Vec::new(),
-                class_priors: Vec::new(),
-            })
+                m,
+                s,
+                q[1],
+                (q[2] - q[0]).max(1e-6),
+                skew,
+                kurt,
+            ))
         }
     }
 }

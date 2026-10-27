@@ -2,7 +2,9 @@
 
 use super::descriptors::{compute_table_descriptors, Level, ShapeOverride, TableDescriptors};
 use super::np::{pairwise_sum, squash};
-use super::scaling::{err, ColumnKind, FitOnlyTableTransform, PrepTask};
+use super::scaling::{
+    err, ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, PrepTask, TargetValue,
+};
 use crate::error::Result;
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
@@ -86,6 +88,34 @@ pub(crate) fn canonical_f64_bits(v: f64) -> u64 {
     } else {
         v.to_bits()
     }
+}
+
+pub(crate) fn hash_raw_cells(x: &[Vec<String>], yv: &[TargetValue<'_>]) -> [u8; 32] {
+    let mut h = Sha256::new();
+    h.update(b"dope.prepared-cells/v1\0");
+    h.update((x.len() as u64).to_le_bytes());
+    for row in x {
+        h.update((row.len() as u64).to_le_bytes());
+        for cell in row {
+            h.update((cell.len() as u64).to_le_bytes());
+            h.update(cell.as_bytes());
+        }
+    }
+    h.update((yv.len() as u64).to_le_bytes());
+    for v in yv {
+        match v {
+            TargetValue::Num(f) => {
+                h.update([0u8]);
+                h.update(canonical_f64_bits(*f).to_le_bytes());
+            }
+            TargetValue::Str(s) => {
+                h.update([1u8]);
+                h.update((s.len() as u64).to_le_bytes());
+                h.update(s.as_bytes());
+            }
+        }
+    }
+    h.finalize().into()
 }
 
 /// Native classification `target_stats` (`[normalized_entropy, min_class_share]`)
@@ -332,7 +362,10 @@ impl PreparedTable {
     /// `source_digest_override`).
     pub fn computed_source_rows_digest(&self) -> String {
         let mut h = Sha256::new();
-        h.update(b"dope.prepared-table/v1\0");
+        match self.transform.class_vocab_policy {
+            ClassVocabPolicy::Cap32V1 => h.update(b"dope.prepared-table/v1\0"),
+            ClassVocabPolicy::LosslessV1 => h.update(b"dope.prepared-table/lossless-v1\0"),
+        }
         h.update(self.task.as_str().as_bytes());
         h.update(b"\0");
         for v in [self.rows as u64, self.features as u64, self.classes as u64] {
