@@ -1147,9 +1147,7 @@ fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScaler {
     let s = sorted(&finite);
     let mut uniq = s.clone();
     uniq.dedup();
-    let qv = quantiles(&finite, &QUANTILE_GRID);
-    let mut q_vals = [0.0; 9];
-    q_vals.copy_from_slice(&qv);
+    let q_vals: [f64; 9] = QUANTILE_GRID.map(|q| super::np::quantile_sorted(&s, q));
     let (skew, kurt) = safe_skew_kurt(&finite);
     if uniq.len() <= 1 {
         return NumericColumnScaler {
@@ -1190,8 +1188,35 @@ fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScaler {
     } else {
         1.0
     };
-    let absdev: Vec<f64> = finite.iter().map(|&v| (v - med).abs()).collect();
-    let mad = median(&absdev);
+    let k = s.len();
+    let split = s.partition_point(|&v| v < med);
+    let mut abs_sorted = Vec::with_capacity(k);
+    let mut left = split;
+    let mut right = split;
+    while left > 0 && right < k {
+        let dl = (s[left - 1] - med).abs();
+        let dr = (s[right] - med).abs();
+        if dl <= dr {
+            abs_sorted.push(dl);
+            left -= 1;
+        } else {
+            abs_sorted.push(dr);
+            right += 1;
+        }
+    }
+    while left > 0 {
+        abs_sorted.push((s[left - 1] - med).abs());
+        left -= 1;
+    }
+    while right < k {
+        abs_sorted.push((s[right] - med).abs());
+        right += 1;
+    }
+    let mad = if k % 2 == 1 {
+        abs_sorted[k / 2]
+    } else {
+        (abs_sorted[k / 2 - 1] + abs_sorted[k / 2]) / 2.0
+    };
     let robust_scale = py_max(&[iqr / 1.3489795, mad * 1.4826, std_f * 0.25, 1e-6]);
     if skew.abs() > 1.0 || kurt > 4.0 || tail_ratio > 4.2 {
         let logged: Vec<f64> = finite

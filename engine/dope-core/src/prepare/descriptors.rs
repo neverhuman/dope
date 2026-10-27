@@ -3,8 +3,9 @@
 //! train-only table descriptors (`table_vec24`, `column_desc`).
 
 use super::np::{
-    clip, col_mean, col_std, eigvalsh_sym, finite_or_zero, finite_or_zero32, gini_coefficient,
-    mean1d, np_max, pairwise_sum, quantiles, ranks_double_argsort, row_sum, sorted, squash, std1d,
+    argsort, clip, col_mean, col_std, eigvalsh_sym, finite_or_zero, finite_or_zero32,
+    gini_coefficient, mean1d, np_max, pairwise_sum, quantile_sorted, ranks_double_argsort, row_sum,
+    sorted, squash, std1d,
 };
 use super::report_view::NativeReportView;
 use crate::error::{DopeError, Result};
@@ -539,71 +540,118 @@ pub fn compute_table_descriptors(
     let cs = col_std(x, n, p);
     let valid: Vec<bool> = cs.iter().map(|&s| s > 1e-9).collect();
     let mut z = vec![0.0f64; n * p];
+    let mut cols: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
     for i in 0..n {
         for j in 0..p {
             if valid[j] {
-                z[i * p + j] = (x[i * p + j] - cm[j]) / cs[j];
+                let v = (x[i * p + j] - cm[j]) / cs[j];
+                z[i * p + j] = v;
+                cols[j][i] = v;
             }
         }
     }
-    let zmap = |f: &dyn Fn(f64) -> f64| -> Vec<f64> { z.iter().map(|&v| f(v)).collect() };
-    let skew = col_mean(&zmap(&|v| v.powf(3.0)), n, p);
-    let kurt: Vec<f64> = col_mean(&zmap(&|v| v.powf(4.0)), n, p)
-        .into_iter()
-        .map(|k| clip(k - 3.0, -3.0, 50.0))
-        .collect();
-    let cols: Vec<Vec<f64>> = (0..p)
-        .map(|j| (0..n).map(|i| z[i * p + j]).collect())
-        .collect();
-    let mut tail_ratio = vec![0.0; p];
-    for j in 0..p {
-        let q = quantiles(&cols[j], &[0.05, 0.25, 0.75, 0.95]);
-        let iqr = (q[2] - q[1]).max(1e-6);
-        tail_ratio[j] = clip((q[3] - q[0]) / iqr, 0.0, 20.0) / 10.0;
-    }
-    let mode_conc = {
-        let med: Vec<f64> = cols.iter().map(|c| super::np::median(c)).collect();
-        let ind: Vec<f64> = (0..n * p)
-            .map(|k| {
-                if (z[k] - med[k % p]).abs() < 0.05 {
-                    1.0
-                } else {
-                    0.0
-                }
-            })
-            .collect();
-        col_mean(&ind, n, p)
+    let col_mean_1d = |buf: &[f64]| -> f64 {
+        if p == 1 {
+            pairwise_sum(buf) / n as f64
+        } else {
+            let mut s = 0.0;
+            for &v in buf {
+                s += v;
+            }
+            s / n as f64
+        }
     };
-
+    let mut tmp_col = vec![0.0f64; n];
+    let mut skew = vec![0.0f64; p];
+    let mut kurt = vec![0.0f64; p];
+    let mut tail_ratio = vec![0.0f64; p];
+    let mut mode_conc = vec![0.0f64; p];
     let y_std = std1d(y);
+    let mut col_orders: Vec<Vec<usize>> = if y_std > 1e-9 {
+        Vec::with_capacity(p)
+    } else {
+        Vec::new()
+    };
+    for j in 0..p {
+        let cj = &cols[j];
+        for i in 0..n {
+            tmp_col[i] = cj[i].powf(3.0);
+        }
+        skew[j] = col_mean_1d(&tmp_col);
+        for i in 0..n {
+            tmp_col[i] = cj[i].powf(4.0);
+        }
+        kurt[j] = clip(col_mean_1d(&tmp_col) - 3.0, -3.0, 50.0);
+        let s = if y_std > 1e-9 {
+            let ord = argsort(cj);
+            for (k, &idx) in ord.iter().enumerate() {
+                tmp_col[k] = cj[idx];
+            }
+            col_orders.push(ord);
+            &tmp_col[..]
+        } else {
+            let sorted_vec = sorted(cj);
+            tmp_col.copy_from_slice(&sorted_vec);
+            &tmp_col[..]
+        };
+        let q05 = quantile_sorted(s, 0.05);
+        let q25 = quantile_sorted(s, 0.25);
+        let q75 = quantile_sorted(s, 0.75);
+        let q95 = quantile_sorted(s, 0.95);
+        let iqr = (q75 - q25).max(1e-6);
+        tail_ratio[j] = clip((q95 - q05) / iqr, 0.0, 20.0) / 10.0;
+        let med_j = if s[n - 1].is_nan() {
+            f64::NAN
+        } else if n % 2 == 1 {
+            s[n / 2]
+        } else {
+            (s[n / 2 - 1] + s[n / 2]) / 2.0
+        };
+        for i in 0..n {
+            tmp_col[i] = if (cj[i] - med_j).abs() < 0.05 {
+                1.0
+            } else {
+                0.0
+            };
+        }
+        mode_conc[j] = col_mean_1d(&tmp_col);
+    }
+
     let mut y_z = vec![0.0; n];
     let (pearson_r, spearman_r) = if y_std > 1e-9 {
         let ym = mean1d(y);
         for i in 0..n {
             y_z[i] = (y[i] - ym) / y_std;
         }
-        let prod: Vec<f64> = (0..n * p).map(|k| z[k] * y_z[k / p]).collect();
-        let pr: Vec<f64> = col_mean(&prod, n, p).into_iter().map(f64::abs).collect();
+        let mut pr = vec![0.0f64; p];
+        for j in 0..p {
+            let cj = &cols[j];
+            for i in 0..n {
+                tmp_col[i] = cj[i] * y_z[i];
+            }
+            pr[j] = col_mean_1d(&tmp_col).abs();
+        }
         let yr = ranks_double_argsort(y);
         let yrm = mean1d(&yr);
         let yrs = std1d(&yr).max(1e-9);
         let yr: Vec<f64> = yr.iter().map(|v| (v - yrm) / yrs).collect();
-        let mut xr = vec![0.0; n * p];
+        let mut sr = vec![0.0f64; p];
+        let mut r_col = vec![0.0f64; n];
         for j in 0..p {
-            let r = ranks_double_argsort(&cols[j]);
-            for i in 0..n {
-                xr[i * p + j] = r[i];
+            for (rank, &idx) in col_orders[j].iter().enumerate() {
+                r_col[idx] = rank as f64;
             }
+            let xrm = col_mean_1d(&r_col);
+            for i in 0..n {
+                let d = r_col[i] - xrm;
+                tmp_col[i] = d * d;
+            }
+            let xrs = col_mean_1d(&tmp_col).sqrt().max(1e-9);
+            for i in 0..n {
+                tmp_col[i] = ((r_col[i] - xrm) / xrs) * yr[i];
+            }
+            sr[j] = col_mean_1d(&tmp_col).abs();
         }
-        let xrm = col_mean(&xr, n, p);
-        let xrs: Vec<f64> = col_std(&xr, n, p)
-            .into_iter()
-            .map(|s| s.max(1e-9))
-            .collect();
-        let prod: Vec<f64> = (0..n * p)
-            .map(|k| ((xr[k] - xrm[k % p]) / xrs[k % p]) * yr[k / p])
-            .collect();
-        let sr: Vec<f64> = col_mean(&prod, n, p).into_iter().map(f64::abs).collect();
         (pr, sr)
     } else {
         (vec![0.0; p], vec![0.0; p])
@@ -613,10 +661,12 @@ pub fn compute_table_descriptors(
     if p > 1 {
         let mut corr = vec![0.0f64; p * p];
         for a in 0..p {
+            let ca = &cols[a];
             for b in a..p {
+                let cb = &cols[b];
                 let mut s = 0.0;
                 for i in 0..n {
-                    s += z[i * p + a] * z[i * p + b];
+                    s += ca[i] * cb[i];
                 }
                 let v = s / n as f64;
                 corr[a * p + b] = v;
