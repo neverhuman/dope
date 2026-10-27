@@ -700,14 +700,79 @@ fn to_f32<const N: usize>(v: &[f64]) -> [f32; N] {
     out
 }
 
-/// Elementwise map of an `n × p` matrix.
-fn map_mat(z: &[f64], f: impl Fn(f64) -> f64) -> Vec<f64> {
-    z.iter().map(|&v| f(v)).collect()
-}
-
-/// Elementwise map with the column index.
-fn map_mat_col(z: &[f64], p: usize, f: impl Fn(f64, usize) -> f64) -> Vec<f64> {
-    z.iter().enumerate().map(|(i, &v)| f(v, i % p)).collect()
+/// Zero-matrix-allocation columnwise correlation against `y_z`, bit-identical
+/// (0 ULP) to `safe_corr_vec(&map_mat_col(z, p, f), n, p, y_z)`.
+fn corr_cols(
+    z_cols: &[Vec<f64>],
+    n: usize,
+    p: usize,
+    y_z: &[f64],
+    col_buf: &mut [f64],
+    sq_buf: &mut [f64],
+    f: impl Fn(f64, usize) -> f64,
+) -> Vec<f64> {
+    if n * p == 0 || y_z.is_empty() {
+        return vec![0.0; p.max(if p == 0 { 1 } else { 0 })];
+    }
+    let inv_n = 1.0 / n as f64;
+    let sum_1col = |buf: &[f64]| -> f64 {
+        if p == 1 {
+            np::sum(buf)
+        } else {
+            let mut s = 0.0;
+            for &v in buf {
+                s += v;
+            }
+            s
+        }
+    };
+    let mut out = vec![0.0f64; p];
+    let mut valid_count = 0usize;
+    let mut first_valid_j = 0usize;
+    let mut first_valid_pw = 0.0f64;
+    for j in 0..p {
+        let zj = &z_cols[j];
+        for i in 0..n {
+            col_buf[i] = f(zj[i], j);
+        }
+        let mu = sum_1col(&col_buf[..n]) * inv_n;
+        for v in &mut col_buf[..n] {
+            *v -= mu;
+        }
+        let m2 = sum_1col(&col_buf[..n]) * inv_n;
+        let a_s = if p == 1 {
+            for i in 0..n {
+                let d = col_buf[i] - m2;
+                sq_buf[i] = d * d;
+            }
+            (np::sum(&sq_buf[..n]) * inv_n).sqrt()
+        } else {
+            let mut sq_s = 0.0;
+            for &v in &col_buf[..n] {
+                let d = v - m2;
+                sq_s += d * d;
+            }
+            (sq_s * inv_n).sqrt()
+        };
+        if a_s > 1e-9 {
+            let mut seq_sum = 0.0;
+            for i in 0..n {
+                let pr = (col_buf[i] / a_s) * y_z[i];
+                col_buf[i] = pr;
+                seq_sum += pr;
+            }
+            if valid_count == 0 {
+                first_valid_j = j;
+                first_valid_pw = (np::sum(&col_buf[..n]) * inv_n).abs();
+            }
+            valid_count += 1;
+            out[j] = np::nan_to_zero((seq_sum * inv_n).abs());
+        }
+    }
+    if valid_count == 1 {
+        out[first_valid_j] = np::nan_to_zero(first_valid_pw);
+    }
+    out
 }
 
 /// `compute_building_block_landmarks(X_train_scaled, y_train_scaled, level=level)`.
@@ -731,10 +796,13 @@ pub fn compute_building_block_landmarks(
     let c_mean = np::mean_axis0(x, n, p);
     let c_std = np::std_axis0(x, n, p);
     let mut z = vec![0.0f64; n * p];
+    let mut z_cols: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
     for i in 0..n {
         for j in 0..p {
             if c_std[j] > 1e-9 {
-                z[i * p + j] = np::clip((x[i * p + j] - c_mean[j]) / c_std[j], -8.0, 8.0);
+                let v = np::clip((x[i * p + j] - c_mean[j]) / c_std[j], -8.0, 8.0);
+                z[i * p + j] = v;
+                z_cols[j][i] = v;
             }
         }
     }
@@ -748,27 +816,48 @@ pub fn compute_building_block_landmarks(
         vec![0.0; n]
     };
 
-    let corr = |a: &[f64], k: usize| safe_corr_vec(a, n, k, &y_z);
+    let mut col_buf = vec![0.0f64; n];
+    let mut sq_buf = vec![0.0f64; if p == 1 { n } else { 0 }];
     let zeros_p = || vec![0.0f64; p];
 
-    // 1. Per-column building-block probes
-    let c_asinh = corr(&map_mat(&z, np::asinh), p);
-    let c_atan = corr(&map_mat(&z, f64::atan), p);
+    // 1. Per-column building-block probes (evaluated column-by-column in L1 cache)
+    let c_asinh = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+        np::asinh(v)
+    });
+    let c_atan = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+        v.atan()
+    });
     let sqrt2 = 2.0f64.sqrt();
-    let c_erf = corr(&map_mat(&z, |v| erf_as(v / sqrt2)), p);
-    let c_cbrt = corr(&map_mat(&z, |v| np::sign(v) * v.abs().powf(1.0 / 3.0)), p);
-    let c_log1p = corr(&map_mat(&z, |v| np::sign(v) * v.abs().ln_1p()), p);
+    let c_erf = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+        erf_as(v / sqrt2)
+    });
+    let c_cbrt = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+        np::sign(v) * v.abs().powf(1.0 / 3.0)
+    });
+    let c_log1p = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+        np::sign(v) * v.abs().ln_1p()
+    });
     let c_tanh = if lvl_r >= 1 {
-        corr(&map_mat(&z, |v| (0.75 * v).tanh()), p)
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+            (0.75 * v).tanh()
+        })
     } else {
         zeros_p()
     };
     let c_laplace = if lvl_r >= 1 {
-        corr(&map_mat(&z, |v| (-v.abs()).exp_m1()), p)
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+            (-v.abs()).exp_m1()
+        })
     } else {
         zeros_p()
     };
 
+    let need_xi = lvl_r >= 2 && y_std > 1e-9;
+    let mut col_orders: Vec<Vec<usize>> = if need_xi {
+        Vec::with_capacity(p)
+    } else {
+        Vec::new()
+    };
     let mut q = [
         vec![0.0f64; p],
         vec![0.0; p],
@@ -776,80 +865,101 @@ pub fn compute_building_block_landmarks(
         vec![0.0; p],
         vec![0.0; p],
     ];
-    let mut col = vec![0.0f64; n];
     for j in 0..p {
-        for i in 0..n {
-            col[i] = z[i * p + j];
-        }
-        let s = np::sorted(&col);
+        let zj = &z_cols[j];
+        let s = if need_xi {
+            let ord = np::argsort(zj);
+            for (k, &idx) in ord.iter().enumerate() {
+                col_buf[k] = zj[idx];
+            }
+            col_orders.push(ord);
+            &col_buf[..n]
+        } else {
+            let sv = np::sorted(zj);
+            col_buf[..n].copy_from_slice(&sv);
+            &col_buf[..n]
+        };
         for (qi, &qq) in [0.10, 0.25, 0.50, 0.75, 0.90].iter().enumerate() {
-            q[qi][j] = np::quantile_sorted(&s, qq);
+            q[qi][j] = np::quantile_sorted(s, qq);
         }
     }
     let [q10, q25, q50, q75, q90] = q;
     let c_clamp = if lvl_r >= 1 {
-        corr(&map_mat_col(&z, p, |v, j| np::clip(v, q10[j], q90[j])), p)
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, j| {
+            np::clip(v, q10[j], q90[j])
+        })
     } else {
         zeros_p()
     };
     let c_step = if lvl_r >= 2 {
-        corr(
-            &map_mat_col(&z, p, |v, j| if v >= q50[j] { 1.0 } else { 0.0 }),
-            p,
-        )
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, j| {
+            if v >= q50[j] {
+                1.0
+            } else {
+                0.0
+            }
+        })
     } else {
         zeros_p()
     };
     let c_hinge = if lvl_r >= 2 {
-        corr(
-            &map_mat_col(&z, p, |v, j| {
-                np::maximum(0.0, v - q75[j]) - np::maximum(0.0, q25[j] - v)
-            }),
-            p,
-        )
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, j| {
+            np::maximum(0.0, v - q75[j]) - np::maximum(0.0, q25[j] - v)
+        })
     } else {
         zeros_p()
     };
     let half_pi = 0.5 * std::f64::consts::PI;
     let c_sincos = if lvl_r >= 2 {
-        let s = corr(&map_mat(&z, |v| (half_pi * v).sin()), p);
-        let c = corr(&map_mat(&z, |v| (half_pi * v).cos()), p);
+        let s = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+            (half_pi * v).sin()
+        });
+        let c = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+            (half_pi * v).cos()
+        });
         s.iter().zip(&c).map(|(&a, &b)| np::maximum(a, b)).collect()
     } else {
         zeros_p()
     };
     let c_fract = if lvl_r >= 2 {
-        corr(&map_mat(&z, |v| v - v.floor()), p)
+        corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| {
+            v - v.floor()
+        })
     } else {
         zeros_p()
     };
 
-    // Chatterjee xi rank-jump proxy
+    // Chatterjee xi rank-jump proxy (O(n) inverse permutation + reused column argsort)
     let mut c_xi = zeros_p();
-    if lvl_r >= 2 && y_std > 1e-9 {
+    if need_xi {
         let order_y = np::argsort(y);
-        let ranks_idx = np::argsort(&order_y.iter().map(|&v| v as f64).collect::<Vec<_>>());
-        let y_ranks: Vec<f64> = ranks_idx.iter().map(|&v| v as f64).collect();
-        let mut diffs = vec![0.0f64; (n - 1) * p];
-        for j in 0..p {
-            for i in 0..n {
-                col[i] = z[i * p + j];
-            }
-            let order = np::argsort(&col);
-            for i in 0..n - 1 {
-                diffs[i * p + j] = (y_ranks[order[i + 1]] - y_ranks[order[i]]).abs();
-            }
+        let mut y_ranks = vec![0.0f64; n];
+        for (rank, &idx) in order_y.iter().enumerate() {
+            y_ranks[idx] = rank as f64;
         }
-        let d = np::mean_axis0(&diffs, n - 1, p);
         let denom = (n + 1).max(2) as f64;
+        let inv_nm1 = 1.0 / (n - 1) as f64;
         for j in 0..p {
-            c_xi[j] = np::clip(1.0 - (3.0 * d[j]) / denom, 0.0, 1.0);
+            let order = &col_orders[j];
+            for i in 0..n - 1 {
+                col_buf[i] = (y_ranks[order[i + 1]] - y_ranks[order[i]]).abs();
+            }
+            let d_j = if p == 1 {
+                np::sum(&col_buf[..n - 1]) * inv_nm1
+            } else {
+                let mut s = 0.0;
+                for &v in &col_buf[..n - 1] {
+                    s += v;
+                }
+                s * inv_nm1
+            };
+            c_xi[j] = np::clip(1.0 - (3.0 * d_j) / denom, 0.0, 1.0);
         }
     }
 
     // 2. Row-level summary features & their target correlations
     let row_feats = compute_row_summary_features(&z, n, p);
-    let row_corrs = corr(&row_feats, 8);
+    let row_corrs = safe_corr_vec(&row_feats, n, 8, &y_z);
     let row_gain = np::max(&row_corrs);
 
     // 3. Bivariate polar & normalized-ratio probes on top driver pairs
@@ -881,9 +991,9 @@ pub fn compute_building_block_landmarks(
                     dd[i * m + c] = (zi - zj) / (1.0 + zi.abs() + zj.abs());
                 }
             }
-            hypot_gain = np::max(&corr(&h, m));
-            atan2_gain = np::max(&corr(&at, m));
-            norm_diff_gain = np::max(&corr(&dd, m));
+            hypot_gain = np::max(&safe_corr_vec(&h, n, m, &y_z));
+            atan2_gain = np::max(&safe_corr_vec(&at, n, m, &y_z));
+            norm_diff_gain = np::max(&safe_corr_vec(&dd, n, m, &y_z));
         }
     }
 
@@ -912,14 +1022,14 @@ pub fn compute_building_block_landmarks(
     if lvl_r >= 1 && y_std > 1e-9 {
         let best_j = np::argmax(&c_asinh);
         let res_abs: Vec<f64> = (0..n)
-            .map(|i| (y_z[i] - c_asinh[best_j] * z[i * p + best_j]).abs())
+            .map(|i| (y_z[i] - c_asinh[best_j] * z_cols[best_j][i]).abs())
             .collect();
         let res_std = np::std(&res_abs);
         let het_corrs = if res_std > 1e-9 {
             let rm = np::mean(&res_abs);
             let den = res_std.max(1e-9);
             let target: Vec<f64> = res_abs.iter().map(|&r| (r - rm) / den).collect();
-            safe_corr_vec(&z, n, p, &target)
+            corr_cols(&z_cols, n, p, &target, &mut col_buf, &mut sq_buf, |v, _| v)
         } else {
             zeros_p()
         };
@@ -938,8 +1048,20 @@ pub fn compute_building_block_landmarks(
             let ml = np::mean(&y_lo);
             let t_hi: Vec<f64> = y_hi.iter().map(|&v| v - mh).collect();
             let t_lo: Vec<f64> = y_lo.iter().map(|&v| v - ml).collect();
-            let u_corrs = safe_corr_vec(&ind(&|v| v > 1.0, &z), n, p, &t_hi);
-            let l_corrs = safe_corr_vec(&ind(&|v| v < -1.0, &z), n, p, &t_lo);
+            let u_corrs = corr_cols(&z_cols, n, p, &t_hi, &mut col_buf, &mut sq_buf, |v, _| {
+                if v > 1.0 {
+                    1.0
+                } else {
+                    0.0
+                }
+            });
+            let l_corrs = corr_cols(&z_cols, n, p, &t_lo, &mut col_buf, &mut sq_buf, |v, _| {
+                if v < -1.0 {
+                    1.0
+                } else {
+                    0.0
+                }
+            });
             het_and_tail8[4] = np::max(&u_corrs);
             het_and_tail8[5] = np::mean(&u_corrs);
             het_and_tail8[6] = np::max(&l_corrs);
@@ -951,7 +1073,7 @@ pub fn compute_building_block_landmarks(
     let mc_vec20 = compute_multiclass_and_target_simplex(&z, n, p, y, lvl_r);
 
     // 6. Contrasts among the building-block probes
-    let c_lin = corr(&z, p);
+    let c_lin = corr_cols(&z_cols, n, p, &y_z, &mut col_buf, &mut sq_buf, |v, _| v);
     let lin_max = np::max(&c_lin);
     let denom = np::py_max(np::py_max(np::max(&bb_gains16), lin_max), 0.02);
     let g = &bb_gains16;
