@@ -23,9 +23,13 @@ import numpy as np
 ARMS = ['zero', 'macro', 'larger', 'random_sparse', 'random_dense', 'full', 'full_2e9', 'sub100', 'sub200', 'sub300', 'sub500', 'sub1000']
 TRANSITIONS = [('zero', 'macro'), ('macro', 'larger'), ('larger', 'full')]
 GENERATOR_WIDTH = 64
-SUB_ARM_PARTITION = ('sub arms pair sampled native gains with building blocks computed on all fit rows in the Python '
-                     'evaluator; the served Rust path computes building blocks on the native selection, so these arms '
-                     'do not certify served sampled conditioning')
+SUB_ARM_PARTITION = {
+    'served-v1': ('sub arms build their building blocks on the native stratified selection (evidence_positions, '
+                  'cross-checked per table) with table descriptors on the full fit table, as the served Rust path does'),
+    None: ('sub arms pair sampled native gains with building blocks computed on all fit rows in the Python evaluator; '
+           'the served Rust path computes building blocks on the native selection, so these arms do not certify '
+           'served sampled conditioning'),
+}
 MEASURED_FAILURES = {'single_class_synthetic'}
 
 
@@ -128,7 +132,8 @@ def main():
                   vs_full={arm: compare(tabs, arm, 'full') for arm in ARMS if arm != 'full'},
                   fi_vs_full={arm: compare(tabs, arm, 'full', 'FI') for arm in ARMS if arm != 'full'},
                   transitions={f'{x}->{y}': compare(tabs, y, x) for x, y in TRANSITIONS},
-                  vs_full_by_task=by_task, vs_full_truly_subsampled=truly, sub_arm_partition=SUB_ARM_PARTITION,
+                  vs_full_by_task=by_task, vs_full_truly_subsampled=truly,
+                  semantics=meta.get('semantics'), sub_arm_partition=SUB_ARM_PARTITION[meta.get('semantics')],
                   zero_vs_full_where_full_positive=compare([t for t in tabs if t.get('full', {}).get('R') is not None
                                                             and t['full']['R'] > 0], 'zero', 'full'),
                   enc629_cos_to_full={arm: med([t[arm]['enc629_cos'] for t in tabs if arm in t]) for arm in ARMS})

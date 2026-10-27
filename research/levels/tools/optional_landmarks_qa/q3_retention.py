@@ -41,6 +41,7 @@ OPTS = ['--folds', '5', '--knn-reference', '2048', '--ridge-rows', '8192', '--se
 ROLES = ('dev_val_ablation',)
 SIZES = (100, 200, 300, 500, 1000)
 GENERATOR_WIDTH = 64  # MultiLevelLandmarkModel.max_cols: columns emitted by generate_synthetic
+SEMANTICS = 'served-v1'  # raw-target moments, native-selection building blocks, served zero-digest check
 RELEASED_CKPT = '/home/ubuntu/dope/target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.safetensors'
 TASK = {'regression': 'regression', 'binary': 'classification', 'multi_label': 'multiclass'}
 # Per-table failures the evaluation records explicitly instead of aborting the roster: native CLI
@@ -243,7 +244,9 @@ def run_table(job):
                 except ValueError:
                     rho = float('nan')
                 fis.append(None if rho != rho else float(rho))
-            res[name] = dict(retention=rs, fi_spearman=fis, auditor_failures=fails, kept_cells=a.get('kept'), wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
+            res[name] = dict(retention=rs, fi_spearman=fis, auditor_failures=fails,
+                             evidence_rows=len(a['evidence_positions']) if a.get('evidence_positions') is not None else None,
+                             kept_cells=a.get('kept'), wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
                              status=(a['bundle'].status if a.get('bundle') is not None else None))
         for name in res:
             if 'full' not in feats:
@@ -299,7 +302,7 @@ def main():
         raise SystemExit('checkpoint SHA-256 mismatch')
     jobs = [(a.repo, a.bin, e, os.path.join(a.out, 'work'), seeds, i < a.verify_ids, a.ckpt, a.ckpt_sha)
             for i, e in enumerate(picked)]
-    meta = dict(pool=len(pool), picked=len(picked), excluded=excluded, role_manifest=a.role_manifest,
+    meta = dict(semantics=SEMANTICS, pool=len(pool), picked=len(picked), excluded=excluded, role_manifest=a.role_manifest,
                 role_manifest_sha256=a.role_manifest_sha, argv=sys.argv,
                 harness_sha256=hashlib.sha256(open(os.path.abspath(__file__), 'rb').read()).hexdigest(), ckpt=a.ckpt, ckpt_sha256=a.ckpt_sha, roles=ROLES, seeds=seeds, bin=a.bin,
                 bin_sha256=hashlib.sha256(open(a.bin, 'rb').read()).hexdigest(), started=time.time(), loadavg=os.getloadavg())
