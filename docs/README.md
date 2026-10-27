@@ -8,6 +8,7 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | [../paper/](../paper/README.md) | **The DOPE White Paper**: [`paper/dope1.tex`](../paper/dope1.tex) (`target/paper/dope1.pdf`) and [`paper/dope1-supplement.tex`](../paper/dope1-supplement.tex) (`target/paper/dope1-supplement.pdf`), covering the standalone Rust `dope` engine, 16-table real-world study, and 1,000+ dataset `DOPE-MLC-v2`/`v3` study |
 | [multilevel-landmark-dl-study.md](multilevel-landmark-dl-study.md) | Canonical 1,000-dataset (`DOPE-MLC-v2`) and 1,069-dataset (`DOPE-MLC-v3`) deep learning study, round-by-round convergence tables, and `v8` receipt provenance |
 | [model-sizes-and-elo.md](model-sizes-and-elo.md) | Complete model weight inventory (`SafeTensors`, `.pt`, `.dml3`), SHA-256 digests, wire byte accounting, and Bradley–Terry Elo tables |
+| [jopedime-integration.md](jopedime-integration.md) | **Downstream Integration & Pinning Guide (`JopeDime` & `JopeDimeMicro`)**: `v1.0.0` tag/SHA-256 pinning, weight hosting decision (`1.70 MiB` on GitHub Releases), `[B, 256] + [B, 64, 17] -> [B, 629]` tensor contract (`DopeEncoder629`), CPU export, CUDA capture, and proposed downstream projection optimization |
 | [math.md](math.md) | The program, the metric, the transfer theory, where the bytes go, and the research roadmap |
 | [metric.md](metric.md) | Transfer Description Length (TDL): definitions, gates, result states |
 | [claims-policy.md](claims-policy.md) | What the public surface may claim, evidence labels, banned phrases |
