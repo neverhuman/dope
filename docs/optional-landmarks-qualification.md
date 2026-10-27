@@ -53,7 +53,7 @@ An earlier version of this page did not do the first two, so its regression and 
 
 **Coverage (101 of 112 tables valid):**
 - Ten multiclass tables (p 76–795) are wider than the generator's 64 output columns. Their synthetic rows cannot be scored on the full-width test split, so they are protocol-unavailable.
-- One multiclass table with fractional class labels is protocol-unavailable because the Python evaluator's class preparation differs from the served one. Lossless class lineage is open work.
+- One multiclass table (ten fractional class labels) is protocol-unavailable: one column's Spearman descriptor differs between the Python evaluator and the served path (0.020782 vs 0.020763, a tie-ranking difference), so its zero-arm digest does not match the served one.
 - Stratified subsampling refuses classes with fewer than two rows at that N. Those arms are recorded as unavailable rather than dropped.
 - No auditor failed on any valid table.
 
