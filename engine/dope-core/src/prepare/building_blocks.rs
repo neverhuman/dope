@@ -12,16 +12,6 @@
 pub use super::building_blocks_np as np;
 pub use super::building_blocks_simplex::*;
 
-/// `LEVEL_RANK` of the Python reference; unknown levels rank as `ultra` (3).
-pub fn level_rank(level: &str) -> u8 {
-    match level {
-        "low" | "small" => 0,
-        "medium" => 1,
-        "high" => 2,
-        _ => 3,
-    }
-}
-
 /// Output of [`compute_building_block_landmarks`] (float32 like Python).
 #[derive(Debug, Clone, PartialEq)]
 pub struct BuildingBlockDescriptors {
@@ -53,14 +43,6 @@ impl BuildingBlockDescriptors {
     }
 }
 
-pub(crate) fn to_f32<const N: usize>(v: &[f64]) -> [f32; N] {
-    let mut out = [0.0f32; N];
-    for (o, &x) in out.iter_mut().zip(v) {
-        *o = x as f32;
-    }
-    out
-}
-
 /// Zero-matrix-allocation columnwise correlation against `y_z`, bit-identical
 /// (0 ULP) to `safe_corr_vec(&map_mat_col(z, p, f), n, p, y_z)`.
 fn corr_cols(
@@ -76,31 +58,40 @@ fn corr_cols(
         return vec![0.0; p.max(if p == 0 { 1 } else { 0 })];
     }
     let inv_n = 1.0 / n as f64;
-    let sum_1col = |buf: &[f64]| -> f64 {
-        if p == 1 {
-            np::sum(buf)
-        } else {
-            let mut s = 0.0;
-            for &v in buf {
-                s += v;
-            }
-            s
-        }
-    };
     let mut out = vec![0.0f64; p];
     let mut valid_count = 0usize;
     let mut first_valid_j = 0usize;
     let mut first_valid_pw = 0.0f64;
     for j in 0..p {
         let zj = &z_cols[j];
-        for i in 0..n {
-            col_buf[i] = f(zj[i], j);
-        }
-        let mu = sum_1col(&col_buf[..n]) * inv_n;
-        for v in &mut col_buf[..n] {
-            *v -= mu;
-        }
-        let m2 = sum_1col(&col_buf[..n]) * inv_n;
+        let mu = if p == 1 {
+            for i in 0..n {
+                col_buf[i] = f(zj[i], j);
+            }
+            np::sum(&col_buf[..n]) * inv_n
+        } else {
+            let mut s = 0.0;
+            for i in 0..n {
+                let v = f(zj[i], j);
+                col_buf[i] = v;
+                s += v;
+            }
+            s * inv_n
+        };
+        let m2 = if p == 1 {
+            for v in &mut col_buf[..n] {
+                *v -= mu;
+            }
+            np::sum(&col_buf[..n]) * inv_n
+        } else {
+            let mut s2 = 0.0;
+            for v in &mut col_buf[..n] {
+                let c = *v - mu;
+                *v = c;
+                s2 += c;
+            }
+            s2 * inv_n
+        };
         let a_s = if p == 1 {
             for i in 0..n {
                 let d = col_buf[i] - m2;
@@ -117,14 +108,18 @@ fn corr_cols(
         };
         if a_s > 1e-9 {
             let mut seq_sum = 0.0;
-            for i in 0..n {
-                let pr = (col_buf[i] / a_s) * y_z[i];
-                col_buf[i] = pr;
-                seq_sum += pr;
-            }
             if valid_count == 0 {
+                for i in 0..n {
+                    let pr = (col_buf[i] / a_s) * y_z[i];
+                    col_buf[i] = pr;
+                    seq_sum += pr;
+                }
                 first_valid_j = j;
                 first_valid_pw = (np::sum(&col_buf[..n]) * inv_n).abs();
+            } else {
+                for i in 0..n {
+                    seq_sum += (col_buf[i] / a_s) * y_z[i];
+                }
             }
             valid_count += 1;
             out[j] = np::nan_to_zero((seq_sum * inv_n).abs());
@@ -155,13 +150,14 @@ pub fn compute_building_block_landmarks(
 
     // Standardize columns on D_train
     let c_mean = np::mean_axis0(x, n, p);
-    let c_std = np::std_axis0(x, n, p);
+    let c_std = np::std_axis0_with_mean(x, n, p, &c_mean);
     let mut z = vec![0.0f64; n * p];
     let mut z_cols: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
     for i in 0..n {
+        let row = &x[i * p..(i + 1) * p];
         for j in 0..p {
             if c_std[j] > 1e-9 {
-                let v = np::clip((x[i * p + j] - c_mean[j]) / c_std[j], -8.0, 8.0);
+                let v = np::clip((row[j] - c_mean[j]) / c_std[j], -8.0, 8.0);
                 z[i * p + j] = v;
                 z_cols[j][i] = v;
             }
@@ -178,7 +174,7 @@ pub fn compute_building_block_landmarks(
     };
 
     let mut col_buf = vec![0.0f64; n];
-    let mut sq_buf = vec![0.0f64; if p == 1 { n } else { 0 }];
+    let mut sq_buf = vec![0.0f64; n];
     let zeros_p = || vec![0.0f64; p];
 
     // 1. Per-column building-block probes (evaluated column-by-column in L1 cache)
@@ -339,22 +335,35 @@ pub fn compute_building_block_landmarks(
             }
         }
         if !pairs.is_empty() {
-            let m = pairs.len();
-            let mut h = vec![0.0f64; n * m];
-            let mut at = vec![0.0f64; n * m];
-            let mut dd = vec![0.0f64; n * m];
-            for i in 0..n {
-                for (c, &(ia, ib)) in pairs.iter().enumerate() {
-                    let zi = z[i * p + ia];
-                    let zj = z[i * p + ib];
-                    h[i * m + c] = zi.hypot(zj);
-                    at[i * m + c] = zi.atan2(zj);
-                    dd[i * m + c] = (zi - zj) / (1.0 + zi.abs() + zj.abs());
-                }
+            hypot_gain = np::max(&corr_pairs(
+                &z_cols,
+                &pairs,
+                n,
+                &y_z,
+                &mut col_buf,
+                &mut sq_buf,
+                f64::hypot,
+            ));
+            if lvl_r >= 3 {
+                atan2_gain = np::max(&corr_pairs(
+                    &z_cols,
+                    &pairs,
+                    n,
+                    &y_z,
+                    &mut col_buf,
+                    &mut sq_buf,
+                    f64::atan2,
+                ));
+                norm_diff_gain = np::max(&corr_pairs(
+                    &z_cols,
+                    &pairs,
+                    n,
+                    &y_z,
+                    &mut col_buf,
+                    &mut sq_buf,
+                    |zi, zj| (zi - zj) / (1.0 + zi.abs() + zj.abs()),
+                ));
             }
-            hypot_gain = np::max(&safe_corr_vec(&h, n, m, &y_z));
-            atan2_gain = np::max(&safe_corr_vec(&at, n, m, &y_z));
-            norm_diff_gain = np::max(&safe_corr_vec(&dd, n, m, &y_z));
         }
     }
 

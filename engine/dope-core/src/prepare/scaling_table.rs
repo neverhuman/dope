@@ -91,31 +91,31 @@ pub(crate) fn canonical_f64_bits(v: f64) -> u64 {
 }
 
 pub(crate) fn hash_raw_cells(x: &[Vec<String>], yv: &[TargetValue<'_>]) -> [u8; 32] {
-    let mut h = Sha256::new();
+    let mut h = BufferedSha256::new();
     h.update(b"dope.prepared-cells/v1\0");
-    h.update((x.len() as u64).to_le_bytes());
+    h.update(&(x.len() as u64).to_le_bytes());
     for row in x {
-        h.update((row.len() as u64).to_le_bytes());
+        h.update(&(row.len() as u64).to_le_bytes());
         for cell in row {
-            h.update((cell.len() as u64).to_le_bytes());
+            h.update(&(cell.len() as u64).to_le_bytes());
             h.update(cell.as_bytes());
         }
     }
-    h.update((yv.len() as u64).to_le_bytes());
+    h.update(&(yv.len() as u64).to_le_bytes());
     for v in yv {
         match v {
             TargetValue::Num(f) => {
-                h.update([0u8]);
-                h.update(canonical_f64_bits(*f).to_le_bytes());
+                h.update(&[0u8]);
+                h.update(&canonical_f64_bits(*f).to_le_bytes());
             }
             TargetValue::Str(s) => {
-                h.update([1u8]);
-                h.update((s.len() as u64).to_le_bytes());
+                h.update(&[1u8]);
+                h.update(&(s.len() as u64).to_le_bytes());
                 h.update(s.as_bytes());
             }
         }
     }
-    h.finalize().into()
+    h.finalize()
 }
 
 /// Native classification `target_stats` (`[normalized_entropy, min_class_share]`)
@@ -361,7 +361,7 @@ impl PreparedTable {
     /// Deterministic SHA-256 hex digest over all prepared table identity fields (ignoring
     /// `source_digest_override`).
     pub fn computed_source_rows_digest(&self) -> String {
-        let mut h = Sha256::new();
+        let mut h = BufferedSha256::new();
         match self.transform.class_vocab_policy {
             ClassVocabPolicy::Cap32V1 => h.update(b"dope.prepared-table/v1\0"),
             ClassVocabPolicy::LosslessV1 => h.update(b"dope.prepared-table/lossless-v1\0"),
@@ -369,29 +369,29 @@ impl PreparedTable {
         h.update(self.task.as_str().as_bytes());
         h.update(b"\0");
         for v in [self.rows as u64, self.features as u64, self.classes as u64] {
-            h.update(v.to_le_bytes());
+            h.update(&v.to_le_bytes());
         }
         for &id in &self.row_ids {
-            h.update(id.to_le_bytes());
+            h.update(&id.to_le_bytes());
         }
         for &c in &self.categories {
-            h.update(c.map_or(u64::MAX, |k| k as u64).to_le_bytes());
+            h.update(&c.map_or(u64::MAX, |k| k as u64).to_le_bytes());
         }
         for &k in &self.transform.kinds {
-            h.update([match k {
+            h.update(&[match k {
                 ColumnKind::Numeric => 0u8,
                 ColumnKind::Categorical => 1u8,
             }]);
         }
         match &self.category_tokens {
-            None => h.update([0u8]),
+            None => h.update(&[0u8]),
             Some(cols) => {
-                h.update([1u8]);
-                h.update((cols.len() as u64).to_le_bytes());
+                h.update(&[1u8]);
+                h.update(&(cols.len() as u64).to_le_bytes());
                 for col in cols {
-                    h.update((col.len() as u64).to_le_bytes());
+                    h.update(&(col.len() as u64).to_le_bytes());
                     for tok in col {
-                        h.update((tok.len() as u64).to_le_bytes());
+                        h.update(&(tok.len() as u64).to_le_bytes());
                         h.update(tok.as_bytes());
                     }
                 }
@@ -399,33 +399,33 @@ impl PreparedTable {
         }
         for opt_ce in &self.transform.categorical {
             match opt_ce {
-                None => h.update([0u8]),
+                None => h.update(&[0u8]),
                 Some(ce) => {
-                    h.update([1u8]);
-                    h.update((ce.vocab_tokens.len() as u64).to_le_bytes());
+                    h.update(&[1u8]);
+                    h.update(&(ce.vocab_tokens.len() as u64).to_le_bytes());
                     for tok in &ce.vocab_tokens {
-                        h.update((tok.len() as u64).to_le_bytes());
+                        h.update(&(tok.len() as u64).to_le_bytes());
                         h.update(tok.as_bytes());
                     }
                 }
             }
         }
         match &self.transform.target.positive_label {
-            None => h.update([0u8]),
+            None => h.update(&[0u8]),
             Some(pos) => {
-                h.update([1u8]);
-                h.update((pos.len() as u64).to_le_bytes());
+                h.update(&[1u8]);
+                h.update(&(pos.len() as u64).to_le_bytes());
                 h.update(pos.as_bytes());
             }
         }
-        h.update((self.transform.target.class_labels.len() as u64).to_le_bytes());
+        h.update(&(self.transform.target.class_labels.len() as u64).to_le_bytes());
         for &lbl in &self.transform.target.class_labels {
-            h.update(canonical_f64_bits(lbl).to_le_bytes());
+            h.update(&canonical_f64_bits(lbl).to_le_bytes());
         }
         match &self.raw_cells_sha256 {
-            None => h.update([0u8]),
+            None => h.update(&[0u8]),
             Some(raw) => {
-                h.update([1u8]);
+                h.update(&[1u8]);
                 h.update(raw);
             }
         }
@@ -436,8 +436,58 @@ impl PreparedTable {
             .chain(self.frame_columns.iter().flatten())
             .chain(self.frame_y.iter())
         {
-            h.update(canonical_f64_bits(v).to_le_bytes());
+            h.update(&canonical_f64_bits(v).to_le_bytes());
         }
-        format!("{:x}", h.finalize())
+        let digest = h.finalize();
+        let mut out = String::with_capacity(64);
+        for b in digest {
+            use std::fmt::Write;
+            let _ = write!(&mut out, "{b:02x}");
+        }
+        out
+    }
+}
+
+pub(crate) struct BufferedSha256 {
+    h: Sha256,
+    buf: [u8; 4096],
+    len: usize,
+}
+
+impl BufferedSha256 {
+    #[inline]
+    pub(crate) fn new() -> Self {
+        Self {
+            h: Sha256::new(),
+            buf: [0u8; 4096],
+            len: 0,
+        }
+    }
+
+    #[inline]
+    pub(crate) fn update(&mut self, data: &[u8]) {
+        if self.len + data.len() <= self.buf.len() {
+            self.buf[self.len..self.len + data.len()].copy_from_slice(data);
+            self.len += data.len();
+        } else {
+            if self.len > 0 {
+                self.h.update(&self.buf[..self.len]);
+                self.len = 0;
+            }
+            if data.len() >= self.buf.len() {
+                self.h.update(data);
+            } else {
+                self.buf[..data.len()].copy_from_slice(data);
+                self.len = data.len();
+            }
+        }
+    }
+
+    #[inline]
+    pub(crate) fn finalize(mut self) -> [u8; 32] {
+        if self.len > 0 {
+            self.h.update(&self.buf[..self.len]);
+        }
+        self.h.finalize().into()
     }
 }

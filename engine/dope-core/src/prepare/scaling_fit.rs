@@ -1,12 +1,16 @@
 //! Column and target fitting helpers for `prepare::scaling`.
 
-use super::np::{clip, linspace, mean1d, sorted, std1d};
+use super::np::{
+    clip, linspace, mean1d, pairwise_sum_map, quantiles, sorted, std1d, std1d_with_mean,
+};
 use super::scaling::{
-    err, CategoricalColumnEncoder, ColumnKind, NumericColumnScaler, TargetValue, TransformKind,
-    QUANTILE_GRID,
+    err, CategoricalColumnEncoder, NumericColumnScaler, PrepTask, TargetScaler, TargetValue,
+    TransformKind, QUANTILE_GRID,
 };
 use crate::error::Result;
 use std::collections::HashMap;
+
+const MISSING_TOKENS: [&str; 5] = ["nan", "null", "none", "?", "na"];
 
 #[inline]
 pub(crate) fn np_sign(x: f64) -> f64 {
@@ -22,49 +26,51 @@ pub(crate) fn np_sign(x: f64) -> f64 {
 }
 
 /// Python `str.strip()` (whitespace per `str.isspace` for ASCII + Unicode).
+#[inline]
 pub(crate) fn py_strip(s: &str) -> &str {
     s.trim_matches(|c: char| c.is_whitespace() || ('\u{1c}'..='\u{1f}').contains(&c))
 }
 
 #[inline]
 pub(crate) fn is_missing_token(s: &str) -> bool {
-    matches!(s.len(), 0..=4)
-        && (s.is_empty()
-            || s == "?"
-            || s.eq_ignore_ascii_case("na")
-            || s.eq_ignore_ascii_case("nan")
-            || s.eq_ignore_ascii_case("null")
-            || s.eq_ignore_ascii_case("none"))
+    let _ = MISSING_TOKENS;
+    match s.len() {
+        0 => true,
+        1 => s == "?",
+        2 => s.eq_ignore_ascii_case("na"),
+        3 => s.eq_ignore_ascii_case("nan"),
+        4 => s.eq_ignore_ascii_case("null") || s.eq_ignore_ascii_case("none"),
+        _ => false,
+    }
 }
 
 /// Python `float(s)` on an already-stripped string.
 #[inline]
 pub(crate) fn py_float(s: &str) -> Option<f64> {
-    if s.is_empty() {
-        return None;
-    }
     let b = s.as_bytes();
-    let body = match b[0] {
-        b'+' | b'-' => &s[1..],
-        _ => s,
-    };
-    if body.is_empty() || matches!(body.as_bytes()[0], b'+' | b'-') {
+    if b.is_empty() {
         return None;
     }
-    if !(body.eq_ignore_ascii_case("inf")
-        || body.eq_ignore_ascii_case("infinity")
-        || body.eq_ignore_ascii_case("nan")
-        || body
-            .bytes()
-            .all(|c| c.is_ascii_digit() || matches!(c, b'.' | b'e' | b'E' | b'+' | b'-')))
-    {
+    let body = match b[0] {
+        b'+' | b'-' => &b[1..],
+        _ => b,
+    };
+    if body.is_empty() || matches!(body[0], b'+' | b'-') {
+        return None;
+    }
+    let valid = body
+        .iter()
+        .all(|&c| c.is_ascii_digit() || matches!(c, b'.' | b'e' | b'E' | b'+' | b'-'))
+        || body.eq_ignore_ascii_case(b"inf")
+        || body.eq_ignore_ascii_case(b"infinity")
+        || body.eq_ignore_ascii_case(b"nan");
+    if !valid {
         return None;
     }
     s.parse::<f64>().ok()
 }
 
 /// `scaling._parse_float` for a string cell.
-#[inline]
 pub fn parse_float_cell(cell: &str) -> f64 {
     let s = py_strip(cell);
     if is_missing_token(s) {
@@ -84,53 +90,13 @@ pub(crate) fn regression_array(y: &[TargetValue<'_>]) -> Result<Vec<f64>> {
         .collect()
 }
 
-pub(crate) fn infer_feature_kinds_and_parse(
-    rows: &[Vec<String>],
-    p: usize,
-) -> (Vec<ColumnKind>, Vec<Option<Vec<f64>>>) {
-    let n = rows.len();
-    let mut kinds = Vec::with_capacity(p);
-    let mut parsed_cols = Vec::with_capacity(p);
-    for j in 0..p {
-        let mut col = Vec::with_capacity(n);
-        let mut is_numeric = true;
-        for r in rows {
-            let s = py_strip(&r[j]);
-            if is_missing_token(s) {
-                col.push(f64::NAN);
-                continue;
-            }
-            if let Some(v) = py_float(s) {
-                col.push(v);
-            } else {
-                is_numeric = false;
-                break;
-            }
-        }
-        if is_numeric {
-            kinds.push(ColumnKind::Numeric);
-            parsed_cols.push(Some(col));
-        } else {
-            kinds.push(ColumnKind::Categorical);
-            parsed_cols.push(None);
-        }
-    }
-    (kinds, parsed_cols)
-}
-
-pub(super) fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {
-    if x.len() < 4 {
+fn safe_skew_kurt_with_stats(x: &[f64], m: f64, s: f64) -> (f64, f64) {
+    if x.len() < 4 || !s.is_finite() || s <= 1e-12 {
         return (0.0, 0.0);
     }
-    let m = mean1d(x);
-    let s = std1d(x);
-    if !s.is_finite() || s <= 1e-12 {
-        return (0.0, 0.0);
-    }
-    let z3: Vec<f64> = x.iter().map(|&v| ((v - m) / s).powf(3.0)).collect();
-    let z4: Vec<f64> = x.iter().map(|&v| ((v - m) / s).powf(4.0)).collect();
-    let skew = mean1d(&z3);
-    let kurt = mean1d(&z4) - 3.0;
+    let n_f = x.len() as f64;
+    let skew = pairwise_sum_map(x, |v| ((v - m) / s).powf(3.0)) / n_f;
+    let kurt = pairwise_sum_map(x, |v| ((v - m) / s).powf(4.0)) / n_f - 3.0;
     let skew = if skew.is_finite() {
         clip(skew, -50.0, 50.0)
     } else {
@@ -142,6 +108,15 @@ pub(super) fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {
         0.0
     };
     (skew, kurt)
+}
+
+pub(super) fn safe_skew_kurt(x: &[f64]) -> (f64, f64) {
+    if x.len() < 4 {
+        return (0.0, 0.0);
+    }
+    let m = mean1d(x);
+    let s = std1d_with_mean(x, m);
+    safe_skew_kurt_with_stats(x, m, s)
 }
 
 fn py_max(vals: &[f64]) -> f64 {
@@ -173,16 +148,22 @@ pub(crate) fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScale
         };
     }
     let s = sorted(&finite);
-    let mut uniq = s.clone();
-    uniq.dedup();
+    let mut uniq_count = 1usize;
+    for w in s.windows(2) {
+        if w[0] != w[1] {
+            uniq_count += 1;
+            if uniq_count > 2 {
+                break;
+            }
+        }
+    }
     let q_vals: [f64; 9] = QUANTILE_GRID.map(|q| super::np::quantile_sorted(&s, q));
-    let (skew, kurt) = safe_skew_kurt(&finite);
-    if uniq.len() <= 1 {
+    if uniq_count <= 1 {
         return NumericColumnScaler {
             slot,
             transform_kind: TransformKind::Constant,
             missing_rate: miss_rate,
-            center: uniq[0],
+            center: s[0],
             scale: 1.0,
             post_mean: 0.0,
             post_std: 1.0,
@@ -192,13 +173,15 @@ pub(crate) fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScale
             blend_quantile_weight: 0.35,
         };
     }
-    let std_f = std1d(&finite);
-    if uniq.len() == 2 {
+    let mean_f = mean1d(&finite);
+    let std_f = std1d_with_mean(&finite, mean_f);
+    let (skew, kurt) = safe_skew_kurt_with_stats(&finite, mean_f, std_f);
+    if uniq_count == 2 {
         return NumericColumnScaler {
             slot,
             transform_kind: TransformKind::Binary,
             missing_rate: miss_rate,
-            center: mean1d(&finite),
+            center: mean_f,
             scale: std_f.max(1e-6),
             post_mean: 0.0,
             post_std: 1.0,
@@ -218,32 +201,35 @@ pub(crate) fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScale
     };
     let k = s.len();
     let split = s.partition_point(|&v| v < med);
-    let mut abs_sorted = Vec::with_capacity(k);
     let mut left = split;
     let mut right = split;
-    while left > 0 && right < k {
-        let dl = (s[left - 1] - med).abs();
-        let dr = (s[right] - med).abs();
-        if dl <= dr {
-            abs_sorted.push(dl);
+    let mut prev = 0.0f64;
+    let mut curr = 0.0f64;
+    for _ in 0..=(k / 2) {
+        prev = curr;
+        curr = if left > 0 && right < k {
+            let dl = (s[left - 1] - med).abs();
+            let dr = (s[right] - med).abs();
+            if dl <= dr {
+                left -= 1;
+                dl
+            } else {
+                right += 1;
+                dr
+            }
+        } else if left > 0 {
             left -= 1;
+            (s[left] - med).abs()
         } else {
-            abs_sorted.push(dr);
+            let v = (s[right] - med).abs();
             right += 1;
-        }
-    }
-    while left > 0 {
-        abs_sorted.push((s[left - 1] - med).abs());
-        left -= 1;
-    }
-    while right < k {
-        abs_sorted.push((s[right] - med).abs());
-        right += 1;
+            v
+        };
     }
     let mad = if k % 2 == 1 {
-        abs_sorted[k / 2]
+        curr
     } else {
-        (abs_sorted[k / 2 - 1] + abs_sorted[k / 2]) / 2.0
+        (prev + curr) / 2.0
     };
     let robust_scale = py_max(&[iqr / 1.3489795, mad * 1.4826, std_f * 0.25, 1e-6]);
     if skew.abs() > 1.0 || kurt > 4.0 || tail_ratio > 4.2 {
@@ -254,14 +240,16 @@ pub(crate) fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScale
                 np_sign(sh) * (sh.abs() / robust_scale).ln_1p()
             })
             .collect();
+        let lm = mean1d(&logged);
+        let ls = std1d_with_mean(&logged, lm).max(1e-6);
         return NumericColumnScaler {
             slot,
             transform_kind: TransformKind::SignedLog1pHybrid,
             missing_rate: miss_rate,
             center: med,
             scale: robust_scale,
-            post_mean: mean1d(&logged),
-            post_std: std1d(&logged).max(1e-6),
+            post_mean: lm,
+            post_std: ls,
             quantiles: q_vals,
             skewness: skew,
             kurtosis: kurt,
@@ -274,7 +262,7 @@ pub(crate) fn fit_numeric_column(slot: usize, col: &[f64]) -> NumericColumnScale
         missing_rate: miss_rate,
         center: med,
         scale: robust_scale,
-        post_mean: mean1d(&finite),
+        post_mean: mean_f,
         post_std: std_f.max(1e-6),
         quantiles: q_vals,
         skewness: skew,
@@ -394,6 +382,68 @@ pub fn py_float_repr(x: f64) -> String {
         format!("0.{}{}", "0".repeat((-exp - 1) as usize), digits)
     };
     format!("{sign}{s}")
+}
+
+pub(crate) fn fit_target_scaler_with_policy(
+    y: &[TargetValue<'_>],
+    task: PrepTask,
+    policy: super::scaling::ClassVocabPolicy,
+) -> Result<TargetScaler> {
+    match task {
+        PrepTask::Multiclass => Ok(super::scaling::fit_multiclass_target_scaler(y, policy)),
+        PrepTask::Classification => {
+            let tokens: Vec<String> = y
+                .iter()
+                .map(|v| match v {
+                    TargetValue::Num(x) => py_float_repr(*x),
+                    TargetValue::Str(s) => py_strip(s).to_string(),
+                })
+                .collect();
+            let mut uniq = tokens.clone();
+            uniq.sort();
+            uniq.dedup();
+            let pos = if uniq.iter().any(|u| u == "1") {
+                "1".to_string()
+            } else if uniq.iter().any(|u| u == "1.0") {
+                "1.0".to_string()
+            } else if let Some(t) = uniq.iter().find(|u| u.to_lowercase() == "true") {
+                t.clone()
+            } else {
+                uniq.last().cloned().unwrap_or_else(|| "1".to_string())
+            };
+            let bin: Vec<f64> = tokens.iter().map(|t| f64::from(*t == pos)).collect();
+            let prior = if bin.is_empty() { 0.5 } else { mean1d(&bin) };
+            let (s, med) = (
+                (prior * (1.0 - prior)).sqrt().max(1e-6),
+                f64::from(prior >= 0.5),
+            );
+            let mut ts = TargetScaler::base(task, prior, s, med, 1.0, 0.0, 0.0);
+            ts.positive_label = Some(pos);
+            ts.class_prior = prior;
+            Ok(ts)
+        }
+        PrepTask::Regression => {
+            let finite: Vec<f64> = regression_array(y)?
+                .into_iter()
+                .filter(|v| v.is_finite())
+                .collect();
+            if finite.is_empty() {
+                return Ok(TargetScaler::base(task, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0));
+            }
+            let (m, s) = (mean1d(&finite), std1d(&finite).max(1e-6));
+            let q = quantiles(&finite, &[0.25, 0.5, 0.75]);
+            let (skew, kurt) = safe_skew_kurt(&finite);
+            Ok(TargetScaler::base(
+                task,
+                m,
+                s,
+                q[1],
+                (q[2] - q[0]).max(1e-6),
+                skew,
+                kurt,
+            ))
+        }
+    }
 }
 
 #[cfg(test)]

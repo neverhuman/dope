@@ -92,20 +92,38 @@ pub fn mean_axis0(x: &[f64], n: usize, k: usize) -> Vec<f64> {
     s
 }
 
+/// `np.std(x, axis=0)` (ddof = 0) given precomputed `mean_axis0`.
+pub fn std_axis0_with_mean(x: &[f64], n: usize, k: usize, m: &[f64]) -> Vec<f64> {
+    if k == 1 {
+        let m0 = m[0];
+        let sq: Vec<f64> = x[..n]
+            .iter()
+            .map(|&v| {
+                let d = v - m0;
+                d * d
+            })
+            .collect();
+        return vec![(sum(&sq) / n as f64).sqrt()];
+    }
+    let mut out = vec![0.0f64; k];
+    for i in 0..n {
+        let row = &x[i * k..(i + 1) * k];
+        for j in 0..k {
+            let d = row[j] - m[j];
+            out[j] += d * d;
+        }
+    }
+    let n_f = n as f64;
+    for v in &mut out {
+        *v = (*v / n_f).sqrt();
+    }
+    out
+}
+
 /// `np.std(x, axis=0)` (ddof = 0).
 pub fn std_axis0(x: &[f64], n: usize, k: usize) -> Vec<f64> {
     let m = mean_axis0(x, n, k);
-    let mut sq = vec![0.0f64; n * k];
-    for i in 0..n {
-        for j in 0..k {
-            let d = x[i * k + j] - m[j];
-            sq[i * k + j] = d * d;
-        }
-    }
-    sum_axis0(&sq, n, k)
-        .into_iter()
-        .map(|s| (s / n as f64).sqrt())
-        .collect()
+    std_axis0_with_mean(x, n, k, &m)
 }
 
 /// `np.sum(x, axis=1)` of a C-contiguous `(n, k)` matrix.
@@ -196,126 +214,10 @@ fn less(a: f64, b: f64) -> bool {
     a < b || (b.is_nan() && !a.is_nan())
 }
 
-fn aheapsort(v: &[f64], t: &mut [usize]) {
-    let mut n = t.len();
-    let a = |t: &[usize], i: usize| t[i - 1];
-    let mut l = n >> 1;
-    while l > 0 {
-        let tmp = a(t, l);
-        let (mut i, mut j) = (l, l << 1);
-        while j <= n {
-            if j < n && less(v[a(t, j)], v[a(t, j + 1)]) {
-                j += 1;
-            }
-            if less(v[tmp], v[a(t, j)]) {
-                t[i - 1] = a(t, j);
-                i = j;
-                j += j;
-            } else {
-                break;
-            }
-        }
-        t[i - 1] = tmp;
-        l -= 1;
-    }
-    while n > 1 {
-        let tmp = a(t, n);
-        t[n - 1] = a(t, 1);
-        n -= 1;
-        let (mut i, mut j) = (1usize, 2usize);
-        while j <= n {
-            if j < n && less(v[a(t, j)], v[a(t, j + 1)]) {
-                j += 1;
-            }
-            if less(v[tmp], v[a(t, j)]) {
-                t[i - 1] = a(t, j);
-                i = j;
-                j += j;
-            } else {
-                break;
-            }
-        }
-        t[i - 1] = tmp;
-    }
-}
-
 /// `np.argsort(v)` with the default (introsort, unstable) kind, including
 /// numpy's tie ordering on hosts without AVX-512 dispatch.
 pub fn argsort(v: &[f64]) -> Vec<usize> {
-    let num = v.len();
-    let mut t: Vec<usize> = (0..num).collect();
-    if num <= 1 {
-        return t;
-    }
-    let msb = (usize::BITS - 1 - num.leading_zeros()) as i64;
-    let mut cdepth: i64 = msb * 2;
-    let (mut pl, mut pr): (usize, usize) = (0, num - 1);
-    let mut stack: Vec<(usize, usize, i64)> = Vec::new();
-    loop {
-        if cdepth < 0 {
-            aheapsort(v, &mut t[pl..=pr]);
-        } else {
-            while pr - pl > 15 {
-                let pm = pl + ((pr - pl) >> 1);
-                if less(v[t[pm]], v[t[pl]]) {
-                    t.swap(pm, pl);
-                }
-                if less(v[t[pr]], v[t[pm]]) {
-                    t.swap(pr, pm);
-                }
-                if less(v[t[pm]], v[t[pl]]) {
-                    t.swap(pm, pl);
-                }
-                let vp = v[t[pm]];
-                let mut pi = pl;
-                let mut pj = pr - 1;
-                t.swap(pm, pj);
-                loop {
-                    pi += 1;
-                    while less(v[t[pi]], vp) {
-                        pi += 1;
-                    }
-                    pj -= 1;
-                    while less(vp, v[t[pj]]) {
-                        pj -= 1;
-                    }
-                    if pi >= pj {
-                        break;
-                    }
-                    t.swap(pi, pj);
-                }
-                let pk = pr - 1;
-                t.swap(pi, pk);
-                cdepth -= 1;
-                if pi - pl < pr - pi {
-                    stack.push((pi + 1, pr, cdepth));
-                    pr = pi - 1;
-                } else {
-                    stack.push((pl, pi - 1, cdepth));
-                    pl = pi + 1;
-                }
-            }
-            for pi in pl + 1..=pr {
-                let vi = t[pi];
-                let vp = v[vi];
-                let mut pj = pi;
-                while pj > pl && less(vp, v[t[pj - 1]]) {
-                    t[pj] = t[pj - 1];
-                    pj -= 1;
-                }
-                t[pj] = vi;
-            }
-        }
-        match stack.pop() {
-            Some((l, r, d)) => {
-                pl = l;
-                pr = r;
-                cdepth = d;
-            }
-            None => break,
-        }
-    }
-    t
+    super::np::argsort(v)
 }
 
 /// `np.sort(v)` values (order of equal values is irrelevant).

@@ -1,6 +1,6 @@
 //! Interpolation, symmetric Jacobi eigensolver, and scalar helpers for `prepare::np`.
 
-use super::np::{pairwise_sum, sorted};
+use super::np::{msb, pairwise_sum, sorted};
 
 /// `np.interp(x, xp, fp)` for a single finite `x` (xp increasing).
 pub fn interp(x: f64, xp: &[f64], fp: &[f64]) -> f64 {
@@ -214,6 +214,142 @@ pub fn linspace(start: f64, stop: f64, num: usize) -> Vec<f64> {
         y[num - 1] = stop;
     }
     y
+}
+
+fn aheapsort_no_nan(a: &[f64], tosort: &mut [usize]) {
+    let n0 = tosort.len();
+    if n0 < 2 {
+        return;
+    }
+    let mut n = n0;
+    let mut l = n >> 1;
+    while l > 0 {
+        let tmp = tosort[l - 1];
+        let tmp_val = a[tmp];
+        let mut i = l;
+        let mut j = l << 1;
+        while j <= n {
+            if j < n && a[tosort[j - 1]] < a[tosort[j]] {
+                j += 1;
+            }
+            if tmp_val < a[tosort[j - 1]] {
+                tosort[i - 1] = tosort[j - 1];
+                i = j;
+                j += j;
+            } else {
+                break;
+            }
+        }
+        tosort[i - 1] = tmp;
+        l -= 1;
+    }
+    while n > 1 {
+        let tmp = tosort[n - 1];
+        let tmp_val = a[tmp];
+        tosort[n - 1] = tosort[0];
+        n -= 1;
+        let mut i = 1;
+        let mut j = 2;
+        while j <= n {
+            if j < n && a[tosort[j - 1]] < a[tosort[j]] {
+                j += 1;
+            }
+            if tmp_val < a[tosort[j - 1]] {
+                tosort[i - 1] = tosort[j - 1];
+                i = j;
+                j += j;
+            } else {
+                break;
+            }
+        }
+        tosort[i - 1] = tmp;
+    }
+}
+
+pub(crate) fn aquicksort_no_nan(a: &[f64]) -> Vec<usize> {
+    const SMALL_QUICKSORT: isize = 15;
+    let num = a.len();
+    let mut ts: Vec<usize> = (0..num).collect();
+    if num <= 1 {
+        return ts;
+    }
+    let mut pl: isize = 0;
+    let mut pr: isize = num as isize - 1;
+    let mut stack: Vec<(isize, isize, i32)> = Vec::with_capacity(64);
+    let mut cdepth = msb(num) * 2;
+    loop {
+        let mut do_insertion = true;
+        if cdepth < 0 {
+            aheapsort_no_nan(a, &mut ts[pl as usize..=pr as usize]);
+            do_insertion = false;
+        } else {
+            while (pr - pl) > SMALL_QUICKSORT {
+                let pm = pl + ((pr - pl) >> 1);
+                if a[ts[pm as usize]] < a[ts[pl as usize]] {
+                    ts.swap(pm as usize, pl as usize);
+                }
+                if a[ts[pr as usize]] < a[ts[pm as usize]] {
+                    ts.swap(pr as usize, pm as usize);
+                }
+                if a[ts[pm as usize]] < a[ts[pl as usize]] {
+                    ts.swap(pm as usize, pl as usize);
+                }
+                let vp_val = a[ts[pm as usize]];
+                let mut pi = pl;
+                let mut pj = pr - 1;
+                ts.swap(pm as usize, pj as usize);
+                loop {
+                    pi += 1;
+                    while a[ts[pi as usize]] < vp_val {
+                        pi += 1;
+                    }
+                    pj -= 1;
+                    while vp_val < a[ts[pj as usize]] {
+                        pj -= 1;
+                    }
+                    if pi >= pj {
+                        break;
+                    }
+                    ts.swap(pi as usize, pj as usize);
+                }
+                let pk = pr - 1;
+                ts.swap(pi as usize, pk as usize);
+                cdepth -= 1;
+                if pi - pl < pr - pi {
+                    stack.push((pi + 1, pr, cdepth));
+                    pr = pi - 1;
+                } else {
+                    stack.push((pl, pi - 1, cdepth));
+                    pl = pi + 1;
+                }
+            }
+        }
+        if do_insertion {
+            let mut pi = pl + 1;
+            while pi <= pr {
+                let vi = ts[pi as usize];
+                let vi_val = a[vi];
+                let mut pj = pi;
+                let mut pk = pi - 1;
+                while pj > pl && vi_val < a[ts[pk as usize]] {
+                    ts[pj as usize] = ts[pk as usize];
+                    pj -= 1;
+                    pk -= 1;
+                }
+                ts[pj as usize] = vi;
+                pi += 1;
+            }
+        }
+        match stack.pop() {
+            None => break,
+            Some((l, r, d)) => {
+                pl = l;
+                pr = r;
+                cdepth = d;
+            }
+        }
+    }
+    ts
 }
 
 #[cfg(test)]
