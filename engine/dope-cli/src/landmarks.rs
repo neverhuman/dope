@@ -1,6 +1,10 @@
 use crate::args::*;
 use dope_core::{
-    landmark::{signature, LandmarkFrame, LandmarkOptions, TransferReference},
+    landmark::{
+        bundle::REPORT_RECIPE_OBSERVED, parse_landmark_ids, signature, signature_requested,
+        LandmarkBundle, LandmarkFrame, LandmarkOptions, LandmarkScope, SubsampleSpec,
+        TransferReference,
+    },
     levels::{ensure_disjoint, remap_samples},
     schema::{infer, IntakeOptions, Task},
     RawTable, SampleOptions,
@@ -102,12 +106,38 @@ pub(crate) fn run(command: LandmarkCommand) -> Result<(), String> {
                 groups.as_deref(),
             )
             .map_err(err)?;
-            emit(
-                &a.common,
-                signature(&frame, &opts(&a.common))
-                    .map_err(err)?
-                    .private_report(),
-            )
+            let options = opts(&a.common);
+            let requested_ids = a
+                .ids
+                .as_deref()
+                .map(parse_landmark_ids)
+                .transpose()
+                .map_err(err)?;
+            let subsample_spec = a
+                .subsample
+                .map(|n| SubsampleSpec::new(n, a.subsample_seed.unwrap_or(a.common.seed)));
+            let scope = LandmarkScope::for_frame(&frame, &options, subsample_spec);
+            let measured = match &subsample_spec {
+                Some(spec) => frame.subsample(spec).map_err(err)?.0,
+                None => frame,
+            };
+            let report = signature_requested(&measured, &options, requested_ids.as_deref())
+                .map_err(err)?
+                .private_report();
+            if let Some(bundle_path) = &a.emit_bundle {
+                let bundle = LandmarkBundle::from_report_with_scope(
+                    &report,
+                    scope.bundle_scope(),
+                    REPORT_RECIPE_OBSERVED,
+                )
+                .map_err(err)?;
+                let mut text = serde_json::to_string_pretty(&bundle)
+                    .map_err(|_| "cannot encode landmark bundle".to_string())?;
+                text.push('\n');
+                std::fs::write(bundle_path, text)
+                    .map_err(|_| "cannot write landmark bundle".to_string())?;
+            }
+            emit(&a.common, report)
         }
         LandmarkCommand::Synthetic(a) => {
             if !(20..=200_000).contains(&a.rows) {

@@ -142,6 +142,80 @@ impl LandmarkFrame {
         self.columns.len()
     }
 
+    /// Additive: keep only `rows` (positions into this frame). Physical row
+    /// identities, groups, head and kind are preserved, so fold assignment
+    /// stays keyed by the original ids.
+    pub fn select_rows(&self, rows: &[usize]) -> Result<Self> {
+        if rows.iter().any(|&r| r >= self.rows()) {
+            return Err(DopeError::Input("invalid landmark row selection".into()));
+        }
+        let pick = |v: &Vec<f64>| rows.iter().map(|&r| v[r]).collect::<Vec<f64>>();
+        let f = Self {
+            columns: self.columns.iter().map(pick).collect(),
+            categories: self.categories.clone(),
+            y: pick(&self.y),
+            ids: rows.iter().map(|&r| self.ids[r]).collect(),
+            groups: self
+                .groups
+                .as_ref()
+                .map(|g| rows.iter().map(|&r| g[r]).collect()),
+            head: self.head,
+            kind: self.kind,
+        };
+        f.validate()?;
+        Ok(f)
+    }
+
+    /// Additive: deterministic stratified subsample keyed by the frame's
+    /// physical row ids (see [`super::SubsampleSpec::select`]), applied BEFORE
+    /// a signature. Returns the subsampled frame and the selection.
+    pub fn subsample(&self, spec: &super::SubsampleSpec) -> Result<(Self, super::RowSelection)> {
+        let task = if self.head == Head::Regression {
+            crate::schema::Task::Regression
+        } else {
+            crate::schema::Task::Classification
+        };
+        let selection = spec.select(&self.y, task, Some(&self.ids))?;
+        Ok((self.select_rows(&selection.positions)?, selection))
+    }
+
+    /// Additive "prepared source digest": sha256 hex over the frame content
+    /// (`b"dope.landmark-frame/v1\0"`, kind, classes, rows, features, per-feature
+    /// category counts, physical ids, y bits, column-major value bits, groups).
+    pub fn content_digest(&self) -> String {
+        use sha2::{Digest, Sha256};
+        let mut h = Sha256::new();
+        h.update(b"dope.landmark-frame/v1\0");
+        h.update([u8::from(self.kind == SignatureKind::Real)]);
+        let classes: u64 = match self.head {
+            Head::Regression => 0,
+            Head::Binary => 2,
+            Head::Multiclass(k) => k as u64,
+        };
+        for v in [classes, self.rows() as u64, self.features() as u64] {
+            h.update(v.to_le_bytes());
+        }
+        for c in &self.categories {
+            h.update(c.map_or(u64::MAX, |k| k as u64).to_le_bytes());
+        }
+        for id in &self.ids {
+            h.update(id.to_le_bytes());
+        }
+        for v in self.y.iter().chain(self.columns.iter().flatten()) {
+            h.update(v.to_bits().to_le_bytes());
+        }
+        match &self.groups {
+            None => h.update([0u8]),
+            Some(g) => {
+                h.update([1u8]);
+                for v in g {
+                    h.update(v.to_le_bytes());
+                }
+            }
+        }
+        format!("{:x}", h.finalize())
+    }
+
     pub(crate) fn validate(&self) -> Result<()> {
         let n = self.y.len();
         let classes = match self.head {

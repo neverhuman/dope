@@ -1,6 +1,15 @@
 //! Explicit experimental learned commands. Frozen local weights; no downloads or backend fallback.
 use clap::{Args, Subcommand};
-use dope_core::{learned, levels::Level, Result};
+use dope_core::{
+    landmark::{
+        bundle::REPORT_RECIPE_COMPLETE, LandmarkBundle, LandmarkFrame, LandmarkMode,
+        LandmarkOptions, ProgressiveLandmarks, SubsampleSpec, PROGRESSIVE_ORDER,
+    },
+    learned,
+    levels::Level,
+    schema::{infer, IntakeOptions, Task},
+    RawTable, Result,
+};
 use std::{
     io::Write,
     path::{Path, PathBuf},
@@ -41,6 +50,9 @@ pub(crate) struct Encode {
     landmark_input: Option<PathBuf>,
     #[arg(long, requires = "landmark_input")]
     landmark_manifest_sha256: Option<String>,
+    /// Landmark computation mode: none | fast | progressive | full.
+    #[arg(long, default_value = "full", value_parser = ["none", "fast", "progressive", "full"])]
+    landmark_mode: String,
     #[arg(long)]
     out: PathBuf,
 }
@@ -127,29 +139,111 @@ fn execute(command: LearnedCommand) -> Result<()> {
                 &manifest.graph,
                 a.seed,
             )?;
-            let landmarks = match (&a.landmark_input, &a.landmark_manifest_sha256) {
-                (Some(path), Some(expected)) => Some(learned::landmark_features::load_for_recipe(
-                    path,
-                    expected,
-                    &a.csv,
-                    &context.schema,
-                    manifest.graph.landmark_recipe().ok_or_else(bad)?,
-                )?),
-                (None, None) => None,
-                _ => return Err(bad()),
+            let mode: LandmarkMode = a.landmark_mode.parse().map_err(|_| bad())?;
+            let (landmarks, optional_landmarks) =
+                match (mode, &a.landmark_input, &a.landmark_manifest_sha256) {
+                    (m, Some(_), _) | (m, _, Some(_)) if m.is_landmark_free() => {
+                        return Err(bad());
+                    }
+                    (m, None, None) if m.is_landmark_free() => {
+                        let features = if manifest.graph.landmark_input() && !a.target_free {
+                            Some(LandmarkBundle::zero().features46())
+                        } else {
+                            None
+                        };
+                        (features, true)
+                    }
+                    (LandmarkMode::Progressive, None, None) => {
+                        let features = if manifest.graph.landmark_input() && !a.target_free {
+                            let raw = RawTable::read(&a.csv)?;
+                            let target_idx = raw.column_index(&a.target)?;
+                            let task = if a.task == "regression" {
+                                Task::Regression
+                            } else {
+                                Task::Classification
+                            };
+                            let schema = infer(
+                                &raw,
+                                target_idx,
+                                &IntakeOptions {
+                                    task: Some(task),
+                                    ..Default::default()
+                                },
+                            )?;
+                            let data = schema.to_model(&raw)?;
+                            let frame = LandmarkFrame::real(
+                                &schema,
+                                &data,
+                                &(0..data.rows()).collect::<Vec<_>>(),
+                                None,
+                            )?;
+                            let opts = LandmarkOptions {
+                                seed: a.seed,
+                                ..Default::default()
+                            };
+                            let mut prog = ProgressiveLandmarks::new(
+                                &frame,
+                                &opts,
+                                Some(SubsampleSpec::new(
+                                    SubsampleSpec::PROGRESSIVE_DEFAULT.n,
+                                    a.seed,
+                                )),
+                            )?;
+                            for g in PROGRESSIVE_ORDER {
+                                prog.next_group(g)?;
+                            }
+                            let recipe = manifest
+                                .graph
+                                .landmark_recipe()
+                                .unwrap_or(REPORT_RECIPE_COMPLETE);
+                            let bundle = LandmarkBundle::from_report_with_scope(
+                                &prog.report().private_report(),
+                                prog.scope().bundle_scope(),
+                                recipe,
+                            )?;
+                            Some(bundle.features46())
+                        } else {
+                            None
+                        };
+                        (features, true)
+                    }
+                    (_, Some(path), Some(expected)) => (
+                        Some(learned::landmark_features::load_for_recipe(
+                            path,
+                            expected,
+                            &a.csv,
+                            &context.schema,
+                            manifest.graph.landmark_recipe().ok_or_else(bad)?,
+                        )?),
+                        false,
+                    ),
+                    (_, None, None) => (None, false),
+                    _ => return Err(bad()),
+                };
+            let inputs = learned::EncoderInputs {
+                target_included: !a.target_free,
+                through,
+                landmarks: landmarks.as_ref(),
             };
-            let local = learned::LocalEncoding::encode_inputs(
-                &encoder,
-                manifest,
-                &context.values,
-                &context.observed,
-                context.schema,
-                learned::EncoderInputs {
-                    target_included: !a.target_free,
-                    through,
-                    landmarks: landmarks.as_ref(),
-                },
-            )?;
+            let local = if optional_landmarks {
+                learned::LocalEncoding::encode_optional_inputs(
+                    &encoder,
+                    manifest,
+                    &context.values,
+                    &context.observed,
+                    context.schema,
+                    inputs,
+                )?
+            } else {
+                learned::LocalEncoding::encode_inputs(
+                    &encoder,
+                    manifest,
+                    &context.values,
+                    &context.observed,
+                    context.schema,
+                    inputs,
+                )?
+            };
             let exported = local.export(&selected, max_bytes)?;
             publish(&a.out, exported.bytes())?;
             println!(

@@ -53,10 +53,22 @@ pub(crate) fn cost(id: usize, n: usize, d: usize, classes: usize, opts: &Landmar
     units.saturating_mul(opts.folds as u64).saturating_mul(o)
 }
 
-pub(crate) fn plan(
+/// Unrequested landmarks cost nothing, are never dropped and never enabled.
+/// With every landmark requested (`[true; 23]`) this is the original full-panel plan.
+pub(crate) fn plan_requested(
     frame: &LandmarkFrame,
     opts: &LandmarkOptions,
+    requested: &[bool; 23],
 ) -> Result<([bool; 23], WorkReport)> {
+    let (enabled, _, work) = plan_requested_with_costs(frame, opts, requested)?;
+    Ok((enabled, work))
+}
+
+pub(crate) fn plan_requested_with_costs(
+    frame: &LandmarkFrame,
+    opts: &LandmarkOptions,
+    requested: &[bool; 23],
+) -> Result<([bool; 23], [u64; 23], WorkReport)> {
     let d = frame
         .categories
         .iter()
@@ -71,13 +83,19 @@ pub(crate) fn plan(
         ));
     }
     let classes = super::ridge::outputs(frame.head);
-    let costs: [u64; 23] = std::array::from_fn(|i| cost(i + 1, frame.rows(), d, classes, opts));
-    if costs[0] > opts.work_budget {
+    let costs: [u64; 23] = std::array::from_fn(|i| {
+        if requested[i] {
+            cost(i + 1, frame.rows(), d, classes, opts)
+        } else {
+            0
+        }
+    });
+    if requested[0] && costs[0] > opts.work_budget {
         return Err(DopeError::Budget(
             "landmark budget cannot run linear baseline".into(),
         ));
     }
-    let mut enabled = [true; 23];
+    let mut enabled = *requested;
     let mut units = costs.iter().fold(0u64, |a, b| a.saturating_add(*b));
     let mut dropped = Vec::new();
     for id in [
@@ -86,12 +104,16 @@ pub(crate) fn plan(
         if units <= opts.work_budget {
             break;
         }
+        if !requested[id - 1] {
+            continue;
+        }
         enabled[id - 1] = false;
         units = units.saturating_sub(costs[id - 1]);
         dropped.push(id as u8);
     }
     Ok((
         enabled,
+        costs,
         WorkReport {
             budget: opts.work_budget,
             estimated_units: units,

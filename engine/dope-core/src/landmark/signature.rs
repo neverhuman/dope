@@ -13,7 +13,7 @@ use crate::{
 };
 use rayon::prelude::*;
 
-struct Fold {
+pub(super) struct Fold {
     z: Encoded,
     q: Encoded,
     y: Vec<f64>,
@@ -136,16 +136,75 @@ fn evaluate(id: usize, head: Head, folds: &[Fold], opts: &LandmarkOptions) -> La
 }
 
 pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signature> {
+    signature_requested(frame, opts, None)
+}
+
+/// Additive: compute only the requested landmark ids (1..=23). `None` is the
+/// full panel and is byte-identical to [`signature`]. Unrequested cells are
+/// reported as [`CellState::NotRequested`], cost nothing and are never run.
+/// Row subsampling is NOT an option here: apply it to the frame beforehand
+/// (`LandmarkFrame::subsample`), keeping `LandmarkOptions` unchanged.
+pub fn signature_requested(
+    frame: &LandmarkFrame,
+    opts: &LandmarkOptions,
+    ids: Option<&[u8]>,
+) -> Result<Signature> {
     opts.validate()?;
     frame.validate()?;
+    let requested = requested_mask(ids)?;
+    let full_panel = requested == [true; 23];
     let assigned = folds::assign_folds(frame, opts.folds, opts.seed)?;
-    let (enabled, mut work) = cost::plan(frame, opts)?;
-    let ridge_folds: Vec<Fold> = (0..opts.folds)
+    let (enabled, mut work) = cost::plan_requested(frame, opts, &requested)?;
+    let ridge_folds: Vec<Fold> = if full_panel || enabled[..15].iter().any(|&v| v) {
+        ridge_folds(frame, &assigned, opts)?
+    } else {
+        Vec::new()
+    };
+    let small_folds: Vec<Fold> = if needs_small_folds(&enabled) {
+        small_folds(frame, &assigned, opts)?
+    } else {
+        Vec::new()
+    };
+    let cells: Vec<LandmarkCell> = PANEL
+        .par_iter()
+        .enumerate()
+        .map(|(i, _)| {
+            if !enabled[i] {
+                return idle_cell(
+                    i,
+                    if requested[i] {
+                        CellState::OverBudget
+                    } else {
+                        CellState::NotRequested
+                    },
+                );
+            }
+            run_cell(i, frame, &assigned, opts, &ridge_folds, &small_folds)
+        })
+        .collect();
+    let spectrum = if full_panel {
+        spectrum(frame, opts, &ridge_folds, &mut work)
+    } else {
+        Vec::new()
+    };
+    Ok(assemble(frame, opts, cells, spectrum, work))
+}
+
+pub(super) fn needs_small_folds(enabled: &[bool; 23]) -> bool {
+    enabled[15..21].iter().any(|v| *v)
+}
+
+pub(super) fn ridge_folds(
+    frame: &LandmarkFrame,
+    assigned: &[usize],
+    opts: &LandmarkOptions,
+) -> Result<Vec<Fold>> {
+    (0..opts.folds)
         .into_par_iter()
         .map(|k| {
             prepare(
                 frame,
-                &assigned,
+                assigned,
                 k,
                 opts.ridge_rows,
                 opts.ridge_rows,
@@ -153,17 +212,20 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
                 false,
             )
         })
-        .collect::<Result<_>>()?;
-    let small_folds: Vec<Fold> = (0..if enabled[15..21].iter().any(|v| *v) {
-        opts.folds
-    } else {
-        0
-    })
+        .collect::<Result<_>>()
+}
+
+pub(super) fn small_folds(
+    frame: &LandmarkFrame,
+    assigned: &[usize],
+    opts: &LandmarkOptions,
+) -> Result<Vec<Fold>> {
+    (0..opts.folds)
         .into_par_iter()
         .map(|k| {
             prepare(
                 frame,
-                &assigned,
+                assigned,
                 k,
                 opts.small_rows,
                 opts.small_rows.div_ceil(opts.folds),
@@ -171,75 +233,73 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
                 false,
             )
         })
-        .collect::<Result<_>>()?;
-    let cells: Vec<LandmarkCell> = PANEL
-        .par_iter()
-        .enumerate()
-        .map(|(i, r)| {
-            if !enabled[i] {
-                return LandmarkCell {
-                    id: r.id,
-                    name: r.name,
-                    family: r.family,
-                    state: CellState::OverBudget,
-                    gain: None,
-                    se: None,
-                    stable: false,
-                    lambda_indices: Vec::new(),
-                    train_rows: Vec::new(),
-                    query_rows: 0,
-                };
-            }
-            if i + 1 == 22 || i + 1 == 23 {
-                let cap = if i + 1 == 22 {
-                    opts.ridge_rows
-                } else {
-                    opts.small_rows
-                };
-                match (0..opts.folds)
-                    .map(|k| {
-                        prepare(
-                            frame,
-                            &assigned,
-                            k,
-                            cap,
-                            if i + 1 == 22 {
-                                opts.ridge_rows
-                            } else {
-                                opts.small_rows.div_ceil(opts.folds)
-                            },
-                            opts.seed,
-                            true,
-                        )
-                    })
-                    .collect::<Result<Vec<_>>>()
-                {
-                    Ok(f) => evaluate(i + 1, frame.head, &f, opts),
-                    Err(_) => LandmarkCell {
-                        id: r.id,
-                        name: r.name,
-                        family: r.family,
-                        state: CellState::Failed,
-                        gain: None,
-                        se: None,
-                        stable: false,
-                        lambda_indices: Vec::new(),
-                        train_rows: Vec::new(),
-                        query_rows: 0,
+        .collect::<Result<_>>()
+}
+
+pub(super) fn idle_cell(i: usize, state: CellState) -> LandmarkCell {
+    let r = PANEL[i];
+    LandmarkCell {
+        id: r.id,
+        name: r.name,
+        family: r.family,
+        state,
+        gain: None,
+        se: None,
+        stable: false,
+        lambda_indices: Vec::new(),
+        train_rows: Vec::new(),
+        query_rows: 0,
+    }
+}
+
+/// One enabled panel cell (0-based slot `i`). `small` must be prepared when
+/// `i` is in 15..21.
+pub(super) fn run_cell(
+    i: usize,
+    frame: &LandmarkFrame,
+    assigned: &[usize],
+    opts: &LandmarkOptions,
+    ridge: &[Fold],
+    small: &[Fold],
+) -> LandmarkCell {
+    if i + 1 == 22 || i + 1 == 23 {
+        let cap = if i + 1 == 22 {
+            opts.ridge_rows
+        } else {
+            opts.small_rows
+        };
+        match (0..opts.folds)
+            .map(|k| {
+                prepare(
+                    frame,
+                    assigned,
+                    k,
+                    cap,
+                    if i + 1 == 22 {
+                        opts.ridge_rows
+                    } else {
+                        opts.small_rows.div_ceil(opts.folds)
                     },
-                }
-            } else {
-                evaluate(
-                    i + 1,
-                    frame.head,
-                    if i < 15 { &ridge_folds } else { &small_folds },
-                    opts,
+                    opts.seed,
+                    true,
                 )
-            }
-        })
-        .collect();
-    let target_stats = target_stats(frame);
-    let contrasts = contrasts(&cells, target_stats);
+            })
+            .collect::<Result<Vec<_>>>()
+        {
+            Ok(f) => evaluate(i + 1, frame.head, &f, opts),
+            Err(_) => idle_cell(i, CellState::Failed),
+        }
+    } else {
+        evaluate(i + 1, frame.head, if i < 15 { ridge } else { small }, opts)
+    }
+}
+
+pub(super) fn spectrum(
+    frame: &LandmarkFrame,
+    opts: &LandmarkOptions,
+    ridge_folds: &[Fold],
+    work: &mut cost::WorkReport,
+) -> Vec<FeatureSpectrum> {
     let mut spectrum = Vec::new();
     for slot in 0..frame.features().min(opts.spectrum_features) {
         // Charge every univariate fit; do not hide feature spectra outside the
@@ -285,12 +345,24 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
         }
         spectrum.push(FeatureSpectrum { slot, values });
     }
+    spectrum
+}
+
+pub(super) fn assemble(
+    frame: &LandmarkFrame,
+    opts: &LandmarkOptions,
+    cells: Vec<LandmarkCell>,
+    spectrum: Vec<FeatureSpectrum>,
+    work: cost::WorkReport,
+) -> Signature {
+    let target_stats = target_stats(frame);
+    let contrasts = contrasts(&cells, target_stats);
     let classes = match frame.head {
         Head::Regression => 0,
         Head::Binary => 2,
         Head::Multiclass(k) => k,
     };
-    Ok(Signature {
+    Signature {
         panel: opts.panel.clone(),
         kind: frame.kind,
         task: if classes == 0 {
@@ -307,7 +379,28 @@ pub fn signature(frame: &LandmarkFrame, opts: &LandmarkOptions) -> Result<Signat
         options: opts.clone(),
         rows: frame.rows(),
         features: frame.features(),
-    })
+    }
+}
+
+pub(super) fn requested_mask(ids: Option<&[u8]>) -> Result<[bool; 23]> {
+    let Some(ids) = ids else {
+        return Ok([true; 23]);
+    };
+    let mut requested = [false; 23];
+    for &id in ids {
+        if !(1..=23).contains(&id) || requested[id as usize - 1] {
+            return Err(crate::DopeError::Input(
+                "requested landmark ids must be unique and in 1..=23".into(),
+            ));
+        }
+        requested[id as usize - 1] = true;
+    }
+    if ids.is_empty() {
+        return Err(crate::DopeError::Input(
+            "at least one landmark must be requested".into(),
+        ));
+    }
+    Ok(requested)
 }
 
 fn target_stats(f: &LandmarkFrame) -> [Option<f64>; 3] {

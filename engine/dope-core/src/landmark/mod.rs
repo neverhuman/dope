@@ -3,11 +3,13 @@
 //! No landmark score is an external transfer certification.
 
 mod basis;
+pub mod bundle;
 mod cost;
 mod folds;
 mod frame;
 mod learners;
 mod panel;
+mod progressive;
 mod report;
 mod ridge;
 mod signature;
@@ -16,14 +18,20 @@ mod transfer;
 /// Frozen coordinate layout; consumers must check the exact panel identity.
 pub const LAYOUT_JSON: &str = include_str!("layout-native-v1.json");
 
+pub use bundle::{
+    parse_landmark_ids, squash_raw_gain, stratified_subsample, BundleScope, LandmarkBundle,
+    LandmarkGroup, LandmarkMode, LandmarkScope, LandmarkStatus, RowSelection, SubsampleSpec,
+    LANDMARK_SLOTS, PROGRESSIVE_ORDER,
+};
 pub use cost::WorkReport;
 pub use folds::assign_folds;
 pub use frame::LandmarkFrame;
 pub use panel::{Family, LandmarkId, Recipe, PANEL, PANEL_V1};
+pub use progressive::ProgressiveLandmarks;
 pub use report::{
     CellState, FeatureSpectrum, GlobalCoordinates, LandmarkCell, Signature, SignatureKind,
 };
-pub use signature::signature;
+pub use signature::{signature, signature_requested};
 pub use transfer::{PairedComparison, TransferCell, TransferReference, TransferSignature};
 
 use crate::{DopeError, Result};

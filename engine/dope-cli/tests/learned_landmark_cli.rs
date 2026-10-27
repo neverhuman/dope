@@ -110,3 +110,76 @@ fn journey(version: &str) {
     assert!(!recipient.join("encoder.safetensors").exists());
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn landmark_mode_none_and_fast_encode_without_landmark_input() {
+    let root = std::env::temp_dir().join(format!("dope-landmark-mode-cli-{}", std::process::id()));
+    if root.exists() {
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+    std::fs::create_dir(&root).unwrap();
+    let csv = root.join("fit.csv");
+    let text = String::from("PRIVATE_HEADER,c,target\n")
+        + &(0..60)
+            .map(|i| format!("{},PRIVATE_CATEGORY_{},{}\n", i, i % 2, i * 2))
+            .collect::<String>();
+    std::fs::write(&csv, &text).unwrap();
+    let model = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../dope-core/tests/fixtures/learned-v3/input/model");
+
+    // Default (full) without --landmark-input refuses on a landmark-conditioned model.
+    let missing_out = root.join("missing.code");
+    let missing = Command::new(env!("CARGO_BIN_EXE_dope"))
+        .args(["--threads", "1", "learned", "encode", "--model"])
+        .arg(&model)
+        .arg("--csv")
+        .arg(&csv)
+        .args([
+            "--target",
+            "target",
+            "--kinds",
+            "numeric,categorical,numeric",
+            "--task",
+            "regression",
+            "--levels",
+            "low",
+            "--out",
+        ])
+        .arg(&missing_out)
+        .output()
+        .unwrap();
+    assert!(!missing.status.success());
+
+    // none and fast succeed without --landmark-input and produce identical code bytes.
+    let none_code = root.join("none.code");
+    let fast_code = root.join("fast.code");
+    for (mode, out) in [("none", &none_code), ("fast", &fast_code)] {
+        let res = Command::new(env!("CARGO_BIN_EXE_dope"))
+            .args(["--threads", "1", "learned", "encode", "--model"])
+            .arg(&model)
+            .arg("--csv")
+            .arg(&csv)
+            .args([
+                "--target",
+                "target",
+                "--kinds",
+                "numeric,categorical,numeric",
+                "--task",
+                "regression",
+                "--levels",
+                "low",
+                "--landmark-mode",
+                mode,
+                "--out",
+            ])
+            .arg(out)
+            .output()
+            .unwrap();
+        assert!(res.status.success(), "{mode}: {res:?}");
+    }
+    assert_eq!(
+        std::fs::read(&none_code).unwrap(),
+        std::fs::read(&fast_code).unwrap()
+    );
+    std::fs::remove_dir_all(root).unwrap();
+}
