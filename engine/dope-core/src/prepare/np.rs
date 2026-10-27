@@ -53,22 +53,66 @@ pub fn pairwise_sum(a: &[f64]) -> f64 {
     }
 }
 
+/// numpy `pairwise_sum_DOUBLE` mapped over `f(a[i])` in-place without allocating a `Vec<f64>`.
+#[inline]
+pub fn pairwise_sum_map<F: Fn(f64) -> f64 + Copy>(a: &[f64], f: F) -> f64 {
+    let n = a.len();
+    if n < 8 {
+        let mut res = 0.0;
+        for &v in a {
+            res += f(v);
+        }
+        res
+    } else if n <= 128 {
+        let mut r = [
+            f(a[0]),
+            f(a[1]),
+            f(a[2]),
+            f(a[3]),
+            f(a[4]),
+            f(a[5]),
+            f(a[6]),
+            f(a[7]),
+        ];
+        let mut i = 8;
+        while i < n - (n % 8) {
+            for j in 0..8 {
+                r[j] += f(a[i + j]);
+            }
+            i += 8;
+        }
+        let mut res = ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]));
+        while i < n {
+            res += f(a[i]);
+            i += 1;
+        }
+        res
+    } else {
+        let mut n2 = n / 2;
+        n2 -= n2 % 8;
+        pairwise_sum_map(&a[..n2], f) + pairwise_sum_map(&a[n2..], f)
+    }
+}
+
 /// `np.mean` of a 1-D float64 array (NaN for empty input, like numpy).
 pub fn mean1d(a: &[f64]) -> f64 {
     pairwise_sum(a) / a.len() as f64
 }
 
+/// `np.std` (ddof=0) of a 1-D float64 array given precomputed `mean1d(a)`.
+#[inline]
+pub fn std1d_with_mean(a: &[f64], m: f64) -> f64 {
+    (pairwise_sum_map(a, |v| {
+        let d = v - m;
+        d * d
+    }) / a.len() as f64)
+        .sqrt()
+}
+
 /// `np.std` (ddof=0) of a 1-D float64 array.
 pub fn std1d(a: &[f64]) -> f64 {
     let m = mean1d(a);
-    let sq: Vec<f64> = a
-        .iter()
-        .map(|&v| {
-            let d = v - m;
-            d * d
-        })
-        .collect();
-    (pairwise_sum(&sq) / a.len() as f64).sqrt()
+    std1d_with_mean(a, m)
 }
 
 /// `np.sum(x, axis=0)` for a row-major `(n, p)` array.
@@ -91,20 +135,31 @@ pub fn col_mean(x: &[f64], n: usize, p: usize) -> Vec<f64> {
     col_sum(x, n, p).into_iter().map(|s| s / n as f64).collect()
 }
 
+/// `np.std(x, axis=0)` (ddof=0) for a row-major `(n, p)` array given precomputed `col_mean`.
+pub fn col_std_with_mean(x: &[f64], n: usize, p: usize, m: &[f64]) -> Vec<f64> {
+    if p == 1 {
+        let m0 = m[0];
+        return vec![std1d_with_mean(&x[..n], m0)];
+    }
+    let mut out = vec![0.0; p];
+    for i in 0..n {
+        let row = &x[i * p..(i + 1) * p];
+        for j in 0..p {
+            let d = row[j] - m[j];
+            out[j] += d * d;
+        }
+    }
+    let n_f = n as f64;
+    for v in &mut out {
+        *v = (*v / n_f).sqrt();
+    }
+    out
+}
+
 /// `np.std(x, axis=0)` (ddof=0) for a row-major `(n, p)` array.
 pub fn col_std(x: &[f64], n: usize, p: usize) -> Vec<f64> {
     let m = col_mean(x, n, p);
-    let mut sq = vec![0.0; n * p];
-    for i in 0..n {
-        for j in 0..p {
-            let d = x[i * p + j] - m[j];
-            sq[i * p + j] = d * d;
-        }
-    }
-    col_sum(&sq, n, p)
-        .into_iter()
-        .map(|s| (s / n as f64).sqrt())
-        .collect()
+    col_std_with_mean(x, n, p, &m)
 }
 
 /// `np.sum(x, axis=1)` for a row-major `(n, p)` array (contiguous rows → pairwise).
@@ -192,7 +247,7 @@ pub fn median(a: &[f64]) -> f64 {
     }
 }
 
-fn msb(mut n: usize) -> i32 {
+pub(crate) fn msb(mut n: usize) -> i32 {
     let mut depth = 0;
     n >>= 1;
     while n > 0 {
@@ -343,7 +398,11 @@ fn aquicksort<F: Fn(usize, usize) -> bool>(less: &F, num: usize) -> Vec<usize> {
 
 /// `np.argsort(a)` for float64 (default kind, numpy 1.26 generic introsort).
 pub fn argsort(a: &[f64]) -> Vec<usize> {
-    aquicksort(&|i: usize, j: usize| np_less(a[i], a[j]), a.len())
+    if !a.iter().any(|v| v.is_nan()) {
+        aquicksort_no_nan(a)
+    } else {
+        aquicksort(&|i: usize, j: usize| np_less(a[i], a[j]), a.len())
+    }
 }
 
 /// `np.argsort(a)` for int64.

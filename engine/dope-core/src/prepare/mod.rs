@@ -49,11 +49,12 @@ pub use inter_landmark::{
 pub use report_view::{NativeReportView, ReportCellView, SpectrumView};
 pub use scaling::{
     compute_native_target_stats, compute_observed_target_stats, prepare_table, prepare_table_cells,
-    prepare_table_cells_with_ids, prepare_table_cells_with_policy, prepare_table_lossless,
-    prepare_table_mixed, prepare_table_mixed_with_policy, prepare_table_with_ids,
-    prepare_table_with_policy, CategoricalColumnEncoder, ClassVocabPolicy, ColumnKind,
-    FitOnlyTableTransform, NumericColumnScaler, PrepTask, PreparedTable, TargetScaler,
-    TransformKind,
+    prepare_table_cells_timed, prepare_table_cells_with_ids, prepare_table_cells_with_ids_timed,
+    prepare_table_cells_with_policy, prepare_table_lossless, prepare_table_mixed,
+    prepare_table_mixed_with_policy, prepare_table_timed, prepare_table_with_ids,
+    prepare_table_with_ids_timed, prepare_table_with_policy, CategoricalColumnEncoder,
+    ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, NumericColumnScaler, PrepTask,
+    PrepareStageTimings, PreparedTable, TargetScaler, TransformKind,
 };
 
 use crate::error::Result;

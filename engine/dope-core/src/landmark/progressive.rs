@@ -132,20 +132,20 @@ impl ProgressiveLandmarks {
     /// Compute arbitrary landmark ids (1..=23), reusing everything cached.
     pub fn run_ids(&mut self, ids: &[u8]) -> Result<(LandmarkBundle, &Signature)> {
         let requested = signature::requested_mask(Some(ids))?;
-        let todo: Vec<usize> = (0..23)
+        let pending: Vec<usize> = (0..23)
             .filter(|&i| requested[i] && !self.computed[i])
             .collect();
-        if todo.is_empty() {
+        if pending.is_empty() {
             return Ok((self.bundle.clone(), &self.report));
         }
-        if todo.iter().any(|&i| self.enabled[i] && i < 15) && self.ridge.is_none() {
+        if pending.iter().any(|&i| self.enabled[i] && i < 15) && self.ridge.is_none() {
             self.ridge = Some(signature::ridge_folds(
                 &self.frame,
                 &self.assigned,
                 &self.opts,
             )?);
         }
-        if todo
+        if pending
             .iter()
             .any(|&i| self.enabled[i] && (15..21).contains(&i))
             && self.small.is_none()
@@ -160,7 +160,7 @@ impl ProgressiveLandmarks {
         let small: &[Fold] = self.small.as_deref().unwrap_or(&[]);
         let (frame, assigned, opts, enabled) =
             (&self.frame, &self.assigned, &self.opts, &self.enabled);
-        let fresh: Vec<(usize, LandmarkCell)> = todo
+        let fresh: Vec<(usize, LandmarkCell)> = pending
             .par_iter()
             .map(|&i| {
                 let cell = if enabled[i] {

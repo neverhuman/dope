@@ -2,19 +2,21 @@
 //! for constructing a [`PreparedTable`].
 
 use super::descriptors::{compute_table_descriptors, Level};
-use super::np::{argsort_i64, mean1d, median, pairwise_sum, quantiles, round6, sorted, std1d};
+use super::np::mean1d;
 use super::scaling::{
-    err, ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, PrepTask, TargetScaler, TargetValue,
+    err, ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, PrepTask, PrepareStageTimings,
+    TargetScaler, TargetValue,
 };
 use super::scaling_fit::{
-    fit_categorical_column, fit_numeric_column, infer_feature_kinds_and_parse, parse_float_cell,
-    py_float_repr, py_strip, regression_array, safe_skew_kurt,
+    fit_categorical_column, fit_numeric_column, fit_target_scaler_with_policy, is_missing_token,
+    parse_float_cell, py_float, py_strip, regression_array,
 };
 use super::scaling_table::{
     compute_native_target_stats, compute_observed_target_stats, hash_raw_cells, validate_row_ids,
     PreparedTable,
 };
 use crate::error::Result;
+use std::time::Instant;
 
 fn classes_of(t: &TargetScaler) -> usize {
     match t.task {
@@ -24,14 +26,17 @@ fn classes_of(t: &TargetScaler) -> usize {
     }
 }
 
-/// Numeric-matrix preparation with explicit physical `row_ids` and [`ClassVocabPolicy`].
-pub fn prepare_table_with_policy(
+/// Numeric-matrix preparation with explicit physical `row_ids`, [`ClassVocabPolicy`],
+/// and non-overlapping stage timings.
+pub fn prepare_table_with_policy_timed(
     x: &[Vec<f64>],
     y: &[f64],
     task: PrepTask,
     row_ids: Vec<u64>,
     class_vocab_policy: ClassVocabPolicy,
-) -> Result<PreparedTable> {
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    let t_total = Instant::now();
+    let t_parse = Instant::now();
     let n = x.len();
     let p = x.first().map_or(0, Vec::len);
     if x.iter().any(|r| r.len() != p) {
@@ -41,25 +46,28 @@ pub fn prepare_table_with_policy(
         return Err(err("prepare_target_length_mismatch"));
     }
     validate_row_ids(&row_ids, n)?;
+    let mut frame_columns: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
+    for (i, row) in x.iter().enumerate() {
+        for (j, &v) in row.iter().enumerate() {
+            frame_columns[j][i] = v;
+        }
+    }
+    let parse_and_infer_ms = t_parse.elapsed().as_secs_f64() * 1e3;
+
+    let t_scale = Instant::now();
     let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
     let target = fit_target_scaler_with_policy(&yv, task, class_vocab_policy)?;
     let mut numeric = Vec::with_capacity(p);
-    let mut frame_columns = Vec::with_capacity(p);
-    for j in 0..p {
-        let col: Vec<f64> = x.iter().map(|r| r[j]).collect();
-        numeric.push(Some(fit_numeric_column(j, &col)));
-        frame_columns.push(
-            col.into_iter()
-                .map(|v| if v.is_finite() { v } else { f64::NAN })
-                .collect(),
-        );
-    }
     let mut xs = vec![0.0; n * p];
-    for j in 0..p {
-        let sc = numeric[j].as_ref().expect("numeric");
-        for i in 0..n {
-            xs[i * p + j] = sc.transform_value(x[i][j]).0;
+    for (j, col) in frame_columns.iter_mut().enumerate() {
+        let sc = fit_numeric_column(j, col);
+        sc.transform_column_strided(col, &mut xs, j, p);
+        for v in col.iter_mut() {
+            if !v.is_finite() {
+                *v = f64::NAN;
+            }
         }
+        numeric.push(Some(sc));
     }
     let y_scaled = target.transform(&yv)?;
     let frame_y = if task == PrepTask::Regression {
@@ -76,7 +84,12 @@ pub fn prepare_table_with_policy(
     };
     let observed_target_stats = compute_observed_target_stats(&y_scaled, task);
     let target_stats = compute_native_target_stats(&frame_y, &y_scaled, task);
+    let scaler_fit_transform_ms = t_scale.elapsed().as_secs_f64() * 1e3;
+
+    let t_desc = Instant::now();
     let high_table_descriptors = compute_table_descriptors(&xs, n, p, &y_scaled, Level::High);
+    let table_descriptors_ms = t_desc.elapsed().as_secs_f64() * 1e3;
+
     let transform = FitOnlyTableTransform {
         task,
         kinds: vec![ColumnKind::Numeric; p],
@@ -87,25 +100,56 @@ pub fn prepare_table_with_policy(
         prior_smoothing: 10.0,
         class_vocab_policy,
     };
-    Ok(PreparedTable {
-        task,
-        rows: n,
-        features: p,
-        classes: classes_of(&transform.target),
-        x_scaled: xs,
-        y_scaled,
-        transform,
-        row_ids,
-        categories: vec![None; p],
-        category_tokens: None,
-        frame_columns,
-        frame_y,
-        target_stats,
-        observed_target_stats,
-        high_table_descriptors,
-        raw_cells_sha256: None,
-        source_digest_override: None,
-    })
+    let timings = PrepareStageTimings {
+        parse_and_infer_ms,
+        scaler_fit_transform_ms,
+        table_descriptors_ms,
+        total_ms: t_total.elapsed().as_secs_f64() * 1e3,
+    };
+    Ok((
+        PreparedTable {
+            task,
+            rows: n,
+            features: p,
+            classes: classes_of(&transform.target),
+            x_scaled: xs,
+            y_scaled,
+            transform,
+            row_ids,
+            categories: vec![None; p],
+            category_tokens: None,
+            frame_columns,
+            frame_y,
+            target_stats,
+            observed_target_stats,
+            high_table_descriptors,
+            raw_cells_sha256: None,
+            source_digest_override: None,
+        },
+        timings,
+    ))
+}
+
+/// Numeric-matrix preparation with explicit physical `row_ids` and [`ClassVocabPolicy`].
+pub fn prepare_table_with_policy(
+    x: &[Vec<f64>],
+    y: &[f64],
+    task: PrepTask,
+    row_ids: Vec<u64>,
+    class_vocab_policy: ClassVocabPolicy,
+) -> Result<PreparedTable> {
+    Ok(prepare_table_with_policy_timed(x, y, task, row_ids, class_vocab_policy)?.0)
+}
+
+/// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
+/// (all-numeric ndarray path) with explicit physical `row_ids` and stage timings (`Cap32V1`).
+pub fn prepare_table_with_ids_timed(
+    x: &[Vec<f64>],
+    y: &[f64],
+    task: PrepTask,
+    row_ids: Vec<u64>,
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    prepare_table_with_policy_timed(x, y, task, row_ids, ClassVocabPolicy::Cap32V1)
 }
 
 /// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
@@ -117,6 +161,17 @@ pub fn prepare_table_with_ids(
     row_ids: Vec<u64>,
 ) -> Result<PreparedTable> {
     prepare_table_with_policy(x, y, task, row_ids, ClassVocabPolicy::Cap32V1)
+}
+
+/// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
+/// (all-numeric ndarray path) using sequential `0..n as u64` row IDs, returning stage timings.
+pub fn prepare_table_timed(
+    x: &[Vec<f64>],
+    y: &[f64],
+    task: PrepTask,
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    let row_ids = (0..x.len() as u64).collect();
+    prepare_table_with_ids_timed(x, y, task, row_ids)
 }
 
 /// Python `FitOnlyTableTransform.fit(X: float ndarray, y, task).transform(X, y)`
@@ -139,7 +194,9 @@ fn prepare_cells_with_yv(
     task: PrepTask,
     row_ids: Vec<u64>,
     class_vocab_policy: ClassVocabPolicy,
-) -> Result<PreparedTable> {
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    let t_total = Instant::now();
+    let t_parse = Instant::now();
     let n = x.len();
     let p = x.first().map_or(0, Vec::len);
     if x.iter().any(|r| r.len() != p) {
@@ -152,16 +209,67 @@ fn prepare_cells_with_yv(
     let raw_cells_sha256 = Some(hash_raw_cells(x, yv));
     let min_level_count = 5usize;
     let prior_smoothing = 10.0f64;
-    let (kinds, mut parsed_numeric_cols): (Vec<ColumnKind>, Vec<Option<Vec<f64>>>) =
-        match declared_kinds {
-            Some(dk) => {
-                if dk.len() != p {
-                    return Err(err("prepare_kinds_length_mismatch"));
-                }
-                (dk.to_vec(), vec![None; p])
+
+    let (kinds, mut parsed_cols) = match declared_kinds {
+        Some(dk) => {
+            if dk.len() != p {
+                return Err(err("prepare_kinds_length_mismatch"));
             }
-            None => infer_feature_kinds_and_parse(x, p),
-        };
+            let kinds = dk.to_vec();
+            let mut cols: Vec<Vec<f64>> = kinds
+                .iter()
+                .map(|&k| {
+                    if k == ColumnKind::Numeric {
+                        Vec::with_capacity(n)
+                    } else {
+                        Vec::new()
+                    }
+                })
+                .collect();
+            for row in x {
+                for (j, &k) in kinds.iter().enumerate() {
+                    if k == ColumnKind::Numeric {
+                        cols[j].push(parse_float_cell(&row[j]));
+                    }
+                }
+            }
+            (kinds, cols)
+        }
+        None => {
+            let mut is_num = vec![true; p];
+            let mut cols: Vec<Vec<f64>> = (0..p).map(|_| Vec::with_capacity(n)).collect();
+            for row in x {
+                for j in 0..p {
+                    if !is_num[j] {
+                        continue;
+                    }
+                    let s = py_strip(&row[j]);
+                    if is_missing_token(s) {
+                        cols[j].push(f64::NAN);
+                    } else if let Some(v) = py_float(s) {
+                        cols[j].push(v);
+                    } else {
+                        is_num[j] = false;
+                        cols[j] = Vec::new();
+                    }
+                }
+            }
+            let kinds: Vec<ColumnKind> = is_num
+                .into_iter()
+                .map(|ok| {
+                    if ok {
+                        ColumnKind::Numeric
+                    } else {
+                        ColumnKind::Categorical
+                    }
+                })
+                .collect();
+            (kinds, cols)
+        }
+    };
+    let parse_and_infer_ms = t_parse.elapsed().as_secs_f64() * 1e3;
+
+    let t_scale = Instant::now();
     let target = fit_target_scaler_with_policy(yv, task, class_vocab_policy)?;
     let y_num = target.transform(yv)?;
     let y_global_mean = if y_num.is_empty() {
@@ -171,47 +279,42 @@ fn prepare_cells_with_yv(
     };
     let mut numeric = vec![None; p];
     let mut categorical = vec![None; p];
+    let mut xs = vec![0.0; n * p];
+    let mut categories = vec![None; p];
+    let mut frame_columns = vec![Vec::new(); p];
     for (j, kind) in kinds.iter().enumerate() {
         match kind {
             ColumnKind::Numeric => {
-                let col = parsed_numeric_cols[j]
-                    .get_or_insert_with(|| x.iter().map(|r| parse_float_cell(&r[j])).collect());
-                numeric[j] = Some(fit_numeric_column(j, col));
+                let col = &mut parsed_cols[j];
+                let sc = fit_numeric_column(j, col);
+                sc.transform_column_strided(col, &mut xs, j, p);
+                for v in col.iter_mut() {
+                    if !v.is_finite() {
+                        *v = f64::NAN;
+                    }
+                }
+                frame_columns[j] = std::mem::take(col);
+                numeric[j] = Some(sc);
             }
             ColumnKind::Categorical => {
                 let col: Vec<&str> = x.iter().map(|r| r[j].as_str()).collect();
-                categorical[j] = Some(fit_categorical_column(
+                let ce = fit_categorical_column(
                     j,
                     &col,
                     &y_num,
                     y_global_mean,
                     min_level_count,
                     prior_smoothing,
-                ));
-            }
-        }
-    }
-    let mut xs = vec![0.0; n * p];
-    let mut categories = vec![None; p];
-    let mut frame_columns = vec![vec![f64::NAN; n]; p];
-    for j in 0..p {
-        match kinds[j] {
-            ColumnKind::Numeric => {
-                let sc = numeric[j].as_ref().expect("numeric");
-                let col = parsed_numeric_cols[j].as_ref().expect("parsed numeric");
-                for (i, &raw) in col.iter().enumerate() {
-                    xs[i * p + j] = sc.transform_value(raw).0;
-                    frame_columns[j][i] = if raw.is_finite() { raw } else { f64::NAN };
-                }
-            }
-            ColumnKind::Categorical => {
-                let ce = categorical[j].as_ref().expect("categorical");
+                );
                 categories[j] = Some(ce.vocab_tokens.len());
+                let mut fcol = vec![f64::NAN; n];
                 for i in 0..n {
                     let (z, idx, miss) = ce.transform_cell(&x[i][j]);
                     xs[i * p + j] = z;
-                    frame_columns[j][i] = if miss > 0.0 { f64::NAN } else { idx as f64 };
+                    fcol[i] = if miss > 0.0 { f64::NAN } else { idx as f64 };
                 }
+                frame_columns[j] = fcol;
+                categorical[j] = Some(ce);
             }
         }
     }
@@ -244,7 +347,12 @@ fn prepare_cells_with_yv(
     };
     let observed_target_stats = compute_observed_target_stats(&y_num, task);
     let target_stats = compute_native_target_stats(&frame_y, &y_num, task);
+    let scaler_fit_transform_ms = t_scale.elapsed().as_secs_f64() * 1e3;
+
+    let t_desc = Instant::now();
     let high_table_descriptors = compute_table_descriptors(&xs, n, p, &y_num, Level::High);
+    let table_descriptors_ms = t_desc.elapsed().as_secs_f64() * 1e3;
+
     let transform = FitOnlyTableTransform {
         task,
         kinds,
@@ -255,25 +363,34 @@ fn prepare_cells_with_yv(
         prior_smoothing,
         class_vocab_policy,
     };
-    Ok(PreparedTable {
-        task,
-        rows: n,
-        features: p,
-        classes: classes_of(&transform.target),
-        x_scaled: xs,
-        y_scaled: y_num,
-        transform,
-        row_ids,
-        categories,
-        category_tokens,
-        frame_columns,
-        frame_y,
-        target_stats,
-        observed_target_stats,
-        high_table_descriptors,
-        raw_cells_sha256,
-        source_digest_override: None,
-    })
+    let timings = PrepareStageTimings {
+        parse_and_infer_ms,
+        scaler_fit_transform_ms,
+        table_descriptors_ms,
+        total_ms: t_total.elapsed().as_secs_f64() * 1e3,
+    };
+    Ok((
+        PreparedTable {
+            task,
+            rows: n,
+            features: p,
+            classes: classes_of(&transform.target),
+            x_scaled: xs,
+            y_scaled: y_num,
+            transform,
+            row_ids,
+            categories,
+            category_tokens,
+            frame_columns,
+            frame_y,
+            target_stats,
+            observed_target_stats,
+            high_table_descriptors,
+            raw_cells_sha256,
+            source_digest_override: None,
+        },
+        timings,
+    ))
 }
 
 /// String-cell table preparation with explicit `row_ids` and [`ClassVocabPolicy`].
@@ -285,7 +402,19 @@ pub fn prepare_table_cells_with_policy(
     class_vocab_policy: ClassVocabPolicy,
 ) -> Result<PreparedTable> {
     let yv: Vec<TargetValue<'_>> = y.iter().map(|s| TargetValue::Str(s.as_str())).collect();
-    prepare_cells_with_yv(x, &yv, None, task, row_ids, class_vocab_policy)
+    Ok(prepare_cells_with_yv(x, &yv, None, task, row_ids, class_vocab_policy)?.0)
+}
+
+/// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
+/// with explicit physical `row_ids`, returning non-overlapping stage timings (`Cap32V1`).
+pub fn prepare_table_cells_with_ids_timed(
+    x: &[Vec<String>],
+    y: &[String],
+    task: PrepTask,
+    row_ids: Vec<u64>,
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    let yv: Vec<TargetValue<'_>> = y.iter().map(|s| TargetValue::Str(s.as_str())).collect();
+    prepare_cells_with_yv(x, &yv, None, task, row_ids, ClassVocabPolicy::Cap32V1)
 }
 
 /// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
@@ -310,14 +439,15 @@ pub fn prepare_table_mixed_with_policy(
 ) -> Result<PreparedTable> {
     let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
     let row_ids = row_ids.unwrap_or_else(|| (0..x_cells.len() as u64).collect());
-    prepare_cells_with_yv(
+    Ok(prepare_cells_with_yv(
         x_cells,
         &yv,
         declared_kinds,
         task,
         row_ids,
         class_vocab_policy,
-    )
+    )?
+    .0)
 }
 
 /// Mixed-column table preparation (`Cap32V1` default).
@@ -339,6 +469,17 @@ pub fn prepare_table_mixed(
 }
 
 /// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
+/// using sequential `0..n as u64` row IDs (`Cap32V1`), returning non-overlapping stage timings.
+pub fn prepare_table_cells_timed(
+    x: &[Vec<String>],
+    y: &[String],
+    task: PrepTask,
+) -> Result<(PreparedTable, PrepareStageTimings)> {
+    let row_ids = (0..x.len() as u64).collect();
+    prepare_table_cells_with_ids_timed(x, y, task, row_ids)
+}
+
+/// Python `FitOnlyTableTransform.fit(X: list of str rows, y: list of str, task).transform(X, y)`
 /// using sequential `0..n as u64` row IDs (`Cap32V1`).
 pub fn prepare_table_cells(
     x: &[Vec<String>],
@@ -347,127 +488,4 @@ pub fn prepare_table_cells(
 ) -> Result<PreparedTable> {
     let row_ids = (0..x.len() as u64).collect();
     prepare_table_cells_with_ids(x, y, task, row_ids)
-}
-
-pub(crate) fn fit_target_scaler_with_policy(
-    y: &[TargetValue<'_>],
-    task: PrepTask,
-    class_vocab_policy: ClassVocabPolicy,
-) -> Result<TargetScaler> {
-    match task {
-        PrepTask::Multiclass => {
-            let raw: Vec<f64> = y
-                .iter()
-                .map(|v| match v {
-                    TargetValue::Num(x) => *x,
-                    TargetValue::Str(s) => parse_float_cell(s),
-                })
-                .collect();
-            let finite: Vec<f64> = raw.into_iter().filter(|v| v.is_finite()).collect();
-            if finite.is_empty() {
-                let mut ts = TargetScaler::base(task, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0);
-                ts.class_labels = vec![0.0, 0.5, 1.0];
-                ts.class_priors = vec![0.34, 0.33, 0.33];
-                return Ok(ts);
-            }
-            let rounded = sorted(&finite.iter().map(|&v| round6(v)).collect::<Vec<_>>());
-            let mut u_vals: Vec<f64> = Vec::new();
-            let mut u_counts: Vec<i64> = Vec::new();
-            for v in rounded {
-                if u_vals.last() == Some(&v) {
-                    *u_counts.last_mut().expect("count") += 1;
-                } else {
-                    u_vals.push(v);
-                    u_counts.push(1);
-                }
-            }
-            let counts_f: Vec<f64> =
-                if class_vocab_policy == ClassVocabPolicy::Cap32V1 && u_vals.len() > 32 {
-                    let order = argsort_i64(&u_counts);
-                    let top: Vec<f64> = order.iter().rev().take(32).map(|&i| u_vals[i]).collect();
-                    u_vals = sorted(&top);
-                    u_vals
-                        .iter()
-                        .map(|&v| finite.iter().filter(|&&f| (f - v).abs() <= 1e-5).count() as f64)
-                        .collect()
-                } else {
-                    u_counts.iter().map(|&c| c as f64).collect()
-                };
-            let total = pairwise_sum(&counts_f).max(1.0);
-            let priors: Vec<f64> = counts_f.iter().map(|c| c / total).collect();
-            let mut ts = TargetScaler::base(
-                task,
-                mean1d(&finite),
-                std1d(&finite).max(1e-6),
-                median(&finite),
-                1.0,
-                0.0,
-                0.0,
-            );
-            ts.class_prior = priors[0];
-            ts.class_labels = u_vals;
-            ts.class_priors = priors;
-            Ok(ts)
-        }
-        PrepTask::Classification => {
-            let tokens: Vec<String> = y
-                .iter()
-                .map(|v| match v {
-                    TargetValue::Num(x) => py_float_repr(*x),
-                    TargetValue::Str(s) => py_strip(s).to_string(),
-                })
-                .collect();
-            let mut uniq = tokens.clone();
-            uniq.sort();
-            uniq.dedup();
-            let pos = if uniq.iter().any(|u| u == "1" || u == "1.0") {
-                if uniq.iter().any(|u| u == "1") {
-                    "1".to_string()
-                } else {
-                    "1.0".to_string()
-                }
-            } else if let Some(t) = uniq.iter().find(|u| u.to_lowercase() == "true") {
-                t.clone()
-            } else {
-                uniq.last().cloned().unwrap_or_else(|| "1".to_string())
-            };
-            let bin: Vec<f64> = tokens
-                .iter()
-                .map(|t| if *t == pos { 1.0 } else { 0.0 })
-                .collect();
-            let prior = if bin.is_empty() { 0.5 } else { mean1d(&bin) };
-            let mut ts = TargetScaler::base(
-                task,
-                prior,
-                (prior * (1.0 - prior)).sqrt().max(1e-6),
-                if prior >= 0.5 { 1.0 } else { 0.0 },
-                1.0,
-                0.0,
-                0.0,
-            );
-            ts.positive_label = Some(pos);
-            ts.class_prior = prior;
-            Ok(ts)
-        }
-        PrepTask::Regression => {
-            let arr = regression_array(y)?;
-            let finite: Vec<f64> = arr.into_iter().filter(|v| v.is_finite()).collect();
-            if finite.is_empty() {
-                return Ok(TargetScaler::base(task, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0));
-            }
-            let m = mean1d(&finite);
-            let s = std1d(&finite).max(1e-6);
-            let q = quantiles(&finite, &[0.25, 0.5, 0.75]);
-            let (skew, kurt) = safe_skew_kurt(&finite);
-            Ok(TargetScaler::base(
-                task,
-                m,
-                s,
-                q[1],
-                (q[2] - q[0]).max(1e-6),
-                skew,
-                kurt,
-            ))
-        }
-    }
 }

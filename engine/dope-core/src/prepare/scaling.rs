@@ -4,13 +4,31 @@
 //! `X_train_scaled` / `y_train_scaled` arrays consumed by the MLC-v3
 //! conditioning builders. Statistics are fitted on the training rows only.
 
-use super::np::{clip, interp};
+use super::np::{argsort_i64, clip, interp, mean1d, median, pairwise_sum, round6, sorted, std1d};
 use crate::error::{DopeError, Result};
 use std::collections::HashMap;
 
 pub use super::scaling_fit::*;
 pub use super::scaling_prepare::*;
 pub use super::scaling_table::*;
+
+/// Non-overlapping stage timings (in milliseconds) for [`prepare_table_cells_timed`]
+/// and [`prepare_table_timed`].
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct PrepareStageTimings {
+    /// Raw cell hashing (`raw_cells_sha256`), string stripping, missing-token detection,
+    /// column kind inference, and float parsing.
+    pub parse_and_infer_ms: f64,
+    /// Target and feature scaler fitting (`fit_target_scaler`, `fit_numeric_column`,
+    /// `fit_categorical_column`) plus forward transformation into `x_scaled`, `y_scaled`,
+    /// `frame_columns`, `frame_y`, and `target_stats`.
+    pub scaler_fit_transform_ms: f64,
+    /// Static [`super::descriptors::Level::High`] [`super::descriptors::TableDescriptors`]
+    /// computation (`compute_table_descriptors`).
+    pub table_descriptors_ms: f64,
+    /// Total elapsed wall time inside `prepare_table*`.
+    pub total_ms: f64,
+}
 
 /// `scaling.QUANTILE_GRID`.
 pub const QUANTILE_GRID: [f64; 9] = [0.01, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99];
@@ -122,7 +140,8 @@ pub struct NumericColumnScaler {
 }
 
 impl NumericColumnScaler {
-    fn raw_transform(&self, v: f64) -> f64 {
+    #[inline]
+    fn raw_transform_with_q(&self, v: f64, has_monotone_q: bool, iqr: f64) -> f64 {
         let z_log = match self.transform_kind {
             TransformKind::Constant => return 0.0,
             TransformKind::Binary => {
@@ -141,8 +160,7 @@ impl NumericColumnScaler {
             TransformKind::QuantileRobustHybrid => (v - self.post_mean) / self.post_std.max(1e-9),
         };
         let q = &self.quantiles;
-        let z = if q.windows(2).all(|w| w[1] - w[0] > 1e-12) {
-            let iqr = (q[5] - q[3]).max(1e-9);
+        let z = if has_monotone_q {
             let z_q = if v < q[0] {
                 NORMAL_GRID[0] + (v - q[0]) / iqr * 1.3489795
             } else if v > q[8] {
@@ -158,12 +176,34 @@ impl NumericColumnScaler {
         6.0 * (z / 6.0).tanh()
     }
 
+    fn raw_transform(&self, v: f64) -> f64 {
+        let q = &self.quantiles;
+        let has_monotone_q = q.windows(2).all(|w| w[1] - w[0] > 1e-12);
+        let iqr = (q[5] - q[3]).max(1e-9);
+        self.raw_transform_with_q(v, has_monotone_q, iqr)
+    }
+
     /// Returns (z, missing indicator) for one value.
     pub fn transform_value(&self, v: f64) -> (f64, f64) {
         if v.is_finite() {
             (self.raw_transform(v), 0.0)
         } else {
             (0.0, 1.0)
+        }
+    }
+
+    /// Transform a column of length `n` into `xs` (strided `j + i * p`), hoisting
+    /// per-column quantile invariants out of the row loop.
+    pub(crate) fn transform_column_strided(&self, col: &[f64], xs: &mut [f64], j: usize, p: usize) {
+        let q = &self.quantiles;
+        let has_monotone_q = q.windows(2).all(|w| w[1] - w[0] > 1e-12);
+        let iqr = (q[5] - q[3]).max(1e-9);
+        for (i, &v) in col.iter().enumerate() {
+            xs[i * p + j] = if v.is_finite() {
+                self.raw_transform_with_q(v, has_monotone_q, iqr)
+            } else {
+                0.0
+            };
         }
     }
 }
@@ -384,4 +424,53 @@ pub struct FitOnlyTableTransform {
     pub min_level_count: usize,
     pub prior_smoothing: f64,
     pub class_vocab_policy: ClassVocabPolicy,
+}
+
+pub(crate) fn fit_multiclass_target_scaler(
+    y: &[TargetValue<'_>],
+    policy: ClassVocabPolicy,
+) -> TargetScaler {
+    let finite: Vec<f64> = y
+        .iter()
+        .map(|v| match v {
+            TargetValue::Num(x) => *x,
+            TargetValue::Str(s) => parse_float_cell(s),
+        })
+        .filter(|v| v.is_finite())
+        .collect();
+    if finite.is_empty() {
+        let mut ts = TargetScaler::base(PrepTask::Multiclass, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0);
+        ts.class_labels = vec![0.0, 0.5, 1.0];
+        ts.class_priors = vec![0.34, 0.33, 0.33];
+        return ts;
+    }
+    let rounded = sorted(&finite.iter().map(|&v| round6(v)).collect::<Vec<_>>());
+    let (mut u_vals, mut u_counts) = (Vec::new(), Vec::new());
+    for v in rounded {
+        if u_vals.last() == Some(&v) {
+            *u_counts.last_mut().expect("count") += 1;
+        } else {
+            u_vals.push(v);
+            u_counts.push(1i64);
+        }
+    }
+    let counts_f: Vec<f64> = if policy == ClassVocabPolicy::Cap32V1 && u_vals.len() > 32 {
+        let order = argsort_i64(&u_counts);
+        let top: Vec<f64> = order.iter().rev().take(32).map(|&i| u_vals[i]).collect();
+        u_vals = sorted(&top);
+        u_vals
+            .iter()
+            .map(|&v| finite.iter().filter(|&&f| (f - v).abs() <= 1e-5).count() as f64)
+            .collect()
+    } else {
+        u_counts.iter().map(|&c| c as f64).collect()
+    };
+    let total = pairwise_sum(&counts_f).max(1.0);
+    let priors: Vec<f64> = counts_f.iter().map(|c| c / total).collect();
+    let (m, s, med) = (mean1d(&finite), std1d(&finite).max(1e-6), median(&finite));
+    let mut ts = TargetScaler::base(PrepTask::Multiclass, m, s, med, 1.0, 0.0, 0.0);
+    ts.class_prior = priors[0];
+    ts.class_labels = u_vals;
+    ts.class_priors = priors;
+    ts
 }

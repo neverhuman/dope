@@ -13,7 +13,7 @@ use dope_core::landmark::{LandmarkBundle, LandmarkMode, LandmarkOptions, Subsamp
 use dope_core::landmark::{LandmarkGroup, PROGRESSIVE_ORDER};
 use dope_core::mlc_v3::MlcV3Model;
 use dope_core::prepare::{
-    build_conditioning, build_conditioning_sampled, prepare_table_cells,
+    build_conditioning, build_conditioning_sampled, prepare_table_cells_timed,
     progressive_landmarks_for_table, DopeConditioning, NativeReportView, PrepTask, PreparedTable,
 };
 use dope_core::RawTable;
@@ -115,9 +115,17 @@ fn main() -> Res<()> {
     let mut runs = Vec::new();
     for _ in 0..reps {
         let t = Instant::now();
-        let table = prepare_table_cells(&x, &y, task)?;
+        let (table, stage_timings) = prepare_table_cells_timed(&x, &y, task)?;
         let prepare_ms = ms(t);
-        let mut run = json!({"prepare_ms": prepare_ms});
+        let mut run = json!({
+            "prepare_ms": prepare_ms,
+            "prepare_stages_ms": {
+                "parse_and_infer_ms": stage_timings.parse_and_infer_ms,
+                "scaler_fit_transform_ms": stage_timings.scaler_fit_transform_ms,
+                "table_descriptors_ms": stage_timings.table_descriptors_ms,
+                "total_ms": stage_timings.total_ms,
+            }
+        });
         if want("none") {
             let t = Instant::now();
             let cond =

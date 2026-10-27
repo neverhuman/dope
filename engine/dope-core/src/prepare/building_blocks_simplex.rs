@@ -3,6 +3,113 @@
 
 use super::building_blocks::np;
 
+/// `LEVEL_RANK` of the Python reference; unknown levels rank as `ultra` (3).
+pub fn level_rank(level: &str) -> u8 {
+    match level {
+        "low" | "small" => 0,
+        "medium" => 1,
+        "high" => 2,
+        _ => 3,
+    }
+}
+
+pub(crate) fn to_f32<const N: usize>(v: &[f64]) -> [f32; N] {
+    let mut out = [0.0f32; N];
+    for (o, &x) in out.iter_mut().zip(v) {
+        *o = x as f32;
+    }
+    out
+}
+
+/// Zero-matrix-allocation bivariate correlation against `y_z` over `pairs`.
+pub(crate) fn corr_pairs(
+    z_cols: &[Vec<f64>],
+    pairs: &[(usize, usize)],
+    n: usize,
+    y_z: &[f64],
+    col_buf: &mut [f64],
+    sq_buf: &mut [f64],
+    f: impl Fn(f64, f64) -> f64,
+) -> Vec<f64> {
+    let m = pairs.len();
+    if n * m == 0 || y_z.is_empty() {
+        return vec![0.0; m.max(if m == 0 { 1 } else { 0 })];
+    }
+    let n_f = n as f64;
+    let mut out = vec![0.0f64; m];
+    let mut valid_count = 0usize;
+    let mut first_valid_c = 0usize;
+    let mut first_valid_pw = 0.0f64;
+    for (c, &(ia, ib)) in pairs.iter().enumerate() {
+        let za = &z_cols[ia];
+        let zb = &z_cols[ib];
+        let mu = if m == 1 {
+            for i in 0..n {
+                col_buf[i] = f(za[i], zb[i]);
+            }
+            np::sum(&col_buf[..n]) / n_f
+        } else {
+            let mut s = 0.0;
+            for i in 0..n {
+                let v = f(za[i], zb[i]);
+                col_buf[i] = v;
+                s += v;
+            }
+            s / n_f
+        };
+        let m2 = if m == 1 {
+            for v in &mut col_buf[..n] {
+                *v -= mu;
+            }
+            np::sum(&col_buf[..n]) / n_f
+        } else {
+            let mut s2 = 0.0;
+            for v in &mut col_buf[..n] {
+                let cv = *v - mu;
+                *v = cv;
+                s2 += cv;
+            }
+            s2 / n_f
+        };
+        let a_s = if m == 1 {
+            for i in 0..n {
+                let d = col_buf[i] - m2;
+                sq_buf[i] = d * d;
+            }
+            (np::sum(&sq_buf[..n]) / n_f).sqrt()
+        } else {
+            let mut sq_s = 0.0;
+            for &v in &col_buf[..n] {
+                let d = v - m2;
+                sq_s += d * d;
+            }
+            (sq_s / n_f).sqrt()
+        };
+        if a_s > 1e-9 {
+            let mut seq_sum = 0.0;
+            if valid_count == 0 {
+                for i in 0..n {
+                    let pr = (col_buf[i] / a_s) * y_z[i];
+                    col_buf[i] = pr;
+                    seq_sum += pr;
+                }
+                first_valid_c = c;
+                first_valid_pw = (np::sum(&col_buf[..n]) / n_f).abs();
+            } else {
+                for i in 0..n {
+                    seq_sum += (col_buf[i] / a_s) * y_z[i];
+                }
+            }
+            valid_count += 1;
+            out[c] = np::nan_to_zero((seq_sum / n_f).abs());
+        }
+    }
+    if valid_count == 1 {
+        out[first_valid_c] = np::nan_to_zero(first_valid_pw);
+    }
+    out
+}
+
 /// `_squash` on a scalar: non-finite → 0, else `v / (1 + |v|)`.
 pub fn squash(v: f64) -> f64 {
     if !v.is_finite() {
@@ -329,5 +436,44 @@ mod tests {
         assert_eq!(np::quantile_sorted(&s, 0.5), 3.0);
         assert_eq!(np::quantile_sorted(&s, 1.0), 8.0);
         assert_eq!(np::quantile_sorted(&s, 0.0), 1.0);
+    }
+
+    #[test]
+    fn sorted_preserves_signed_zero_and_nan_tie_order() {
+        let nan_a = f64::from_bits(0x7ff8_0000_0000_0001);
+        let nan_b = f64::from_bits(0x7ff8_0000_0000_0002);
+        let input = [1.0, -0.0, nan_b, 0.0, -1.0, -0.0, nan_a];
+        let s1 = np::sorted(&input);
+        let s2 = crate::prepare::np::sorted(&input);
+        let want_bits = [
+            (-1.0f64).to_bits(),
+            (-0.0f64).to_bits(),
+            0.0f64.to_bits(),
+            (-0.0f64).to_bits(),
+            1.0f64.to_bits(),
+            nan_b.to_bits(),
+            nan_a.to_bits(),
+        ];
+        for (i, &w) in want_bits.iter().enumerate() {
+            assert_eq!(s1[i].to_bits(), w, "building_blocks_np::sorted[{i}]");
+            assert_eq!(s2[i].to_bits(), w, "np::sorted[{i}]");
+        }
+    }
+
+    #[test]
+    fn building_blocks_reciprocal_exactness_non_pot_rows() {
+        let (n, p) = (130usize, 2usize);
+        let x: Vec<f64> = (0..n * p)
+            .map(|k| ((k * 17 + 5) as f64 * 0.137).sin())
+            .collect();
+        let y: Vec<f64> = (0..n)
+            .map(|i| ((i * 31 + 3) as f64 * 0.271).cos())
+            .collect();
+        let bb =
+            super::super::building_blocks::compute_building_block_landmarks(&x, n, p, &y, "high");
+        assert!(bb.building_block_vec68.iter().all(|v| v.is_finite()));
+        assert_eq!(bb.col_bb_probes7.len(), p);
+        assert_eq!(bb.bb_gains16[0].to_bits(), 0x3c9b_92c5);
+        assert_eq!(bb.col_bb_probes7[0][0].to_bits(), 0x3c9e_95c2);
     }
 }
