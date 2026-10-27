@@ -3,10 +3,13 @@
 //! Loads all 56 `F32` tensors (`444,168` parameters) of `LandmarkHyperRouter`,
 //! `ConditionalHyperTargetNet`, and `CovariateRefinementNet` from a `.safetensors` file
 //! without Python, and executes routing, target conditioning, covariate refinement,
-//! and `DML3`/`CSC1` wire decoding and synthetic table generation on CPU.
+//! and `DML3`/`CSC1` wire decoding and synthetic table generation. CPU is the default;
+//! explicit device loading and tensor feature APIs keep neural inference on CUDA.
 
 pub mod inflate;
 pub mod nets;
+mod resident;
+pub use resident::MlcV3RoutedTensors;
 pub mod sample;
 pub mod scaler;
 pub mod wire;
@@ -56,7 +59,7 @@ pub(crate) struct MlcV3Weights {
 }
 
 impl MlcV3Weights {
-    pub(crate) fn from_bytes(raw: &[u8]) -> Result<Self> {
+    pub(crate) fn from_bytes_on_device(raw: &[u8], device: &Device) -> Result<Self> {
         if raw.is_empty() || raw.len() > 33_554_432 {
             return Err(bad("mlc_v3 safetensors byte size out of bounds"));
         }
@@ -83,7 +86,7 @@ impl MlcV3Weights {
             return Err(bad("mlc_v3 safetensors parameter count mismatch"));
         }
         let tensor_count = st.len();
-        let tensors = candle_core::safetensors::load_buffer(raw, &Device::Cpu)?;
+        let tensors = candle_core::safetensors::load_buffer(raw, device)?;
         Ok(Self {
             tensors,
             used: BTreeSet::new(),
@@ -234,21 +237,23 @@ impl LandmarkHyperRouter {
         let x140 = self.input_norm.forward(&Tensor::from_slice(
             &desc_vec[..140],
             (1, 140),
-            &Device::Cpu,
+            self.small_embed.device(),
         )?)?;
         let x_extra = if desc_vec.len() >= 256 {
             self.v3_inter_norm.forward(&Tensor::from_slice(
                 &desc_vec[140..256],
                 (1, 116),
-                &Device::Cpu,
+                self.small_embed.device(),
             )?)?
         } else {
-            Tensor::zeros((1, 116), DType::F32, &Device::Cpu)?
+            Tensor::zeros((1, 116), DType::F32, self.small_embed.device())?
         };
         let x256 = Tensor::cat(&[&x140, &x_extra], 1)?;
-        let mut lvl_emb =
-            self.level_embed
-                .forward(&Tensor::from_slice(&[lvl_idx], (1,), &Device::Cpu)?)?;
+        let mut lvl_emb = self.level_embed.forward(&Tensor::from_slice(
+            &[lvl_idx],
+            (1,),
+            self.small_embed.device(),
+        )?)?;
         let is_small = matches!(level, "low" | "small");
         if is_small {
             lvl_emb = (lvl_emb + self.small_embed.unsqueeze(0)?)?;
@@ -338,17 +343,32 @@ pub struct MlcV3Model {
 }
 
 impl MlcV3Model {
+    pub fn device(&self) -> &Device {
+        self.router.small_embed.device()
+    }
+
     pub fn load_safetensors(path: &Path) -> Result<Self> {
+        Self::load_safetensors_on_device(path, &Device::Cpu)
+    }
+
+    /// Load and validate the whole checkpoint on the explicitly selected device.
+    pub fn load_safetensors_on_device(path: &Path, device: &Device) -> Result<Self> {
         let meta = std::fs::symlink_metadata(path)?;
         if !meta.is_file() || meta.file_type().is_symlink() {
             return Err(bad("mlc_v3 safetensors path must be a regular file"));
         }
         let raw = std::fs::read(path)?;
-        Self::from_safetensors_bytes(&raw)
+        Self::from_safetensors_bytes_on_device(&raw, device)
     }
 
     pub fn from_safetensors_bytes(raw: &[u8]) -> Result<Self> {
-        let mut w = MlcV3Weights::from_bytes(raw)?;
+        Self::from_safetensors_bytes_on_device(raw, &Device::Cpu)
+    }
+
+    /// Validate all 56 tensors before retaining the whole model on `device`.
+    /// No device fallback or checkpoint pruning is performed.
+    pub fn from_safetensors_bytes_on_device(raw: &[u8], device: &Device) -> Result<Self> {
+        let mut w = MlcV3Weights::from_bytes_on_device(raw, device)?;
         let router = LandmarkHyperRouter::load(&mut w)?;
         let target_net = ConditionalHyperTargetNet::load(&mut w)?;
         let cov_net = CovariateRefinementNet::load(&mut w)?;

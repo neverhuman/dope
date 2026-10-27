@@ -472,3 +472,6 @@ fn released_encoder_matches_micro_reference_when_required() {
     }
     println!("released Micro max abs differences by feature block: {differences:?}");
 }
+
+#[path = "mlc_v3_resident/mod.rs"]
+mod resident;
