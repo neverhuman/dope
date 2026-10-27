@@ -63,6 +63,7 @@ def write_candidate(a, tools, out):
     meta = json.load(open(os.path.join(a.candidate, 'meta.json')))
     cand['harness_sha256'] = a.candidate_harness_sha or meta.get('harness_sha256') or sha(os.path.join(tools, 'q3_retention.py'))
     cand['summarizer_sha256'] = sha(summarize)
+    cand['role_manifest_sha256'] = meta.get('role_manifest_sha256')
     json.dump(cand, open(os.path.join(out, 'retention-candidate.json'), 'w'), indent=1, sort_keys=True)
 
 

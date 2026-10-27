@@ -133,7 +133,7 @@ Addendum item 1 asks for quality at each mask level after landmark-dropout train
 | multiclass | 43 | 0.995 (0.964–1.023) | 1.026 | 0.984 (0.955–1.009) | 0.999 (0.990–1.005) |
 
 - Dropout training narrows the zero-landmark gap on regression (from 8.0% to 3.9% at the point estimate) and closes it on binary, without making full mode worse.
-- With served sampling, N=300 keeps at least 95% of full on every task: 1.008 pooled and 1.014 on the 66 truly subsampled tables. The lower CI bound is under 0.95 only on binary (0.917, 17 tables).
+- With served sampling, N=300 keeps at least 95% of full on every task: 1.008 pooled and 1.014 on the 66 truly subsampled tables. N=300 is measured on 99 of the 101 valid tables: the native subsampler refuses two multiclass tables whose classes are too small for stratification at that N. The lower CI bound is under 0.95 only on binary (0.917, 17 tables). That is a point-estimate reading; no lower-bound rule is applied.
 - Multiclass zero is slightly below the released pin (0.984, CI crossing 1).
 - The Encoder629 cosine of zero to full rises from 0.76 to 0.89.
 - The four-seed supplement agrees in sign on every row: zero 0.998, N=300 1.011.

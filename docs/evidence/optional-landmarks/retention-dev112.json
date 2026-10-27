@@ -152,7 +152,7 @@
    "worse_by_gt_0_05": 31
   }
  },
- "harness_sha256": "3c6c42d1d7bb321802530677a62b3654284f1532f598ca88510837c6cf6d77cf",
+ "harness_sha256": "4f35e82f12142344e1d0c4c2fbab2d5fbea0f260b21dff317fce78b6998c6162",
  "metric": "clipped_R",
  "primary_seeds": [
   20261024,
@@ -218,11 +218,12 @@
  "role_manifest_sha256": "66d2a63c3e4b84e69a554af212a2f9f63081d59f366cd1f4b796bfc7eea39bdd",
  "roster_sha256": "c3cc1dc2500c3baa7eb99ee339948501cf7d8d83561d0a72ea051581b6e6353a",
  "roster_size": 112,
- "run": "target/qual/q1-dev112-v5-released",
+ "run": "target/qual/q1-dev112-v6-released",
  "schema": "dope.optional-landmarks-retention/v2",
+ "semantics": "served-v1",
  "source_bin_sha256": "3b73bac610eac40aafd7d1e39f7086c25cea5a737675a6d8fe34b42c506fe685",
- "sub_arm_partition": "sub arms pair sampled native gains with building blocks computed on all fit rows in the Python evaluator; the served Rust path computes building blocks on the native selection, so these arms do not certify served sampled conditioning",
- "summarizer_sha256": "ab6665ca43c5e16187213d272c44fb952fe335d24664c3ee03b18f221d52d950",
+ "sub_arm_partition": "sub arms build their building blocks on the native stratified selection (evidence_positions, cross-checked per table) with table descriptors on the full fit table, as the served Rust path does",
+ "summarizer_sha256": "07a6ddf67a3453eacdbcdaafb070ed4931b0e51eff7779d6e013f0e8f3b64685",
  "supplement_all_four_seeds": {
   "transitions": {
    "larger->full": {
