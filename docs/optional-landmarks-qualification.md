@@ -45,34 +45,33 @@ On every Rust change the effective-conditioning digest was also unchanged on rea
 **Served semantics.** Every arm is conditioned the way `dope mlc-v3 encode` conditions it:
 - Regression arms get raw-target moments.
 - Sub-N arms build their building blocks on exactly the rows the native report measured (the stratified selection), while table descriptors stay on the full fit table.
-- Each table's zero-arm conditioning digest is checked against the served none-mode encoding of the same `fit.csv`.
+- Each table's zero-arm conditioning digest is checked against the served none-mode encoding of the same `fit.csv`. It matches on all 102 measured tables.
 
 An earlier version of this page did not do the first two, so its regression and N numbers measured a conditioning the product never serves. Those runs are superseded.
 
 **Metric:** the six-auditor `v3_ledger_replay` clipped R, computed as the paired mean over generation seeds 20261024 and 20261025, then averaged with equal weight across tables. The ratio is a ratio of means against full, with a paired bootstrap 95% CI. The evidence file also carries a four-seed supplement.
 
-**Coverage (101 of 112 tables valid):**
-- Ten multiclass tables (p 76–795) are wider than the generator's 64 output columns. Their synthetic rows cannot be scored on the full-width test split, so they are protocol-unavailable.
-- One multiclass table (ten fractional class labels) is protocol-unavailable: one column's Spearman descriptor differs between the Python evaluator and the served path (0.020782 vs 0.020763, a tie-ranking difference), so its zero-arm digest does not match the served one.
-- Stratified subsampling refuses classes with fewer than two rows at that N. Those arms are recorded as unavailable rather than dropped.
+**Coverage (102 of 112 tables valid):**
+- 10 multiclass tables (p 76–795) are wider than the generator's 64 output columns. Their synthetic rows cannot be scored on the full-width test split, so they are protocol-unavailable.
+- Stratified subsampling refuses classes with fewer than two rows at that N. Those arms are recorded as unavailable rather than dropped; N=300 is measured on 99 tables.
 - No auditor failed on any valid table.
 
 | arm | valid | ratio of mean R | 95% CI | RF importance Spearman (arm / full) |
 |---|---|---|---|---|
-| zero (`none`) | 101 | 0.985 | 0.942–1.030 | 0.600 / 0.655 |
-| macro | 101 | 1.003 | 0.978–1.030 | 0.641 / 0.655 |
-| macro + larger | 101 | 1.001 | 0.977–1.029 | 0.647 / 0.655 |
-| full at the former default 2e9 budget | 101 | 1.007 | 0.988–1.029 | 0.653 / 0.655 |
+| zero (`none`) | 102 | 0.985 | 0.941–1.030 | 0.602 / 0.655 |
+| macro | 102 | 1.003 | 0.977–1.029 | 0.641 / 0.655 |
+| macro + larger | 102 | 1.001 | 0.976–1.028 | 0.648 / 0.655 |
+| full at the former default 2e9 budget | 102 | 1.007 | 0.989–1.028 | 0.653 / 0.655 |
 
 **Paired transitions:**
 
 | transition | ratio | 95% CI |
 |---|---|---|
-| zero → macro | 1.019 | 0.980–1.064 |
-| macro → larger | 0.998 | 0.976–1.017 |
-| larger → full | 0.999 | 0.972–1.024 |
+| zero → macro | 1.018 | 0.980–1.062 |
+| macro → larger | 0.998 | 0.978–1.016 |
+| larger → full | 0.999 | 0.973–1.025 |
 
-Eleven tables have full R ≤ 0. Excluding them, zero comes to 0.984 (0.938–1.028) on 90 tables.
+11 tables have full R ≤ 0. Excluding them, zero comes to 0.984 (0.942–1.029) on 91 tables.
 
 **By task:**
 
@@ -80,7 +79,7 @@ Eleven tables have full R ≤ 0. Excluding them, zero comes to 0.984 (0.938–1.
 |---|---|---|---|---|---|
 | regression | 41 | 0.920 | 0.808–1.026 | 0.998 | 1.011 (0.983–1.051) |
 | binary | 17 | 0.923 | 0.797–1.048 | 1.048 | 0.924 (0.836–1.008) |
-| multiclass | 43 | 1.026 | 0.986–1.085 | 0.995 | 1.002 (0.997–1.011) |
+| multiclass | 44 | 1.025 | 0.986–1.079 | 0.995 | 1.002 (0.997–1.011) |
 
 **Random partial masks.** These keep each observed High cell with probability 0.25 (sparse) or 0.75 (dense), seeded per table so a candidate sees the same masks:
 
@@ -88,7 +87,7 @@ Eleven tables have full R ≤ 0. Excluding them, zero comes to 0.984 (0.938–1.
 |---|---|---|
 | regression | 0.938 (0.842–1.025) | 0.953 (0.860–1.028) |
 | binary | 0.982 (0.892–1.085) | 1.027 (0.934–1.132) |
-| multiclass | 1.014 (0.972–1.067) | 1.013 (0.966–1.071) |
+| multiclass | 1.014 (0.973–1.063) | 1.012 (0.967–1.065) |
 
 **Subsample size (served sampled conditioning):**
 
@@ -98,31 +97,31 @@ Eleven tables have full R ≤ 0. Excluding them, zero comes to 0.984 (0.938–1.
 | 200 | 99 | 1.010 | 0.994–1.027 | 70 | 1.015 | 0.990–1.043 |
 | 300 | 99 | 0.994 | 0.978–1.010 | 66 | 0.989 | 0.959–1.017 |
 | 500 | 100 | 0.999 | 0.980–1.017 | 61 | 0.997 | 0.959–1.035 |
-| 1000 | 100 | 1.000 | 0.999–1.000 | 6 | 0.996 | 0.993–0.999 |
+| 1000 | 101 | 1.000 | 0.999–1.000 | 6 | 0.996 | 0.993–0.999 |
 
 **Against the targets (released pin):**
 - Pooled, zero-landmark loss is 1.5% at the point estimate, and the CI does not exclude a loss above 5%.
-- On regression the loss is 8.0%, and on binary 7.7%. Both are outside the 5% target.
+- On regression the loss is 8.0%, and on binary 7.7%.
 - The MACRO group alone restores both to full.
-- N=300 keeps at least 95% pooled and on regression and multiclass. On binary it does not (0.924, CI 0.836–1.008).
+- N=300 keeps at least 95% pooled (0.994) and on regression, multiclass; not on binary: 0.924 (0.836–1.008).
 
-**What these numbers do and don't say.** High-tier retention here is only weakly sensitive to landmark conditioning. The representation moves more: the Encoder629 cosine to full is 0.76 for zero, 0.92 for macro and 0.99 for N=300. JopeDime consumes that representation, and no policy has been evaluated on it.
+**What these numbers do and don't say.** High-tier retention here is only weakly sensitive to landmark conditioning. The representation moves more: the Encoder629 cosine to full is 0.77 for zero, 0.92 for macro and 0.99 for N=300. JopeDime consumes that representation, and no policy has been evaluated on it.
 
 ## 2a. Mask-trained candidate `ecded022` (dev roster; not registered)
 
 Addendum item 1 asks for quality at each mask level after landmark-dropout training.
 - **Identity:** `ecded0225fca7c6e13c413b0e39b1040bf95f7694940b2809f1ce2ce2abf7bd9`, warm-started from the released pin and trained on `train_gradient` tables only.
-- **Evaluation:** the same harness, served semantics, roster, masks, native reports and seeds as section 2 ([`retention-candidate.json`](evidence/optional-landmarks/retention-candidate.json)), on the same 101 tables.
+- **Evaluation:** the same harness, served semantics, roster, masks, native reports and seeds as section 2 ([`retention-candidate.json`](evidence/optional-landmarks/retention-candidate.json)), on the same 102 tables.
 - **Custody:** its training-source custody has been independently verified.
-- **Status:** its preparation lineage (lossless class vocabulary for K ≥ 33) is still open, so it is not a registered checkpoint. Nothing below is a JopeDime policy-quality claim.
+- **Status:** it is not a registered checkpoint; registration and redistribution need an owner decision. Nothing below is a JopeDime policy-quality claim.
 
 | arm | candidate / candidate full | candidate / released, same arm | candidate / released full |
 |---|---|---|---|
-| zero (`none`) | 0.994 (0.961–1.028) | 1.024 (0.993–1.060) | 1.008 (0.971–1.048) |
-| random sparse | 0.996 (0.969–1.023) | 1.021 (0.990–1.051) | 1.010 (0.980–1.046) |
-| macro | 0.999 (0.973–1.022) | 1.009 (0.993–1.028) | 1.013 (0.984–1.043) |
-| random dense | 0.994 (0.968–1.021) | 1.009 (0.981–1.043) | 1.008 (0.974–1.049) |
-| macro + larger | 1.000 (0.979–1.021) | 1.012 (0.981–1.050) | 1.014 (0.986–1.046) |
+| zero (`none`) | 0.994 (0.962–1.028) | 1.024 (0.994–1.059) | 1.008 (0.970–1.047) |
+| random sparse | 0.996 (0.970–1.024) | 1.021 (0.990–1.051) | 1.010 (0.979–1.045) |
+| macro | 0.998 (0.973–1.022) | 1.009 (0.993–1.026) | 1.012 (0.984–1.043) |
+| random dense | 0.994 (0.968–1.020) | 1.010 (0.980–1.042) | 1.008 (0.973–1.049) |
+| macro + larger | 0.999 (0.979–1.020) | 1.012 (0.982–1.049) | 1.013 (0.986–1.045) |
 | N=300 | 1.008 (0.989–1.028) | 1.029 (1.002–1.061) | 1.022 (0.996–1.053) |
 | full | 1.000 | 1.014 (0.987–1.049) | 1.014 (0.987–1.049) |
 
@@ -130,12 +129,12 @@ Addendum item 1 asks for quality at each mask level after landmark-dropout train
 |---|---|---|---|---|---|
 | regression | 41 | 0.961 (0.878–1.028) | 0.920 | 1.040 (0.981–1.110) | 1.014 (0.996–1.039) |
 | binary | 17 | 1.053 (0.915–1.264) | 0.923 | 1.192 (1.046–1.429) | 1.033 (0.917–1.187) |
-| multiclass | 43 | 0.995 (0.964–1.023) | 1.026 | 0.984 (0.955–1.009) | 0.999 (0.990–1.005) |
+| multiclass | 44 | 0.995 (0.963–1.021) | 1.025 | 0.984 (0.957–1.008) | 0.999 (0.990–1.005) |
 
-- Dropout training narrows the zero-landmark gap on regression (from 8.0% to 3.9% at the point estimate) and closes it on binary, without making full mode worse.
-- With served sampling, N=300 keeps at least 95% of full on every task: 1.008 pooled and 1.014 on the 66 truly subsampled tables. N=300 is measured on 99 of the 101 valid tables: the native subsampler refuses two multiclass tables whose classes are too small for stratification at that N. The lower CI bound is under 0.95 only on binary (0.917, 17 tables). That is a point-estimate reading; no lower-bound rule is applied.
-- Multiclass zero is slightly below the released pin (0.984, CI crossing 1).
-- The Encoder629 cosine of zero to full rises from 0.76 to 0.89.
+- Dropout training narrows the zero-landmark gap on regression (from 8.0% to 3.9% at the point estimate) and on binary, without making full mode worse (1.014 vs released).
+- With served sampling, N=300 keeps at least 95% of full: 1.008 pooled and 1.014 on the 66 truly subsampled tables. It is measured on 99 of the 102 valid tables: the native subsampler refuses 3 multiclass tables whose classes are too small for stratification at that N. The lower CI bound is under 0.95 on binary. That is a point-estimate reading; no lower-bound rule is applied.
+- Multiclass zero vs the released pin: 0.984 (0.957–1.008).
+- The Encoder629 cosine of zero to full rises from 0.77 to 0.89.
 - The four-seed supplement agrees in sign on every row: zero 0.998, N=300 1.011.
 
 ## 3. Subsample landmark fidelity (`subsample-ablation.json`)
