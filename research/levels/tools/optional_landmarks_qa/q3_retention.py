@@ -1,7 +1,11 @@
 """Q3 retention arms for optional landmarks (spec 5.4) on non-training catalog tables.
 
-Roster: catalog entries whose v3 role is dev_val_ablation or an eval_gradient_disjoint
-panel (never MLC-v3 training), numeric-only, p <= 64, with local train/test blobs.
+Roster: catalog entries of the pinned role manifest (--role-manifest, SHA-256 checked) whose
+v3 role is dev_val_ablation (never MLC-v3 training), with local train/test blobs; tables with
+categorical or missing cells use the string-row scaler. Tables wider than the generator
+(p > GENERATOR_WIDTH = 64 columns) stay in the roster but are recorded as
+protocol_unavailable: synthetic rows have 64 columns and cannot be scored on the full-width
+real test split.
 Native evidence per table comes from the integrated `dope landmarks real` (work_budget
 2e12 = MLC-v3 training options, plus the 2e9 product default and --subsample 300).
 Arms (level High, the Encoder629 tier):
@@ -13,6 +17,7 @@ Arms (level High, the Encoder629 tier):
   sub300      sampled full on the --subsample 300 report
 Per arm: vec256 / Encoder629 cosine to `full`, then wire -> generate_synthetic (2 seeds)
 -> 6-auditor sklearn probe retention R (v3_ledger_replay recipe) on the real test split.
+Each seed's per-auditor failure map is kept, so a score that fell back to chance is visible.
 Restricting a full report to MACRO/LARGER cells equals a native `--ids` run (cells are
 independent given folds); `--verify-ids K` checks that on K tables.
 """
@@ -30,6 +35,7 @@ OPTS = ['--folds', '5', '--knn-reference', '2048', '--ridge-rows', '8192', '--se
         '--spectrum-features', '64']
 ROLES = ('dev_val_ablation',)
 SIZES = (100, 200, 300, 500, 1000)
+GENERATOR_WIDTH = 64  # MultiLevelLandmarkModel.max_cols: columns emitted by generate_synthetic
 TASK = {'regression': 'regression', 'binary': 'classification', 'multi_label': 'multiclass'}
 # Per-table failures the evaluation records explicitly instead of aborting the roster: native CLI
 # refusals (RuntimeError), unreadable or malformed splits (OSError, ValueError, IndexError, KeyError)
@@ -96,6 +102,9 @@ def run_table(job):
             Xf, Xt = [r[:-1] for r in tr], [r[:-1] for r in te]
             yf = np.array([float(r[-1]) for r in tr]); yt = np.array([float(r[-1]) for r in te])
         out.update(n_fit=len(Xf), n_test=len(Xt), p=len(Xf[0]), numeric_only=bool(numeric))
+        if out['p'] > GENERATOR_WIDTH:
+            out['protocol_unavailable'] = f"p={out['p']} exceeds the generator width {GENERATOR_WIDTH}"
+            return out
         d = os.path.join(workdir, e['dataset_id']); os.makedirs(d, exist_ok=True)
         fit_csv = os.path.join(d, 'fit.csv')
         with open(fit_csv, 'w', newline='') as fh:
@@ -180,7 +189,7 @@ def run_table(job):
                                          subsample_n=a.get('subsample_n'))
             wire = serialize_dope_v3_envelope(enc, scaler=scaler, compress=True)
             dec, _ = deserialize_dope_v3_envelope(wire)
-            rs, fis = [], []
+            rs, fis, fails = [], [], []
             for s in seeds:
                 Xsyn, ysyn = model.generate_synthetic(dec, n_rows=len(Xs), seed=s)
                 if task == 'multiclass':
@@ -190,12 +199,13 @@ def run_table(job):
                     ev = evaluate_reg_bin_dev_cell(Xs, ys, Xsyn, ysyn, Xts, yts, task)
                     probe = ev['sklearn_6aud_probe']
                 rs.append(probe)
+                fails.append(ev['failures'])
                 try:
                     rho = spearmanr(fi_real, importances(Xsyn, ysyn)).correlation if Xs.shape[1] > 1 else float('nan')
                 except ValueError:
                     rho = float('nan')
                 fis.append(None if rho != rho else float(rho))
-            res[name] = dict(retention=rs, fi_spearman=fis, kept_cells=a.get('kept'), wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
+            res[name] = dict(retention=rs, fi_spearman=fis, auditor_failures=fails, kept_cells=a.get('kept'), wire_bytes=len(wire), recipe=cond['recipe'], digest=cond['digest'],
                              status=(a['bundle'].status if a.get('bundle') is not None else None))
         for name in res:
             if 'full' not in feats:
@@ -220,12 +230,17 @@ def main():
     ap.add_argument('--ckpt', default='/home/ubuntu/dope/target/s3-multilevel-training-20261023/v3/dope_mlc_v3_multitask_best.safetensors')
     ap.add_argument('--ckpt-sha', default='d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c',
                     help='SHA-256 the checkpoint must match (the released pin by default)')
+    ap.add_argument('--role-manifest', required=True,
+                    help='pinned v3_corpus_exposure_and_split_manifest.json; read directly, so no mixed-role cache is opened')
+    ap.add_argument('--role-manifest-sha', required=True, help='SHA-256 the role manifest must match')
     a = ap.parse_args()
     sys.path.insert(0, a.repo)
-    from pathlib import Path
-    from research.levels.v3_ablation_and_eval import build_reconciled_v3_manifest, find_local_blob
+    from research.levels.v3_ablation_and_eval import find_local_blob
     os.makedirs(a.out, exist_ok=True)
-    manifest = build_reconciled_v3_manifest(Path(a.out) / 'manifest')
+    manifest_bytes = open(a.role_manifest, 'rb').read()
+    if hashlib.sha256(manifest_bytes).hexdigest() != a.role_manifest_sha:
+        raise SystemExit('role manifest SHA-256 mismatch')
+    manifest = json.loads(manifest_bytes)
     cat = {json.loads(l)['id']: json.loads(l) for l in open('/home/ubuntu/dope-fit-cv-precalc-20261023/catalog.jsonl')}
     pool, excluded = [], []
     for e in manifest['entries']:
@@ -245,7 +260,9 @@ def main():
         raise SystemExit('checkpoint SHA-256 mismatch')
     jobs = [(a.repo, a.bin, e, os.path.join(a.out, 'work'), seeds, i < a.verify_ids, a.ckpt, a.ckpt_sha)
             for i, e in enumerate(picked)]
-    meta = dict(pool=len(pool), picked=len(picked), excluded=excluded, ckpt=a.ckpt, ckpt_sha256=a.ckpt_sha, roles=ROLES, seeds=seeds, bin=a.bin,
+    meta = dict(pool=len(pool), picked=len(picked), excluded=excluded, role_manifest=a.role_manifest,
+                role_manifest_sha256=a.role_manifest_sha, argv=sys.argv,
+                harness_sha256=hashlib.sha256(open(os.path.abspath(__file__), 'rb').read()).hexdigest(), ckpt=a.ckpt, ckpt_sha256=a.ckpt_sha, roles=ROLES, seeds=seeds, bin=a.bin,
                 bin_sha256=hashlib.sha256(open(a.bin, 'rb').read()).hexdigest(), started=time.time(), loadavg=os.getloadavg())
     json.dump(meta, open(os.path.join(a.out, 'meta.json'), 'w'), indent=1)
     with cf.ProcessPoolExecutor(a.jobs) as ex, open(os.path.join(a.out, 'results.jsonl'), 'a') as fh:
