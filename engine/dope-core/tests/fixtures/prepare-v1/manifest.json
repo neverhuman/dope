@@ -1,0 +1,104 @@
+{
+ "a_levels": [
+  "small",
+  "medium",
+  "high",
+  "ultra"
+ ],
+ "b_levels": [
+  "high",
+  "ultra"
+ ],
+ "cases": [
+  {
+   "input": "numeric",
+   "n": 40,
+   "name": "reg_small",
+   "p": 5,
+   "seed": 20261027,
+   "task": "regression"
+  },
+  {
+   "input": "numeric",
+   "n": 300,
+   "name": "reg_missing",
+   "p": 12,
+   "seed": 20261028,
+   "task": "regression"
+  },
+  {
+   "input": "numeric",
+   "n": 200,
+   "name": "bin_medium",
+   "p": 8,
+   "seed": 20261029,
+   "task": "classification"
+  },
+  {
+   "input": "numeric",
+   "n": 240,
+   "name": "mc_medium",
+   "p": 7,
+   "seed": 20261030,
+   "task": "multiclass"
+  },
+  {
+   "input": "numeric",
+   "n": 150,
+   "name": "mc_many",
+   "p": 6,
+   "seed": 20261031,
+   "task": "multiclass"
+  },
+  {
+   "input": "numeric",
+   "n": 120,
+   "name": "reg_wide",
+   "p": 70,
+   "seed": 20261032,
+   "task": "regression"
+  },
+  {
+   "input": "numeric",
+   "n": 30,
+   "name": "reg_p1",
+   "p": 1,
+   "seed": 20261033,
+   "task": "regression"
+  },
+  {
+   "input": "numeric",
+   "n": 5,
+   "name": "bin_tiny",
+   "p": 3,
+   "seed": 20261034,
+   "task": "classification"
+  },
+  {
+   "input": "numeric",
+   "n": 3,
+   "name": "reg_n3",
+   "p": 4,
+   "seed": 20261035,
+   "task": "regression"
+  },
+  {
+   "input": "cells",
+   "n": 90,
+   "name": "cells_reg",
+   "p": 6,
+   "seed": 20261036,
+   "task": "regression"
+  },
+  {
+   "input": "cells",
+   "n": 80,
+   "name": "cells_bin",
+   "p": 5,
+   "seed": 20261037,
+   "task": "classification"
+  }
+ ],
+ "numpy": "1.26.4",
+ "schema": "dope.prepare-goldens/v1"
+}
