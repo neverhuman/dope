@@ -37,7 +37,7 @@ pub use conditioning::{
     pad_col_landmarks, report_complete_landmarks, report_observed_landmarks, same_landmarks,
     subsample_scaled_rows, unsquash, BundleConditioningInput, DopeConditioning,
     LegacyReportConditioningInput, ObservedReportDescriptors, V3ConditioningBundle,
-    COL_LANDMARK_DIM, CONDITIONING_DOMAIN, LEGACY_FULL_RECIPE, MAX_COLS, OBSERVED_RECIPE,
+    COL_LANDMARK_DIM, CONDITIONING_DOMAIN, FULL_REPORT_RECIPE, MAX_COLS, OBSERVED_RECIPE,
 };
 pub use descriptors::{
     compute_level_contrasts, compute_table_descriptors, extract_report_descriptors,

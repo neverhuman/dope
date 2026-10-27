@@ -1,0 +1,122 @@
+{
+ "new_recipe": "full-report-v1",
+ "note": "vec256 and 64x17 column inputs are unchanged; only the recipe string hashed into the effective-conditioning digest changes. Historical receipts and evidence that record legacy-full-v1 stay valid and readable.",
+ "numeric_inputs_changed": false,
+ "old_recipe": "legacy-full-v1",
+ "prepare_v1_b_goldens": [
+  {
+   "case": "reg_high",
+   "level": "high",
+   "new_conditioning_digest": "21c253f587357970a16e72f504b4f10b3b1ae5d28f807f3e8667ac6fce40d510",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "38306d75a095a91edea30a0b843a677a39329baaa1d82dbce23192783c1d09a6",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "reg_ultra",
+   "level": "ultra",
+   "new_conditioning_digest": "355a29505861146608b691ee5a03f1d4948a7376669ca3cc042e5adcce49d0c5",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "4759b3fbfebe8e82ecd6c0bb33b581c3ef74bc9bdeca190232008733220ab703",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "reg_medium",
+   "level": "medium",
+   "new_conditioning_digest": "7759479d820c7157d141a7aab5f4cd09913d7dee2ac7fab9256223e25f7e24a6",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "f6a3a025b7e53e323ba08082535c67ed6c4a8a1df8dca362d5dec3e52e30128e",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "reg_small",
+   "level": "small",
+   "new_conditioning_digest": "0c68f6025887e9f68d0f5ad032d4bb8043229d99bd261356f52ccb1ec96395df",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "86c713d32b3abd5a20924c05438adaa2564a6fdb46aca995c1ecf28843ea758e",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "clf3_high",
+   "level": "high",
+   "new_conditioning_digest": "eed51d78c8caf70d677f5f0b0918daff1b9d701fb0cc9ee11b962e56dc0c9f98",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "864211459798173fcd7e51980926f998df4f8cfad09ab4becdb164d7bf0dde56",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "clf2_high_partial",
+   "level": "high",
+   "new_conditioning_digest": "6c01048415a2866444a07e3238ac4eb57d3345b2ff2eeb5603580a1d0ce5dc67",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "7df2850aaafe98f7b4f71cc3f7d8659cb7712cca0b5f866e065cea220d71825d",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "ties_high",
+   "level": "high",
+   "new_conditioning_digest": "c6d4c68686acac639d8a2b2e1aebd19b2e411b5681ada7557547849f7d06ce55",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "67b567301c2b490259b0e8b4dfef84c7a9f6bd22cb108027aee75eea77130b90",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "empty_report_high",
+   "level": "high",
+   "new_conditioning_digest": "ae4606001d7168e11c401bab100ec40aa02f33bf58335c8e56f8da981e559f54",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "e581ba3ddf0efedf4a9a9e18de652b1bc7d5008d7669549a7001bfa0ff0ff97f",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "p1_high",
+   "level": "high",
+   "new_conditioning_digest": "aff66acfa1c020a1aa453ff38e264cf6c50dca23e4b82b2aa6f61925bbe9a39e",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "733c9301ba4bdfa9d8ec47078903e2c46fad2e7bf4852971a99cebe391f2ae5e",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "p2_high",
+   "level": "high",
+   "new_conditioning_digest": "1d715b3515e252098327cd4d6699b74435a1e28544a9768859f2b5613fce22cd",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "88f9ae6e09f22fc61c2c1037db0334293503306f503b9c6b127f9adff32c4003",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "const_y_high",
+   "level": "high",
+   "new_conditioning_digest": "8945e95f9d559a7cdb2691dbaaf14ddbca53bc6cdcdf18ec0fea57c1f0700edb",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "dfe1d75e07b787bb5911000062b4c0ea09ea914b89717fc59c725ae72c1bced5",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "tiny_n_high",
+   "level": "high",
+   "new_conditioning_digest": "2242ec2bced067eddde58ec48b74b8ef7a93b5aaeae3d9ee41f707d54c1436d0",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "3670fc4bfd14e7737a32c8dbabe87588134ace1ec1eb26552107bebf5d3506b9",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "wide_high",
+   "level": "high",
+   "new_conditioning_digest": "d09dfc3782aa6c0402afcfda1aed2bb67babb859319b976b32c98404e8ba28f7",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "1c2727eeb6549a4b69c3d31708b0232b02bb09ed48b3a7ddd6198e903e80b5e5",
+   "old_recipe": "legacy-full-v1"
+  },
+  {
+   "case": "big_n_high",
+   "level": "high",
+   "new_conditioning_digest": "c8e1abd17883ec371510eed128cfda9d8b46e9d14e5d8015e81dae6713f806fd",
+   "new_recipe": "full-report-v1",
+   "old_conditioning_digest": "ec265e4bae186b4a3ad153e5cec93b16cc4527a2727b89c6b7f2bf1b96e278f1",
+   "old_recipe": "legacy-full-v1"
+  }
+ ],
+ "reason": "audit HLT-001 forbids the dead-language term in product code; the identifier is renamed rather than obfuscated",
+ "schema": "dope.recipe-transition/v1"
+}

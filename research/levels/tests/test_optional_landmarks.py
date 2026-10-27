@@ -16,7 +16,7 @@ from research.levels.multilevel_model import (
     MultiLevelLandmarkModel, build_conditioning, build_conditioning_inputs, build_v3_conditioning_bundle,  # noqa: F401
 )
 from research.levels.optional_landmarks import (  # noqa: F401
-    FINE_INDICES, LANDMARK_NAMES, LARGER_INDICES, LEGACY_FULL_RECIPE, LandmarkBundle,
+    FINE_INDICES, LANDMARK_NAMES, LARGER_INDICES, FULL_REPORT_RECIPE, LandmarkBundle,
     MACRO_INDICES, OBSERVED_RECIPE, bundle_to_report, effective_conditioning_digest,
     observed_report_descriptors, observed_target_stats, progressive_bundles, progressive_steps,
     squash_f32, stratified_subsample, table_target_stats, unsquash,
@@ -322,7 +322,7 @@ class TestOptionalLandmarks(unittest.TestCase):
         new_cond = build_conditioning(
             X, y, task="regression", bundle=None, mode="full", native_report=rep, level="high"
         )
-        self.assertEqual(new_cond["recipe"], LEGACY_FULL_RECIPE)
+        self.assertEqual(new_cond["recipe"], FULL_REPORT_RECIPE)
         np.testing.assert_array_equal(new_cond["vec256"], legacy_cond["vec256"])
         np.testing.assert_array_equal(new_cond["cond"]["col_landmarks24"], legacy_cond["col_landmarks24"])
         np.testing.assert_array_equal(new_cond["col_landmarks"][:6], legacy_cond["col_landmarks24"][:6, :17])
@@ -481,7 +481,7 @@ class TestOptionalLandmarks(unittest.TestCase):
                 with mock.patch("sys.stdout", buf_full):
                     self.assertEqual(cli.main(["encode", "--csv", str(csv_path), "--target", "target", "--task", "regression", "--weights", str(weights_path), "--landmark-mode", "full", "--report-json", str(rep_path), "--landmark-subsample", "25", "--json"]), 0)
                 rec_full = json.loads(buf_full.getvalue().strip())
-                self.assertEqual((rec_full["status"], rec_full["recipe"]), ("full", LEGACY_FULL_RECIPE))
+                self.assertEqual((rec_full["status"], rec_full["recipe"]), ("full", FULL_REPORT_RECIPE))
                 self.assertNotEqual(rec_full["features629_sha256"], rec_none["features629_sha256"])
 
 

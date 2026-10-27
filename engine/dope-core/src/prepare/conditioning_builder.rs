@@ -7,7 +7,7 @@ use crate::error::Result;
 use super::building_blocks::compute_building_block_landmarks;
 use super::conditioning::{
     apply_table_base_override, bad, level_landmark_mask, observed_target_stats, report_task,
-    table_classes, COL_LANDMARK_DIM, CONDITIONING_DOMAIN, LEGACY_FULL_RECIPE, MAX_COLS,
+    table_classes, COL_LANDMARK_DIM, CONDITIONING_DOMAIN, FULL_REPORT_RECIPE, MAX_COLS,
     OBSERVED_RECIPE,
 };
 use super::conditioning_observed::{
@@ -160,7 +160,7 @@ pub struct BundleConditioningInput<'a> {
 }
 
 /// Pre-extracted native report descriptors + complete/observed landmarks for
-/// the `mode == "full"` (`legacy-full-v1`) path.
+/// the `mode == "full"` (`full-report-v1`) path.
 #[derive(Debug, Clone, Copy)]
 pub struct LegacyReportConditioningInput<'a> {
     pub vector116: &'a [f32; 116],
@@ -195,7 +195,7 @@ impl<'a> LegacyReportConditioningInput<'a> {
 /// Assembled MLC-v3 / `DopeEncoder629` conditioning output and effective digest.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DopeConditioning {
-    /// `"legacy-full-v1"` (`mode == "full"`) or `"observed-only-v1"` (`"none"|"fast"|"progressive"`).
+    /// `"full-report-v1"` (`mode == "full"`) or `"observed-only-v1"` (`"none"|"fast"|"progressive"`).
     pub recipe: String,
     /// `"low" | "small" | "medium" | "high" | "ultra"`.
     pub level: String,
@@ -360,7 +360,7 @@ pub fn build_conditioning_with_cached_table_stats(
                 &bb,
                 level,
             );
-            (LEGACY_FULL_RECIPE, v3)
+            (FULL_REPORT_RECIPE, v3)
         }
         "none" | "fast" => {
             if let Some(b) = bundle {

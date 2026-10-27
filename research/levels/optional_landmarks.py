@@ -460,7 +460,7 @@ def table_target_stats(y: Any, task: str) -> List[Optional[float]]:
 
 from .observed_conditioning import (  # noqa: E402,F401
     CONDITIONING_DOMAIN,
-    LEGACY_FULL_RECIPE,
+    FULL_REPORT_RECIPE,
     MLC_V3_TRAINING_WORK_BUDGET,
     OBSERVED_RECIPE,
     build_conditioning,
