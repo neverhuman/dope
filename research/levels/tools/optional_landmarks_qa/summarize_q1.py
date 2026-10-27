@@ -10,7 +10,8 @@ Invalid measurements are excluded, never scored as zero. A table wider than the 
 (p > 64) is protocol_unavailable: its synthetic rows cannot be scored on the full-width real
 test split. Runs that predate the harness flag get the same rule from the recorded p. An arm
 whose per-auditor failure map shows an exception on a primary seed is unavailable for that
-table; a single-class synthetic draw is a measured outcome and stays.
+table; a single-class synthetic draw is a measured outcome and stays. A table whose zero-arm digest
+differs from the served none-mode digest (recorded by newer harness runs) is protocol_unavailable too.
 
 --against REF pairs this run with another checkpoint's run on the same roster and seeds:
 per table, each arm against REF's same arm and against REF's full arm, with the exclusions
@@ -33,6 +34,8 @@ def protocol_reason(r):
         return r['protocol_unavailable']
     if r.get('p', 0) > GENERATOR_WIDTH:
         return f"p={r['p']} exceeds the generator width {GENERATOR_WIDTH}"
+    if r.get('served_zero_digest_equal') is False:
+        return 'evaluator preparation differs from the served none-mode conditioning'
     return None
 
 
