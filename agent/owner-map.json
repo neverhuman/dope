@@ -887,6 +887,11 @@
     "engine/dope-cli/src/mlc_v3.rs": "rust-core",
     "engine/dope-cli/src/style.rs": "rust-core",
     "engine/dope-core/examples/encoder_629.rs": "rust-core",
+    "engine/dope-core/examples/landmark_mode_bench.rs": "rust-core",
+    "engine/dope-core/examples/mlc_v3_device_bench.rs": "rust-core",
+    "research/levels/tools/optional_landmarks_qa/": "external-evidence",
+    "docs/evidence/optional-landmarks/": "external-evidence",
+    "docs/optional-landmarks-qualification.md": "external-evidence",
     "engine/dope-core/tests/mlc_v3_safetensors.rs": "rust-core",
     "scripts/install.sh": "release"
   },

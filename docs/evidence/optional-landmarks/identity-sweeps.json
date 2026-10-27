@@ -1,0 +1,42 @@
+[
+ {
+  "cand_bin_sha256": "67492491c38a0d4343a2d1b30845bb76fa31f51d32de5375dd770a1045da2b69",
+  "cand_dir": "qa-lane:target/qual/runs/hpc-v1",
+  "compare_stdout": "{('same', 8): 285, ('same', 2): 285, ('same', 1): 285, ('same', 64): 27}\ndiffs: []",
+  "identical": true,
+  "name": "PR #339 ridge/xi (ededfc15) vs main 245d4f18",
+  "ref_dir": "qa-lane:target/qual/runs/baseline"
+ },
+ {
+  "cand_bin_sha256": "c5dc9781372bbd0d8d288038297fc812b2f7317b3aaa71515b53c34a29cc1669",
+  "cand_dir": "qa-lane:target/qual/runs/olc",
+  "compare_stdout": "{('same', 8): 285}\ndiffs: []",
+  "identical": true,
+  "name": "ol-contract signature refactor (3a0c9bb4) vs main",
+  "ref_dir": "qa-lane:target/qual/runs/baseline"
+ },
+ {
+  "cand_bin_sha256": "6bbe55abb50ad3abd821d19d330ad016816607820d84d92aef5902a4affb7f9c",
+  "cand_dir": "qa-lane:target/qual/runs/olc-hpc",
+  "compare_stdout": "{('same', 1): 285}\ndiffs: []",
+  "identical": true,
+  "name": "ol-contract + PR #339 vs main",
+  "ref_dir": "qa-lane:target/qual/runs/baseline"
+ },
+ {
+  "cand_bin_sha256": "c52121ba06ce93bfdd993951a49205735077f265ef0cf4d8cf10203f428a1fae",
+  "cand_dir": "qa-lane:target/qual/runs/pra-82cea8c4",
+  "compare_stdout": "{('same', 8): 285}\ndiffs: []",
+  "identical": true,
+  "name": "PR A head 82cea8c4 vs main",
+  "ref_dir": "qa-lane:target/qual/runs/baseline"
+ },
+ {
+  "cand_bin_sha256": "f998d4443d1620b86ed72e52449265a3373bf6b2145913105d497e29daccfbaf",
+  "cand_dir": "qa-lane:target/qual/runs/gbdt-v1",
+  "compare_stdout": "{('same', 8): 285, ('same', 1): 285, ('same', 2): 27}\ndiffs: []",
+  "identical": true,
+  "name": "gbdt column-major histograms (848ba2a0, not proposed: no end-to-end gain) vs main",
+  "ref_dir": "qa-lane:target/qual/runs/baseline"
+ }
+]
