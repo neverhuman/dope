@@ -2,7 +2,7 @@
 
 use super::{bad, MlcV3Model, MlcV3RoutedOutput, MlcV3Weights, MLC_V3_MAX_COLS};
 use crate::Result;
-use candle_core::{Device, IndexOp, Module, Tensor};
+use candle_core::{DType, IndexOp, Module, Tensor};
 use candle_nn::{LayerNorm, Linear};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -44,6 +44,35 @@ impl ConditionalHyperTargetNet {
             out_head: w.linear("target_net.out_head", 128, 1)?,
             col_gate_head: w.linear("target_net.col_gate_head", 145, 1)?,
         })
+    }
+
+    /// Batched column attention, retaining the task latent and result on their device.
+    pub fn compute_column_gates_tensor(
+        &self,
+        task_latent: &Tensor,
+        col_landmarks: &Tensor,
+    ) -> Result<Tensor> {
+        let (batch, width) = task_latent.dims2()?;
+        if batch == 0
+            || width != 128
+            || col_landmarks.dims() != [batch, 64, 17]
+            || task_latent.dtype() != DType::F32
+            || col_landmarks.dtype() != DType::F32
+            || !task_latent
+                .device()
+                .same_device(self.col_gate_head.weight().device())
+            || !col_landmarks.device().same_device(task_latent.device())
+        {
+            return Err(bad("column attention requires matching FP32 [B,128] and [B,64,17] tensors on the model device"));
+        }
+        let repeated = task_latent.unsqueeze(1)?.broadcast_as((batch, 64, 128))?;
+        let input = Tensor::cat(&[&repeated, col_landmarks], 2)?.contiguous()?;
+        Ok(self
+            .col_gate_head
+            .forward(&input)?
+            .squeeze(2)?
+            .tanh()?
+            .affine(0.25, 1.0)?)
     }
 
     pub fn compute_column_gates(
@@ -107,7 +136,11 @@ impl ConditionalHyperTargetNet {
             cat_in.extend_from_slice(&task_lat[..128]);
             cat_in.extend_from_slice(&c_pad[j * 17..(j + 1) * 17]);
         }
-        let tin = Tensor::from_vec(cat_in, (MLC_V3_MAX_COLS, 145), &Device::Cpu)?;
+        let tin = Tensor::from_vec(
+            cat_in,
+            (MLC_V3_MAX_COLS, 145),
+            self.col_gate_head.weight().device(),
+        )?;
         let raw_g = self
             .col_gate_head
             .forward(&tin)?
@@ -125,7 +158,7 @@ impl ConditionalHyperTargetNet {
     ) -> Result<Vec<f32>> {
         let n = x_pad.len();
         let c_gate = self.compute_column_gates(task_lat, col_lm, Some(x_pad))?;
-        let t_ten = Tensor::from_slice(&task_lat[..128], (1, 128), &Device::Cpu)?;
+        let t_ten = Tensor::from_slice(&task_lat[..128], (1, 128), self.fc1.weight().device())?;
         let gamma = self
             .film_gamma
             .forward(&t_ten)?
@@ -152,7 +185,11 @@ impl ConditionalHyperTargetNet {
         }
         let h = self
             .fc1
-            .forward(&Tensor::from_vec(fc1_in, (n, 192), &Device::Cpu)?)?
+            .forward(&Tensor::from_vec(
+                fc1_in,
+                (n, 192),
+                self.fc1.weight().device(),
+            )?)?
             .silu()?;
         let h2 = (self.fc2.forward(&h)?.silu()? + &h)?;
         Ok(self.out_head.forward(&h2)?.squeeze(1)?.to_vec1::<f32>()?)
@@ -189,7 +226,11 @@ impl CovariateRefinementNet {
         let h = self.ln2.forward(
             &self
                 .fc0
-                .forward(&Tensor::from_vec(net_in, (n, 192), &Device::Cpu)?)?
+                .forward(&Tensor::from_vec(
+                    net_in,
+                    (n, 192),
+                    self.fc0.weight().device(),
+                )?)?
                 .silu()?,
         )?;
         let delta = self.fc3.forward(&h)?.tanh()?;
