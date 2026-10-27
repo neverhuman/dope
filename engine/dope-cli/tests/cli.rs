@@ -571,7 +571,7 @@ fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
     assert_eq!(prog_docs[0]["work_budget"], 2_000_000_000_000u64);
     assert_eq!(prog_docs[0]["options_digest"].as_str().unwrap().len(), 64);
     assert_eq!(prog_docs[3]["group"], "fine");
-    assert_eq!(prog_docs[3]["recipe"], "legacy-full-v1");
+    assert_eq!(prog_docs[3]["recipe"], "full-report-v1");
 
     let enc_full_raw = dope(
         &dir,

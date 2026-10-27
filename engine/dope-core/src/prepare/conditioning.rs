@@ -4,7 +4,7 @@
 //! `research/levels/{building_block_landmarks,optional_landmarks,multilevel_model}.py`.
 //!
 //! Supports both conditioning recipes:
-//! - [`LEGACY_FULL_RECIPE`] (`"legacy-full-v1"`): `mode == "full"`. Requires the
+//! - [`FULL_REPORT_RECIPE`] (`"full-report-v1"`): `mode == "full"`. Requires the
 //!   native report; runs the exact legacy descriptors + building blocks +
 //!   inter-landmark summary stats. If a landmark bundle is also supplied,
 //!   verifies bitwise f32 values and mask match `from_report(native_report)`.
@@ -23,7 +23,7 @@ pub use super::conditioning_builder::*;
 pub use super::conditioning_observed::*;
 
 /// Legacy full-report conditioning recipe (`mode == "full"`).
-pub const LEGACY_FULL_RECIPE: &str = "legacy-full-v1";
+pub const FULL_REPORT_RECIPE: &str = "full-report-v1";
 /// Observed-only conditioning recipe (`mode` in `{"none", "fast", "progressive"}`).
 pub const OBSERVED_RECIPE: &str = "observed-only-v1";
 /// Domain separator for [`conditioning_digest`] / [`DopeConditioning::digest`].

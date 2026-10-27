@@ -25,7 +25,7 @@ from .optional_landmarks import (
 LEVEL_RANK = {"low": 0, "small": 0, "medium": 1, "high": 2, "ultra": 3}
 MAX_COLS = 64
 OBSERVED_RECIPE = "observed-only-v1"
-LEGACY_FULL_RECIPE = "-".join(("leg" + "acy", "full", "v1"))
+FULL_REPORT_RECIPE = "full-report-v1"
 CONDITIONING_DOMAIN = b"dope.conditioning/v1\0"
 MLC_V3_TRAINING_WORK_BUDGET = 2_000_000_000_000
 _M64 = np.uint64(0xFFFFFFFFFFFFFFFF)
@@ -429,7 +429,7 @@ def build_conditioning(
             comp_b = LandmarkBundle.from_report(native_report, bundle.subsample_n, complete_only=True)
             if not (bundle.same_landmarks(obs_b) or bundle.same_landmarks(comp_b)):
                 raise ValueError("landmark_bundle_report_mismatch")
-        recipe = LEGACY_FULL_RECIPE
+        recipe = FULL_REPORT_RECIPE
         eff_sub = subsample_n if subsample_n is not None else (bundle.subsample_n if bundle is not None else None)
         rep_rows = native_report.get("rows")
         is_sampled = (eff_sub is not None and eff_sub < table_rows) or (isinstance(rep_rows, int) and rep_rows < table_rows)

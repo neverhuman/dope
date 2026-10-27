@@ -10,7 +10,7 @@ use dope_core::prepare::conditioning::{
     build_conditioning_with_full_table_stats, conditioning_digest, observed_report_descriptors,
     observed_target_stats, pad_col_landmarks, report_complete_landmarks, report_observed_landmarks,
     subsample_scaled_rows, table_classes, BundleConditioningInput, LegacyReportConditioningInput,
-    LEGACY_FULL_RECIPE, OBSERVED_RECIPE,
+    FULL_REPORT_RECIPE, OBSERVED_RECIPE,
 };
 use dope_core::prepare::inter_landmark::{
     compute_inter_landmark_summary_stats, compute_observed_inter_landmark_stats, ReportLandmarkView,
@@ -148,7 +148,7 @@ fn flatten<const K: usize>(rows: &[[f32; K]]) -> Vec<f32> {
 }
 
 #[test]
-fn legacy_full_building_blocks_inter_and_conditioning_parity() {
+fn full_report_building_blocks_inter_and_conditioning_parity() {
     let goldens = load_goldens();
     let mut exact_digest_matches = 0usize;
 
@@ -272,7 +272,7 @@ fn legacy_full_building_blocks_inter_and_conditioning_parity() {
                 &c.level,
             )
             .expect("full conditioning succeeds");
-            assert_eq!(cond.recipe, LEGACY_FULL_RECIPE);
+            assert_eq!(cond.recipe, FULL_REPORT_RECIPE);
             assert_eq!(cond.vec256, v3.vec256);
             assert_eq!(cond.col_landmarks, cols17x64);
             if v_bit_diff == 0 && c_bit_diff == 0 {

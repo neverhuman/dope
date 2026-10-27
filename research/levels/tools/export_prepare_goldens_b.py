@@ -45,7 +45,7 @@ from research.levels.descriptors import (
 )
 from research.levels.optional_landmarks import (
     CONDITIONING_DOMAIN,
-    LEGACY_FULL_RECIPE,
+    FULL_REPORT_RECIPE,
     OBSERVED_RECIPE,
     effective_conditioning_digest,
     report_task,
@@ -360,7 +360,7 @@ def build() -> Dict[str, Any]:
         assert np.array_equal(inter, bundle["inter_landmark_vec48"])
         cols17x64 = pad_col_landmarks(bundle["col_landmarks24"])
         legacy_digest = effective_conditioning_digest(
-            bundle["vec256"], cols17x64, recipe=LEGACY_FULL_RECIPE, level=level
+            bundle["vec256"], cols17x64, recipe=FULL_REPORT_RECIPE, level=level
         )
         comp_vals, comp_mask = report_complete_landmarks(report, include_uninformative=False)
         obs_rep_vals, obs_rep_mask = report_complete_landmarks(report, include_uninformative=True)
@@ -407,7 +407,7 @@ def build() -> Dict[str, Any]:
             "name": name,
             "level": level,
             "task": task,
-            "recipe": LEGACY_FULL_RECIPE,
+            "recipe": FULL_REPORT_RECIPE,
             "n": n,
             "p": p,
             "x": _f(X.reshape(-1)),

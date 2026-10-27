@@ -179,7 +179,7 @@ pub struct V3ConditioningBundle {
     pub v3_driver_weights: Vec<f32>,
 }
 
-/// Assemble the legacy (`legacy-full-v1`) conditioning bundle from
+/// Assemble the full-report (`full-report-v1`) conditioning bundle from
 /// already-computed descriptor blocks (`build_v3_conditioning_bundle`).
 #[allow(clippy::too_many_arguments)]
 pub fn assemble_v3_conditioning(
