@@ -1,11 +1,29 @@
 //! `ConditionalHyperTargetNet` and `CovariateRefinementNet` for `DOPE-MLC-v3` SafeTensors inference.
 
-use super::{MlcV3RoutedOutput, MlcV3Weights, MLC_V3_MAX_COLS};
+use super::{bad, MlcV3Model, MlcV3RoutedOutput, MlcV3Weights, MLC_V3_MAX_COLS};
 use crate::Result;
 use candle_core::{Device, IndexOp, Module, Tensor};
 use candle_nn::{LayerNorm, Linear};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+
+pub const MLC_V3_FEATURES_629_DIM: usize = 629;
+pub const MLC_V3_GATE_KEYS_14: [&str; 14] = [
+    "asinh_atan_w",
+    "copula_retention",
+    "het_scale_w",
+    "hinge_w",
+    "monotone_w",
+    "neural_w",
+    "noise_scale",
+    "pair_w",
+    "periodic_fract_w",
+    "regime_sharpness",
+    "rff_w",
+    "ridge_alpha",
+    "row_summary_w",
+    "tree_w",
+];
 
 pub struct ConditionalHyperTargetNet {
     film_gamma: Linear,
@@ -246,5 +264,86 @@ impl MlcV3ForwardCheckOutput {
             target_net_out_from_xpad,
             cov_net_out,
         })
+    }
+}
+
+impl MlcV3Model {
+    /// Compute the canonical `629D` DOPE feature vector from `dataset_features: [256]`
+    /// and zero-padded `col_landmarks: [64, 17]`, FP32/High only.
+    ///
+    /// Output slice layout (`[629]`):
+    /// - `[0..256]`: `dataset_features` (`256`)
+    /// - `[256..384]`: `task_latent` (`128`)
+    /// - `[384..512]`: `dist_latent` (`128`)
+    /// - `[512..526]`: `gates` in [`MLC_V3_GATE_KEYS_14`] alphabetical order (`14`)
+    /// - `[526..549]`: `landmark_pred` (`23`)
+    /// - `[549..565]`: `bb_pred` (`16`)
+    /// - `[565..629]`: `col_gates` (`64`)
+    pub fn encode_features_629(
+        &self,
+        dataset_features: &[f32],
+        col_landmarks: &[Vec<f32>],
+        level: &str,
+    ) -> Result<Vec<f32>> {
+        if level != "high" {
+            return Err(bad("629D encoding requires High tier"));
+        }
+        if dataset_features.len() != 256 {
+            return Err(bad("dataset_features requires exactly 256 coordinates"));
+        }
+        if col_landmarks.len() != MLC_V3_MAX_COLS || col_landmarks.iter().any(|row| row.len() != 17)
+        {
+            return Err(bad("col_landmarks requires shape [64, 17]"));
+        }
+        let v256 = dataset_features;
+        let routed = self.router.forward(v256, level)?;
+        let col_gates =
+            self.target_net
+                .compute_column_gates(&routed.task_latent, Some(col_landmarks), None)?;
+        let mut out = Vec::with_capacity(MLC_V3_FEATURES_629_DIM);
+        out.extend_from_slice(v256);
+        out.extend_from_slice(&routed.task_latent);
+        out.extend_from_slice(&routed.dist_latent);
+        for key in MLC_V3_GATE_KEYS_14 {
+            out.push(
+                *routed
+                    .gates
+                    .get(key)
+                    .ok_or_else(|| bad("629D gate schema mismatch"))? as f32,
+            );
+        }
+        out.extend_from_slice(&routed.landmark_pred);
+        out.extend_from_slice(&routed.bb_pred);
+        out.extend_from_slice(&col_gates);
+        for val in &mut out {
+            if !val.is_finite() {
+                *val = 0.0;
+            }
+        }
+        Ok(out)
+    }
+
+    /// Batched `([B, 256], [B, 64, 17]) -> [B, 629]` DOPE feature encoding.
+    pub fn encode_features_629_batch(
+        &self,
+        dataset_features_batch: &[Vec<f32>],
+        col_landmarks_batch: &[Vec<Vec<f32>>],
+        level: &str,
+    ) -> Result<Vec<Vec<f32>>> {
+        if dataset_features_batch.is_empty()
+            || col_landmarks_batch.len() != dataset_features_batch.len()
+        {
+            return Err(bad(
+                "dataset_features_batch and col_landmarks_batch batch size mismatch",
+            ));
+        }
+        dataset_features_batch
+            .iter()
+            .enumerate()
+            .map(|(i, v256)| {
+                let lm = &col_landmarks_batch[i];
+                self.encode_features_629(v256, lm, level)
+            })
+            .collect()
     }
 }

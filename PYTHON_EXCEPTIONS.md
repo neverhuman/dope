@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 838
-- **`keep-with-reason`**: 812 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 849
+- **`keep-with-reason`**: 823 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -846,6 +846,17 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/descriptors.py` | `research/levels` | `keep-with-reason` | 3-level landmark hierarchy (Medium/High/Ultra) and 140-D train-only data descriptor extraction. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/disjoint_reconcile.py` | `research/levels` | `keep-with-reason` | Strictly dataset-disjoint 1,000-dataset training/re-scoring reconciliation and dev_val selection audit. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/landmark_features.py` | `research/levels` | `keep-with-reason` | Versioned finite CV landmark input feature and mask tensor construction. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
+| `research/levels/encoder.py` | `research/levels` | `keep-with-reason` | Verified FP32/High router and column-gate tensor export for downstream composition. | Isolated PyTorch reference/export boundary; native DOPE product and certification remain Rust. |
+| `research/levels/tests/test_encoder_629.py` | `research/levels` | `keep-with-reason` | Released-weight Micro parity, schema refusals, CPU export and CUDA replay. | Tests the Python reference/export boundary directly; no product authority. |
+| `research/levels/budget_planner.py` | `research/levels` | `keep-with-reason` | Tier envelope and compact scaler contracts imported by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/building_block_landmarks.py` | `research/levels` | `keep-with-reason` | Train-only mathematical probes and conditioning statistics used by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/multiclass_head.py` | `research/levels` | `keep-with-reason` | Shared inter-landmark attention and multiclass research heads used by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/rust_v3_parity.py` | `research/levels` | `keep-with-reason` | Checkpoint conversion and Python/Rust forward and sampling parity evidence. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/tests/test_dope_mlc_v3.py` | `research/levels` | `keep-with-reason` | Direct conformance tests for V3 statistics, routing, wire format and cross-runtime parity. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/v3_ablation_and_eval.py` | `research/levels` | `keep-with-reason` | Offline corpus exposure, ablation and evaluation evidence. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/v3_canonical_roster_eval.py` | `research/levels` | `keep-with-reason` | Offline canonical auditor roster evaluation and fidelity evidence. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/v3_canonical_runner.py` | `research/levels` | `keep-with-reason` | Bounded offline roster runner and aggregate evidence. | Offline reference, research and export evidence; no native product or certification authority. |
+| `research/levels/v3_ledger_replay.py` | `research/levels` | `keep-with-reason` | Frozen-checkpoint evaluation ledger and raw-domain inverse replay. | Offline reference, research and export evidence; no native product or certification authority. |
 | `research/levels/multilevel_model.py` | `research/levels` | `keep-with-reason` | Unified 3-level landmark-conditioned encoder/decoder (DOPE-MLC-v2) and source-free synthetic generator. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/precalc/__init__.py` | `research/levels` | `keep-with-reason` | Fit-CV landmark input precalculation package initializer. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/precalc/__main__.py` | `research/levels` | `keep-with-reason` | CLI entrypoint for Fit-CV landmark input precalculation and recovery. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |

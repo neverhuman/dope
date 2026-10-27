@@ -2,6 +2,7 @@ use dope_core::mlc_v3::{
     inflate::crc32_ieee, sample_synthetic_table, sample_synthetic_table_with_draws, Dml3Envelope,
     FixedSampleDraws, MlcV3ForwardCheckInput, MlcV3ForwardCheckOutput, MlcV3Model,
     MlcV3SampledTable, MLC_V3_EXPECTED_PARAMETERS, MLC_V3_EXPECTED_TENSORS,
+    MLC_V3_FEATURES_629_DIM, MLC_V3_GATE_KEYS_14,
 };
 use half::f16;
 use safetensors::tensor::{Dtype, TensorView};
@@ -233,6 +234,86 @@ fn loads_safetensors_and_verifies_trained_parity_and_fail_closed_wire() {
     assert!(MlcV3Model::from_safetensors_bytes(b"").is_err());
     assert!(MlcV3Model::from_safetensors_bytes(b"corrupt_safetensors").is_err());
 
+    // 629D composite encoder contract check (`[B, 256] + [B, 64, 17] -> [B, 629]`)
+    let v256_a: Vec<f32> = (0..256).map(|i| ((i as f32) - 128.0) * 0.01).collect();
+    let v256_b: Vec<f32> = (0..256).map(|i| ((i as f32) - 64.0) * -0.015).collect();
+    let lm_a: Vec<Vec<f32>> = (0..64)
+        .map(|j| (0..17).map(|k| ((j * 17 + k) as f32) * 0.002).collect())
+        .collect();
+    let lm_b: Vec<Vec<f32>> = (0..64)
+        .map(|j| {
+            (0..17)
+                .map(|k| ((j * 17 + k) as f32) * -0.001 + 0.05)
+                .collect()
+        })
+        .collect();
+    let f629_a = det_model
+        .encode_features_629(&v256_a, &lm_a, "high")
+        .expect("encode 629 single");
+    assert_eq!(f629_a.len(), MLC_V3_FEATURES_629_DIM);
+    assert!(f629_a.iter().all(|v| v.is_finite()));
+    assert!(max_diff_f32(&f629_a[..256], &v256_a) == 0.0);
+    let routed_a = det_model.router.forward(&v256_a, "high").unwrap();
+    let col_g_a = det_model
+        .target_net
+        .compute_column_gates(&routed_a.task_latent, Some(&lm_a), None)
+        .unwrap();
+    assert!(max_diff_f32(&f629_a[256..384], &routed_a.task_latent) == 0.0);
+    assert!(max_diff_f32(&f629_a[384..512], &routed_a.dist_latent) == 0.0);
+    for (idx, gk) in MLC_V3_GATE_KEYS_14.iter().enumerate() {
+        assert!((f629_a[512 + idx] - (routed_a.gates[*gk] as f32)).abs() < 1e-7);
+    }
+    assert!(max_diff_f32(&f629_a[526..549], &routed_a.landmark_pred) == 0.0);
+    assert!(max_diff_f32(&f629_a[549..565], &routed_a.bb_pred) == 0.0);
+    assert!(max_diff_f32(&f629_a[565..629], &col_g_a) == 0.0);
+
+    let batch_out = det_model
+        .encode_features_629_batch(
+            &[v256_a.clone(), v256_b.clone()],
+            &[lm_a.clone(), lm_b.clone()],
+            "high",
+        )
+        .expect("encode 629 batch");
+    assert_eq!(batch_out.len(), 2);
+    assert!(max_diff_f32(&batch_out[0], &f629_a) == 0.0);
+    assert!(det_model
+        .encode_features_629(&v256_a[..100], &lm_a, "high")
+        .is_err());
+
+    for level in ["small", "medium", "ultra", "private-source-value"] {
+        let err = det_model
+            .encode_features_629(&v256_a, &lm_a, level)
+            .unwrap_err();
+        assert!(!err.to_string().contains(level));
+    }
+    assert!(det_model
+        .encode_features_629(&vec![0.0; 257], &lm_a, "high")
+        .is_err());
+    for lm in [
+        vec![],
+        vec![vec![0.0; 17]; 63],
+        vec![vec![0.0; 18]; 64],
+        vec![vec![0.0; 16]; 64],
+    ] {
+        assert!(det_model.encode_features_629(&v256_a, &lm, "high").is_err());
+    }
+    assert!(det_model
+        .encode_features_629_batch(&[], &[], "high")
+        .is_err());
+    assert!(det_model
+        .encode_features_629_batch(&[v256_a.clone()], &[], "high")
+        .is_err());
+    assert!(det_model
+        .encode_features_629_batch(&[v256_a.clone()], &[lm_a.clone(), lm_b.clone()], "high")
+        .is_err());
+    let mut nonfinite = v256_a.clone();
+    nonfinite[0] = f32::NAN;
+    let out = det_model
+        .encode_features_629(&nonfinite, &lm_a, "high")
+        .unwrap();
+    assert_eq!(out[0], 0.0);
+    assert!(out.iter().all(|v| v.is_finite()));
+
     for (lvl_id, task_id) in [(0u8, 0u8), (1u8, 1u8), (2u8, 2u8), (3u8, 0u8)] {
         let wire = build_synthetic_dml3_packet(lvl_id, task_id);
         let env = Dml3Envelope::from_bytes(&wire).expect("decode synthetic DML3");
@@ -349,4 +430,45 @@ fn loads_safetensors_and_verifies_trained_parity_and_fail_closed_wire() {
         let env = Dml3Envelope::from_bytes(&dml2).expect("decode dml2");
         assert_eq!(env.wire_format, "DML2");
     }
+}
+
+#[test]
+fn released_encoder_matches_micro_reference_when_required() {
+    let Ok(reference_path) = std::env::var("DOPE_ENCODER_PARITY_FIXTURE") else {
+        return;
+    };
+    #[derive(Deserialize)]
+    struct MicroReference {
+        vec: Vec<Vec<f32>>,
+        columns: Vec<Vec<Vec<f32>>>,
+        expected: Vec<Vec<f32>>,
+    }
+    let weights = std::env::var("DOPE_ENCODER_WEIGHTS").expect("released weights required");
+    let model = MlcV3Model::load_safetensors(Path::new(&weights)).unwrap();
+    assert_eq!(model.inventory.sha256, EXPECTED_TRAINED_ST_SHA256);
+    let fixture: MicroReference =
+        serde_json::from_slice(&std::fs::read(reference_path).unwrap()).unwrap();
+    let got = model
+        .encode_features_629_batch(&fixture.vec, &fixture.columns, "high")
+        .unwrap();
+    let mut differences = vec![0.0f32; 7];
+    for (row, expected) in got.iter().zip(&fixture.expected) {
+        for (block, (start, end)) in [
+            (0, 256),
+            (256, 384),
+            (384, 512),
+            (512, 526),
+            (526, 549),
+            (549, 565),
+            (565, 629),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let diff = max_diff_f32(&row[start..end], &expected[start..end]);
+            differences[block] = differences[block].max(diff);
+            assert!(diff < 1e-5, "Micro feature block {block} differs");
+        }
+    }
+    println!("released Micro max abs differences by feature block: {differences:?}");
 }
