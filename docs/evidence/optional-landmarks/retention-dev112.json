@@ -218,9 +218,9 @@
  "role_manifest_sha256": "66d2a63c3e4b84e69a554af212a2f9f63081d59f366cd1f4b796bfc7eea39bdd",
  "roster_sha256": "c3cc1dc2500c3baa7eb99ee339948501cf7d8d83561d0a72ea051581b6e6353a",
  "roster_size": 112,
- "run": "target/qual/q1-dev112-v4-released",
+ "run": "target/qual/q1-dev112-v5-released",
  "schema": "dope.optional-landmarks-retention/v2",
- "source_bin_sha256": "48375237b1b13ee4789b5171aefda3e36b1c30e34fd5c4f269d39cead51bb3d4",
+ "source_bin_sha256": "3b73bac610eac40aafd7d1e39f7086c25cea5a737675a6d8fe34b42c506fe685",
  "sub_arm_partition": "sub arms pair sampled native gains with building blocks computed on all fit rows in the Python evaluator; the served Rust path computes building blocks on the native selection, so these arms do not certify served sampled conditioning",
  "summarizer_sha256": "ab6665ca43c5e16187213d272c44fb952fe335d24664c3ee03b18f221d52d950",
  "supplement_all_four_seeds": {
