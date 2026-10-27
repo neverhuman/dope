@@ -47,6 +47,7 @@ fn state_str(s: CellState) -> &'static str {
         CellState::Unsupported => "unsupported",
         CellState::OverBudget => "over_budget",
         CellState::Failed => "failed",
+        CellState::NotRequested => "not_requested",
     }
 }
 

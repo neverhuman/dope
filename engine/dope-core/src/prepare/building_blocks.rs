@@ -756,10 +756,7 @@ pub fn compute_building_block_landmarks(
     let c_atan = corr(&map_mat(&z, f64::atan), p);
     let sqrt2 = 2.0f64.sqrt();
     let c_erf = corr(&map_mat(&z, |v| erf_as(v / sqrt2)), p);
-    let c_cbrt = corr(
-        &map_mat(&z, |v| np::sign(v) * v.abs().powf(1.0 / 3.0)),
-        p,
-    );
+    let c_cbrt = corr(&map_mat(&z, |v| np::sign(v) * v.abs().powf(1.0 / 3.0)), p);
     let c_log1p = corr(&map_mat(&z, |v| np::sign(v) * v.abs().ln_1p()), p);
     let c_tanh = if lvl_r >= 1 {
         corr(&map_mat(&z, |v| (0.75 * v).tanh()), p)
@@ -772,7 +769,13 @@ pub fn compute_building_block_landmarks(
         zeros_p()
     };
 
-    let mut q = [vec![0.0f64; p], vec![0.0; p], vec![0.0; p], vec![0.0; p], vec![0.0; p]];
+    let mut q = [
+        vec![0.0f64; p],
+        vec![0.0; p],
+        vec![0.0; p],
+        vec![0.0; p],
+        vec![0.0; p],
+    ];
     let mut col = vec![0.0f64; n];
     for j in 0..p {
         for i in 0..n {
@@ -785,10 +788,7 @@ pub fn compute_building_block_landmarks(
     }
     let [q10, q25, q50, q75, q90] = q;
     let c_clamp = if lvl_r >= 1 {
-        corr(
-            &map_mat_col(&z, p, |v, j| np::clip(v, q10[j], q90[j])),
-            p,
-        )
+        corr(&map_mat_col(&z, p, |v, j| np::clip(v, q10[j], q90[j])), p)
     } else {
         zeros_p()
     };

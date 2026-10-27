@@ -965,3 +965,27 @@ fn uninformative_finite_zeros_stay_present_in_optional_bundles() {
     assert_eq!(strict_v1.status, LandmarkStatus::Partial(1));
     assert!(!strict_v1.mask[0] && !strict_v1.mask[1] && strict_v1.mask[3]);
 }
+
+#[test]
+fn shared_cross_repo_fixture_landmark_bundle_v1_matches_digests_and_roundtrips() {
+    let raw = include_str!("fixtures/landmark_bundle_v1.json");
+    let v: serde_json::Value = serde_json::from_str(raw).unwrap();
+    assert_eq!(v["schema"], "dope.landmark-bundle-fixtures/v1");
+    let cases = v["cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 2);
+    for case in cases {
+        let name = case["name"].as_str().unwrap();
+        let expected_digest = case["conditioning_digest"].as_str().unwrap();
+        let bundle: LandmarkBundle = serde_json::from_value(case["bundle"].clone()).unwrap();
+        bundle.validate().unwrap();
+        assert_eq!(
+            bundle.conditioning_digest(),
+            expected_digest,
+            "case {name} conditioning_digest"
+        );
+        let round_trip: LandmarkBundle =
+            serde_json::from_str(&serde_json::to_string(&bundle).unwrap()).unwrap();
+        assert_eq!(round_trip, bundle);
+        assert_eq!(round_trip.conditioning_digest(), expected_digest);
+    }
+}

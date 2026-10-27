@@ -313,8 +313,7 @@ pub fn native_target_stats(
         if !v.is_finite() || v <= 1e-24 {
             return Ok([None, None, None]);
         }
-        let skew =
-            raw_y.iter().map(|&val| (val - m).powi(3)).sum::<f64>() / n as f64 / v.powf(1.5);
+        let skew = raw_y.iter().map(|&val| (val - m).powi(3)).sum::<f64>() / n as f64 / v.powf(1.5);
         let kurt =
             raw_y.iter().map(|&val| (val - m).powi(4)).sum::<f64>() / n as f64 / v.powi(2) - 3.0;
         Ok([
@@ -468,7 +467,11 @@ pub fn observed_report_descriptors(
         if !gate {
             return 0.0;
         }
-        let sel: Vec<f64> = idxs.iter().filter(|&&i| present[i]).map(|&i| s[i]).collect();
+        let sel: Vec<f64> = idxs
+            .iter()
+            .filter(|&&i| present[i])
+            .map(|&i| s[i])
+            .collect();
         if sel.is_empty() {
             0.0
         } else {
@@ -951,6 +954,8 @@ pub struct DopeConditioning {
     pub level: String,
     /// `"none" | "fast" | "progressive" | "full"`.
     pub mode: String,
+    /// Sanitized [`crate::landmark::LandmarkBundle`] carrying `source_digest`, `subsample_n`, `values`, `mask`, and `status`.
+    pub bundle: crate::landmark::LandmarkBundle,
     /// 256-dim conditioning vector.
     pub vec256: [f32; 256],
     /// `col_landmarks24[:64, :17]` zero-padded to 64 rows.
@@ -1172,11 +1177,33 @@ pub fn build_conditioning_with_cached_table_stats(
         }
         _ => return Err(bad(format!("unknown_landmark_mode_{mode}"))),
     };
+    let out_bundle = match bundle {
+        Some(b) => {
+            if b.subsample_n.is_none() && b.mask.iter().all(|&m| !m) {
+                crate::landmark::LandmarkBundle::zero()
+            } else {
+                crate::landmark::LandmarkBundle::from_squashed(
+                    b.values,
+                    b.mask,
+                    crate::landmark::BundleScope::new("unbound").with_subsample(b.subsample_n),
+                )
+            }
+        }
+        None => match raw_report {
+            Some(raw) => crate::landmark::LandmarkBundle::from_squashed(
+                &raw.observed_values23,
+                &raw.observed_mask23,
+                crate::landmark::BundleScope::new("unbound"),
+            ),
+            None => crate::landmark::LandmarkBundle::zero(),
+        },
+    };
     let col_landmarks = pad_col_landmarks(&v3.col_landmarks24);
     Ok(DopeConditioning {
         recipe: recipe.to_string(),
         level: level.to_string(),
         mode: mode.to_string(),
+        bundle: out_bundle,
         vec256: v3.vec256,
         col_landmarks,
         col_landmarks24: v3.col_landmarks24,
