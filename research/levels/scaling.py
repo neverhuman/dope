@@ -75,7 +75,12 @@ class NumericColumnScaler:
             z = (1.0 - w) * z_log + w * z_q
         else:
             z = z_log
-        return 6.0 * np.tanh(z / 6.0)
+        u = z / 6.0
+        t = np.tanh(u)
+        tail = (np.abs(u) >= 18.0) & (np.abs(u) < 20.0)
+        if np.any(tail):
+            t[tail] = [math.tanh(float(x)) for x in u[tail]]
+        return 6.0 * t
 
     def transform(self, col: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         arr = np.asarray(col, dtype=np.float64).reshape(-1)

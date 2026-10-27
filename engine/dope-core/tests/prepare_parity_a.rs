@@ -1,9 +1,11 @@
+use dope_core::landmark::{LandmarkBundle, LandmarkGroup, LandmarkMode, LandmarkOptions};
 use dope_core::prepare::scaling::TargetValue;
 use dope_core::prepare::{
-    compute_table_descriptors, extract_report_descriptors, prepare_table, prepare_table_cells,
-    prepare_table_cells_with_ids, prepare_table_lossless, prepare_table_mixed,
-    prepare_table_with_ids, prepare_table_with_policy, ClassVocabPolicy, ColumnKind, Level,
-    NativeReportView, PrepTask, ShapeOverride,
+    build_conditioning, compute_table_descriptors, extract_report_descriptors, prepare_table,
+    prepare_table_cells, prepare_table_cells_with_ids, prepare_table_cells_with_policy,
+    prepare_table_lossless, prepare_table_mixed, prepare_table_with_ids, prepare_table_with_policy,
+    progressive_landmarks_for_table, ClassVocabPolicy, ColumnKind, Level, NativeReportView,
+    PrepTask, ShapeOverride,
 };
 use safetensors::tensor::Dtype;
 use safetensors::SafeTensors;
@@ -550,4 +552,56 @@ fn multiclass_lossless_k3_k32_k36_and_cap32_lineage_preserved() {
             .transform_strict(&[TargetValue::Num(f64::NAN)])
             .is_err());
     }
+}
+
+#[test]
+fn lossless_multiclass_k36_progressive_and_conditioning_modes_e2e() {
+    let k_classes = 36usize;
+    let n = k_classes * 2;
+    let x_cells: Vec<Vec<String>> = (0..n)
+        .map(|i| {
+            vec![
+                format!("{:.4}", (i as f64) * 0.15 - 2.0),
+                format!("{:.4}", ((i % 11) as f64) * 0.3),
+            ]
+        })
+        .collect();
+    let y_cells: Vec<String> = (0..n)
+        .map(|i| format!("{:.6}", (i / 2) as f64 * 0.25))
+        .collect();
+    let row_ids: Vec<u64> = (0..n as u64).map(|i| 1000 + i).collect();
+
+    let tbl = prepare_table_cells_with_policy(
+        &x_cells,
+        &y_cells,
+        PrepTask::Multiclass,
+        row_ids,
+        ClassVocabPolicy::LosslessV1,
+    )
+    .unwrap();
+    assert_eq!(tbl.classes, 36);
+    assert_eq!(tbl.head(), dope_core::target::Head::Multiclass(36));
+
+    // None-mode conditioning preserves classes=36 and finite descriptors
+    let zero = LandmarkBundle::zero();
+    let cond_none = build_conditioning(&tbl, &zero, None, LandmarkMode::None).unwrap();
+    assert!(cond_none.vec256.iter().all(|v| v.is_finite()));
+    assert!(cond_none
+        .col_landmarks
+        .iter()
+        .flatten()
+        .all(|v| v.is_finite()));
+
+    // Progressive landmarks session binds to the lossless source_rows_digest
+    let mut prog =
+        progressive_landmarks_for_table(&tbl, &LandmarkOptions::default(), None).unwrap();
+    assert_eq!(prog.scope().source_rows_digest, tbl.source_rows_digest());
+    let (bun_macro, _) = prog.next_group(LandmarkGroup::Macro).unwrap();
+    assert_eq!(
+        bun_macro.source_digest,
+        prog.scope().bundle_scope().source_digest
+    );
+    let cond_prog = build_conditioning(&tbl, &bun_macro, None, LandmarkMode::Progressive).unwrap();
+    assert!(cond_prog.vec256.iter().all(|v| v.is_finite()));
+    assert_ne!(cond_prog.digest(), cond_none.digest());
 }
