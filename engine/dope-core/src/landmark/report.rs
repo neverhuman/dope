@@ -15,6 +15,9 @@ pub enum CellState {
     Unsupported,
     OverBudget,
     Failed,
+    /// Additive: the caller did not request this landmark (`signature_requested`).
+    /// Readers must treat it as missing, never as a measured zero.
+    NotRequested,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct LandmarkCell {
@@ -37,6 +40,7 @@ pub struct FeatureSpectrum {
 
 /// Intentionally does NOT implement Serialize or Debug. Choose a private view
 /// explicitly, or an admitted global export. This prevents accidental sidecars.
+#[derive(Clone)]
 pub struct Signature {
     pub panel: String,
     pub kind: SignatureKind,

@@ -230,3 +230,75 @@ fn combined_descriptors_bind_only_the_authorized_artifacts() {
     assert!(!inventory.to_string().contains("CANARY"));
     std::fs::remove_dir_all(p).unwrap();
 }
+
+#[test]
+fn real_signature_supports_ids_subsample_and_emit_bundle() {
+    let p = dir("bundle_cli");
+    let macro_json = success(
+        &p,
+        &[
+            "landmarks",
+            "real",
+            "fit.csv",
+            "-t",
+            "y",
+            "--ids",
+            "macro",
+            "--subsample",
+            "60",
+            "--subsample-seed",
+            "7",
+            "--emit-bundle",
+            "macro.bundle.json",
+            "--spectrum-features",
+            "0",
+            "--json",
+        ],
+    );
+    let report: serde_json::Value = serde_json::from_str(&macro_json).unwrap();
+    assert_eq!(report["rows"], 60);
+    let cells = report["cells"].as_array().unwrap();
+    assert_eq!(
+        cells
+            .iter()
+            .filter(|c| c["state"] != "not_requested")
+            .count(),
+        9
+    );
+    let b_macro: dope_core::landmark::LandmarkBundle =
+        serde_json::from_slice(&std::fs::read(p.join("macro.bundle.json")).unwrap()).unwrap();
+    b_macro.validate().unwrap();
+    assert_eq!(b_macro.subsample_n, Some(60));
+    assert_eq!(
+        b_macro.provenance.as_deref(),
+        Some("subsample-60-stratified")
+    );
+    success(
+        &p,
+        &[
+            "landmarks",
+            "real",
+            "fit.csv",
+            "-t",
+            "y",
+            "--ids",
+            "larger",
+            "--subsample",
+            "60",
+            "--subsample-seed",
+            "7",
+            "--emit-bundle",
+            "larger.bundle.json",
+            "--spectrum-features",
+            "0",
+            "--json",
+        ],
+    );
+    let b_larger: dope_core::landmark::LandmarkBundle =
+        serde_json::from_slice(&std::fs::read(p.join("larger.bundle.json")).unwrap()).unwrap();
+    assert_eq!(b_macro.source_digest, b_larger.source_digest);
+    let merged = b_macro.merge(&b_larger).unwrap();
+    merged.validate().unwrap();
+    assert!(merged.status.present() >= b_macro.status.present());
+    std::fs::remove_dir_all(p).unwrap();
+}

@@ -103,8 +103,29 @@ impl LocalEncoding {
         model: ModelManifest,
         values: &Tensor,
         observed: &Tensor,
+        schema: Schema,
+        inputs: EncoderInputs<'_>,
+    ) -> Result<Self> {
+        Self::encode_inputs_inner(encoder, model, values, observed, schema, inputs, false)
+    }
+    pub fn encode_optional_inputs(
+        encoder: &TableEncoder,
+        model: ModelManifest,
+        values: &Tensor,
+        observed: &Tensor,
+        schema: Schema,
+        inputs: EncoderInputs<'_>,
+    ) -> Result<Self> {
+        Self::encode_inputs_inner(encoder, model, values, observed, schema, inputs, true)
+    }
+    fn encode_inputs_inner(
+        encoder: &TableEncoder,
+        model: ModelManifest,
+        values: &Tensor,
+        observed: &Tensor,
         mut schema: Schema,
         inputs: EncoderInputs<'_>,
+        optional_landmarks: bool,
     ) -> Result<Self> {
         let EncoderInputs {
             target_included,
@@ -119,14 +140,26 @@ impl LocalEncoding {
             model.trained_levels.iter().any(|l| l == through.name()),
             "requested learned level is untrained",
         )?;
-        let code = encoder.encode_with_landmarks(
-            values,
-            observed,
-            &schema,
-            target_included,
-            model.graph.widths()[through as usize],
-            landmarks,
-        )?;
+        let width = model.graph.widths()[through as usize];
+        let code = if optional_landmarks {
+            encoder.encode_with_optional_landmarks(
+                values,
+                observed,
+                &schema,
+                target_included,
+                width,
+                landmarks,
+            )?
+        } else {
+            encoder.encode_with_landmarks(
+                values,
+                observed,
+                &schema,
+                target_included,
+                width,
+                landmarks,
+            )?
+        };
         if !target_included {
             schema.columns.pop();
             schema.target_index = None;

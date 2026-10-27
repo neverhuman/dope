@@ -122,12 +122,58 @@ impl TableEncoder {
         width: usize,
         landmarks: Option<&[f32; 46]>,
     ) -> Result<Tensor> {
+        self.encode_inner(
+            values,
+            observed,
+            schema,
+            target_included,
+            width,
+            landmarks,
+            false,
+        )
+    }
+
+    pub fn encode_with_optional_landmarks(
+        &self,
+        values: &Tensor,
+        observed: &Tensor,
+        schema: &Schema,
+        target_included: bool,
+        width: usize,
+        landmarks: Option<&[f32; 46]>,
+    ) -> Result<Tensor> {
+        self.encode_inner(
+            values,
+            observed,
+            schema,
+            target_included,
+            width,
+            landmarks,
+            true,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn encode_inner(
+        &self,
+        values: &Tensor,
+        observed: &Tensor,
+        schema: &Schema,
+        target_included: bool,
+        width: usize,
+        landmarks: Option<&[f32; 46]>,
+        optional_landmarks: bool,
+    ) -> Result<Tensor> {
         schema.validate(&self.graph)?;
         let landmark = if let Some(projection) = &self.landmark_projection {
             if target_included {
                 let features =
                     landmarks.ok_or_else(|| super::manifest::bad("CV landmark inputs required"))?;
-                super::landmark_features::validate(features)?;
+                if optional_landmarks {
+                    super::landmark_features::validate_optional(features)?;
+                } else {
+                    super::landmark_features::validate(features)?;
+                }
                 let input = if self.graph.landmark_masked() {
                     [0f32; 46]
                 } else {

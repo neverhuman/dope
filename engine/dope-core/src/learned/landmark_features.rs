@@ -146,6 +146,19 @@ pub(crate) fn validate(features: &[f32; 46]) -> Result<()> {
     )
 }
 
+/// Optional landmark feature validation (allows an empty or partial mask;
+/// requires finite values in `[-1, 1]`, `{0, 1}` mask entries, and `+0.0` on
+/// unmasked slots).
+pub fn validate_optional(features: &[f32; 46]) -> Result<()> {
+    check(
+        features.iter().all(|v| v.is_finite())
+            && features[..23].iter().all(|v| v.abs() <= 1.)
+            && features[23..].iter().all(|v| *v == 0. || *v == 1.)
+            && (0..23).all(|i| features[23 + i] == 1. || features[i].to_bits() == 0),
+        "invalid optional CV landmark features",
+    )
+}
+
 fn expected_query_rows(coordinate: usize, rows: u64, options: &LandmarkOptions) -> u64 {
     let folds = options.folds as u64;
     let cap = if coordinate <= 15 || coordinate == 22 {

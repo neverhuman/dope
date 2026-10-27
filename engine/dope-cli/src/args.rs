@@ -103,6 +103,18 @@ pub(crate) struct LandmarkRealArgs {
     /// Optional grouping/time-block column; excluded from predictor features.
     #[arg(long)]
     pub(crate) group: Option<String>,
+    /// Optional subset of landmark ids/names or group (macro|larger|fine|1,2,...).
+    #[arg(long)]
+    pub(crate) ids: Option<String>,
+    /// Optional deterministic stratified row subsample size before CV.
+    #[arg(long)]
+    pub(crate) subsample: Option<usize>,
+    /// Seed for deterministic stratified row subsampling (defaults to --seed).
+    #[arg(long)]
+    pub(crate) subsample_seed: Option<u64>,
+    /// Write the LandmarkBundle v1 JSON for this measurement.
+    #[arg(long)]
+    pub(crate) emit_bundle: Option<PathBuf>,
     #[command(flatten)]
     pub(crate) common: LandmarkCommon,
 }
