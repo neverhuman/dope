@@ -3,10 +3,11 @@ use dope_core::landmark::{
 };
 use dope_core::prepare::scaling::TargetValue;
 use dope_core::prepare::{
-    build_conditioning, build_conditioning_sampled, compute_table_descriptors,
-    extract_report_descriptors, prepare_table, prepare_table_cells, prepare_table_cells_with_ids,
-    prepare_table_cells_with_policy, prepare_table_lossless, prepare_table_mixed,
-    prepare_table_with_ids, prepare_table_with_policy, progressive_landmarks_for_table,
+    build_conditioning, build_conditioning_sampled, compute_landmark_group,
+    compute_table_descriptors, extract_report_descriptors, prepare_table, prepare_table_cells,
+    prepare_table_cells_with_ids, prepare_table_cells_with_policy, prepare_table_lossless,
+    prepare_table_mixed, prepare_table_mixed_with_policy, prepare_table_with_ids,
+    prepare_table_with_policy, progressive_landmarks_for_table, subsample_scaled_rows,
     ClassVocabPolicy, ColumnKind, Level, NativeReportView, PrepTask, ShapeOverride,
 };
 use safetensors::tensor::Dtype;
@@ -660,4 +661,55 @@ fn lossless_multiclass_k36_progressive_and_conditioning_modes_e2e() {
         &cond_full_sampled.vec256[188..256],
         &cond_full_unsampled_bb.vec256[188..256]
     );
+
+    // D4: Mixed numeric+categorical K=36 LosslessV1 vs Cap32V1, compute_landmark_group, and select_scaled_rows
+    let x_mixed: Vec<Vec<String>> = (0..n_big)
+        .map(|i| {
+            vec![
+                format!("{:.4}", (i as f64) * 0.11 - 3.0),
+                ["alpha", "beta", "gamma"][i % 3].to_string(),
+            ]
+        })
+        .collect();
+    let kinds = [ColumnKind::Numeric, ColumnKind::Categorical];
+    let tbl_mixed_lossless = prepare_table_mixed_with_policy(
+        &x_mixed,
+        &y_big,
+        Some(&kinds),
+        PrepTask::Multiclass,
+        None,
+        ClassVocabPolicy::LosslessV1,
+    )
+    .unwrap();
+    let tbl_mixed_cap32 =
+        prepare_table_mixed(&x_mixed, &y_big, Some(&kinds), PrepTask::Multiclass, None).unwrap();
+    assert_eq!(tbl_mixed_lossless.classes, 36);
+    assert_eq!(tbl_mixed_cap32.classes, 32);
+    assert_eq!(tbl_mixed_lossless.categories, vec![None, Some(4)]);
+    assert_ne!(
+        tbl_mixed_lossless.source_rows_digest(),
+        tbl_mixed_cap32.source_rows_digest()
+    );
+    let sub_spec = Some(SubsampleSpec::new(72, 42));
+    let opts = LandmarkOptions::default();
+    let (bun_grp, sig_grp) =
+        compute_landmark_group(&tbl_mixed_lossless, LandmarkGroup::Macro, sub_spec, &opts).unwrap();
+    let mut prog_mixed =
+        progressive_landmarks_for_table(&tbl_mixed_lossless, &opts, sub_spec).unwrap();
+    let (bun_drv, sig_drv) = prog_mixed.next_group(LandmarkGroup::Macro).unwrap();
+    assert_eq!(bun_grp, bun_drv);
+    assert_eq!(sig_grp.private_report(), sig_drv.private_report());
+    let (sx_tbl, sy_tbl) = tbl_mixed_lossless.select_scaled_rows(&sel_pos).unwrap();
+    let (sx_sub, s_rows, sy_sub) = subsample_scaled_rows(
+        &tbl_mixed_lossless.x_scaled,
+        tbl_mixed_lossless.rows,
+        tbl_mixed_lossless.features,
+        &tbl_mixed_lossless.y_scaled,
+        &sel_pos,
+    )
+    .unwrap();
+    assert_eq!(s_rows, 72);
+    assert_eq!(sx_tbl, sx_sub);
+    assert_eq!(sy_tbl, sy_sub);
+    assert!(tbl_mixed_lossless.select_scaled_rows(&[n_big]).is_err());
 }

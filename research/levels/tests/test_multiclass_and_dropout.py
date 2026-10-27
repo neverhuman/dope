@@ -286,6 +286,30 @@ class TestMulticlassAndDropoutSupervision(unittest.TestCase):
         np.testing.assert_array_equal(c_sampled["vec256"][116:140], c_all_rows["vec256"][116:140])
         self.assertFalse(np.array_equal(c_sampled["vec256"][188:256], c_all_rows["vec256"][188:256]))
 
+        # Base target_stats + shape [85:91] stay identical across none, progressive (macro), and sampled full
+        c_none = build_conditioning(
+            x_sc, y_sc, task="multiclass", bundle=None, mode="none", y_train_raw=y_raw,
+        )
+        bun_macro = LandmarkBundle.from_dict({
+            "panel": "landmarks-native-v1", "values": [0.02 * (i + 1) if i < 6 else 0.0 for i in range(23)],
+            "mask": [i < 6 for i in range(23)], "subsample_n": 72, "source_digest": "b" * 64,
+        })
+        c_prog = build_conditioning(
+            x_sc, y_sc, task="multiclass", bundle=bun_macro, mode="progressive", y_train_raw=y_raw,
+        )
+        np.testing.assert_array_equal(c_sampled["vec256"][85:91], c_none["vec256"][85:91])
+        np.testing.assert_array_equal(c_sampled["vec256"][85:91], c_prog["vec256"][85:91])
+
+        # Mixed numeric+categorical K=36 LosslessV1 fit & strict unseen target rejection
+        x_mixed = [[f"{float(x_raw[i, 0]):.4f}", ("alpha", "beta", "gamma")[i % 3]] for i in range(n)]
+        sc_mixed = FitOnlyTableTransform.fit(x_mixed, y_raw, task="multiclass", max_multiclass_classes=None)
+        self.assertEqual(len(sc_mixed.target_scaler.class_labels), 36)
+        x_m_sc, y_m_sc = sc_mixed.transform(x_mixed, y_raw, strict_unknown=True)
+        self.assertEqual(x_m_sc.shape, (n, 2))
+        self.assertTrue(np.all(np.isfinite(x_m_sc)))
+        with self.assertRaises(ValueError):
+            sc_mixed.transform(x_mixed[:2], np.array([999.0, 0.0]), strict_unknown=True)
+
 
 if __name__ == "__main__":
     unittest.main()
