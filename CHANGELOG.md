@@ -2,6 +2,66 @@
 
 ## Engine 1.1.0 (unreleased)
 
+- Add optional and progressive landmarking (`dope-core::landmark`, `dope landmarks`,
+  `dope mlc-v3 encode --landmark-mode none|fast|progressive|full`):
+  - `LandmarkGroup::{Macro, Larger, Fine}` (`6 -> 18 -> 23` High cells),
+    `LandmarkBundle` (`landmarks-native-v1`, finite `[0, 1]` values, explicit
+    observation mask, and `source_digest` bound to `source_rows_digest + panel +
+    options_digest + subsample`), and `ProgressiveLandmarks` fold-reuse sessions
+    that never recompute completed groups.
+  - Deterministic `splitmix64` + largest-remainder stratified subsampling
+    (`SubsampleSpec`, `N=300` progressive default) with physical `row_ids`
+    permutation invariance (`RowSelection::select_with_row_ids`) and typed
+    `LandmarkError::SubsampleClassTooSmall` refusal when any class has fewer than
+    two rows or `N < 2k`.
+- Add pure-Rust static table preparation and MLC-v3 conditioning descriptors
+  (`dope-core::prepare`, matching `research/levels/{scaling,descriptors,building_block_landmarks,observed_conditioning}.py`):
+  - `FitOnlyTableTransform` -> `PreparedTable` (`prepare_table`, `prepare_table_cells`,
+    `prepare_table_mixed`) with explicit `ClassVocabPolicy::{Cap32V1, LosslessV1}`.
+    Default `Cap32V1` (`b"dope.prepared-table/v1\0"`) preserves the legacy 32-class
+    cap and all released `prepare-v1` goldens; explicit `LosslessV1`
+    (`prepare_table_lossless`, `prepare_table_with_policy`,
+    `prepare_table_cells_with_policy`, `prepare_table_mixed_with_policy`, bound to
+    `b"dope.prepared-table/lossless-v1\0"`) preserves arbitrary `K >= 33` FIT
+    vocabularies, `round6` fractional labels, `TargetScaler::transform_strict`
+    unseen/non-finite query rejection, and host-independent IEEE-754 `libm` `tanh`
+    saturation-tail (`18.0 <= |u| < 20.0`) parity.
+  - `OBSERVED_RECIPE` (`observed-only-v1`, zeroed unobserved landmark coordinates,
+    `building_block_vec68 = 0`, and cached `TableDescriptors` /
+    `observed_target_stats` so progressive updates never rescan or sort training
+    columns) and `FULL_REPORT_RECIPE` (`full-report-v1`, renamed from
+    `legacy-full-v1` with identical 629-D features and golden digest mapping in
+    `docs/evidence/optional-landmarks/recipe-transition.json`).
+  - `build_conditioning_sampled` evaluates building-block probes on the exact
+    stratified sample positions (`evidence_positions`) while keeping `table_vec24`,
+    `target_stats[85..87]`, and `shape[87..91]` on the complete training table.
+  - Byte-identical table-preparation, descriptor, and building-block speedups
+    (`1.03–1.12x` `dope mlc-v3 encode --landmark-mode none` p50 across 10k–50k-row
+    tables, verified `570/570` byte-identical across the 285-table `none`+`full`
+    corpus) and `PrepareStageTimings` (`prepare_table_timed`,
+    `prepare_table_with_ids_timed`, `prepare_table_cells_timed`,
+    `prepare_table_cells_with_ids_timed`), together with Rust/Python `K=36`
+    `LosslessV1` sampled-conditioning, mixed-column, `±0`/`NaN`/`±1e9`
+    scaling/finiteness, and timed/untimed parity tests (#341, #342).
+- Add the optional-landmarks qualification record (`docs/optional-landmarks-qualification.md`,
+  `docs/evidence/optional-landmarks/`):
+  - Full-path `dope landmarks real --json` byte identity across 285 tables against
+    `main` (`245d4f18`).
+  - Served-semantics Q3 retention across the 102 width-valid (`p <= 64`)
+    `dev_val_ablation` tables of the pinned role manifest (`66d2a63c…`; 10 wide
+    `p > 64` multiclass tables marked `protocol_unavailable`; 102/102 zero-arm
+    conditioning digests byte-equal to served `dope mlc-v3 encode --landmark-mode none`)
+    on both the released pin (`d0b69603`: zero `0.985`, macro `1.003`, `N=300`
+    `0.994` on 99 tables) and the landmark-dropout candidate checkpoint
+    (`ecded0225fca7c6e13c413b0e39b1040bf95f7694940b2809f1ce2ce2abf7bd9`,
+    warm-started from the released pin and trained on `train_gradient` tables only
+    with verified training-source custody: zero `0.994` vs candidate full / `1.008`
+    vs released full, macro `0.998`, `N=300` `1.008` `[0.989, 1.028]` pooled on 99
+    tables and `1.014` on 66 truly subsampled tables) (#340).
+  - Cold subprocess and warm resident latency profiles (`latency-public-cold.json`,
+    `examples/mlc_v3_device_bench.rs`, `examples/landmark_mode_bench.rs`). Candidate
+    `ecded022` remains an unregistered research checkpoint pending owner registration;
+    published default weights remain `v1.0.0` (`d0b69603`).
 - Add the pinned FP32/High `DopeEncoder629` PyTorch composition interface and
   matching Rust feature methods, preserving Micro's 629-coordinate feature order.
 - Verify canonical SafeTensors bytes before parsing, validate the full checkpoint
