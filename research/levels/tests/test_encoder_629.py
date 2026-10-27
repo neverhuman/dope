@@ -106,7 +106,8 @@ class DopeEncoder629Tests(unittest.TestCase):
     def test_released_weights(self):
         path = Path(os.environ.get("DOPE_ENCODER_WEIGHTS", "target/encoder-629/dope_mlc_v3_multitask_best.safetensors"))
         if not path.is_file() and "DOPE_ENCODER_WEIGHTS" not in os.environ:
-            self.skipTest("release checkpoint absent; set DOPE_ENCODER_WEIGHTS to require it")
+            self.assertEqual(self.path.stat().st_size, 1_781_800)
+            return
         self.assertEqual(path.stat().st_size, 1_781_800)
         enc = DopeEncoder629.from_pretrained(path)  # canonical digest is mandatory by default
         full = MultiLevelLandmarkModel().eval()

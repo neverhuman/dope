@@ -429,17 +429,10 @@ def compute_table_descriptors(
             -np.sum(eig_shares[eig_shares > 1e-12] * np.log(eig_shares[eig_shares > 1e-12]))
             / max(math.log(p), 1e-9)
         )
-        top1_eig = float(eig_shares[0])
-        top3_eig = float(np.sum(eig_shares[: min(3, p)]))
-        top5_eig = float(np.sum(eig_shares[: min(5, p)]))
+        top1_eig, top3_eig, top5_eig = float(eig_shares[0]), float(np.sum(eig_shares[: min(3, p)])), float(np.sum(eig_shares[: min(5, p)]))
     else:
-        col_max_corr = np.zeros(1, dtype=np.float64)
-        col_mean_corr = np.zeros(1, dtype=np.float64)
-        eff_rank = 1.0
-        spec_entropy = 1.0
-        top1_eig = 1.0
-        top3_eig = 1.0
-        top5_eig = 1.0
+        col_max_corr, col_mean_corr = np.zeros(1, dtype=np.float64), np.zeros(1, dtype=np.float64)
+        eff_rank = spec_entropy = top1_eig = top3_eig = top5_eig = 1.0
 
     # Empirical driver weights combining linear, rank, and non-linear quadratic correlation on D_train
     if y_std > 1e-9 and level == "ultra":
@@ -450,57 +443,27 @@ def compute_table_descriptors(
         quad_r = np.zeros(p, dtype=np.float64)
 
     raw_driver = 0.45 * pearson_r + 0.35 * spearman_r + 0.20 * quad_r
-    if float(np.sum(raw_driver)) > 1e-9:
-        driver_weights = raw_driver / float(np.sum(raw_driver))
-    else:
-        driver_weights = np.full(p, 1.0 / float(p), dtype=np.float64)
-
-    sorted_r = np.sort(pearson_r)[::-1]
-    sorted_sp = np.sort(spearman_r)[::-1]
-
-    # Mask fine/larger descriptors appropriately by level
+    driver_weights = raw_driver / float(np.sum(raw_driver)) if float(np.sum(raw_driver)) > 1e-9 else np.full(p, 1.0 / float(p), dtype=np.float64)
+    sorted_r, sorted_sp = np.sort(pearson_r)[::-1], np.sort(spearman_r)[::-1]
     include_larger = 1.0 if level in ("high", "ultra") else 0.0
     include_fine = 1.0 if level == "ultra" else 0.0
 
     table_vec = np.array([
-        # Macro (always active: 8 features)
-        eff_rank,
-        spec_entropy,
-        float(np.mean(np.abs(skew))) / (1.0 + float(np.mean(np.abs(skew)))),
-        float(np.mean(mode_conc)),
-        float(sorted_r[0]) if sorted_r.size >= 1 else 0.0,
-        float(np.mean(pearson_r)),
-        gini_coefficient(pearson_r),
-        math.log10(max(n, 1)) / 6.0,
-        # Larger (active at High & Ultra: 8 features)
-        include_larger * top1_eig,
-        include_larger * top3_eig,
-        include_larger * top5_eig,
-        include_larger * float(np.max(col_max_corr)),
-        include_larger * float(np.mean(col_mean_corr)),
-        include_larger * float(np.mean(tail_ratio)),
-        include_larger * (float(sorted_sp[0]) if sorted_sp.size >= 1 else 0.0),
-        include_larger * float(np.max(spearman_r - pearson_r)),
-        # Fine (active at Ultra: 8 features)
+        eff_rank, spec_entropy, float(np.mean(np.abs(skew))) / (1.0 + float(np.mean(np.abs(skew)))), float(np.mean(mode_conc)),
+        float(sorted_r[0]) if sorted_r.size >= 1 else 0.0, float(np.mean(pearson_r)), gini_coefficient(pearson_r), math.log10(max(n, 1)) / 6.0,
+        include_larger * top1_eig, include_larger * top3_eig, include_larger * top5_eig, include_larger * float(np.max(col_max_corr)),
+        include_larger * float(np.mean(col_mean_corr)), include_larger * float(np.mean(tail_ratio)),
+        include_larger * (float(sorted_sp[0]) if sorted_sp.size >= 1 else 0.0), include_larger * float(np.max(spearman_r - pearson_r)),
         include_fine * float(np.max(np.abs(skew)) / (1.0 + np.max(np.abs(skew)))),
         include_fine * float(np.mean(np.maximum(kurt, 0.0)) / (1.0 + np.mean(np.maximum(kurt, 0.0)))),
-        include_fine * float(np.max(tail_ratio)),
-        include_fine * float(np.mean( sorted_r[: min(3, p)] )),
-        include_fine * float(np.mean( sorted_sp[: min(3, p)] )),
-        include_fine * float(np.max(quad_r)),
-        include_fine * gini_coefficient(raw_driver),
-        include_fine * float(np.max(raw_driver)),
+        include_fine * float(np.max(tail_ratio)), include_fine * float(np.mean(sorted_r[: min(3, p)])),
+        include_fine * float(np.mean(sorted_sp[: min(3, p)])), include_fine * float(np.max(quad_r)),
+        include_fine * gini_coefficient(raw_driver), include_fine * float(np.max(raw_driver)),
     ], dtype=np.float32)
 
     col_desc = np.column_stack([
-        squash(skew),
-        squash(kurt) * include_larger,
-        tail_ratio * include_larger,
-        mode_conc,
-        col_max_corr * include_larger,
-        pearson_r,
-        spearman_r * include_larger,
-        quad_r * include_fine,
+        squash(skew), squash(kurt) * include_larger, tail_ratio * include_larger, mode_conc,
+        col_max_corr * include_larger, pearson_r, spearman_r * include_larger, quad_r * include_fine,
     ]).astype(np.float32)
 
     return {

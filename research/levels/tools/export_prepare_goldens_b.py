@@ -1,10 +1,10 @@
 """Export lane-B intermediate and end-to-end conditioning goldens for `dope_core::prepare`.
 
 Covers both conditioning recipes defined in `research/levels`:
-1. `legacy-full-v1` (`mode == "full"`): `compute_building_block_landmarks`,
+1. Full-report v1 (`mode == "full"`): `compute_building_block_landmarks`,
    `compute_inter_landmark_summary_stats`, `build_v3_conditioning_bundle`,
    `col_landmarks17x64`, and `effective_conditioning_digest` across full,
-   partial, and empty legacy reports.
+   partial, and empty native reports.
 2. `observed-only-v1` (`mode` in `{"none", "fast", "progressive"}`):
    `observed_report_descriptors`, `compute_observed_inter_landmark_stats`,
    `build_observed_conditioning_bundle`, `col_landmarks17x64`, and
@@ -27,11 +27,11 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 
 from research.levels.building_block_landmarks import (
-    LEVEL_RANK,
-    _squash,
     build_v3_conditioning_bundle,
     compute_building_block_landmarks,
     compute_inter_landmark_summary_stats,
+    compute_observed_inter_landmark_stats,
+    zero_building_block_landmarks,
 )
 from research.levels.descriptors import (
     FINE_ADDED_INDICES,
@@ -43,24 +43,20 @@ from research.levels.descriptors import (
     level_landmark_mask,
     squash,
 )
+from research.levels.optional_landmarks import (
+    CONDITIONING_DOMAIN,
+    LEGACY_FULL_RECIPE,
+    OBSERVED_RECIPE,
+    effective_conditioning_digest,
+    report_task,
+    squash_f32,
+    table_classes,
+    table_target_stats,
+    unsquash,
+)
 
 SCHEMA = "dope.prepare-goldens-b/v1"
-LEGACY_FULL_RECIPE = "legacy-full-v1"
-OBSERVED_RECIPE = "observed-only-v1"
-CONDITIONING_DOMAIN = b"dope.conditioning/v1\0"
 MAX_COLS = 64
-F32_MAX = 3.4028234663852886e38
-
-
-def zero_building_block_landmarks(p: int) -> Dict[str, np.ndarray]:
-    return {
-        "bb_gains16": np.zeros(16, dtype=np.float32),
-        "row_summary_corrs8": np.zeros(8, dtype=np.float32),
-        "col_bb_probes7": np.zeros((max(int(p), 1), 7), dtype=np.float32),
-        "het_and_tail8": np.zeros(8, dtype=np.float32),
-        "multiclass_simplex20": np.zeros(20, dtype=np.float32),
-        "building_block_vec68": np.zeros(68, dtype=np.float32),
-    }
 
 
 def _f(x: Any) -> List[Any]:
@@ -69,145 +65,10 @@ def _f(x: Any) -> List[Any]:
     return np.asarray(arr, dtype=np.float64).tolist()
 
 
-def squash_f32(gain: float) -> Optional[np.float32]:
-    g = float(gain)
-    if not math.isfinite(g) or abs(g) > F32_MAX:
-        return None
-    v = np.float32(g)
-    if not math.isfinite(v):
-        return None
-    return np.float32(v / (np.float32(1.0) + np.abs(v)))
-
-
-def unsquash(value: float) -> float:
-    s = float(value)
-    if abs(s) >= 1.0:
-        return math.copysign(F32_MAX, s)
-    return s / (1.0 - abs(s))
-
-
-def report_task(task: str) -> str:
-    if task == "regression":
-        return "regression"
-    if task in ("classification", "binary", "multiclass"):
-        return "classification"
-    raise ValueError(f"unknown_task_{task}")
-
-
-def table_classes(y: np.ndarray, task: str) -> int:
-    if task == "regression":
-        return 0
-    if task in ("classification", "binary"):
-        return 2
-    return int(len(np.unique(np.rint(np.asarray(y, dtype=np.float64).reshape(-1)))))
-
-
-def table_target_stats(y: np.ndarray, task: str) -> List[Optional[float]]:
-    arr = np.asarray(y, dtype=np.float64).reshape(-1)
-    n = arr.size
-    if n == 0:
-        return [None, None, None]
-    if task == "regression":
-        m = float(np.sum(arr) / n)
-        d = arr - m
-        v = float(np.sum(d ** 2) / n)
-        if v <= 1e-24:
-            return [None, None, None]
-        return [float(np.sum(d ** 3) / n / v ** 1.5), float(np.sum(d ** 4) / n / v ** 2 - 3.0), None]
-    labels = np.rint(arr).astype(np.int64)
-    classes = [0, 1] if task in ("classification", "binary") else sorted(set(int(v) for v in labels))
-    slot = {c: i for i, c in enumerate(classes)}
-    counts = np.zeros(len(classes), dtype=np.float64)
-    for lab in labels:
-        if int(lab) in slot:
-            counts[slot[int(lab)]] += 1.0 / n
-    if counts.size < 2:
-        return [None, None, None]
-    pos = counts[counts > 0.0]
-    ent = -float(np.sum(pos * np.log(pos))) / math.log(counts.size)
-    return [ent, float(np.min(counts)), None]
-
-
 def observed_target_stats(y: np.ndarray, task: str) -> List[Optional[float]]:
     if task == "regression":
         return [None, None, None]
     return table_target_stats(y, task)
-
-
-def compute_observed_inter_landmark_stats(rep_desc: Dict[str, Any], *, level: str = "ultra") -> np.ndarray:
-    lvl_r = LEVEL_RANK.get(level, 3)
-    g = np.asarray(rep_desc["gains23"], dtype=np.float64)
-    m = np.asarray(rep_desc["mask23"], dtype=bool)
-
-    def mp(idxs: Sequence[int]) -> Optional[float]:
-        vals = [float(g[i]) for i in idxs if m[i]]
-        return max(vals) if vals else None
-
-    active = g[m]
-    s_max = max(float(np.max(active)) if active.size > 0 else 0.0, 0.02)
-    fam_idx = [
-        [0, 1, 2, 4],
-        [3, 5, 9],
-        [6, 7, 15, 16, 17] if lvl_r >= 1 else [],
-        [8, 12] if lvl_r >= 2 else [],
-        [10, 11, 18, 19, 20] if lvl_r >= 1 else [],
-    ]
-    fam_vec = np.zeros(20, dtype=np.float64)
-    fam_has = [False] * 5
-    for f_idx, idxs in enumerate(fam_idx):
-        pos = np.array([g[i] for i in idxs if m[i] and math.isfinite(g[i]) and abs(g[i]) > 1e-9], dtype=np.float64)
-        if pos.size > 0:
-            fam_has[f_idx] = True
-            f_max, f_mean, f_std = float(np.max(pos)), float(np.mean(pos)), float(np.std(pos))
-            fam_vec[4 * f_idx + 0] = float(np.clip(f_max, -1.0, 1.0))
-            fam_vec[4 * f_idx + 1] = float(np.clip(f_mean, -1.0, 1.0))
-            fam_vec[4 * f_idx + 2] = float(np.clip(f_std / s_max, 0.0, 1.0))
-            fam_vec[4 * f_idx + 3] = float(np.clip(f_max / s_max, -1.0, 1.0))
-
-    def clip1(v: float) -> float:
-        return float(np.clip(v, -1.0, 1.0))
-
-    r = np.zeros(12, dtype=np.float64)
-    lin = max(float(g[0]), 0.0) if m[0] else None
-    b1 = mp([0, 14])
-    best1 = max(b1, 0.01) if b1 is not None else None
-    tail = mp([1, 2])
-    if lin is not None and tail is not None:
-        r[0] = clip1((tail - lin) / s_max)
-    if lvl_r >= 2:
-        sharp, smooth = mp([7, 15]), mp([4])
-        if sharp is not None and smooth is not None:
-            r[1] = clip1((sharp - smooth) / s_max)
-        if m[15] and m[16]:
-            r[2] = clip1((g[16] - g[15]) / s_max)
-        if m[11] and best1 is not None:
-            r[4] = clip1((g[11] - best1) / s_max)
-        if m[8] and fam_has[0]:
-            r[7] = clip1((g[8] - fam_vec[0]) / s_max)
-    if lvl_r >= 3 and m[16] and m[17]:
-        r[3] = clip1((g[17] - g[16]) / s_max)
-    if m[10] and best1 is not None:
-        r[5] = clip1((g[10] - best1) / s_max)
-    if m[10] and lin is not None:
-        r[6] = float(_squash(float(g[10]) / (lin + 0.02)))
-    if lvl_r >= 3:
-        if m[20] and m[17]:
-            r[8] = math.tanh(math.asinh(max(float(g[20]), 0.0) / (max(float(g[17]), 0.0) + 0.02)) - math.asinh(1.0))
-        if m[18] and m[19]:
-            r[9] = clip1((g[18] - g[19]) / s_max)
-        if m[0] and m[21] and m[17] and m[22]:
-            d_lin, d_gbdt = float(g[0] - g[21]), float(g[17] - g[22])
-            r[10] = clip1((d_gbdt - d_lin) / (max(abs(d_gbdt), abs(d_lin)) + 0.02))
-    elif m[0] and m[21]:
-        r[10] = clip1(float(g[0] - g[21]) / s_max)
-    if active.size > 1:
-        logits = 8.0 * active / s_max
-        logits = logits - np.max(logits)
-        probs = np.exp(logits) / max(float(np.sum(np.exp(logits))), 1e-12)
-        ent = -float(np.sum(probs * np.log(np.maximum(probs, 1e-12)))) / max(math.log(probs.size), 1e-9)
-        r[11] = float(np.clip(ent, 0.0, 1.0))
-    out48 = np.concatenate([fam_vec, r, np.zeros(8), np.zeros(8)]).astype(np.float32)
-    return np.nan_to_num(out48, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 def observed_report_descriptors(
@@ -359,16 +220,6 @@ def pad_col_landmarks(col24: np.ndarray) -> np.ndarray:
     take = min(MAX_COLS, col24.shape[0])
     cols[:take] = np.asarray(col24, dtype=np.float32)[:take, :17]
     return cols
-
-
-def effective_conditioning_digest(vec256: np.ndarray, col_landmarks: np.ndarray, *, recipe: str, level: str) -> str:
-    vec = np.asarray(vec256, dtype="<f4").reshape(256)
-    cols = np.asarray(col_landmarks, dtype="<f4").reshape(64, 17)
-    h = hashlib.sha256(CONDITIONING_DOMAIN)
-    h.update(recipe.encode() + b"\0" + level.encode() + b"\0")
-    h.update(vec.tobytes())
-    h.update(cols.tobytes())
-    return h.hexdigest()
 
 
 def report_complete_landmarks(report: Dict[str, Any], *, include_uninformative: bool = False) -> Tuple[List[float], List[bool]]:

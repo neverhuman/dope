@@ -17,10 +17,8 @@ from torch.nn import functional as F
 
 from .budget_planner import TIER_COORD_WIDTHS, plan_tier_envelope
 from .building_block_landmarks import build_v3_conditioning_bundle
-from .optional_landmarks import (
-    LANDMARK_MODES, LEGACY_FULL_RECIPE, OBSERVED_RECIPE, LandmarkBundle,
-    build_observed_conditioning_bundle, effective_conditioning_digest,
-    observed_target_stats, report_task, table_classes,
+from .optional_landmarks import (  # noqa: F401
+    LandmarkBundle, build_conditioning, build_conditioning_inputs, encode_with_landmarks,
 )
 from .multiclass_head import (
     InterLandmarkAttentionBlock, build_enriched_numpy_basis, erf_approx as _erf_approx,
@@ -42,22 +40,17 @@ class LandmarkHyperRouter(nn.Module):
 
     def __init__(self, in_dim: int = 140, hidden_dim: int = 256, latent_dim: int = 128):
         super().__init__()
-        self.in_dim = in_dim
-        self.level_embed = nn.Embedding(3, hidden_dim)
+        self.in_dim, self.level_embed = in_dim, nn.Embedding(3, hidden_dim)
         self.small_embed = nn.Parameter(torch.zeros(hidden_dim))
-        self.input_norm = nn.LayerNorm(140)
-        self.v3_inter_norm = nn.LayerNorm(116)
+        self.input_norm, self.v3_inter_norm = nn.LayerNorm(140), nn.LayerNorm(116)
         self.backbone = nn.Sequential(
             nn.Linear(140, hidden_dim), nn.SiLU(), nn.LayerNorm(hidden_dim),
             nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.LayerNorm(hidden_dim),
         )
         self.inter_attn = InterLandmarkAttentionBlock(in_dim=256, num_tokens=8, token_dim=32, hidden_dim=hidden_dim)
-        self.gate_head = nn.Linear(hidden_dim, 10)
-        self.v3_gate_head = nn.Linear(hidden_dim, 4)
-        self.task_latent_head = nn.Linear(hidden_dim, latent_dim)
-        self.dist_latent_head = nn.Linear(hidden_dim, latent_dim)
-        self.landmark_recon_head = nn.Linear(hidden_dim, 23)
-        self.bb_recon_head = nn.Linear(hidden_dim, 16)
+        self.gate_head, self.v3_gate_head = nn.Linear(hidden_dim, 10), nn.Linear(hidden_dim, 4)
+        self.task_latent_head, self.dist_latent_head = nn.Linear(hidden_dim, latent_dim), nn.Linear(hidden_dim, latent_dim)
+        self.landmark_recon_head, self.bb_recon_head = nn.Linear(hidden_dim, 23), nn.Linear(hidden_dim, 16)
         nn.init.zeros_(self.gate_head.weight)
         nn.init.zeros_(self.v3_gate_head.weight)
         nn.init.zeros_(self.v3_gate_head.bias)
@@ -114,16 +107,12 @@ class ConditionalHyperTargetNet(nn.Module):
     def __init__(self, max_cols: int = MAX_COLS, latent_dim: int = 128, hidden_dim: int = 128):
         super().__init__()
         self.max_cols = max_cols
-        self.film_gamma = nn.Linear(latent_dim, max_cols)
-        self.film_beta = nn.Linear(latent_dim, max_cols)
-        self.fc1 = nn.Linear(max_cols + latent_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        self.out_head = nn.Linear(hidden_dim, 1)
-        self.col_gate_head = nn.Linear(latent_dim + 17, 1)
-        nn.init.zeros_(self.out_head.weight)
-        nn.init.zeros_(self.out_head.bias)
-        nn.init.zeros_(self.col_gate_head.weight)
-        nn.init.zeros_(self.col_gate_head.bias)
+        self.film_gamma, self.film_beta = nn.Linear(latent_dim, max_cols), nn.Linear(latent_dim, max_cols)
+        self.fc1, self.fc2 = nn.Linear(max_cols + latent_dim, hidden_dim), nn.Linear(hidden_dim, hidden_dim)
+        self.out_head, self.col_gate_head = nn.Linear(hidden_dim, 1), nn.Linear(latent_dim + 17, 1)
+        for m in (self.out_head, self.col_gate_head):
+            nn.init.zeros_(m.weight)
+            nn.init.zeros_(m.bias)
 
     def compute_column_gates(
         self, task_latent: torch.Tensor, col_landmarks: Optional[torch.Tensor] = None, X_pad: Optional[torch.Tensor] = None
@@ -132,13 +121,10 @@ class ConditionalHyperTargetNet(nn.Module):
         t_1d = task_latent.squeeze(0) if task_latent.ndim > 1 else task_latent
         c_pad = torch.zeros((self.max_cols, 17), device=t_1d.device, dtype=t_1d.dtype)
         if col_landmarks is not None:
-            p_in, d_in = col_landmarks.shape
-            p_take, d_take = min(p_in, self.max_cols), min(d_in, 17)
+            p_take, d_take = min(col_landmarks.shape[0], self.max_cols), min(col_landmarks.shape[1], 17)
             c_pad[:p_take, :d_take] = col_landmarks[:p_take, :d_take].to(device=t_1d.device, dtype=t_1d.dtype)
         elif X_pad is not None and X_pad.shape[0] > 1:
-            # Deterministic 17-dim column-distribution summary from X_pad at receiver decode time
-            xm = X_pad.mean(dim=0)
-            xs = X_pad.std(dim=0, unbiased=False).clamp(min=1e-6)
+            xm, xs = X_pad.mean(dim=0), X_pad.std(dim=0, unbiased=False).clamp(min=1e-6)
             xz = ((X_pad - xm.unsqueeze(0)) / xs.unsqueeze(0)).clamp(-6.0, 6.0)
             feats = torch.stack([
                 xm, xs, (xz ** 3).mean(dim=0) / 6.0, ((xz ** 4).mean(dim=0) - 3.0).clamp(-3.0, 20.0) / 10.0,
@@ -151,8 +137,7 @@ class ConditionalHyperTargetNet(nn.Module):
             ], dim=-1)
             c_pad = feats.to(device=t_1d.device, dtype=t_1d.dtype)
         t_rep = t_1d.unsqueeze(0).expand(self.max_cols, -1)
-        raw_g = self.col_gate_head(torch.cat([t_rep, c_pad], dim=-1)).squeeze(-1)
-        return 1.0 + 0.25 * torch.tanh(raw_g)
+        return 1.0 + 0.25 * torch.tanh(self.col_gate_head(torch.cat([t_rep, c_pad], dim=-1)).squeeze(-1))
 
     def forward(
         self, X_pad: torch.Tensor, task_latent: torch.Tensor, col_mask: torch.Tensor, col_landmarks: Optional[torch.Tensor] = None
@@ -233,7 +218,7 @@ class MultiLevelLandmarkModel(nn.Module):
         alpha_mat = gram + gates["ridge_alpha"].clamp(1e-3, 50.0) * eye
 
         if task == "multiclass":
-            y_tr_int, y_qr_int = y_train.long().clamp(0, 31), y_query.long().clamp(0, 31)
+            y_tr_int, y_qr_int = y_train.round().long().clamp(0, 31), y_query.round().long().clamp(0, 31)
             k_cls = max(int(max(y_tr_int.max().item(), y_qr_int.max().item())) + 1, 3)
             Y_oh = F.one_hot(y_tr_int, num_classes=k_cls).to(dtype=X_tr.dtype)
             priors = Y_oh.mean(dim=0, keepdim=True).clamp(1e-3, 1.0)
@@ -265,10 +250,11 @@ class MultiLevelLandmarkModel(nn.Module):
         pred_imp = lin_w * film_g * torch.abs(c_gate)
         driver_loss = F.l1_loss(pred_imp / (pred_imp.sum() + 1e-8), emp_drivers[:p_use] / (emp_drivers[:p_use].sum() + 1e-8))
 
-        true_gains, true_mask = desc_vec[:23], desc_vec[23:46] > 0.5
+        sup_vec = supervision_desc_vec if supervision_desc_vec is not None else desc_vec
+        true_gains, true_mask = sup_vec[:23], sup_vec[23:46] > 0.5
         lm_loss = F.huber_loss(lm_pred[true_mask], true_gains[true_mask]) if true_mask.any() else lm_pred.sum() * 0.0
-        if desc_vec.shape[-1] >= 204:
-            true_bb = desc_vec[188:204]
+        if sup_vec.shape[-1] >= 204:
+            true_bb = sup_vec[188:204]
             lm_loss = lm_loss + 0.5 * F.huber_loss(bb_pred, true_bb)
         total_loss = cond_loss + 0.25 * dist_loss + 0.20 * driver_loss + 0.10 * lm_loss
         return {
@@ -375,33 +361,24 @@ class MultiLevelLandmarkModel(nn.Module):
         self, encoding: Dict[str, Any], n_rows: Optional[int] = None, *, seed: int = 20261023
     ) -> Tuple[np.ndarray, np.ndarray]:
         n, p_use = int(encoding["n_train"] if n_rows is None else n_rows), int(encoding["p_use"])
-        level, task = encoding["level"], encoding["task"]
-        rng = np.random.default_rng(seed)
-
+        level, task, rng = encoding["level"], encoding["task"], np.random.default_rng(seed)
         reg_w = np.asarray(encoding["regime_weights"], dtype=np.float64)
         reg_w = reg_w / np.sum(reg_w)
         reg_m, reg_s = np.asarray(encoding["regime_means"], dtype=np.float64), np.asarray(encoding["regime_scales"], dtype=np.float64)
         chol, diag_std = np.asarray(encoding["chol_factor"], dtype=np.float64), np.asarray(encoding["diag_res_std"], dtype=np.float64)
-
         reg_idx = rng.choice(len(reg_w), size=n, p=reg_w)
         Z_syn = reg_m[reg_idx] + reg_s[reg_idx] * (rng.standard_normal((n, chol.shape[1])) @ chol.T + rng.standard_normal((n, p_use)) * diag_std[None, :])
-
         device = next(self.parameters()).device
-        Z_pad = torch.zeros((n, self.max_cols), dtype=torch.float32, device=device)
-        Z_pad[:, :p_use] = torch.tensor(Z_syn, dtype=torch.float32, device=device)
-        col_mask = torch.zeros(self.max_cols, dtype=torch.float32, device=device)
-        col_mask[:p_use] = 1.0
+        Z_pad, col_mask = torch.zeros((n, self.max_cols), dtype=torch.float32, device=device), torch.zeros(self.max_cols, dtype=torch.float32, device=device)
+        Z_pad[:, :p_use], col_mask[:p_use] = torch.tensor(Z_syn, dtype=torch.float32, device=device), 1.0
         dist_lat = torch.tensor(np.asarray(encoding["dist_latent"], dtype=np.float32), device=device)
         Z_ref = self.cov_net(Z_pad, dist_lat, col_mask)[:, :p_use].detach().cpu().numpy().astype(np.float64)
         Z_syn = 0.94 * Z_syn + 0.06 * Z_ref
         Z_syn = (Z_syn - np.mean(Z_syn, axis=0)) / np.maximum(np.std(Z_syn, axis=0), 1e-6)
-
         U_syn = np.clip(0.5 * (1.0 + _erf_approx(Z_syn / math.sqrt(2.0))), 0.001, 0.999)
         knot_grid, knots = np.asarray(encoding.get("knot_grid", QUANTILE_KNOTS), dtype=np.float64), np.asarray(encoding["col_knots"], dtype=np.float64)
         is_bin, bin_p, bin_lh = np.asarray(encoding["is_binary_col"], dtype=bool), np.asarray(encoding["binary_probs"], dtype=np.float64), np.asarray(encoding["binary_low_high"], dtype=np.float64)
-        disc_sup = encoding.get("discrete_support", {})
-
-        X_syn = np.zeros((n, p_use), dtype=np.float64)
+        disc_sup, X_syn = encoding.get("discrete_support", {}), np.zeros((n, p_use), dtype=np.float64)
         for j in range(p_use):
             if is_bin[j]:
                 X_syn[:, j] = np.where(U_syn[:, j] >= (1.0 - bin_p[j]), bin_lh[j, 1], bin_lh[j, 0])
@@ -410,7 +387,6 @@ class MultiLevelLandmarkModel(nn.Module):
                 X_syn[:, j] = np.asarray(u_vals, dtype=np.float64)[np.clip(np.searchsorted(np.asarray(cum_p, dtype=np.float64), U_syn[:, j]), 0, len(u_vals) - 1)]
             else:
                 X_syn[:, j] = np.interp(U_syn[:, j], knot_grid, knots[j])
-
         tb = encoding["target_bundle"]
         if task == "multiclass" or tb.get("task_kind") == "multiclass":
             y_syn = predict_multiclass_from_bundle(X_syn, tb, level=level, rng=rng)
@@ -420,127 +396,6 @@ class MultiLevelLandmarkModel(nn.Module):
                 target_net=self.target_net, task_lat=torch.tensor(np.asarray(encoding["task_latent"], dtype=np.float32), device=device), device=device,
             )
         return X_syn, y_syn
-
-
-def build_conditioning(
-    X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *, task: str,
-    bundle: Optional[LandmarkBundle] = None, mode: str = "full",
-    native_report: Optional[Dict[str, Any]] = None,
-    level: str = "high", subsample_n: Optional[int] = None,
-    y_train_raw: Optional[np.ndarray] = None,
-    target_stats: Optional[Sequence[Optional[float]]] = None,
-) -> Dict[str, Any]:
-    """Select and run the V3 conditioning recipe for an optional-landmark mode.
-
-    * ``full``: native report REQUIRED; exact legacy ``build_v3_conditioning_bundle(native_report,
-      X, y, level)`` (raw report, no squashed round trip) -> bit-identical to the historical path
-      when unsampled. When sampled (``subsample_n`` set or report rows < table rows), overrides
-      base ``shape[87:91]`` and ``target_stats[85:87]`` from the complete table while keeping
-      all native landmark evidence losslessly. A supplied ``bundle`` must match ``from_report``
-      (accepting both ``complete|uninformative`` and ``complete``-only masks, even if partial).
-      Recipe ``legacy-full-v1``. Full conditioning is chosen by MODE, never by ``mask.all()``.
-    * ``none`` == ``fast`` (alias): no native CV, spectrum or building blocks. ``bundle`` must be
-      ``None`` or have no present slots. Recipe ``observed-only-v1`` with the zero bundle.
-    * ``progressive``: recipe ``observed-only-v1`` on the current bundle (``None`` = zero).
-      ``native_report`` is ignored, so conditioning is a pure function of (table, bundle, level).
-
-    Returns ``{"recipe", "level", "cond" (legacy-shaped bundle dict), "vec256" f32[256],
-    "col_landmarks" f32[64, 17], "digest"}``.
-    """
-    if mode not in LANDMARK_MODES:
-        raise ValueError(f"unknown_landmark_mode_{mode}")
-    if bundle is not None:
-        if not isinstance(bundle, LandmarkBundle):
-            raise TypeError("landmark_bundle_required")
-        bundle = bundle.sanitize()
-    X_arr = np.asarray(X_train_scaled, dtype=np.float64)
-    X_arr = X_arr.reshape(-1, 1) if X_arr.ndim == 1 else X_arr
-    y_arr = np.asarray(y_train_scaled, dtype=np.float64).reshape(-1)
-    table_rows, table_features = int(X_arr.shape[0]), int(X_arr.shape[1])
-    if mode == "full":
-        if native_report is None:
-            raise ValueError("landmark_full_requires_native_report")
-        if bundle is not None:
-            obs_b = LandmarkBundle.from_report(native_report, bundle.subsample_n, include_uninformative=True)
-            comp_b = LandmarkBundle.from_report(native_report, bundle.subsample_n, complete_only=True)
-            if not (bundle.same_landmarks(obs_b) or bundle.same_landmarks(comp_b)):
-                raise ValueError("landmark_bundle_report_mismatch")
-        recipe = LEGACY_FULL_RECIPE
-        eff_sub = subsample_n if subsample_n is not None else (bundle.subsample_n if bundle is not None else None)
-        rep_rows = native_report.get("rows")
-        is_sampled = (
-            (eff_sub is not None and eff_sub < table_rows)
-            or (isinstance(rep_rows, int) and rep_rows < table_rows)
-        )
-        overrides: Optional[Dict[str, Any]] = None
-        if is_sampled or target_stats is not None or y_train_raw is not None:
-            overrides = {
-                "rows": table_rows,
-                "features": table_features,
-                "classes": table_classes(y_arr, task),
-                "task": report_task(task),
-                "target_stats": observed_target_stats(y_arr, task, y_raw=y_train_raw, target_stats=target_stats),
-            }
-        cond = build_v3_conditioning_bundle(
-            native_report, X_train_scaled, y_train_scaled, level=level, report_overrides=overrides,
-        )
-    else:
-        if mode in ("none", "fast") and bundle is not None and any(bundle.mask):
-            raise ValueError("landmark_mode_none_rejects_bundle")
-        recipe = OBSERVED_RECIPE
-        cond = build_observed_conditioning_bundle(
-            LandmarkBundle.zero() if (bundle is None or mode in ("none", "fast")) else bundle,
-            X_train_scaled, y_train_scaled, task=task, level=level,
-            y_train_raw=y_train_raw, target_stats=target_stats,
-        )
-    vec256 = np.asarray(cond["vec256"], dtype=np.float32).reshape(256)
-    col24 = np.asarray(cond["col_landmarks24"], dtype=np.float32)
-    cols = np.zeros((MAX_COLS, 17), dtype=np.float32)
-    take = min(MAX_COLS, col24.shape[0])
-    cols[:take] = col24[:take, :17]
-    return {
-        "recipe": recipe, "level": level, "cond": cond, "vec256": vec256, "col_landmarks": cols,
-        "digest": effective_conditioning_digest(vec256, cols, recipe=recipe, level=level),
-    }
-
-
-def build_conditioning_inputs(
-    X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *, task: str,
-    bundle: Optional[LandmarkBundle], mode: str, native_report: Optional[Dict[str, Any]] = None,
-    level: str = "high", subsample_n: Optional[int] = None,
-    y_train_raw: Optional[np.ndarray] = None,
-    target_stats: Optional[Sequence[Optional[float]]] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
-    """Reference inputs for ``DopeEncoder629``: ``(vec256 f32[256], col_landmarks f32[64, 17])``.
-
-    Pure numpy and deterministic (no torch, no RNG); the Rust ``prepare::build_conditioning``
-    port must match it. ``X_train_scaled``/``y_train_scaled`` are the train-only
-    ``FitOnlyTableTransform`` outputs; ``level`` defaults to ``"high"`` (the pinned encoder).
-    Recipe selection is ``build_conditioning``; ``col_landmarks = col_landmarks24[:64, :17]``
-    zero-padded to 64 rows.
-    """
-    out = build_conditioning(
-        X_train_scaled, y_train_scaled, task=task, bundle=bundle, mode=mode,
-        native_report=native_report, level=level, subsample_n=subsample_n,
-        y_train_raw=y_train_raw, target_stats=target_stats,
-    )
-    return out["vec256"], out["col_landmarks"]
-
-
-def encode_with_landmarks(
-    model: "MultiLevelLandmarkModel", X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *,
-    landmarks: Optional[LandmarkBundle] = None, landmark_mode: str = "full",
-    native_report: Optional[Dict[str, Any]] = None, task: str = "regression", level: str = "ultra",
-    **kwargs: Any,
-) -> Dict[str, Any]:
-    """``model.encode_table`` on the optional-landmark path (always via ``build_conditioning``)."""
-    if landmarks is None:
-        landmarks = (LandmarkBundle.from_report(native_report) if landmark_mode == "full" and native_report is not None
-                     else LandmarkBundle.zero())
-    return model.encode_table(
-        X_train_scaled, y_train_scaled, native_report, task=task, level=level,
-        landmarks=landmarks, landmark_mode=landmark_mode, **kwargs,
-    )
 
 
 def _build_differentiable_basis(X: torch.Tensor, gates: Dict[str, torch.Tensor], *, level: str) -> torch.Tensor:
@@ -588,13 +443,9 @@ def _fit_hierarchical_target_bundle(
     res_net = target_net(X_pad, task_lat_tensor, col_mask, col_landmarks=col_landmarks).detach().cpu().numpy().astype(np.float64)
     res_net_mean = float(np.mean(res_net))
     residual = y - (pred_basis + float(gates["neural_w"]) * (res_net - res_net_mean))
-
     n_trees = plan["n_trees"] if plan else (2 if level in ("low", "small") else 4 if level == "medium" else 24 if level == "high" else 56)
     depth = plan["tree_depth"] if plan else (2 if level in ("low", "small", "medium") else 3 if level == "high" else 4)
-    trees = _fit_oblivious_trees(
-        X, residual, combined_prior, n_trees=n_trees, depth=depth,
-        learning_rate=0.16 if level in ("low", "small", "medium") else 0.19 if level == "high" else 0.22,
-    )
+    trees = _fit_oblivious_trees(X, residual, combined_prior, n_trees=n_trees, depth=depth, learning_rate=0.16 if level in ("low", "small", "medium") else 0.19 if level == "high" else 0.22)
     final_res = residual - _eval_oblivious_trees(X, trees)
     return {
         "gates": gates, "pairs": pairs, "include_v3_primitives": include_v3_primitives,
@@ -610,10 +461,7 @@ def _predict_from_target_bundle(
     rng: np.random.Generator, target_net: ConditionalHyperTargetNet, task_lat: torch.Tensor, device: torch.device,
 ) -> np.ndarray:
     n, p = X_syn.shape
-    gates_for_basis = bundle.get("gates") or {
-        "monotone_w": 0.55 if level in ("low", "small", "medium") else 0.65, "hinge_w": 0.55 if level in ("high", "ultra") else 0.0,
-        "pair_w": 0.60 if level in ("high", "ultra") else 0.0, "tree_w": 1.00 if level == "ultra" else 0.0,
-    }
+    gates_for_basis = bundle.get("gates") or {"monotone_w": 0.55 if level in ("low", "small", "medium") else 0.65, "hinge_w": 0.55 if level in ("high", "ultra") else 0.0, "pair_w": 0.60 if level in ("high", "ultra") else 0.0, "tree_w": 1.00 if level == "ultra" else 0.0}
     Phi = build_enriched_numpy_basis(X_syn, gates_for_basis, bundle["pairs"], level=level, include_v3_primitives=bool(bundle.get("include_v3_primitives", False)))
     w_basis = np.asarray(bundle["w_basis"], dtype=np.float64)
     m = min(Phi.shape[1], w_basis.size)
@@ -637,13 +485,8 @@ def _pack_code_vector(
     *, width: int, col_knots: np.ndarray, chol_factor: np.ndarray,
     target_bundle: Dict[str, Any], task_lat: np.ndarray, dist_lat: np.ndarray,
 ) -> np.ndarray:
-    parts = [
-        col_knots.reshape(-1).astype(np.float32), chol_factor.reshape(-1).astype(np.float32),
-        np.asarray(target_bundle["w_basis"], dtype=np.float32).reshape(-1),
-        task_lat.reshape(-1).astype(np.float32), dist_lat.reshape(-1).astype(np.float32),
-    ] + [np.asarray(t["leaf_values"], dtype=np.float32).reshape(-1) for t in target_bundle["trees"]]
-    flat = np.concatenate(parts)
-    out = np.zeros(width, dtype=np.float32)
+    parts = [col_knots.reshape(-1).astype(np.float32), chol_factor.reshape(-1).astype(np.float32), np.asarray(target_bundle["w_basis"], dtype=np.float32).reshape(-1), task_lat.reshape(-1).astype(np.float32), dist_lat.reshape(-1).astype(np.float32)] + [np.asarray(t["leaf_values"], dtype=np.float32).reshape(-1) for t in target_bundle["trees"]]
+    flat, out = np.concatenate(parts), np.zeros(width, dtype=np.float32)
     take = min(width, flat.size)
     out[:take] = np.tanh(flat[:take] / 4.0) * 4.0
     return out
