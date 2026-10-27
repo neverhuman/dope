@@ -17,6 +17,11 @@ from torch.nn import functional as F
 
 from .budget_planner import TIER_COORD_WIDTHS, plan_tier_envelope
 from .building_block_landmarks import build_v3_conditioning_bundle
+from .optional_landmarks import (
+    LANDMARK_MODES, LEGACY_FULL_RECIPE, OBSERVED_RECIPE, LandmarkBundle,
+    build_observed_conditioning_bundle, effective_conditioning_digest,
+    observed_target_stats, report_task, table_classes,
+)
 from .multiclass_head import (
     InterLandmarkAttentionBlock, build_enriched_numpy_basis, erf_approx as _erf_approx,
     erfinv_approx as _erfinv_approx, eval_oblivious_trees as _eval_oblivious_trees,
@@ -189,8 +194,12 @@ class MultiLevelLandmarkModel(nn.Module):
     @staticmethod
     def build_conditioning_vector(
         report: Dict[str, Any], X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, level: str, device: torch.device,
+        *, building_blocks: bool = True, report_overrides: Optional[Dict[str, Any]] = None,
     ) -> Tuple[torch.Tensor, Dict[str, Any], Dict[str, Any]]:
-        bundle = build_v3_conditioning_bundle(report, X_train_scaled, y_train_scaled, level=level)
+        bundle = build_v3_conditioning_bundle(
+            report, X_train_scaled, y_train_scaled, level=level,
+            building_blocks=building_blocks, report_overrides=report_overrides,
+        )
         rep_desc, tab_desc = bundle["rep_desc"], dict(bundle["tab_desc"])
         tab_desc["col_landmarks24"] = bundle["col_landmarks24"]
         tab_desc["v3_driver_weights"] = bundle["v3_driver_weights"]
@@ -270,12 +279,36 @@ class MultiLevelLandmarkModel(nn.Module):
 
     @torch.no_grad()
     def encode_table(
-        self, X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, report: Dict[str, Any],
+        self, X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, report: Optional[Dict[str, Any]] = None,
         *, task: str = "regression", level: str = "ultra", adaptive_budget: bool = False,
-        include_v3_primitives: bool = False,
+        include_v3_primitives: bool = False, landmarks: Optional[LandmarkBundle] = None,
+        landmark_mode: str = "full", subsample_n: Optional[int] = None,
+        y_train_raw: Optional[np.ndarray] = None,
+        target_stats: Optional[Sequence[Optional[float]]] = None,
     ) -> Dict[str, Any]:
+        """Encode a scaled training table.
+
+        Historical call ``encode_table(X, y, report, ...)`` (``landmarks=None``,
+        ``landmark_mode="full"``, ``subsample_n=None``) is unchanged. Otherwise conditioning
+        comes from ``build_conditioning`` (``report`` acts as the optional native report;
+        ``landmarks=None`` outside ``full`` is the zero bundle).
+        """
         device = next(self.parameters()).device
-        vec256, rep_desc, tab_desc = self.build_conditioning_vector(report, X_train_scaled, y_train_scaled, level=level, device=device)
+        if (landmarks is None and landmark_mode == "full" and subsample_n is None
+                and y_train_raw is None and target_stats is None):
+            if report is None:
+                raise ValueError("landmark_full_requires_native_report")
+            vec256, rep_desc, tab_desc = self.build_conditioning_vector(report, X_train_scaled, y_train_scaled, level=level, device=device)
+        else:
+            cond = build_conditioning(
+                X_train_scaled, y_train_scaled, task=task, bundle=landmarks, mode=landmark_mode,
+                native_report=report, level=level, subsample_n=subsample_n,
+                y_train_raw=y_train_raw, target_stats=target_stats,
+            )["cond"]
+            rep_desc, tab_desc = cond["rep_desc"], dict(cond["tab_desc"])
+            for key in ("col_landmarks24", "v3_driver_weights", "inter_landmark_vec48", "building_block_vec68"):
+                tab_desc[key] = cond[key]
+            vec256 = torch.tensor(cond["vec256"], dtype=torch.float32, device=device)
         routed = self.router(vec256, level=level)
         gates = {k: float(v.item()) for k, v in routed["gates"].items()}
         task_lat, dist_lat = routed["task_latent"].detach().cpu().numpy().astype(np.float16), routed["dist_latent"].detach().cpu().numpy().astype(np.float16)
@@ -387,6 +420,127 @@ class MultiLevelLandmarkModel(nn.Module):
                 target_net=self.target_net, task_lat=torch.tensor(np.asarray(encoding["task_latent"], dtype=np.float32), device=device), device=device,
             )
         return X_syn, y_syn
+
+
+def build_conditioning(
+    X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *, task: str,
+    bundle: Optional[LandmarkBundle] = None, mode: str = "full",
+    native_report: Optional[Dict[str, Any]] = None,
+    level: str = "high", subsample_n: Optional[int] = None,
+    y_train_raw: Optional[np.ndarray] = None,
+    target_stats: Optional[Sequence[Optional[float]]] = None,
+) -> Dict[str, Any]:
+    """Select and run the V3 conditioning recipe for an optional-landmark mode.
+
+    * ``full``: native report REQUIRED; exact legacy ``build_v3_conditioning_bundle(native_report,
+      X, y, level)`` (raw report, no squashed round trip) -> bit-identical to the historical path
+      when unsampled. When sampled (``subsample_n`` set or report rows < table rows), overrides
+      base ``shape[87:91]`` and ``target_stats[85:87]`` from the complete table while keeping
+      all native landmark evidence losslessly. A supplied ``bundle`` must match ``from_report``
+      (accepting both ``complete|uninformative`` and ``complete``-only masks, even if partial).
+      Recipe ``legacy-full-v1``. Full conditioning is chosen by MODE, never by ``mask.all()``.
+    * ``none`` == ``fast`` (alias): no native CV, spectrum or building blocks. ``bundle`` must be
+      ``None`` or have no present slots. Recipe ``observed-only-v1`` with the zero bundle.
+    * ``progressive``: recipe ``observed-only-v1`` on the current bundle (``None`` = zero).
+      ``native_report`` is ignored, so conditioning is a pure function of (table, bundle, level).
+
+    Returns ``{"recipe", "level", "cond" (legacy-shaped bundle dict), "vec256" f32[256],
+    "col_landmarks" f32[64, 17], "digest"}``.
+    """
+    if mode not in LANDMARK_MODES:
+        raise ValueError(f"unknown_landmark_mode_{mode}")
+    if bundle is not None:
+        if not isinstance(bundle, LandmarkBundle):
+            raise TypeError("landmark_bundle_required")
+        bundle = bundle.sanitize()
+    X_arr = np.asarray(X_train_scaled, dtype=np.float64)
+    X_arr = X_arr.reshape(-1, 1) if X_arr.ndim == 1 else X_arr
+    y_arr = np.asarray(y_train_scaled, dtype=np.float64).reshape(-1)
+    table_rows, table_features = int(X_arr.shape[0]), int(X_arr.shape[1])
+    if mode == "full":
+        if native_report is None:
+            raise ValueError("landmark_full_requires_native_report")
+        if bundle is not None:
+            obs_b = LandmarkBundle.from_report(native_report, bundle.subsample_n, include_uninformative=True)
+            comp_b = LandmarkBundle.from_report(native_report, bundle.subsample_n, complete_only=True)
+            if not (bundle.same_landmarks(obs_b) or bundle.same_landmarks(comp_b)):
+                raise ValueError("landmark_bundle_report_mismatch")
+        recipe = LEGACY_FULL_RECIPE
+        eff_sub = subsample_n if subsample_n is not None else (bundle.subsample_n if bundle is not None else None)
+        rep_rows = native_report.get("rows")
+        is_sampled = (
+            (eff_sub is not None and eff_sub < table_rows)
+            or (isinstance(rep_rows, int) and rep_rows < table_rows)
+        )
+        overrides: Optional[Dict[str, Any]] = None
+        if is_sampled or target_stats is not None or y_train_raw is not None:
+            overrides = {
+                "rows": table_rows,
+                "features": table_features,
+                "classes": table_classes(y_arr, task),
+                "task": report_task(task),
+                "target_stats": observed_target_stats(y_arr, task, y_raw=y_train_raw, target_stats=target_stats),
+            }
+        cond = build_v3_conditioning_bundle(
+            native_report, X_train_scaled, y_train_scaled, level=level, report_overrides=overrides,
+        )
+    else:
+        if mode in ("none", "fast") and bundle is not None and any(bundle.mask):
+            raise ValueError("landmark_mode_none_rejects_bundle")
+        recipe = OBSERVED_RECIPE
+        cond = build_observed_conditioning_bundle(
+            LandmarkBundle.zero() if (bundle is None or mode in ("none", "fast")) else bundle,
+            X_train_scaled, y_train_scaled, task=task, level=level,
+            y_train_raw=y_train_raw, target_stats=target_stats,
+        )
+    vec256 = np.asarray(cond["vec256"], dtype=np.float32).reshape(256)
+    col24 = np.asarray(cond["col_landmarks24"], dtype=np.float32)
+    cols = np.zeros((MAX_COLS, 17), dtype=np.float32)
+    take = min(MAX_COLS, col24.shape[0])
+    cols[:take] = col24[:take, :17]
+    return {
+        "recipe": recipe, "level": level, "cond": cond, "vec256": vec256, "col_landmarks": cols,
+        "digest": effective_conditioning_digest(vec256, cols, recipe=recipe, level=level),
+    }
+
+
+def build_conditioning_inputs(
+    X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *, task: str,
+    bundle: Optional[LandmarkBundle], mode: str, native_report: Optional[Dict[str, Any]] = None,
+    level: str = "high", subsample_n: Optional[int] = None,
+    y_train_raw: Optional[np.ndarray] = None,
+    target_stats: Optional[Sequence[Optional[float]]] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Reference inputs for ``DopeEncoder629``: ``(vec256 f32[256], col_landmarks f32[64, 17])``.
+
+    Pure numpy and deterministic (no torch, no RNG); the Rust ``prepare::build_conditioning``
+    port must match it. ``X_train_scaled``/``y_train_scaled`` are the train-only
+    ``FitOnlyTableTransform`` outputs; ``level`` defaults to ``"high"`` (the pinned encoder).
+    Recipe selection is ``build_conditioning``; ``col_landmarks = col_landmarks24[:64, :17]``
+    zero-padded to 64 rows.
+    """
+    out = build_conditioning(
+        X_train_scaled, y_train_scaled, task=task, bundle=bundle, mode=mode,
+        native_report=native_report, level=level, subsample_n=subsample_n,
+        y_train_raw=y_train_raw, target_stats=target_stats,
+    )
+    return out["vec256"], out["col_landmarks"]
+
+
+def encode_with_landmarks(
+    model: "MultiLevelLandmarkModel", X_train_scaled: np.ndarray, y_train_scaled: np.ndarray, *,
+    landmarks: Optional[LandmarkBundle] = None, landmark_mode: str = "full",
+    native_report: Optional[Dict[str, Any]] = None, task: str = "regression", level: str = "ultra",
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    """``model.encode_table`` on the optional-landmark path (always via ``build_conditioning``)."""
+    if landmarks is None:
+        landmarks = (LandmarkBundle.from_report(native_report) if landmark_mode == "full" and native_report is not None
+                     else LandmarkBundle.zero())
+    return model.encode_table(
+        X_train_scaled, y_train_scaled, native_report, task=task, level=level,
+        landmarks=landmarks, landmark_mode=landmark_mode, **kwargs,
+    )
 
 
 def _build_differentiable_basis(X: torch.Tensor, gates: Dict[str, torch.Tensor], *, level: str) -> torch.Tensor:

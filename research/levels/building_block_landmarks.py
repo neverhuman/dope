@@ -100,6 +100,18 @@ def compute_row_summary_features(
     return np.column_stack([r_mean, r_std, r_l1, r_l2, r_min, r_max, r_skew, miss_frac])
 
 
+def zero_building_block_landmarks(p: int) -> Dict[str, np.ndarray]:
+    """All-zero building-block outputs for ``p`` columns (landmark mode ``none``)."""
+    return {
+        "bb_gains16": np.zeros(16, dtype=np.float32),
+        "row_summary_corrs8": np.zeros(8, dtype=np.float32),
+        "col_bb_probes7": np.zeros((max(int(p), 1), 7), dtype=np.float32),
+        "het_and_tail8": np.zeros(8, dtype=np.float32),
+        "multiclass_simplex20": np.zeros(20, dtype=np.float32),
+        "building_block_vec68": np.zeros(68, dtype=np.float32),
+    }
+
+
 def compute_building_block_landmarks(
     X_train_scaled: np.ndarray,
     y_train_scaled: np.ndarray,
@@ -422,19 +434,125 @@ def compute_inter_landmark_summary_stats(
     return np.nan_to_num(out48, nan=0.0, posinf=0.0, neginf=0.0)
 
 
+def compute_observed_inter_landmark_stats(rep_desc: Dict[str, Any], *, level: str = "ultra") -> np.ndarray:
+    """Observed-only 48 inter-landmark stats (optional none/partial path); legacy builder untouched.
+
+    Uses ONLY measured landmark gains (``gains23`` squashed, ``mask23`` level-filtered).
+    Building blocks, SE, lambdas and spectrum are unmeasured on this path, so every
+    term involving them is dropped and every entry whose required gains are absent is 0.
+    ``mp(S)`` = max of present gains in S (absent if none present). ``s_max`` =
+    max(max present gain, 0.02).
+
+    * A [0:20]  5 families (g-slots only): F0 {0,1,2,4}; F1 {3,5,9}; F2 {6,7,15,16,17} (rank>=1);
+      F3 {8,12} (rank>=2); F4 {10,11,18,19,20} (rank>=1). pos = present gains with |g|>1e-9;
+      [clip(max), clip(mean), clip(std/s_max, 0, 1), clip(max/s_max)] else 0.
+    * B [20:32] lin = max(g0, 0) needs 0; best1 = max(mp{0,14}, 0.01) needs any of {0,14}.
+      r0 (mp{1,2} - lin)/s_max; r1 (rank>=2) (mp{7,15} - mp{4})/s_max; r2 (rank>=2) (g16-g15)/s_max;
+      r3 (rank>=3) (g17-g16)/s_max; r4 (rank>=2) (g11 - best1)/s_max; r5 (g10 - best1)/s_max;
+      r6 squash(g10/(lin+0.02)); r7 (rank>=2) (g8 - A[0])/s_max needs F0 pos non-empty;
+      r8 (rank>=3) tanh(asinh(max(g20,0)/(max(g17,0)+0.02)) - asinh(1)); r9 (rank>=3) (g18-g19)/s_max;
+      r10 rank>=3: needs 0,21,17,22: (d_gbdt-d_lin)/(max(|d_gbdt|,|d_lin|)+0.02), rank<3: needs 0,21:
+      d_lin/s_max; r11 softmax entropy of 8*g/s_max over present gains (needs >=2).
+      All ratios are clipped to [-1, 1] as in the legacy builder.
+    * C [32:40] confidence (needs SE/lambda): 0.   * D [40:48] column alignment (needs spectrum/bb): 0.
+    """
+    lvl_r = LEVEL_RANK.get(level, 3)
+    g = np.asarray(rep_desc["gains23"], dtype=np.float64)
+    m = np.asarray(rep_desc["mask23"], dtype=bool)
+
+    def mp(idxs):
+        vals = [float(g[i]) for i in idxs if m[i]]
+        return max(vals) if vals else None
+
+    active = g[m]
+    s_max = max(float(np.max(active)) if active.size > 0 else 0.0, 0.02)
+    fam_idx = [
+        [0, 1, 2, 4], [3, 5, 9], [6, 7, 15, 16, 17] if lvl_r >= 1 else [],
+        [8, 12] if lvl_r >= 2 else [], [10, 11, 18, 19, 20] if lvl_r >= 1 else [],
+    ]
+    fam_vec = np.zeros(20, dtype=np.float64)
+    fam_has = [False] * 5
+    for f_idx, idxs in enumerate(fam_idx):
+        pos = np.array([g[i] for i in idxs if m[i] and math.isfinite(g[i]) and abs(g[i]) > 1e-9], dtype=np.float64)
+        if pos.size > 0:
+            fam_has[f_idx] = True
+            f_max, f_mean, f_std = float(np.max(pos)), float(np.mean(pos)), float(np.std(pos))
+            fam_vec[4 * f_idx + 0] = float(np.clip(f_max, -1.0, 1.0))
+            fam_vec[4 * f_idx + 1] = float(np.clip(f_mean, -1.0, 1.0))
+            fam_vec[4 * f_idx + 2] = float(np.clip(f_std / s_max, 0.0, 1.0))
+            fam_vec[4 * f_idx + 3] = float(np.clip(f_max / s_max, -1.0, 1.0))
+
+    def clip1(v):
+        return float(np.clip(v, -1.0, 1.0))
+
+    r = np.zeros(12, dtype=np.float64)
+    lin = max(float(g[0]), 0.0) if m[0] else None
+    b1 = mp([0, 14])
+    best1 = max(b1, 0.01) if b1 is not None else None
+    tail = mp([1, 2])
+    if lin is not None and tail is not None:
+        r[0] = clip1((tail - lin) / s_max)
+    if lvl_r >= 2:
+        sharp, smooth = mp([7, 15]), mp([4])
+        if sharp is not None and smooth is not None:
+            r[1] = clip1((sharp - smooth) / s_max)
+        if m[15] and m[16]:
+            r[2] = clip1((g[16] - g[15]) / s_max)
+        if m[11] and best1 is not None:
+            r[4] = clip1((g[11] - best1) / s_max)
+        if m[8] and fam_has[0]:
+            r[7] = clip1((g[8] - fam_vec[0]) / s_max)
+    if lvl_r >= 3 and m[16] and m[17]:
+        r[3] = clip1((g[17] - g[16]) / s_max)
+    if m[10] and best1 is not None:
+        r[5] = clip1((g[10] - best1) / s_max)
+    if m[10] and lin is not None:
+        r[6] = float(_squash(float(g[10]) / (lin + 0.02)))
+    if lvl_r >= 3:
+        if m[20] and m[17]:
+            r[8] = math.tanh(math.asinh(max(float(g[20]), 0.0) / (max(float(g[17]), 0.0) + 0.02)) - math.asinh(1.0))
+        if m[18] and m[19]:
+            r[9] = clip1((g[18] - g[19]) / s_max)
+        if m[0] and m[21] and m[17] and m[22]:
+            d_lin, d_gbdt = float(g[0] - g[21]), float(g[17] - g[22])
+            r[10] = clip1((d_gbdt - d_lin) / (max(abs(d_gbdt), abs(d_lin)) + 0.02))
+    elif m[0] and m[21]:
+        r[10] = clip1(float(g[0] - g[21]) / s_max)
+    if active.size > 1:
+        logits = 8.0 * active / s_max
+        logits = logits - np.max(logits)
+        probs = np.exp(logits) / max(float(np.sum(np.exp(logits))), 1e-12)
+        ent = -float(np.sum(probs * np.log(np.maximum(probs, 1e-12)))) / max(math.log(probs.size), 1e-9)
+        r[11] = float(np.clip(ent, 0.0, 1.0))
+    out48 = np.concatenate([fam_vec, r, np.zeros(8), np.zeros(8)]).astype(np.float32)
+    return np.nan_to_num(out48, nan=0.0, posinf=0.0, neginf=0.0)
+
+
 def build_v3_conditioning_bundle(
     report: Dict[str, Any],
     X_train_scaled: np.ndarray,
     y_train_scaled: np.ndarray,
     *,
     level: str = "ultra",
+    building_blocks: bool = True,
+    report_overrides: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Assemble full 256-dim hierarchical landmark + inter-landmark summary vector & (p, 24) column matrix."""
+    """Assemble full 256-dim hierarchical landmark + inter-landmark summary vector & (p, 24) column matrix.
+
+    ``building_blocks=False`` (landmark mode ``none``) skips the building-block probes and
+    uses all-zero bb outputs (bb68 and col_bb7 zero; inter-landmark stats are still computed
+    from the zero bb inputs). ``report_overrides`` (rows/features/classes/task) is forwarded
+    to ``extract_report_descriptors``. Defaults reproduce the historical output exactly.
+    """
     from .descriptors import compute_table_descriptors, extract_report_descriptors
 
-    rep_desc = extract_report_descriptors(report, level=level)
+    rep_desc = extract_report_descriptors(report, level=level, **(report_overrides or {}))
     tab_desc = compute_table_descriptors(X_train_scaled, y_train_scaled, level=level)
-    bb_desc = compute_building_block_landmarks(X_train_scaled, y_train_scaled, level=level)
+    if building_blocks:
+        bb_desc = compute_building_block_landmarks(X_train_scaled, y_train_scaled, level=level)
+    else:
+        X_arr = np.asarray(X_train_scaled)
+        bb_desc = zero_building_block_landmarks(X_arr.shape[1] if X_arr.ndim == 2 else 1)
     inter_vec48 = compute_inter_landmark_summary_stats(rep_desc, tab_desc, bb_desc, level=level)
 
     vec140 = np.concatenate([rep_desc["vector116"], tab_desc["table_vec24"]]).astype(np.float32)

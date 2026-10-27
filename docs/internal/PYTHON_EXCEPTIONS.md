@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 849
-- **`keep-with-reason`**: 823 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 851
+- **`keep-with-reason`**: 825 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -881,3 +881,5 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/tests/test_validation.py` | `research/levels` | `keep-with-reason` | Unit tests for fixed development validation panels and physical table disjointness. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/validation.py` | `research/levels` | `keep-with-reason` | Fixed development validation panel selection with distinct physical table coverage. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/world_class_eval.py` | `research/levels` | `keep-with-reason` | 1,000-dataset 6-auditor synthetic-to-real transfer and Bradley-Terry Elo evaluation harness. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
+| `research/levels/optional_landmarks.py` | `research/levels` | `keep-with-reason` | Optional and progressive LandmarkBundle v1 reference implementation and observed-only MLC-v3 conditioning. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
+| `research/levels/tests/test_optional_landmarks.py` | `research/levels` | `keep-with-reason` | Unit tests for LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and optional conditioning. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
