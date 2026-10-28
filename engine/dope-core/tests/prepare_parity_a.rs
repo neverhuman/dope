@@ -5,10 +5,12 @@ use dope_core::prepare::scaling::TargetValue;
 use dope_core::prepare::{
     build_conditioning, build_conditioning_sampled, compute_landmark_group,
     compute_table_descriptors, extract_report_descriptors, prepare_table, prepare_table_cells,
-    prepare_table_cells_with_ids, prepare_table_cells_with_policy, prepare_table_lossless,
-    prepare_table_mixed, prepare_table_mixed_with_policy, prepare_table_with_ids,
-    prepare_table_with_policy, progressive_landmarks_for_table, subsample_scaled_rows,
-    ClassVocabPolicy, ColumnKind, Level, NativeReportView, PrepTask, ShapeOverride,
+    prepare_table_cells_timed, prepare_table_cells_with_ids, prepare_table_cells_with_ids_timed,
+    prepare_table_cells_with_policy, prepare_table_lossless, prepare_table_mixed,
+    prepare_table_mixed_with_policy, prepare_table_timed, prepare_table_with_ids,
+    prepare_table_with_ids_timed, prepare_table_with_policy, progressive_landmarks_for_table,
+    subsample_scaled_rows, ClassVocabPolicy, ColumnKind, Level, NativeReportView, PrepTask,
+    PrepareStageTimings, ShapeOverride,
 };
 use safetensors::tensor::Dtype;
 use safetensors::SafeTensors;
@@ -712,4 +714,82 @@ fn lossless_multiclass_k36_progressive_and_conditioning_modes_e2e() {
     assert_eq!(sx_tbl, sx_sub);
     assert_eq!(sy_tbl, sy_sub);
     assert!(tbl_mixed_lossless.select_scaled_rows(&[n_big]).is_err());
+}
+
+#[test]
+fn prepare_stage_timings_are_finite_ordered_and_preserve_table_identity() {
+    fn assert_valid_timings(t: &PrepareStageTimings, label: &str) {
+        for (name, ms) in [
+            ("parse_and_infer_ms", t.parse_and_infer_ms),
+            ("scaler_fit_transform_ms", t.scaler_fit_transform_ms),
+            ("table_descriptors_ms", t.table_descriptors_ms),
+            ("total_ms", t.total_ms),
+        ] {
+            assert!(ms.is_finite() && ms >= 0.0, "{label}.{name} invalid: {ms}");
+        }
+        let sum = t.parse_and_infer_ms + t.scaler_fit_transform_ms + t.table_descriptors_ms;
+        assert!(
+            sum <= t.total_ms + 1e-3,
+            "{label}: stage sum {sum} exceeds total_ms {}",
+            t.total_ms
+        );
+    }
+
+    let n = 36usize;
+    let x_num: Vec<Vec<f64>> = (0..n)
+        .map(|i| vec![(i as f64) * 0.25 - 4.0, ((i % 7) as f64) * 0.5])
+        .collect();
+    let y_num: Vec<f64> = (0..n).map(|i| (i % 3) as f64).collect();
+    let ids: Vec<u64> = (0..n as u64).map(|i| 500 + i).collect();
+
+    let untimed = prepare_table(&x_num, &y_num, PrepTask::Multiclass).unwrap();
+    let (timed, st1) = prepare_table_timed(&x_num, &y_num, PrepTask::Multiclass).unwrap();
+    assert_valid_timings(&st1, "prepare_table_timed");
+    assert_eq!(timed.x_scaled, untimed.x_scaled);
+    assert_eq!(timed.y_scaled, untimed.y_scaled);
+    assert_eq!(timed.source_rows_digest(), untimed.source_rows_digest());
+    assert_eq!(
+        timed.high_table_descriptors(),
+        untimed.high_table_descriptors()
+    );
+
+    let untimed_ids =
+        prepare_table_with_ids(&x_num, &y_num, PrepTask::Regression, ids.clone()).unwrap();
+    let (timed_ids, st2) =
+        prepare_table_with_ids_timed(&x_num, &y_num, PrepTask::Regression, ids.clone()).unwrap();
+    assert_valid_timings(&st2, "prepare_table_with_ids_timed");
+    assert_eq!(timed_ids.row_ids, untimed_ids.row_ids);
+    assert_eq!(
+        timed_ids.source_rows_digest(),
+        untimed_ids.source_rows_digest()
+    );
+
+    let x_cells: Vec<Vec<String>> = x_num
+        .iter()
+        .map(|r| vec![format!("{:.4}", r[0]), format!("cat_{}", r[1] as i64)])
+        .collect();
+    let y_cells: Vec<String> = (0..n)
+        .map(|i| if i % 2 == 0 { "yes" } else { "no" }.into())
+        .collect();
+    let untimed_c = prepare_table_cells(&x_cells, &y_cells, PrepTask::Classification).unwrap();
+    let (timed_c, st3) =
+        prepare_table_cells_timed(&x_cells, &y_cells, PrepTask::Classification).unwrap();
+    assert_valid_timings(&st3, "prepare_table_cells_timed");
+    assert_eq!(timed_c.source_rows_digest(), untimed_c.source_rows_digest());
+    assert_eq!(
+        timed_c.high_table_descriptors(),
+        untimed_c.high_table_descriptors()
+    );
+
+    let untimed_ci =
+        prepare_table_cells_with_ids(&x_cells, &y_cells, PrepTask::Classification, ids.clone())
+            .unwrap();
+    let (timed_ci, st4) =
+        prepare_table_cells_with_ids_timed(&x_cells, &y_cells, PrepTask::Classification, ids)
+            .unwrap();
+    assert_valid_timings(&st4, "prepare_table_cells_with_ids_timed");
+    assert_eq!(
+        timed_ci.source_rows_digest(),
+        untimed_ci.source_rows_digest()
+    );
 }
