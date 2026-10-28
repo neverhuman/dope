@@ -11,8 +11,8 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Compatible encoder source commit | `22dad4ed080653d31b8acf02a507a7b35ce1cdb6` |
-| Source engine workspace version | `1.1.0` (source enhancement; no new release published) |
+| Compatible encoder source commit | `29ba3db72df79b2a799cbfb13d55485eb46bb2d5` (also compatible with signed engine tag `15e12aa3dc33851655580f6aa7c9c66353143f23` and initial `1.1.0` source pin `22dad4ed080653d31b8acf02a507a7b35ce1cdb6`) |
+| Source engine workspace version | `1.1.0` ([`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0), tag commit `15e12aa3dc33851655580f6aa7c9c66353143f23`) |
 | Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) |
 | Canonical file | `dope_mlc_v3_multitask_best.safetensors` |
 | Exact bytes | `1,781,800` |
@@ -21,12 +21,13 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Existing research requirements | [requirements.txt](../research/levels/requirements.txt), including `packaging==25.0` |
 | Rust dependency graph | [engine/Cargo.lock](../engine/Cargo.lock) at the source pin |
 
-The model release `v1.0.0` and the signed engine release
-[`dope-engine-v1.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.0.0)
-are distinct. The engine release carries binaries, not these model weights.
+The model release `v1.0.0` and the signed engine releases
+([`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0) and
+[`dope-engine-v1.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.0.0))
+are distinct. The engine releases carry binaries, not these model weights.
 The `v1.0.0` source tag predates `research/levels/multilevel_model.py`, the Python
 model source used by Micro. Checking out that tag does not provide the encoder.
-Use the exact source commit above, separately from the weight asset URL.
+Use a compatible `1.1.0` source commit above, separately from the weight asset URL.
 
 The 1.70 MiB checkpoint fits comfortably within GitHub's per-asset limit of under
 2 GiB ([GitHub release documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)).
