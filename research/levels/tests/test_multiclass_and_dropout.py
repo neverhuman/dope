@@ -310,6 +310,16 @@ class TestMulticlassAndDropoutSupervision(unittest.TestCase):
         with self.assertRaises(ValueError):
             sc_mixed.transform(x_mixed[:2], np.array([999.0, 0.0]), strict_unknown=True)
 
+        # Signed-zero (+0.0 / -0.0) and NaN feature-cell invariance under LosslessV1
+        x_adv = x_raw.copy()
+        x_adv[0, 0] = 0.0
+        x_adv[1, 0] = -0.0
+        x_adv[2, 0] = np.nan
+        sc_adv = FitOnlyTableTransform.fit(x_adv, y_raw, task="multiclass", max_multiclass_classes=None)
+        x_adv_sc, _ = sc_adv.transform(x_adv, y_raw, strict_unknown=True)
+        self.assertEqual(float(x_adv_sc[0, 0]), float(x_adv_sc[1, 0]))
+        self.assertTrue(np.all(np.isfinite(x_adv_sc)))
+
 
 if __name__ == "__main__":
     unittest.main()
