@@ -18,6 +18,7 @@ pub mod conditioning;
 mod conditioning_builder;
 mod conditioning_observed;
 pub mod descriptors;
+mod descriptors_par;
 mod descriptors_table;
 pub mod inter_landmark;
 pub mod np;
@@ -25,6 +26,7 @@ mod np_linalg;
 pub mod report_view;
 pub mod scaling;
 mod scaling_fit;
+mod scaling_par;
 mod scaling_prepare;
 mod scaling_table;
 

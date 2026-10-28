@@ -1,10 +1,12 @@
 //! Train-only table descriptors (`table_vec24`, `column_desc`, `empirical_driver_weights`).
 
 use super::descriptors::Level;
+use super::descriptors_par::{
+    column_shapes, correlation_matrix, pearson_abs, spearman_abs, standardized_columns,
+};
 use super::np::{
-    argsort, clip, col_mean, col_std_with_mean, eigvalsh_sym, finite_or_zero, finite_or_zero32,
-    gini_coefficient, mean1d, np_max, pairwise_sum, quantile_sorted, ranks_double_argsort, row_sum,
-    sorted, squash, std1d,
+    col_mean, col_std_with_mean, eigvalsh_sym, finite_or_zero, finite_or_zero32, gini_coefficient,
+    mean1d, np_max, pairwise_sum, ranks_double_argsort, row_sum, sorted, squash, std1d,
 };
 
 /// Output of `descriptors.compute_table_descriptors`.
@@ -37,15 +39,7 @@ pub fn compute_table_descriptors(
     let cm = col_mean(x, n, p);
     let cs = col_std_with_mean(x, n, p, &cm);
     let valid: Vec<bool> = cs.iter().map(|&s| s > 1e-9).collect();
-    let mut cols: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
-    for i in 0..n {
-        let row = &x[i * p..(i + 1) * p];
-        for j in 0..p {
-            if valid[j] {
-                cols[j][i] = (row[j] - cm[j]) / cs[j];
-            }
-        }
-    }
+    let cols = standardized_columns(x, n, p, &cm, &cs, &valid);
     let n_f = n as f64;
     let col_mean_1d = |buf: &[f64]| -> f64 {
         if p == 1 {
@@ -59,81 +53,13 @@ pub fn compute_table_descriptors(
         }
     };
     let mut tmp_col = vec![0.0f64; n];
-    let mut skew = vec![0.0f64; p];
-    let mut kurt = vec![0.0f64; p];
-    let mut tail_ratio = vec![0.0f64; p];
-    let mut mode_conc = vec![0.0f64; p];
     let y_std = std1d(y);
-    let mut col_orders: Vec<Vec<usize>> = if y_std > 1e-9 {
-        Vec::with_capacity(p)
-    } else {
-        Vec::new()
-    };
-    for j in 0..p {
-        let cj = &cols[j];
-        if p == 1 {
-            for i in 0..n {
-                tmp_col[i] = cj[i].powf(3.0);
-            }
-            skew[j] = pairwise_sum(&tmp_col) / n_f;
-            for i in 0..n {
-                tmp_col[i] = cj[i].powf(4.0);
-            }
-            kurt[j] = clip(pairwise_sum(&tmp_col) / n_f - 3.0, -3.0, 50.0);
-        } else {
-            let mut s3 = 0.0;
-            let mut s4 = 0.0;
-            for &v in cj {
-                s3 += v.powf(3.0);
-                s4 += v.powf(4.0);
-            }
-            skew[j] = s3 / n_f;
-            kurt[j] = clip(s4 / n_f - 3.0, -3.0, 50.0);
-        }
-        let s = if y_std > 1e-9 {
-            let ord = argsort(cj);
-            for (k, &idx) in ord.iter().enumerate() {
-                tmp_col[k] = cj[idx];
-            }
-            col_orders.push(ord);
-            &tmp_col[..]
-        } else {
-            let sorted_vec = sorted(cj);
-            tmp_col.copy_from_slice(&sorted_vec);
-            &tmp_col[..]
-        };
-        let q05 = quantile_sorted(s, 0.05);
-        let q25 = quantile_sorted(s, 0.25);
-        let q75 = quantile_sorted(s, 0.75);
-        let q95 = quantile_sorted(s, 0.95);
-        let iqr = (q75 - q25).max(1e-6);
-        tail_ratio[j] = clip((q95 - q05) / iqr, 0.0, 20.0) / 10.0;
-        let med_j = if s[n - 1].is_nan() {
-            f64::NAN
-        } else if n % 2 == 1 {
-            s[n / 2]
-        } else {
-            (s[n / 2 - 1] + s[n / 2]) / 2.0
-        };
-        if p == 1 {
-            for i in 0..n {
-                tmp_col[i] = if (cj[i] - med_j).abs() < 0.05 {
-                    1.0
-                } else {
-                    0.0
-                };
-            }
-            mode_conc[j] = pairwise_sum(&tmp_col) / n_f;
-        } else {
-            let mut mc_s = 0.0;
-            for &v in cj {
-                if (v - med_j).abs() < 0.05 {
-                    mc_s += 1.0;
-                }
-            }
-            mode_conc[j] = mc_s / n_f;
-        }
-    }
+    let shapes = column_shapes(&cols, n, p, y_std);
+    let skew: Vec<f64> = shapes.iter().map(|s| s.skew).collect();
+    let kurt: Vec<f64> = shapes.iter().map(|s| s.kurt).collect();
+    let tail_ratio: Vec<f64> = shapes.iter().map(|s| s.tail_ratio).collect();
+    let mode_conc: Vec<f64> = shapes.iter().map(|s| s.mode_conc).collect();
+    let col_orders: Vec<Vec<usize>> = shapes.into_iter().filter_map(|s| s.order).collect();
 
     let mut y_z = vec![0.0; n];
     let (pearson_r, spearman_r) = if y_std > 1e-9 {
@@ -141,60 +67,12 @@ pub fn compute_table_descriptors(
         for i in 0..n {
             y_z[i] = (y[i] - ym) / y_std;
         }
-        let mut pr = vec![0.0f64; p];
-        for j in 0..p {
-            let cj = &cols[j];
-            if p == 1 {
-                for i in 0..n {
-                    tmp_col[i] = cj[i] * y_z[i];
-                }
-                pr[j] = (pairwise_sum(&tmp_col) / n_f).abs();
-            } else {
-                let mut ps = 0.0;
-                for i in 0..n {
-                    ps += cj[i] * y_z[i];
-                }
-                pr[j] = (ps / n_f).abs();
-            }
-        }
+        let pr = pearson_abs(&cols, &y_z, n, p);
         let yr = ranks_double_argsort(y);
         let yrm = mean1d(&yr);
         let yrs = std1d(&yr).max(1e-9);
         let yr: Vec<f64> = yr.iter().map(|v| (v - yrm) / yrs).collect();
-        let mut sr = vec![0.0f64; p];
-        let mut r_col = vec![0.0f64; n];
-        for j in 0..p {
-            for (rank, &idx) in col_orders[j].iter().enumerate() {
-                r_col[idx] = rank as f64;
-            }
-            let xrm = col_mean_1d(&r_col);
-            let xrs = if p == 1 {
-                for i in 0..n {
-                    let d = r_col[i] - xrm;
-                    tmp_col[i] = d * d;
-                }
-                (pairwise_sum(&tmp_col) / n_f).sqrt().max(1e-9)
-            } else {
-                let mut sq_s = 0.0;
-                for &rv in &r_col {
-                    let d = rv - xrm;
-                    sq_s += d * d;
-                }
-                (sq_s / n_f).sqrt().max(1e-9)
-            };
-            if p == 1 {
-                for i in 0..n {
-                    tmp_col[i] = ((r_col[i] - xrm) / xrs) * yr[i];
-                }
-                sr[j] = (pairwise_sum(&tmp_col) / n_f).abs();
-            } else {
-                let mut sp_s = 0.0;
-                for i in 0..n {
-                    sp_s += ((r_col[i] - xrm) / xrs) * yr[i];
-                }
-                sr[j] = (sp_s / n_f).abs();
-            }
-        }
+        let sr = spearman_abs(&col_orders, &yr, n, p);
         (pr, sr)
     } else {
         (vec![0.0; p], vec![0.0; p])
@@ -202,67 +80,7 @@ pub fn compute_table_descriptors(
 
     let (col_max_corr, col_mean_corr, eff_rank, spec_entropy, top1_eig, top3_eig, top5_eig);
     if p > 1 {
-        let mut corr = vec![0.0f64; p * p];
-        let mut a0 = 0usize;
-        while a0 < p {
-            let a_end = (a0 + 4).min(p);
-            for a in a0..a_end {
-                let ca = &cols[a];
-                for b in a..a_end {
-                    let cb = &cols[b];
-                    let mut s = 0.0;
-                    for i in 0..n {
-                        s += ca[i] * cb[i];
-                    }
-                    let v = s / n_f;
-                    corr[a * p + b] = v;
-                    corr[b * p + a] = v;
-                }
-            }
-            let mut b0 = a_end;
-            while b0 < p {
-                let b_end = (b0 + 4).min(p);
-                if a_end - a0 == 4 && b_end - b0 == 4 {
-                    let (ca0, ca1, ca2, ca3) =
-                        (&cols[a0], &cols[a0 + 1], &cols[a0 + 2], &cols[a0 + 3]);
-                    let (cb0, cb1, cb2, cb3) =
-                        (&cols[b0], &cols[b0 + 1], &cols[b0 + 2], &cols[b0 + 3]);
-                    let mut s = [[0.0f64; 4]; 4];
-                    for i in 0..n {
-                        let va = [ca0[i], ca1[i], ca2[i], ca3[i]];
-                        let vb = [cb0[i], cb1[i], cb2[i], cb3[i]];
-                        for u in 0..4 {
-                            for v in 0..4 {
-                                s[u][v] += va[u] * vb[v];
-                            }
-                        }
-                    }
-                    for (u, row_s) in s.iter().enumerate() {
-                        for (v_idx, &s_val) in row_s.iter().enumerate() {
-                            let (a, b, val) = (a0 + u, b0 + v_idx, s_val / n_f);
-                            corr[a * p + b] = val;
-                            corr[b * p + a] = val;
-                        }
-                    }
-                } else {
-                    for a in a0..a_end {
-                        let ca = &cols[a];
-                        for b in b0..b_end {
-                            let cb = &cols[b];
-                            let mut s = 0.0;
-                            for i in 0..n {
-                                s += ca[i] * cb[i];
-                            }
-                            let v = s / n_f;
-                            corr[a * p + b] = v;
-                            corr[b * p + a] = v;
-                        }
-                    }
-                }
-                b0 += 4;
-            }
-            a0 += 4;
-        }
+        let mut corr = correlation_matrix(&cols, n, p);
         for a in 0..p {
             corr[a * p + a] = 1.0;
         }
