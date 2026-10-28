@@ -7,9 +7,10 @@ use super::scaling::{
     err, ClassVocabPolicy, ColumnKind, FitOnlyTableTransform, PrepTask, PrepareStageTimings,
     TargetScaler, TargetValue,
 };
-use super::scaling_fit::{
-    fit_categorical_column, fit_numeric_column, fit_target_scaler_with_policy, is_missing_token,
-    parse_float_cell, py_float, py_strip, regression_array,
+use super::scaling_fit::{fit_target_scaler_with_policy, regression_array};
+use super::scaling_par::{
+    infer_parse_columns, interleave_columns, parse_declared_columns, scale_columns,
+    scale_numeric_rows,
 };
 use super::scaling_table::{
     compute_native_target_stats, compute_observed_target_stats, hash_raw_cells, validate_row_ids,
@@ -46,28 +47,18 @@ pub fn prepare_table_with_policy_timed(
         return Err(err("prepare_target_length_mismatch"));
     }
     validate_row_ids(&row_ids, n)?;
-    let mut frame_columns: Vec<Vec<f64>> = vec![vec![0.0f64; n]; p];
-    for (i, row) in x.iter().enumerate() {
-        for (j, &v) in row.iter().enumerate() {
-            frame_columns[j][i] = v;
-        }
-    }
     let parse_and_infer_ms = t_parse.elapsed().as_secs_f64() * 1e3;
 
     let t_scale = Instant::now();
     let yv: Vec<TargetValue<'_>> = y.iter().map(|&v| TargetValue::Num(v)).collect();
     let target = fit_target_scaler_with_policy(&yv, task, class_vocab_policy)?;
+    let scaled = scale_numeric_rows(x, p);
+    let xs = interleave_columns(&scaled, n, p);
     let mut numeric = Vec::with_capacity(p);
-    let mut xs = vec![0.0; n * p];
-    for (j, col) in frame_columns.iter_mut().enumerate() {
-        let sc = fit_numeric_column(j, col);
-        sc.transform_column_strided(col, &mut xs, j, p);
-        for v in col.iter_mut() {
-            if !v.is_finite() {
-                *v = f64::NAN;
-            }
-        }
-        numeric.push(Some(sc));
+    let mut frame_columns = Vec::with_capacity(p);
+    for column in scaled {
+        numeric.push(column.numeric);
+        frame_columns.push(column.frame);
     }
     let y_scaled = target.transform(&yv)?;
     let frame_y = if task == PrepTask::Regression {
@@ -206,67 +197,21 @@ fn prepare_cells_with_yv(
         return Err(err("prepare_target_length_mismatch"));
     }
     validate_row_ids(&row_ids, n)?;
-    let raw_cells_sha256 = Some(hash_raw_cells(x, yv));
+    if declared_kinds.is_some_and(|dk| dk.len() != p) {
+        return Err(err("prepare_kinds_length_mismatch"));
+    }
     let min_level_count = 5usize;
     let prior_smoothing = 10.0f64;
 
-    let (kinds, mut parsed_cols) = match declared_kinds {
-        Some(dk) => {
-            if dk.len() != p {
-                return Err(err("prepare_kinds_length_mismatch"));
-            }
-            let kinds = dk.to_vec();
-            let mut cols: Vec<Vec<f64>> = kinds
-                .iter()
-                .map(|&k| {
-                    if k == ColumnKind::Numeric {
-                        Vec::with_capacity(n)
-                    } else {
-                        Vec::new()
-                    }
-                })
-                .collect();
-            for row in x {
-                for (j, &k) in kinds.iter().enumerate() {
-                    if k == ColumnKind::Numeric {
-                        cols[j].push(parse_float_cell(&row[j]));
-                    }
-                }
-            }
-            (kinds, cols)
-        }
-        None => {
-            let mut is_num = vec![true; p];
-            let mut cols: Vec<Vec<f64>> = (0..p).map(|_| Vec::with_capacity(n)).collect();
-            for row in x {
-                for j in 0..p {
-                    if !is_num[j] {
-                        continue;
-                    }
-                    let s = py_strip(&row[j]);
-                    if is_missing_token(s) {
-                        cols[j].push(f64::NAN);
-                    } else if let Some(v) = py_float(s) {
-                        cols[j].push(v);
-                    } else {
-                        is_num[j] = false;
-                        cols[j] = Vec::new();
-                    }
-                }
-            }
-            let kinds: Vec<ColumnKind> = is_num
-                .into_iter()
-                .map(|ok| {
-                    if ok {
-                        ColumnKind::Numeric
-                    } else {
-                        ColumnKind::Categorical
-                    }
-                })
-                .collect();
-            (kinds, cols)
-        }
-    };
+    // The raw-cell digest and the per-column parse are independent; run them together.
+    let (raw_cells_sha256, (kinds, parsed_cols)) = rayon::join(
+        || hash_raw_cells(x, yv),
+        || match declared_kinds {
+            Some(dk) => (dk.to_vec(), parse_declared_columns(x, dk)),
+            None => infer_parse_columns(x, p),
+        },
+    );
+    let raw_cells_sha256 = Some(raw_cells_sha256);
     let parse_and_infer_ms = t_parse.elapsed().as_secs_f64() * 1e3;
 
     let t_scale = Instant::now();
@@ -277,46 +222,25 @@ fn prepare_cells_with_yv(
     } else {
         mean1d(&y_num)
     };
-    let mut numeric = vec![None; p];
-    let mut categorical = vec![None; p];
-    let mut xs = vec![0.0; n * p];
-    let mut categories = vec![None; p];
-    let mut frame_columns = vec![Vec::new(); p];
-    for (j, kind) in kinds.iter().enumerate() {
-        match kind {
-            ColumnKind::Numeric => {
-                let col = &mut parsed_cols[j];
-                let sc = fit_numeric_column(j, col);
-                sc.transform_column_strided(col, &mut xs, j, p);
-                for v in col.iter_mut() {
-                    if !v.is_finite() {
-                        *v = f64::NAN;
-                    }
-                }
-                frame_columns[j] = std::mem::take(col);
-                numeric[j] = Some(sc);
-            }
-            ColumnKind::Categorical => {
-                let col: Vec<&str> = x.iter().map(|r| r[j].as_str()).collect();
-                let ce = fit_categorical_column(
-                    j,
-                    &col,
-                    &y_num,
-                    y_global_mean,
-                    min_level_count,
-                    prior_smoothing,
-                );
-                categories[j] = Some(ce.vocab_tokens.len());
-                let mut fcol = vec![f64::NAN; n];
-                for i in 0..n {
-                    let (z, idx, miss) = ce.transform_cell(&x[i][j]);
-                    xs[i * p + j] = z;
-                    fcol[i] = if miss > 0.0 { f64::NAN } else { idx as f64 };
-                }
-                frame_columns[j] = fcol;
-                categorical[j] = Some(ce);
-            }
-        }
+    let scaled = scale_columns(
+        x,
+        &kinds,
+        parsed_cols,
+        &y_num,
+        y_global_mean,
+        min_level_count,
+        prior_smoothing,
+    );
+    let xs = interleave_columns(&scaled, n, p);
+    let mut numeric = Vec::with_capacity(p);
+    let mut categorical = Vec::with_capacity(p);
+    let mut categories = Vec::with_capacity(p);
+    let mut frame_columns = Vec::with_capacity(p);
+    for column in scaled {
+        categories.push(column.categorical.as_ref().map(|ce| ce.vocab_tokens.len()));
+        numeric.push(column.numeric);
+        categorical.push(column.categorical);
+        frame_columns.push(column.frame);
     }
     let category_tokens = if kinds.contains(&ColumnKind::Categorical) {
         Some(

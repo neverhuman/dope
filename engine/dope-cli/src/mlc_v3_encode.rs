@@ -95,21 +95,11 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
     let target_idx = raw.column_index(&a.target).map_err(map_err)?;
     let nrows = raw.rows();
     let ncols = raw.columns.len();
-    let mut x_cells = vec![Vec::with_capacity(ncols.saturating_sub(1)); nrows];
-    for (col_idx, col) in raw.columns.iter().enumerate() {
-        if col_idx == target_idx {
-            continue;
-        }
-        for (r, val) in col.iter().enumerate() {
-            x_cells[r].push(val.clone());
-        }
-    }
-    let y_cells = raw.columns[target_idx].clone();
     let prep_task = match a.task.as_deref() {
         Some("regression") => PrepTask::Regression,
         Some("multiclass") => PrepTask::Multiclass,
         Some("classification") => {
-            let uniq: std::collections::BTreeSet<&str> = y_cells
+            let uniq: std::collections::BTreeSet<&str> = raw.columns[target_idx]
                 .iter()
                 .map(|s| s.trim())
                 .filter(|s| !s.is_empty())
@@ -125,7 +115,7 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
             match schema.task {
                 Task::Regression => PrepTask::Regression,
                 Task::Classification => {
-                    let uniq: std::collections::BTreeSet<&str> = y_cells
+                    let uniq: std::collections::BTreeSet<&str> = raw.columns[target_idx]
                         .iter()
                         .map(|s| s.trim())
                         .filter(|s| !s.is_empty())
@@ -140,6 +130,18 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
         }
         Some(other) => return Err(format!("unsupported task `{other}`")),
     };
+    // Move the cells into row-major order rather than cloning every one.
+    let mut columns = raw.columns;
+    let y_cells = std::mem::take(&mut columns[target_idx]);
+    let mut x_cells = vec![Vec::with_capacity(ncols.saturating_sub(1)); nrows];
+    for (col_idx, col) in columns.into_iter().enumerate() {
+        if col_idx == target_idx {
+            continue;
+        }
+        for (r, val) in col.into_iter().enumerate() {
+            x_cells[r].push(val);
+        }
+    }
 
     let prepared = prepare_table_cells(&x_cells, &y_cells, prep_task).map_err(map_err)?;
     let supplied_bundle: Option<LandmarkBundle> = match &a.bundle_json {
