@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Default `scripts/install.sh` (`DOPE_RELEASE_TAG=dope-engine-v1.1.0`) to the
+  signed `dope-engine-v1.1.0` Linux x86-64 engine binary with Sigstore OIDC
+  bundle verification (`gh >= 2.102.0` policy flags) while fetching the
+  independent `v1.0.0` model inventory (`MODEL_TAG=v1.0.0`, overridable via
+  `--model-tag`, `--model-from-dir`, or `--no-weights`) and preserving explicit
+  `--tag v1.0.0` (`sha256-content-integrity-only`) fallback (#347).
+
 ## Engine 1.1.0 - 2026-10-28
 
 - Add optional and progressive landmarking (`dope-core::landmark`, `dope landmarks`,
