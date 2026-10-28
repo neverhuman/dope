@@ -182,7 +182,7 @@ let rows = sample(&program, &SampleOptions { rows: 100_000, ..Default::default()
 ```
 dope-core/src/
   table.rs schema.rs encode.rs output.rs      intake, ML-ready encoding, CSV output
-  prepare/                                    intake preparation, K<=36 LosslessV1 class policy and stage timings
+  prepare/                                    intake preparation, Cap32V1 (default) and LosslessV1 class-vocabulary policies, and stage timings
   landmark/                                   tabular landmark probes and progressive conditioning builders
   mlc_v3/                                     DOPE-MLC-v3 SafeTensors hypernetwork, DML3 wire codec and 629D/512D encoders
   marginal.rs copula.rs regimes.rs screen.rs  marginals and dependence
