@@ -35,7 +35,7 @@ Each candidate was compared with main `245d4f18` at one thread
 | optional-landmarks head `82cea8c4` | 285 | identical |
 | column-parallel prepare & descriptors (PR #349, `29ba3db7`), `none` + `full` at 1 and 8 threads (285 real) plus 1/2/8 threads (27 synthetic) | 1,221 | identical (`0 / 1,221` diffs) |
 
-On every Rust change the effective-conditioning digest and `features_629` output were also unchanged on real and synthetic tables. This covers `7a5cffa9` (prepare HPC), `82cea8c4` (single-pass parsing), and `29ba3db7` (PR `#349`: `prepare/scaling_par.rs`, `prepare/descriptors_par.rs`, and zero-clone cell moves in `dope-cli/src/mlc_v3_encode.rs`, where sorting categorical distinct values by deterministic first-occurrence row index resolved the earlier `26 / 285` multithreaded digest drift).
+On every Rust change the effective-conditioning digest and `features_629` output were also unchanged on real and synthetic tables. This covers `7a5cffa9` (prepare HPC), `82cea8c4` (single-pass parsing), and `29ba3db7` (PR `#349`: `prepare/scaling_par.rs`, `prepare/descriptors_par.rs`, and moving CSV cells out of `raw.columns` without cloning in `dope-cli/src/mlc_v3_encode.rs` after inferring the task on the intact table; each column keeps its own serial element order and arithmetic, results are collected in column order, cross-column reductions stay serial, and single-column `p == 1` tables keep the `pairwise_sum` branches, so outputs are bitwise identical across any thread count).
 
 ## 2. Retention (`retention-dev112.json`)
 
@@ -161,35 +161,35 @@ FINE costs 43–78% of single-thread native time on 10k×64 tables. It sits on t
 
 ### 5a. Post-`#349` qualification at `29ba3db7` (28 October 2026)
 
-Following PR `#349` (`29ba3db72df79b2a799cbfb13d55485eb46bb2d5`, column-parallel preparation and table descriptors with zero-clone cell moves), `--landmark-mode none` versus `--landmark-mode full` latency was measured at `--threads 8` (pinned to cores 64–71 under the shared qualification lock, `work_budget` 2e12) across:
-- **Headline 40-real-table cohort:** 30 stratified `registry-real-v1` benchmark tables (`n = 32..1,024, p = 1..202`) plus 10 `jopedime-test` fixtures (`n <= 400`).
+Following PR `#349` (`29ba3db72df79b2a799cbfb13d55485eb46bb2d5`, column-parallel preparation and table descriptors with non-cloning cell moves in `dope mlc-v3 encode`), `--landmark-mode none` versus `--landmark-mode full` latency was measured at `--threads 8` / `RAYON_NUM_THREADS=8` (pinned to cores 32–39 via `taskset -c 32-39` under the shared qualification lock, `work_budget` 2e12) across:
+- **Headline 40-real-table cohort:** 30 stratified `registry-real-v1` benchmark tables (sampled from the `n = 32..1,024, p = 1..202` frame; sample range `n = 40..800, p = 2..130`) plus 10 `jopedime-test` fixtures (`n = 109..1,000`).
 - **Supporting 27-cell synthetic matrix:** `{binary, multiclass, regression} × n ∈ {1,000, 10,000, 50,000} × p ∈ {11, 65, 201}` (10, 64, and 200 features plus target).
 
 #### Headline 40-real-table cohort by regime (`29ba3db7` vs `42e5b4f5`)
 
 | Regime | Cohort | Tables `>= 5x` | Geomean ratio (`29ba3db7`) | Median ratio | Min–Max ratio | `42e5b4f5` geomean | Fast (`none`) p50 range | Full p50 range | Gate status |
 |---|---|---:|---:|---:|---|---:|---|---|---|
-| **Resident/session CUDA** (`landmark_mode_bench`, 5 warm reps after checkpoint load) | `registry-real-v1` (30) | **30 / 30** | **33.9×** | 34.8× | 13.3×–62.9× | 29.5× | 1.4–27.9 ms | 53–967 ms | **PASS (accepted evaluation regime)** |
-| **Resident/session CUDA** (`landmark_mode_bench`, 5 warm reps after checkpoint load) | `jopedime-test` (10) | **10 / 10** | **41.7×** | 39.4× | 27.0×–61.5× | 37.5× | 1.4–3.2 ms | 55–183 ms | **PASS (accepted evaluation regime)** |
-| **Strict-cold per-process CUDA** (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps) | `registry-real-v1` (30) | **0 / 30** | **1.22×** | 1.16× | 0.97×–2.18× | 1.19× | 573–612 ms | 589–1,303 ms | **FAIL (cold-CLI regime context)** |
-| **Strict-cold per-process CUDA** (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps) | `jopedime-test` (10) | **0 / 10** | **1.25×** | 1.24× | 1.06×–1.66× | 1.26× | 575–601 ms | 620–979 ms | **FAIL (cold-CLI regime context)** |
-| **Strict-cold per-process CPU** (`dope mlc-v3 encode --device cpu --threads 8`, 15 interleaved A/B reps on 15-table subset; 3–15 reps on full 30) | `registry-real-v1` (30) | **3 / 30** | **2.31×** | 2.13× | 1.09×–5.76× | 2.27× | 110–190 ms | 120–1,050 ms | **FAIL (cold-CLI regime context)** |
-| **Strict-cold per-process CPU** (`dope mlc-v3 encode --device cpu --threads 8`) | `jopedime-test` (10) | **0 / 10** | **1.44×** | 1.40× | 1.19×–1.86× | 1.42× | 108–125 ms | 132–220 ms | **FAIL (cold-CLI regime context)** |
+| **Resident/session CUDA** (`landmark_mode_bench`, 5 warm reps after checkpoint load) | `registry-real-v1` (30) | **30 / 30** | **33.9×** | 35.0× | 13.3×–62.9× | 29.5× | 1.7–27.9 ms | 48–690 ms | **PASS (accepted evaluation regime)** |
+| **Resident/session CUDA** (`landmark_mode_bench`, 5 warm reps after checkpoint load) | `jopedime-test` (10) | **10 / 10** | **41.7×** | 45.9× | 27.0×–61.5× | 37.5× | 1.4–6.5 ms | 38–343 ms | **PASS (accepted evaluation regime)** |
+| **Strict-cold per-process CUDA** (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps) | `registry-real-v1` (30) | **0 / 30** | **1.22×** | 1.09× | 0.97×–2.18× | 1.22× | 552–646 ms | 587–1,275 ms | **FAIL (cold-CLI regime context)** |
+| **Strict-cold per-process CUDA** (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps) | `jopedime-test` (10) | **0 / 10** | **1.25×** | 1.24× | 1.06×–1.66× | 1.25× | 556–580 ms | 590–925 ms | **FAIL (cold-CLI regime context)** |
+| **Strict-cold per-process CPU** (`dope mlc-v3 encode --device cpu --threads 8`, 15 interleaved A/B reps across all 40 tables) | `registry-real-v1` (30) | **3 / 30** | **2.24×** | 1.71× | 1.37×–6.54× | 2.33× | 97–142 ms | 144–760 ms | **FAIL (cold-CLI regime context)** |
+| **Strict-cold per-process CPU** (`dope mlc-v3 encode --device cpu --threads 8`, 15 interleaved A/B reps across all 40 tables) | `jopedime-test` (10) | **0 / 10** | **2.37×** | 2.60× | 1.45×–4.40× | 2.25× | 99–103 ms | 146–451 ms | **FAIL (cold-CLI regime context)** |
 
 - **Accepted regime & release test bounds (`2026-10-28T21:45Z` / `22:05Z`):**
   - The `>= 5x` qualification gate is evaluated on the **resident/session regime**, where all **40 / 40** real tables pass (`30 / 30` on `registry-real-v1` at `33.9×` geomean; `10 / 10` on `jopedime-test` at `41.7×` geomean).
   - Two resident/session release test bounds are accepted for the resident/session regime only (not as a fresh-process CLI SLA):
-    1. Resident `none`-mode overhead beyond CSV read + table preparation is **`<= 5 ms`**.
+    1. Resident `none`-mode overhead beyond CSV read + table preparation is **`<= 5 ms`** (measured maximum `1.39 ms`, median `1.11 ms`).
     2. Resident `none`-mode `p50` is **`<= 30 ms`** on real tables with `n <= 1,024`.
-  - Strict-cold per-process CLI numbers (`0 / 40` on Cold CUDA due to the fixed `~550–650 ms` CUDA-context + cuBLAS + checkpoint weight-upload startup floor; `3 / 40` on Cold CPU due to the `~100 ms` fixed process/model-load floor on `n <= 1,024`) are retained alongside as separate product-regime context. On the 15-rep interleaved Cold CPU A/B (`29ba3db7` vs `42e5b4f5`), `#349` is `+3.3%` faster on `none` (geomean `0.967×`) and `+1.2%` faster on `full` (geomean `0.988×`). A persistent CLI worker or daemon is deferred to a future serving-contract item.
+  - Strict-cold per-process CLI numbers (`0 / 40` on Cold CUDA due to the fixed `~550–650 ms` CUDA-context + cuBLAS + checkpoint weight-upload startup floor; `3 / 40` on Cold CPU due to the `~100 ms` fixed process/model-load floor on `n <= 1,024`) are retained alongside as separate product-regime context. On the 15-rep interleaved Cold CPU A/B across all 40 real tables (`29ba3db7` vs `42e5b4f5`), `#349` is `+3.3%` faster on `none` (geomean `0.967×`) and `+1.2%` faster on `full` (geomean `0.988×`). A persistent CLI worker or daemon is deferred to a future serving-contract item.
 
-#### Supporting 27-cell synthetic matrix (`{binary, multiclass, regression} × n ∈ {1k, 10k, 50k} × p ∈ {11, 65, 201}`, `--threads 8`)
+#### Supporting 27-cell synthetic matrix (`{binary, multiclass, regression} × n ∈ {1k, 10k, 50k} × p ∈ {11, 65, 201}`, `--threads 8`, cores 32–39)
 
-| Regime | Cells `>= 5x` (`42e5b4f5` → `29ba3db7`) | Geomean ratio (`42e5b4f5` → `29ba3db7`) | Median ratio (`29ba3db7`) | Min–Max ratio (`29ba3db7`) | Notable `29ba3db7` cell behavior |
+| Regime | Cells `>= 5x` (`29ba3db7`) | Geomean ratio (`29ba3db7`) | Median ratio (`29ba3db7`) | Min–Max ratio (`29ba3db7`) | `42e5b4f5` baseline & notable `29ba3db7` cell behavior |
 |---|---|---|---|---|---|
-| **Cold CPU** (`dope mlc-v3 encode --device cpu --threads 8`, paired A/B) | **17 / 27 → 25 / 27** | **5.83× → 9.32×** | 8.68× | 3.84×–25.73× | All **9 / 9** `n = 50,000` cells pass (`5.93×–9.59×`, geomean `7.27×`, up from `0 / 9` before `#349`); only 2 tiny cells (`n = 1,000, p = 11`: binary `4.53×`, regression `3.84×`) miss due to the `~100 ms` process floor |
-| **Cold CUDA** (`dope mlc-v3 encode --device cuda:0 --threads 8`) | **7 / 27 → 8 / 27** | **3.32× → 4.01×** | 3.95× | 1.98×–6.21× | `regression n = 50,000, p = 201` crosses `5×` (`2.24× → 5.31×`, fast path `13.6 s → 3.5 s`); `n = 1,000` cells are bounded by the `~550–650 ms` CUDA startup floor |
-| **Resident CUDA** (`landmark_mode_bench`, 13-cell subset) | **9 / 13 → 10 / 13** | **6.88× → 9.54×** | 7.64× | 3.52×–26.95× | All `n <= 10,000` cells pass (`5.14×–26.95×`); the 3 `n = 50,000` misses (`3.52×–4.59×`) are bounded by single-threaded CSV text parsing (`0.5–3.0 s` in `RawTable::from_csv_path`), not preparation or GPU forward |
+| **Cold CPU** (`dope mlc-v3 encode --device cpu --threads 8`, paired A/B) | **25 / 27** | **9.32×** | 8.06× | 3.84×–22.99× | Up from **17 / 27** (`5.83×` geomean) on `42e5b4f5`; all **9 / 9** `n = 50,000` cells pass (`5.93×–9.59×`, geomean `7.29×`, up from **1 / 9** on `42e5b4f5`); only 2 tiny cells (`n = 1,000, p = 11`: binary `4.53×`, regression `3.84×`) miss due to the `~100 ms` process floor |
+| **Cold CUDA** (`dope mlc-v3 encode --device cuda:0 --threads 8`) | **8 / 27** | **4.01×** | 4.26× | 1.39×–12.79× | On `42e5b4f5`, only the 3 `regression n = 50,000` cells were measured (`2.60×`, `3.05×`, and `2.24×`); on `29ba3db7`, `regression n = 50,000, p = 201` crosses `5×` (`2.24× → 5.31×`, fast path `13.6 s → 3.5 s`), while `n = 1,000` cells remain bounded by the `~550–650 ms` CUDA startup floor |
+| **Resident CUDA** (`landmark_mode_bench`, 13-cell subset) | **10 / 13** | **9.54×** | 5.89× | 2.98×–63.15× | Measured on `29ba3db7` only; all **8 / 8** `n <= 10,000` cells pass (`5.07×–63.15×`) plus **2 / 5** `n = 50,000` cells; the 3 `n = 50,000` misses (`2.98×`, `4.03×`, `4.68×`) are bounded by single-threaded CSV text parsing (`0.5–3.0 s` in `RawTable::from_csv_path`), not preparation or GPU forward |
 
 ### 5b. Historical pre-`#349` cold baseline at `82cea8c4` (27 October 2026)
 
@@ -214,7 +214,7 @@ Values are p50 wall times in seconds, fast (`none`) / full.
 
 **Why the pre-`#349` cold baseline missed on `n = 50,000` and why cold CUDA has a fixed floor:**
 - A cold CUDA call has a floor of about 0.55–0.60 s: process and CUDA library start (about 0.26 s) plus context and first forward.
-- On large tables at `82cea8c4`, fast mode was dominated by single-threaded `prepare_table_cells` (about 4 s at 50k × 64 on `82cea8c4`). PR `#349` (`29ba3db7`) resolved the `26 / 285` multithreaded categorical-digest drift and parallelized column scaling and descriptor extraction across columns (`prepare/scaling_par.rs`, `prepare/descriptors_par.rs`), raising 8-thread Cold CPU on the 27-cell synthetic matrix from `17 / 27` (`5.83×` geomean) to `25 / 27` (`9.32×` geomean) and `9 / 9` on `n = 50,000` (`5.93×–9.59×`).
+- On large tables at `82cea8c4`, fast mode was dominated by single-threaded `prepare_table_cells` (about 4 s at 50k × 64 on `82cea8c4`). Earlier H1 phase-2 preparation work was not included because its port changed full-mode conditioning digests on 26 of 285 corpus tables. PR `#349` (`29ba3db7`) implemented a separate column-parallel preparation and descriptor design (`prepare/scaling_par.rs`, `prepare/descriptors_par.rs`) where each column keeps its own serial element order and arithmetic and cross-column reductions stay serial, preserving exact conditioning digests (`0 / 1,221` diffs) while raising 8-thread Cold CPU on the 27-cell synthetic matrix from `17 / 27` (`5.83×` geomean) to `25 / 27` (`9.32×` geomean) and `9 / 9` on `n = 50,000` (`5.93×–9.59×`, `7.29×` geomean, up from `1 / 9`).
 - Genuine full evidence at 8 threads is bounded by the native row caps, so it grows slowly with n.
 
 **Device study** (`examples/mlc_v3_device_bench.rs`, warm, p50):
@@ -238,4 +238,4 @@ Values are p50 wall times in seconds, fast (`none`) / full.
 
 **Stage-timed resident encode** (`examples/landmark_mode_bench.rs`, one thread at `82cea8c4`; 8 threads at `29ba3db7`):
 - At 10k×64 (one thread, `82cea8c4`), `prepare_table_cells` takes 0.5–0.7 s and conditioning plus forward under 1 ms; genuine full landmarks at 2e12 take 25 s (`38×`), and at 1k×19 the ratio is `123×`.
-- At 8 threads on `29ba3db7` (`landmark_mode_bench`, Resident CUDA), warm `--landmark-mode none` across the 40 real tables (`registry-real-v1` + `jopedime-test`) takes `1.4–27.9 ms` (`40 / 40 >= 5x`, geomean `33.9×` on `registry-real-v1` and `41.7×` on `jopedime-test`), with resident `none`-mode overhead beyond CSV read + table preparation under `1 ms` (within the `<= 5 ms` resident overhead bound and `<= 30 ms` resident `p50` bound for `n <= 1,024`).
+- At 8 threads on `29ba3db7` (`landmark_mode_bench`, Resident CUDA, `taskset -c 32-39`), warm `--landmark-mode none` across the 40 real tables (`registry-real-v1` + `jopedime-test`) takes `1.4–27.9 ms` (`40 / 40 >= 5x`, geomean `33.9×` on `registry-real-v1` and `41.7×` on `jopedime-test`), with resident `none`-mode overhead beyond CSV read + table preparation at maximum `1.39 ms` and median `1.11 ms` (within the `<= 5 ms` resident overhead bound and `<= 30 ms` resident `p50` bound for `n <= 1,024`).
