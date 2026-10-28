@@ -29,7 +29,7 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | `dope doctor` | Backends compiled into this build. |
 | `dope --threads 8 fit data.csv -t y --json --report fit.json` | Bound CPU parallelism and emit machine-readable fit output. |
 | `dope --threads 4 doctor --json` | Runtime identity, backend, worker count and executable SHA-256. |
-| `dope mlc-v3 fetch-weights [--preset multitask\|maxtrain97\|all] [--out DIR]` | Download and SHA-256 verify released `DOPE-MLC-v3` SafeTensors weights and sample wire packets into the local cache. |
+| `dope mlc-v3 fetch-weights [--preset multitask\|maxtrain97\|all] [--tag v1.0.0] [--out-dir DIR]` | Download and SHA-256 verify released `DOPE-MLC-v3` SafeTensors weights and sample wire packets into the local cache. |
 | `dope mlc-v3 inspect-weights [--preset multitask] [--weights FILE] [--json]` | Verify SafeTensors digest, tensor inventory and parameter count on CPU without Python or LibTorch. |
 | `dope mlc-v3 inspect-wire --wire packet.dml3 [--json]` | Inspect a `DML3+CSC1` multi-level wire packet (tier, task, code width, CRC-32 and byte cap). |
 | `dope mlc-v3 sample --preset multitask --wire packet.dml3 -n N [--seed S] [-o out.csv]` | Sample synthetic rows from a `DML3+CSC1` wire packet in pure Rust using the hypernetwork decoder. |
