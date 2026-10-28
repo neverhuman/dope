@@ -41,15 +41,16 @@
     - **Strict-cold per-process CLI (preserved as separate regime context):**
       Cold CUDA (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps)
       is `0 / 40 >= 5x` (`registry-real-v1` geomean `1.22x`, median `1.09x`,
-      range `0.97x–2.18x`; `jopedime-test` geomean `1.25x`, median `1.24x`,
+      range `0.97x–2.18x`; `jopedime-test` geomean `1.25x`, median `1.25x`,
       range `1.06x–1.66x`) due to the `~550–650 ms` per-process CUDA-context +
       cuBLAS + checkpoint weight-upload startup floor; Cold CPU (`--device cpu
-      --threads 8`, 15 interleaved A/B reps across all 40 tables) is
-      `3 / 40 >= 5x` on the real tables (`registry-real-v1` `3 / 30`, geomean
-      `2.24x`, median `1.71x`, range `1.37x–6.54x`; `jopedime-test` `0 / 10`,
-      geomean `2.37x`, median `2.60x`, range `1.45x–4.40x`; `~100 ms` fixed
-      process floor; interleaved A/B `#349` vs `42e5b4f5` is `+3.3%` faster on
-      `none` and `+1.2%` faster on `full`), while paired 8-thread Cold CPU on
+      --threads 8`, 15 reps per mode per binary; patched-vs-main deltas from a
+      15-rep interleaved A/B across all 40 tables) is `3 / 40 >= 5x` on the
+      real tables (`registry-real-v1` `3 / 30`, geomean `2.24x`, median `1.71x`,
+      range `1.37x–6.54x`; `jopedime-test` `0 / 10`, geomean `2.37x`, median
+      `2.60x`, range `1.45x–4.40x`; `~100 ms` fixed process floor; interleaved
+      A/B `#349` vs `42e5b4f5` is `+3.3%` faster on `none` and `+1.2%` faster
+      on `full`), while paired 8-thread Cold CPU on
       the 27-cell synthetic matrix improves from `17 / 27 >= 5x` (geomean
       `5.83x`) to `25 / 27 >= 5x` (geomean `9.32x`, median `8.06x`, range
       `3.84x–22.99x`), passing `9 / 9` `n = 50,000` cells (`5.93x–9.59x`,
