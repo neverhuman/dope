@@ -11,7 +11,7 @@ set -euo pipefail
 
 REPO_SLUG="neverhuman/dope"
 SIGNER_WORKFLOW="neverhuman/dope/.github/workflows/engine-release.yml"
-TAG="${DOPE_RELEASE_TAG:-dope-engine-v1.1.0}"
+TAG="${DOPE_RELEASE_TAG:-v1.0.0}"
 SOURCE_COMMIT="${DOPE_SOURCE_COMMIT:-}"
 FROM_DIR=""
 INSTALL_DIR="${DOPE_INSTALL_DIR:-$HOME/.local/bin}"
@@ -26,7 +26,7 @@ usage() {
 Usage: install.sh [OPTIONS]
 
 Options:
-  --tag <TAG>               Concrete release tag resolved once (default: dope-engine-v1.1.0)
+  --tag <TAG>               Concrete release tag resolved once (default: v1.0.0)
   --source-digest <SHA40>   Expected 40-char git commit SHA for OIDC attestation verification
   --require-attestation     Require cryptographic Sigstore OIDC attestation (mandatory for dope-engine-v* tags)
   --from-dir <DIR>          Install offline from a local release/stage directory instead of HTTPS download
@@ -36,6 +36,12 @@ Options:
   --no-weights              Install only the standalone `dope` binary and legal notices (skip .safetensors weights)
   --color <auto|always|never>
   -h, --help                Show this help
+
+Engine-only signed release tags (e.g. dope-engine-v1.1.0) ship the CPU binary and
+Sigstore OIDC bundle without model weights; pass --no-weights and fetch pinned
+weights from v1.0.0 separately:
+  DOPE_RELEASE_TAG=dope-engine-v1.1.0 ./scripts/install.sh --no-weights
+  dope mlc-v3 fetch-weights --preset multitask --tag v1.0.0
 EOF
 }
 
