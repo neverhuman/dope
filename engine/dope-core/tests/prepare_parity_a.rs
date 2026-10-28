@@ -714,6 +714,56 @@ fn lossless_multiclass_k36_progressive_and_conditioning_modes_e2e() {
     assert_eq!(sx_tbl, sx_sub);
     assert_eq!(sy_tbl, sy_sub);
     assert!(tbl_mixed_lossless.select_scaled_rows(&[n_big]).is_err());
+
+    // D5: PrepareStageTimings parity across timed entrypoints and LosslessV1 ±0.0 / NaN / tie invariants
+    let (tbl_t1, tim1) = prepare_table_timed(&x_big, &y_big, PrepTask::Multiclass).unwrap();
+    let tbl_u1 = prepare_table(&x_big, &y_big, PrepTask::Multiclass).unwrap();
+    assert_eq!(tbl_t1, tbl_u1);
+    let ids_big: Vec<u64> = (0..n_big as u64).map(|i| 5000 + i).collect();
+    let (tbl_t2, tim2) =
+        prepare_table_with_ids_timed(&x_big, &y_big, PrepTask::Multiclass, ids_big.clone())
+            .unwrap();
+    let tbl_u2 = prepare_table_with_ids(&x_big, &y_big, PrepTask::Multiclass, ids_big).unwrap();
+    assert_eq!(tbl_t2, tbl_u2);
+    let (tbl_t3, tim3) =
+        prepare_table_cells_timed(&x_cells, &y_cells, PrepTask::Multiclass).unwrap();
+    let tbl_u3 = prepare_table_cells(&x_cells, &y_cells, PrepTask::Multiclass).unwrap();
+    assert_eq!(tbl_t3, tbl_u3);
+    let ids_cells: Vec<u64> = (0..n as u64).map(|i| 9000 + i).collect();
+    let (tbl_t4, tim4) = prepare_table_cells_with_ids_timed(
+        &x_cells,
+        &y_cells,
+        PrepTask::Multiclass,
+        ids_cells.clone(),
+    )
+    .unwrap();
+    let tbl_u4 =
+        prepare_table_cells_with_ids(&x_cells, &y_cells, PrepTask::Multiclass, ids_cells).unwrap();
+    assert_eq!(tbl_t4, tbl_u4);
+    for tim in [tim1, tim2, tim3, tim4] {
+        assert!(
+            tim.parse_and_infer_ms >= 0.0
+                && tim.scaler_fit_transform_ms >= 0.0
+                && tim.table_descriptors_ms >= 0.0
+                && tim.total_ms >= 0.0
+        );
+        assert!(
+            tim.parse_and_infer_ms + tim.scaler_fit_transform_ms + tim.table_descriptors_ms
+                <= tim.total_ms + 1e-3
+        );
+    }
+
+    let mut x_adv = x_big.clone();
+    x_adv[0][0] = 0.0;
+    x_adv[1][0] = -0.0;
+    x_adv[2][0] = f64::NAN;
+    x_adv[3][0] = 1e9;
+    let tbl_adv = prepare_table_lossless(&x_adv, &y_big, PrepTask::Multiclass).unwrap();
+    assert_eq!(tbl_adv.classes, 36);
+    assert_eq!(tbl_adv.x(0, 0).to_bits(), tbl_adv.x(1, 0).to_bits());
+    assert!(tbl_adv.x_scaled.iter().all(|v| v.is_finite()));
+    let cond_adv = build_conditioning(&tbl_adv, &zero, None, LandmarkMode::None).unwrap();
+    assert!(cond_adv.vec256.iter().all(|v| v.is_finite()));
 }
 
 #[test]
