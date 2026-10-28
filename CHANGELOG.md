@@ -1,6 +1,6 @@
 # Changelog
 
-## Engine 1.1.0 (unreleased)
+## Engine 1.1.0 - 2026-10-28
 
 - Add optional and progressive landmarking (`dope-core::landmark`, `dope landmarks`,
   `dope mlc-v3 encode --landmark-mode none|fast|progressive|full`):
@@ -64,15 +64,17 @@
     published default weights remain `v1.0.0` (`d0b69603`).
 - Add the pinned FP32/High `DopeEncoder629` PyTorch composition interface and
   matching Rust feature methods, preserving Micro's 629-coordinate feature order.
+- Add the 512-D resident conditioning and router-latent prefix encoder on
+  `MlcV3Model` (`encode_descriptor_512_tensor`, `encode_features_512_tensor`,
+  `encode_conditioning_512`, `MLC_V3_FEATURES_512_DIM`) and
+  `LandmarkHyperRouter::forward_latents_tensor`, skipping the router
+  gate/reconstruction heads and `target_net` column attention while matching the
+  `[0..512]` prefix of the 629-D encoder at 0 ULP on CPU and CUDA (#344).
 - Verify canonical SafeTensors bytes before parsing, validate the full checkpoint
   schema, and retain only the 40 encoder tensors (353,095 parameters).
 - Add released-weight CPU parity/export coverage and CUDA replay checks, plus a
   source-pinned downstream integration guide. Published model weights remain
   `v1.0.0`; no tags or release assets are changed.
-
-
-## Unreleased
-
 - Add the levels and landmark development probes' receipts under `bench/real-world/probes/` and
   the non-shipped Rust tool `engine/dope-probes`: a NumPy-exact input split, a levels-probe
   driver and a replay that regenerates every number the multilevel and landmark plans cite,
