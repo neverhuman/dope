@@ -235,12 +235,12 @@ The nonlinear router cannot be collapsed into a single projection matrix.
 
 `dope_core::mlc_v3` exports `MLC_V3_FEATURES_629_DIM` (`629`), `MLC_V3_FEATURES_512_DIM` (`512`),
 and `MLC_V3_GATE_KEYS_14`, and provides both CPU/CUDA device-resident tensor encoders and
-host-slice wrappers on `MlcV3Model` (loaded via `MlcV3Model::from_safetensors_bytes` /
-`from_safetensors_file` on CPU or `from_safetensors_bytes_on_device` /
-`from_safetensors_file_on_device` on `Device::Cpu` or `Device::Cuda`):
+host-slice wrappers on `MlcV3Model` (loaded via `MlcV3Model::load_safetensors(path)` /
+`from_safetensors_bytes(raw)` on CPU or `load_safetensors_on_device(path, &Device)` /
+`from_safetensors_bytes_on_device(raw, &Device)` on `Device::Cpu` or `Device::Cuda`):
 
 - **629-D full feature encoding (`[0:629]`):**
-  - `MlcV3Model::encode_features_629(&self, dataset_features: &[f32; 256], col_landmarks: &[[f32; 17]; 64], level: &str) -> Result<[f32; 629]>` and `MlcV3Model::encode_features_629_batch(&self, dataset_features: &[[f32; 256]], col_landmarks: &[[[f32; 17]; 64]], level: &str) -> Result<Vec<[f32; 629]>>` (nonempty matching-length batches) run on CPU with fixed-size arrays.
+  - `MlcV3Model::encode_features_629(&self, dataset_features: &[f32], col_landmarks: &[Vec<f32>], level: &str) -> Result<Vec<f32>>` and `MlcV3Model::encode_features_629_batch(&self, dataset_features_batch: &[Vec<f32>], col_landmarks_batch: &[Vec<Vec<f32>>], level: &str) -> Result<Vec<Vec<f32>>>` (nonempty matching-length batches) validate exact `256` and `64 × 17` dimensions and return `629`-element `Vec<f32>` outputs.
   - `MlcV3Model::encode_conditioning_629(&self, dataset_features: &[f32], col_landmarks: &[[f32; 17]], level: &str) -> Result<Vec<f32>>` validates host slices (`256` and `64 × 17`), uploads `[1, 256]` and `[1, 64, 17]` to `self.device()`, executes `encode_features_629_tensor`, and copies the `629` features back to the host.
   - `MlcV3Model::encode_features_629_tensor(&self, dataset_features: &Tensor, col_landmarks: &Tensor, level: &str) -> Result<Tensor>` executes `([B, 256], [B, 64, 17]) -> [B, 629]` directly on `self.device()` (`Cpu` or `Cuda`) for `level == "high"` and `B >= 1`, enforcing matching device, `DType::F32`, finite inputs, and final nonfinite-to-zero masking without host round-trips.
 - **512-D conditioning + router-latent prefix encoding (`[0:512]`):**
