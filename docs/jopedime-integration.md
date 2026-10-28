@@ -11,7 +11,7 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Compatible encoder source commit | `8b12a262ef43d30538da8274cd2a758b3740881e` |
+| Compatible encoder source commit | `22dad4ed080653d31b8acf02a507a7b35ce1cdb6` |
 | Source engine workspace version | `1.1.0` (source enhancement; no new release published) |
 | Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) |
 | Canonical file | `dope_mlc_v3_multitask_best.safetensors` |
@@ -50,10 +50,10 @@ submodule gitlink; do not follow a moving branch automatically.
 ```bash
 set -euo pipefail
 git clone https://github.com/neverhuman/dope.git vendor/dope
-git -C vendor/dope checkout --detach 8b12a262ef43d30538da8274cd2a758b3740881e
+git -C vendor/dope checkout --detach 22dad4ed080653d31b8acf02a507a7b35ce1cdb6
 # Alternatively, instead of the clone above:
 # git submodule add https://github.com/neverhuman/dope.git vendor/dope
-# git -C vendor/dope checkout --detach 8b12a262ef43d30538da8274cd2a758b3740881e
+# git -C vendor/dope checkout --detach 22dad4ed080653d31b8acf02a507a7b35ce1cdb6
 # git add .gitmodules vendor/dope
 
 python3.12 -m venv .venv
@@ -233,11 +233,23 @@ The nonlinear router cannot be collapsed into a single projection matrix.
 
 ## Rust composition
 
-The additive `MlcV3Model::encode_features_629` and `encode_features_629_batch`
-methods use the same layout, High-only level, exact 256/64/17 dimensions, and
-final nonfinite-to-zero behavior. Rust types enforce FP32; this implementation
-runs on CPU and retains the full model. The batch must be nonempty with matching
-lengths. Legacy routing/sampling methods retain their existing contracts.
+`dope_core::mlc_v3` exports `MLC_V3_FEATURES_629_DIM` (`629`), `MLC_V3_FEATURES_512_DIM` (`512`),
+and `MLC_V3_GATE_KEYS_14`, and provides both CPU/CUDA device-resident tensor encoders and
+host-slice wrappers on `MlcV3Model` (loaded via `MlcV3Model::from_safetensors_bytes` /
+`from_safetensors_file` on CPU or `from_safetensors_bytes_on_device` /
+`from_safetensors_file_on_device` on `Device::Cpu` or `Device::Cuda`):
+
+- **629-D full feature encoding (`[0:629]`):**
+  - `MlcV3Model::encode_features_629(&self, dataset_features: &[f32; 256], col_landmarks: &[[f32; 17]; 64], level: &str) -> Result<[f32; 629]>` and `MlcV3Model::encode_features_629_batch(&self, dataset_features: &[[f32; 256]], col_landmarks: &[[[f32; 17]; 64]], level: &str) -> Result<Vec<[f32; 629]>>` (nonempty matching-length batches) run on CPU with fixed-size arrays.
+  - `MlcV3Model::encode_conditioning_629(&self, dataset_features: &[f32], col_landmarks: &[[f32; 17]], level: &str) -> Result<Vec<f32>>` validates host slices (`256` and `64 × 17`), uploads `[1, 256]` and `[1, 64, 17]` to `self.device()`, executes `encode_features_629_tensor`, and copies the `629` features back to the host.
+  - `MlcV3Model::encode_features_629_tensor(&self, dataset_features: &Tensor, col_landmarks: &Tensor, level: &str) -> Result<Tensor>` executes `([B, 256], [B, 64, 17]) -> [B, 629]` directly on `self.device()` (`Cpu` or `Cuda`) for `level == "high"` and `B >= 1`, enforcing matching device, `DType::F32`, finite inputs, and final nonfinite-to-zero masking without host round-trips.
+- **512-D conditioning + router-latent prefix encoding (`[0:512]`):**
+  - Downstream consumers that use only the `512`-coordinate prefix `[dataset_features (256), task_latent (128), dist_latent (128)]` can skip the router gate/reconstruction heads (`[512:565]`) and `target_net` column-attention head (`TableGraphEncoderV1` `G_117`, `[565:629]`). All three `512D` entry points evaluate `LandmarkHyperRouter::forward_latents_tensor` (`[B, 256] -> ([B, 128], [B, 128])`) with final nonfinite-to-zero masking and are bit-identical (`0` ULP) to the `[.., ..512]` prefix of the corresponding `629D` methods on the same device:
+  - `MlcV3Model::encode_descriptor_512_tensor(&self, dataset_features: &Tensor, level: &str) -> Result<Tensor>` maps `FP32 [B, 256] -> FP32 [B, 512]` (`level == "high"`, `B >= 1`) directly on `self.device()` without requiring a `[B, 64, 17]` column-landmark tensor.
+  - `MlcV3Model::encode_features_512_tensor(&self, dataset_features: &Tensor, col_landmarks: &Tensor, level: &str) -> Result<Tensor>` maps `([B, 256], [B, 64, 17]) -> [B, 512]` on `self.device()`, enforcing the same two-input `[B, 256]` and `[B, 64, 17]` shape, dtype, device, and finiteness contract as `encode_features_629_tensor` before delegating to `encode_descriptor_512_tensor`.
+  - `MlcV3Model::encode_conditioning_512(&self, dataset_features: &[f32], col_landmarks: &[[f32; 17]], level: &str) -> Result<Vec<f32>>` validates host slices (`256` and `64 × 17`), uploads `[1, 256]` to `self.device()`, runs `encode_descriptor_512_tensor`, and returns the `512`-element `Vec<f32>`.
+
+Legacy routing and sampling methods retain their existing contracts.
 
 The [complete Rust example](../engine/dope-core/examples/encoder_629.rs) verifies
 the canonical digest on raw bytes before parsing. Compile and run from the pinned
