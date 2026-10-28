@@ -177,7 +177,7 @@ impl MlcV3Model {
                 .same_device(dataset_features.device())
         {
             return Err(bad(
-                "column attention requires matching FP32 [B,128] and [B,64,17] tensors on the model device",
+                "512D encoding requires matching FP32 [B,256] and [B,64,17] tensors on the model device",
             ));
         }
         self.encode_descriptor_512_tensor(dataset_features, level)
