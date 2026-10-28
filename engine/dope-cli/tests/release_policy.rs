@@ -7,6 +7,16 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 const TAG: &str = "dope-engine-v1.0.0";
 const SHA: &str = "0123456789abcdef0123456789abcdef01234567";
+fn installer_gh_fixture() -> &'static str {
+    r#"#!/bin/bash
+case "$*" in
+  --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
+esac
+printf '%s\n' "$@" >> "$GH_TEST_LOG"
+[[ "${GH_TEST_MODE:-ok}" == ok ]]
+"#
+}
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
@@ -17,7 +27,7 @@ fn fixture(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("dope-release-{name}-{}", std::process::id()));
     std::fs::create_dir_all(dir.join("tools")).unwrap();
     let gh = dir.join("tools/gh");
-    std::fs::write(&gh, "#!/bin/bash\nprintf '%s\\n' \"$@\" >> \"$GH_TEST_LOG\"\n[[ \"${GH_TEST_MODE:-ok}\" == ok ]]\n").unwrap();
+    std::fs::write(&gh, installer_gh_fixture()).unwrap();
     std::fs::set_permissions(&gh, std::fs::Permissions::from_mode(0o755)).unwrap();
     let mut sums = String::new();
     for name in [
@@ -167,11 +177,7 @@ fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
     std::fs::create_dir_all(dir.join("stage")).unwrap();
     std::fs::create_dir_all(dir.join("tools")).unwrap();
     let gh = dir.join("tools/gh");
-    std::fs::write(
-        &gh,
-        "#!/bin/bash\nprintf '%s\\n' \"$@\" >> \"$GH_TEST_LOG\"\n[[ \"${GH_TEST_MODE:-ok}\" == ok ]]\n",
-    )
-    .unwrap();
+    std::fs::write(&gh, installer_gh_fixture()).unwrap();
     std::fs::set_permissions(&gh, std::fs::Permissions::from_mode(0o755)).unwrap();
 
     let bin_bytes = std::fs::read(env!("CARGO_BIN_EXE_dope")).unwrap();
