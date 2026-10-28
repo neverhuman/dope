@@ -10,41 +10,50 @@
   `--no-weights`) and preserving explicit `--tag v1.0.0`
   (`sha256-content-integrity-only`) fallback (#347, #348).
 - Parallelize static table preparation and descriptor extraction across columns
-  via Rayon when `rayon::current_num_threads() > 1` (`dope-core::prepare::scaling_par`,
-  `dope-core::prepare::descriptors_par`) and eliminate cell-matrix cloning in
-  `dope mlc-v3 encode` (`prepare_table_cells_owned_with_ids_timed`) (#349):
-  - Sort categorical distinct values by deterministic first-occurrence row index
-    so multithreaded column scaling and descriptor extraction preserve exact
-    conditioning digests (`0 / 1,221` differing encode records across `570 / 570`
-    `285`-table corpus runs at `1` and `8` threads and `27 / 27` synthetic tables
-    at `1`, `2`, and `8` threads).
+  under Rayon (`dope-core::prepare::scaling_par`,
+  `dope-core::prepare::descriptors_par`, keeping per-column serial arithmetic,
+  column-ordered collection, serial cross-column reductions, and single-column
+  `p == 1` `pairwise_sum` branches) and move CSV cells out of `raw.columns`
+  without cloning in `dope mlc-v3 encode` after inferring the task on the
+  intact table (#349):
+  - Verified bitwise-identical encode outputs across thread counts (`0 / 1,221`
+    differing encode records across `570 / 570` `285`-table corpus runs at `1`
+    and `8` threads and `27 / 27` synthetic tables at `1`, `2`, and `8`
+    threads).
   - Update the optional-landmarks latency qualification record
-    (`docs/optional-landmarks-qualification.md`) on `29ba3db7` across the
-    40-real-table cohort (`30` stratified `registry-real-v1` tables
-    `n = 32..1,024, p = 1..202` plus `10` `jopedime-test` fixtures) and the
-    27-cell synthetic matrix (`n = 1,000..50,000, p = 11..201`):
+    (`docs/optional-landmarks-qualification.md`) on `29ba3db7` (`taskset -c 32-39`,
+    `--threads 8` / `RAYON_NUM_THREADS=8`) across the 40-real-table cohort
+    (`30` stratified `registry-real-v1` tables sampled from `n = 32..1,024,
+    p = 1..202`, sample range `n = 40..800, p = 2..130`, plus `10`
+    `jopedime-test` fixtures `n = 109..1,000`) and the 27-cell synthetic matrix
+    (`n = 1,000..50,000, p = 11..201`):
     - **Resident/session CUDA (`landmark_mode_bench`, 5 warm reps) — `40 / 40 >= 5x`
       (accepted evaluation regime for the `>= 5x` gate):** `30 / 30` on
-      `registry-real-v1` (geomean `33.9x`, median `34.8x`, range `13.3x–62.9x`,
-      warm `--landmark-mode none` `1.4–27.9 ms` vs `--landmark-mode full`
-      `53–967 ms`) and `10 / 10` on `jopedime-test` (geomean `41.7x`, median
-      `39.4x`, range `27.0x–61.5x`, warm `none` `1.4–3.2 ms`), with accepted
-      resident/session release test bounds (`<= 5 ms` resident `none`-mode
-      overhead beyond read + prepare; `<= 30 ms` resident `none`-mode `p50` on
-      real tables with `n <= 1,024`, scoped strictly to the resident/session
+      `registry-real-v1` (geomean `33.9x`, median `35.0x`, range `13.3x–62.9x`,
+      warm `--landmark-mode none` `1.7–27.9 ms` vs `--landmark-mode full`
+      `48–690 ms`) and `10 / 10` on `jopedime-test` (geomean `41.7x`, median
+      `45.9x`, range `27.0x–61.5x`, warm `none` `1.4–6.5 ms` vs `full`
+      `38–343 ms`), with accepted resident/session release test bounds
+      (`<= 5 ms` resident `none`-mode overhead beyond read + prepare, measured
+      max `1.39 ms` and median `1.11 ms`; `<= 30 ms` resident `none`-mode `p50`
+      on real tables with `n <= 1,024`, scoped strictly to the resident/session
       regime).
     - **Strict-cold per-process CLI (preserved as separate regime context):**
       Cold CUDA (`dope mlc-v3 encode --device cuda:0`, 15 interleaved A/B reps)
-      is `0 / 40 >= 5x` (`registry-real-v1` geomean `1.22x`, range `0.97x–2.18x`;
-      `jopedime-test` geomean `1.25x`, range `1.06x–1.66x`) due to the
-      `~550–650 ms` per-process CUDA-context + cuBLAS + checkpoint weight-upload
-      startup floor; Cold CPU (`--device cpu --threads 8`) is `3 / 40 >= 5x` on
-      the small real tables (`n <= 1,024`, `~100 ms` fixed process floor;
-      interleaved A/B `#349` vs `42e5b4f5` is `+3.3%` faster on `none` and
-      `+1.2%` faster on `full`), while paired 8-thread Cold CPU on the 27-cell
-      synthetic matrix improves from `17 / 27 >= 5x` (geomean `5.83x`) to
-      `25 / 27 >= 5x` (geomean `9.32x`, median `8.68x`, range `3.84x–25.73x`),
-      passing `9 / 9` `n = 50,000` cells (`5.93x–9.59x`, geomean `7.27x`).
+      is `0 / 40 >= 5x` (`registry-real-v1` geomean `1.22x`, median `1.09x`,
+      range `0.97x–2.18x`; `jopedime-test` geomean `1.25x`, median `1.24x`,
+      range `1.06x–1.66x`) due to the `~550–650 ms` per-process CUDA-context +
+      cuBLAS + checkpoint weight-upload startup floor; Cold CPU (`--device cpu
+      --threads 8`, 15 interleaved A/B reps across all 40 tables) is
+      `3 / 40 >= 5x` on the real tables (`registry-real-v1` `3 / 30`, geomean
+      `2.24x`, median `1.71x`, range `1.37x–6.54x`; `jopedime-test` `0 / 10`,
+      geomean `2.37x`, median `2.60x`, range `1.45x–4.40x`; `~100 ms` fixed
+      process floor; interleaved A/B `#349` vs `42e5b4f5` is `+3.3%` faster on
+      `none` and `+1.2%` faster on `full`), while paired 8-thread Cold CPU on
+      the 27-cell synthetic matrix improves from `17 / 27 >= 5x` (geomean
+      `5.83x`) to `25 / 27 >= 5x` (geomean `9.32x`, median `8.06x`, range
+      `3.84x–22.99x`), passing `9 / 9` `n = 50,000` cells (`5.93x–9.59x`,
+      geomean `7.29x`, up from `1 / 9` on `42e5b4f5`).
 
 ## Engine 1.1.0 - 2026-10-28
 
