@@ -25,9 +25,9 @@ multiclass tables the sampled rows preserve the predictive structure that learne
 - **Multi-level byte-budgeted capacity (`DOPE-MLC-v2` & `DOPE-MLC-v3`).** One forward pass
   emits nested tiers (`Small`, `Medium`, `High`, `Ultra`) conditioned on train-only CV
   landmarks and inter-landmark attention ([study](docs/multilevel-landmark-dl-study.md)).
-- **Optional and progressive landmarks.** `dope mlc-v3 encode --landmark-mode none|progressive|full`
+- **Optional and progressive landmarks.** `dope mlc-v3 encode --landmark-mode none|fast|progressive|full`
   feeds the same pinned 629-D encoder with no landmarks (only table preparation and one forward
-  pass), with landmark groups as they finish on a stratified 300-row subsample (zero → macro →
+  pass; `fast` is a CLI alias for `none`), with landmark groups as they finish on a stratified 300-row subsample (zero → macro →
   larger → fine, one encoding per stage), or with the full released conditioning. Missing landmarks
   are masked, never synthesized, and a recipe-tagged digest names the mode behind every encoding
   ([qualification record](docs/optional-landmarks-qualification.md)).
@@ -111,7 +111,7 @@ dope mlc-v3 sample --preset multitask \
   --wire ~/.cache/dope/weights/packet_high_regression.dml3 -n 1024 --seed 42 -o syn_v3.csv
 
 # Workflow C — Any CSV table -> pinned 629-D DOPE-MLC-v3 encoding, with optional landmarks (JSON lines):
-dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode none --json        # no landmark probes
+dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode none --json        # no landmark probes (alias: fast)
 dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode progressive --json # one record per landmark stage
 dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode full --json        # released full-report conditioning
 ```

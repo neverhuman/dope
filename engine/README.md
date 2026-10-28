@@ -29,6 +29,11 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 | `dope doctor` | Backends compiled into this build. |
 | `dope --threads 8 fit data.csv -t y --json --report fit.json` | Bound CPU parallelism and emit machine-readable fit output. |
 | `dope --threads 4 doctor --json` | Runtime identity, backend, worker count and executable SHA-256. |
+| `dope mlc-v3 fetch-weights [--preset multitask\|maxtrain97\|all] [--out DIR]` | Download and SHA-256 verify released `DOPE-MLC-v3` SafeTensors weights and sample wire packets into the local cache. |
+| `dope mlc-v3 inspect-weights [--preset multitask] [--weights FILE] [--json]` | Verify SafeTensors digest, tensor inventory and parameter count on CPU without Python or LibTorch. |
+| `dope mlc-v3 inspect-wire --wire packet.dml3 [--json]` | Inspect a `DML3+CSC1` multi-level wire packet (tier, task, code width, CRC-32 and byte cap). |
+| `dope mlc-v3 sample --preset multitask --wire packet.dml3 -n N [--seed S] [-o out.csv]` | Sample synthetic rows from a `DML3+CSC1` wire packet in pure Rust using the hypernetwork decoder. |
+| `dope mlc-v3 encode --preset multitask --csv data.csv --target y [--landmark-mode none\|fast\|progressive\|full] [--landmark-subsample N] [--json]` | Emit pinned 629-D `DOPE-MLC-v3` conditioning and router encodings with optional or progressive landmarks and recipe-tagged digests. |
 
 ## Recipes
 
@@ -177,6 +182,9 @@ let rows = sample(&program, &SampleOptions { rows: 100_000, ..Default::default()
 ```
 dope-core/src/
   table.rs schema.rs encode.rs output.rs      intake, ML-ready encoding, CSV output
+  prepare/                                    intake preparation, K<=36 LosslessV1 class policy and stage timings
+  landmark/                                   tabular landmark probes and progressive conditioning builders
+  mlc_v3/                                     DOPE-MLC-v3 SafeTensors hypernetwork, DML3 wire codec and 629D/512D encoders
   marginal.rs copula.rs regimes.rs screen.rs  marginals and dependence
   target.rs train.rs train_cpu.rs noise.rs    conditional model and noise
   forest.rs                                   boosted oblivious trees (byte-coded, error feedback)
@@ -190,6 +198,8 @@ dope-probes/                                  development-probe inputs and recei
 
 ## Experimental landmarks and portable levels
 
-The native CLI now provides `landmarks real`, `landmarks synthetic`, `landmarks compare`
-and `fit-levels --export-levels`. See [the detailed guide](../docs/landmarks.md) for commands,
+The native CLI now provides `landmarks real`, `landmarks synthetic`, `landmarks compare`,
+`fit-levels --export-levels`, and `mlc-v3 encode --landmark-mode none|fast|progressive|full`
+(`--landmark-subsample N`). See [the detailed guide](../docs/landmarks.md) and the
+[optional-landmarks qualification record](../docs/optional-landmarks-qualification.md) for commands,
 privacy boundaries, byte accounting, recipe identity and unrun promotion gates.
