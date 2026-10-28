@@ -4,8 +4,8 @@
 
 - Add optional and progressive landmarking (`dope-core::landmark`, `dope landmarks`,
   `dope mlc-v3 encode --landmark-mode none|fast|progressive|full`):
-  - `LandmarkGroup::{Macro, Larger, Fine}` (`6 -> 18 -> 23` High cells),
-    `LandmarkBundle` (`landmarks-native-v1`, finite `[0, 1]` values, explicit
+  - `LandmarkGroup::{Macro, Larger, Fine}` (`9 -> 18 -> 23` cells),
+    `LandmarkBundle` (`landmarks-native-v1`, finite `[-1, 1]` values, explicit
     observation mask, and `source_digest` bound to `source_rows_digest + panel +
     options_digest + subsample`), and `ProgressiveLandmarks` fold-reuse sessions
     that never recompute completed groups.
