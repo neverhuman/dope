@@ -824,6 +824,7 @@
     "engine/dope-cli/src/runtime.rs": "rust-core",
     "engine/dope-cli/tests/native_cli.rs": "rust-core",
     "engine/dope-cli/tests/release_policy.rs": "rust-core",
+    "engine/dope-cli/tests/installer_policy.rs": "rust-core",
     "ops/ci/engine-release.sh": "release",
     "ops/ci/engine-release-smoke.sh": "release",
     "ops/ci/engine-runtime-graph.sh": "release",

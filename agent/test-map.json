@@ -3299,6 +3299,7 @@
     "engine/dope-cli/src/runtime.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify CPU worker settings, JSON diagnostics and executable identity"},
     "engine/dope-cli/tests/native_cli.rs": {"command": "bash ops/ci/engine.sh", "purpose": "exercise customer commands with an empty tool PATH and validate JSON/worker controls"},
     "engine/dope-cli/tests/release_policy.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify signature policy invocation, failure propagation, inventory/hash checks and graph refusals"},
+    "engine/dope-cli/tests/installer_policy.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test installer_policy", "purpose": "verify independent engine/model inventories, early GitHub CLI compatibility refusal and strict pre-install integrity/provenance checks"},
     "ops/ci/engine-release.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"},
     "ops/ci/engine-release-smoke.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "exercise all commands of the actual optimized deliverable without external tool lookup"},
     "ops/ci/engine-runtime-graph.sh": {"command": "bash ops/ci/engine.sh", "purpose": "reject training bindings and GPU dependencies from the CPU release closure"},
@@ -3372,7 +3373,7 @@
     "engine/dope-cli/src/style.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli", "purpose": "verify zero-dependency ANSI terminal styling, TTY auto-detection, NO_COLOR and --color flags"},
     "engine/dope-core/examples/encoder_629.rs": {"command": "cargo check --manifest-path engine/Cargo.toml --locked -p dope-core --example encoder_629", "purpose": "compile the checksummed FP32 High 629D integration example"},
     "engine/dope-core/tests/mlc_v3_safetensors.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors loading, 4-tier routing, CRC32 wire tamper refusal and synthetic table sampling"},
-    "scripts/install.sh": {"command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy", "purpose": "verify pinned concrete release tag resolution, SHA-256 content integrity, optional cosign OIDC attestation and SafeTensors weight verification before install"}
+    "scripts/install.sh": {"command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy", "purpose": "verify independent concrete engine/model tags, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"}
   },
   "workspace": "dope"
 }
