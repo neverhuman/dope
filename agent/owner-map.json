@@ -893,6 +893,7 @@
     "engine/dope-cli/src/style.rs": "rust-core",
     "engine/dope-core/examples/encoder_629.rs": "rust-core",
     "engine/dope-core/examples/landmark_mode_bench.rs": "rust-core",
+    "engine/dope-core/examples/resident_release_check.rs": "rust-core",
     "engine/dope-core/examples/resident_release_check/": "rust-core",
     "engine/dope-core/tests/resident_release_limits.rs": "rust-core",
     "engine/dope-core/examples/mlc_v3_device_bench.rs": "rust-core",

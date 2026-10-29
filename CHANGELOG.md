@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add the Rust `resident_release_check` example: execute six real zero-landmark
+  MLC-v3 High629 forwards on an explicit CPU/CUDA device, discard one warm-up,
+  and enforce the accepted resident/session maximum overhead (<= 5 ms) and
+  median complete latency (<= 30 ms) on a declared fit fixture with <= 1,024
+  rows and eight Rayon threads. Verify the local released checkpoint before
+  loading; disclose raw timings and checkpoint/executable/source identities.
+  Measured failures and unavailable/refused execution have distinct nonzero
+  exits. This one-fixture check does not requalify the none/full speedup ratio,
+  cold-process latency, training quality or release certification.
+
 - Default `scripts/install.sh` (`DOPE_RELEASE_TAG=dope-engine-v1.1.0`) to the
   signed `dope-engine-v1.1.0` Linux x86-64 engine binary with Sigstore OIDC
   bundle verification (`gh >= 2.102.0` policy flags) while fetching the
