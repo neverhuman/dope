@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/neverhuman/dope/schemas/landmark-encoding-receipt-v1.schema.json",
+  "title": "Dope High629 landmark encoding snapshot v1",
+  "description": "One successfully encoded snapshot. Does not certify whole-run completion, model quality, or release qualification.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "seq", "version", "status", "mask", "subsample_n", "source_digest", "landmark_source_digest", "conditioning_digest", "conditioning_recipe", "conditioning_level", "options_digest", "work_budget", "weights_sha256", "embedding_identity", "features629_sha256", "device"],
+  "properties": {
+    "schema": {"const": "dope.landmark-encoding/v1"},
+    "seq": {"type": "integer", "minimum": 0},
+    "version": {"type": "integer", "minimum": 0},
+    "status": {
+      "oneOf": [
+        {"enum": ["none", "full"]},
+        {"type": "object", "additionalProperties": false, "required": ["partial"], "properties": {"partial": {"type": "integer", "minimum": 1, "maximum": 22}}}
+      ]
+    },
+    "mask": {"type": "array", "minItems": 23, "maxItems": 23, "items": {"type": "boolean"}},
+    "subsample_n": {"type": ["integer", "null"], "minimum": 2},
+    "source_digest": {"$ref": "#/$defs/sha256"},
+    "landmark_source_digest": {"oneOf": [{"const": "zero"}, {"$ref": "#/$defs/sha256"}]},
+    "conditioning_digest": {"$ref": "#/$defs/sha256"},
+    "conditioning_recipe": {"enum": ["observed-only-v1", "full-report-v1"]},
+    "conditioning_level": {"enum": ["small", "low", "medium", "high", "ultra"]},
+    "options_digest": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+    "work_budget": {"type": ["integer", "null"], "minimum": 0},
+    "weights_sha256": {"$ref": "#/$defs/sha256"},
+    "embedding_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model", "layout", "encoder_level", "dimensions", "dtype"],
+      "properties": {
+        "model": {"const": "mlc-v3"}, "layout": {"const": "High629"},
+        "encoder_level": {"const": "high"}, "dimensions": {"const": 629}, "dtype": {"const": "f32"}
+      }
+    },
+    "features629_sha256": {"$ref": "#/$defs/sha256"},
+    "device": {"type": "string", "minLength": 1}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}},
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "none"}}},
+      "then": {"properties": {"mask": {"contains": {"const": true}, "minContains": 0, "maxContains": 0}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "full"}}},
+      "then": {"properties": {"mask": {"contains": {"const": true}, "minContains": 23}}}
+    },
+    {
+      "if": {"properties": {"status": {"type": "object"}}},
+      "then": {"oneOf": [
+        {"properties": {"status": {"properties": {"partial": {"const": 1}}}, "mask": {"contains": {"const": true}, "minContains": 1, "maxContains": 1}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 2}}}, "mask": {"contains": {"const": true}, "minContains": 2, "maxContains": 2}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 3}}}, "mask": {"contains": {"const": true}, "minContains": 3, "maxContains": 3}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 4}}}, "mask": {"contains": {"const": true}, "minContains": 4, "maxContains": 4}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 5}}}, "mask": {"contains": {"const": true}, "minContains": 5, "maxContains": 5}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 6}}}, "mask": {"contains": {"const": true}, "minContains": 6, "maxContains": 6}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 7}}}, "mask": {"contains": {"const": true}, "minContains": 7, "maxContains": 7}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 8}}}, "mask": {"contains": {"const": true}, "minContains": 8, "maxContains": 8}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 9}}}, "mask": {"contains": {"const": true}, "minContains": 9, "maxContains": 9}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 10}}}, "mask": {"contains": {"const": true}, "minContains": 10, "maxContains": 10}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 11}}}, "mask": {"contains": {"const": true}, "minContains": 11, "maxContains": 11}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 12}}}, "mask": {"contains": {"const": true}, "minContains": 12, "maxContains": 12}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 13}}}, "mask": {"contains": {"const": true}, "minContains": 13, "maxContains": 13}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 14}}}, "mask": {"contains": {"const": true}, "minContains": 14, "maxContains": 14}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 15}}}, "mask": {"contains": {"const": true}, "minContains": 15, "maxContains": 15}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 16}}}, "mask": {"contains": {"const": true}, "minContains": 16, "maxContains": 16}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 17}}}, "mask": {"contains": {"const": true}, "minContains": 17, "maxContains": 17}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 18}}}, "mask": {"contains": {"const": true}, "minContains": 18, "maxContains": 18}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 19}}}, "mask": {"contains": {"const": true}, "minContains": 19, "maxContains": 19}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 20}}}, "mask": {"contains": {"const": true}, "minContains": 20, "maxContains": 20}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 21}}}, "mask": {"contains": {"const": true}, "minContains": 21, "maxContains": 21}}},
+        {"properties": {"status": {"properties": {"partial": {"const": 22}}}, "mask": {"contains": {"const": true}, "minContains": 22, "maxContains": 22}}}
+      ]}
+    }
+  ]
+}

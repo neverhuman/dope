@@ -1,5 +1,10 @@
 {
   "tests": {
+    "engine/dope-cli/src/mlc_v3_encode/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli", "purpose": "verify typed snapshot serialization, effective conditioning versions and primary encode compatibility"},
+    "engine/dope-cli/tests/fixtures/landmark-encoding-v1.jsonl": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test cli encoding_receipts && python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "bind real CPU CLI snapshots to the named schema and frozen wire fixture"},
+    "schemas/landmark-encoding-receipt-v1.schema.json": {"command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "validate High629 snapshot schema and refuse incompatible identities, masks and incomplete evidence"},
+    "research/transfer/tests/test_landmark_encoding_schema.py": {"command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "verify named encoding snapshot schema using actual Rust CLI fixtures"},
+    "docs/landmark-encoding-receipts.md": {"command": "just fast", "purpose": "verify encoding receipt contract documentation"},
     ".cargo/": {
       "command": "just check",
       "purpose": "verify Cargo configuration"

@@ -40,6 +40,13 @@ Keep measured failures, setup costs and CPU/CUDA results distinct. A determinist
 unit pass does not establish a hardware latency pass or replace the existing
 none/full cohort qualification.
 
+For the opt-in [encoding snapshot companion](landmark-encoding-receipts.md), run
+`cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli`
+and `python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v`.
+These CPU synthetic-checkpoint tests check primary-output compatibility, exact
+wire fixtures, coverage/version semantics, sampling identity and failure handling.
+They do not establish retention or latency qualification.
+
 ## Repository and research-kernel gates
 
 `just deployment-check` verifies the separate locked `deploy/` CPU graph, typed

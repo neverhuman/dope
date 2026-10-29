@@ -619,6 +619,246 @@ fn color_flags_preserve_plain_pipes_and_enable_ansi_when_requested() {
     std::fs::remove_dir_all(dir).ok();
 }
 
+#[test]
+fn encoding_receipts_preserve_events_and_bind_progressive_snapshots() {
+    use sha2::{Digest, Sha256};
+
+    let dir = workdir("encoding-receipts");
+    let weights = write_test_safetensors(&dir);
+    let weights_sha = format!("{:x}", Sha256::digest(&weights));
+    let base = [
+        "mlc-v3",
+        "encode",
+        "--weights",
+        "test.safetensors",
+        "--csv",
+        "train.csv",
+        "--target",
+        "score",
+        "--json",
+    ];
+    let run = |mode, receipt: Option<&str>| {
+        let mut args = base.to_vec();
+        args.extend(["--landmark-mode", mode, "--landmark-subsample", "0"]);
+        if let Some(path) = receipt {
+            args.extend(["--encoding-receipt", path]);
+        }
+        dope(&dir, &args)
+    };
+    let parse = |text: &str| -> Vec<serde_json::Value> {
+        text.lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
+    };
+    let mut terminal = None;
+    let mut fit_digest = None;
+    for mode in ["none", "fast", "progressive", "full"] {
+        let filename = format!("{mode}.jsonl");
+        let plain = parse(&run(mode, None));
+        let enabled = parse(&run(mode, Some(&filename)));
+        let receipts = parse(&std::fs::read_to_string(dir.join(&filename)).unwrap());
+        assert_eq!(receipts.len(), if mode == "progressive" { 4 } else { 1 });
+        assert_eq!(plain.len(), receipts.len());
+        assert_eq!(enabled.len(), receipts.len());
+        let mut last_digest = None;
+        let mut expected_version = 0;
+        for (seq, ((mut before, mut after), receipt)) in
+            plain.into_iter().zip(enabled).zip(&receipts).enumerate()
+        {
+            before.as_object_mut().unwrap().remove("latency_ms");
+            after.as_object_mut().unwrap().remove("latency_ms");
+            assert_eq!(before, after, "primary output changed with receipt enabled");
+            assert_eq!(receipt["schema"], "dope.landmark-encoding/v1");
+            assert_eq!(receipt["seq"], seq);
+            assert_eq!(receipt["weights_sha256"], weights_sha);
+            assert_eq!(receipt["features629_sha256"], after["features629_sha256"]);
+            assert_eq!(receipt["conditioning_digest"], after["conditioning_digest"]);
+            assert_eq!(receipt["conditioning_recipe"], after["recipe"]);
+            assert_eq!(receipt["landmark_source_digest"], after["source_digest"]);
+            assert_eq!(receipt["status"], after["status"]);
+            assert_eq!(receipt["subsample_n"], after["subsample_n"]);
+            assert_eq!(receipt["device"], "cpu (1 threads)");
+            assert_eq!(
+                receipt["embedding_identity"],
+                serde_json::json!({
+                    "model": "mlc-v3", "layout": "High629", "encoder_level": "high",
+                    "dimensions": 629, "dtype": "f32",
+                })
+            );
+            let mask = receipt["mask"].as_array().unwrap();
+            assert_eq!(mask.len(), 23);
+            let present = mask.iter().filter(|m| m.as_bool().unwrap()).count();
+            let status = match present {
+                0 => serde_json::json!("none"),
+                23 => serde_json::json!("full"),
+                n => serde_json::json!({"partial": n}),
+            };
+            assert_eq!(receipt["status"], status);
+            if seq == 0 && mode != "full" {
+                assert_eq!(receipt["landmark_source_digest"], "zero");
+                assert_eq!(receipt["status"], "none");
+            }
+            let source = receipt["source_digest"].as_str().unwrap();
+            assert_eq!(source.len(), 64);
+            assert!(source.bytes().all(|b| b.is_ascii_hexdigit()));
+            if let Some(expected) = &fit_digest {
+                assert_eq!(source, expected);
+            } else {
+                fit_digest = Some(source.to_string());
+            }
+            let digest = receipt["conditioning_digest"].as_str().unwrap();
+            if last_digest.as_deref().is_some_and(|last| last != digest) {
+                expected_version += 1;
+            }
+            assert_eq!(receipt["version"], expected_version);
+            last_digest = Some(digest.to_string());
+            if ["none", "fast"].contains(&mode) {
+                assert!(receipt["options_digest"].is_null());
+                assert!(receipt["work_budget"].is_null());
+            } else {
+                assert_eq!(receipt["options_digest"], after["options_digest"]);
+                assert_eq!(receipt["work_budget"], after["work_budget"]);
+            }
+        }
+        if mode == "progressive" {
+            let golden = parse(include_str!("fixtures/landmark-encoding-v1.jsonl"));
+            assert_eq!(receipts, golden, "frozen snapshot wire fixture changed");
+            assert_ne!(
+                receipts[0]["conditioning_digest"],
+                receipts[1]["conditioning_digest"]
+            );
+            terminal = receipts.last().cloned();
+        }
+        if mode == "full" {
+            let progressive = terminal.as_ref().unwrap();
+            for field in [
+                "mask",
+                "status",
+                "source_digest",
+                "landmark_source_digest",
+                "conditioning_digest",
+                "features629_sha256",
+                "conditioning_recipe",
+                "subsample_n",
+            ] {
+                assert_eq!(
+                    receipts[0][field], progressive[field],
+                    "terminal mismatch: {field}"
+                );
+            }
+        }
+    }
+
+    // The base FIT identity remains stable when only landmark evidence is sampled.
+    let mut args = base.to_vec();
+    args.extend([
+        "--landmark-mode",
+        "progressive",
+        "--encoding-receipt",
+        "sampled.jsonl",
+        "--out",
+        "sampled-primary.jsonl",
+    ]);
+    assert!(dope(&dir, &args).is_empty());
+    let sampled = parse(&std::fs::read_to_string(dir.join("sampled.jsonl")).unwrap());
+    let sampled_primary =
+        parse(&std::fs::read_to_string(dir.join("sampled-primary.jsonl")).unwrap());
+    assert_eq!(sampled.len(), 4);
+    assert!(sampled[0]["subsample_n"].is_null());
+    for (receipt, primary) in sampled.iter().skip(1).zip(sampled_primary.iter().skip(1)) {
+        assert_eq!(receipt["source_digest"].as_str(), fit_digest.as_deref());
+        assert_eq!(receipt["subsample_n"], 300);
+        assert_eq!(receipt["landmark_source_digest"], primary["source_digest"]);
+        assert_eq!(receipt["features629_sha256"], primary["features629_sha256"]);
+    }
+
+    // Receipt failures must be visible, with no overwrite of evidence or inputs.
+    for (receipt, output) in [
+        ("none.jsonl", "primary.json"),
+        ("train.csv", "primary.json"),
+        ("test.safetensors", "primary.json"),
+        ("same.jsonl", "same.jsonl"),
+        ("missing/receipt.jsonl", "primary.json"),
+    ] {
+        let input_before = std::fs::read(dir.join("train.csv")).unwrap();
+        std::fs::write(dir.join("primary.json"), b"preserve primary").unwrap();
+        let old = std::fs::read(dir.join(receipt)).ok();
+        let mut args = base.to_vec();
+        args.extend([
+            "--landmark-mode",
+            "fast",
+            "--encoding-receipt",
+            receipt,
+            "--out",
+            output,
+        ]);
+        let result = Command::new(env!("CARGO_BIN_EXE_dope"))
+            .current_dir(&dir)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("encoding receipt"));
+        if let Some(old) = old {
+            assert_eq!(std::fs::read(dir.join(receipt)).unwrap(), old);
+        }
+        assert_eq!(
+            std::fs::read(dir.join("primary.json")).unwrap(),
+            b"preserve primary"
+        );
+        assert_eq!(std::fs::read(dir.join("train.csv")).unwrap(), input_before);
+    }
+    // Invalid native sampling fails after the flushed zero snapshot, leaving usable evidence.
+    let mut args = base.to_vec();
+    args.extend([
+        "--landmark-mode",
+        "progressive",
+        "--landmark-subsample",
+        "1",
+        "--encoding-receipt",
+        "interrupted.jsonl",
+    ]);
+    let result = Command::new(env!("CARGO_BIN_EXE_dope"))
+        .current_dir(&dir)
+        .args(args)
+        .output()
+        .unwrap();
+    assert!(!result.status.success());
+    let retained = parse(&std::fs::read_to_string(dir.join("interrupted.jsonl")).unwrap());
+    assert_eq!(retained.len(), 1);
+    assert_eq!(retained[0]["status"], "none");
+    assert_eq!(retained[0]["version"], 0);
+    assert_eq!(parse(std::str::from_utf8(&result.stdout).unwrap()).len(), 1);
+    #[cfg(unix)]
+    {
+        // Catch a dangling primary symlink that resolves to the newly created receipt.
+        std::os::unix::fs::symlink("alias-receipt.jsonl", dir.join("primary-link.json")).unwrap();
+        let mut args = base.to_vec();
+        args.extend([
+            "--landmark-mode",
+            "fast",
+            "--encoding-receipt",
+            "alias-receipt.jsonl",
+            "--out",
+            "primary-link.json",
+        ]);
+        let result = Command::new(env!("CARGO_BIN_EXE_dope"))
+            .current_dir(&dir)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("must differ"));
+        assert_eq!(
+            std::fs::metadata(dir.join("alias-receipt.jsonl"))
+                .unwrap()
+                .len(),
+            0
+        );
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
 fn write_test_safetensors(dir: &Path) -> Vec<u8> {
     let specs: &[(&str, &[usize])] = &[
         ("router.level_embed.weight", &[3, 256]),
