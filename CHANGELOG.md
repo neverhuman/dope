@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add opt-in `dope mlc-v3 encode --encoding-receipt FILE` JSONL snapshot
+  companions with a named High629 schema, actual loaded checkpoint identity,
+  sanitized landmark coverage, complete FIT-source identity, and effective
+  conditioning versions. Preserve the existing primary event contract. See
+  [receipt semantics](docs/landmark-encoding-receipts.md).
+
 - Add the Rust `resident_release_check` example: execute six real zero-landmark
   MLC-v3 High629 forwards on an explicit CPU/CUDA device, discard one warm-up,
   and enforce the accepted resident/session maximum overhead (<= 5 ms) and

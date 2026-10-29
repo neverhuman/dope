@@ -16,6 +16,9 @@ use sha2::{Digest, Sha256};
 use std::io::Write;
 use std::path::PathBuf;
 
+#[path = "mlc_v3_encode/receipt.rs"]
+mod receipt;
+
 #[derive(Args)]
 pub(crate) struct EncodeV3Args {
     #[arg(long)]
@@ -42,6 +45,9 @@ pub(crate) struct EncodeV3Args {
     pub(crate) json: bool,
     #[arg(short, long)]
     pub(crate) out: Option<PathBuf>,
+    /// Write named snapshot receipts to a new JSONL file, separate from encode output.
+    #[arg(long)]
+    pub(crate) encoding_receipt: Option<PathBuf>,
 }
 
 fn encode_cond_on_model(
@@ -152,6 +158,19 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
         None => None,
     };
 
+    let mut receipts = a
+        .encoding_receipt
+        .as_ref()
+        .map(|path| {
+            receipt::ReceiptWriter::create(
+                path,
+                a.out.as_deref(),
+                prepared.computed_source_rows_digest(),
+                model.inventory.sha256.clone(),
+                dev_desc.clone(),
+            )
+        })
+        .transpose()?;
     let mut out_w = crate::writer(&a.out)?;
     let emit_line =
         |w: &mut Box<dyn Write>, val: &serde_json::Value, pretty: bool| -> Result<(), String> {
@@ -184,6 +203,9 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                 "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
             });
             emit_line(&mut out_w, &doc, !a.json)?;
+            if let Some(receipts) = &mut receipts {
+                receipts.emit(0, &cond, &feat_sha, None)?;
+            }
         }
         LandmarkMode::Progressive => {
             let opts = LandmarkOptions {
@@ -213,6 +235,9 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                 "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
             });
             emit_line(&mut out_w, &doc0, false)?;
+            if let Some(receipts) = &mut receipts {
+                receipts.emit(0, &cond0, &sha0, Some(&opts))?;
+            }
 
             let sub_n = a
                 .landmark_subsample
@@ -260,6 +285,9 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                     "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
                 });
                 emit_line(&mut out_w, &doc, false)?;
+                if let Some(receipts) = &mut receipts {
+                    receipts.emit(idx + 1, &cond, &sha, Some(&opts))?;
+                }
             }
         }
         LandmarkMode::Full => {
@@ -305,6 +333,9 @@ pub(super) fn run_encode(a: EncodeV3Args) -> Result<(), String> {
                 "latency_ms": t0.elapsed().as_secs_f64() * 1000.0,
             });
             emit_line(&mut out_w, &doc, !a.json)?;
+            if let Some(receipts) = &mut receipts {
+                receipts.emit(0, &cond, &sha, Some(&opts))?;
+            }
         }
     }
     Ok(())

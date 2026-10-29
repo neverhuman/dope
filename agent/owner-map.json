@@ -1,5 +1,10 @@
 {
   "owners": {
+    "engine/dope-cli/src/mlc_v3_encode/": "rust-core",
+    "engine/dope-cli/tests/fixtures/landmark-encoding-v1.jsonl": "rust-core",
+    "schemas/landmark-encoding-receipt-v1.schema.json": "rust-core",
+    "research/transfer/tests/test_landmark_encoding_schema.py": "external-evidence",
+    "docs/landmark-encoding-receipts.md": "governance",
     ".cargo/": "rust-core",
     ".gitattributes": "governance",
     ".github/": "governance",
