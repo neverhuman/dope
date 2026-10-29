@@ -11,7 +11,7 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Compatible encoder source commit | `15e12aa3dc33851655580f6aa7c9c66353143f23` (signed `dope-engine-v1.1.0`, pinned by JopeDime `#435`; initial `1.1.0` source pin `22dad4ed080653d31b8acf02a507a7b35ce1cdb6`; `29ba3db72df79b2a799cbfb13d55485eb46bb2d5` is later `main` where encode outputs are byte-identical on the 285-table and 27-synthetic checks, not a JopeDime-tested pin) |
+| Compatible encoder source commit | `15e12aa3dc33851655580f6aa7c9c66353143f23` (signed `dope-engine-v1.1.0`, pinned by JopeDime `#435` and `#437`; initial `1.1.0` source pin `22dad4ed080653d31b8acf02a507a7b35ce1cdb6`; `29ba3db72df79b2a799cbfb13d55485eb46bb2d5` (`#349`) and `bbba9863faaad35f0c66d1ba5ed42ee2b138ff52` (`#351`, standalone `resident_release_check` example) are later `main` commits where encode outputs are byte-identical on the 285-table and 27-synthetic checks) |
 | Source engine workspace version | `1.1.0` ([`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0), tag commit `15e12aa3dc33851655580f6aa7c9c66353143f23`) |
 | Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) |
 | Canonical file | `dope_mlc_v3_multitask_best.safetensors` |
@@ -51,10 +51,10 @@ submodule gitlink; do not follow a moving branch automatically.
 ```bash
 set -euo pipefail
 git clone https://github.com/neverhuman/dope.git vendor/dope
-git -C vendor/dope checkout --detach 22dad4ed080653d31b8acf02a507a7b35ce1cdb6
+git -C vendor/dope checkout --detach 15e12aa3dc33851655580f6aa7c9c66353143f23
 # Alternatively, instead of the clone above:
 # git submodule add https://github.com/neverhuman/dope.git vendor/dope
-# git -C vendor/dope checkout --detach 22dad4ed080653d31b8acf02a507a7b35ce1cdb6
+# git -C vendor/dope checkout --detach 15e12aa3dc33851655580f6aa7c9c66353143f23
 # git add .gitmodules vendor/dope
 
 python3.12 -m venv .venv
@@ -259,6 +259,13 @@ DOPE checkout:
 ```bash
 cargo run --manifest-path engine/Cargo.toml --locked -p dope-core \
   --example encoder_629 -- /absolute/path/to/dope_mlc_v3_multitask_best.safetensors
+```
+
+When upgrading past `15e12aa3dc33851655580f6aa7c9c66353143f23` to `bbba9863faaad35f0c66d1ba5ed42ee2b138ff52` (`#351`) or later `main`, the standalone [resident release check example](../engine/dope-core/examples/resident_release_check.rs) verifies the accepted resident/session optional-landmark bounds (`<= 5 ms` max `none` overhead beyond read + prepare, `<= 30 ms` median complete latency over 5 post-warmup runs on `1..=1,024` fit rows with 8 Rayon threads; see [optional-landmarks-qualification.md](optional-landmarks-qualification.md)):
+
+```bash
+cargo run --manifest-path engine/Cargo.toml --locked --release -p dope-core \
+  --example resident_release_check
 ```
 
 Downstream Cargo projects may use
