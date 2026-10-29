@@ -30,6 +30,16 @@ surfaces in memory and fails if the README block, figures or paper macros differ
 `bench/real-world/results/confirm/records.jsonl` implies. A benchmark cell that fails, times out
 or crashes is recorded as such and stays in every denominator.
 
+The resident/session release checker has deterministic boundary/refusal tests:
+`cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits`.
+`just engine` includes these tests and compiles/lints the measurement example.
+Actual timing requires the local released checkpoint, explicitly declared fit
+input, requested CPU/CUDA device and eight-thread profile; see the
+[exact command, timing spans and receipt/exit contract](optional-landmarks-qualification.md#executable-residentsession-bound-check).
+Keep measured failures, setup costs and CPU/CUDA results distinct. A deterministic
+unit pass does not establish a hardware latency pass or replace the existing
+none/full cohort qualification.
+
 ## Repository and research-kernel gates
 
 `just deployment-check` verifies the separate locked `deploy/` CPU graph, typed

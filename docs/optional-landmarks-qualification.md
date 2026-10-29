@@ -183,6 +183,61 @@ Following PR `#349` (`29ba3db72df79b2a799cbfb13d55485eb46bb2d5`, column-parallel
     2. Resident `none`-mode `p50` is **`<= 30 ms`** on real tables with `n <= 1,024`.
   - Strict-cold per-process CLI numbers (`0 / 40` on Cold CUDA due to the fixed `~550–650 ms` CUDA-context + cuBLAS + checkpoint weight-upload startup floor; `3 / 40` on Cold CPU due to the `~100 ms` fixed process/model-load floor on `n <= 1,024`) are retained alongside as separate product-regime context. On the 15-rep interleaved Cold CPU A/B across all 40 real tables (`29ba3db7` vs `42e5b4f5`), `#349` is `+3.3%` faster on `none` (geomean `0.967×`) and `+1.2%` faster on `full` (geomean `0.988×`). A persistent CLI worker or daemon is deferred to a future serving-contract item.
 
+### Executable resident/session bound check
+
+The Rust `resident_release_check` example enforces the accepted resident/session
+bounds on one explicitly supplied fit CSV. Build the existing CUDA backend and
+run with a local released MLC-v3 checkpoint:
+
+```sh
+CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path engine/Cargo.toml \
+  -p dope-core --example resident_release_check --features cuda
+RAYON_NUM_THREADS=8 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  taskset -c 32-39 target/release/examples/resident_release_check \
+  /path/to/released.safetensors /path/to/fit.csv TARGET regression cuda:0
+```
+
+Run from the repository root and reuse the lane's existing `target/`.
+`TARGET` must come from the dataset's explicit declaration. Normalize external
+fit tables through the [target-last intake](data-contract.md) before measurement.
+Tasks are `regression`, `classification` (binary), and `multiclass`. The device
+must be explicit `cpu` or `cuda:N`; there is no automatic selection or CPU
+fallback. A CPU-only build omits `--features cuda` and accepts `cpu` for a
+separate functional/timing result. Match CPU affinity, thread settings, hardware
+and input provenance when comparing results.
+
+The command requires an actual eight-thread Rayon pool, 1..=1,024 fit rows and
+the released checkpoint SHA-256
+`d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`
+(1,781,800 bytes). It checks local bytes before loading them; it downloads no
+weights. It reads/materializes the CSV once and performs six real
+prepare/zero-landmark conditioning/MLC-v3 High629 forwards, discarding the first
+run as warm-up. Forward timing includes tensor creation, upload and completed
+629-coordinate host readback. Using the five remaining runs:
+
+- **Overhead:** maximum `conditioning_ms + forward_ms` must be <= 5 ms.
+- **Latency:** median of each complete
+  `read_ms + prepare_ms + conditioning_ms + forward_ms` must be <= 30 ms.
+  The single measured CSV read is included in each total. This is not the sum
+  of the individual stage medians.
+- The receipt also reports a linearly interpolated p95 of complete latency.
+  It does not apply an additional p95 acceptance threshold.
+
+Stdout is one `dope.resident-release-check/v1` JSON object containing all six
+raw runs, limits and reductions, actual device, source/conditioning digests,
+and checkpoint/executable SHA-256. It contains no source headers or values.
+Exit **0** means both measured bounds pass; **1** means a measured bound fails;
+**2** means refusal or unavailable execution, including invalid input/device,
+wrong thread count, checkpoint mismatch or failed/nonfinite output. Preserve
+failures and the caller's declared fit-input provenance alongside the receipt.
+
+This command checks one fixture, not the whole real-table cohort. It executes
+none mode only, so it does not requalify the >= 5x none/full ratio. Model/device
+setup is excluded from the resident bounds; model-load time is disclosed
+separately. These results are not a fresh-process CLI SLA, candidate
+registration, training-quality evaluation or release certification. Existing
+`landmark_mode_bench` measurements and historical qualification remain intact.
+
 #### Supporting 27-cell synthetic matrix (`{binary, multiclass, regression} × n ∈ {1k, 10k, 50k} × p ∈ {11, 65, 201}`, `--threads 8`, cores 32–39)
 
 | Regime | Cells `>= 5x` (`29ba3db7`) | Geomean ratio (`29ba3db7`) | Median ratio (`29ba3db7`) | Min–Max ratio (`29ba3db7`) | `42e5b4f5` baseline & notable `29ba3db7` cell behavior |
