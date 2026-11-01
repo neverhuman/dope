@@ -1,5 +1,8 @@
 use std::path::PathBuf;
 
+use dope_core::landmark::{BundleScope, LandmarkBundle, LandmarkMode, LandmarkStatus};
+use dope_core::prepare::{build_conditioning, prepare_table, NativeReportView, PrepTask};
+
 use dope_core::prepare::building_blocks::{
     compute_building_block_landmarks, BuildingBlockDescriptors,
 };
@@ -156,6 +159,86 @@ fn unflatten<const K: usize>(flat: &[f32]) -> Vec<[f32; K]> {
 
 fn flatten<const K: usize>(rows: &[[f32; K]]) -> Vec<f32> {
     rows.iter().flat_map(|r| r.iter().copied()).collect()
+}
+
+#[test]
+fn conditioning_sanitizes_public_bundle_before_descriptors_and_mode_checks() {
+    let x: Vec<Vec<f64>> = (0..8).map(|i| vec![i as f64]).collect();
+    let y: Vec<f64> = (0..8).map(|i| i as f64).collect();
+    let table = prepare_table(&x, &y, PrepTask::Regression).unwrap();
+    let report = NativeReportView::empty();
+    for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY, 1.5] {
+        // Public fields can bypass constructor/JSON sanitation. Every claimed
+        // observation here is invalid, so the effective input must be zero.
+        let mut supplied = LandmarkBundle::zero();
+        supplied.values.fill(value);
+        supplied.mask.fill(true);
+        supplied.status = LandmarkStatus::Full;
+        for mode in LandmarkMode::ALL {
+            let raw_report = (mode == LandmarkMode::Full).then_some(&report);
+            let expected =
+                build_conditioning(&table, &LandmarkBundle::zero(), raw_report, mode).unwrap();
+            let actual = build_conditioning(&table, &supplied, raw_report, mode).unwrap();
+            assert_eq!(actual.bundle, expected.bundle);
+            assert_eq!(actual.vec256[23], 0.0, "invalid presence: {value} {mode:?}");
+            assert_eq!(actual.vec256[46], 0.0, "invalid rank: {value} {mode:?}");
+            assert_eq!(actual.digest(), expected.digest());
+            assert_eq!(actual, expected, "sanitized conditioning: {value} {mode:?}");
+        }
+    }
+}
+
+#[test]
+fn conditioning_sanitation_preserves_measured_zero_and_other_valid_observations() {
+    let x: Vec<Vec<f64>> = (0..8).map(|i| vec![i as f64]).collect();
+    let y: Vec<f64> = (0..8).map(|i| i as f64).collect();
+    let table = prepare_table(&x, &y, PrepTask::Regression).unwrap();
+    let mut values = [0.0; 23];
+    let mut mask = [false; 23];
+    values[0] = 0.25;
+    mask[0] = true;
+    mask[1] = true; // A measured finite zero remains present.
+    let clean = LandmarkBundle::from_squashed(&values, &mask, BundleScope::new("synthetic-fit"));
+    let mut supplied = clean.clone();
+    for (slot, value) in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY, 1.5]
+        .into_iter()
+        .enumerate()
+    {
+        supplied.values[slot + 2] = value;
+        supplied.mask[slot + 2] = true;
+    }
+    supplied.values[6] = 0.75; // A masked-out finite value is missing too.
+    supplied.status = LandmarkStatus::None; // Ignore stale caller coverage.
+    let expected = build_conditioning(&table, &clean, None, LandmarkMode::Progressive).unwrap();
+    let actual = build_conditioning(&table, &supplied, None, LandmarkMode::Progressive).unwrap();
+    assert_eq!(actual.bundle.status, LandmarkStatus::Partial(2));
+    assert_eq!(actual.bundle.values[1].to_bits(), 0.0f32.to_bits());
+    assert!(actual.bundle.mask[1]);
+    assert_eq!(actual.vec256[24], 1.0);
+    assert_eq!(actual.digest(), expected.digest());
+    assert_eq!(actual, expected);
+    let zero = build_conditioning(
+        &table,
+        &LandmarkBundle::zero(),
+        None,
+        LandmarkMode::Progressive,
+    )
+    .unwrap();
+    assert_ne!(actual.digest(), zero.digest());
+    for mode in [LandmarkMode::None, LandmarkMode::Fast] {
+        let err = build_conditioning(&table, &supplied, None, mode).unwrap_err();
+        assert!(err
+            .to_string()
+            .contains("landmark_mode_none_rejects_bundle"));
+    }
+    let err = build_conditioning(
+        &table,
+        &supplied,
+        Some(&NativeReportView::empty()),
+        LandmarkMode::Full,
+    )
+    .unwrap_err();
+    assert!(err.to_string().contains("landmark_bundle_report_mismatch"));
 }
 
 #[test]

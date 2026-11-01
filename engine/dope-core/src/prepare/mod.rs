@@ -117,6 +117,9 @@ pub fn build_conditioning_at_level(
     level: Level,
     sample_positions: Option<&[usize]>,
 ) -> Result<DopeConditioning> {
+    // Public bundle fields can bypass constructors; condition on the same
+    // sanitized observations that the returned metadata describes.
+    let bundle = bundle.sanitized();
     let tab_desc = table.table_descriptors(level);
     let bundle_input = BundleConditioningInput {
         values: &bundle.values,
@@ -187,7 +190,7 @@ pub fn build_conditioning_at_level(
         mode.as_str(),
         level.as_str(),
     )?;
-    cond.bundle = bundle.sanitized();
+    cond.bundle = bundle;
     Ok(cond)
 }
 
