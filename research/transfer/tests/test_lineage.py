@@ -10,6 +10,7 @@ from pathlib import Path
 
 import jsonschema
 
+from research.transfer import lineage_manifest
 from research.transfer.lineage import (
     DEFAULT_REGISTRY,
     ExposureState,
@@ -378,9 +379,35 @@ class LineageTests(unittest.TestCase):
             else:
                 with self.assertRaises(LineageError):
                     admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+        # The leakage check needs an otherwise valid feature, not the loop's date-only value.
+        document = private_manifest()
+        document["sources"][0]["features"][0]["feature_timestamp"] = "2026-01-01T01:00:00+01:00"
         document["sources"][0]["features"][0]["column"] = "private-target-canary"
         with self.assertRaisesRegex(LineageError, "source_feature_leakage"):
             admit_source_manifest(document, admitted_registry(), signing_key=KEY)
+
+    def test_date_time_format_is_checked_without_optional_packages(self) -> None:
+        # Admission uses lineage_manifest's own RFC 3339 check, never jsonschema's optional
+        # rfc3339-validator, so a date-only value is refused identically on every host.
+        self.assertIs(lineage_manifest._FORMATS.checkers["date-time"][0],
+                      lineage_manifest._rfc3339_date_time)
+        for value in ("2026-01-01T00:00:00Z", "2026-01-01T01:00:00+01:00",
+                      "2026-01-01t00:00:00.250-07:00"):
+            with self.subTest(value=value):
+                self.assertTrue(lineage_manifest._rfc3339_date_time(value))
+        for value in ("2026-01-01", "2026-01-01T00:00:00", "2026-01-01T01:00+01:00",
+                      "2026-13-01T00:00:00Z", "20260101T000000Z", "2026-01-01 00:00:00Z"):
+            with self.subTest(value=value):
+                self.assertFalse(lineage_manifest._rfc3339_date_time(value))
+        for field in ("feature_timestamp", "prediction_time"):
+            document = private_manifest()
+            if field == "feature_timestamp":
+                document["sources"][0]["features"][0]["feature_timestamp"] = "2026-01-01"
+            else:
+                document["sources"][0]["prediction_time"]["timestamp"] = "2026-01-01"
+            with self.subTest(field=field), \
+                    self.assertRaisesRegex(LineageError, "^source_manifest_schema_invalid$"):
+                admit_source_manifest(document, admitted_registry(), signing_key=KEY)
 
     def test_rights_admission_refuses_unlicensed_unknown_and_unapproved_use(self) -> None:
         for field, value in (("license", "unlicensed"), ("license", " UNKNOWN "),

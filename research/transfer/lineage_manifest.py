@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -19,12 +20,37 @@ class LineageError(ValueError):
     """A lineage, rights, exposure, or public-provenance rule failed."""
 
 
+_RFC3339_DATE_TIME = re.compile(
+    r"\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(\.\d+)?([Zz]|[+-]\d{2}:\d{2})"
+)
+
+
+def _rfc3339_date_time(value: object) -> bool:
+    """RFC 3339 date-time, checked here rather than by jsonschema's optional format packages.
+
+    Without rfc3339-validator installed, jsonschema skips "date-time" entirely, so admission
+    would differ between hosts. Non-strings pass: "format" only constrains strings.
+    """
+    if not isinstance(value, str):
+        return True
+    if _RFC3339_DATE_TIME.fullmatch(value) is None:
+        return False
+    try:
+        datetime.fromisoformat(value.upper().replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
+_FORMATS = FormatChecker()
+_FORMATS.checks("date-time")(_rfc3339_date_time)
+
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas/source-manifest-v1.schema.json"
 _SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-_MANIFEST = Draft202012Validator(_SCHEMA, format_checker=FormatChecker())
+_MANIFEST = Draft202012Validator(_SCHEMA, format_checker=_FORMATS)
 _PUBLIC = Draft202012Validator(
     {"$ref": "#/$defs/public_projection", "$defs": _SCHEMA["$defs"]},
-    format_checker=FormatChecker(),
+    format_checker=_FORMATS,
 )
 
 
@@ -55,12 +81,10 @@ def _token(key: bytes, domain: str, value: object) -> str:
 
 
 def _timestamp(value: str) -> datetime:
-    try:
-        result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if isinstance(value, str) and _rfc3339_date_time(value):
+        result = datetime.fromisoformat(value.upper().replace("Z", "+00:00"))
         if result.utcoffset() is not None:
             return result
-    except ValueError:
-        pass
     raise LineageError("source_timestamp_invalid")
 
 
