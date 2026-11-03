@@ -191,3 +191,5 @@ M0 source. The1811 full audit scored87 with0caps/high/critical, but its strict
 badge check failed against the committed88 snapshot; preserve that failure.
 Counts remain38PASS/23NOT_RUN/4historicalBLOCKED. See the
 [source and scoped execution receipt](receipts/stage-pin-and-sdk-prepared-surface.json).
+
+The README score now copies the exact generated87-point SVG from the authentic1811 hosted artifact. Its clean/full report passed the85floor with0caps/high/critical; the original job still failed the old88snapshot comparison. This is historical source-bound evidence, not a fresh pass for the new SDK/CI batch. The earlier451 witness is retained unchanged.

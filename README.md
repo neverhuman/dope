@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Engine: pure Rust](https://img.shields.io/badge/engine-pure%20Rust-orange.svg)](engine/)
 
-Last completed local full-audit measurement: **88/100 (pass)** with Jankurai 1.7.1 at [source `451ad474`](https://github.com/neverhuman/dope/commit/451ad47423a98db9de104269174dfe26eebf5e9f), with zero caps, HIGH or critical findings ([hash-only witness](docs/plans/next-version/dope/receipts/jankurai-451-snapshot.json)). This historical report marked the worktree dirty despite independently clean tracked Git status; it does not qualify later commits or hosted CI. The generated score snapshot is checked against each fresh exact-head CI audit; click the badges for current run status.
+Recorded hosted full-audit report: **87/100 (pass)** with Jankurai 1.7.1 at [source `181116c7`](https://github.com/neverhuman/dope/commit/181116c7aa8f91ce74ab3ff9e5838ebdcde5037b), with a clean source tree and zero caps, HIGH or critical findings ([hash-only witness](docs/plans/next-version/dope/receipts/hosted-audit-1811-snapshot.json). The [audit job](https://github.com/neverhuman/dope/actions) failed its final check against the previous 88-point badge; this snapshot copies the genuine generated 87-point artifact. Later commits require their own fresh exact-head check. The historical local 451 report and its dirty-state discrepancy remain in [the earlier witness](docs/plans/next-version/dope/receipts/jankurai-451-snapshot.json).
 
 ![Overall multi-auditor tournament Elo and holdout retention by byte-budget tier across the thousand-dataset benchmark: DOPE (v1.0.0) against raw row subsampling, Gaussian copula, tabular diffusion, and adversarial random forests.](bench/real-world/figures/hero.png)
 

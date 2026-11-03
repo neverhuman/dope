@@ -135,8 +135,8 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 21641,
-      "sha256": "e554e37911ed1d0f66b942a1946f09ada0c4652dff54fb340cd0a66515c3d10e"
+      "bytes": 21998,
+      "sha256": "d775fe8c1ae5c571658b24bc1334a86891217f57c2a892441176577f548c8e25"
     },
     "STATUS.json": {
       "bytes": 25543,
@@ -237,6 +237,10 @@
     "dope/receipts/stage-pin-and-sdk-prepared-surface.json": {
       "bytes": 3487,
       "sha256": "050064230501211893682e8b7edbafcbbb1f4dac7738ee8db7c5ffee85348477"
+    },
+    "dope/receipts/hosted-audit-1811-snapshot.json": {
+      "bytes": 1363,
+      "sha256": "c53b1d522af139e07dd985285ddbc83ce83a0bfa12f015b8c860807c8a7ec1b5"
     }
   },
   "historical_status": "PLANNED"
