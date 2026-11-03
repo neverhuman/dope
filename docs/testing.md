@@ -651,3 +651,21 @@ fixed-draw `DML3`/`CSC1` sampling (`< 1e-5`) parity across all four tiers and th
 ## Additive next-version checks
 
 The `test_next_version` shared CPU reference shard covers prospective evaluation, versioned informative rank, actual Rust NC1/DML4 fixtures, actual synthesized-data gradients and actual-model CPU checkpoint replay. The native shard adds normalization/SDK, High-required execution, DVS, DML4 and CLI journey tests; ordinary engine discovery remains intact. See [workflow commands and private/public boundaries](next-version-workflows.md). Missing tracked parity fixtures fail rather than skip. GPU training and scientific qualification remain unrun.
+
+## Strict native shared-golden validation
+
+`just golden-parity` and the golden step in `ops/ci/public-smoke.sh` now use
+the existing Rust `audit-proof focus metrics::golden` route, which refuses zero
+test discovery. The consumer recursively validates all 163 standard cases
+(129 top-level plus 34 driver-v2 cases), with exact per-component counts, and
+separately checks the seven informative-rank cases. Missing/unreadable required
+directories, entry failures, symlinks/special nodes, duplicate IDs, wrong
+component paths, malformed cases and expected-value mismatches fail closed.
+Outer schema2 driver fixtures call the unchanged explicit v2 reducer; historical
+`run_case` continues to reject schema2. Golden arithmetic stays at 1e-12.
+
+The Python golden implementation and historical tests remain preserved. Other
+Python claim/publication checks are still active migration work; this native
+caller slice does not establish repository-wide language compliance. New
+discovery fixtures and caller changes require actual source-bound native
+execution and final required CI/review. No fixture is regenerated or rebaselined.

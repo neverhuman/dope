@@ -929,7 +929,10 @@
     "engine/dope-core/src/dvs/roles.rs": "rust-core",
     "engine/dope-core/tests/dvs_contract.rs": "rust-core",
     "engine/dope-cli/tests/dvs_contract.rs": "rust-core",
-    "engine/dope-core/tests/mlc_v4_wire.rs": "rust-core"
+    "engine/dope-core/tests/mlc_v4_wire.rs": "rust-core",
+    "rust/metrics/golden.rs": "rust-core",
+    "rust/metrics/golden/discovery.rs": "rust-core",
+    "rust/metrics/golden/discovery_tests.rs": "rust-core"
   },
   "workspace": "dope"
 }

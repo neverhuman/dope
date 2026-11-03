@@ -713,8 +713,8 @@
       "purpose": "prepare both full locked graphs before mandatory offline feature, workspace, dependency and checksum boundary proofs; CPU uses the same bounded setup"
     },
     "ops/ci/public-smoke.sh": {
-      "command": "actionlint .github/workflows/*.yml",
-      "purpose": "verify thin public fork smoke script and workflow wiring"
+      "command": "bash ops/ci/public-smoke.sh",
+      "purpose": "native public compile/inspect/sample and strict nonempty Rust golden consumer plus remaining historical claim checks"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -3767,6 +3767,18 @@
     "engine/dope-core/tests/mlc_v4_wire.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v4_wire",
       "purpose": "complete 2/16/64KiB envelope boundaries and bounded malformed-packet safe errors"
+    },
+    "rust/metrics/golden.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    "rust/metrics/golden/discovery.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    "rust/metrics/golden/discovery_tests.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
     }
   },
   "workspace": "dope"

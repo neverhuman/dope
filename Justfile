@@ -94,8 +94,7 @@ score:
     bash ops/ci/audit.sh run
 
 golden-parity:
-    python3 -B -m research.transfer.tdl.golden --check
-    cargo test --locked --lib metrics::golden
+    just focus metrics::golden
 
 paper-tdl:
     bash paper/build.sh
