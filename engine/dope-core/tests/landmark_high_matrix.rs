@@ -1,7 +1,8 @@
+use dope_core::landmark::bundle::FINE_SLOTS;
 use dope_core::{
     landmark::{
         CellState, ExecutionPlan, LandmarkBundle, LandmarkGroup, LandmarkMode, LandmarkOptions,
-        LandmarkScope, ProgressiveLandmarks, SubsampleSpec, FINE_SLOTS,
+        LandmarkScope, ProgressiveLandmarks, SubsampleSpec,
     },
     mlc_v3::{MlcV3Model, MLC_V3_EXPECTED_PARAMETERS},
     prepare::{

@@ -3879,6 +3879,10 @@
     "engine/dope-core/tests/landmark_high_matrix.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_high_matrix",
       "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-cli/tests/nc1_refusal_privacy.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test nc1_refusal_privacy",
+      "purpose": "native actualCLI FIT privatepresence/publicredaction and4parser/schema/role refusals/no-partial-output; D05-S4 remainsNOT_RUN until executed"
     }
   },
   "workspace": "dope"
