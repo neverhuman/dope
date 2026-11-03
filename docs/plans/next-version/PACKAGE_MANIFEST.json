@@ -39,28 +39,28 @@
       "sha256": "73953978226c862e3a87029089a8646673583e7ad9f946e9b885ff882b65a349"
     },
     "dope/tasks/d02-versioned-driver-rank-successor.md": {
-      "bytes": 10051,
-      "sha256": "50bd7513fa1c0146942930a2cca6a2102ab3b2ed9d6dfe67956a7f85f79cf0f7"
+      "bytes": 10411,
+      "sha256": "9feacd6b868bb5ec9056c260f4a97a8e7188a9cab5603405cb41e6bc73da05a9"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
       "bytes": 8572,
       "sha256": "c1ef172b071cf1914eddf188de7101b208a03f3c9b8b29dab8cb4ce51206ef0d"
     },
     "dope/tasks/d04-high-landmark-dependency-plan.md": {
-      "bytes": 8734,
-      "sha256": "2350ca6cefc4b7b628a5b754b2650af394c829602907e995f0467dcbe3c482d0"
+      "bytes": 8995,
+      "sha256": "dc029421274c974a5d072afc76dce163f76cd3717cd4e93e1f424e9561067024"
     },
     "dope/tasks/d05-nc1-private-normalization-contract.md": {
       "bytes": 9995,
       "sha256": "5d8a94699c4f18caf57eddc8b6f1176401d569a9f0a092fd290f6cce1ba710ef"
     },
     "dope/tasks/d06-dvs-and-audit-card.md": {
-      "bytes": 8886,
-      "sha256": "62549ad16cf329e2b6dfd602f24421120c914c7a568080b3363b94585fd8b9ae"
+      "bytes": 10540,
+      "sha256": "d8f54713bc5926fa3c7d3f46f061c8b1d4b399714849afb0507c5f84212f9e3a"
     },
     "dope/tasks/d07-dml4-wire-reference-sampler-and-hard-caps.md": {
-      "bytes": 9650,
-      "sha256": "17f4e68afef72bcee644576a3b8024dba0e85300368c2192ec03cf1bcfa32dd0"
+      "bytes": 10256,
+      "sha256": "da895ca6ea5439b629702b709aad82f5f41ae4219ea94f0a2e5401934b3f54d1"
     },
     "dope/tasks/d08-batched-resumable-trainer.md": {
       "bytes": 9663,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 27143,
-      "sha256": "525c967607e673e5c01c931590a95a537930121cecd9bcdad6c09e3e6580a9ba"
+      "bytes": 32731,
+      "sha256": "0e482b56cb885d3fbd20002cda14a3ea9eaf4bafa148768edc7c3c7ce317d15d"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 23360,
-      "sha256": "82103e9566b4b317de4173e7d845ed3c0ee26f237202f44711d9e69389714940"
+      "bytes": 24450,
+      "sha256": "767c20fc6b6adb16070ecedca967babefe9afee315f5024dff73e969b97aec65"
     },
     "STATUS.json": {
-      "bytes": 29695,
-      "sha256": "0b038c68ae540deb2c986716612ccfb4ccc8b15bd945b6e16a3ad39e66a210e7"
+      "bytes": 30782,
+      "sha256": "99ceb064428977e41956b8df8346584307135b02de994f456a3a32b4a7103907"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -245,6 +245,10 @@
     "dope/receipts/bedf-command-and-lock-repair.json": {
       "bytes": 3558,
       "sha256": "3f864a7d74007f2ae3badd0cafa287feb667160461461a7f86492b6403c09c52"
+    },
+    "dope/receipts/hosted-native-1811-criteria.json": {
+      "bytes": 6909,
+      "sha256": "8bf2356e548c08fef7ededa18335e931b4729e0a30ffd1eaf672f649fe6b675e"
     }
   },
   "historical_status": "PLANNED"

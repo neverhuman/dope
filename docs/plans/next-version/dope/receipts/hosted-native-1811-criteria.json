@@ -1,0 +1,49 @@
+{
+  "schema": "dope.criterion-evidence-strong-review/v1",
+  "reviewer": "/root",
+  "decision": "ACCEPT_NINE_SCOPED_CRITERIA_AFTER_INDEPENDENT_ASSERTION_AND_SOURCE_CLOSURE_REVIEW",
+  "not_a_whole_job_current_source_or_release_verdict": true,
+  "primary_evidence": {
+    "source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+    "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+    "tested_and_source_tree": "f3b5f5ebe4541bdf17f2110661f7f91ee0c4f362",
+    "run": 41687886049,
+    "job": 126098368662,
+    "whole_job": "success",
+    "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d",
+    "rust_summary": {"passed": 273, "failed": 0, "ignored": 1, "zero_result_rows": 6},
+    "prior_D02_component": "Tracked completed-root-metrics-ccd.json preserves actual completed malformed/analytic root targets; enclosing historical job was cancelled, never whole-job PASS. Previously missing actual production duplicated-member assertion is executed in the1811 log929."
+  },
+  "independently_verified_unchanged_1811_to_bedf": {
+    "core_src_tree": "52696350d4a46f911e3740e5c0c4ef6a9b642f2f",
+    "cli_src_tree": "4db65eed647730785077e0361298c491bc6e9400",
+    "norm_tree": "5f9afe8f4c12914048de480d0cd081711ab19c78",
+    "golden_tree": "c05852018f23aeca689c23c80556c439b403f39b",
+    "reviewed_test_paths": ["engine/dope-core/tests/dvs.rs", "engine/dope-core/tests/dvs_contract.rs", "engine/dope-cli/tests/dvs_contract.rs", "engine/dope-cli/tests/next_version_cli.rs", "engine/dope-core/tests/landmark_high_required.rs", "engine/dope-core/tests/mlc_v4_wire.rs"],
+    "new_bedf_M0_and_SDK_qualification": "NOT_RUN; deliberately excluded. Test-dependency lock qualifier repair does not license current-head compilation PASS."
+  },
+  "accepted": [
+    {"id":"D02-S4","evidence":"Actual production grouped permutation test in engine/dope-core/tests/dvs_contract.rs duplicates one-hot member within same declared group, asserts identical loss increases, mass agreement1, successor rank equal identical-input rank/value1/informative_pairs1 and tied refusal. Authentic log929 PASS. Prior malformed/unsupported metric component evidence preserved; fixture/root/engine bridges retain prior analytic parity. No arbitrary duplicate-group invariance claim."},
+    {"id":"D04-S4","evidence":"high_omits_fine_marks_readiness_and_preserves_conditioning actual log981 PASS: FINE no-op before request, progressive Larger/Macro order, report byte/work equality after repeated run_ids/run_required, explicit Full upgrade, later Fine completion and final report/bundle equality. Existing implementation/test closure unchanged; not the new three-task encoder matrix."},
+    {"id":"D06-S1","evidence":"Core dvs10PASS and dvs_contract4PASS log912-934: hand R0.75/1.25/-0.25, grouped mass0.5, selected index0/regret2/transfer-rank1, ties/no-choice, zero-gain uninformativeness and failed schedules asserted explicitly. This is fixture correctness, not scientific qualification."},
+    {"id":"D06-S2","evidence":"dvs_role_binding_refuses_missing_wrong_or_reused_views_before_selection and dvs_real_test_poison_changes_assessment_but_not_synthetic_choice log918/921 PASS, plus common-view identity refusal log917. Poisoned TEST changes assessment but leaves model choice0; malformed role/usage/shared pins fail before empty selection is consumed. Binding remains caller_declared_hash_checked, no authenticated custody claim."},
+    {"id":"D06-S3","evidence":"Core missing/uninformative schedule test log919, four-outcome failed/timed_out/unsupported/missing test log931 and actual incomplete CLI log743 retain every scheduled cell, failed/missing counts, null unknown wall/fit/result and incomplete robust score. No missing result is converted to zero or success."},
+    {"id":"D06-S5","evidence":"Actual transfer_report_serializes_actual_parts_and_card_without_python log744 PASS. Fixed literal serialized components independently assert payload63/shared17/closure80/private37, five part byte lengths and known SHA256s; card fields/role digest/selection/privacy match actual receipt; private CANARY value absent in receipt/card/stdout/stderr. Root independently read the complete test body, not only its name."},
+    {"id":"D06-S6","evidence":"Actual native CLI log742-744 and816-817 PASS: complete report and incomplete denominator paths, missing-role/no-partial-output refusal, parsed-error redaction. Test child launches absolute built CLI with PATH empty and Python environment removed. No Python product process dependency for this bounded journey."},
+    {"id":"D07-S2","evidence":"Actual mlc_v4_wire15PASS log1065-1082 includes all three complete envelope caps2048/16384/65536, exact-boundary CRC-framed decode, one-byte-over refusals, typed impossible-cap refusal and real80-group65-knot graph encoded above16k and below64k. Root independently read those four substantive functions. Optional conformance_export no-op is not relied upon."},
+    {"id":"D07-S4","evidence":"Actual wire tests log1069-1079 PASS: truncated/unknown-version/corrupt checksums, u32MAX header length preflight with13byte buffer, invalid semantic gate with valid CRC, unknown private key/value redaction, 257-column scalar bound refusal and >64k envelope refusal. Root independently read implementation-bound assertions; no huge allocation launched."}
+  ],
+  "before": {"PASS":38,"NOT_RUN":23,"historical_BLOCKED":4},
+  "after_if_owner_integrates": {"PASS":47,"NOT_RUN":14,"historical_BLOCKED":4},
+  "original_engineering_tasks_still_open":7,
+  "new_python_rust_migration_streams_still_open":7,
+  "campaign_criteria": "D00-S4,D11-S2/S3/S4 remain historical BLOCKED and engineering-release DEFERRED_CAMPAIGN_QUALIFICATION, never PASS",
+  "excluded_or_deferred": {
+    "already_PASS_no_duplicate_promotion": ["D02-S2","D02-S3","D04-S3","D05-S1","D05-S3","D07-S1","D07-S5"],
+    "D04-S1": "Whole all-legacy-fixture digest closure not inferred from constant aliases alone.",
+    "D05-S2": "Keep open for complete every-view/SDK conversion closure; current SDK source changed after tested1811.",
+    "D09-S5": "Native producer basis pass alone is not complete measured sampler-versus-training-approximation discrepancy closure.",
+    "remaining": "D02-S1,D03-S2/S3/S4,D04-S1/S2/S5,D05-S2/S4/S6,D06-S4,D07-S6,D09-S5/S6 remain NOT_RUN."
+  },
+  "integration_conditions": ["Sole source writer rereads current inventory and only promotes these nine if each is still NOT_RUN; never add counts twice.","Preserve original baseline and r1 Luna proposal; this strong review explicitly corrects its already-PASS duplicates and insufficient broad claims.","Bind tracked individual criteria to primary job/source/log/test assertions and this review, update task headers/inventories/status/package hashes in one owned batch.","No current full CI, release, privacy/scientific efficacy, Python compliance or new SDK runtime PASS is implied."]
+}

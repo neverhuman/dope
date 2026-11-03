@@ -2,6 +2,8 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
+Current criterion matrix: **47 PASS /14 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+
 ## Latest user language policy: NOT_COMPLIANT
 
 Python is permitted only for genuine deep-learning training and necessary training-coupled state. The retained v3 summary/Elo and evaluation/orchestration paths are nontraining migration debt, not approved Python end state. The current snapshot has 890 tracked Python files; 787 runtime-inventory paths exclude103 research/levels files. No inventory or historical exception is a waiver. [The Rust migration queue](language-policy/README.md) tracks seven external source-only lanes and separate LP-/RS-/rs- acceptance IDs. The existing Rust frozen-evidence checker is now activated in the CPU/Justfile routes; its new synthetic tests and compatibility extension still require hosted compilation/execution. The broader seven Rust migration lanes remain incomplete and unqualified. Preserve all compatibility/test/evidence history; the original 65 criteria below remain their historical scoped baseline, not new-policy completion.
@@ -9,10 +11,10 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `9484dd2e3c6c68ab390ee7f1b6c4231918f34df8`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `e3eaadd803c5a556f2d729dd9b8f95af85868704`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
-- The current static tracked-source inventory covers 1,300 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
+- The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
 
 A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; those earlier source-preservation pushes launched no PR or workflow.
 
@@ -215,3 +217,9 @@ Formatting, Bash, Actionlint, source-limit and diff checks pass. New native
 execution and required CI remain NOT_RUN/PENDING; actualbedf failures are
 preserved. No acceptance promotions follow from these source checks. See the
 [repair receipt](receipts/bedf-command-and-lock-repair.json).
+
+## SDK parity repair and scoped native evidence
+
+Sourcee3eaadd8 explicitly compares independently produced SDK and Core High vector bits, fixing the actual7eb Clippy refusal without suppression, underscore hiding or assertion removal. The test remains497lines and current native execution is pending.
+
+Exactly D02-S4,D04-S4,D06-S1/S2/S3/S5/S6 and D07-S2/S4 are promoted from NOT_RUN after verifying each status and all referenced production/test blobs. Counts47PASS/14NOT_RUN/4historicalBLOCKED use individual assertions, not the generic273-test total. The prior baseline/receipts remain preserved; D04-S1,D05-S2,D09-S5 and current SDK qualification stay open.

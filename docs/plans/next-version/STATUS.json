@@ -24,12 +24,12 @@
     },
     "D02": {
       "source": "IMPLEMENTED",
-      "focused_checks": "ACCEPTED_S2_S3_COMPLETED_CCD_SUBTARGETS",
+      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "S2/S3 accepted from completed root Rust/Python subtargets despite later job cancellation. S1/S4 remain pending; current full CI separate.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D03": {
@@ -44,12 +44,12 @@
     },
     "D04": {
       "source": "IMPLEMENTED",
-      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Full-reservation spectrum/FINE-not-fabricated criterion S3 accepted; other landmark criteria remain pending.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
-      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D05": {
@@ -65,23 +65,23 @@
     },
     "D06": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json",
       "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
     },
     "D07": {
       "source": "IMPLEMENTED",
-      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Nondefault gate definition and source-free sampling criteria S1/S5 accepted; remaining wire/CLI/compatibility criteria pending.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
-      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json",
       "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
     },
@@ -130,10 +130,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 38,
-    "NOT_RUN": 23,
+    "PASS": 47,
+    "NOT_RUN": 14,
     "BLOCKED": 4,
-    "note": "Historical30/31/4 baseline, six451-tree promotions and two completed ccd metric subtargets. Four campaign criteria separately DEFERRED_CAMPAIGN_QUALIFICATION, never PASS. Current source/new tests need exact-head qualification."
+    "note": "Original65 criteria retained. Nine individually reviewed1811 source/test closures promoted; no generic273/currentSDK/allCI inference. Four campaign criteria separately deferred, neverPASS."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -276,7 +276,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "5378f87c67d20b511022fb986a2ecb2bd4220893",
+  "current_local_source_commit": "e3eaadd803c5a556f2d729dd9b8f95af85868704",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -633,5 +633,37 @@
     },
     "acceptance": "No criteria promoted.38PASS23NOT_RUN4historicalBLOCKED; only4campaigncriteria deferred neverPASS. Rustlanguagepolicy NOT_COMPLIANT/sevenstreams unfinished.",
     "audit": "Current source requires fresh audit/badge; historical1811authentic87snapshot/witness preserved, no score guessed."
+  },
+  "historical_success_criteria": [
+    {
+      "PASS": 38,
+      "NOT_RUN": 23,
+      "BLOCKED": 4,
+      "note": "Historical30/31/4 baseline, six451-tree promotions and two completed ccd metric subtargets. Four campaign criteria separately DEFERRED_CAMPAIGN_QUALIFICATION, never PASS. Current source/new tests need exact-head qualification."
+    }
+  ],
+  "hosted_native_1811_acceptance": {
+    "receipt": "dope/receipts/hosted-native-1811-criteria.json",
+    "sha256": "8bf2356e548c08fef7ededa18335e931b4729e0a30ffd1eaf672f649fe6b675e",
+    "accepted": [
+      "D02-S4",
+      "D04-S4",
+      "D06-S1",
+      "D06-S2",
+      "D06-S3",
+      "D06-S5",
+      "D06-S6",
+      "D07-S2",
+      "D07-S4"
+    ],
+    "source_closure_current_verified": true
+  },
+  "current_sdk_parity_repair": {
+    "source": "e3eaadd803c5a556f2d729dd9b8f95af85868704",
+    "actual_failing_run": 41694404601,
+    "job": 126121036461,
+    "reason": "Clippy unused sdk_vec",
+    "fix": "Explicit independent SDK/CoreHigh floatbit equality;497LOC; no test/assertion removed",
+    "new_native_execution": "NOT_RUN"
   }
 }

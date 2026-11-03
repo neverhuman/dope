@@ -1,6 +1,6 @@
 # D04 — Skip unused High probes while preserving admitted conditioning
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Named native fixtures below passed at the pinned hosted 451-equivalent tree; final-head full CI and remaining criteria are still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -56,12 +56,12 @@ Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D0
 
 ## Individual engineering verdicts
 
-Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+Verdicts reflect source-bound engineering receipts. Named1811 native fixtures are mapped individually below; new SDK/runtime and current full CI require separate evidence. `PASS` never implies scientific efficacy, privacy qualification or release.
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D04-S1 | **NOT_RUN** | Shared constants are aliases and all-target compilation passed; actual legacy/golden replay pending. |
 | D04-S2 | **NOT_RUN** | High-required native fixture is compiled; actual vector/digest matrix execution pending. Effective vector-only digest is distinguished from mask-bound bundle identity. |
 | D04-S3 | **PASS** | Hosted native tight_spectrum_boundaries_reserve_unused_full_panel_cost and high_omits_fine_marks_readiness_and_preserves_conditioning passed at451-equivalent tested tree; full reservation and NotRequested FINE asserted. See ../receipts/hosted-native-451-criteria.json. |
-| D04-S4 | **NOT_RUN** | Order/idempotence/explicit upgrade fixtures compiled; actual native execution pending. |
+| D04-S4 | **PASS** | high_omits_fine_marks_readiness_and_preserves_conditioning actual log981 PASS: FINE no-op before request, progressive Larger/Macro order, report byte/work equality after repeated run_ids/run_required, explicit Full upgrade, later Fine completion and final report/bundle equality. Existing implementation/test closure unchanged; not the new three-task encoder matrix. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D04-S5 | **NOT_RUN** | Historical constructors/default full path unchanged in source; actual legacy report replay pending. |

@@ -1,6 +1,6 @@
 # D06 — Implement one versioned downstream-value receipt and Audit Card
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D06/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -57,13 +57,13 @@ Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D0
 
 ## Individual engineering verdicts
 
-Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+Verdicts reflect source-bound engineering receipts. Named1811 native fixtures are mapped individually below; new SDK/runtime and current full CI require separate evidence. `PASS` never implies scientific efficacy, privacy qualification or release.
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
-| D06-S1 | **NOT_RUN** | External source-bound small Rust harness passed analytic R/D/S and all34 C02 goldens; actual locked engine DVS test execution pending. |
-| D06-S2 | **NOT_RUN** | Prepared identity/role refusal helpers implemented; actual engine test execution pending. |
-| D06-S3 | **NOT_RUN** | Missing/failed scheduled denominator fixtures authored/compiled; actual execution pending. |
+| D06-S1 | **PASS** | Core dvs10PASS and dvs_contract4PASS log912-934: hand R0.75/1.25/-0.25, grouped mass0.5, selected index0/regret2/transfer-rank1, ties/no-choice, zero-gain uninformativeness and failed schedules asserted explicitly. This is fixture correctness, not scientific qualification. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
+| D06-S2 | **PASS** | dvs_role_binding_refuses_missing_wrong_or_reused_views_before_selection and dvs_real_test_poison_changes_assessment_but_not_synthetic_choice log918/921 PASS, plus common-view identity refusal log917. Poisoned TEST changes assessment but leaves model choice0; malformed role/usage/shared pins fail before empty selection is consumed. Binding remains caller_declared_hash_checked, no authenticated custody claim. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
+| D06-S3 | **PASS** | Core missing/uninformative schedule test log919, four-outcome failed/timed_out/unsupported/missing test log931 and actual incomplete CLI log743 retain every scheduled cell, failed/missing counts, null unknown wall/fit/result and incomplete robust score. No missing result is converted to zero or success. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D06-S4 | **NOT_RUN** | Legacy source goldens unchanged; current root and engine exact-head C02 execution pending. |
-| D06-S5 | **NOT_RUN** | Actual-byte dependency accounting and AuditCard rendering implemented; actual native/canary/schema output checks pending. |
-| D06-S6 | **NOT_RUN** | Actual bounded transfer-report CLI journey compiled; execution pending. |
+| D06-S5 | **PASS** | Actual transfer_report_serializes_actual_parts_and_card_without_python log744 PASS. Fixed literal serialized components independently assert payload63/shared17/closure80/private37, five part byte lengths and known SHA256s; card fields/role digest/selection/privacy match actual receipt; private CANARY value absent in receipt/card/stdout/stderr. Root independently read the complete test body, not only its name. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
+| D06-S6 | **PASS** | Actual native CLI log742-744 and816-817 PASS: complete report and incomplete denominator paths, missing-role/no-partial-output refusal, parsed-error redaction. Test child launches absolute built CLI with PATH empty and Python environment removed. No Python product process dependency for this bounded journey. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |

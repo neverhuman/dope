@@ -1,6 +1,6 @@
 # D07 — Freeze DML4 wire, basis and reference sampler before training
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D07/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Named native fixtures below passed at the pinned hosted 451-equivalent tree; final-head full CI and remaining criteria are still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -60,13 +60,13 @@ Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D0
 
 ## Individual engineering verdicts
 
-Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+Verdicts reflect source-bound engineering receipts. Named1811 native fixtures are mapped individually below; new SDK/runtime and current full CI require separate evidence. `PASS` never implies scientific efficacy, privacy qualification or release.
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D07-S1 | **PASS** | Hosted each_active_gate_changes_its_declared_basis_coordinate and fitted_and_decoded_nondefault_gates_match_independent_math passed for all six gates at451-equivalent tree. See ../receipts/hosted-native-451-criteria.json. |
-| D07-S2 | **NOT_RUN** | Typed cap/framing validator compiled; actual boundary and allocation refusal execution pending. |
+| D07-S2 | **PASS** | Actual mlc_v4_wire15PASS log1065-1082 includes all three complete envelope caps2048/16384/65536, exact-boundary CRC-framed decode, one-byte-over refusals, typed impossible-cap refusal and real80-group65-knot graph encoded above16k and below64k. Root independently read those four substantive functions. Optional conformance_export no-op is not relied upon. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D07-S3 | **PASS** | Default source-bound actual Rust regression and grouped-classification packets/fixed draws replay in Python test_v4_wire with 0 SKIP; engine native execution pending separately. |
-| D07-S4 | **NOT_RUN** | Malformed wire/native bounds fixtures compiled; actual refusal execution pending. |
+| D07-S4 | **PASS** | Actual wire tests log1069-1079 PASS: truncated/unknown-version/corrupt checksums, u32MAX header length preflight with13byte buffer, invalid semantic gate with valid CRC, unknown private key/value redaction, 257-column scalar bound refusal and >64k envelope refusal. Root independently read implementation-bound assertions; no huge allocation launched. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D07-S5 | **PASS** | Hosted decoded-packet source_free_replay_and_group_validity and fixed_draws_apply_missing_onehot_and_target_exactly passed at451-equivalent tree; no source/encoder/private card used by sampler. See ../receipts/hosted-native-451-criteria.json. |
 | D07-S6 | **NOT_RUN** | D07 graph contract frozen before producer/trainer. Complete DML3/CSC1/DPK compatibility replay pending. |

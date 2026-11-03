@@ -1,6 +1,6 @@
 # D02 — Add informative driver-rank semantics without rewriting history
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -58,12 +58,12 @@ Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D0
 
 ## Individual engineering verdicts
 
-Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+Verdicts reflect source-bound engineering receipts. Named1811 native fixtures are mapped individually below; new SDK/runtime and current full CI require separate evidence. `PASS` never implies scientific efficacy, privacy qualification or release.
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D02-S1 | **NOT_RUN** | Strict recursive native corpus/caller source implemented at53c2b008: exact163standard cases (129top+34v2) and seven separate analytic cases, typed IO/symlink/shape refusal. Native execution NOT_RUN; existing completed Rust golden logs print no case count. Historical expected bytes unchanged. |
 | D02-S2 | **PASS** | Accepted completed subtargets at tested synthetic merge07887a13b1f9bc60ac085bde85a502ca2924b599 (head ccd28bb0122425e625e36323091627267a46af39): root Rust rank_successor_shared_analytic_cases and Python shared/all-tied successor tests passed. Every seven-case expected object includes informative/total counts. Overall job41651340409/job125970478639 cancelled later; not whole-job CI PASS. D02 metric/dependency/fixture closure unchanged through a23 and4054; scoped evidence only. |
 | D02-S3 | **PASS** | The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending. |
-| D02-S4 | **NOT_RUN** | Malformed-input refusals passed at ccd. New actual production grouped-permutation same-group member duplication and successor-rank equality fixture authored at4054; execution pending. |
+| D02-S4 | **PASS** | Actual production grouped permutation test in engine/dope-core/tests/dvs_contract.rs duplicates one-hot member within same declared group, asserts identical loss increases, mass agreement1, successor rank equal identical-input rank/value1/informative_pairs1 and tied refusal. Authentic log929 PASS. Prior malformed/unsupported metric component evidence preserved; fixture/root/engine bridges retain prior analytic parity. No arbitrary duplicate-group invariance claim. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D02-S5 | **PASS** | test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately. |

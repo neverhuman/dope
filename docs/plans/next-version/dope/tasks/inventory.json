@@ -131,8 +131,8 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "50bd7513fa1c0146942930a2cca6a2102ab3b2ed9d6dfe67956a7f85f79cf0f7",
-      "words": 1185,
+      "sha256": "9feacd6b868bb5ec9056c260f4a97a8e7188a9cab5603405cb41e6bc73da05a9",
+      "words": 1224,
       "criterion_verdicts": {
         "D02-S1": {
           "verdict": "NOT_RUN",
@@ -147,14 +147,20 @@
           "evidence": "The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending."
         },
         "D02-S4": {
-          "verdict": "NOT_RUN",
-          "evidence": "Malformed/refusal root tests passed at ccd. Actual production grouped-permutation same-group member duplication + successor-rank assertion authored at4054; native execution pending."
+          "verdict": "PASS",
+          "evidence": "Actual production grouped permutation test in engine/dope-core/tests/dvs_contract.rs duplicates one-hot member within same declared group, asserts identical loss increases, mass agreement1, successor rank equal identical-input rank/value1/informative_pairs1 and tied refusal. Authentic log929 PASS. Prior malformed/unsupported metric component evidence preserved; fixture/root/engine bridges retain prior analytic parity. No arbitrary duplicate-group invariance claim.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D02-S5": {
           "verdict": "PASS",
           "evidence": "test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately."
         }
-      }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
     },
     {
       "id": "D10",
@@ -264,8 +270,8 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "2350ca6cefc4b7b628a5b754b2650af394c829602907e995f0467dcbe3c482d0",
-      "words": 990,
+      "sha256": "dc029421274c974a5d072afc76dce163f76cd3717cd4e93e1f424e9561067024",
+      "words": 1016,
       "criterion_verdicts": {
         "D04-S1": {
           "verdict": "NOT_RUN",
@@ -280,14 +286,20 @@
           "evidence": "Hosted native tight_spectrum_boundaries_reserve_unused_full_panel_cost and high_omits_fine_marks_readiness_and_preserves_conditioning passed at451-equivalent tested tree; full reservation and NotRequested FINE asserted. See ../receipts/hosted-native-451-criteria.json."
         },
         "D04-S4": {
-          "verdict": "NOT_RUN",
-          "evidence": "Order/idempotence/explicit upgrade fixtures compiled; actual native execution pending."
+          "verdict": "PASS",
+          "evidence": "high_omits_fine_marks_readiness_and_preserves_conditioning actual log981 PASS: FINE no-op before request, progressive Larger/Macro order, report byte/work equality after repeated run_ids/run_required, explicit Full upgrade, later Fine completion and final report/bundle equality. Existing implementation/test closure unchanged; not the new three-task encoder matrix.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D04-S5": {
           "verdict": "NOT_RUN",
           "evidence": "Historical constructors/default full path unchanged in source; actual legacy report replay pending."
         }
-      }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
     },
     {
       "id": "D05",
@@ -368,34 +380,60 @@
         "J08 JopeDime auditor",
         "J09 conditional artifact/curriculum growth"
       ],
-      "sha256": "62549ad16cf329e2b6dfd602f24421120c914c7a568080b3363b94585fd8b9ae",
-      "words": 1053,
+      "sha256": "d8f54713bc5926fa3c7d3f46f061c8b1d4b399714849afb0507c5f84212f9e3a",
+      "words": 1214,
       "criterion_verdicts": {
         "D06-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "External source-bound small Rust harness passed analytic R/D/S and all34 C02 goldens; actual locked engine DVS test execution pending."
+          "verdict": "PASS",
+          "evidence": "Core dvs10PASS and dvs_contract4PASS log912-934: hand R0.75/1.25/-0.25, grouped mass0.5, selected index0/regret2/transfer-rank1, ties/no-choice, zero-gain uninformativeness and failed schedules asserted explicitly. This is fixture correctness, not scientific qualification.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D06-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "Prepared identity/role refusal helpers implemented; actual engine test execution pending."
+          "verdict": "PASS",
+          "evidence": "dvs_role_binding_refuses_missing_wrong_or_reused_views_before_selection and dvs_real_test_poison_changes_assessment_but_not_synthetic_choice log918/921 PASS, plus common-view identity refusal log917. Poisoned TEST changes assessment but leaves model choice0; malformed role/usage/shared pins fail before empty selection is consumed. Binding remains caller_declared_hash_checked, no authenticated custody claim.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D06-S3": {
-          "verdict": "NOT_RUN",
-          "evidence": "Missing/failed scheduled denominator fixtures authored/compiled; actual execution pending."
+          "verdict": "PASS",
+          "evidence": "Core missing/uninformative schedule test log919, four-outcome failed/timed_out/unsupported/missing test log931 and actual incomplete CLI log743 retain every scheduled cell, failed/missing counts, null unknown wall/fit/result and incomplete robust score. No missing result is converted to zero or success.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D06-S4": {
           "verdict": "NOT_RUN",
           "evidence": "Legacy source goldens unchanged; current root and engine exact-head C02 execution pending."
         },
         "D06-S5": {
-          "verdict": "NOT_RUN",
-          "evidence": "Actual-byte dependency accounting and AuditCard rendering implemented; actual native/canary/schema output checks pending."
+          "verdict": "PASS",
+          "evidence": "Actual transfer_report_serializes_actual_parts_and_card_without_python log744 PASS. Fixed literal serialized components independently assert payload63/shared17/closure80/private37, five part byte lengths and known SHA256s; card fields/role digest/selection/privacy match actual receipt; private CANARY value absent in receipt/card/stdout/stderr. Root independently read the complete test body, not only its name.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D06-S6": {
-          "verdict": "NOT_RUN",
-          "evidence": "Actual bounded transfer-report CLI journey compiled; execution pending."
+          "verdict": "PASS",
+          "evidence": "Actual native CLI log742-744 and816-817 PASS: complete report and incomplete denominator paths, missing-role/no-partial-output refusal, parsed-error redaction. Test child launches absolute built CLI with PATH empty and Python environment removed. No Python product process dependency for this bounded journey.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         }
-      }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
     },
     {
       "id": "D07",
@@ -422,24 +460,34 @@
         "J06 private owner transform contract",
         "J09 optional artifact consumer"
       ],
-      "sha256": "17f4e68afef72bcee644576a3b8024dba0e85300368c2192ec03cf1bcfa32dd0",
-      "words": 1102,
+      "sha256": "da895ca6ea5439b629702b709aad82f5f41ae4219ea94f0a2e5401934b3f54d1",
+      "words": 1165,
       "criterion_verdicts": {
         "D07-S1": {
           "verdict": "PASS",
           "evidence": "Hosted each_active_gate_changes_its_declared_basis_coordinate and fitted_and_decoded_nondefault_gates_match_independent_math passed for all six gates at451-equivalent tree. See ../receipts/hosted-native-451-criteria.json."
         },
         "D07-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "Typed cap/framing validator compiled; actual boundary and allocation refusal execution pending."
+          "verdict": "PASS",
+          "evidence": "Actual mlc_v4_wire15PASS log1065-1082 includes all three complete envelope caps2048/16384/65536, exact-boundary CRC-framed decode, one-byte-over refusals, typed impossible-cap refusal and real80-group65-knot graph encoded above16k and below64k. Root independently read those four substantive functions. Optional conformance_export no-op is not relied upon.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D07-S3": {
           "verdict": "PASS",
           "evidence": "Default source-bound actual Rust regression and grouped-classification packets/fixed draws replay in Python test_v4_wire with 0 SKIP; engine native execution pending separately."
         },
         "D07-S4": {
-          "verdict": "NOT_RUN",
-          "evidence": "Malformed wire/native bounds fixtures compiled; actual refusal execution pending."
+          "verdict": "PASS",
+          "evidence": "Actual wire tests log1069-1079 PASS: truncated/unknown-version/corrupt checksums, u32MAX header length preflight with13byte buffer, invalid semantic gate with valid CRC, unknown private key/value redaction, 257-column scalar bound refusal and >64k envelope refusal. Root independently read implementation-bound assertions; no huge allocation launched.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D07-S5": {
           "verdict": "PASS",
@@ -449,7 +497,8 @@
           "verdict": "NOT_RUN",
           "evidence": "D07 graph contract frozen before producer/trainer. Complete DML3/CSC1/DPK compatibility replay pending."
         }
-      }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
     },
     {
       "id": "D08",
