@@ -8,7 +8,9 @@ pub mod receipt;
 pub mod roles;
 pub mod selection;
 
-use receipt::{CellReceipt, DriverPolicyBinding, DvsReceipt, FamilyReceipt};
+use receipt::{
+    CellDriverIdentityBinding, CellReceipt, DriverPolicyBinding, DvsReceipt, FamilyReceipt,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -185,6 +187,7 @@ fn cell_receipt(
     cell: Option<&AuditorCell>,
     schedule: &ScheduledCell,
     pins: &DataPins,
+    policy: &DriverPolicyBinding,
 ) -> Result<CellReceipt, DvsError> {
     let mut out = CellReceipt {
         cell_sha256: schedule.cell_sha256.clone(),
@@ -197,6 +200,7 @@ fn cell_receipt(
         synthetic_loss: None,
         raw_retention: None,
         driver: json!({"status": "not_run"}),
+        driver_identity_binding: None,
         wall_seconds: None,
         fit_count: None,
     };
@@ -269,6 +273,9 @@ fn cell_receipt(
                     )?;
                 }
                 out.driver = drivers::evaluate(e);
+                if out.driver["status"] == "complete" {
+                    out.driver_identity_binding = cell_driver_identity_binding(e, pins, policy);
+                }
                 if out.status == "complete" && out.driver["status"] != "complete" {
                     out.status = "incomplete";
                     out.reason = Some("incomplete_driver_evidence");
@@ -309,6 +316,39 @@ fn cell_receipt(
     Ok(out)
 }
 
+fn cell_driver_identity_binding(
+    evidence: &Value,
+    pins: &DataPins,
+    policy: &DriverPolicyBinding,
+) -> Option<CellDriverIdentityBinding> {
+    let read_pin = |key: &str| -> Option<String> {
+        let value = evidence.get(key)?.as_str()?;
+        (value.len() == 64
+            && value
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)))
+        .then(|| value.to_owned())
+    };
+    let query_sha256 = read_pin("query_sha256")?;
+    let groups_sha256 = read_pin("groups_sha256")?;
+    let perturbation_sha256 = read_pin("perturbation_sha256")?;
+    let prepared_view_sha256 = read_pin("prepared_view_sha256")?;
+    if query_sha256 != pins.real_test_sha256
+        || groups_sha256 != pins.groups_sha256
+        || prepared_view_sha256 != pins.prepared_view_sha256
+    {
+        return None;
+    }
+    Some(CellDriverIdentityBinding {
+        state: "declared_identity_hashes_shape_and_scope_checked",
+        required_policy: policy.clone(),
+        query_sha256,
+        groups_sha256,
+        perturbation_sha256,
+        prepared_view_sha256,
+    })
+}
+
 pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
     ensure(input.protocol == PROTOCOL, "unsupported_dvs_protocol")?;
     ensure(
@@ -319,6 +359,7 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
         "unsupported_preparation_recipe",
     )?;
     input.pins.validate()?;
+    let driver_policy_binding = DriverPolicyBinding::required(input.pins.clone());
     let role_binding = input
         .declared_roles
         .as_ref()
@@ -357,6 +398,7 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
             actual.get(&row.cell_sha256).copied(),
             row,
             &input.pins,
+            &driver_policy_binding,
         )?);
     }
     let complete = cells.iter().filter(|c| c.status == "complete").count();
@@ -430,7 +472,7 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
         bytes: account_bytes(&input.artifacts)?,
         privacy,
         pins: input.pins.clone(),
-        driver_policy_binding: DriverPolicyBinding::required(input.pins.clone()),
+        driver_policy_binding,
         role_binding,
         qualification_state: "not_run",
         formal_dp_state: "not_run",

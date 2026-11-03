@@ -3893,8 +3893,12 @@
       "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
     },
     "schemas/dope-dvs-receipt-v1.schema.json": {
-      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_identity_binding",
       "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
+    },
+    "engine/dope-core/tests/dvs_identity_binding.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_identity_binding",
+      "purpose": "Actual evaluator four declared C02 identity hashes including per-cell perturbation, common policy/pin scope, malformed/missing/wrong-bound/failed/no-driver privacy refusal; runtime and schema-engine NOT_RUN, no custody attestation."
     }
   },
   "workspace": "dope"

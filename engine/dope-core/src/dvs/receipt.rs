@@ -14,6 +14,7 @@ pub struct CellReceipt {
     pub synthetic_loss: Option<f64>,
     pub raw_retention: Option<f64>,
     pub driver: Value,
+    pub driver_identity_binding: Option<CellDriverIdentityBinding>,
     pub wall_seconds: Option<f64>,
     pub fit_count: Option<u64>,
 }
@@ -62,6 +63,19 @@ impl DriverPolicyBinding {
             pins,
         }
     }
+}
+
+/// Declared driver identity hashes copied only after the evaluator accepts the
+/// complete successor driver result. This checks hashes and common-pin scope;
+/// it does not authenticate source data or assert custody.
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
+pub struct CellDriverIdentityBinding {
+    pub state: &'static str,
+    pub required_policy: DriverPolicyBinding,
+    pub query_sha256: String,
+    pub groups_sha256: String,
+    pub perturbation_sha256: String,
+    pub prepared_view_sha256: String,
 }
 
 #[derive(Clone, Debug, Serialize)]

@@ -483,6 +483,50 @@
               }
             }
           },
+          "driver_identity_binding": {
+            "description": "Optional on historical receipts; when present, declares identity hashes accepted by the successor evaluator and links the fixed required policy. It does not authenticate source data or custody.",
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "state",
+                  "required_policy",
+                  "query_sha256",
+                  "groups_sha256",
+                  "perturbation_sha256",
+                  "prepared_view_sha256"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "declared_identity_hashes_shape_and_scope_checked"
+                  },
+                  "required_policy": {
+                    "$ref": "#/properties/driver_policy_binding"
+                  },
+                  "query_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "groups_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "perturbation_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "prepared_view_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            ]
+          },
           "wall_seconds": {
             "type": [
               "number",
