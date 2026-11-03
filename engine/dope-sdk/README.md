@@ -9,3 +9,14 @@ Use `dope_sdk::v0::prepare` for released-v3 preparation (`PreparedTable`, `FitOn
 The additive `mlc_v4` and `dvs` modules expose the closed six-gate DML4 sampler and prepared-evidence evaluator. Their recipe/hash contracts and qualification states are distinct from v0 legacy serving. No recipient operation requires the owner's source, card or Python encoder. These modules do not grant model publication, benchmark acceptance, privacy certification or live serving adoption.
 
 From the repository root, use `cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-sdk` for direct-core/facade parity and refusals. The focused consumer handoff must retain exact source, weight, recipe, FIT/input-policy and conditioning/sampler identities; compare vectors/digests under the same qualified path before changing a consumer pin. Compilation alone does not establish parity or consumer qualification. See [the explicit workflows](../../docs/next-version-workflows.md) and [contract decisions](../../docs/adr/normalize-once-and-dvs-v1.md).
+
+The additive native consumer view is available by importing
+`dope_sdk::nc1::TargetLastViewExt` and calling
+`unit_table.to_target_last_view()?`. It preserves physical row IDs, structural
+schema and source/FIT/transform hashes, copies existing feature values in order,
+and appends the declared target at `target_column()`. Allocation limits include
+that extra target cell per row. Feature-only tables refuse with
+`target_last_target_absent`. The view is owner-private, has redacted Debug and
+no serialization implementation; it does not alter normalization, producer
+identity, the existing x/y wire or released-v3 serving. Native boundary fixtures
+must execute before this addition is called qualified.

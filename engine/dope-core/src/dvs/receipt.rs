@@ -59,6 +59,7 @@ pub struct DvsReceipt {
     pub bytes: ByteReceipt,
     pub privacy: Value,
     pub pins: super::DataPins,
+    pub role_binding: super::roles::RoleBindingReceipt,
     pub qualification_state: &'static str,
     pub formal_dp_state: &'static str,
     pub release_authorization_state: &'static str,
@@ -68,9 +69,25 @@ pub struct DvsReceipt {
 pub fn audit_card(r: &DvsReceipt) -> String {
     let value =
         |v: Option<f64>| v.map_or_else(|| "not available".to_string(), |n| format!("{n:.6}"));
-    format!("# DOPE Audit Card\n\nProtocol: {}\nPreparation: {}\nState: {}\n\nScheduled cells: {}\nComplete: {}\nUninformative: {}\nFailed or missing: {}\nRobust retention: {}\nPayload bytes: {}\nSampling closure bytes: {}\nOwner-private dependency bytes: {}\n\nSelection: {}\nPrivacy diagnostics: {}\n\nQualification: {}\nFormal DP: {}\nRelease authorization: {}\n\nEmpirical diagnostics establish no formal DP or de-identification claim. No byte-based memorization bound is asserted.\n",
-        r.protocol, r.preparation_recipe, r.status, r.scheduled_cells, r.complete_cells,
-        r.uninformative_cells, r.failed_or_missing_cells, value(r.robust_retention),
-        r.bytes.payload_bytes, r.bytes.sampling_closure_bytes, r.bytes.owner_private_dependency_bytes,
-        r.selection, r.privacy, r.qualification_state, r.formal_dp_state, r.release_authorization_state)
+    format!(
+        "# DOPE Audit Card\n\nProtocol: {}\nPreparation: {}\nState: {}\n\nScheduled cells: {}\nComplete: {}\nUninformative: {}\nFailed or missing: {}\nRobust retention: {}\nPayload bytes: {}\nSampling closure bytes: {}\nOwner-private dependency bytes: {}\n\nSelection: {}\nPrivacy diagnostics: {}\n\nEvidence role binding: {}\nRole declaration digest: {}\n\nQualification: {}\nFormal DP: {}\nRelease authorization: {}\n\nEmpirical diagnostics establish no formal DP or de-identification claim. No byte-based memorization bound is asserted.\n",
+        r.protocol,
+        r.preparation_recipe,
+        r.status,
+        r.scheduled_cells,
+        r.complete_cells,
+        r.uninformative_cells,
+        r.failed_or_missing_cells,
+        value(r.robust_retention),
+        r.bytes.payload_bytes,
+        r.bytes.sampling_closure_bytes,
+        r.bytes.owner_private_dependency_bytes,
+        r.selection,
+        r.privacy,
+        r.role_binding.state,
+        r.role_binding.binding_sha256,
+        r.qualification_state,
+        r.formal_dp_state,
+        r.release_authorization_state
+    )
 }

@@ -767,6 +767,59 @@
         }
       }
     },
+    "role_binding": {
+      "description": "Optional only on historical receipts, where absence means unverified. New issuance requires a role binding.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "schema",
+        "real_fit_usage",
+        "synthetic_validation_usage",
+        "real_test_usage",
+        "real_fit_sha256",
+        "synthetic_validation_sha256",
+        "real_test_sha256",
+        "common_pins",
+        "binding_sha256"
+      ],
+      "properties": {
+        "state": {
+          "const": "caller_declared_hash_checked"
+        },
+        "schema": {
+          "const": "dope.dvs.declared-evidence-roles/v1"
+        },
+        "real_fit_usage": {
+          "const": "fit_only"
+        },
+        "synthetic_validation_usage": {
+          "const": "model_choice"
+        },
+        "real_test_usage": {
+          "const": "assessment_only"
+        },
+        "real_fit_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "synthetic_validation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "real_test_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "common_pins": {
+          "$ref": "#/properties/pins"
+        },
+        "binding_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
     "qualification_state": {
       "const": "not_run"
     },

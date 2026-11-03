@@ -1,8 +1,13 @@
-use dope_core::dvs::{self, drivers, permutation, receipt, selection, DvsRequest};
+use dope_core::dvs::{self, drivers, permutation, receipt, roles, selection, DataPins, DvsRequest};
 use serde_json::{json, Value};
 
 fn pins() -> Value {
     json!({"fit_scope_sha256":"a".repeat(64), "real_test_sha256":"b".repeat(64), "prepared_view_sha256":"c".repeat(64), "groups_sha256":"d".repeat(64), "roster_sha256":"e".repeat(64)})
+}
+fn declared_roles(pins: &Value) -> Value {
+    let common: DataPins = serde_json::from_value(pins.clone()).unwrap();
+    serde_json::to_value(roles::DeclaredEvidenceRoles::new(common, "f".repeat(64)).unwrap())
+        .unwrap()
 }
 fn driver() -> Value {
     let case: Value = serde_json::from_str(include_str!(
@@ -19,15 +24,17 @@ fn driver() -> Value {
     e
 }
 fn request() -> DvsRequest {
-    serde_json::from_value(json!({"protocol":"dope-dvs-v1", "preparation_recipe":"nc1-minmax-onehot-v1", "pins":pins(),
+    let common_pins = pins();
+    let declared_roles = declared_roles(&common_pins);
+    serde_json::from_value(json!({"protocol":"dope-dvs-v1", "preparation_recipe":"nc1-minmax-onehot-v1", "pins":common_pins.clone(), "declared_roles":declared_roles,
         "scheduled":[{"cell_sha256":"1".repeat(64),"family_id":0}], "required_families":[0],
-        "cells":[{"cell_sha256":"1".repeat(64),"family_id":0,"pins":pins(),"outcome":{"status":"complete",
+        "cells":[{"cell_sha256":"1".repeat(64),"family_id":0,"pins":common_pins.clone(),"outcome":{"status":"complete",
             "null_losses":[10.,10.],"real_losses":[2.,2.],"synthetic_losses":[4.,4.],
             "real_gain_lcb":1.,"absolute_gain_floor":0.01,"relative_gain_floor":0.01,
             "driver_evidence":driver(),"wall_seconds":null,"fit_count":2}}],
         "selection":{"synthetic_validation_losses":[1.,2.,3.],"real_fit_test_losses":[3.,1.,2.],"synthetic_fit_test_losses":[3.,1.,2.]},
         "artifacts":{"packet":[1,2,3],"public_schema":[4,5],"mandatory_sidecars":[[6,7]],"shared_decoder_parts":[[8,9,10]],"owner_private_parts":[[99,98,97,96]]},
-        "privacy":{"pins":pins(),"real_fit":[[0.],[1.]],"synthetic":[[0.],[0.5]],"real_holdout":[[0.25],[0.75]],"max_distance_pairs":8}
+        "privacy":{"pins":common_pins,"real_fit":[[0.],[1.]],"synthetic":[[0.],[0.5]],"real_holdout":[[0.25],[0.75]],"max_distance_pairs":8}
     })).unwrap()
 }
 
@@ -45,11 +52,18 @@ fn dvs_analytic_receipt_preserves_unclipped_r_bytes_and_no_qualification() {
     assert_eq!(r.selection["transfer_rank"]["value"], 1.);
     assert_eq!(r.privacy["exact_copies"], 1);
     assert_eq!(r.privacy["dcr_ratio"], 1.);
+    assert_eq!(r.role_binding.state, "caller_declared_hash_checked");
+    assert_eq!(
+        r.role_binding.binding_sha256,
+        "1c687aa2f84640405a667696ef1483f2324402588a4e6dcbcdd2b5afe2ad5763"
+    );
     assert_eq!(r.qualification_state, "not_run");
     assert_eq!(r.formal_dp_state, "not_run");
     let card = receipt::audit_card(&r);
     assert!(card.contains("Payload bytes: 7"));
     assert!(card.contains("Robust retention: 0.750000"));
+    assert!(card.contains("Evidence role binding: caller_declared_hash_checked"));
+    assert!(card.contains(r.role_binding.binding_sha256.as_str()));
     assert!(!card.contains("CANARY_PRIVATE"));
 }
 
@@ -287,4 +301,109 @@ fn dvs_entire_legacy_v2_c02_corpus_is_unchanged() {
             case["case_id"]
         );
     }
+}
+
+#[test]
+fn dvs_role_binding_refuses_missing_wrong_or_reused_views_before_selection() {
+    let mut input = request();
+    input
+        .selection
+        .as_mut()
+        .unwrap()
+        .synthetic_validation_losses
+        .clear();
+    input
+        .declared_roles
+        .as_mut()
+        .unwrap()
+        .synthetic_validation_usage = "assessment_only".into();
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "invalid_dvs_role_binding"
+    );
+
+    let mut input = request();
+    input
+        .selection
+        .as_mut()
+        .unwrap()
+        .synthetic_validation_losses
+        .clear();
+    let reused_pin = input.pins.real_test_sha256.clone();
+    input.pins.fit_scope_sha256 = reused_pin.clone();
+    for cell in &mut input.cells {
+        cell.pins.fit_scope_sha256 = reused_pin.clone();
+    }
+    input.privacy.as_mut().unwrap().pins.fit_scope_sha256 = reused_pin.clone();
+    let roles = input.declared_roles.as_mut().unwrap();
+    roles.common_pins = input.pins.clone();
+    roles.real_fit_sha256 = reused_pin;
+    roles.binding_sha256 = roles.recompute_binding_sha256().unwrap();
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "invalid_dvs_role_binding"
+    );
+
+    let mut input = request();
+    input.declared_roles = None;
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "missing_dvs_role_binding"
+    );
+
+    let mut input = request();
+    let roles = input.declared_roles.as_mut().unwrap();
+    roles.synthetic_validation_sha256 = roles.real_test_sha256.clone();
+    roles.binding_sha256 = roles.recompute_binding_sha256().unwrap();
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "invalid_dvs_role_binding"
+    );
+
+    let mut input = request();
+    let roles = input.declared_roles.as_mut().unwrap();
+    roles.common_pins.real_test_sha256 = "c".repeat(64);
+    roles.binding_sha256 = roles.recompute_binding_sha256().unwrap();
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "invalid_dvs_role_binding"
+    );
+
+    let mut input = request();
+    input.declared_roles.as_mut().unwrap().binding_sha256 = "0".repeat(64);
+    assert_eq!(
+        dvs::evaluate(&input).unwrap_err().0,
+        "invalid_dvs_role_binding"
+    );
+}
+
+#[test]
+fn dvs_real_test_poison_changes_assessment_but_not_synthetic_choice() {
+    let mut input = request();
+    let first = dvs::evaluate(&input).unwrap();
+    assert_eq!(first.selection["selected_index"], 0);
+    let new_test_pin = "9".repeat(64);
+    input.pins.real_test_sha256 = new_test_pin.clone();
+    for cell in &mut input.cells {
+        cell.pins.real_test_sha256 = new_test_pin.clone();
+    }
+    input.privacy.as_mut().unwrap().pins.real_test_sha256 = new_test_pin.clone();
+    let roles = input.declared_roles.as_mut().unwrap();
+    roles.common_pins = input.pins.clone();
+    roles.real_test_sha256 = new_test_pin.clone();
+    roles.binding_sha256 = roles.recompute_binding_sha256().unwrap();
+    if let dvs::CellOutcome::Complete {
+        driver_evidence: Some(evidence),
+        ..
+    } = &mut input.cells[0].outcome
+    {
+        evidence["query_sha256"] = json!(new_test_pin);
+    }
+    input.selection.as_mut().unwrap().real_fit_test_losses = vec![100., 0.5, 0.25];
+    let poisoned = dvs::evaluate(&input).unwrap();
+    assert_eq!(poisoned.selection["selected_index"], 0);
+    assert_ne!(
+        poisoned.selection["real_best_index"],
+        first.selection["real_best_index"]
+    );
 }

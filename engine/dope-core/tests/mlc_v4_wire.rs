@@ -216,3 +216,143 @@ fn candidate_scope_mismatch_cannot_compare_unrelated_losses() {
         basis::REGISTRY.len()
     );
 }
+
+fn framed_with_whitespace(packet: &Packet, total_len: usize) -> Vec<u8> {
+    let canonical = wire::encode(packet).unwrap();
+    assert!(total_len >= canonical.len());
+    let mut body = canonical[wire::HEADER_BYTES..].to_vec();
+    body.resize(body.len() + total_len - canonical.len(), b' ');
+    let mut framed = canonical[..5].to_vec();
+    framed.extend_from_slice(&(body.len() as u32).to_le_bytes());
+    framed.extend_from_slice(&wire::crc32(&body).to_le_bytes());
+    framed.extend_from_slice(&body);
+    framed
+}
+
+fn larger_l64k_packet() -> Packet {
+    let mut p = packet();
+    p.level = Level::L64k;
+    p.schema.columns = 80;
+    p.schema.groups = (0..80)
+        .map(|i| GroupSpec {
+            id: i,
+            kind: GroupKind::Numeric,
+            start: i,
+            width: 1,
+            has_missing: false,
+        })
+        .collect();
+    p.schema_sha256 = p.schema.sha256().unwrap();
+    p.groups = (0..80)
+        .map(|_| GroupModel::Numeric {
+            knots: (0..65).map(|i| i as f64 / 64.0).collect(),
+            missing_probability: 0.0,
+            imputation: 0.5,
+        })
+        .collect();
+    p.target = TargetModel::Regression {
+        intercept: 0.0,
+        coefficients: vec![0.0; basis::width(80).unwrap()],
+        noise_scale: 0.0,
+    };
+    p
+}
+
+#[test]
+fn every_level_encodes_and_roundtrips_with_complete_envelope_accounting() {
+    for (level, cap) in [
+        (Level::L2k, 2048usize),
+        (Level::L16k, 16384),
+        (Level::L64k, 65536),
+    ] {
+        let mut p = packet();
+        p.level = level;
+        let bytes = wire::encode(&p).unwrap();
+        let declared = u32::from_le_bytes(bytes[5..9].try_into().unwrap()) as usize;
+        assert_eq!(bytes.len(), wire::HEADER_BYTES + declared);
+        assert!(bytes.len() <= cap);
+        assert_eq!(wire::decode(&bytes).unwrap(), p);
+        assert_eq!(wire::encode(&wire::decode(&bytes).unwrap()).unwrap(), bytes);
+    }
+}
+
+#[test]
+fn exact_complete_cap_and_one_byte_over_refuse_are_contract_fixed() {
+    for (level, cap) in [
+        (Level::L2k, 2048usize),
+        (Level::L16k, 16384),
+        (Level::L64k, 65536),
+    ] {
+        let mut p = packet();
+        p.level = level;
+        let exact = framed_with_whitespace(&p, cap);
+        assert_eq!(exact.len(), cap);
+        assert_eq!(wire::decode(&exact).unwrap(), p);
+        if level != Level::L64k {
+            let over = framed_with_whitespace(&p, cap + 1);
+            assert_eq!(over.len(), cap + 1);
+            assert_eq!(wire::decode(&over).unwrap_err().code, "over_budget");
+        } else {
+            let over = framed_with_whitespace(&p, cap + 1);
+            assert_eq!(over.len(), cap + 1);
+            assert_eq!(wire::decode(&over).unwrap_err().code, "invalid_envelope");
+        }
+    }
+}
+
+#[test]
+fn l64k_admits_a_materially_larger_valid_graph() {
+    let p = larger_l64k_packet();
+    let bytes = wire::encode(&p).unwrap();
+    assert!(bytes.len() > Level::L16k.cap());
+    assert!(bytes.len() <= Level::L64k.cap());
+    assert_eq!(wire::decode(&bytes).unwrap(), p);
+}
+
+#[test]
+fn framing_preflight_and_json_canary_refuse_without_disclosure() {
+    let mut header = b"DML4\x01".to_vec();
+    header.extend_from_slice(&u32::MAX.to_le_bytes());
+    header.extend_from_slice(&0u32.to_le_bytes());
+    assert_eq!(header.len(), wire::HEADER_BYTES);
+    assert_eq!(wire::decode(&header).unwrap_err().code, "length_mismatch");
+
+    let canonical = wire::encode(&packet()).unwrap();
+    let mut body: serde_json::Value =
+        serde_json::from_slice(&canonical[wire::HEADER_BYTES..]).unwrap();
+    body["CANARY_PRIVATE_KEY"] = serde_json::json!("CANARY_PRIVATE_EXTREME_999999999");
+    let body = serde_json::to_vec(&body).unwrap();
+    assert!(body.len() + wire::HEADER_BYTES <= Level::L2k.cap());
+    let mut encoded = canonical[..5].to_vec();
+    encoded.extend_from_slice(&(body.len() as u32).to_le_bytes());
+    encoded.extend_from_slice(&wire::crc32(&body).to_le_bytes());
+    encoded.extend_from_slice(&body);
+    let error = wire::decode(&encoded).unwrap_err();
+    assert_eq!(error.code, "invalid_packet_json");
+    let display = error.to_string();
+    assert_eq!(display, "invalid_packet_json");
+    assert!(!display.contains("CANARY_PRIVATE_KEY"));
+    assert!(!display.contains("CANARY_PRIVATE_EXTREME_999999999"));
+}
+
+#[test]
+fn correctly_framed_semantic_bound_refuses_with_stable_public_code() {
+    let canonical = wire::encode(&packet()).unwrap();
+    let mut body: serde_json::Value =
+        serde_json::from_slice(&canonical[wire::HEADER_BYTES..]).unwrap();
+    body["gates"]["linear"] = serde_json::json!(4.0000001);
+    let body = serde_json::to_vec(&body).unwrap();
+    let mut encoded = canonical[..5].to_vec();
+    encoded.extend_from_slice(&(body.len() as u32).to_le_bytes());
+    encoded.extend_from_slice(&wire::crc32(&body).to_le_bytes());
+    encoded.extend_from_slice(&body);
+    let error = wire::decode(&encoded).unwrap_err();
+    assert_eq!(error.code, "invalid_gate");
+    assert_eq!(error.to_string(), "invalid_gate");
+}
+
+#[test]
+fn scalar_shape_preflights_refuse_without_large_allocations() {
+    assert!(basis::width(256).is_ok());
+    assert!(basis::width(257).is_err());
+}

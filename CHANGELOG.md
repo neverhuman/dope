@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Engine 1.2.0 engineering release candidate
+
+- Add the native SDK facade and private NC1 FIT-only normalization, explicit
+  physical-row/target roles, and a bounded private target-last consumer view.
+- Add opt-in High-required landmark execution, the explicit six-gate DML4
+  graph/sampler, and DVS evidence receipts with required caller-declared view
+  roles, stable refusals, actual byte accounting and Audit Cards. Historical
+  model, preparation, metric v1/v2 and wire readers retain their own identities.
+- Add prospective evaluation repair and additive informative rank semantics,
+  bounded deep-learning training/resume fixtures, and native frozen-evidence CI
+  routing. Preserve legacy compatibility sources and fixture values.
+- This is an engineering candidate pending required CI/review. It makes no new
+  scientific accuracy, performance, formal privacy or model qualification
+  claim. Four campaign criteria are explicitly deferred; the Rust-only
+  nontraining migration remains incomplete.
+
+
 - Add opt-in `dope mlc-v3 encode --encoding-receipt FILE` JSONL snapshot
   companions with a named High629 schema, actual loaded checkpoint identity,
   sanitized landmark coverage, complete FIT-source identity, and effective

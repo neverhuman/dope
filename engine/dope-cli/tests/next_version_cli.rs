@@ -1,4 +1,5 @@
 //! Actual native CLI journeys with bounded public synthetic fixtures.
+use dope_core::dvs::{roles::DeclaredEvidenceRoles, DataPins};
 use dope_core::nc1::{
     Cell, DeclaredSchema, FeatureKind, FeatureSpec, InputColumn, InputTable, TargetSpec, Task,
 };
@@ -24,6 +25,10 @@ fn run(args: &[&str]) -> Output {
         .args(args)
         .output()
         .unwrap()
+}
+fn declared_roles(pins: &Value) -> Value {
+    let common: DataPins = serde_json::from_value(pins.clone()).unwrap();
+    serde_json::to_value(DeclaredEvidenceRoles::new(common, "f".repeat(64)).unwrap()).unwrap()
 }
 fn write(path: &Path, value: &Value) {
     std::fs::write(path, serde_json::to_vec(value).unwrap()).unwrap();
@@ -152,9 +157,10 @@ fn dvs_actual_handler_retains_missing_denominator_and_redacts_parse_errors() {
     let request = root.join("request.json");
     let out = root.join("report");
     let pins = json!({"fit_scope_sha256":"a".repeat(64),"real_test_sha256":"b".repeat(64),"prepared_view_sha256":"c".repeat(64),"groups_sha256":"d".repeat(64),"roster_sha256":"e".repeat(64)});
+    let declared_roles = declared_roles(&pins);
     write(
         &request,
-        &json!({"protocol":"dope-dvs-v1","preparation_recipe":"nc1-minmax-onehot-v1","pins":pins,
+        &json!({"protocol":"dope-dvs-v1","preparation_recipe":"nc1-minmax-onehot-v1","pins":pins.clone(),"declared_roles":declared_roles,
         "scheduled":[{"cell_sha256":"1".repeat(64),"family_id":0}],"required_families":[0],"cells":[],"selection":null,"privacy":null,
         "artifacts":{"packet":[1,2],"public_schema":[3],"mandatory_sidecars":[],"shared_decoder_parts":[],"owner_private_parts":[]}}),
     );
@@ -174,6 +180,10 @@ fn dvs_actual_handler_retains_missing_denominator_and_redacts_parse_errors() {
         serde_json::from_slice(&std::fs::read(out.join("receipt.json")).unwrap()).unwrap();
     assert_eq!(receipt["scheduled_cells"], 1);
     assert_eq!(receipt["failed_or_missing_cells"], 1);
+    assert_eq!(
+        receipt["role_binding"]["state"],
+        "caller_declared_hash_checked"
+    );
     assert_eq!(receipt["qualification_state"], "not_run");
     assert!(receipt["robust_retention"].is_null());
     assert!(out.join("AuditCard.md").is_file());
@@ -252,4 +262,28 @@ fn dml4_pack_inspect_and_sample_need_no_encoder_or_source() {
     .status
     .success());
     assert_eq!(std::fs::read(sample).unwrap(), before);
+}
+
+#[test]
+fn dvs_cli_requires_role_binding_before_creating_outputs() {
+    let root = directory();
+    let request = root.join("request.json");
+    let out = root.join("report");
+    write(
+        &request,
+        &json!({"protocol":"dope-dvs-v1","preparation_recipe":"nc1-minmax-onehot-v1",
+        "pins":{"fit_scope_sha256":"a".repeat(64),"real_test_sha256":"b".repeat(64),"prepared_view_sha256":"c".repeat(64),"groups_sha256":"d".repeat(64),"roster_sha256":"e".repeat(64)},
+        "scheduled":[{"cell_sha256":"1".repeat(64),"family_id":0}],"required_families":[0],"cells":[],"selection":null,"privacy":null,
+        "artifacts":{"packet":[1],"public_schema":[2],"mandatory_sidecars":[],"shared_decoder_parts":[],"owner_private_parts":[]}}),
+    );
+    let result = run(&[
+        "transfer-report",
+        "--request",
+        path(&request),
+        "--out",
+        path(&out),
+    ]);
+    assert!(!result.status.success());
+    assert!(!out.exists());
+    assert!(String::from_utf8_lossy(&result.stderr).contains("missing_dvs_role_binding"));
 }

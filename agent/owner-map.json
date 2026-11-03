@@ -922,7 +922,14 @@
     "engine/dope-cli/src/normalize.rs": "rust-core",
     "engine/dope-cli/src/mlc_v4.rs": "rust-core",
     "engine/dope-cli/src/dvs.rs": "rust-core",
-    "engine/dope-cli/src/safe_io.rs": "rust-core"
+    "engine/dope-cli/src/safe_io.rs": "rust-core",
+    "engine/dope-sdk/src/nc1_view.rs": "rust-core",
+    "engine/dope-sdk/tests/nc1_boundaries.rs": "rust-core",
+    "engine/dope-cli/tests/nc1_boundaries.rs": "rust-core",
+    "engine/dope-core/src/dvs/roles.rs": "rust-core",
+    "engine/dope-core/tests/dvs_contract.rs": "rust-core",
+    "engine/dope-cli/tests/dvs_contract.rs": "rust-core",
+    "engine/dope-core/tests/mlc_v4_wire.rs": "rust-core"
   },
   "workspace": "dope"
 }

@@ -1,6 +1,8 @@
 //! Versioned DOPE integration facade. No model arithmetic or preparation is duplicated.
 //! New input semantics require a new recipe and qualification, not a facade version bump.
 
+mod nc1_view;
+
 pub const SDK_CONTRACT: &str = "dope-sdk/v0";
 
 /// Lane-A integration surface. Types are the original engine types, preserving numerical
@@ -55,6 +57,7 @@ pub mod v0 {
 
 /// NC1 successor normalization; never reinterpret Lane-A model preparation.
 pub mod nc1 {
+    pub use crate::nc1_view::{TargetLastView, TargetLastViewExt};
     pub use dope_norm::*;
 }
 

@@ -5,6 +5,7 @@
 pub mod drivers;
 pub mod permutation;
 pub mod receipt;
+pub mod roles;
 pub mod selection;
 
 use receipt::{CellReceipt, DvsReceipt, FamilyReceipt};
@@ -159,6 +160,8 @@ pub struct DvsRequest {
     pub scheduled: Vec<ScheduledCell>,
     pub required_families: Vec<u32>,
     pub cells: Vec<AuditorCell>,
+    /// Required for new receipt issuance; absence fails closed before cells or selection.
+    pub declared_roles: Option<roles::DeclaredEvidenceRoles>,
     pub selection: Option<selection::SelectionEvidence>,
     pub artifacts: ArtifactInputs,
     pub privacy: Option<PrivacyInputs>,
@@ -316,6 +319,11 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
         "unsupported_preparation_recipe",
     )?;
     input.pins.validate()?;
+    let role_binding = input
+        .declared_roles
+        .as_ref()
+        .ok_or(DvsError("missing_dvs_role_binding"))?
+        .validate(&input.pins)?;
     ensure(
         !input.scheduled.is_empty() && !input.required_families.is_empty(),
         "empty_dvs_schedule",
@@ -422,6 +430,7 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
         bytes: account_bytes(&input.artifacts)?,
         privacy,
         pins: input.pins.clone(),
+        role_binding,
         qualification_state: "not_run",
         formal_dp_state: "not_run",
         release_authorization_state: "not_run",

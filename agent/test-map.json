@@ -3739,6 +3739,34 @@
     "ops/merge_guard/frozen_evidence_tests.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",
       "purpose": "exercise all synthetic frozen-evidence Python scenarios in Rust plus non-UTF-8 Git path refusal"
+    },
+    "engine/dope-sdk/src/nc1_view.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk",
+      "purpose": "native private target-last bounded conversion, roles and physical identity"
+    },
+    "engine/dope-sdk/tests/nc1_boundaries.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test nc1_boundaries",
+      "purpose": "actual SDK NC1 roles, private view, schema canaries and declared three-task targets"
+    },
+    "engine/dope-cli/tests/nc1_boundaries.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test nc1_boundaries",
+      "purpose": "actual normalization CLI with empty PATH and safe public/error surfaces"
+    },
+    "engine/dope-core/src/dvs/roles.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_contract",
+      "purpose": "required declared view-role digest/pin refusal before selection; no principal authentication claim"
+    },
+    "engine/dope-core/tests/dvs_contract.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_contract",
+      "purpose": "unclipped R, real grouped permutations/member duplication and all scheduled null-cost failures"
+    },
+    "engine/dope-cli/tests/dvs_contract.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test dvs_contract",
+      "purpose": "actual DVS CLI byte hashes, canary-safe Card consistency and complete/incomplete/refusal journeys"
+    },
+    "engine/dope-core/tests/mlc_v4_wire.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v4_wire",
+      "purpose": "complete 2/16/64KiB envelope boundaries and bounded malformed-packet safe errors"
     }
   },
   "workspace": "dope"
