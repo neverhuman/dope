@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 25412,
-      "sha256": "79eacef0067b99d47a2729167dde6b0c624f82c1a0a1ce8d62e24622a0674c6a"
+      "bytes": 26800,
+      "sha256": "fc4f47607e5c410f1717bcd208c7c0398e1677456a3cca770000ae01b903f698"
     },
     "STATUS.json": {
-      "bytes": 34049,
-      "sha256": "c6ad24d64df8a97d390ad57eec4f58bf912a95b75c39ca5825e788839faf5db4"
+      "bytes": 39442,
+      "sha256": "8b75ba75c0ddbf4fd018b4b397856ea8ffec4ba18605c7eedbc7bd0688429106"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -253,6 +253,14 @@
     "dope/receipts/m1-and-high-import-source.json": {
       "bytes": 2819,
       "sha256": "5d7811da0d7db42a7de7393127fa65f735558e94b0b25c0625e63bed7a3e5f88"
+    },
+    "dope/receipts/hosted-audit-bb-snapshot.json": {
+      "bytes": 1532,
+      "sha256": "0bee2aee0cef41793b409ad343f341066403fafa80184c1a2f6cbf82bb1123e8"
+    },
+    "dope/receipts/bb-ci-repair-source.json": {
+      "bytes": 2665,
+      "sha256": "21dd222a47a2b912d65fa2419d5e948373cb3fa4bc13ac6d36ff6b2534d6c383"
     }
   },
   "historical_status": "PLANNED"

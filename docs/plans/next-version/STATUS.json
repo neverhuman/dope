@@ -276,7 +276,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+  "current_local_source_commit": "492fae914f6151cf32e14dad16699b40019d999a",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -352,12 +352,13 @@
     ]
   },
   "current_ci_known_failure": {
-    "head": "94d870f0915d3c18591f553803dc38e26be932e2",
-    "run": 41696444169,
-    "job": 126128142260,
-    "reason": "HighmatrixFINE_SLOTS wrongtestimport",
-    "fix_source": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
-    "new_native_execution": "NOT_RUN"
+    "CI_run": 41699461094,
+    "native_job": 126140855993,
+    "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
+    "compat_job": 126140855691,
+    "compat": "FAIL public-claims tools/claims/check.py\u2192figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
+    "audit_job": 126138603944,
+    "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
   },
   "historical_ci_worker_activation": [
     {
@@ -565,6 +566,14 @@
       "Signed_run": 41691846863,
       "Signed_check": 126112158285,
       "Signed": "FAIL --locked lock update required before tests; no test success claimed"
+    },
+    {
+      "head": "94d870f0915d3c18591f553803dc38e26be932e2",
+      "run": 41696444169,
+      "job": 126128142260,
+      "reason": "HighmatrixFINE_SLOTS wrongtestimport",
+      "fix_source": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+      "new_native_execution": "NOT_RUN"
     }
   ],
   "current_command_and_lock_repair": {
@@ -734,5 +743,115 @@
       "historical_BLOCKED": 4
     },
     "remaining": "ActualcurrentCI/review/M1/nativeM0qualifications, sevenRuststreams,14engineeringcriteria;4campaigncriteria deferredneverPASS; no newscore/audit claim"
+  },
+  "current_bb_ci_repair": {
+    "schema": "dope.bb-ci-repair-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "492fae914f6151cf32e14dad16699b40019d999a",
+    "base": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+    "actual_bb_failures": {
+      "CI_run": 41699461094,
+      "native_job": 126140855993,
+      "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
+      "compat_job": 126140855691,
+      "compat": "FAIL public-claims tools/claims/check.py\u2192figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
+      "audit_job": 126138603944,
+      "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
+    },
+    "repairs": {
+      "coverage": "SemanticMarkerFields4Stringtuple andMarkedCommandsmapaliases; exactfieldorder/bodiesunchanged, no lintallow",
+      "compat": "ONE claims-plot-dependencies check installs existingmatplotlib==3.10.8 withunchanged validation/requirements-v1.txt intoownci-python beforepublic-claims. Originalmonolith provisioned it in sameenv beforeclaims; splitotherguest cannot supply it. No localinstall/newversion/lock.",
+      "inventory": "83runtimeIDs/74markers/22testcommands; original70origins/testIDs/frozenpreimages/sourcehashes unchanged. Newcheckhasactualreceipt/fatalfailure, no fakeframeworkcounts.",
+      "badge": "Copyexactauthenticbb88SVG withhashonlysourcewitness; preserveoldjobFAIL andolder87/451witnesses"
+    },
+    "checks": {
+      "Rust1.88_format": "PASS2files",
+      "Bash_syntax": "PASScompatstage",
+      "independent_source_review": "APPROVED exact3CIpathdiff;74marker/order/kind/bodyhashes+all5stagepinsmatch",
+      "diff_check": "PASS",
+      "static_governed_sources": 1301,
+      "source_cap_violations": 0,
+      "new_build_tests_executed_locally": 0,
+      "new_required_CI": "PENDING_NEW_PUSH"
+    },
+    "bb_Signed_evidence": {
+      "run": 41699460902,
+      "job": 126138608036,
+      "conclusion": "SUCCESS",
+      "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+      "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+      "same_as_bb": true,
+      "passed": 280,
+      "failed": 0,
+      "ignored": 1,
+      "result_rows": 48,
+      "includes": "M0actualSDK/Highmatrix andM1CLI3tests executed; rootcriterionreview separate",
+      "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+    },
+    "criterion_counts": {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "historical_BLOCKED": 4
+    },
+    "qualification": "No automaticcriterionpromotion from280total orsourcechanges; actualper-criterionreviewrequired. NewheadfullCIpending.",
+    "remaining": "Sevenengineeringtasks/sevenRuststreams/14engineeringcriteria; only4campaigncriteria deferredneverPASS; no model/sciencepromotion"
+  },
+  "source_bound_bb_signed": {
+    "run": 41699460902,
+    "job": 126138608036,
+    "conclusion": "SUCCESS",
+    "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+    "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+    "same_as_bb": true,
+    "passed": 280,
+    "failed": 0,
+    "ignored": 1,
+    "result_rows": 48,
+    "includes": "M0actualSDK/Highmatrix andM1CLI3tests executed; rootcriterionreview separate",
+    "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+  },
+  "latest_recorded_audit_snapshot": {
+    "schema": "dope.hosted-audit-snapshot/v1",
+    "source_head": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+    "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+    "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+    "tree_matches_source": true,
+    "source_binding": "RootindependentGitAPI: parentsmain59b+bb; exactsamecheckedout/source tree",
+    "audit_run": 41699460421,
+    "audit_job": 126138603944,
+    "artifact_id": 13263332952,
+    "report": {
+      "sha256": "587becb08546e6e89cd1934e635614e89e751bf361e2ca762c5d4a6b4606274e",
+      "bytes": 154690,
+      "version": "1.7.1",
+      "scope": "full",
+      "dirty_worktree": false,
+      "score": 88,
+      "raw_score": 88,
+      "minimum_score": 85,
+      "report_decision": "pass",
+      "caps": 0,
+      "high": 0,
+      "critical": 0,
+      "medium": 11
+    },
+    "generated_svg": {
+      "sha256": "6074b4b29a628bd4645cbf1008a110592b14b25944eb7c97c92f7d8189cae86b",
+      "bytes": 437,
+      "generator": "Unchangedaudit-proof in authenticGHAjob",
+      "adoption": "Exactartifactbytes; no manualscore edit"
+    },
+    "score_receipt": {
+      "sha256": "d5f90bf96701fce3af4d92a40d8b77a6819abcca9bcd86872b06dba16c4c4e04",
+      "report_status": "pass",
+      "committed_badge_matches": false
+    },
+    "proof_tests": 9,
+    "job_conclusion": "FAIL finalbadgecheck againstformer87snapshot; reportPASSisnotwholejobPASS",
+    "later_source_qualification": "PENDING; no inheritednewhead exactauditpass",
+    "historical_witnesses_preserved": [
+      "hosted-audit-1811-snapshot.json",
+      "jankurai-451-snapshot.json"
+    ]
   }
 }

@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `0dfe96a0d1a90aec5f2100bd6177b57c80f436f4`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `492fae914f6151cf32e14dad16699b40019d999a`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -239,3 +239,26 @@ output. Source/hash/format review passed; runtime remains NOT_RUN and D05-S4
 is not promoted. Counts remain47PASS/14NOT_RUN/4historicalBLOCKED. See the
 [source receipt](receipts/m1-and-high-import-source.json). New required CI
 and the seven Rust migration streams remain open; no audit score is inferred.
+
+## Actual bb engine pass and remaining split-CI repair
+
+The actualbb signed-engine job succeeded with280Rust passes,0failures and
+1ignored across48resultrows, including the new SDK/High matrix and M1CLI
+targets. Its tested mergefee51ff5/tree08b9fecf exactly matchesbb. This is
+source-bound execution evidence; individual acceptance review remains separate.
+It does not qualify all CI or the new repair source.
+
+Source492fae91 names the marker tuple/map types without changing their fields
+or suppressing Clippy. The compat guest now provisions the original pinned
+Matplotlib3.10.8 with unchanged constraints before its claims checks; the
+installer runs only through ordinaryCI. One explicit check ID is added, with
+83runtime IDs/74markers/22testcommands. All original70origins and test IDs
+remain bound, and setup failure remains fatal. Independent source review and
+format/Bash/diff/hash checks pass; new actual execution remains pending.
+
+README now copies the genuine generated88-point artifact from the full clean
+bb audit. That job failed its old87badge comparison even though both reports
+passed the85floor with0caps/high/critical. The new source requires a fresh
+exact-head audit. See the [repair receipt](receipts/bb-ci-repair-source.json)
+and [bb audit witness](receipts/hosted-audit-bb-snapshot.json). Counts stay
+47PASS/14NOT_RUN/4historicalBLOCKED pending individual review.
