@@ -43,6 +43,27 @@ pub struct FamilyReceipt {
     pub descriptive_mean_retention: Option<f64>,
 }
 
+/// States the policy required for a complete successor driver assessment.
+/// This is a requirement binding, not evidence that inference ran or passed.
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
+pub struct DriverPolicyBinding {
+    pub state: &'static str,
+    pub driver_protocol: &'static str,
+    pub inference_bound_method: &'static str,
+    pub pins: super::DataPins,
+}
+
+impl DriverPolicyBinding {
+    pub(crate) fn required(pins: super::DataPins) -> Self {
+        Self {
+            state: "required_for_complete_driver_evidence",
+            driver_protocol: "driver-rank-informative-v1",
+            inference_bound_method: "full_family_max_t",
+            pins,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct DvsReceipt {
     pub protocol: &'static str,
@@ -59,6 +80,7 @@ pub struct DvsReceipt {
     pub bytes: ByteReceipt,
     pub privacy: Value,
     pub pins: super::DataPins,
+    pub driver_policy_binding: DriverPolicyBinding,
     pub role_binding: super::roles::RoleBindingReceipt,
     pub qualification_state: &'static str,
     pub formal_dp_state: &'static str,

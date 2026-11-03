@@ -8,7 +8,7 @@ pub mod receipt;
 pub mod roles;
 pub mod selection;
 
-use receipt::{CellReceipt, DvsReceipt, FamilyReceipt};
+use receipt::{CellReceipt, DriverPolicyBinding, DvsReceipt, FamilyReceipt};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -430,6 +430,7 @@ pub fn evaluate(input: &DvsRequest) -> Result<DvsReceipt, DvsError> {
         bytes: account_bytes(&input.artifacts)?,
         privacy,
         pins: input.pins.clone(),
+        driver_policy_binding: DriverPolicyBinding::required(input.pins.clone()),
         role_binding,
         qualification_state: "not_run",
         formal_dp_state: "not_run",

@@ -767,6 +767,31 @@
         }
       }
     },
+    "driver_policy_binding": {
+      "description": "Required-policy binding for complete successor driver evidence; its presence does not assert that driver inference ran or passed. Optional only on historical receipts.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "driver_protocol",
+        "inference_bound_method",
+        "pins"
+      ],
+      "properties": {
+        "state": {
+          "const": "required_for_complete_driver_evidence"
+        },
+        "driver_protocol": {
+          "const": "driver-rank-informative-v1"
+        },
+        "inference_bound_method": {
+          "const": "full_family_max_t"
+        },
+        "pins": {
+          "$ref": "#/properties/pins"
+        }
+      }
+    },
     "role_binding": {
       "description": "Optional only on historical receipts, where absence means unverified. New issuance requires a role binding.",
       "type": "object",

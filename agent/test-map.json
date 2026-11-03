@@ -1586,15 +1586,15 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
@@ -3887,6 +3887,14 @@
     "engine/dope-sdk/tests/safe_errors.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test safe_errors",
       "purpose": "actualSDK malformedweight/schemafixedvariant/message/canaryrefusals;D03-S3remainsNOTRUNuntilnewnativeexecution"
+    },
+    "engine/dope-core/tests/dvs.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
+      "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
+    },
+    "schemas/dope-dvs-receipt-v1.schema.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
+      "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
     }
   },
   "workspace": "dope"

@@ -407,3 +407,83 @@ fn dvs_real_test_poison_changes_assessment_but_not_synthetic_choice() {
         first.selection["real_best_index"]
     );
 }
+
+#[test]
+fn dvs_successor_receipt_binds_required_driver_policy_and_pins_without_claiming_execution() {
+    let mut input = request();
+    if let dvs::CellOutcome::Complete {
+        driver_evidence, ..
+    } = &mut input.cells[0].outcome
+    {
+        driver_evidence.as_mut().unwrap()["owner_private_note"] =
+            json!("CANARY_PRIVATE_DRIVER_POLICY_NOTE");
+    }
+    let complete = dvs::evaluate(&input).unwrap();
+    assert_eq!(complete.cells[0].driver["status"], "complete");
+    assert_eq!(
+        complete.driver_policy_binding.state,
+        "required_for_complete_driver_evidence"
+    );
+    assert_eq!(
+        complete.driver_policy_binding.driver_protocol,
+        "driver-rank-informative-v1"
+    );
+    assert_eq!(
+        complete.driver_policy_binding.inference_bound_method,
+        "full_family_max_t"
+    );
+    assert_eq!(complete.driver_policy_binding.pins, complete.pins);
+    let wire = serde_json::to_value(&complete).unwrap();
+    assert_eq!(wire["driver_policy_binding"]["pins"], wire["pins"]);
+    assert!(!wire.to_string().contains("CANARY_PRIVATE"));
+
+    if let dvs::CellOutcome::Complete {
+        driver_evidence, ..
+    } = &mut input.cells[0].outcome
+    {
+        driver_evidence.as_mut().unwrap()["inference"]["bound_method"] = json!("ratio_only");
+    }
+    let refused = dvs::evaluate(&input).unwrap();
+    assert_eq!(
+        refused.cells[0].driver["reason"],
+        "non_simultaneous_driver_bounds"
+    );
+    assert_eq!(refused.cells[0].status, "incomplete");
+    assert_eq!(
+        refused.driver_policy_binding,
+        complete.driver_policy_binding
+    );
+
+    if let dvs::CellOutcome::Complete {
+        driver_evidence, ..
+    } = &mut input.cells[0].outcome
+    {
+        *driver_evidence = None;
+    }
+    let missing = dvs::evaluate(&input).unwrap();
+    assert_eq!(missing.cells[0].reason, Some("missing_driver_evidence"));
+    assert_eq!(missing.cells[0].status, "incomplete");
+    assert_eq!(
+        missing.driver_policy_binding,
+        complete.driver_policy_binding
+    );
+
+    let schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/dope-dvs-receipt-v1.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(schema["additionalProperties"], false);
+    assert_eq!(
+        schema["properties"]["driver_policy_binding"]["additionalProperties"],
+        false
+    );
+    assert_eq!(
+        schema["properties"]["driver_policy_binding"]["required"],
+        json!(["state", "driver_protocol", "inference_bound_method", "pins"])
+    );
+    assert!(schema["required"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|key| key != "driver_policy_binding"));
+}
