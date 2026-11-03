@@ -1,6 +1,11 @@
 # D08 — Build bounded batched training and exact resume around frozen wire
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **CPU ENGINEERING; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D08/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P1**. Prerequisites: D00, D05, D07, D10.
 
@@ -51,3 +56,15 @@ Stop on unfrozen wire, identity mismatch, unknown input exposure, memory admissi
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D08/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D08-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D08-S1 | **PASS** | test_shape_buckets_padding_masks_and_no_truncation and real model native23/dropout/outer-role tests pass; explicit max padded allocation refusal. |
+| D08-S2 | **PASS** | Actual V4ObjectiveAdapter batch 2 weighted loss and every compared parameter gradient agree with per-cell references; NaN-poisoned padding leaves exact loss/grad unchanged. |
+| D08-S3 | **PASS** | Actual V4Model AdamW two-step interrupted/uninterrupted checkpoint replay gives exact weights/cursor/Torch RNG; generic test covers Python/NumPy/Torch RNG. |
+| D08-S4 | **PASS** | Data/schema/role/membership/weight drift, orphan/missing checkpoint generation, owned prefetch interruption, nonfinite gradients and mutating optimizer failures are exercised with retained model/optimizer/scheduler/RNG/cursor. Checkpoint v2 counters are validated. |
+| D08-S5 | **PASS** | attempt_count, failed_update_count, update_count and measured setup/compute seconds survive checkpoint; only accumulation_steps=1 is supported and other values refuse. No CUDA optimizer or speedup claim. |

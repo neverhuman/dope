@@ -13,6 +13,7 @@ import os
 import random
 import re
 import tempfile
+import time
 import uuid
 from dataclasses import dataclass, fields, is_dataclass, asdict, field
 from pathlib import Path
@@ -126,12 +127,15 @@ class V4TrainerConfig:
     seed: int = 0
     report_interval: int = 100
     device: str = "cpu"
+    accumulation_steps: int = 1
 
     def __post_init__(self) -> None:
         if min(self.batch_size, self.row_bucket, self.column_bucket, self.max_padded_cells, self.report_interval) < 1:
             raise ValueError("trainer_limits_must_be_positive")
         if self.device != "cpu":
             raise UnsupportedDeviceError("trainer_updates_currently_support_cpu_only")
+        if type(self.accumulation_steps) is not int or self.accumulation_steps != 1:
+            raise UnsupportedDeviceError("gradient_accumulation_steps_other_than_one_not_supported")
 
 
 @dataclass
@@ -312,6 +316,18 @@ def _state_shapes(model: torch.nn.Module) -> dict[str, tuple[int, ...]]:
     return {k: tuple(v.shape) for k, v in model.state_dict().items()}
 
 
+def _finite_tree(value: Any) -> bool:
+    if isinstance(value, torch.Tensor):
+        return not (value.is_floating_point() or value.is_complex()) or bool(torch.isfinite(value).all())
+    if isinstance(value, Mapping):
+        return all(_finite_tree(item) for item in value.values())
+    if isinstance(value, (list, tuple)):
+        return all(_finite_tree(item) for item in value)
+    if type(value) is float:
+        return math.isfinite(value)
+    return True
+
+
 def _fsync_dir(path: Path) -> None:
     fd = os.open(path, os.O_RDONLY)
     try:
@@ -326,6 +342,7 @@ class V4Trainer:
                  cells: Sequence[BatchCell], loss_fn: Callable[[torch.nn.Module, PaddedBatch], Any],
                  identity: TrainingIdentity, config: V4TrainerConfig = V4TrainerConfig(),
                  scheduler: Any = None):
+        setup_started = time.perf_counter()
         self.model, self.optimizer, self.scheduler = model, optimizer, scheduler
         self.cells = list(cells)
         if not self.cells:
@@ -337,11 +354,16 @@ class V4Trainer:
             cell.validate()
         self.loss_fn, self.identity, self.config = loss_fn, identity, config
         self.update_count = 0
+        self.attempt_count = 0
+        self.failed_update_count = 0
+        self.setup_seconds = 0.0
+        self.compute_seconds = 0.0
         self.cursor = 0
         self.permutation = build_shape_batches(self.cells, config, config.seed)
         self.dataset_fingerprint = _dataset_fingerprint(self.cells)
         self.cell_fingerprints = {c.cell_id: _dataset_fingerprint([c]) for c in self.cells}
         self.last_report: dict[str, Any] = {}
+        self.setup_seconds = time.perf_counter() - setup_started
 
     def _next_batch(self) -> PaddedBatch:
         if self.cursor >= len(self.permutation):
@@ -356,32 +378,72 @@ class V4Trainer:
         self.permutation = build_shape_batches(self.cells, self.config, self.config.seed + self.update_count + 1)
         self.cursor = 0
 
+    def counters(self) -> dict[str, int | float]:
+        """Return explicit attempt, failure, committed-update, setup, and compute totals."""
+        return {
+            "attempt_count": self.attempt_count,
+            "failed_update_count": self.failed_update_count,
+            "update_count": self.update_count,
+            "setup_seconds": self.setup_seconds,
+            "compute_seconds": self.compute_seconds,
+            "accumulation_steps": 1,
+        }
+
     def fit_step(self) -> dict[str, Any]:
         batch = self._next_batch()
-        self.optimizer.zero_grad(set_to_none=True)
-        output = self.loss_fn(self.model, batch)
-        loss = output["loss"] if isinstance(output, Mapping) else output
-        if not isinstance(loss, torch.Tensor) or loss.ndim != 0:
-            raise TypeError("loss_fn_must_return_scalar_tensor_or_loss_mapping")
-        if not bool(torch.isfinite(loss.detach()).all()):
+        self.attempt_count += 1
+        compute_started = time.perf_counter()
+        snapshot: dict[str, Any] | None = None
+        try:
+            snapshot = {
+                "model": {k: v.detach().clone() for k, v in self.model.state_dict().items()},
+                "optimizer": copy.deepcopy(self.optimizer.state_dict()),
+                "scheduler": copy.deepcopy(self.scheduler.state_dict()) if self.scheduler is not None else None,
+                "rng": _rng_state(),
+                "grads": [None if p.grad is None else p.grad.detach().clone() for p in self.model.parameters()],
+            }
             self.optimizer.zero_grad(set_to_none=True)
-            raise NonFiniteUpdate("nonfinite_loss_update_refused")
-        loss.backward()
-        for parameter in self.model.parameters():
-            if parameter.grad is not None and not bool(torch.isfinite(parameter.grad).all()):
-                self.optimizer.zero_grad(set_to_none=True)
-                raise NonFiniteUpdate("nonfinite_gradient_update_refused")
-        self.optimizer.step()
-        if self.scheduler is not None:
-            self.scheduler.step()
-        self.cursor += 1
-        self.update_count += 1
-        result = dict(output) if isinstance(output, Mapping) else {"loss": loss.detach()}
-        result["loss"] = float(loss.detach().cpu())
-        result["cell_ids"] = batch.cell_ids
-        result["update_count"] = self.update_count
-        self.last_report = result
-        return result
+            output = self.loss_fn(self.model, batch)
+            loss = output["loss"] if isinstance(output, Mapping) else output
+            if not isinstance(loss, torch.Tensor) or loss.ndim != 0:
+                raise TypeError("loss_fn_must_return_scalar_tensor_or_loss_mapping")
+            if not bool(torch.isfinite(loss.detach()).all()):
+                raise NonFiniteUpdate("nonfinite_loss_update_refused")
+            loss.backward()
+            for parameter in self.model.parameters():
+                if parameter.grad is not None and not bool(torch.isfinite(parameter.grad).all()):
+                    raise NonFiniteUpdate("nonfinite_gradient_update_refused")
+            self.optimizer.step()
+            if self.scheduler is not None:
+                self.scheduler.step()
+            if not _finite_tree(self.model.state_dict()) or not _finite_tree(self.optimizer.state_dict()):
+                raise NonFiniteUpdate("nonfinite_optimizer_result_refused")
+            result = dict(output) if isinstance(output, Mapping) else {"loss": loss.detach()}
+            result["loss"] = float(loss.detach().cpu())
+            self.cursor += 1
+            self.update_count += 1
+            self.compute_seconds += time.perf_counter() - compute_started
+            result["cell_ids"] = batch.cell_ids
+            result.update(self.counters())
+            self.last_report = result
+            return result
+        except Exception:
+            if snapshot is not None:
+                try:
+                    self.model.load_state_dict(snapshot["model"], strict=True)
+                    self.optimizer.load_state_dict(snapshot["optimizer"])
+                    if self.scheduler is not None:
+                        self.scheduler.load_state_dict(snapshot["scheduler"])
+                    _restore_rng(snapshot["rng"])
+                    for parameter, grad in zip(self.model.parameters(), snapshot["grads"]):
+                        parameter.grad = None if grad is None else grad.clone()
+                except Exception as rollback_error:
+                    self.failed_update_count += 1
+                    self.compute_seconds += time.perf_counter() - compute_started
+                    raise TrainerError("failed_update_rollback_failed") from rollback_error
+            self.failed_update_count += 1
+            self.compute_seconds += time.perf_counter() - compute_started
+            raise
 
     def fit(self, updates: int) -> list[dict[str, Any]]:
         if updates < 0:
@@ -402,12 +464,13 @@ class V4Trainer:
         model_state = {k: v.detach().cpu().contiguous() for k, v in self.model.state_dict().items()}
         save_file(model_state, str(model_tmp))
         state = {
-            "format": "dope.v4-training-resume/v1",
+            "format": "dope.v4-training-resume/v2",
             "identity": self.identity.as_dict(),
             "model_shapes": {k: list(v) for k, v in _state_shapes(self.model).items()},
             "optimizer": self.optimizer.state_dict(),
             "scheduler": self.scheduler.state_dict() if self.scheduler is not None else None,
             "update_count": self.update_count,
+            "counters": self.counters(),
             "cursor": self.cursor,
             "permutation": [list(x) for x in self.permutation],
             "dataset_fingerprint": self.dataset_fingerprint,
@@ -452,7 +515,7 @@ class V4Trainer:
             state = torch.load(state_file, map_location="cpu", weights_only=True)
         except Exception as exc:
             raise TrainerError("checkpoint_missing_or_invalid") from exc
-        if state.get("format") != "dope.v4-training-resume/v1":
+        if state.get("format") != "dope.v4-training-resume/v2":
             raise TrainerError("checkpoint_format_mismatch")
         if state.get("identity") != self.identity.as_dict():
             raise IdentityMismatch("checkpoint_training_identity_mismatch")
@@ -481,6 +544,22 @@ class V4Trainer:
         update_count = state.get("update_count")
         if type(update_count) is not int or update_count < 0:
             raise TrainerError("checkpoint_update_count_invalid")
+        counters = state.get("counters")
+        if not isinstance(counters, dict) or set(counters) != {
+            "attempt_count", "failed_update_count", "update_count", "setup_seconds", "compute_seconds", "accumulation_steps"
+        }:
+            raise TrainerError("checkpoint_counters_invalid")
+        attempts = counters["attempt_count"]
+        failed = counters["failed_update_count"]
+        if (type(attempts) is not int or type(failed) is not int or attempts < 0 or failed < 0
+                or attempts != update_count + failed or type(counters["update_count"]) is not int
+                or counters["update_count"] != update_count
+                or type(counters["accumulation_steps"]) is not int or counters["accumulation_steps"] != 1
+                or type(counters["setup_seconds"]) not in (float, int)
+                or type(counters["compute_seconds"]) not in (float, int)
+                or not math.isfinite(float(counters["setup_seconds"])) or float(counters["setup_seconds"]) < 0
+                or not math.isfinite(float(counters["compute_seconds"])) or float(counters["compute_seconds"]) < 0):
+            raise TrainerError("checkpoint_counters_invalid")
         # Validate mutable libraries on detached copies before committing state.
         try:
             staged_optimizer = copy.deepcopy(self.optimizer)
@@ -512,6 +591,10 @@ class V4Trainer:
             raise TrainerError("checkpoint_restore_refused") from exc
         self.permutation, self.cursor = permutation, cursor
         self.update_count = update_count
+        self.attempt_count = attempts
+        self.failed_update_count = failed
+        self.setup_seconds = float(counters["setup_seconds"])
+        self.compute_seconds = float(counters["compute_seconds"])
 
 
 class BoundedPrefetcher:

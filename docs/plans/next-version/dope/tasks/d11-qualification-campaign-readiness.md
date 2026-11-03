@@ -1,6 +1,11 @@
 # D11 — Prepare qualification gates without launching or promoting a model
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **READINESS HOLD; NO CAMPAIGN.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D11/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P1-gated**. Prerequisites: D00, D01, D02, D03, D04, D05, D06, D07, D08, D09, D10.
 
@@ -49,3 +54,16 @@ Stop readiness on stale source, reused exposure/ID, missing budget, weak denomin
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D11/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D11-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D11-S1 | **PASS** | Readiness state HOLD and ready_for_owner_admission=false until exact-head passing prerequisite inventory exists; nulls/blockers are explicit. |
+| D11-S2 | **BLOCKED** | Finite cohort/family/exposure/fresh-ID verification unavailable; no protected outcome opened. |
+| D11-S3 | **BLOCKED** | No owner-frozen campaign hypotheses/thresholds/comparators/resources yet; no guessed values or outcome exposure. |
+| D11-S4 | **BLOCKED** | Owner, host, budget/custody/recovery admission remain explicit nulls; no campaign authorization. |
+| D11-S5 | **PASS** | Manifest separates source, fixture, exact-head CI, efficacy, release and serving adoption. CPU synthetic update fixtures are engineering evidence only. |
+| D11-S6 | **PASS** | Readiness docs/manifest are reviewable and HOLD; no campaign/model publication/live pointer action was taken. |

@@ -7,7 +7,7 @@
   "native_landmarks": "explicit_none",
   "real_data_reads": 0,
   "source_sha256": {
-    "v4_model.py": "bef5ec9c4eaa98dbae42711f84924cd05b140c56b6ea27d80b48e0260563e82c",
+    "v4_model.py": "b8abf7eda7d78cfe729895297222515b284560a01b6526647a22b2ae3839b16e",
     "v4_objectives.py": "5742bf5169ca46d5e25472d64d11c1582a87ad3414d30bed5c37c1c3135a454a",
     "v4_encode.py": "1382b3c542d668ca020118fe284f40cc56944efd800b0f596d7f8517fcb85d9a",
     "v4_wire_reference.py": "35b0e7a7d0578a179ac74654ce9fb5f4ad4df30b66bed02645f41f9c8cf5f77a"

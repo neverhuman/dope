@@ -1,6 +1,11 @@
 # D02 — Add informative driver-rank semantics without rewriting history
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P0**. Prerequisites: D00.
 
@@ -50,3 +55,15 @@ Stop if existing v2 is assumed mutable, metric definition remains unresolved, gr
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D02/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D02-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D02-S1 | **NOT_RUN** | Python conformance: 129 golden cases PASS at tolerance 1e-12; v1/v2 fixture bytes unchanged. Actual root Rust golden replay remains pending. |
+| D02-S2 | **NOT_RUN** | Applied Python successor fixtures pass; authored Rust shared-fixture test compiled in workspace; actual root Rust execution pending. |
+| D02-S3 | **NOT_RUN** | Seven analytic cases exist in shared golden JSON and Python passes; exact current Rust/Python execution receipt pending. |
+| D02-S4 | **NOT_RUN** | Python group-member and malformed-input checks pass; native root successor refusal execution pending. |
+| D02-S5 | **PASS** | test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately. |

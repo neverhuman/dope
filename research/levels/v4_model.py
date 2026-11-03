@@ -122,8 +122,11 @@ def ridge(features, targets, alpha):
     eye = torch.eye(design.shape[1], dtype=features.dtype, device=features.device)
     eye[0, 0] = 1e-6
     try:
-        result = torch.linalg.solve(design.T @ design / len(design) + alpha * eye,
-                                    design.T @ targets / len(design))
+        # Autocast also changes FP32 matrix multiplies, so disable it for both
+        # Gram construction and solve, while retaining FP64 fixture precision.
+        with torch.autocast(device_type=features.device.type, enabled=False):
+            result = torch.linalg.solve(design.T @ design / len(design) + alpha * eye,
+                                        design.T @ targets / len(design))
     except RuntimeError:
         raise V4Error("v4_ridge_solve_failed") from None
     require(bool(torch.isfinite(result).all()), "nonfinite_v4_ridge")

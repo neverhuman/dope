@@ -1,6 +1,11 @@
 # D01 — Repair prospective evaluation coordinate identity
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D01/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P0**. Prerequisites: D00.
 
@@ -50,3 +55,15 @@ Stop on missing coordinate provenance, unsupported inverse, changed upstream API
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D01/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D01-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D01-S1 | **PASS** | test_real_fit_map_is_shared_and_synthetic_refit_reproduces_bug demonstrates old mismatch and corrected common map. |
+| D01-S2 | **PASS** | Same test and canonical receiver bridge assert shared real-test arrays, common FIT identity and protocol-tagged prepared views. |
+| D01-S3 | **PASS** | test_test_and_synthetic_poisoning_never_changes_fitted_metadata plus double-transform/mutation/mismatched-space refusals. |
+| D01-S4 | **PASS** | CanonicalReceiverBridgeTests executes actual extracted orchestration with deterministic callbacks under both named routes; default historical replay remains explicit. Full legacy suite pending separately. |
+| D01-S5 | **PASS** | Held-out target190 maps to10 without clipping; bridge asserts real query targets exceed1. No current-engine repair is claimed. |

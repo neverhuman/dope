@@ -1,13 +1,15 @@
 """Tiny public CPU conformance cases, not a training/quality campaign."""
 import dataclasses
+import hashlib
 import json
+from pathlib import Path
 import math
 import unittest
 
 import torch
 import torch.nn.functional as F
 
-from research.levels.v4_model import (GATE_KEYS, NativeLandmarks, V4Error, V4Model, basis)
+from research.levels.v4_model import (GATE_KEYS, NativeLandmarks, V4Error, V4Model, basis, ridge)
 from research.levels.v4_objectives import LossWeights, sample_differentiable, synthesize_then_learn_loss
 from research.levels.v4_encode import export_packet
 from research.levels.v4_wire_reference import basis as reference_basis, decode as reference_decode, sample_with_draws
@@ -122,6 +124,31 @@ class V4ObjectiveTests(unittest.TestCase):
         self.assertIsNotNone(self.model.support_head[-1].weight.grad)
         self.assertGreater(self.model.support_head[-1].weight.grad.abs().sum().item(),1e-14)
 
+    def test_tracked_producer_fixture_manifest_binds_sources_and_artifacts(self):
+        root=Path(__file__).resolve().parents[3]
+        folder=root/"engine/dope-core/tests/fixtures/v4_producer"
+        manifest=json.loads((folder/"manifest.json").read_text())
+        self.assertEqual(manifest["kind"],"public_synthetic_conformance_only")
+        self.assertEqual(manifest["optimizer_updates"],0)
+        self.assertEqual(manifest["real_data_reads"],0)
+        self.assertEqual(set(manifest["source_sha256"]),{"v4_model.py","v4_objectives.py","v4_encode.py","v4_wire_reference.py"})
+        for name,expected in manifest["source_sha256"].items():
+            self.assertEqual(hashlib.sha256((root/"research/levels"/name).read_bytes()).hexdigest(),expected,"producer source drift; regenerate into a new directory with retained evidence")
+        self.assertEqual(hashlib.sha256((root/"research/levels/tools/export_v4_conformance.py").read_bytes()).hexdigest(),manifest["generator_sha256"])
+        for artifact in manifest["files"]:
+            self.assertEqual(Path(artifact["file"]).name,artifact["file"])
+            data=(folder/artifact["file"]).read_bytes()
+            self.assertEqual(len(data),artifact["bytes"])
+            self.assertEqual(hashlib.sha256(data).hexdigest(),artifact["sha256"])
+
+    def test_amp_keeps_gram_and_solve_in_fp32(self):
+        features=self.x.float();target=self.y.float()[:,None]
+        expected=ridge(features,target,.02)
+        with torch.autocast(device_type="cpu",dtype=torch.bfloat16):
+            actual=ridge(features,target,.02)
+        self.assertEqual(actual.dtype,torch.float32)
+        torch.testing.assert_close(actual,expected,rtol=0,atol=0)
+
     def test_padding_cannot_affect_encoding_and_column_65_is_not_truncated(self):
         baseline=self.model.encode(self.x,self.y,schema(),self.native)
         x=torch.full((1,27,7),float("nan"),dtype=torch.float64);x[0,:24,:2]=self.x
@@ -147,6 +174,8 @@ class V4ObjectiveTests(unittest.TestCase):
         self.assertEqual(dropped.native_observed.sum().item(),23)  # supervision distinct from input mask
         loss=synthesize_then_learn_loss(self.model,dropped,self.x,self.y,torch.rand(12,5,dtype=torch.float64),weights=self.weights)
         self.assertGreater(loss["native"].item(),0)
+        loss["total"].backward()
+        self.assertGreater(self.model.native_head.weight.grad.abs().sum().item(),1e-14)
         with self.assertRaises(V4Error):self.model.encode(self.x,self.y,schema(),dataclasses.replace(report,recipe="heuristic-proxy"))
         for role in ["outer_test","sealed_meta_test","tune"]:
             with self.assertRaisesRegex(V4Error,"^outer_query_role_forbidden$"):

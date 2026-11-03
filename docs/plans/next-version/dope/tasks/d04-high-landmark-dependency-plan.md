@@ -1,6 +1,11 @@
 # D04 — Skip unused High probes while preserving admitted conditioning
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P1**. Prerequisites: D00, D10.
 
@@ -48,3 +53,15 @@ Stop on any conditioning/admission drift, false coverage state, claimed-owner ov
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D04/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D04-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D04-S1 | **NOT_RUN** | Shared constants are aliases and all-target compilation passed; actual legacy/golden replay pending. |
+| D04-S2 | **NOT_RUN** | High-required native fixture is compiled; actual vector/digest matrix execution pending. Effective vector-only digest is distinguished from mask-bound bundle identity. |
+| D04-S3 | **NOT_RUN** | Tight spectrum boundary fixtures compiled; actual full-reservation admission execution pending. |
+| D04-S4 | **NOT_RUN** | Order/idempotence/explicit upgrade fixtures compiled; actual native execution pending. |
+| D04-S5 | **NOT_RUN** | Historical constructors/default full path unchanged in source; actual legacy report replay pending. |

@@ -1,10 +1,10 @@
 import hashlib
+import copy
+import json
 import random
 import tempfile
 import unittest
 from pathlib import Path
-TEST_OUTPUT_ROOT = Path(__file__).resolve().parents[3] / "target" / "v4-training-tests"
-TEST_OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 import numpy as np
@@ -12,9 +12,11 @@ import torch
 
 from research.levels.v4_trainer import (
     BatchCell,
+    BoundedPrefetcher,
     IdentityMismatch,
     NonFiniteUpdate,
     RoleViolation,
+    TrainerError,
     TrainingIdentity,
     V4Trainer,
     V4TrainerConfig,
@@ -134,7 +136,7 @@ class V4TrainingTests(unittest.TestCase):
         torch.manual_seed(19)
         uninterrupted = trainer()
         uninterrupted.fit(2)
-        with tempfile.TemporaryDirectory(dir=TEST_OUTPUT_ROOT) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             uninterrupted.save_checkpoint(tmp)
             uninterrupted.fit(2)
             expected = weights(uninterrupted.model)
@@ -153,7 +155,7 @@ class V4TrainingTests(unittest.TestCase):
             self.assertTrue(torch.equal(expected_rng, torch.rand(3)))
 
     def test_checkpoint_identity_and_model_shapes_are_strict(self):
-        with tempfile.TemporaryDirectory(dir=TEST_OUTPUT_ROOT) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             source = trainer()
             source.fit(1)
             source.save_checkpoint(tmp)
@@ -173,9 +175,142 @@ class V4TrainingTests(unittest.TestCase):
         with self.assertRaises(NonFiniteUpdate):
             subject.fit_step()
         self.assertEqual(subject.update_count, 0)
+        self.assertEqual(subject.attempt_count, 1)
+        self.assertEqual(subject.failed_update_count, 1)
         self.assertEqual(subject.cursor, 0)
+        self.assertEqual(subject.counters()["accumulation_steps"], 1)
+        self.assertEqual(subject.counters()["failed_update_count"], 1)
         for key, tensor in before.items():
             self.assertTrue(torch.equal(tensor, subject.model.state_dict()[key]))
+
+    def test_accumulation_is_explicitly_single_step_only(self):
+        self.assertEqual(V4TrainerConfig().accumulation_steps, 1)
+        with self.assertRaisesRegex(Exception, "accumulation_steps_other_than_one"):
+            V4TrainerConfig(accumulation_steps=2)
+        with self.assertRaisesRegex(Exception, "accumulation_steps_other_than_one"):
+            V4TrainerConfig(accumulation_steps=True)
+
+    def test_callback_and_mutating_optimizer_failures_roll_back_update_state(self):
+        subject = trainer()
+        before_model = weights(subject.model)
+        before_optimizer = copy.deepcopy(subject.optimizer.state_dict())
+        before_rng = torch.get_rng_state().clone()
+        def bad_loss(model, batch):
+            torch.rand(10)
+            with torch.no_grad():
+                next(model.parameters()).add_(7)
+            raise RuntimeError("fixture_callback_failure")
+        subject.loss_fn = bad_loss
+        with self.assertRaisesRegex(RuntimeError, "fixture_callback_failure"):
+            subject.fit_step()
+        self.assertEqual(subject.cursor, 0)
+        self.assertEqual(subject.update_count, 0)
+        self.assertEqual(subject.attempt_count, 1)
+        self.assertEqual(subject.failed_update_count, 1)
+        self.assertEqual(subject.optimizer.state_dict(), before_optimizer)
+        self.assertTrue(torch.equal(torch.get_rng_state(), before_rng))
+        for key, tensor in before_model.items():
+            self.assertTrue(torch.equal(tensor, subject.model.state_dict()[key]))
+
+        subject.loss_fn = make_loss()
+        before_model = weights(subject.model)
+        before_optimizer = copy.deepcopy(subject.optimizer.state_dict())
+        before_rng = torch.get_rng_state().clone()
+        def mutating_failure():
+            with torch.no_grad():
+                for parameter in subject.model.parameters():
+                    parameter.add_(13)
+            subject.optimizer.param_groups[0]["lr"] = 999.0
+            raise RuntimeError("fixture_optimizer_failure")
+        subject.optimizer.step = mutating_failure
+        with self.assertRaisesRegex(RuntimeError, "fixture_optimizer_failure"):
+            subject.fit_step()
+        self.assertEqual(subject.cursor, 0)
+        self.assertEqual(subject.update_count, 0)
+        self.assertEqual(subject.attempt_count, 2)
+        self.assertEqual(subject.failed_update_count, 2)
+        self.assertEqual(subject.optimizer.state_dict(), before_optimizer)
+        self.assertTrue(torch.equal(torch.get_rng_state(), before_rng))
+        for key, tensor in before_model.items():
+            self.assertTrue(torch.equal(tensor, subject.model.state_dict()[key]))
+
+    def test_checkpoint_restores_and_validates_counters(self):
+        source = trainer(inject_nan=True)
+        with self.assertRaises(NonFiniteUpdate):
+            source.fit_step()
+        source.loss_fn = make_loss()
+        report = source.fit_step()
+        self.assertEqual((report["attempt_count"], report["failed_update_count"], report["update_count"]), (2, 1, 1))
+        self.assertEqual((source.attempt_count, source.failed_update_count, source.update_count), (2, 1, 1))
+        with tempfile.TemporaryDirectory() as tmp:
+            source.save_checkpoint(tmp)
+            target = trainer()
+            target.load_checkpoint(tmp)
+            self.assertEqual((target.attempt_count, target.failed_update_count, target.update_count), (2, 1, 1))
+            self.assertEqual(target.setup_seconds, source.setup_seconds)
+            self.assertEqual(target.compute_seconds, source.compute_seconds)
+
+            pointer = json.loads((Path(tmp) / "CURRENT").read_text())
+            state_path = Path(tmp) / pointer["state"]
+            state = torch.load(state_path, map_location="cpu", weights_only=True)
+            state["counters"]["failed_update_count"] = 0
+            torch.save(state, state_path)
+            invalid_target = trainer()
+            before = weights(invalid_target.model)
+            before_rng = torch.get_rng_state().clone()
+            with self.assertRaisesRegex(TrainerError, "checkpoint_counters_invalid"):
+                invalid_target.load_checkpoint(tmp)
+            self.assertEqual((invalid_target.attempt_count, invalid_target.failed_update_count, invalid_target.update_count), (0, 0, 0))
+            self.assertTrue(torch.equal(torch.get_rng_state(), before_rng))
+            for key, tensor in before.items():
+                self.assertTrue(torch.equal(tensor, invalid_target.model.state_dict()[key]))
+
+    def test_checkpoint_ignores_orphan_generation_and_missing_pointer_preserves_target(self):
+        source = trainer()
+        source.fit_step()
+        with tempfile.TemporaryDirectory() as tmp:
+            source.save_checkpoint(tmp)
+            current_before = (Path(tmp) / "CURRENT").read_bytes()
+            orphan = "f" * 32
+            Path(tmp, f"model-{orphan}.safetensors.tmp").write_bytes(b"partial model")
+            Path(tmp, f"state-{orphan}.pt.tmp").write_bytes(b"partial metadata")
+            target = trainer()
+            target.load_checkpoint(tmp)
+            self.assertEqual(target.update_count, 1)
+            self.assertEqual((Path(tmp) / "CURRENT").read_bytes(), current_before)
+
+            pointer = json.loads(current_before)
+            pointer["state"] = f"state-{'e' * 32}.pt"
+            (Path(tmp) / "CURRENT").write_text(json.dumps(pointer))
+            untouched = trainer(ident=identity("target"))
+            before = weights(untouched.model)
+            before_rng = torch.get_rng_state().clone()
+            with self.assertRaises(TrainerError):
+                untouched.load_checkpoint(tmp)
+            self.assertEqual(untouched.update_count, 0)
+            self.assertTrue(torch.equal(torch.get_rng_state(), before_rng))
+            for key, tensor in before.items():
+                self.assertTrue(torch.equal(tensor, untouched.model.state_dict()[key]))
+
+    def test_prefetch_ring_ownership_and_exception_cleanup_are_bounded(self):
+        ring = BoundedPrefetcher(capacity=1, device="cpu")
+        slot, payload = ring.transfer({"x": torch.tensor([1.0])})
+        self.assertTrue(torch.equal(ring.consume(slot)["x"], payload["x"]))
+        with self.assertRaisesRegex(TrainerError, "still_owned"):
+            ring.transfer({"x": torch.tensor([2.0])})
+        ring.release(slot)
+        slot, _ = ring.transfer({"x": torch.tensor([3.0])})
+        ring.close()
+        with self.assertRaisesRegex(TrainerError, "closed"):
+            ring.transfer({"x": torch.tensor([4.0])})
+
+        interrupted = BoundedPrefetcher(capacity=1, device="cpu")
+        with self.assertRaisesRegex(RuntimeError, "fixture interruption"):
+            with interrupted:
+                interrupted.transfer({"x": torch.tensor([5.0])})
+                raise RuntimeError("fixture interruption")
+        with self.assertRaisesRegex(TrainerError, "closed"):
+            interrupted.transfer({"x": torch.tensor([6.0])})
 
 
 if __name__ == "__main__":

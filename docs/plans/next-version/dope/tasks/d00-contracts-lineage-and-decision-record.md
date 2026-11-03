@@ -1,6 +1,11 @@
 # D00 — Freeze contracts, lineage and exposure decisions
 
-Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D00/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+
+Historical planning baseline (retained for audit; current assignment and lane above govern):
+
+> Status: **PLANNED — no implementation or qualification executed.** Repository: DOPE on xbabe2. Audited base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Planning checkout: `/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102`; branch: `codex/dope-jope-master-plan-20261102`. Relative paths below resolve under that checkout. Refresh upstream, claims and API differences before implementation; never change the dirty canonical `/home/ubuntu/dope` checkout. The supplied engineering specifications are proposals. This task grants no campaign, release, deployment, cloud write, credential change or foreign-job control.
+
 
 Priority: **P0**. Prerequisites: none; live ownership admission still required.
 
@@ -49,3 +54,15 @@ Stop on conflicting current owner direction, unknown source/protocol lineage, oc
 ## Durable completion evidence
 
 Store this task's receipt under `/home/ubuntu/jope_plan/evidence/next-version/D00/<full-head>/`: `RECEIPT.json`, `commands.log` and `artifacts.sha256`. `RECEIPT.json` maps each `D00-S*` criterion to an actual evidence path/hash and verdict (`PASS`, `FAIL`, `NOT_RUN` or `BLOCKED`), records base/stopped HEAD, claim/owner, dirty files, command exits/executed counts, exclusions and remaining blockers. Never mark planned checks passed. Store bulky generated data outside source trees; retain only small source-linked pointers. Required repository exact-head review/CI and claim disposition remain separate fields.
+
+## Individual engineering verdicts
+
+Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded externally and in the live ledger. Native compilation PASS belongs to 84a55cf9; later source has native execution/full CI pending. `PASS` never implies efficacy or release.
+
+| Criterion | Verdict | Evidence and limitation |
+| :--- | :--- | :--- |
+| D00-S1 | **PASS** | Distinct source/model/recipe/FIT/query identities and null confirmation provenance in docs/plans/dope-jope-contract-decisions.json; D00 frozen SHA c371bbc8dc4e2be3b515b9b786745777fa021673ec0888b39477da370f401240. |
+| D00-S2 | **PASS** | ADR normalize-once-and-dvs-v1 and decision lanes A/B explicitly reject automatic reinterpretation; legacy-real-fit receiver identity differs from NC1. |
+| D00-S3 | **PASS** | Frozen decisions record normalization, schema privacy, hard caps, historic v1/v2, undefined science parameters and one integrator; no numeric campaign threshold invented. |
+| D00-S4 | **BLOCKED** | Exposure roles are recorded; no new campaign family roster, source custody/fresh experiment-ID admission is authorized or evidenced. D11 HOLD enforces this. |
+| D00-S5 | **PASS** | Integrator and normalization/metric/producer packet INTEGRATION notes acknowledge frozen D00 SHA; later engineering writes use that contract. |
