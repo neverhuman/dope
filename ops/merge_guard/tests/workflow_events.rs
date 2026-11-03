@@ -75,7 +75,16 @@ fn main_push_profile_requires_both_source_pr_workflows_and_exact_jobs() {
     main_push(&mut original);
     pr_only(&mut original, &mut receipt);
     assert!(evidence::evaluate_preflight(&original, &pins, &receipt).is_ok());
-    for name in ["cpu", "paper-clean", "security", "jankurai-audit"] {
+    for name in [
+        "cpu",
+        "cpu-native",
+        "cpu-compat",
+        "cpu-transfer-paper",
+        "ci-shard-portable-arm64",
+        "paper-clean",
+        "security",
+        "jankurai-audit",
+    ] {
         for condition in ["missing", "cancelled", "wrong-source"] {
             let mut candidate = original.clone();
             for run in candidate["runs"].as_array_mut().unwrap() {

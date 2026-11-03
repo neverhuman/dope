@@ -729,8 +729,8 @@
       "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
     },
     "ops/merge_guard/Cargo.toml": {
-      "command": "just native-guard-check",
-      "purpose": "format, Clippy and focused tests for all three existing native guard binaries, including check-frozen-evidence"
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
     },
     "ops/merge_guard/audit_proof.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
@@ -749,8 +749,8 @@
       "purpose": "native focused-proof and badge fail-closed controls"
     },
     "ops/merge_guard/tests/workflow_events.rs": {
-      "command": "just native-guard-check",
-      "purpose": "verify current PR-only source event admission with mandatory main pushes, historical dual-source events, exact four-job/source/app binding and stale-review/receiving-check refusal; preserve all original scenarios and canonical version1 receipts"
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
     },
     "ops/native_control/Cargo.lock": {
       "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
@@ -3779,6 +3779,94 @@
     "rust/metrics/golden/discovery_tests.rs": {
       "command": "cargo test --locked --lib metrics::golden",
       "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    ".github/workflows/ci.yml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/runs.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/cpu-native.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/cpu-compat.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/cpu-transfer-paper.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/shard-runtime.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_coverage.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_coverage_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_inventory.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_shell.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/command-map.json": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/source/.github/workflows/ci.yml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/source/ops/ci/cpu.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_summary.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_workflow.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "agent/cost-budget.toml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/check-budgets.sh": {
+      "command": "bash ops/ci/check-budgets.sh",
+      "purpose": "native exact named finite workflow quotas, manual GPU, neural600s/16GiB/fitness128x32 and bounded complete source closure"
+    },
+    "ops/merge_guard/ci_shard_budget.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_budget_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_budget_toml.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
     }
   },
   "workspace": "dope"

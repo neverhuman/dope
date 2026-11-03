@@ -1,0 +1,678 @@
+{
+  "schema": 1,
+  "source_head": "a23ee0541b955061e17cf462dc1f926e55d6dee9",
+  "source_sha256": {
+    ".github/workflows/ci.yml": "efff84032e0170266dea7f3ab854238cc6c9c033e7b7ef6fd85fe91d9dc62263",
+    "ops/ci/cpu.sh": "5c6462184c66b7d7c74825e36321627b52d1acf8dab11818acd32b98c3fb55c5"
+  },
+  "stage_paths": {
+    "cpu-native": "cpu-native.sh",
+    "cpu-compat": "cpu-compat.sh",
+    "cpu-transfer-paper": "cpu-transfer-paper.sh"
+  },
+  "commands": [
+    {
+      "id": "cpu-native:landmark-cache",
+      "shard": "cpu-native",
+      "body_sha256": "cc478598c8d2250be85b236103a38617cfde15303db5a26c37807c3fbd4e7b59",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 10,
+      "origin_end": 10,
+      "origin_sha256": "8b83247acc49dccee8ed45ffed242562acc639b2990e8791f37e67ab66e6bdcc"
+    },
+    {
+      "id": "cpu-native:legal-inputs",
+      "shard": "cpu-native",
+      "body_sha256": "cd7f2fcc9e6a809d19f0394a2559c48aa176d84e7456b37bfdb9f490b92d83f9",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 12,
+      "origin_end": 12,
+      "origin_sha256": "41e3a3d8337942d3ae1df7361122fe739c62935d1871ec6c5a66493fd2cb8590"
+    },
+    {
+      "id": "cpu-native:budgets",
+      "shard": "cpu-native",
+      "body_sha256": "45d2b37503b2c3dc39a9b5213ab2b3e606d63a8eedb6078979322a8661d336c0",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 13,
+      "origin_end": 13,
+      "origin_sha256": "736350310094c9b58b14f1e3eded1bde51f9606fba12e1fd28514d0d68f5c572"
+    },
+    {
+      "id": "cpu-native:contracts",
+      "shard": "cpu-native",
+      "body_sha256": "b1196c8511d80538050f5bac0d0c761122661840ec9f606bb40d20bdc9fc5471",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 14,
+      "origin_end": 14,
+      "origin_sha256": "1504a6c73eefa4857a0c3848f4a4cb95d9d352c4d1d788e42b6c1231e072948f"
+    },
+    {
+      "id": "cpu-native:root-format",
+      "shard": "cpu-native",
+      "body_sha256": "3d8b66678a0ac20b1fbff53bd1120edcb7a8640941b5586535bdd31630a4afcc",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 15,
+      "origin_end": 15,
+      "origin_sha256": "810e75f0d3dee10e68076ea4a252c5cad284ef355c74785fc33f0cd493f3b98e"
+    },
+    {
+      "id": "cpu-native:root-clippy",
+      "shard": "cpu-native",
+      "body_sha256": "1ab3c6176e008c738c825108f176299ac75100aa3c3ecb4d8a7cf1f950dc5a4d",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 16,
+      "origin_end": 16,
+      "origin_sha256": "41bb79fa1ef4c10e2eab28a8e76e66eaf50159babad3d83dfeb41d2ca72f7868"
+    },
+    {
+      "id": "cpu-native:merge-guard-prepare",
+      "shard": "cpu-native",
+      "body_sha256": "d1b48262b2aa3823b8aabc359f0f77991aa046b67ce803e6ea73829a6fdaafac",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 17,
+      "origin_end": 17,
+      "origin_sha256": "262237f9725634756b8b62c6df3b3c54831f133d662f4c3195beb3aa531fc2f5"
+    },
+    {
+      "id": "cpu-native:root-cargo-test",
+      "shard": "cpu-native",
+      "body_sha256": "39431e057e668c629ea7e1fa993b2ec4bdaddce7a1b02303bc22ba37d327a248",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 18,
+      "origin_end": 18,
+      "origin_sha256": "867397632d16f206a677694bf4b9fdbf28a7dae1ca29ccd9efb54ac550a8774d"
+    },
+    {
+      "id": "cpu-native:engine-test",
+      "shard": "cpu-native",
+      "body_sha256": "937093a35003f117f371bcfbb25e5e63ccff503d147db693d0fb82fa599034d1",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 19,
+      "origin_end": 19,
+      "origin_sha256": "f48cf208c78397f9f8d907214ea07608118ed14bdd877b95779cf8c7d641d1ab"
+    },
+    {
+      "id": "cpu-native:native-notices",
+      "shard": "cpu-native",
+      "body_sha256": "ee2edbf0dc94c17d853860c4eba5f09e629d92208011ba243ceb2d0d70a1b066",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 20,
+      "origin_end": 20,
+      "origin_sha256": "fda52139b1fa41be36a5a76c28cad61f7fe2b4d911ee3730d63f60251b900a3b"
+    },
+    {
+      "id": "cpu-native:merge-guard-format",
+      "shard": "cpu-native",
+      "body_sha256": "2da8989742345c533f86c9b626b37039f355c187315bce1b38e2023cd6185baa",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 21,
+      "origin_end": 21,
+      "origin_sha256": "5bb6fe6c9123e688436ed004781a7f712583d74bfe5f8044f9594692c9731e07"
+    },
+    {
+      "id": "cpu-native:merge-guard-clippy",
+      "shard": "cpu-native",
+      "body_sha256": "94a58c2296c95cf887e805e5e06d891890e2395e88d12e2000c9b6db43df2b07",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 22,
+      "origin_end": 22,
+      "origin_sha256": "3658e40e4a4fb20ef5f82d6a9ff8d30fe185ac6b8b8d1fe49912011b6fed393d"
+    },
+    {
+      "id": "cpu-native:merge-guard-test",
+      "shard": "cpu-native",
+      "body_sha256": "129dfb7b509d1d3da8d1edbe8c0c71ace0c93ae73de9381966b76d5db3313d4e",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 23,
+      "origin_end": 23,
+      "origin_sha256": "8ee1e69a231ba0cba4967779f025551d9b79d6944153d2674386215d8747714f"
+    },
+    {
+      "id": "cpu-compat:python-v1-venv",
+      "shard": "cpu-compat",
+      "body_sha256": "5d99194eb3c43f3c411b64a193c56695ffd1245a1f072014d7ad17a504ccab3b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 24,
+      "origin_end": 24,
+      "origin_sha256": "8ea3a186c772396926af597def92cc819396d3149ce21f838e756b8d0eea56f6"
+    },
+    {
+      "id": "cpu-compat:python-v1-install",
+      "shard": "cpu-compat",
+      "body_sha256": "21865de22cd96ed38c1077970a1eccc930e8d7d65d57d5357c6475a24aa196e7",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 25,
+      "origin_end": 25,
+      "origin_sha256": "cb15665a69499d7c0188191e18de470860e1becb5b8d0929e52f10b5d099a1f8"
+    },
+    {
+      "id": "cpu-compat:engine-benchmark",
+      "shard": "cpu-compat",
+      "body_sha256": "ce728c26f336f5a414d2c0a538f5c74864eac444dd13fe027aafacb044637d7e",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 26,
+      "origin_end": 26,
+      "origin_sha256": "339d3bd6f4aa8d22c87be68dbdc1ab2c849683e2a03184f3a8b7a596f751dafc"
+    },
+    {
+      "id": "cpu-compat:project-pytest",
+      "shard": "cpu-compat",
+      "body_sha256": "237dd9730f9acd84acf68ae42f267e1232e6b4e18a90afda683c81ed4e2930e9",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 27,
+      "origin_end": 27,
+      "origin_sha256": "1e6d918774a3c6a566b61f9b19a994f1897a1fdb6dc0f50ee9a78b17999de6d8"
+    },
+    {
+      "id": "cpu-compat:jsonschema-install",
+      "shard": "cpu-compat",
+      "body_sha256": "7d578618510fbcc73b04365ff8f0b76a80395cd5f5c1b56bbbffe2747220010b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 28,
+      "origin_end": 28,
+      "origin_sha256": "70ae8f775424a49e5e138e1ffb8914c93e9dea12b0e8cd6b84fec8fb4f130057"
+    },
+    {
+      "id": "cpu-compat:benchmark-tests",
+      "shard": "cpu-compat",
+      "body_sha256": "088bd9c2f0073d382f5a0c693feedc094bbd714213324d5ce248079180e2bab5",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 29,
+      "origin_end": 29,
+      "origin_sha256": "98d4e8160d09ad3a2bc9b045e76a39cde1a430d66866c1328bc0989eb14dfc48"
+    },
+    {
+      "id": "cpu-compat:external-online",
+      "shard": "cpu-compat",
+      "body_sha256": "50f715182395cc5494a0071edfd676b0fb120443ea09a52ed08d6d646e0bed75",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 31,
+      "origin_end": 31,
+      "origin_sha256": "a7aca0bc77d0d547baf42b543a3cd3121a71958cf3c6a3c039ee97543de4fd09"
+    },
+    {
+      "id": "cpu-compat:external-offline",
+      "shard": "cpu-compat",
+      "body_sha256": "6869ef8304ffe5c309e9a41cf7e296d0c6b0029bd19582a90735e661f2127e56",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 32,
+      "origin_end": 32,
+      "origin_sha256": "341aa0d9c4ef5d7e395ebd65753844ebcbd80ab62085ec1fdc4bf5f8986b3469"
+    },
+    {
+      "id": "cpu-compat:external-tests",
+      "shard": "cpu-compat",
+      "body_sha256": "32075a3dcbe895fd91fa3d1d0849e1b3fca58710111a20eaba198ded373f33d2",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 33,
+      "origin_end": 33,
+      "origin_sha256": "da4a801339f10c603cfc3c0c1398193d81ad4715b5bf2caf21a495405e6af02c"
+    },
+    {
+      "id": "cpu-compat:tabsyn-tests",
+      "shard": "cpu-compat",
+      "body_sha256": "c173ee1958c67de0cb5eaac682da67701b902515cb90bcb9e6cd4d100e77dfe5",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 35,
+      "origin_end": 35,
+      "origin_sha256": "652a2982c8518cd4a927bac5d6410a1078dbc19ae1795687f266eecfc7474e7e"
+    },
+    {
+      "id": "cpu-compat:mfs-tests",
+      "shard": "cpu-compat",
+      "body_sha256": "cea3667209337dbd548f11fba972200f8e1a963c777f8f656aef01c792ee6c42",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 36,
+      "origin_end": 36,
+      "origin_sha256": "a5b79fb144569c6396ca7c94423a127878ec13a7b1e14b71395b861f5b1edc17"
+    },
+    {
+      "id": "cpu-compat:fit-ledger-test",
+      "shard": "cpu-compat",
+      "body_sha256": "30e4c7f856bfef4b516bf8bdfa9f6878a6f13999d8ecb0f05a0134244dafa5d5",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 38,
+      "origin_end": 38,
+      "origin_sha256": "85173d884f044e3619387356f72accb18a4ea9681a36758768f0c8c06730c2c6"
+    },
+    {
+      "id": "cpu-compat:r10-tests",
+      "shard": "cpu-compat",
+      "body_sha256": "97e8d3665264c7218b1f0b07f9c0cbaa8b57877c1f58915d19fd9e4e67940af9",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 68,
+      "origin_end": 68,
+      "origin_sha256": "ccd85768af524268a319c7be4eb979fae437d71440671e28dd6f26ae30329976"
+    },
+    {
+      "id": "cpu-compat:u04-admissions",
+      "shard": "cpu-compat",
+      "body_sha256": "5732c95b52c02335262fb2a77bcb46750f304f4f4666c4901d2aaa34b4490f92",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 71,
+      "origin_end": 71,
+      "origin_sha256": "c77c8c3c0d68a23e8f29c3744344525bfdbe77a3c64b4a16f3984e7a49bfbff7"
+    },
+    {
+      "id": "cpu-compat:u03-prepare",
+      "shard": "cpu-compat",
+      "body_sha256": "a5175ae4ae1e955e33c2a4f00531b7ae9b1e28a4c63830d4bec6276cfd27c745",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 82,
+      "origin_end": 82,
+      "origin_sha256": "df98ad18c5275cdec3c45f0fc97c9d9e243aaa8854e5ce63dcd68ccb7319e444"
+    },
+    {
+      "id": "cpu-compat:u03-verify",
+      "shard": "cpu-compat",
+      "body_sha256": "857344f8ce4b514a2478a8d0342f5cd66775fe2b7fccfb49fdc9d631273023a4",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 83,
+      "origin_end": 83,
+      "origin_sha256": "92a2b0b80b4b8b5f67981e0a652be2d48576bb5208616a87126e45e070ef3807"
+    },
+    {
+      "id": "cpu-compat:u03-build",
+      "shard": "cpu-compat",
+      "body_sha256": "310c08d507f169540deb39dedde1c9715c26e10ba20484c44060e73446c8afad",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 84,
+      "origin_end": 84,
+      "origin_sha256": "0b1630a62f95e91aa3be66d0bef138ac98bd0b06529ea4fd81af44a5129d2972"
+    },
+    {
+      "id": "cpu-compat:u03-compile",
+      "shard": "cpu-compat",
+      "body_sha256": "b5a77991e1c3a8317f4a0e7c62cce0586e8b5eb78facad8dca6674579d2f2f92",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 85,
+      "origin_end": 87,
+      "origin_sha256": "1802e7941a546b183dd46c63d7bf1f461bc4e5f70980ca5b6f6f21c4ed4fef55"
+    },
+    {
+      "id": "cpu-compat:u03-sample",
+      "shard": "cpu-compat",
+      "body_sha256": "abe9c9c02958e18164c27e3e8be84e7f27e09ab4f0b7ac6a286ecb556020ed2a",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 88,
+      "origin_end": 89,
+      "origin_sha256": "5146ca751ae910b989b073f7e46c7d34b81f45e29934a4e8f2ab3b225991e3bd"
+    },
+    {
+      "id": "cpu-compat:u03-evaluate",
+      "shard": "cpu-compat",
+      "body_sha256": "cc797242a6d14e30868f87538f2187fc604d2ec2b5b5afcc60dfae761320f19c",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 90,
+      "origin_end": 91,
+      "origin_sha256": "6254ebe4a5f997acef6da02d21084430bd402d32cf1fe6a5c8d709a7b41e2e85"
+    },
+    {
+      "id": "cpu-compat:u03-cleanup",
+      "shard": "cpu-compat",
+      "body_sha256": "399cd1e593fffdee4029d52a05cd1f26514c510f426128fd89c8e3759321b7c7",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 92,
+      "origin_end": 92,
+      "origin_sha256": "770a6ab92171f41baac94fde4e115acb2adb5bbca2319422b07a257b8474e237"
+    },
+    {
+      "id": "cpu-compat:public-claims",
+      "shard": "cpu-compat",
+      "body_sha256": "af6f2d1bdfb25fa98897c6acb3e2ab0527d5b53ed88269513c50b5ba0cdc34ec",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 96,
+      "origin_end": 96,
+      "origin_sha256": "c9b3232a504b56810c38ad9af2d1bf94dec596728c76c2a965cb34bc922af4d0"
+    },
+    {
+      "id": "cpu-compat:claims-render",
+      "shard": "cpu-compat",
+      "body_sha256": "8e17b62df24defabb8a31b6cc4291668c3a53894f163b4d0c565390fcd7b14d0",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 97,
+      "origin_end": 97,
+      "origin_sha256": "4610e3966678b5fcacf01eee74f9b05351eeb8a4c2b11650e8e270cb310c5d85"
+    },
+    {
+      "id": "cpu-compat:golden-parity",
+      "shard": "cpu-compat",
+      "body_sha256": "a64bf7b68c5c7fa15e41812346893518b6598da5c890901d4e4d2d08c22b8566",
+      "origin_path": ".github/workflows/ci.yml",
+      "origin_start": 98,
+      "origin_end": 98,
+      "origin_sha256": "4002eab35ed4532dbcd1aa0d3212c591e9b7794884cfae81a25086a187e08100"
+    },
+    {
+      "id": "cpu-transfer-paper:cpu-tool-readiness",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "f414d47701dc5f42592be8111e602f176347e276c32eb9715c6fe4b5eba5d81b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 11,
+      "origin_end": 11,
+      "origin_sha256": "7cce3eac95f9295119777579fc49264ee103ff7c2c6c09bd54f4ed5ec83b32d9"
+    },
+    {
+      "id": "cpu-transfer-paper:python-v1-venv",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "5d99194eb3c43f3c411b64a193c56695ffd1245a1f072014d7ad17a504ccab3b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 24,
+      "origin_end": 24,
+      "origin_sha256": "8ea3a186c772396926af597def92cc819396d3149ce21f838e756b8d0eea56f6"
+    },
+    {
+      "id": "cpu-transfer-paper:python-v1-install",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "21865de22cd96ed38c1077970a1eccc930e8d7d65d57d5357c6475a24aa196e7",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 25,
+      "origin_end": 25,
+      "origin_sha256": "cb15665a69499d7c0188191e18de470860e1becb5b8d0929e52f10b5d099a1f8"
+    },
+    {
+      "id": "cpu-transfer-paper:jsonschema-install",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "7d578618510fbcc73b04365ff8f0b76a80395cd5f5c1b56bbbffe2747220010b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 28,
+      "origin_end": 28,
+      "origin_sha256": "70ae8f775424a49e5e138e1ffb8914c93e9dea12b0e8cd6b84fec8fb4f130057"
+    },
+    {
+      "id": "cpu-transfer-paper:local-receipts",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "98c16613280083aae2e249c33484e8a02fd5bcabe114ccd273e8b6f1f28e3ecd",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 39,
+      "origin_end": 39,
+      "origin_sha256": "4e75b250a21d4c6a611b12e5acc845a210eb4610b5258d8d03e17c1abfc22142"
+    },
+    {
+      "id": "cpu-transfer-paper:paper-numbers",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "bdc603a6aa0273b4af7c36cd6d62024d51a4143efc26f3c83969944427a167ce",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 40,
+      "origin_end": 40,
+      "origin_sha256": "688f5bb77711edfc54cdc6ecd4498f8e2fdb34ab67515303ca465b6f20bda473"
+    },
+    {
+      "id": "cpu-transfer-paper:compute-cost",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "13e411791173ff11d96791a5a4543937f7f89ff51a20236bc301f3a64003a84c",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 41,
+      "origin_end": 41,
+      "origin_sha256": "ef3338caf2f4dd0492909cc260617ca3c9dbb2101469d7b946be3bc3c8ac4330"
+    },
+    {
+      "id": "cpu-transfer-paper:paper-dependencies",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "012b84a5b306ca3418577510d087e36c8dc620099082ffc0c24873f6b7b22d1b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 42,
+      "origin_end": 42,
+      "origin_sha256": "52b61e473c56fcf928233ecf4a0ab0adad041e3cbb3e54e145c0bcfb39a68d9a"
+    },
+    {
+      "id": "cpu-transfer-paper:transfer-test-tmp",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "f91fa118f36735ca80efb061fe4ca2ce16bfb0c83ee782119d0255d33c98376d",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 43,
+      "origin_end": 43,
+      "origin_sha256": "6820cf509df18205d29e577cc574f702a20c95d31c52bbe70880a367c3c021ac"
+    },
+    {
+      "id": "cpu-transfer-paper:workplan-packet",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "b9226e47959039326a2e80e5daefd99dcd96921b1c5511dbaa8d69d46b5e9b20",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 45,
+      "origin_end": 45,
+      "origin_sha256": "e6d7940e1cafe4fd5810e66c9245f8210ff176322f97b8259d74964f91f84ee9"
+    },
+    {
+      "id": "cpu-transfer-paper:native-control-prepare",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "c590f690703ecd8159089f051e0ea0d34fa17bb034856bea653e550adbf1d52a",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 46,
+      "origin_end": 46,
+      "origin_sha256": "d53ea566955442bc8657c1e812e50fc50659ea6127156a5c8946a5627590be73"
+    },
+    {
+      "id": "cpu-transfer-paper:transfer-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "dac2bc433e8e9d0a48a5ea6f8e6092cb8f04c76ac89846a9102e7c3c5d16ea67",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 47,
+      "origin_end": 47,
+      "origin_sha256": "b31c66f63dcb6a458c35e3fe7c85e518c7deaf868760186cbfbfb1235b1badae"
+    },
+    {
+      "id": "cpu-transfer-paper:retained-evidence",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "2669e9486d67805926999ff635c51d71d8c38d18afb06c9f614217f74cf0425d",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 48,
+      "origin_end": 48,
+      "origin_sha256": "0d1ff66d2939b112a3d90e03349df2169d1b05b65c9c81531ba937546c4b15a7"
+    },
+    {
+      "id": "cpu-transfer-paper:compute-panel",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "c9c6058b836f79f853b5fa1eda6ddcd2a90c16ddcd908557f5e8c3e568027cb4",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 49,
+      "origin_end": 49,
+      "origin_sha256": "6bab2651ea972f04b6d5ea47faed354fea44433da5219d277cc42f1114c06c99"
+    },
+    {
+      "id": "cpu-transfer-paper:paper-script-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "a74e15e18d8f0468306cea8099ef8a19f890ad2634053c9e37efa742a2eb4dd1",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 52,
+      "origin_end": 52,
+      "origin_sha256": "2e4b0f949160e4cf02eeeed1939fc51993901342af55c65931eb8cad4f8df620"
+    },
+    {
+      "id": "cpu-transfer-paper:pipeline-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "adc99c383aa1e39f150ad2ff8fb23d04d368d15d0812bae5e3dc17a141799e12",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 53,
+      "origin_end": 53,
+      "origin_sha256": "571f6b991380dccf26904a74c7c0251204b52a3f86a63a4b273286ea862810d1"
+    },
+    {
+      "id": "cpu-transfer-paper:claims-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "dc361e9398eb00c269256196a8fd47b21c0fb13f75eb676dc04cad728227d7e8",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 54,
+      "origin_end": 54,
+      "origin_sha256": "85d72b48beae68a9b0ffffbadbb52539de5dc056defd077de3f878916e21d807"
+    },
+    {
+      "id": "cpu-transfer-paper:review-fixes",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "5f23313dd0d7772d21104fb2e730017544ab18acad22e31083d854f1f763fcdb",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 55,
+      "origin_end": 55,
+      "origin_sha256": "f6e6268e86dcfe6afd10479438e423859ed1481ce691eb23ec03164ed8b4640d"
+    },
+    {
+      "id": "cpu-transfer-paper:publication-rows",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "6dde6be72d18bb6efba4c628080ab3ba0d804dce1402f98dbc8f02f361831b1a",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 56,
+      "origin_end": 56,
+      "origin_sha256": "597daa5cf748ec14f02a4dc34ef6d0262c7ba9747b2cd778330e783a8ed9fd80"
+    },
+    {
+      "id": "cpu-transfer-paper:retained-drift",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "cda52a08061857458aaf3f9d44fa7866695a326d75b14144fb19c01db133a68b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 57,
+      "origin_end": 57,
+      "origin_sha256": "f564de9e677a53b55ea26c857d577eeb3bcbfba7fdd7bbf331441f802d8137c9"
+    },
+    {
+      "id": "cpu-transfer-paper:render-figures",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "c90e87d4cacd63f768f0da1156d0eae15a0367b8e2c2389452d64f6e85db1eff",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 58,
+      "origin_end": 58,
+      "origin_sha256": "baef11438be3020fda46fdf97c49b7d48813429422fbeb7078ed15ba9c6c21a1"
+    },
+    {
+      "id": "cpu-transfer-paper:mfs-table",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "9f44e2bc73ff04885827ce0de6dc5ffcfd8d4b9a13a9955e731bef4b1c7f7834",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 59,
+      "origin_end": 59,
+      "origin_sha256": "f8b37e4cb591b9f5233c683c353dd623954cf71b82f466a16f6c34b887ab1b17"
+    },
+    {
+      "id": "cpu-transfer-paper:v2-figures",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "33e344ea63475b33eeeeab9d39925817da9e329a3d4d5b92f6f71656487813fa",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 60,
+      "origin_end": 60,
+      "origin_sha256": "28dec886c49cfa666f6062c40c0c065c6e30cc3dd6c885de84fdbbce94605892"
+    },
+    {
+      "id": "cpu-transfer-paper:readme-benchmark",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "ddfe735776170584bdd89aeeb9d48215e1b1ab88d8b213c6dfbb22f85240426b",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 61,
+      "origin_end": 61,
+      "origin_sha256": "fdddd30fb1e77669e8c130c2c166fb9424eb16efa4424e496121d2dcb13e8ee6"
+    },
+    {
+      "id": "cpu-transfer-paper:compression-frontier",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "b65a68a2be1a0d7e4fe077f5a96260ffbf0f40996e17363ad6b30b5488a4dd3e",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 62,
+      "origin_end": 62,
+      "origin_sha256": "eecd670a0d50260fd94b2b0055c53e5cfb156befcff5c213be5097192b54d7b9"
+    },
+    {
+      "id": "cpu-transfer-paper:quickstart-block",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "4136269c2021fd5cb6056f1000ab58a61aa62f721e2a06e381de8e6604b22002",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 63,
+      "origin_end": 63,
+      "origin_sha256": "5b647bf49bd31c0accbdf0276f0e5b788f30f85437fc5b80172b9fbff7c25603"
+    },
+    {
+      "id": "cpu-transfer-paper:quickstart-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "11b5216907e3dd32009801702869196f8e792e141f169fc1d6b262a736ac8088",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 64,
+      "origin_end": 64,
+      "origin_sha256": "d28dc376f81ac3c259a989ba8ca21f1b0dac75a851db5fd6c0b9ee9aa51e784f"
+    },
+    {
+      "id": "cpu-transfer-paper:main-output-drift",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "88be8afb527a1dcd7ff467479d6eecdfd7af312adbc1ee666752778e3688a889",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 65,
+      "origin_end": 65,
+      "origin_sha256": "9766c934ee946de80b32ece3654b8fdb6ffd1aee3616c513f464675601efcbcc"
+    },
+    {
+      "id": "cpu-transfer-paper:paper-number-tests",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "1090c3de128719d81eb9b99e13798ccf93576e387d35e3db22ae678d8816c186",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 66,
+      "origin_end": 66,
+      "origin_sha256": "197e832a2ff75046cf1b05bf7521bfb26b808865c9df35a5bb6a83a3067544d6"
+    },
+    {
+      "id": "cpu-transfer-paper:pdf-build",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "c446ec3d994cce96329e8069738a297f69080b8f0d76f2ce5629f35dbd0d692f",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 69,
+      "origin_end": 69,
+      "origin_sha256": "890cd2b012b6e24e75c14a51fd3e4e2c97622e69101ed64f32fff8c551fb149f"
+    },
+    {
+      "id": "cpu-transfer-paper:paper-admission",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "3541714de08074d81dd13da2cf775cd8d6e9e9d1ac75d0c55d89357fa37e77d4",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 70,
+      "origin_end": 70,
+      "origin_sha256": "afae3fa9301efeb8379d341a29b4ee4bc515b7f5146ea3efcc7b79436cd369d4"
+    },
+    {
+      "id": "cpu-transfer-paper:cleanup",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "50f2c6495d7077be873f04ebadd27901938dfe01f9e12224d06f80d0ca50ea39",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 71,
+      "origin_end": 71,
+      "origin_sha256": "ab3420e4bfc4d4a22870a49f8f2fa19fa0bffa6d00e21123cdd2c58e49186673"
+    },
+    {
+      "id": "cpu-transfer-paper:cleanup-cargo-deps",
+      "shard": "cpu-transfer-paper",
+      "body_sha256": "14d5cf8417fbd0255c0a4d660ba1bafe0bf2c21f90fcbfa0eecc673d42becd13",
+      "origin_path": "ops/ci/cpu.sh",
+      "origin_start": 72,
+      "origin_end": 72,
+      "origin_sha256": "84a049fbf71844b5371bf3e45abc31a952de46d1aa5abbfa1fd4acc4eada35a5"
+    }
+  ],
+  "test_ids": {
+    "cpu-native": [
+      "landmark-cache",
+      "root-cargo-test",
+      "engine-test",
+      "merge-guard-test"
+    ],
+    "cpu-compat": [
+      "engine-benchmark",
+      "project-pytest",
+      "benchmark-tests",
+      "external-tests",
+      "tabsyn-tests",
+      "mfs-tests",
+      "fit-ledger-test",
+      "r10-tests",
+      "u04-admissions"
+    ],
+    "cpu-transfer-paper": [
+      "cpu-tool-readiness",
+      "transfer-tests",
+      "paper-script-tests",
+      "pipeline-tests",
+      "claims-tests",
+      "review-fixes",
+      "quickstart-tests",
+      "paper-number-tests"
+    ]
+  },
+  "limitations": [
+    "The Rust verifier binds command IDs to frozen source line ranges and exact candidate recipe-line hashes. It does not parse Bash argument semantics; the strong review must compare each ci_run argv to the source line.",
+    "Original developer cpu.sh remains byte-identical and sequential."
+  ]
+}

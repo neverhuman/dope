@@ -669,3 +669,31 @@ Python claim/publication checks are still active migration work; this native
 caller slice does not establish repository-wide language compliance. New
 discovery fixtures and caller changes require actual source-bound native
 execution and final required CI/review. No fixture is regenerated or rebaselined.
+
+## General CI worker receipts and budget policy
+
+The reviewed source graph partitions the existing command inventory into
+`cpu-native`, `cpu-compat` and `cpu-transfer-paper` X64 workers, with
+the existing ARM64 general pool running the portable frozen/receipt proof.
+The stable `cpu` gate requires all four worker successes and complete
+current-run/current-attempt receipts. Every declared test command requires
+nonzero framework counts and no framework failure, even if a wrapper exits
+zero. Re-run **all jobs** when recovering an attempt; old-attempt receipts do
+not qualify a new attempt. Dependency source caches do not transfer binaries,
+targets or virtual environments between guests.
+
+`bash ops/ci/check-budgets.sh` now invokes the existing native
+`ci-shard budgets` command. The version1 scalar policy keeps all original
+bounds and declares the seven actual CI-role timeouts: 90/120/120/30/20/60/60
+minutes. The five CPU roles have a finite maximum of 380 job minutes; paper/security,
+audit and explicitly manual GPU remain separately bounded. This is a policy
+ceiling, not a speedup measurement or host-capacity reservation. Invalid,
+duplicate, missing, dynamic or unsupported configuration fails closed. The
+old manual-only GPU, neural 600 seconds, 16 GiB and fitness 128x32 guards remain.
+
+Local native-guard Clippy/tests include `ci-shard`. Native compilation,
+actual worker lifecycle/receipts and source-bound full CI must execute before
+qualification. These source changes do not bypass local capacity/runner
+controls or establish full Rust-language compliance. The shared next-version
+Torch reference/training suite still needs its ordinary-PR route; this worker
+split alone does not silently count that missing route as passed.

@@ -17,8 +17,8 @@ native-guard-check:
     bash ops/ci/prepare-merge-guard.sh
     cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root .
     cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
-    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence -- -D warnings
-    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard
 
 fast: native-guard-check
     bash ops/ci/test-cpu-tool-readiness.sh
