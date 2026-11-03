@@ -275,7 +275,6 @@ fn direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder() {
             core.transform.class_vocab_policy,
             sdk.transform.class_vocab_policy
         );
-
         let opts = options();
         let frame = core.landmark_frame().unwrap();
         let sdk_frame = sdk.landmark_frame().unwrap();
@@ -437,6 +436,7 @@ fn direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder() {
         }
         let (core_high_condition, sdk_high_condition, core_vec, sdk_vec) =
             high_condition_pair.expect("HighRequiredV1 conditioning");
+        assert_eq!(bits(&core_vec, f32::to_bits), bits(&sdk_vec, f32::to_bits));
         let core_lm = cols(&core_high_condition.col_landmarks);
         let sdk_lm = cols(&sdk_high_condition.col_landmarks);
         assert!(core_vec.iter().any(|v| *v != 0.0));
