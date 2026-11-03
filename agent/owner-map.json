@@ -958,7 +958,8 @@
     "engine/dope-sdk/src/checked.rs": "rust-core",
     "engine/dope-sdk/tests/legacy_surface_parity.rs": "rust-core",
     "engine/dope-core/tests/landmark_high_matrix.rs": "rust-core",
-    "engine/dope-cli/tests/nc1_refusal_privacy.rs": "rust-core"
+    "engine/dope-cli/tests/nc1_refusal_privacy.rs": "rust-core",
+    "engine/dope-sdk/tests/safe_errors.rs": "rust-core"
   },
   "workspace": "dope"
 }

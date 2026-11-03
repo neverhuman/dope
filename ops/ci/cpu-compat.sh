@@ -13,6 +13,8 @@ ci_run python-v1-venv check /usr/bin/python3 -m venv --system-site-packages targ
 ci_run python-v1-install check bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 # ci-command:cpu-compat:engine-benchmark ce728c26f336f5a414d2c0a538f5c74864eac444dd13fe027aafacb044637d7e
 ci_run engine-benchmark unittest bash ops/ci/engine-benchmark.sh target/ci-python/bin/python
+# Preserve all configured options; expose pytest's real terminal test count.
+export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:-} -v"
 # ci-command:cpu-compat:project-pytest 237dd9730f9acd84acf68ae42f267e1232e6b4e18a90afda683c81ed4e2930e9
 ci_run project-pytest pytest env PYTHONPATH=src target/ci-python/bin/python -m pytest -q tests
 # ci-command:cpu-compat:jsonschema-install 7d578618510fbcc73b04365ff8f0b76a80395cd5f5c1b56bbbffe2747220010b

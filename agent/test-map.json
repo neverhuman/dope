@@ -3883,6 +3883,10 @@
     "engine/dope-cli/tests/nc1_refusal_privacy.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test nc1_refusal_privacy",
       "purpose": "native actualCLI FIT privatepresence/publicredaction and4parser/schema/role refusals/no-partial-output; D05-S4 remainsNOT_RUN until executed"
+    },
+    "engine/dope-sdk/tests/safe_errors.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test safe_errors",
+      "purpose": "actualSDK malformedweight/schemafixedvariant/message/canaryrefusals;D03-S3remainsNOTRUNuntilnewnativeexecution"
     }
   },
   "workspace": "dope"
