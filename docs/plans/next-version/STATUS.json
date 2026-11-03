@@ -5,7 +5,7 @@
     "D00": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "ADRs and frozen machine-readable decisions; no campaign authorization",
       "release": "NOT_AUTHORIZED",
@@ -15,7 +15,7 @@
     "D01": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Prospective common REAL-FIT route opt-in; historical replay retained; applied Python fixture PASS",
       "release": "NOT_AUTHORIZED",
@@ -25,7 +25,7 @@
     "D02": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Additive informative rank; v1/v2 untouched; applied Python fixture PASS; root Rust pending",
       "release": "NOT_AUTHORIZED",
@@ -35,7 +35,7 @@
     "D03": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Native facade/no duplicate arithmetic; Rust1.88 SDK compilation pending",
       "release": "NOT_AUTHORIZED",
@@ -45,7 +45,7 @@
     "D04": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Explicit High-required execution with full reservation; actual native fixture pending",
       "release": "NOT_AUTHORIZED",
@@ -55,7 +55,7 @@
     "D05": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Strict NC1 private card/public schema and native CLI; tracked Rust-produced Python fixtures PASS; native CLI pending",
       "release": "NOT_AUTHORIZED",
@@ -65,7 +65,7 @@
     "D06": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
       "release": "NOT_AUTHORIZED",
@@ -75,7 +75,7 @@
     "D07": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Closed six-gate DML4 graph; hard caps; external Rust and applied default Python fixtures PASS; actual engine pending",
       "release": "NOT_AUTHORIZED",
@@ -85,7 +85,7 @@
     "D08": {
       "source": "IMPLEMENTED_CPU_ONLY",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "CPU bounded batching, native23 masks, actual batch2 gradient/padding proof, transactional updates, counters and content-bound checkpointv2. CUDA optimizer training unsupported; no GPU or speed claim.",
       "release": "NOT_AUTHORIZED",
@@ -95,7 +95,7 @@
     "D09": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Group-aware autograd producer, all served gates, actual classification update, native aux and all intended module gradients, strict NC1/DML4 interop and FP32 AMP Gram/solve; no campaign or model qualification.",
       "release": "NOT_AUTHORIZED",
@@ -105,7 +105,7 @@
     "D10": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Local combined check-all target; existing hosted engine coverage retained; full local gate pending",
       "release": "NOT_AUTHORIZED",
@@ -115,7 +115,7 @@
     "D11": {
       "source": "READINESS_HOLD",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_CAPACITY_HOLD",
+      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
       "efficacy": "NOT_RUN",
       "notes": "Readiness dossier created; no qualification campaign launched; prerequisites and owner admission remain HOLD",
       "release": "NOT_AUTHORIZED",
@@ -141,21 +141,45 @@
     "receipt": "node2/engine-check-84a55cf9/RECEIPT.json"
   },
   "native_execution": {
+    "status": "NOT_RUN_FINAL_HEAD",
+    "executed_tests": 0,
+    "admission": "11:36:58 focused source_limits test only if85percentguard admits; fullgates/PRseparateadmission",
+    "note": "Prior compile and interrupted attempts retain their own source pins and receipts."
+  },
+  "python_legacy_goldens": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "cases": 129,
+    "tolerance": 1e-12,
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "python_next_version": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "tests": 50,
+    "skips": 0,
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "source_checkpoint": "409c84e3486fe820776aa781a37b373954653c94",
+  "dope_status_page": "dope/STATUS.md",
+  "python_v3_summary_fixture": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "tests": 1,
+    "scope": "selected existing synthetic canonical-summary case; no Rustparity/modelcheckpoint case executed",
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "source_cap_inventory": {
+    "status": "ZERO_STATIC_VIOLATIONS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "governed_sources": 1289,
+    "native_guard": "NOT_RUN; conditional85percent allocation admission required",
+    "guard_threshold_or_exclusion_changes": false
+  },
+  "historical_native_execution": {
     "status": "STOPPED_CAPACITY_HOLD",
     "executed_tests": 0,
     "receipt": "node2/core-fixtures-84a55cf9/CAPACITY_HOLD.json",
     "note": "Compilation only before termination; never count as a test pass."
-  },
-  "python_legacy_goldens": {
-    "status": "PASS",
-    "cases": 129,
-    "tolerance": 1e-12,
-    "log": "source-batch/python-legacy-golden.log"
-  },
-  "python_next_version": {
-    "status": "PASS",
-    "tests": 50,
-    "skips": 0,
-    "log": "source-batch/python-integrated-final.log"
   }
 }

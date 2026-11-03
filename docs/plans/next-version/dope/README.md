@@ -1,5 +1,7 @@
 # Next version DOPE tasks
 
+> **Current execution status:** see [STATUS.md](STATUS.md). The planning text and table below preserve the original planning snapshot; their PLANNED wording is historical, not a current implementation or qualification claim.
+
 DOPE changes are justified, starting with trustworthy measurement and an identity-preserving facade/landmark path. The new normalization/model lane follows those foundations. All 12 tasks are **PLANNED**; none has been implemented or scientifically qualified for this assignment.
 
 Read [the shared master](../MASTER_PLAN.md) and [execution rules](../EXECUTION_RULES.md), then open one task file. Every task has its own objective, exact read-first files, ownership, implementation, named acceptance criteria, tests, failure rules and stopped-head handoff. Do not assign a whole row group to a worker as one unbounded task.
