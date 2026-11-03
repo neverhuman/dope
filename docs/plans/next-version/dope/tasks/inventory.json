@@ -325,8 +325,8 @@
         "J05 NC1 intake",
         "J06 owner-private emitter"
       ],
-      "sha256": "5d8a94699c4f18caf57eddc8b6f1176401d569a9f0a092fd290f6cce1ba710ef",
-      "words": 1142,
+      "sha256": "37496e66c40052437453600e39ceb3627173097832812e8d8f5b349b44dbbd6a",
+      "words": 1146,
       "criterion_verdicts": {
         "D05-S1": {
           "verdict": "PASS",
@@ -342,7 +342,7 @@
         },
         "D05-S4": {
           "verdict": "NOT_RUN",
-          "evidence": "Public schema structure and Python malformed-card refusals pass; actual native CLI/error canary journeys pending."
+          "evidence": "Existingreference andpublicSchemaunit canary checks passed. New native actualCLI nc1_refusal_privacy357LOC/3tests/7calls source-adopted at0dfe96a0 for privatepresence/publicredaction and4refusals/nooutputs; actual executionNOT_RUN. See ../receipts/m1-and-high-import-source.json."
         },
         "D05-S5": {
           "verdict": "PASS",

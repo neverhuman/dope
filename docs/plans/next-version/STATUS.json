@@ -276,7 +276,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "e3eaadd803c5a556f2d729dd9b8f95af85868704",
+  "current_local_source_commit": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -352,14 +352,12 @@
     ]
   },
   "current_ci_known_failure": {
-    "CPU_run": 41691847183,
-    "native_job": 126112158608,
-    "compat_job": 126112158688,
-    "portable_job": 126112158768,
-    "coverage": "command_semantics_mismatch before stage execution; portable34PASS1FAIL packaged proof",
-    "Signed_run": 41691846863,
-    "Signed_check": 126112158285,
-    "Signed": "FAIL --locked lock update required before tests; no test success claimed"
+    "head": "94d870f0915d3c18591f553803dc38e26be932e2",
+    "run": 41696444169,
+    "job": 126128142260,
+    "reason": "HighmatrixFINE_SLOTS wrongtestimport",
+    "fix_source": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+    "new_native_execution": "NOT_RUN"
   },
   "historical_ci_worker_activation": [
     {
@@ -557,6 +555,16 @@
       "audit_badge": "FAIL after report87passed floor; committed88 snapshot mismatch",
       "cpu_compat_provision": "runner communication lost before stages; no executed test count",
       "current_qualification": "PENDING_CURRENT_HEAD"
+    },
+    {
+      "CPU_run": 41691847183,
+      "native_job": 126112158608,
+      "compat_job": 126112158688,
+      "portable_job": 126112158768,
+      "coverage": "command_semantics_mismatch before stage execution; portable34PASS1FAIL packaged proof",
+      "Signed_run": 41691846863,
+      "Signed_check": 126112158285,
+      "Signed": "FAIL --locked lock update required before tests; no test success claimed"
     }
   ],
   "current_command_and_lock_repair": {
@@ -665,5 +673,66 @@
     "reason": "Clippy unused sdk_vec",
     "fix": "Explicit independent SDK/CoreHigh floatbit equality;497LOC; no test/assertion removed",
     "new_native_execution": "NOT_RUN"
+  },
+  "current_m1_and_high_import_source": {
+    "schema": "dope.m1-and-high-import-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+    "base": "94d870f0915d3c18591f553803dc38e26be932e2",
+    "actual_failure": {
+      "run": 41696444169,
+      "job": 126128142260,
+      "conclusion": "FAIL unresolveddope_core::landmark::FINE_SLOTS import",
+      "disposition": "Retained; no newruntimePASS"
+    },
+    "repair": "Test imports existing landmark::bundle::FINE_SLOTS; no productreexport/constant/math change",
+    "Clippy": {
+      "script": "ops/ci/engine.sh",
+      "change": "Append only --keep-going before -- -D warnings on existing Clippy invocation",
+      "preserved": [
+        "--all-targets",
+        "--locked",
+        "set-e",
+        "nonzero final warning/failure exit",
+        "existing cargo test --no-fail-fast",
+        "alltargets and alltest assertions"
+      ],
+      "version_support": "Cargo stabilized1.74; pinned1.88. Root verified official CargoBook unstable#keep-going and officialCI guide example. Help-only Clippy exit0 does not list every Cargo flag; no build/test was used for support check."
+    },
+    "M1": {
+      "path": "engine/dope-cli/tests/nc1_refusal_privacy.rs",
+      "author_sha256": "c9a63328d9892a8b2bd4caf96c3462cf6bc322a8e31b04e8145af0903486b517",
+      "integrated_sha256": "19f76d87660ef8e51686acbd8d3139ee9c9d77c482b72518a65880cde55a8dfa",
+      "adaptation": "Rust1.88 workspaceedition2021 format/importordering only; authorpacket preserved",
+      "source_preimages_match": 13,
+      "author_checksums_match": 16,
+      "lines": 357,
+      "ordinary_test_functions_authored": 3,
+      "native_CLI_calls_authored": 7,
+      "actual_executed": 0,
+      "assertions": [
+        "Privateheaders/vocabulary/classes/inFIT1e300 actuallyplanted; publicschema/stdoutredacted",
+        "MalformedJSON andunknownfields fixedsafecode/nooutput",
+        "Rolecollision andtamperedactualprivatecard fixedsafecode/nooutput",
+        "Absolute actualCLI with emptyPATH/removedPythonvars"
+      ],
+      "criterion": "D05-S4",
+      "criterion_verdict": "NOT_RUN until actualcurrent-source result accepted",
+      "independent_review": "nc1-cli-canary-m1/REVIEW-STRONG.md: no concrete static blocker; no runtime qualification"
+    },
+    "scope_preserved": "No dependencies/locks/productionparsers/CLIregistration/Python/guardthreshold/exclusions/frozenfixtures changed",
+    "checks": {
+      "Rust1.88_format": "PASS2files",
+      "Bash_syntax": "PASSengine.sh",
+      "diff_check": "PASS",
+      "new_native_build_tests_executed": 0,
+      "full_current_CI": "PENDING_NEW_PUSH"
+    },
+    "criterion_counts": {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "historical_BLOCKED": 4
+    },
+    "remaining": "ActualcurrentCI/review/M1/nativeM0qualifications, sevenRuststreams,14engineeringcriteria;4campaigncriteria deferredneverPASS; no newscore/audit claim"
   }
 }

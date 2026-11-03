@@ -67,6 +67,6 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 | D05-S1 | **PASS** | Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json. |
 | D05-S2 | **NOT_RUN** | Typed declarations and physical row IDs are implemented; native conversion/CLI role tests pending. |
 | D05-S3 | **PASS** | Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json. |
-| D05-S4 | **NOT_RUN** | Public schema structure and Python malformed-card refusals pass; actual native CLI/error canary journeys pending. |
+| D05-S4 | **NOT_RUN** | Native nc1_refusal_privacy actual-CLI fixture source adopted at0dfe96a0:3tests/7calls, privatecanary presence, publicredaction and4fixed-code refusals/nooutput. Source reviewed; runtime NOT_RUN. See ../receipts/m1-and-high-import-source.json. |
 | D05-S5 | **PASS** | Three source-bound actual Rust NC1 exports replay in default Python test_nc1 without ENV/skip; private/public JSON schemas validate. This is focused fixture evidence, not full native qualification. |
 | D05-S6 | **NOT_RUN** | Legacy preparation remains separate and SDK NC1 explicit; complete legacy native decoder replay pending. |

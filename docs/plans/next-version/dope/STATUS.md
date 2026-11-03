@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `e3eaadd803c5a556f2d729dd9b8f95af85868704`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `0dfe96a0d1a90aec5f2100bd6177b57c80f436f4`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -223,3 +223,19 @@ preserved. No acceptance promotions follow from these source checks. See the
 Sourcee3eaadd8 explicitly compares independently produced SDK and Core High vector bits, fixing the actual7eb Clippy refusal without suppression, underscore hiding or assertion removal. The test remains497lines and current native execution is pending.
 
 Exactly D02-S4,D04-S4,D06-S1/S2/S3/S5/S6 and D07-S2/S4 are promoted from NOT_RUN after verifying each status and all referenced production/test blobs. Counts47PASS/14NOT_RUN/4historicalBLOCKED use individual assertions, not the generic273-test total. The prior baseline/receipts remain preserved; D04-S1,D05-S2,D09-S5 and current SDK qualification stay open.
+
+## High test import and M1 native CLI privacy fixture
+
+Source0dfe96a0 corrects the actual94Signed-test import to the existing
+landmark::bundle::FINE_SLOTS; no public reexport or constant is added. The
+existing Clippy command adds --keep-going before its unchanged -Dwarnings
+boundary, retaining all-targets/locked and final nonzero failure behavior.
+This collects independent compile failures; it does not skip targets or tests.
+
+The reviewed357-line M1 Rust fixture adds three tests with seven actual CLI
+journeys: three successful FITs proving planted private names/extrema stay
+out of public output, and four parser/schema/role refusals with no partial
+output. Source/hash/format review passed; runtime remains NOT_RUN and D05-S4
+is not promoted. Counts remain47PASS/14NOT_RUN/4historicalBLOCKED. See the
+[source receipt](receipts/m1-and-high-import-source.json). New required CI
+and the seven Rust migration streams remain open; no audit score is inferred.
