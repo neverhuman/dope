@@ -381,7 +381,7 @@ class V4Trainer:
                 or not math.isfinite(float(counters["compute_seconds"])) or float(counters["compute_seconds"]) < 0):
             raise TrainerError("checkpoint_counters_invalid")
         # Validate mutable libraries on detached copies before committing state.
-        try:
+        with _training_helpers.checkpoint_error_boundary(TrainerError, "checkpoint_state_invalid"):
             staged_optimizer = copy.deepcopy(self.optimizer)
             staged_optimizer.load_state_dict(state["optimizer"])
             if self.scheduler is not None:
@@ -390,25 +390,24 @@ class V4Trainer:
             n = state["rng"]["numpy"]
             np.random.RandomState().set_state((n["name"], np.asarray(n["keys"], dtype=np.uint32), int(n["pos"]), n["gauss"], float(n["cached"])))
             torch.Generator(device="cpu").set_state(state["rng"]["torch_cpu"])
-        except Exception as exc:
-            raise TrainerError("checkpoint_state_invalid") from exc
         previous_model = {k: v.detach().clone() for k, v in self.model.state_dict().items()}
         previous_optimizer = copy.deepcopy(self.optimizer.state_dict())
         previous_scheduler = copy.deepcopy(self.scheduler.state_dict()) if self.scheduler is not None else None
         previous_rng = _rng_state()
-        try:
-            self.model.load_state_dict(model_state, strict=True)
-            self.optimizer.load_state_dict(state["optimizer"])
-            if self.scheduler is not None:
-                self.scheduler.load_state_dict(state["scheduler"])
-            _restore_rng(state["rng"])
-        except Exception as exc:
+        def rollback_checkpoint_restore() -> None:
             self.model.load_state_dict(previous_model, strict=True)
             self.optimizer.load_state_dict(previous_optimizer)
             if self.scheduler is not None:
                 self.scheduler.load_state_dict(previous_scheduler)
             _restore_rng(previous_rng)
-            raise TrainerError("checkpoint_restore_refused") from exc
+        with _training_helpers.checkpoint_error_boundary(
+            TrainerError, "checkpoint_restore_refused", rollback=rollback_checkpoint_restore
+        ):
+            self.model.load_state_dict(model_state, strict=True)
+            self.optimizer.load_state_dict(state["optimizer"])
+            if self.scheduler is not None:
+                self.scheduler.load_state_dict(state["scheduler"])
+            _restore_rng(state["rng"])
         self.permutation, self.cursor = permutation, cursor
         self.update_count = update_count
         self.attempt_count = attempts

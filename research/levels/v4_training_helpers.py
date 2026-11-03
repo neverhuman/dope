@@ -14,19 +14,26 @@ from typing import Any, Callable, Mapping, Sequence
 import numpy as np
 import torch
 
-class _CheckpointReadBoundary:
-    # Translate ordinary checkpoint I/O failures without swallowing process control.
-    def __init__(self, trainer_error: type[Exception]):
-        self._trainer_error = trainer_error
+class _CheckpointErrorBoundary:
+    # Translate ordinary failures; leave BaseException process controls untouched.
+    def __init__(self, trainer_error: type[Exception], message: str, rollback: Callable[[], None] | None = None):
+        self._trainer_error, self._message, self._rollback = trainer_error, message, rollback
     def __enter__(self):
         return self
     def __exit__(self, error_type, error, traceback):
         if error_type is None or not issubclass(error_type, Exception):
             return False
-        raise self._trainer_error("checkpoint_missing_or_invalid") from error
+        if self._rollback is not None:
+            self._rollback()
+        raise self._trainer_error(self._message) from error
 
-def checkpoint_read_boundary(trainer_error: type[Exception]) -> _CheckpointReadBoundary:
-    return _CheckpointReadBoundary(trainer_error)
+def checkpoint_error_boundary(
+    trainer_error: type[Exception], message: str, rollback: Callable[[], None] | None = None
+) -> _CheckpointErrorBoundary:
+    return _CheckpointErrorBoundary(trainer_error, message, rollback)
+
+def checkpoint_read_boundary(trainer_error: type[Exception]) -> _CheckpointErrorBoundary:
+    return checkpoint_error_boundary(trainer_error, "checkpoint_missing_or_invalid")
 
 
 def _round_up(value: int, multiple: int) -> int:

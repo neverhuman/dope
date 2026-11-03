@@ -3,9 +3,12 @@ import dataclasses
 import hashlib
 import json
 import copy
+import random
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+import numpy as np
 import torch
 from research.levels.v4_model import NativeLandmarks,V4Model
 from research.levels.v4_objectives import LossWeights
@@ -37,6 +40,173 @@ class RealModelTrainerTests(unittest.TestCase):
         identity=TrainingIdentity("a"*64,"b"*64,"c"*64,"d"*64,callback.identity_sha256(),"e"*64)
         trainer=V4Trainer(model,optimizer,cells() if source is None else source,callback,identity,V4TrainerConfig(batch_size=1,seed=7,report_interval=1))
         return trainer
+    def _checkpoint_snapshot(self, subject):
+        numpy_state = np.random.get_state()
+        return {
+            "model": {key: value.clone() for key, value in subject.model.state_dict().items()},
+            "optimizer": copy.deepcopy(subject.optimizer.state_dict()),
+            "scheduler": None if subject.scheduler is None else copy.deepcopy(subject.scheduler.state_dict()),
+            "cursor_state": (subject.permutation[:], subject.cursor, subject.update_count,
+                             subject.attempt_count, subject.failed_update_count),
+            "timings": (subject.setup_seconds, subject.compute_seconds),
+            "last_report": copy.deepcopy(subject.last_report),
+            "python_rng": random.getstate(),
+            "numpy_rng": (numpy_state[0], numpy_state[1].copy(), *numpy_state[2:]),
+            "torch_rng": torch.get_rng_state().clone(),
+        }
+    def _assert_checkpoint_snapshot(self, subject, before):
+        for key, value in before["model"].items():
+            torch.testing.assert_close(value, subject.model.state_dict()[key], rtol=0, atol=0)
+        self.assertEqual(subject.optimizer.state_dict(), before["optimizer"])
+        self.assertEqual(None if subject.scheduler is None else subject.scheduler.state_dict(), before["scheduler"])
+        self.assertEqual((subject.permutation, subject.cursor, subject.update_count,
+                          subject.attempt_count, subject.failed_update_count), before["cursor_state"])
+        self.assertEqual((subject.setup_seconds, subject.compute_seconds), before["timings"])
+        self.assertEqual(subject.last_report, before["last_report"])
+        self.assertEqual(random.getstate(), before["python_rng"])
+        numpy_after = np.random.get_state()
+        self.assertEqual(numpy_after[0], before["numpy_rng"][0])
+        np.testing.assert_array_equal(numpy_after[1], before["numpy_rng"][1])
+        self.assertEqual(numpy_after[2:], before["numpy_rng"][2:])
+        torch.testing.assert_close(torch.get_rng_state(), before["torch_rng"], rtol=0, atol=0)
+    def test_checkpoint_staging_boundary_preserves_exception_contract(self):
+        class StageFailure(Exception):
+            pass
+        class StageAbort(BaseException):
+            pass
+        source = self.make()
+        source.fit_step()
+        with tempfile.TemporaryDirectory() as out:
+            source.save_checkpoint(out)
+            target = self.make(seed=123)
+            before = self._checkpoint_snapshot(target)
+            fault = StageFailure("arbitrary staged validation failure")
+            original_deepcopy = copy.deepcopy
+            def fault_target_deepcopy(value, memo=None):
+                if value is target.optimizer:
+                    raise fault
+                return original_deepcopy(value, memo)
+            with patch("research.levels.v4_trainer.copy.deepcopy", new=fault_target_deepcopy):
+                with self.assertRaisesRegex(TrainerError, "checkpoint_state_invalid") as raised:
+                    target.load_checkpoint(out)
+            self.assertEqual(str(raised.exception), "checkpoint_state_invalid")
+            self.assertIs(raised.exception.__cause__, fault)
+            self._assert_checkpoint_snapshot(target, before)
+            abort = StageAbort("staged validation control signal")
+            def abort_target_deepcopy(value, memo=None):
+                if value is target.optimizer:
+                    raise abort
+                return original_deepcopy(value, memo)
+            with patch("research.levels.v4_trainer.copy.deepcopy", new=abort_target_deepcopy):
+                with self.assertRaises(StageAbort) as raised_abort:
+                    target.load_checkpoint(out)
+            self.assertIs(raised_abort.exception, abort)
+            self._assert_checkpoint_snapshot(target, before)
+    def test_checkpoint_live_restore_failure_rolls_back_before_translation(self):
+        class RestoreFailure(Exception):
+            pass
+        source = self.make()
+        source.fit_step()
+        with tempfile.TemporaryDirectory() as out:
+            source.save_checkpoint(out)
+            target = self.make(seed=123)
+            before = self._checkpoint_snapshot(target)
+            failure = RestoreFailure("live optimizer restore failed")
+            original = type(target.optimizer).load_state_dict
+            calls = 0
+            def fail_once(optimizer, state):
+                nonlocal calls
+                if optimizer is target.optimizer:
+                    calls += 1
+                    if calls == 1:
+                        raise failure
+                return original(optimizer, state)
+            with patch.object(type(target.optimizer), "load_state_dict", new=fail_once):
+                with self.assertRaisesRegex(TrainerError, "checkpoint_restore_refused") as raised:
+                    target.load_checkpoint(out)
+            self.assertEqual(str(raised.exception), "checkpoint_restore_refused")
+            self.assertIs(raised.exception.__cause__, failure)
+            self.assertEqual(calls, 2)
+            self._assert_checkpoint_snapshot(target, before)
+    def test_checkpoint_restore_rollback_failure_escapes_without_wrapper(self):
+        class InitialFailure(Exception):
+            pass
+        class RollbackFailure(Exception):
+            pass
+        source = self.make()
+        source.fit_step()
+        with tempfile.TemporaryDirectory() as out:
+            source.save_checkpoint(out)
+            target = self.make(seed=123)
+            before = self._checkpoint_snapshot(target)
+            initial, rollback = InitialFailure("initial restore failed"), RollbackFailure("rollback failed")
+            original = type(target.optimizer).load_state_dict
+            calls = 0
+            def fail_restore(optimizer, state):
+                nonlocal calls
+                if optimizer is target.optimizer:
+                    calls += 1
+                    if calls == 1:
+                        raise initial
+                    raise rollback
+                return original(optimizer, state)
+            with patch.object(type(target.optimizer), "load_state_dict", new=fail_restore):
+                with self.assertRaises(RollbackFailure) as raised:
+                    target.load_checkpoint(out)
+            self.assertIs(raised.exception, rollback)
+            self.assertIsNone(raised.exception.__cause__)
+            self.assertIs(raised.exception.__context__, initial)
+            self.assertNotIsInstance(raised.exception, TrainerError)
+            self.assertEqual(calls, 2)
+            for key, value in before["model"].items():
+                torch.testing.assert_close(value, target.model.state_dict()[key], rtol=0, atol=0)
+            self.assertEqual(target.cursor, before["cursor_state"][1])
+            self.assertEqual(target.update_count, before["cursor_state"][2])
+            self.assertEqual(target.optimizer.state_dict(), before["optimizer"])
+            self.assertEqual(None if target.scheduler is None else target.scheduler.state_dict(), before["scheduler"])
+            self.assertEqual(random.getstate(), before["python_rng"])
+            numpy_after = np.random.get_state()
+            self.assertEqual(numpy_after[0], before["numpy_rng"][0])
+            np.testing.assert_array_equal(numpy_after[1], before["numpy_rng"][1])
+            torch.testing.assert_close(torch.get_rng_state(), before["torch_rng"], rtol=0, atol=0)
+    def test_checkpoint_live_restore_baseexception_escapes_without_rollback(self):
+        class RestoreAbort(BaseException):
+            pass
+        source = self.make()
+        source.fit_step()
+        with tempfile.TemporaryDirectory() as out:
+            source.save_checkpoint(out)
+            target = self.make(seed=123)
+            before = self._checkpoint_snapshot(target)
+            abort = RestoreAbort("live restore control signal")
+            original = type(target.optimizer).load_state_dict
+            calls = 0
+            def abort_live(optimizer, state):
+                nonlocal calls
+                if optimizer is target.optimizer:
+                    calls += 1
+                    raise abort
+                return original(optimizer, state)
+            with patch.object(type(target.optimizer), "load_state_dict", new=abort_live):
+                with self.assertRaises(RestoreAbort) as raised:
+                    target.load_checkpoint(out)
+            self.assertIs(raised.exception, abort)
+            self.assertEqual(calls, 1)
+            self.assertTrue(any(
+                not torch.equal(value, target.model.state_dict()[key])
+                for key, value in before["model"].items()
+            ))
+            self.assertEqual(target.cursor, before["cursor_state"][1])
+            self.assertEqual(target.update_count, before["cursor_state"][2])
+            self.assertEqual(target.attempt_count, before["cursor_state"][3])
+            self.assertEqual(target.failed_update_count, before["cursor_state"][4])
+            self.assertEqual(target.optimizer.state_dict(), before["optimizer"])
+            self.assertEqual(None if target.scheduler is None else target.scheduler.state_dict(), before["scheduler"])
+            self.assertEqual(random.getstate(), before["python_rng"])
+            numpy_after = np.random.get_state()
+            self.assertEqual(numpy_after[0], before["numpy_rng"][0])
+            np.testing.assert_array_equal(numpy_after[1], before["numpy_rng"][1])
+            torch.testing.assert_close(torch.get_rng_state(), before["torch_rng"], rtol=0, atol=0)
     def test_real_model_two_steps_checkpoint_resume_and_native23_mask(self):
         trainer=self.make();before={k:v.clone() for k,v in trainer.model.state_dict().items()}
         batch=collate_cells([trainer.cells[0]],trainer.config);self.assertEqual(batch.keep_masks.shape,(1,23))
