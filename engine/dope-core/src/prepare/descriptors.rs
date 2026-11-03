@@ -33,9 +33,9 @@ pub const LANDMARK_NAMES: [&str; 23] = [
     "lin_quarter",
     "gbdt_quarter",
 ];
-pub const MACRO_INDICES: [usize; 9] = [0, 1, 2, 3, 4, 5, 13, 14, 21];
-pub const LARGER_ADDED_INDICES: [usize; 9] = [6, 7, 8, 9, 10, 11, 12, 15, 16];
-pub const FINE_ADDED_INDICES: [usize; 5] = [17, 18, 19, 20, 22];
+pub use crate::landmark::bundle::FINE_SLOTS as FINE_ADDED_INDICES;
+pub use crate::landmark::bundle::LARGER_SLOTS as LARGER_ADDED_INDICES;
+pub use crate::landmark::bundle::MACRO_SLOTS as MACRO_INDICES;
 
 /// MLC-v3 level (`descriptors.LEVEL_LANDMARK_INDICES` keys).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

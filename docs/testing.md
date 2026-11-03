@@ -647,3 +647,7 @@ verifies the 100% pure-Rust `DOPE-MLC-v3` SafeTensors inference engine and `DML3
 and `python3 -B -m research.levels.rust_v3_parity` (plus `DOPE_REQUIRE_RUST_PARITY=1` in both the
 Rust and Python test suites) enforces fail-closed trained-checkpoint tensor forward (`< 1e-5`) and
 fixed-draw `DML3`/`CSC1` sampling (`< 1e-5`) parity across all four tiers and three tasks.
+
+## Additive next-version checks
+
+The `test_next_version` shared CPU reference shard covers prospective evaluation, versioned informative rank, actual Rust NC1/DML4 fixtures, actual synthesized-data gradients and actual-model CPU checkpoint replay. The native shard adds normalization/SDK, High-required execution, DVS, DML4 and CLI journey tests; ordinary engine discovery remains intact. See [workflow commands and private/public boundaries](next-version-workflows.md). Missing tracked parity fixtures fail rather than skip. GPU training and scientific qualification remain unrun.

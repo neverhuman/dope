@@ -22,6 +22,14 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 pub(crate) enum Command {
+    /// Owner-private normalize-once workflow from explicitly declared typed input.
+    #[command(subcommand)]
+    Normalize(crate::normalize::NormalizeCommand),
+    /// Evaluate frozen DVS evidence and render an honest Audit Card.
+    TransferReport(crate::dvs::DvsArgs),
+    /// Closed DML4 unit-space packing, inspection and sampling.
+    #[command(subcommand)]
+    MlcV4(crate::mlc_v4::MlcV4Command),
     /// Experimental frozen shared encoder and code-only CPU decoder.
     #[command(subcommand)]
     Learned(crate::learned::LearnedCommand),

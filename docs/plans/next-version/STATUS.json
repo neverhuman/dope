@@ -3,76 +3,103 @@
   "delivery": "one PR per repository; JopeDime existing #2071; full CI at end",
   "tasks": {
     "D00": {
-      "source": "IN_PROGRESS",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "ADRs and frozen machine-readable decisions; no campaign authorization",
+      "release": "NOT_AUTHORIZED"
     },
     "D01": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Prospective common REAL-FIT route opt-in; historical replay retained; applied Python fixture PASS",
+      "release": "NOT_AUTHORIZED"
     },
     "D02": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Additive informative rank; v1/v2 untouched; applied Python fixture PASS; root Rust pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D03": {
-      "source": "IN_PROGRESS",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Native facade/no duplicate arithmetic; Rust1.88 SDK compilation pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D04": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Explicit High-required execution with full reservation; actual native fixture pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D05": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Strict NC1 private card/public schema and native CLI; tracked Rust-produced Python fixtures PASS; native CLI pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D06": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D07": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Closed six-gate DML4 graph; hard caps; external Rust and applied default Python fixtures PASS; actual engine pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D08": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "PARTIAL_CPU_ENGINEERING",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "CPU shape batching, native23 masks, content-bound atomic resume and actual-model adapter; CUDA optimizer training UNSUPPORTED; no GPU qualification",
+      "release": "NOT_AUTHORIZED"
     },
     "D09": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Actual group-aware autograd producer, served-basis export and synthesize-learn-query objective; applied analytic CPU fixtures PASS; native producer parity pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D10": {
-      "source": "IN_PROGRESS",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "IMPLEMENTED",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Local combined check-all target; existing hosted engine coverage retained; full local gate pending",
+      "release": "NOT_AUTHORIZED"
     },
     "D11": {
-      "source": "PENDING",
-      "focused_checks": "NOT_RUN",
-      "full_ci": "DEFERRED_TO_BATCH_END",
-      "efficacy": "NOT_CLAIMED"
+      "source": "READINESS_HOLD",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "PENDING_FINAL_HEAD",
+      "efficacy": "NOT_RUN",
+      "notes": "Readiness dossier created; no qualification campaign launched; prerequisites and owner admission remain HOLD",
+      "release": "NOT_AUTHORIZED"
     }
-  }
+  },
+  "branch": "fast/next-version-dope-20261103",
+  "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+  "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103"
 }

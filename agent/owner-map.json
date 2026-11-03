@@ -909,7 +909,14 @@
     "docs/evidence/optional-landmarks/": "external-evidence",
     "docs/optional-landmarks-qualification.md": "external-evidence",
     "engine/dope-core/tests/mlc_v3_safetensors.rs": "rust-core",
-    "scripts/install.sh": "release"
+    "scripts/install.sh": "release",
+    "engine/dope-norm/": "rust-core",
+    "engine/dope-core/src/mlc_v4/": "rust-core",
+    "engine/dope-core/src/dvs/": "rust-core",
+    "engine/dope-cli/src/normalize.rs": "rust-core",
+    "engine/dope-cli/src/mlc_v4.rs": "rust-core",
+    "engine/dope-cli/src/dvs.rs": "rust-core",
+    "engine/dope-cli/src/safe_io.rs": "rust-core"
   },
   "workspace": "dope"
 }

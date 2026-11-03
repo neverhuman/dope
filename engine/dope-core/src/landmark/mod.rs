@@ -28,7 +28,7 @@ pub use cost::WorkReport;
 pub use folds::assign_folds;
 pub use frame::LandmarkFrame;
 pub use panel::{Family, LandmarkId, Recipe, PANEL, PANEL_V1};
-pub use progressive::ProgressiveLandmarks;
+pub use progressive::{ExecutionPlan, ExecutionWork, ProgressiveLandmarks};
 pub use report::{
     CellState, FeatureSpectrum, GlobalCoordinates, LandmarkCell, Signature, SignatureKind,
 };

@@ -31,6 +31,7 @@ pub mod budget;
 pub mod compile;
 pub mod copula;
 pub mod device;
+pub mod dvs;
 pub mod encode;
 pub mod error;
 pub mod eval;
@@ -40,6 +41,7 @@ pub mod learned;
 pub mod levels;
 pub mod marginal;
 pub mod mlc_v3;
+pub mod mlc_v4;
 pub mod noise;
 pub mod output;
 pub mod prepare;
@@ -66,3 +68,8 @@ pub use program::Program;
 pub use sample::{sample, SampleOptions, Samples};
 pub use schema::Task;
 pub use table::RawTable;
+
+/// Canonical successor normalization; owner-private card stays outside packets.
+pub mod nc1 {
+    pub use dope_norm::*;
+}

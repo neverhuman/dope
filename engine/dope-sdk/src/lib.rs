@@ -14,10 +14,10 @@ pub mod v0 {
 
     pub mod landmark {
         pub use dope_core::landmark::{
-            assign_folds, signature, signature_requested, CellState, FeatureSpectrum,
-            LandmarkBundle, LandmarkFrame, LandmarkGroup, LandmarkMode, LandmarkOptions,
-            LandmarkScope, LandmarkStatus, ProgressiveLandmarks, RowSelection, Signature,
-            SignatureKind, SubsampleSpec, WorkReport, LANDMARK_SLOTS, PANEL_V1,
+            assign_folds, signature, signature_requested, CellState, ExecutionPlan, ExecutionWork,
+            FeatureSpectrum, LandmarkBundle, LandmarkFrame, LandmarkGroup, LandmarkMode,
+            LandmarkOptions, LandmarkScope, LandmarkStatus, ProgressiveLandmarks, RowSelection,
+            Signature, SignatureKind, SubsampleSpec, WorkReport, LANDMARK_SLOTS, PANEL_V1,
         };
         pub mod bundle {
             pub use dope_core::landmark::bundle::{
@@ -56,4 +56,12 @@ pub mod v0 {
 /// NC1 successor normalization; never reinterpret Lane-A model preparation.
 pub mod nc1 {
     pub use dope_norm::*;
+}
+
+/// Explicit successor graph and evidence APIs; Lane-A remains unchanged.
+pub mod mlc_v4 {
+    pub use dope_core::mlc_v4::*;
+}
+pub mod dvs {
+    pub use dope_core::dvs::*;
 }

@@ -1,0 +1,780 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dope.dvs-receipt/v1",
+  "title": "DVS measured evidence receipt; never release authorization",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "preparation_recipe",
+    "status",
+    "scheduled_cells",
+    "complete_cells",
+    "uninformative_cells",
+    "failed_or_missing_cells",
+    "cells",
+    "families",
+    "robust_retention",
+    "selection",
+    "bytes",
+    "privacy",
+    "pins",
+    "qualification_state",
+    "formal_dp_state",
+    "release_authorization_state"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "dope-dvs-v1"
+    },
+    "preparation_recipe": {
+      "enum": [
+        "nc1-minmax-onehot-v1",
+        "legacy-real-fit-affine-target-v1"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "incomplete",
+        "uninformative",
+        "failed",
+        "missing",
+        "timed_out",
+        "unsupported",
+        "not_run"
+      ]
+    },
+    "scheduled_cells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "complete_cells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "uninformative_cells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "failed_or_missing_cells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cell_sha256",
+          "family_id",
+          "status",
+          "reason",
+          "query_rows",
+          "null_loss",
+          "real_loss",
+          "synthetic_loss",
+          "raw_retention",
+          "driver",
+          "wall_seconds",
+          "fit_count"
+        ],
+        "properties": {
+          "cell_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "family_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "incomplete",
+              "uninformative",
+              "failed",
+              "missing",
+              "timed_out",
+              "unsupported",
+              "not_run"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "query_rows": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "null_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "real_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "synthetic_loss": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "raw_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "driver": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "complete",
+                  "incomplete",
+                  "uninformative",
+                  "failed",
+                  "missing",
+                  "timed_out",
+                  "unsupported",
+                  "not_run"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-z0-9_]+$"
+              },
+              "format": {
+                "const": "driver-result-informative-v1"
+              },
+              "protocol_version": {
+                "const": "driver-rank-informative-v1"
+              },
+              "components": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "mass": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "a_rs",
+                      "a_rr",
+                      "margin",
+                      "descriptive_ratio",
+                      "lcbs"
+                    ],
+                    "properties": {
+                      "a_rs": {
+                        "type": "number"
+                      },
+                      "a_rr": {
+                        "type": "number"
+                      },
+                      "margin": {
+                        "type": "number"
+                      },
+                      "descriptive_ratio": {
+                        "type": "number"
+                      },
+                      "lcbs": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "margin",
+                          "stability",
+                          "real_strength",
+                          "control_strength",
+                          "synthetic_strength"
+                        ],
+                        "properties": {
+                          "margin": {
+                            "type": "number"
+                          },
+                          "stability": {
+                            "type": "number"
+                          },
+                          "real_strength": {
+                            "type": "number"
+                          },
+                          "control_strength": {
+                            "type": "number"
+                          },
+                          "synthetic_strength": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "rank_diagnostics": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "real_synthetic",
+                          "real_control"
+                        ],
+                        "properties": {
+                          "real_synthetic": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          },
+                          "real_control": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "rank": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "a_rs",
+                      "a_rr",
+                      "margin",
+                      "descriptive_ratio",
+                      "lcbs"
+                    ],
+                    "properties": {
+                      "a_rs": {
+                        "type": "number"
+                      },
+                      "a_rr": {
+                        "type": "number"
+                      },
+                      "margin": {
+                        "type": "number"
+                      },
+                      "descriptive_ratio": {
+                        "type": "number"
+                      },
+                      "lcbs": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "margin",
+                          "stability",
+                          "real_strength",
+                          "control_strength",
+                          "synthetic_strength"
+                        ],
+                        "properties": {
+                          "margin": {
+                            "type": "number"
+                          },
+                          "stability": {
+                            "type": "number"
+                          },
+                          "real_strength": {
+                            "type": "number"
+                          },
+                          "control_strength": {
+                            "type": "number"
+                          },
+                          "synthetic_strength": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "rank_diagnostics": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "real_synthetic",
+                          "real_control"
+                        ],
+                        "properties": {
+                          "real_synthetic": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          },
+                          "real_control": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "sign": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "a_rs",
+                      "a_rr",
+                      "margin",
+                      "descriptive_ratio",
+                      "lcbs"
+                    ],
+                    "properties": {
+                      "a_rs": {
+                        "type": "number"
+                      },
+                      "a_rr": {
+                        "type": "number"
+                      },
+                      "margin": {
+                        "type": "number"
+                      },
+                      "descriptive_ratio": {
+                        "type": "number"
+                      },
+                      "lcbs": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "margin",
+                          "stability",
+                          "real_strength",
+                          "control_strength",
+                          "synthetic_strength"
+                        ],
+                        "properties": {
+                          "margin": {
+                            "type": "number"
+                          },
+                          "stability": {
+                            "type": "number"
+                          },
+                          "real_strength": {
+                            "type": "number"
+                          },
+                          "control_strength": {
+                            "type": "number"
+                          },
+                          "synthetic_strength": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "rank_diagnostics": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "real_synthetic",
+                          "real_control"
+                        ],
+                        "properties": {
+                          "real_synthetic": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          },
+                          "real_control": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "interaction": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "a_rs",
+                      "a_rr",
+                      "margin",
+                      "descriptive_ratio",
+                      "lcbs"
+                    ],
+                    "properties": {
+                      "a_rs": {
+                        "type": "number"
+                      },
+                      "a_rr": {
+                        "type": "number"
+                      },
+                      "margin": {
+                        "type": "number"
+                      },
+                      "descriptive_ratio": {
+                        "type": "number"
+                      },
+                      "lcbs": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "margin",
+                          "stability",
+                          "real_strength",
+                          "control_strength",
+                          "synthetic_strength"
+                        ],
+                        "properties": {
+                          "margin": {
+                            "type": "number"
+                          },
+                          "stability": {
+                            "type": "number"
+                          },
+                          "real_strength": {
+                            "type": "number"
+                          },
+                          "control_strength": {
+                            "type": "number"
+                          },
+                          "synthetic_strength": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "rank_diagnostics": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "real_synthetic",
+                          "real_control"
+                        ],
+                        "properties": {
+                          "real_synthetic": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          },
+                          "real_control": {
+                            "$ref": "driver-rank-informative-v1.schema.json"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "driver_fidelity": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "driver_pass": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "rank_diagnostics": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real_synthetic",
+                  "real_control"
+                ],
+                "properties": {
+                  "real_synthetic": {
+                    "$ref": "driver-rank-informative-v1.schema.json"
+                  },
+                  "real_control": {
+                    "$ref": "driver-rank-informative-v1.schema.json"
+                  }
+                }
+              }
+            }
+          },
+          "wall_seconds": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fit_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "families": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family_id",
+          "scheduled_cells",
+          "informative_cells",
+          "descriptive_mean_retention"
+        ],
+        "properties": {
+          "family_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scheduled_cells": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "informative_cells": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "descriptive_mean_retention": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "robust_retention": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "selection_regret",
+        "transfer_rank"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "incomplete",
+            "uninformative",
+            "failed",
+            "missing",
+            "timed_out",
+            "unsupported",
+            "not_run"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "selected_index": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "real_best_index": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "synthetic_selection_tied": {
+          "type": "boolean"
+        },
+        "selection_regret": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "transfer_rank": {
+          "anyOf": [
+            {
+              "$ref": "driver-rank-informative-v1.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "bytes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payload_bytes",
+        "shared_bytes",
+        "sampling_closure_bytes",
+        "owner_private_dependency_bytes",
+        "parts",
+        "clean_room_sampling_state"
+      ],
+      "properties": {
+        "payload_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shared_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sampling_closure_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "owner_private_dependency_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope",
+              "bytes",
+              "sha256"
+            ],
+            "properties": {
+              "scope": {
+                "enum": [
+                  "packet",
+                  "public_schema",
+                  "mandatory_sidecar",
+                  "shared_decoder",
+                  "owner_private"
+                ]
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "clean_room_sampling_state": {
+          "const": "not_run"
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "exact_copies",
+        "dcr_ratio"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "incomplete",
+            "uninformative",
+            "failed",
+            "missing",
+            "timed_out",
+            "unsupported",
+            "not_run"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "method": {
+          "const": "euclidean-prepared-nearest-v1"
+        },
+        "exact_copies": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "synthetic_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "real_reference_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "heldout_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distance_pairs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dcr_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "formal_dp_state": {
+          "const": "not_run"
+        }
+      }
+    },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fit_scope_sha256",
+        "real_test_sha256",
+        "prepared_view_sha256",
+        "groups_sha256",
+        "roster_sha256"
+      ],
+      "properties": {
+        "fit_scope_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "real_test_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "prepared_view_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "groups_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "roster_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "qualification_state": {
+      "const": "not_run"
+    },
+    "formal_dp_state": {
+      "const": "not_run"
+    },
+    "release_authorization_state": {
+      "const": "not_run"
+    }
+  }
+}
