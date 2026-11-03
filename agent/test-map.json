@@ -1,5 +1,7 @@
 {
   "tests": {
+    "research/levels/v3_canonical_summary.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify canonical ledger summary and Elo reducer compatibility"},
+    "research/levels/v4_training_helpers.py": {"command": "python3 -B -m unittest research.levels.tests.test_v4_training research.levels.tests.test_v4_training_model -v", "purpose": "verify helper extraction retains masks, exact resume, errors and actual-model training"},
     "engine/dope-cli/src/dvs.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli", "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"},
     "engine/dope-cli/src/mlc_v4.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli", "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"},
     "engine/dope-cli/src/normalize.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli", "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"},

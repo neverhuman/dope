@@ -1,5 +1,7 @@
 {
   "owners": {
+    "research/levels/v3_canonical_summary.py": "external-evidence",
+    "research/levels/v4_training_helpers.py": "external-evidence",
     "engine/dope-sdk/": "rust-core",
     "docs/adr/normalize-once-and-dvs-v1.md": "governance",
     "docs/plans/dope-jope-contract-decisions.json": "governance",
