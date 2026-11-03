@@ -24,10 +24,10 @@
     },
     "D02": {
       "source": "IMPLEMENTED",
-      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
+      "focused_checks": "ACCEPTED_S2_S3_COMPLETED_CCD_SUBTARGETS",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Additive informative rank; v1/v2 untouched; applied Python fixture PASS; root Rust pending",
+      "notes": "S2/S3 accepted from completed root Rust/Python subtargets despite later job cancellation. S1/S4 remain pending; current full CI separate.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
@@ -60,7 +60,8 @@
       "notes": "FIT-card poisoning/order and edge/refusal criteria S1/S3 accepted; other NC1/native CLI criteria remain pending.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
-      "criterion_verdicts": "dope/tasks/inventory.json"
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
     },
     "D06": {
       "source": "IMPLEMENTED",
@@ -70,7 +71,8 @@
       "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
-      "criterion_verdicts": "dope/tasks/inventory.json"
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
     },
     "D07": {
       "source": "IMPLEMENTED",
@@ -80,7 +82,8 @@
       "notes": "Nondefault gate definition and source-free sampling criteria S1/S5 accepted; remaining wire/CLI/compatibility criteria pending.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
-      "criterion_verdicts": "dope/tasks/inventory.json"
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
     },
     "D08": {
       "source": "IMPLEMENTED_CPU_ONLY",
@@ -127,10 +130,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 36,
-    "NOT_RUN": 25,
+    "PASS": 38,
+    "NOT_RUN": 23,
     "BLOCKED": 4,
-    "note": "Six accepted hosted451-equivalent criterion promotions; historical30/31/4 preserved in dope/receipts/hosted-native-451-criteria.json. PASS is scoped, not fullCI/scientific/release qualification."
+    "note": "Historical30/31/4 baseline, six451-tree promotions and two completed ccd metric subtargets. Four campaign criteria separately DEFERRED_CAMPAIGN_QUALIFICATION, never PASS. Current source/new tests need exact-head qualification."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -195,5 +198,34 @@
     "compile_tests_parity": "NOT_RUN_LOCALLY",
     "python_originals": "PRESERVED",
     "scope": "C0-reason parity plus minimal root CLI forms; not universal argparse parity"
+  },
+  "engineering_release_scope": {
+    "decision": "ENGINEERING_RELEASE",
+    "deferred_campaign_criteria": [
+      "D00-S4",
+      "D11-S2",
+      "D11-S3",
+      "D11-S4"
+    ],
+    "verdict": "DEFERRED_CAMPAIGN_QUALIFICATION",
+    "historical_verdicts_preserved": true,
+    "receipt": "../receipts/engineering-release-scope-owner-decision.json",
+    "pending_user_question": false
+  },
+  "engineering_source_batch": {
+    "source_commit": "4054cef554ff631a47852b9229469fb6f24a8923",
+    "base": "a23ee0541b955061e17cf462dc1f926e55d6dee9",
+    "engine_version_candidate": "1.2.0",
+    "D06": "Required declared roles + production grouping/CLI fixtures authored",
+    "D05": "Actual private SDK target-last extension + role/privacy tests authored",
+    "D07": "2/16/64KiB caps/malformed tests authored",
+    "rustfmt_1_88": "PASS",
+    "static_caps": {
+      "governed": 1291,
+      "violations": 0
+    },
+    "new_native_tests_executed": 0,
+    "native_execution": "NOT_RUN",
+    "current_full_ci": "PENDING"
   }
 }

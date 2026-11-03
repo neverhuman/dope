@@ -20,7 +20,7 @@
     "D09",
     "D11"
   ],
-  "authorization_boundary": "Current assignment authorizes engineering implementation and bounded correctness checks. Campaigns, merge/release, live adoption and foreign-job control remain unauthorized.",
+  "authorization_boundary": "User authorizes engineering completion, normal same-PR CI, merge and release after required CI/review. No bypass, scientific campaign or model promotion. Four campaign criteria separately deferred, never PASS.",
   "shared_integration_owner": "One integrator serializes workspace/lockfiles/module registration/maps/Python boundary inventories; no parallel writes to those files.",
   "tasks": [
     {
@@ -65,6 +65,9 @@
           "verdict": "PASS",
           "evidence": "Integrator and normalization/metric/producer packet INTEGRATION notes acknowledge frozen D00 SHA; later engineering writes use that contract."
         }
+      },
+      "release_scope_disposition": {
+        "D00-S4": "DEFERRED_CAMPAIGN_QUALIFICATION"
       }
     },
     {
@@ -128,24 +131,24 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "bf5556ab837b11de6db921fd3a5b614d4f4f0c9593885ce30e177f070759b77c",
-      "words": 1113,
+      "sha256": "12dab8a6a64db44bdcb8c0e356b3006fd0cdd0b7cc96ca43d500cfdf60eec08a",
+      "words": 1169,
       "criterion_verdicts": {
         "D02-S1": {
           "verdict": "NOT_RUN",
-          "evidence": "Python conformance: 129 golden cases PASS at tolerance 1e-12; v1/v2 fixture bytes unchanged. Actual root Rust golden replay remains pending."
+          "evidence": "Existing root golden and legacy driver targets passed as scoped completed subtargets; the log prints no corpus-case count. Static a23 inventory has129top-level+34nested cases; strict complete discovery/read-error proof remains pending. Historical fixtures unchanged."
         },
         "D02-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "Applied Python successor fixtures pass; authored Rust shared-fixture test compiled in workspace; actual root Rust execution pending."
+          "verdict": "PASS",
+          "evidence": "Accepted completed subtargets at tested synthetic merge07887a13b1f9bc60ac085bde85a502ca2924b599 (head ccd28bb0122425e625e36323091627267a46af39): root Rust rank_successor_shared_analytic_cases and Python shared/all-tied successor tests passed. Every seven-case expected object includes informative/total counts. Overall job41651340409/job125970478639 cancelled later; not whole-job CI PASS. D02 metric/dependency/fixture closure unchanged through a23 and4054; scoped evidence only."
         },
         "D02-S3": {
-          "verdict": "NOT_RUN",
-          "evidence": "Seven analytic cases exist in shared golden JSON and Python passes; exact current Rust/Python execution receipt pending."
+          "verdict": "PASS",
+          "evidence": "The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending."
         },
         "D02-S4": {
           "verdict": "NOT_RUN",
-          "evidence": "Python group-member and malformed-input checks pass; native root successor refusal execution pending."
+          "evidence": "Malformed/refusal root tests passed at ccd. Actual production grouped-permutation same-group member duplication + successor-rank assertion authored at4054; native execution pending."
         },
         "D02-S5": {
           "verdict": "PASS",
@@ -607,8 +610,26 @@
           "verdict": "PASS",
           "evidence": "Readiness docs/manifest are reviewable and HOLD; no campaign/model publication/live pointer action was taken."
         }
+      },
+      "release_scope_disposition": {
+        "D11-S2": "DEFERRED_CAMPAIGN_QUALIFICATION",
+        "D11-S3": "DEFERRED_CAMPAIGN_QUALIFICATION",
+        "D11-S4": "DEFERRED_CAMPAIGN_QUALIFICATION"
       }
     }
   ],
-  "historical_planning_branch": "codex/dope-jope-master-plan-20261102"
+  "historical_planning_branch": "codex/dope-jope-master-plan-20261102",
+  "engineering_release_scope": {
+    "decision": "ENGINEERING_RELEASE",
+    "deferred_campaign_criteria": [
+      "D00-S4",
+      "D11-S2",
+      "D11-S3",
+      "D11-S4"
+    ],
+    "verdict": "DEFERRED_CAMPAIGN_QUALIFICATION",
+    "historical_verdicts_preserved": true,
+    "receipt": "../receipts/engineering-release-scope-owner-decision.json",
+    "pending_user_question": false
+  }
 }

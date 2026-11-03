@@ -9,10 +9,10 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `7e962aca7e907baf0e7e78788f21c5799a595722`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `4054cef554ff631a47852b9229469fb6f24a8923`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
-- The static tracked-source inventory covers 1,289 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
+- The current static tracked-source inventory covers 1,291 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
 
 A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; those earlier source-preservation pushes launched no PR or workflow.
 
@@ -20,13 +20,13 @@ The single consolidated [draft PR #356](https://github.com/neverhuman/dope/pull/
 
 ## Named acceptance criteria
 
-The historical 65-criterion baseline was **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED**. Six accepted, source-bound hosted native fixture promotions bring the current matrix to **36 scoped PASS / 25 NOT_RUN / 4 BLOCKED**. Only D01, D08 and D10 are fully scoped PASS tasks; nine tasks remain open. The [acceptance receipt](receipts/hosted-native-451-criteria.json) preserves the original counts, exact tested synthetic merge/tree and the failed overall job disposition. PASS describes only the specific evidence cited by that criterion; it never means full CI, scientific efficacy, privacy certification, release or serving approval.
+The historical 65-criterion baseline was **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED**. Six hosted native fixture promotions and two completed metric-subtarget promotions bring the current matrix to **38 scoped PASS / 23 NOT_RUN / 4 BLOCKED**. Only D01, D08 and D10 are fully scoped PASS tasks; nine tasks remain open. The [acceptance receipt](receipts/hosted-native-451-criteria.json) preserves the original counts, exact tested synthetic merge/tree and the failed overall job disposition. PASS describes only the specific evidence cited by that criterion; it never means full CI, scientific efficacy, privacy certification, release or serving approval.
 
 | Task | Implemented scope | Execution disposition | PASS / NOT_RUN / BLOCKED |
 | --- | --- | --- | --- |
 | D00 | Contracts and lineage decisions | Source implemented; validation incomplete | 4 / 0 / 1 |
 | D01 | Prospective common REAL-FIT evaluation | Source implemented; validation incomplete | 5 / 0 / 0 |
-| D02 | Additive informative driver rank | Source implemented; validation incomplete | 1 / 4 / 0 |
+| D02 | Additive informative driver rank | Two completed-subtarget criteria accepted; full corpus/group proof pending | 3 / 2 / 0 |
 | D10 | Explicit local product gate | Source implemented; validation incomplete | 5 / 0 / 0 |
 | D03 | Minimal native SDK facade | Scoped hosted criterion PASS; remainder pending | 2 / 3 / 0 |
 | D04 | Opt-in High-required landmarks | Scoped hosted criterion PASS; remainder pending | 1 / 4 / 0 |
@@ -72,3 +72,30 @@ The 11:36:58 coordinator ACK admits only one focused source-limit test at nice19
 After capacity admission, execute the focused native guard and required source-bound engine/root checks, then the ordinary full CI routes. `just check-all` covers kernel plus engine; the shared-levels next-version Python/native shards require their own admitted workflow route because the quiet fast branch does not trigger that matrix automatically. Stop on a failing check, renewed reserved ledger activity, allocation refusal or changed source pin; preserve logs and fix forward within ownership.
 
 D00-S4 and D11-S2/S3/S4 remain blocked on actual campaign roster/exposure/custody, frozen owner hypotheses/thresholds/resources and admission. The [readiness manifest](../../v4-qualification-readiness.md) is HOLD. The CPU trainer does not support CUDA optimizer training. No training campaign, protected outcome access, model promotion, privacy certification, merge, release or serving activation has been performed or inferred. Product merge/release authorization does not convert the scientific readiness HOLD into a measured result or waive required checks.
+
+## Current native contract batch
+
+Source commit `4054cef554ff631a47852b9229469fb6f24a8923` adds mandatory DVS
+caller-declared roles before selection, actual native grouped-member/CLI fixtures,
+the private SDK `TargetLastViewExt` consumer method, and all-level DML4
+cap/refusal fixtures. The normalization and DML4 producer sources, tracked
+cross-runtime fixtures, historical metrics/wires and Python originals are
+unchanged. Engine workspace 1.2.0 is a release candidate; only inherited
+first-party lock versions changed. Rust1.88 formatting and static source caps
+pass. New native tests executed **zero** and remain NOT_RUN until real CI.
+
+## Engineering release scope; campaign question resolved
+
+The user's owner-direction authorizes completing the engineering release while
+deferring only D00-S4 and D11-S2/S3/S4. These four keep their historical BLOCKED
+verdicts and actual campaign HOLD/null inputs. Their release disposition is
+**DEFERRED_CAMPAIGN_QUALIFICATION**, never PASS. No user question remains open.
+See the [owner decision](receipts/engineering-release-scope-owner-decision.json).
+Seven engineering tasks now have 23 open criteria; seven Rust migration streams,
+full required CI and review remain mandatory. Merge/release is authorized after
+those checks, without a separate historical human hold or any bypass.
+
+The [completed metric receipt](receipts/completed-root-metrics-ccd.json) promotes
+D02-S2/S3 only. The enclosing job was cancelled; completed root-library 298/0/0
+and named Python successor subtargets remain scoped evidence. D02-S1 strict
+whole-corpus discovery and D02-S4 actual grouped-member execution remain open.

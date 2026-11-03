@@ -62,8 +62,8 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
-| D02-S1 | **NOT_RUN** | Python conformance: 129 golden cases PASS at tolerance 1e-12; v1/v2 fixture bytes unchanged. Actual root Rust golden replay remains pending. |
-| D02-S2 | **NOT_RUN** | Applied Python successor fixtures pass; authored Rust shared-fixture test compiled in workspace; actual root Rust execution pending. |
-| D02-S3 | **NOT_RUN** | Seven analytic cases exist in shared golden JSON and Python passes; exact current Rust/Python execution receipt pending. |
-| D02-S4 | **NOT_RUN** | Python group-member and malformed-input checks pass; native root successor refusal execution pending. |
+| D02-S1 | **NOT_RUN** | Existing Rust golden/legacy targets passed as scoped subtargets; strict complete129+34 discovery/count/error proof remains pending. Historical expected bytes unchanged. |
+| D02-S2 | **PASS** | Accepted completed subtargets at tested synthetic merge07887a13b1f9bc60ac085bde85a502ca2924b599 (head ccd28bb0122425e625e36323091627267a46af39): root Rust rank_successor_shared_analytic_cases and Python shared/all-tied successor tests passed. Every seven-case expected object includes informative/total counts. Overall job41651340409/job125970478639 cancelled later; not whole-job CI PASS. D02 metric/dependency/fixture closure unchanged through a23 and4054; scoped evidence only. |
+| D02-S3 | **PASS** | The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending. |
+| D02-S4 | **NOT_RUN** | Malformed-input refusals passed at ccd. New actual production grouped-permutation same-group member duplication and successor-rank equality fixture authored at4054; execution pending. |
 | D02-S5 | **PASS** | test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately. |

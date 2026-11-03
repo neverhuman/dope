@@ -1,0 +1,54 @@
+{
+  "schema": "dope.scoped-native-criterion-acceptance/v1",
+  "decision": "ACCEPT_TWO_COMPLETED_SUBTARGET_CRITERIA",
+  "reviewer": "/root/dope_audit",
+  "recorded_at": "2026-11-03T16:15:44.764051+00:00",
+  "source_pin": {
+    "pr_head": "ccd28bb0122425e625e36323091627267a46af39",
+    "tested_commit": "07887a13b1f9bc60ac085bde85a502ca2924b599",
+    "run_id": 41651340409,
+    "job_id": 125970478639,
+    "root_library_terminal_counts": {
+      "passed": 298,
+      "failed": 0,
+      "ignored": 0
+    },
+    "overall_job_outcome": "cancelled",
+    "component_closure_unchanged_through": "4054cef554ff631a47852b9229469fb6f24a8923"
+  },
+  "evidence_report": {
+    "path": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/root-native-cancelled-subtargets/REPORT.md",
+    "sha256": "d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581"
+  },
+  "job_url": "https://github.com/neverhuman/dope/actions/runs/41651340409/job/125970478639",
+  "accepted": [
+    {
+      "id": "D02-S2",
+      "verdict": "PASS",
+      "evidence": "Accepted completed subtargets at tested synthetic merge07887a13b1f9bc60ac085bde85a502ca2924b599 (head ccd28bb0122425e625e36323091627267a46af39): root Rust rank_successor_shared_analytic_cases and Python shared/all-tied successor tests passed. Every seven-case expected object includes informative/total counts. Overall job41651340409/job125970478639 cancelled later; not whole-job CI PASS. D02 metric/dependency/fixture closure unchanged through a23 and4054; scoped evidence only."
+    },
+    {
+      "id": "D02-S3",
+      "verdict": "PASS",
+      "evidence": "The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending."
+    }
+  ],
+  "not_promoted": {
+    "D02-S1": "Strict full129+34 corpus discovery/count/read-error proof remains pending; do not infer exactly129Rust cases from the test log.",
+    "D02-S4": "Actual production same-group duplicated-member assertion is authored in4054 but native execution pending."
+  },
+  "historical_counts_before": {
+    "PASS": 36,
+    "NOT_RUN": 25,
+    "BLOCKED": 4
+  },
+  "historical_counts_after": {
+    "PASS": 38,
+    "NOT_RUN": 23,
+    "BLOCKED": 4
+  },
+  "limits": [
+    "Completed named targets only; whole cancelled job is not PASS.",
+    "No current full-CI, scientific efficacy, privacy, model or release qualification."
+  ]
+}
