@@ -1,5 +1,9 @@
 {
   "owners": {
+    "catboost_info/catboost_training.json": "external-evidence",
+    "catboost_info/learn/events.out.tfevents": "external-evidence",
+    "catboost_info/learn_error.tsv": "external-evidence",
+    "catboost_info/time_left.tsv": "external-evidence",
     "research/levels/v3_canonical_summary.py": "external-evidence",
     "research/levels/v4_training_helpers.py": "external-evidence",
     "engine/dope-sdk/": "rust-core",

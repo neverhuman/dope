@@ -1,6 +1,6 @@
 """Prospective transfer evaluation in one frozen real-FIT coordinate system.
 
-The bridge retains legacy feature preparation, with an unclipped affine target
+The bridge uses frozen-v3 REAL-FIT feature preparation and an unclipped affine target
 map. It is deliberately NOT NC1. Historical v3 replay remains in its runner.
 Only hashes and structural metadata cross the public receipt boundary.
 """
@@ -101,7 +101,7 @@ class PreparedEvaluationView:
 
 
 class FrozenRealFitReceiver:
-    """One legacy feature fit; regression targets use an unclipped affine map.
+    """One frozen-v3 REAL-FIT feature fit with an unclipped regression target map.
 
     The private fitted object is never returned or serialized publicly. The
     constructor copies its state, and every apply verifies the state identity.

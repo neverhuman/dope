@@ -227,7 +227,13 @@ class V4Trainer:
         self.attempt_count += 1
         compute_started = time.perf_counter()
         snapshot: dict[str, Any] | None = None
-        try:
+        with _training_helpers.UpdateRollbackTransaction(
+            rollback=lambda: _training_helpers.restore_update_snapshot(
+                self.model, self.optimizer, self.scheduler, snapshot
+            ),
+            record_failure=lambda: _training_helpers.record_update_failure(self, compute_started),
+            rollback_error_factory=lambda _: TrainerError("failed_update_rollback_failed"),
+        ):
             snapshot = {
                 "model": {k: v.detach().clone() for k, v in self.model.state_dict().items()},
                 "optimizer": copy.deepcopy(self.optimizer.state_dict()),
@@ -260,23 +266,6 @@ class V4Trainer:
             result.update(self.counters())
             self.last_report = result
             return result
-        except Exception:
-            if snapshot is not None:
-                try:
-                    self.model.load_state_dict(snapshot["model"], strict=True)
-                    self.optimizer.load_state_dict(snapshot["optimizer"])
-                    if self.scheduler is not None:
-                        self.scheduler.load_state_dict(snapshot["scheduler"])
-                    _restore_rng(snapshot["rng"])
-                    for parameter, grad in zip(self.model.parameters(), snapshot["grads"]):
-                        parameter.grad = None if grad is None else grad.clone()
-                except Exception as rollback_error:
-                    self.failed_update_count += 1
-                    self.compute_seconds += time.perf_counter() - compute_started
-                    raise TrainerError("failed_update_rollback_failed") from rollback_error
-            self.failed_update_count += 1
-            self.compute_seconds += time.perf_counter() - compute_started
-            raise
 
     def fit(self, updates: int) -> list[dict[str, Any]]:
         if updates < 0:

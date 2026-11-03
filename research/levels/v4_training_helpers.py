@@ -6,9 +6,10 @@ import json
 import math
 import os
 import random
+import time
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 import torch
@@ -189,3 +190,60 @@ def _fsync_dir(path: Path) -> None:
         os.fsync(fd)
     finally:
         os.close(fd)
+
+
+def restore_update_snapshot(model: torch.nn.Module, optimizer: Any, scheduler: Any,
+                            snapshot: Mapping[str, Any] | None) -> None:
+    """Restore all state captured before one attempted optimizer update."""
+    if snapshot is None:
+        return
+    model.load_state_dict(snapshot["model"], strict=True)
+    optimizer.load_state_dict(snapshot["optimizer"])
+    if scheduler is not None:
+        scheduler.load_state_dict(snapshot["scheduler"])
+    _restore_rng(snapshot["rng"])
+    for parameter, grad in zip(model.parameters(), snapshot["grads"]):
+        parameter.grad = None if grad is None else grad.clone()
+
+
+def record_update_failure(trainer: Any, compute_started: float) -> None:
+    """Account for one failed attempt after rollback succeeds or itself fails."""
+    trainer.failed_update_count += 1
+    trainer.compute_seconds += time.perf_counter() - compute_started
+
+
+class _RollbackFailureTranslation:
+    """Translate rollback exceptions while leaving BaseException unchanged."""
+    def __init__(self, record_failure: Callable[[], None],
+                 error_factory: Callable[[Exception], Exception]):
+        self.record_failure = record_failure
+        self.error_factory = error_factory
+
+    def __enter__(self) -> "_RollbackFailureTranslation":
+        return self
+
+    def __exit__(self, exc_type: Any, exc: BaseException | None, tb: Any) -> bool:
+        if exc_type is None or not issubclass(exc_type, Exception) or exc is None:
+            return False
+        self.record_failure()
+        raise self.error_factory(exc) from exc
+
+
+class UpdateRollbackTransaction:
+    """Rollback ordinary failed updates and preserve prior BaseException behavior."""
+    def __init__(self, rollback: Callable[[], None], record_failure: Callable[[], None],
+                 rollback_error_factory: Callable[[Exception], Exception]):
+        self.rollback = rollback
+        self.record_failure = record_failure
+        self.rollback_error_factory = rollback_error_factory
+
+    def __enter__(self) -> "UpdateRollbackTransaction":
+        return self
+
+    def __exit__(self, exc_type: Any, exc: BaseException | None, tb: Any) -> bool:
+        if exc_type is None or not issubclass(exc_type, Exception):
+            return False
+        with _RollbackFailureTranslation(self.record_failure, self.rollback_error_factory):
+            self.rollback()
+        self.record_failure()
+        return False

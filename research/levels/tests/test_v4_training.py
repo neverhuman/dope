@@ -4,6 +4,7 @@ import json
 import random
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -233,6 +234,112 @@ class V4TrainingTests(unittest.TestCase):
         self.assertTrue(torch.equal(torch.get_rng_state(), before_rng))
         for key, tensor in before_model.items():
             self.assertTrue(torch.equal(tensor, subject.model.state_dict()[key]))
+
+    def test_partial_optimizer_failure_rolls_back_all_state_and_accounts_once(self):
+        subject = trainer()
+        for parameter in subject.model.parameters():
+            parameter.grad = torch.full_like(parameter, 0.125)
+        mutated_parameter = next(subject.model.parameters())
+        subject.optimizer.state[mutated_parameter]["momentum_buffer"] = torch.full_like(mutated_parameter, 0.25)
+        before_grads = [parameter.grad.detach().clone() for parameter in subject.model.parameters()]
+        before_model = weights(subject.model)
+        before_optimizer = copy.deepcopy(subject.optimizer.state_dict())
+        before_scheduler = copy.deepcopy(subject.scheduler.state_dict())
+        before_python_rng = random.getstate()
+        before_numpy_rng = np.random.get_state()
+        before_torch_rng = torch.get_rng_state().clone()
+        before_compute = subject.compute_seconds
+        original_error = RuntimeError("fixture_partial_optimizer_failure")
+        def partial_step():
+            with torch.no_grad():
+                mutated_parameter.add_(13)
+            subject.optimizer.param_groups[0]["lr"] = 999.0
+            subject.optimizer.state[mutated_parameter]["momentum_buffer"].fill_(77.0)
+            subject.scheduler.last_epoch += 1
+            random.random()
+            np.random.random()
+            torch.rand(5)
+            raise original_error
+        subject.optimizer.step = partial_step
+        with patch("research.levels.v4_trainer.time.perf_counter", side_effect=[100.0, 102.5]):
+            with self.assertRaisesRegex(RuntimeError, "fixture_partial_optimizer_failure") as caught:
+                subject.fit_step()
+        self.assertIs(caught.exception, original_error)
+        for key, tensor in before_model.items():
+            self.assertTrue(torch.equal(tensor, subject.model.state_dict()[key]), key)
+        for parameter, expected_grad in zip(subject.model.parameters(), before_grads):
+            self.assertTrue(torch.equal(parameter.grad, expected_grad))
+        parameter_id = next(iter(before_optimizer["state"]))
+        restored_momentum = subject.optimizer.state[mutated_parameter]["momentum_buffer"]
+        self.assertTrue(torch.equal(restored_momentum, before_optimizer["state"][parameter_id]["momentum_buffer"]))
+        self.assertEqual(subject.optimizer.param_groups[0]["lr"], before_optimizer["param_groups"][0]["lr"])
+        self.assertEqual(subject.scheduler.state_dict(), before_scheduler)
+        self.assertEqual(random.getstate(), before_python_rng)
+        after_numpy_rng = np.random.get_state()
+        self.assertEqual(before_numpy_rng[0], after_numpy_rng[0])
+        np.testing.assert_array_equal(before_numpy_rng[1], after_numpy_rng[1])
+        self.assertEqual(before_numpy_rng[2:], after_numpy_rng[2:])
+        self.assertTrue(torch.equal(torch.get_rng_state(), before_torch_rng))
+        self.assertEqual((subject.attempt_count, subject.failed_update_count, subject.update_count, subject.cursor),
+                         (1, 1, 0, 0))
+        self.assertEqual(subject.compute_seconds, before_compute + 2.5)
+
+    def test_rollback_exception_is_wrapped_and_failure_accounted_once(self):
+        class OriginalUpdateError(Exception):
+            pass
+        class RollbackFault(Exception):
+            pass
+        subject = trainer()
+        original_error = OriginalUpdateError("fixture_original_update_failure")
+        rollback_error = RollbackFault("fixture_rollback_failure")
+        def fail_during_update(model, batch):
+            raise original_error
+        def fail_during_rollback(*args, **kwargs):
+            raise rollback_error
+        subject.loss_fn = fail_during_update
+        subject.model.load_state_dict = fail_during_rollback
+        before_compute = subject.compute_seconds
+        with patch("research.levels.v4_trainer.time.perf_counter", side_effect=[10.0, 13.25]):
+            with self.assertRaises(TrainerError) as caught:
+                subject.fit_step()
+        self.assertIs(caught.exception.__cause__, rollback_error)
+        self.assertEqual((subject.attempt_count, subject.failed_update_count, subject.update_count, subject.cursor),
+                         (1, 1, 0, 0))
+        self.assertEqual(subject.compute_seconds, before_compute + 3.25)
+
+    def test_successful_transaction_does_not_restore_snapshot(self):
+        subject = trainer()
+        calls = []
+        original_load_state_dict = subject.model.load_state_dict
+        def spy_load_state_dict(*args, **kwargs):
+            calls.append(None)
+            return original_load_state_dict(*args, **kwargs)
+        subject.model.load_state_dict = spy_load_state_dict
+        subject.fit_step()
+        self.assertEqual(calls, [])
+        self.assertEqual((subject.attempt_count, subject.failed_update_count, subject.update_count, subject.cursor),
+                         (1, 0, 1, 1))
+
+    def test_base_exception_keeps_previous_nonrollback_behavior(self):
+        class ControlStop(BaseException):
+            pass
+        subject = trainer()
+        before_model = weights(subject.model)
+        before_rng = torch.get_rng_state().clone()
+        before_compute = subject.compute_seconds
+        def stop_after_mutation(model, batch):
+            with torch.no_grad():
+                next(model.parameters()).add_(5)
+            torch.rand(5)
+            raise ControlStop("fixture_control_stop")
+        subject.loss_fn = stop_after_mutation
+        with self.assertRaises(ControlStop):
+            subject.fit_step()
+        self.assertFalse(torch.equal(before_model["linear.weight"], subject.model.state_dict()["linear.weight"]))
+        self.assertFalse(torch.equal(before_rng, torch.get_rng_state()))
+        self.assertEqual((subject.attempt_count, subject.failed_update_count, subject.update_count, subject.cursor),
+                         (1, 0, 0, 0))
+        self.assertEqual(subject.compute_seconds, before_compute)
 
     def test_checkpoint_restores_and_validates_counters(self):
         source = trainer(inject_nan=True)
