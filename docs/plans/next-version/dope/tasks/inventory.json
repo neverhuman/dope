@@ -423,8 +423,8 @@
         "J08 JopeDime auditor",
         "J09 conditional artifact/curriculum growth"
       ],
-      "sha256": "fa0eb904c6a55632270980d34a6b60a5882b07dc33a34b8e7c4ea6bdddf94588",
-      "words": 1251,
+      "sha256": "e747b8cedf75f13e6e69fb1634420ce9f900b4317047f5c81f266f01b3819d37",
+      "words": 1345,
       "criterion_verdicts": {
         "D06-S1": {
           "verdict": "PASS",
@@ -455,9 +455,9 @@
         },
         "D06-S4": {
           "verdict": "NOT_RUN",
-          "evidence": "Root/engine C02 and legacy loops actually passed atbdea. New typed DriverPolicyBinding requirement/fivepins/closed historical-optional schema is source-authored in R2; native and schema-engine execution NOT_RUN. Presence is not verified inference, authenticated custody or complete per-cell provenance; full identity/multiplicity clause still requires review. No PASS from source or test names.",
+          "evidence": "Historical C02/legacy execution remains actual PASS; required-policy issuance test passed at128a, not whole D06-S4. New four declared per-cell C02 identity projection/perturbation refusal fixture is SOURCE_AUTHORED_RUNTIME_NOT_RUN. No authenticated custody/inference claim; whole identity/multiplicity acceptance remains open.",
           "source_status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
-          "receipt": "../receipts/d06-policy-requirement-source.json"
+          "receipt": "../receipts/d06-per-cell-identities-source.json"
         },
         "D06-S5": {
           "verdict": "PASS",

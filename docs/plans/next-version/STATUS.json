@@ -66,14 +66,16 @@
     },
     "D06": {
       "source": "IMPLEMENTED",
-      "focused_checks": "LEGACY_C02_ACTUALPASS_NEW_REQUIREMENT_SOURCE_AUTHORED_NOTRUN",
+      "focused_checks": "PER_CELL_DECLARED_IDENTITY_SOURCE_AUTHORED_RUNTIME_NOT_RUN",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
+      "notes": "Prior required-policy actual128a test PASS is scoped, not whole D06-S4. New declared per-cell query/groups/perturbation/prepared binding and actual-evaluator fixture prepared locally; no numeric/legacy change or custody/inference verification.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json",
-      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN",
+      "local_candidate_source": "b3427f89a0cd87bc2e558543d6262d571f2982fc",
+      "publication": "HOLD_REMOTE128a"
     },
     "D07": {
       "source": "IMPLEMENTED",

@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `5cb20de52868b11cf71d544e62579271bd06b35a`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current local source checkpoint: `b3427f89a0cd87bc2e558543d6262d571f2982fc`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -332,3 +332,8 @@ tasks and seven Rust migration streams open. New native/schema-engine/full CI
 are NOT_RUN/PENDING. No driver math, legacy fixture, dependency, lock, CLI,
 Python source or badge changed. See [source receipt](receipts/d06-policy-requirement-source.json),
 [SDK errors](receipts/hosted-native-bdea-sdk-errors.json) and [normalization views](receipts/hosted-native-bdea-normalization-views.json).
+
+
+## Local D06 per-cell identity preparation; publication held
+
+Source `b3427f89a0cd87bc2e558543d6262d571f2982fc` adds the exact reviewed typed per-cell query/groups/perturbation/prepared-view metadata only after a complete validated successor driver result, sharing the global required policy. Common-pin scope is checked; perturbation remains caller-declared, with no custody or inference-verification claim. A new Rust evaluator fixture covers changed perturbation and malformed/missing/wrong-method/failed/no-driver/privacy paths. Native/compiler/tests and schema-engine execution are **NOT_RUN**. Counts remain **54 PASS /7 NOT_RUN /4 historical BLOCKED**; D06-S4 remains NOT_RUN. The previously published128a Signed283/0/1 and full-audit88 observations are exact prior-tree witnesses, not this new source qualification. Published/remote remains `128a99657cf274b3cda2cb3943625619f25f682c`; local commits are held while its CI is active. [Source receipt](receipts/d06-per-cell-identities-source.json).
