@@ -1,0 +1,136 @@
+[
+  {
+    "name": "strict",
+    "real": [
+      3,
+      2,
+      1
+    ],
+    "synthetic": [
+      3,
+      2,
+      1
+    ],
+    "expected": {
+      "status": "complete",
+      "reason": null,
+      "value": 1.0,
+      "informative_pairs": 3,
+      "total_pairs": 3
+    }
+  },
+  {
+    "name": "reverse",
+    "real": [
+      3,
+      2,
+      1
+    ],
+    "synthetic": [
+      1,
+      2,
+      3
+    ],
+    "expected": {
+      "status": "complete",
+      "reason": null,
+      "value": 0.0,
+      "informative_pairs": 3,
+      "total_pairs": 3
+    }
+  },
+  {
+    "name": "synthetic-tied",
+    "real": [
+      3,
+      2,
+      1
+    ],
+    "synthetic": [
+      2,
+      2,
+      2
+    ],
+    "expected": {
+      "status": "complete",
+      "reason": null,
+      "value": 0.5,
+      "informative_pairs": 3,
+      "total_pairs": 3
+    }
+  },
+  {
+    "name": "real-partial-tie",
+    "real": [
+      3,
+      3,
+      1
+    ],
+    "synthetic": [
+      3,
+      1,
+      2
+    ],
+    "expected": {
+      "status": "complete",
+      "reason": null,
+      "value": 0.5,
+      "informative_pairs": 2,
+      "total_pairs": 3
+    }
+  },
+  {
+    "name": "both-tied",
+    "real": [
+      2,
+      2,
+      2
+    ],
+    "synthetic": [
+      2,
+      2,
+      2
+    ],
+    "expected": {
+      "status": "uninformative",
+      "reason": "no_informative_rank_pairs",
+      "value": null,
+      "informative_pairs": 0,
+      "total_pairs": 3
+    }
+  },
+  {
+    "name": "single",
+    "real": [
+      1
+    ],
+    "synthetic": [
+      9
+    ],
+    "expected": {
+      "status": "uninformative",
+      "reason": "no_informative_rank_pairs",
+      "value": null,
+      "informative_pairs": 0,
+      "total_pairs": 0
+    }
+  },
+  {
+    "name": "zero",
+    "real": [
+      0,
+      0
+    ],
+    "synthetic": [
+      0,
+      0
+    ],
+    "expected": {
+      "status": "uninformative",
+      "reason": "no_informative_rank_pairs",
+      "value": null,
+      "informative_pairs": 0,
+      "total_pairs": 1
+    }
+  }
+]

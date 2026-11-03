@@ -1,0 +1,138 @@
+{
+  "schema": "dope-jope.planning-package/v1",
+  "status": "PLANNED",
+  "files": {
+    "EXECUTION_RULES.md": {
+      "bytes": 5047,
+      "sha256": "8fc1634224b984e57093dbe7d54d3300e2943d52344d87a07eacb1e5612fa6a8"
+    },
+    "MASTER_PLAN.md": {
+      "bytes": 43875,
+      "sha256": "1bae58c368a3fcf7962ff121dafe4643525c7cf87007b5620b6d2175924f34e5"
+    },
+    "PLAN_VERIFICATION.json": {
+      "bytes": 363,
+      "sha256": "630a316cca18deba8b62354ae1e866814ca9eb409bf438ef11103c276e6f6655"
+    },
+    "README.md": {
+      "bytes": 4665,
+      "sha256": "8b8add7498161aec7788a233fc53d8502f08ddb71de11131fb5b987943ba4a71"
+    },
+    "SOURCE_PINS.json": {
+      "bytes": 795,
+      "sha256": "72fb4bf6e2c0e68c28cf0a473949e9a693ae2f29720d114005dd62d340444107"
+    },
+    "dependencies.json": {
+      "bytes": 18232,
+      "sha256": "9952fe609fc0a4332092b133c2eb073855d0d6f2a8a2e3b153087718d42bec5e"
+    },
+    "dope/README.md": {
+      "bytes": 4555,
+      "sha256": "4cc616fc39b446fce7fe5026c0f2b690f54dd937924d480f05c720663d021b43"
+    },
+    "dope/tasks/d00-contracts-lineage-and-decision-record.md": {
+      "bytes": 6720,
+      "sha256": "216ebb55cd10bd228316813e76561a016ae31873ee931330be27f106901a39a0"
+    },
+    "dope/tasks/d01-prospective-evaluation-coordinate-repair.md": {
+      "bytes": 7242,
+      "sha256": "1fce82d82a22a8e559f6c20c75c3ee6a25db5e23db644e1100851351cd3d534f"
+    },
+    "dope/tasks/d02-versioned-driver-rank-successor.md": {
+      "bytes": 7369,
+      "sha256": "c5caa6474996f8a164fe4e804f15d6139c032a27a79a32bf971251ef79baec32"
+    },
+    "dope/tasks/d03-minimal-sdk-facade.md": {
+      "bytes": 6753,
+      "sha256": "728d65fcb49f9ad6ef6276ae424316ad7ef3258143f451e052983111b518d351"
+    },
+    "dope/tasks/d04-high-landmark-dependency-plan.md": {
+      "bytes": 6746,
+      "sha256": "1452e30aa8eab877950d23abc40f0b352ddd288f97b31253b55f5f3ebb31faad"
+    },
+    "dope/tasks/d05-nc1-private-normalization-contract.md": {
+      "bytes": 7710,
+      "sha256": "204c0155a60f88d45fd97f4840ec30b209abd1498b7ce7aa6eb1b728c3797ceb"
+    },
+    "dope/tasks/d06-dvs-and-audit-card.md": {
+      "bytes": 7086,
+      "sha256": "82c6bab251d34444fd4fff1707067f40358f7eb2cee9b590c3484844da33bea3"
+    },
+    "dope/tasks/d07-dml4-wire-reference-sampler-and-hard-caps.md": {
+      "bytes": 7441,
+      "sha256": "133ef5af38d97118838d5e095c1183f5287d1864d70e5d1fcb0600d1fcf57bdd"
+    },
+    "dope/tasks/d08-batched-resumable-trainer.md": {
+      "bytes": 7565,
+      "sha256": "c8a3f22d3e5d9e5c47e776d9269e3870310f5646d786c7ff64b87e7228a22cb2"
+    },
+    "dope/tasks/d09-v4-train-what-ships-objective.md": {
+      "bytes": 7672,
+      "sha256": "afd7b5862dc649a759b2da06c315bc1a8ad6e507531e17e18cd26d4d363bc2a4"
+    },
+    "dope/tasks/d10-local-product-gate-routing.md": {
+      "bytes": 6400,
+      "sha256": "18e1df6f49b384dac76a98fc7c4b97bc6bf7928a2ecd262fcbae819851b4e0e7"
+    },
+    "dope/tasks/d11-qualification-campaign-readiness.md": {
+      "bytes": 7623,
+      "sha256": "5690059641a6e4b52e4ac89c86959eeb2262b99ec4b002e1e0a2e3758e6053a4"
+    },
+    "dope/tasks/inventory.json": {
+      "bytes": 9290,
+      "sha256": "7a001af92041994bc074c9ac3e4aadc2dcb025983220fc83754026052f39f547"
+    },
+    "jopedime/README.md": {
+      "bytes": 4608,
+      "sha256": "cf0f0cae6fa22e9977140225db81e16d06dc844584d6027eab8aa9f6902a9298"
+    },
+    "jopedime/tasks/J00-baseline-identities.md": {
+      "bytes": 6798,
+      "sha256": "563f3bd1af190edf1c5b6843d6799a29b9c3634ac032edf860b7ae41a80b3db2"
+    },
+    "jopedime/tasks/J01-v2-seed-transport.md": {
+      "bytes": 7903,
+      "sha256": "2688dd863dee6f62447e8e2e5858677374f482df121484937908e2c5711255e7"
+    },
+    "jopedime/tasks/J02-controlled-retrieval.md": {
+      "bytes": 7934,
+      "sha256": "3ffa390e091613a23fcdfad13032e84260420c046173ba2db329c2129019387c"
+    },
+    "jopedime/tasks/J03-retrieval-study-protocol.md": {
+      "bytes": 7600,
+      "sha256": "0b27b01bc83921e4cf89c9387fde6c9be59a633f39405a43f0fca83cdece42aa"
+    },
+    "jopedime/tasks/J04-cpu-packaging-defaults.md": {
+      "bytes": 7294,
+      "sha256": "8b1ccac7006f755121712d82172f1c083016fe2f72c5a7cf1b7616ed94fb8280"
+    },
+    "jopedime/tasks/J05-nc1-additive-intake.md": {
+      "bytes": 7212,
+      "sha256": "e3a180f29357c543d1335723245df6843d7eb40e796af104614e39a09e57ac61"
+    },
+    "jopedime/tasks/J06-private-scalecard-emission.md": {
+      "bytes": 7096,
+      "sha256": "c9adc90e55650a5b4f4b9b9c97c77d8b9db47ab708b738c4c738cad4ab991263"
+    },
+    "jopedime/tasks/J07-facade-migration.md": {
+      "bytes": 7474,
+      "sha256": "6274ba44b6b8dc9c2cf72a4edc4c2ad7d346e99af70341510577f3a15393a48b"
+    },
+    "jopedime/tasks/J08-dope-auditor.md": {
+      "bytes": 7219,
+      "sha256": "24f983d70e0fe6d4fcf37722c85c3e26a61b0a6c0981e0572b908965348c6e64"
+    },
+    "jopedime/tasks/J09-growth-readiness-routing.md": {
+      "bytes": 7216,
+      "sha256": "7b6b7749048d9c5d6bc73667a1d144951eccdee6b73b8c4d122c559f92c0d36e"
+    },
+    "jopedime/tasks/inventory.json": {
+      "bytes": 6441,
+      "sha256": "802d859d8c9c74efef580223ee5514a42947332545b7d744f9eeed2317ec7c2c"
+    },
+    "review.md": {
+      "bytes": 4024,
+      "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
+    }
+  }
+}

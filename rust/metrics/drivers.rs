@@ -53,6 +53,79 @@ pub fn rank_agreement(real: &[f64], synthetic: &[f64]) -> f64 {
     }
 }
 
+/// Informative grouped-rank successor. Real ties do not manufacture evidence.
+/// Synthetic ties on strict real-order pairs receive half credit; no strict
+/// real-order pairs is an explicit null/uninformative result.
+pub fn rank_agreement_informative(real: &[f64], synthetic: &[f64]) -> MetricResult<Value> {
+    require(
+        !real.is_empty() && real.len() == synthetic.len(),
+        "invalid_rank_evidence",
+    )?;
+    require(
+        real.iter()
+            .chain(synthetic)
+            .all(|v| v.is_finite() && *v >= 0.0),
+        "invalid_rank_evidence",
+    )?;
+    let total = real
+        .len()
+        .checked_mul(real.len() - 1)
+        .ok_or(MetricError::new("invalid_rank_evidence"))?
+        / 2;
+    let (mut pairs, mut score) = (0usize, 0.0_f64);
+    for i in 0..real.len() {
+        for j in (i + 1)..real.len() {
+            let r = (real[i] > real[j]) as i32 - (real[i] < real[j]) as i32;
+            if r == 0 {
+                continue;
+            }
+            let s = (synthetic[i] > synthetic[j]) as i32 - (synthetic[i] < synthetic[j]) as i32;
+            pairs += 1;
+            score += if r == s {
+                1.0
+            } else if s == 0 {
+                0.5
+            } else {
+                0.0
+            };
+        }
+    }
+    Ok(
+        json!({"status": if pairs > 0 { "complete" } else { "uninformative" },
+              "reason": if pairs > 0 { Value::Null } else { json!("no_informative_rank_pairs") },
+              "value": if pairs > 0 { json!(score / pairs as f64) } else { Value::Null },
+              "informative_pairs": pairs, "total_pairs": total}),
+    )
+}
+
+fn evaluate_informative(data: &Value) -> MetricResult<Value> {
+    require(
+        data["importance_unit"] == "declared_group",
+        "grouped_importance_required",
+    )?;
+    let groups = data["group_ids"]
+        .as_array()
+        .ok_or(MetricError::new("invalid_driver_groups"))?;
+    let mut seen = BTreeSet::new();
+    require(!groups.is_empty(), "invalid_driver_groups")?;
+    for group in groups {
+        let id = group
+            .as_u64()
+            .ok_or(MetricError::new("invalid_driver_groups"))?;
+        require(
+            id <= super::MAX_SAFE_INTEGER as u64 && seen.insert(id),
+            "invalid_driver_groups",
+        )?;
+    }
+    require(
+        data["real_importances"]
+            .as_array()
+            .is_some_and(|a| a.len() == groups.len()),
+        "importance_shape_mismatch",
+    )?;
+    evaluate_v2_with_rank(data, true)
+}
+
 fn parse_signs(value: &Value, expected_len: usize) -> MetricResult<Vec<i64>> {
     let arr = value
         .as_array()
@@ -72,6 +145,15 @@ fn parse_signs(value: &Value, expected_len: usize) -> MetricResult<Vec<i64>> {
 pub fn evaluate(data: &Value) -> Value {
     match data.get("protocol_version") {
         None | Some(Value::String(_)) if data.get("protocol_version").is_none_or(|v| v == "v1") => {
+        }
+        Some(v) if v == "driver-rank-informative-v1" => {
+            let mut out = match evaluate_informative(data) {
+                Ok(v) => v,
+                Err(e) => failure_with_status(e.reason, e.status),
+            };
+            out["format"] = json!("driver-result-informative-v1");
+            out["protocol_version"] = json!("driver-rank-informative-v1");
+            return out;
         }
         Some(v) if v == "v2" => {
             let mut out = match evaluate_v2(data) {
@@ -94,6 +176,10 @@ pub fn evaluate(data: &Value) -> Value {
 /// estimates are checked against these paired endpoints. This is fixture
 /// qualification only; D05/D19 calibration and release authorization are separate.
 fn evaluate_v2(data: &Value) -> MetricResult<Value> {
+    evaluate_v2_with_rank(data, false)
+}
+
+fn evaluate_v2_with_rank(data: &Value, informative_rank: bool) -> MetricResult<Value> {
     use crate::transfer_metrics::drivers::{mass_agreement, paired_margin, positive_importances};
     let missing = || MetricError::with_status("missing_driver_component", "incomplete");
     let obj = data.as_object().ok_or(MetricError::new("invalid_input"))?;
@@ -225,7 +311,28 @@ fn evaluate_v2(data: &Value) -> MetricResult<Value> {
         let numeric = |result: Result<f64, crate::transfer_metrics::MetricError>| {
             result.map_err(|_| MetricError::new("invalid_driver_evidence"))
         };
+        let mut rank_diagnostics = None;
         let (rs, rr) = match name {
+            "rank" if informative_rank => {
+                let rs = rank_agreement_informative(&r, &s)?;
+                let rr = rank_agreement_informative(&r, &c)?;
+                let diagnostics = json!({"real_synthetic": rs, "real_control": rr});
+                if diagnostics["real_synthetic"]["status"] != "complete"
+                    || diagnostics["real_control"]["status"] != "complete"
+                {
+                    return Ok(
+                        json!({"status": "uninformative", "reason": "no_informative_rank_pairs",
+                        "driver_fidelity": Value::Null, "driver_pass": Value::Null,
+                        "rank_diagnostics": diagnostics}),
+                    );
+                }
+                let scores = (
+                    number(&diagnostics["real_synthetic"]["value"])?,
+                    number(&diagnostics["real_control"]["value"])?,
+                );
+                rank_diagnostics = Some(diagnostics);
+                scores
+            }
             "rank" => (rank_agreement(&r, &s), rank_agreement(&r, &c)),
             "sign" => {
                 let read_sign = |key| parse_signs(get(key).ok_or_else(missing)?, r.len());
@@ -292,7 +399,11 @@ fn evaluate_v2(data: &Value) -> MetricResult<Value> {
             && lcbs["synthetic_strength"].as_f64().unwrap() >= strength_floor;
         let ratio = (rs / rr).clamp(0.0, 1.0);
         fidelity = fidelity.min(ratio);
-        components.insert(name.to_owned(), json!({"a_rs": rs, "a_rr": rr, "margin": margin, "descriptive_ratio": ratio, "lcbs": lcbs}));
+        let mut component = json!({"a_rs": rs, "a_rr": rr, "margin": margin, "descriptive_ratio": ratio, "lcbs": lcbs});
+        if let Some(diagnostics) = rank_diagnostics {
+            component["rank_diagnostics"] = diagnostics;
+        }
+        components.insert(name.to_owned(), component);
     }
     Ok(
         json!({"status": "complete", "reason": Value::Null, "components": components, "driver_fidelity": fidelity, "driver_pass": pass}),
@@ -469,4 +580,66 @@ fn evaluate_inner(data: &Value) -> MetricResult<Value> {
         "driver_fidelity": min_score,
         "driver_pass": min_score >= threshold,
     }))
+}
+
+#[cfg(test)]
+mod rank_successor_tests {
+    use super::*;
+
+    #[test]
+    fn rank_successor_shared_analytic_cases() {
+        let cases: Value = serde_json::from_str(include_str!(
+            "../../tests/golden/drivers/informative-v1/rank-cases.json"
+        ))
+        .unwrap();
+        for case in cases.as_array().unwrap() {
+            let real = vector(&case["real"], true).unwrap();
+            let syn = vector(&case["synthetic"], true).unwrap();
+            assert_eq!(
+                rank_agreement_informative(&real, &syn).unwrap(),
+                case["expected"],
+                "{}",
+                case["name"]
+            );
+        }
+    }
+
+    #[test]
+    fn rank_successor_preserves_legacy_and_refuses_invalid() {
+        assert_eq!(rank_agreement(&[2., 2.], &[2., 2.]), 1.);
+        for (r, s) in [
+            (vec![], vec![]),
+            (vec![1.], vec![1., 2.]),
+            (vec![f64::NAN], vec![1.]),
+            (vec![-1.], vec![1.]),
+        ] {
+            assert_eq!(
+                rank_agreement_informative(&r, &s).unwrap_err().reason,
+                "invalid_rank_evidence"
+            );
+        }
+        assert_eq!(
+            evaluate(
+                &json!({"protocol_version": "driver-rank-informative-v1", "importance_unit": "columns"})
+            )["reason"],
+            "grouped_importance_required"
+        );
+    }
+
+    #[test]
+    fn rank_successor_reuses_simultaneous_bound_contract() {
+        let case: Value = serde_json::from_str(include_str!(
+            "../../tests/golden/drivers/v2/v2_additive.json"
+        ))
+        .unwrap();
+        assert_eq!(evaluate(&case["input"]), case["expected"]);
+        let mut input = case["input"].clone();
+        input["protocol_version"] = json!("driver-rank-informative-v1");
+        input["importance_unit"] = json!("declared_group");
+        let width = input["real_importances"].as_array().unwrap().len();
+        input["group_ids"] = json!((0..width).collect::<Vec<_>>());
+        assert_eq!(evaluate(&input)["status"], "complete");
+        input["inference"]["bound_method"] = json!("ratio_only");
+        assert_eq!(evaluate(&input)["reason"], "non_simultaneous_driver_bounds");
+    }
 }

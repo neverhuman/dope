@@ -1,0 +1,78 @@
+{
+  "schema": "dope-jope.next-version-status/v1",
+  "delivery": "one PR per repository; JopeDime existing #2071; full CI at end",
+  "tasks": {
+    "D00": {
+      "source": "IN_PROGRESS",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D01": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D02": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D03": {
+      "source": "IN_PROGRESS",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D04": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D05": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D06": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D07": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D08": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D09": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D10": {
+      "source": "IN_PROGRESS",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    },
+    "D11": {
+      "source": "PENDING",
+      "focused_checks": "NOT_RUN",
+      "full_ci": "DEFERRED_TO_BATCH_END",
+      "efficacy": "NOT_CLAIMED"
+    }
+  }
+}

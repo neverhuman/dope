@@ -1,0 +1,16 @@
+[package]
+name = "dope-sdk"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Versioned, identity-preserving integration surface for the DOPE engine"
+
+[features]
+default = []
+cuda = ["dope-core/cuda"]
+
+[dependencies]
+dope-core = { path = "../dope-core" }
+
+dope-norm = { path = "../dope-norm" }

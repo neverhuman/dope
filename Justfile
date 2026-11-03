@@ -53,6 +53,10 @@ fast-audit:
 engine:
     bash ops/ci/engine.sh
 
+# Complete local correctness gate. Hosted CPU already runs the engine separately.
+# Kept explicit so routine kernel focus work does not accidentally rebuild every product.
+check-all: check engine
+
 # Stage and smoke-test the optimized Rust-only CPU CLI; signing runs only for admitted tags.
 engine-release:
     bash ops/ci/engine-release.sh

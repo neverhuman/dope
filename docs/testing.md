@@ -47,6 +47,12 @@ These CPU synthetic-checkpoint tests check primary-output compatibility, exact
 wire fixtures, coverage/version semantics, sampling identity and failure handling.
 They do not establish retention or latency qualification.
 
+The explicit local `just check-all` target runs both `just check` and `just engine`,
+propagating either failure. Hosted CPU already runs the standalone product engine;
+this target closes the local combined-command gap without changing historical
+fast/check scope. Next-version source additions use focused checks while the
+consolidated batch is built, followed by full exact-head stabilization.
+
 ## Repository and research-kernel gates
 
 `just deployment-check` verifies the separate locked `deploy/` CPU graph, typed

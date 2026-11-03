@@ -1,5 +1,8 @@
 {
   "owners": {
+    "engine/dope-sdk/": "rust-core",
+    "docs/adr/normalize-once-and-dvs-v1.md": "governance",
+    "docs/plans/dope-jope-contract-decisions.json": "governance",
     "engine/dope-cli/src/mlc_v3_encode/": "rust-core",
     "engine/dope-cli/tests/fixtures/landmark-encoding-v1.jsonl": "rust-core",
     "schemas/landmark-encoding-receipt-v1.schema.json": "rust-core",

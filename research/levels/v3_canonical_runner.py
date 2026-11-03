@@ -14,6 +14,9 @@ from .budget_planner import TIER_BYTE_CAPS, deserialize_dope_v3_envelope, pack_c
 from .multilevel_model import MultiLevelLandmarkModel
 from .precalc.plan import training_rows
 from .scaling import FitOnlyTableTransform
+from .transfer_evaluation import (
+    EVALUATION_PROTOCOL, LEGACY_REPLAY_PROTOCOL, EvaluationInputError, FrozenRealFitReceiver,
+)
 from .strata_audit import deserialize_dope_latent_wire_bytes, estimate_scaler_sidecar_bytes, serialize_dope_latent_wire_bytes
 from .v3_ablation_and_eval import ALL_TIERS as LEVEL_NAMES
 from .v3_canonical_roster_eval import (
@@ -80,10 +83,13 @@ def _prepare_dataset_split(spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     X_tr_num, y_tr_inv = scaler.inverse_transform(X_tr_s, y_tr_s)
     X_te_num, y_te_inv = scaler.inverse_transform(X_te_s, y_te_s)
     sc_b = int(estimate_scaler_sidecar_bytes(scaler, p_use)["scaler_sidecar_raw_bytes"])
-    return {"X_tr_s": X_tr_s, "y_tr_s": y_tr_s, "X_te_s": X_te_s, "y_te_s": y_te_s, "X_tr_num": X_tr_num, "y_tr_raw": y_tr_raw if task == "multiclass" else y_tr_inv, "X_te_num": X_te_num, "y_te_raw": y_te_raw if task == "multiclass" else y_te_inv, "scaler": scaler, "p_use": p_use, "k_classes": k_cls, "report": rep, "diagnostic_fp64_scaler_sidecar_bytes": sc_b}
+    return {"X_tr_s": X_tr_s, "y_tr_s": y_tr_s, "X_te_s": X_te_s, "y_te_s": y_te_s, "X_tr_num": X_tr_num, "y_tr_raw": y_tr_raw if task == "multiclass" else y_tr_inv, "X_te_num": X_te_num, "y_te_raw": y_te_raw if task == "multiclass" else y_te_inv, "y_tr_original": y_tr_raw, "y_te_original": y_te_raw, "scaler": scaler, "p_use": p_use, "k_classes": k_cls, "report": rep, "diagnostic_fp64_scaler_sidecar_bytes": sc_b}
 
 
 def evaluate_dataset_across_tiers(spec: Dict[str, Any], model_v3: MultiLevelLandmarkModel, model_v2: MultiLevelLandmarkModel) -> List[Dict[str, Any]]:
+    protocol = spec.get("evaluation_protocol", LEGACY_REPLAY_PROTOCOL)
+    if protocol not in (LEGACY_REPLAY_PROTOCOL, EVALUATION_PROTOCOL):
+        raise EvaluationInputError("unsupported_evaluation_protocol")
     t0_ds, prep = time.perf_counter(), _prepare_dataset_split(spec)
     if prep is None:
         return [{"dataset_id": spec["dataset_id"], "role": spec["role"], "task": spec["task"], "level": "all", "cell_status": "skipped_invalid_split", "measurement_provenance": "frozen_checkpoint_canonical_roster_eval"}]
@@ -95,6 +101,20 @@ def evaluate_dataset_across_tiers(spec: Dict[str, Any], model_v3: MultiLevelLand
     rec_real_sc = FitOnlyTableTransform.fit(X_tr_num, y_tr_raw, task=task)
     X_tr_rr, y_tr_rr = rec_real_sc.transform(X_tr_num, y_tr_raw)
     X_te_rr, y_te_rr = rec_real_sc.transform(X_te_num, y_te_raw)
+    receiver = None
+    if protocol == EVALUATION_PROTOCOL:
+        # The inverse-feature proxy is retained as such; it is not an NC1/raw
+        # reconstruction claim. Only REAL FIT determines receiver coordinates.
+        fit_scope = hashlib.sha256(json.dumps({"source": spec["train_sha256"],
+            "split": spec.get("scope", {}).get("split", "canonical-multiclass"),
+            "fit_features_sha256": hashlib.sha256(np.asarray(X_tr_num, dtype="<f8").tobytes()).hexdigest(),
+            "fit_targets_sha256": hashlib.sha256(json.dumps(list(map(str, prep["y_tr_original"])), separators=(",", ":")).encode()).hexdigest()},
+            sort_keys=True).encode()).hexdigest()
+        receiver = FrozenRealFitReceiver.fit(X_tr_num, prep["y_tr_original"],
+                                             task=task, fit_scope=fit_scope)
+        fit_view = receiver.prepare(X_tr_num, prep["y_tr_original"], role="real_fit")
+        test_view = receiver.prepare(X_te_num, prep["y_te_original"], role="real_test")
+        X_tr_rr, y_tr_rr, X_te_rr, y_te_rr = fit_view.x, fit_view.y, test_view.x, test_view.y
     oracle_raw = evaluate_canonical_oracle(X_tr_rr[:, :p_use], y_tr_rr, X_te_rr[:, :p_use], y_te_rr, task=task, n_classes=k_cls)
     prep_ms, rows_out = (time.perf_counter() - t0_ds) * 1000.0, []
     for lvl in LEVEL_NAMES:
@@ -107,16 +127,24 @@ def evaluate_dataset_across_tiers(spec: Dict[str, Any], model_v3: MultiLevelLand
         v3_scaled = score_synthetic_against_oracle(oracle_scaled, X_syn_s, y_syn_s, X_te_s, y_te_s, task=task, n_classes=k_cls, auditors=CANONICAL_6_AUDITORS, compute_drivers=True)
         assert dec_csc1 is not None and rec_real_sc.target_scaler is not None
         X_syn_csc1_raw, y_syn_csc1_raw = dec_csc1.inverse_transform(X_syn_s, y_syn_s)
-        rec_csc1_fit = FitOnlyTableTransform.fit(X_syn_csc1_raw, y_syn_csc1_raw, task=task)
-        X_syn_c_ev, y_syn_c_ev = rec_csc1_fit.transform_features(X_syn_csc1_raw)[:, :p_use], rec_real_sc.target_scaler.transform(y_syn_csc1_raw)
-        X_te_c_ev = rec_csc1_fit.transform_features(X_te_num)[:, :p_use]
+        if receiver is None:  # Explicit historical diagnostic replay only.
+            rec_csc1_fit = FitOnlyTableTransform.fit(X_syn_csc1_raw, y_syn_csc1_raw, task=task)
+            X_syn_c_ev, y_syn_c_ev = rec_csc1_fit.transform_features(X_syn_csc1_raw)[:, :p_use], rec_real_sc.target_scaler.transform(y_syn_csc1_raw)
+            X_te_c_ev = rec_csc1_fit.transform_features(X_te_num)[:, :p_use]
+        else:
+            syn_view = receiver.prepare(X_syn_csc1_raw, y_syn_csc1_raw, role="synthetic_fit")
+            X_syn_c_ev, y_syn_c_ev, X_te_c_ev = syn_view.x, syn_view.y, test_view.x
         X_te_csc1_inv, _ = dec_csc1.inverse_transform(X_te_s, y_te_s)
         csc1_max_te_diff = float(np.max(np.abs(np.nan_to_num(X_te_csc1_inv - X_te_num, nan=0.0))))
         v3_csc1_raw = score_synthetic_against_oracle(oracle_raw, X_syn_c_ev, y_syn_c_ev, X_te_c_ev, y_te_rr, task=task, n_classes=k_cls, auditors=CANONICAL_6_AUDITORS, compute_drivers=True)
         X_syn_fp64_raw, y_syn_fp64_raw = scaler.inverse_transform(X_syn_s, y_syn_s)
-        rec_fp64_fit = FitOnlyTableTransform.fit(X_syn_fp64_raw, y_syn_fp64_raw, task=task)
-        X_syn_f_ev, y_syn_f_ev = rec_fp64_fit.transform_features(X_syn_fp64_raw)[:, :p_use], rec_real_sc.target_scaler.transform(y_syn_fp64_raw)
-        X_te_f_ev = rec_fp64_fit.transform_features(X_te_num)[:, :p_use]
+        if receiver is None:
+            rec_fp64_fit = FitOnlyTableTransform.fit(X_syn_fp64_raw, y_syn_fp64_raw, task=task)
+            X_syn_f_ev, y_syn_f_ev = rec_fp64_fit.transform_features(X_syn_fp64_raw)[:, :p_use], rec_real_sc.target_scaler.transform(y_syn_fp64_raw)
+            X_te_f_ev = rec_fp64_fit.transform_features(X_te_num)[:, :p_use]
+        else:
+            fp64_view = receiver.prepare(X_syn_fp64_raw, y_syn_fp64_raw, role="synthetic_fit")
+            X_syn_f_ev, y_syn_f_ev, X_te_f_ev = fp64_view.x, fp64_view.y, test_view.x
         v3_fp64_diag = score_synthetic_against_oracle(oracle_raw, X_syn_f_ev, y_syn_f_ev, X_te_f_ev, y_te_rr, task=task, n_classes=k_cls, auditors=CANONICAL_6_AUDITORS, compute_drivers=False)
         fp64_sc_b, payload_b = prep["diagnostic_fp64_scaler_sidecar_bytes"], max(len(wire_v3) - len(csc1_sc_bytes) - 10, 1)
         fp64_total_wire_b = 10 + fp64_sc_b + payload_b
@@ -137,6 +165,10 @@ def evaluate_dataset_across_tiers(spec: Dict[str, Any], model_v3: MultiLevelLand
         c_raw, f_raw = v3_csc1_raw["complete_case_mean_clipped_R"], v3_fp64_diag["complete_case_mean_clipped_R"]
         abs_del = round(abs(float(c_raw) - float(f_raw)), 5) if (c_raw is not None and f_raw is not None) else None
         rows_out.append({
+            **({"evaluation_protocol": protocol, "receiver_preparation": receiver.metadata(),
+                "receiver_real_test_sha256": test_view.content_sha256,
+                "receiver_feature_domain": "legacy_inverse_proxy_not_original_raw",
+                "sender_scaled_domain_role": "historical_diagnostic"} if receiver is not None else {}),
             "dataset_id": spec["dataset_id"], "role": spec["role"], "prior_v2_exposure": spec["prior_v2_exposure"], "task": task, "level": lvl,
             "cell_status": "completed", "measurement_provenance": "frozen_checkpoint_canonical_roster_eval", "n_train": n_tr, "n_test": n_te, "p_features": p_use, "k_classes": k_cls,
             "wire_accounting": {"nominal_cap_bytes": cap, "dml3_complete_wire_bytes": len(wire_v3), "csc1_sidecar_raw_bytes": len(csc1_sc_bytes), "payload_bytes_approx": payload_b, "within_cap": len(wire_v3) <= cap, "csc1_is_bit_exact_float64_scaler_parity": False, "csc1_max_abs_diff_test_X": round(csc1_max_te_diff, 5), "diagnostic_fp64_scaler_sidecar_bytes": fp64_sc_b, "diagnostic_fp64_total_wire_bytes": fp64_total_wire_b, "diagnostic_fp64_within_cap": fp64_total_wire_b <= cap},
@@ -144,6 +176,11 @@ def evaluate_dataset_across_tiers(spec: Dict[str, Any], model_v3: MultiLevelLand
             "comparators": comparators, "costs_ms": {"dataset_prep_and_oracle_ms": round(prep_ms, 2), "tier_total_eval_ms": round((time.perf_counter() - t0_l) * 1000.0, 2)},
         })
     return rows_out
+
+
+def evaluate_dataset_across_tiers_prospective(spec, model_v3, model_v2):
+    """Corrected receiver protocol; historical command remains explicit replay."""
+    return evaluate_dataset_across_tiers({**spec, "evaluation_protocol": EVALUATION_PROTOCOL}, model_v3, model_v2)
 
 
 def _worker_loop(task_q: "mp.Queue[Any]", res_q: "mp.Queue[Any]", v3_ckpt_str: str, v2_ckpt_str: str) -> None:
@@ -328,7 +365,7 @@ def summarize_canonical_ledger_and_elo(rows: Sequence[Dict[str, Any]], total_pla
 
 def _collect_source_sha256s() -> Dict[str, str]:
     base = Path(__file__).resolve().parent
-    files = ("v3_canonical_roster_eval.py", "v3_canonical_runner.py", "budget_planner.py", "multilevel_model.py", "scaling.py", "building_block_landmarks.py", "multiclass_head.py")
+    files = ("v3_canonical_roster_eval.py", "v3_canonical_runner.py", "budget_planner.py", "multilevel_model.py", "scaling.py", "building_block_landmarks.py", "multiclass_head.py", "transfer_evaluation.py")
     return {fn: hashlib.sha256((base / fn).read_bytes()).hexdigest() for fn in files if (base / fn).exists()}
 
 
@@ -338,6 +375,7 @@ def _build_receipt_common(eff_run_id: str, run_dir: Path, ledger_path: Path, led
     rem_v2 = 1000 - int(summary["coverage"]["completed_v2_panel_slice_datasets"])
     return {
         "schema": "dope.v3.canonical_roster_and_v2panel_slice_receipt.v2",
+        "evaluation_protocol": extra.get("evaluation_protocol", LEGACY_REPLAY_PROTOCOL),
         "run_id": eff_run_id, "run_dir": str(run_dir), "command_line": " ".join(sys.argv),
         "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **extra,
         "ledger_jsonl_path": str(ledger_path), "ledger_jsonl_sha256": hashlib.sha256(ledger_path.read_bytes()).hexdigest(),
@@ -358,7 +396,9 @@ def _build_receipt_common(eff_run_id: str, run_dir: Path, ledger_path: Path, led
     }
 
 
-def run_bounded_canonical_eval(max_v2_slice: int = 80, workers_count: int = 4, wall_budget_s: float = 840.0, run_id: Optional[str] = None, shard_id: Optional[str] = None, explicit_v2_ids: Optional[Sequence[str]] = None) -> Dict[str, Any]:
+def run_bounded_canonical_eval(max_v2_slice: int = 80, workers_count: int = 4, wall_budget_s: float = 840.0, run_id: Optional[str] = None, shard_id: Optional[str] = None, explicit_v2_ids: Optional[Sequence[str]] = None, evaluation_protocol: str = LEGACY_REPLAY_PROTOCOL) -> Dict[str, Any]:
+    if evaluation_protocol not in (LEGACY_REPLAY_PROTOCOL, EVALUATION_PROTOCOL):
+        raise EvaluationInputError("unsupported_evaluation_protocol")
     t0 = time.perf_counter()
     eff_run_id = run_id or shard_id or f"canonical_v3_{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}"
     manifest = json.loads(V3_MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -381,6 +421,8 @@ def run_bounded_canonical_eval(max_v2_slice: int = 80, workers_count: int = 4, w
     v2_tasks = [{"dataset_id": e["dataset_id"], "train_sha256": e["train_sha256"], "entry": e, "role": "eval_gradient_disjoint_v2_panel", "prior_v2_exposure": e["prior_exposure"], "task": "classification" if e["catalog_task"] == "binary" else "regression", "scope": v2_scopes[e["dataset_id"]]["scope"], "report": v2_scopes[e["dataset_id"]]["report"]} for e in v2_slice if e["dataset_id"] in v2_scopes]
     all_tasks = [t for pair in zip(mc_tasks + [None] * max(0, len(v2_tasks) - len(mc_tasks)), v2_tasks + [None] * max(0, len(mc_tasks) - len(v2_tasks))) for t in pair if t is not None]
 
+    for task_spec in all_tasks:
+        task_spec["evaluation_protocol"] = evaluation_protocol
     ctx = mp.get_context("spawn")
     task_q, res_q = ctx.Queue(), ctx.Queue()
     v3_ckpt, v2_ckpt = str(V3_OUT_DIR / "dope_mlc_v3_multitask_best.pt"), str(DEFAULT_V2_CKPT)
@@ -435,7 +477,7 @@ def run_bounded_canonical_eval(max_v2_slice: int = 80, workers_count: int = 4, w
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw_gf, compresslevel=9, mtime=0) as gf:
             gf.write(ledger_path.read_bytes())
     summary = summarize_canonical_ledger_and_elo(all_rows, len(mc_tasks), len(v2_tasks))
-    extra = {"shard_id": shard_id, "elapsed_wall_seconds": round(time.perf_counter() - t0, 2), "wall_budget_seconds": wall_budget_s, "stopped_by_wall_budget": stopped_by_wall, "workers_count": workers_count, "cpu_guard_82pct_pause_events": cpu_pause_events, "cpu_guard_semantics": "dispatch_admission_gate_only_82pct_proc_stat_plus_nice10_single_thread_workers_does_not_throttle_already_active_in_flight_workers", "reaped_worker_process_groups": reaped_cnt}
+    extra = {"evaluation_protocol": evaluation_protocol, "shard_id": shard_id, "elapsed_wall_seconds": round(time.perf_counter() - t0, 2), "wall_budget_seconds": wall_budget_s, "stopped_by_wall_budget": stopped_by_wall, "workers_count": workers_count, "cpu_guard_82pct_pause_events": cpu_pause_events, "cpu_guard_semantics": "dispatch_admission_gate_only_82pct_proc_stat_plus_nice10_single_thread_workers_does_not_throttle_already_active_in_flight_workers", "reaped_worker_process_groups": reaped_cnt}
     receipt = _build_receipt_common(eff_run_id, run_dir, ledger_path, ledger_gz_path, summary, extra)
     with receipt_path.open("x", encoding="utf-8") as rf:
         rf.write(json.dumps(receipt, indent=2) + "\n")
@@ -443,6 +485,20 @@ def run_bounded_canonical_eval(max_v2_slice: int = 80, workers_count: int = 4, w
 
 
 def aggregate_canonical_runs(source_run_ids: Sequence[str], out_run_id: str) -> Dict[str, Any]:
+    protocols = set()
+    for source_id in source_run_ids:
+        source_dir = V3_OUT_DIR / "runs" / source_id
+        source_receipt = json.loads((source_dir / "receipt.json").read_text(encoding="utf-8"))
+        source_protocol = source_receipt.get("evaluation_protocol", LEGACY_REPLAY_PROTOCOL)
+        if source_protocol not in (LEGACY_REPLAY_PROTOCOL, EVALUATION_PROTOCOL):
+            raise EvaluationInputError("unsupported_evaluation_protocol")
+        protocols.add(source_protocol)
+        for line in (source_dir / "ledger.jsonl").read_text(encoding="utf-8").splitlines():
+            row = json.loads(line)
+            if row.get("cell_status") == "completed" and row.get("evaluation_protocol", LEGACY_REPLAY_PROTOCOL) != source_protocol:
+                raise EvaluationInputError("mixed_evaluation_protocols")
+    if len(protocols) != 1:
+        raise EvaluationInputError("mixed_evaluation_protocols")
     t0 = time.perf_counter()
     run_dir = V3_OUT_DIR / "runs" / out_run_id
     run_dir.mkdir(parents=True, exist_ok=False)
@@ -473,7 +529,7 @@ def aggregate_canonical_runs(source_run_ids: Sequence[str], out_run_id: str) -> 
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw_gf, compresslevel=9, mtime=0) as gf:
             gf.write(ledger_path.read_bytes())
     summary = summarize_canonical_ledger_and_elo(all_rows, 69, 1000)
-    extra = {"aggregation_mode": "disjoint_multi_run_union", "source_runs": src_manifests, "duplicate_logical_dataset_level_cells": 0, "total_source_wall_seconds": round(sum(float(x["elapsed_wall_seconds"]) for x in src_manifests), 2), "aggregation_elapsed_wall_seconds": round(time.perf_counter() - t0, 2)}
+    extra = {"evaluation_protocol": next(iter(protocols)), "aggregation_mode": "disjoint_multi_run_union", "source_runs": src_manifests, "duplicate_logical_dataset_level_cells": 0, "total_source_wall_seconds": round(sum(float(x["elapsed_wall_seconds"]) for x in src_manifests), 2), "aggregation_elapsed_wall_seconds": round(time.perf_counter() - t0, 2)}
     receipt = _build_receipt_common(out_run_id, run_dir, ledger_path, ledger_gz_path, summary, extra)
     with receipt_path.open("x", encoding="utf-8") as rf:
         rf.write(json.dumps(receipt, indent=2) + "\n")
@@ -482,6 +538,7 @@ def aggregate_canonical_runs(source_run_ids: Sequence[str], out_run_id: str) -> 
 
 def main() -> None:
     p = argparse.ArgumentParser()
+    p.add_argument("--evaluation-protocol", choices=(LEGACY_REPLAY_PROTOCOL, EVALUATION_PROTOCOL), default=LEGACY_REPLAY_PROTOCOL, help="historical replay or corrected real-FIT receiver; new results use distinct protocol identity")
     for flag, tp, dflt in (("--run-id", str, None), ("--shard-id", str, None), ("--dataset-ids", str, None), ("--aggregate-runs", str, None), ("--max-v2-slice", int, 80), ("--workers", int, 4), ("--wall-budget-s", float, 840.0)):
         p.add_argument(flag, type=tp, default=dflt)
     args = p.parse_args()
@@ -489,7 +546,7 @@ def main() -> None:
         res = aggregate_canonical_runs([x.strip() for x in args.aggregate_runs.split(",") if x.strip()], args.run_id or "canonical_v3_full_1069_unified_v1")
     else:
         ds_ids = [x.strip() for x in args.dataset_ids.split(",") if x.strip()] if args.dataset_ids else None
-        res = run_bounded_canonical_eval(args.max_v2_slice, args.workers, args.wall_budget_s, args.run_id, args.shard_id, ds_ids)
+        res = run_bounded_canonical_eval(args.max_v2_slice, args.workers, args.wall_budget_s, args.run_id, args.shard_id, ds_ids, evaluation_protocol=args.evaluation_protocol)
     print(json.dumps(res["coverage"], indent=2))
 
 
