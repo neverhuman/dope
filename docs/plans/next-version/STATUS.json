@@ -276,7 +276,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+  "current_local_source_commit": "6116c2db346a037cbc3bff05bad605fb35949164",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -352,12 +352,11 @@
     ]
   },
   "current_ci_known_failure": {
-    "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
-    "receipt_emit_compile": "FAIL",
-    "ARM_privileged_setup": "FAIL",
-    "NC1_private_card_assertion": "FAIL",
-    "fix_source": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
-    "current_qualification": "NOT_RUN"
+    "head": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+    "coverage_stage_pin": "FAIL; source6116c2db fixes one new pin",
+    "audit_badge": "FAIL after report87passed floor; committed88 snapshot mismatch",
+    "cpu_compat_provision": "runner communication lost before stages; no executed test count",
+    "current_qualification": "PENDING_CURRENT_HEAD"
   },
   "historical_ci_worker_activation": [
     {
@@ -459,5 +458,95 @@
     "source": "IMPLEMENTED_R6",
     "actual_runtime": "NOT_RUN",
     "receipt": "dope/receipts/ci-r6-required-reference-route.json"
-  }
+  },
+  "current_stage_pin_and_sdk_surface": {
+    "schema": "dope.stage-pin-and-sdk-prepared-surface/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "6116c2db346a037cbc3bff05bad605fb35949164",
+    "base": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+    "actual_1811_findings": {
+      "coverage": "FAIL coverage_stage_changed before stages; ARM34passed1failed strict packaged coverage test",
+      "root_cause": "R6 candidate pin hashed an extra trailing blank line absent in actual script",
+      "script": "ops/ci/shared-levels.sh",
+      "raw_git_bytes": 5132,
+      "actual_sha256": "db919c20f23e729686a800d5bcdca22abd54b1258bd337f04471f083a1ba9453",
+      "unchanged_between": "664 and1811 raw Git bytes identical",
+      "repair": "Only new inventory pin changes; script and strict verifier unchanged"
+    },
+    "m0": {
+      "new_tests": [
+        "engine/dope-sdk/tests/legacy_surface_parity.rs",
+        "engine/dope-core/tests/landmark_high_matrix.rs"
+      ],
+      "actual_forward_boundary": "dope_sdk::v0::encode_prepared",
+      "validates": [
+        "known expected existing recipe",
+        "known conditioning recipe and exact match",
+        "known conditioning level before tensor conversion/forward"
+      ],
+      "actual_encoder": "unchanged MlcV3Model::encode_features_629",
+      "authenticity_limit": "caller-declared structural consistency, not model/training/custody authentication",
+      "legacy_readers_and_ids": "unchanged",
+      "source_review_fixes": [
+        "remove unused sdk_columns",
+        "assert original delegated Artifact shape error rather than Input"
+      ],
+      "existing_graph_test_dependencies": [
+        "safetensors",
+        "serde_json"
+      ],
+      "native_tests": "NOT_RUN current source; no criterion credit"
+    },
+    "engine_failure_collection": {
+      "scripts": [
+        "ops/ci/engine.sh",
+        "ops/ci/engine-release.sh"
+      ],
+      "change": "append --no-fail-fast only to existing all-engine cargo test commands",
+      "preserved": "targets/flags/set-e/final nonzero gate; later release/build/smoke remain blocked on any test failure"
+    },
+    "checks": {
+      "Rust1.88_format": "PASS5files",
+      "Bash_syntax": "PASS2scripts",
+      "all5_stage_pins_against_rawGit": "PASS",
+      "diff_check": "PASS",
+      "static_governed_source_count": 1301,
+      "static_source_cap_violations": 0,
+      "new_native_test_execution": "NOT_RUN",
+      "full_current_CI": "PENDING"
+    },
+    "historical_hosted_signed": {
+      "head": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+      "run_id": 41687886049,
+      "job_id": 126098368662,
+      "conclusion": "SUCCESS",
+      "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+      "tested_tree": "f3b5f5ebe4541bdf17f2110661f7f91ee0c4f362",
+      "same_as_head_tree": true,
+      "Rust_passed": 273,
+      "failed": 0,
+      "ignored": 1,
+      "result_rows": 45,
+      "zero_result_rows": 6,
+      "scope": "Signed-engine named job; not all CI, new-source M0 or automatic criterion promotion",
+      "primary_log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+    },
+    "criteria": "38PASS/23NOT_RUN/4historicalBLOCKED unchanged; four campaign criteria separately deferred neverPASS",
+    "language_policy": "NOT_COMPLIANT; seven Rust streams remain required",
+    "remaining": [
+      "Actual current-source required CI/review and per-criterion evidence mapping",
+      "Authentic current audit/badge snapshot reconciliation;1811 score87 report passed floor but88 snapshot mismatch failed job",
+      "Seven Rust streams/23 engineering criteria; no campaign or model promotion"
+    ]
+  },
+  "historical_ci_known_failures": [
+    {
+      "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+      "receipt_emit_compile": "FAIL",
+      "ARM_privileged_setup": "FAIL",
+      "NC1_private_card_assertion": "FAIL",
+      "fix_source": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+      "current_qualification": "NOT_RUN"
+    }
+  ]
 }

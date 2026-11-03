@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 20109,
-      "sha256": "f45650c58f9f0facd84742b4e8c01d2b5b6c29b755597ced8bd83a760f36e52d"
+      "bytes": 21641,
+      "sha256": "e554e37911ed1d0f66b942a1946f09ada0c4652dff54fb340cd0a66515c3d10e"
     },
     "STATUS.json": {
-      "bytes": 21437,
-      "sha256": "b6f9d6e35093ebdb54a6d18fa7d78078fa806a273e2d7fe141a38ca2b798612c"
+      "bytes": 25543,
+      "sha256": "0c21466b090aadf0ebc66091e0c9c531350f6c475adc1eac489164dc8308aa89"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -233,6 +233,10 @@
     "dope/receipts/ci-r6-required-reference-route.json": {
       "bytes": 3082,
       "sha256": "0331fd3c5818adfb884f75f5e7ef40a4b6c06d96cf62a75134b5d569a638aba5"
+    },
+    "dope/receipts/stage-pin-and-sdk-prepared-surface.json": {
+      "bytes": 3487,
+      "sha256": "050064230501211893682e8b7edbafcbbb1f4dac7738ee8db7c5ffee85348477"
     }
   },
   "historical_status": "PLANNED"

@@ -167,3 +167,27 @@ qualification remains open. M0 and the seven Rust migration streams remain
 unfinished. Criterion counts remain38PASS/23NOT_RUN/4historicalBLOCKED, with
 campaign deferral separately recorded and never PASS. See the
 [repair/route receipt](receipts/ci-r6-required-reference-route.json).
+
+## Stage-pin repair and native SDK matrix
+
+Source6116c2db corrects one new graph pin to the actual unchanged5132-byte
+shared-levels.sh. Independent raw-Git checks confirm664 and1811 are identical;
+all five current stage pins now match. The script, verifier, coverage inventory
+and frozen inputs remain unchanged. Both existing all-engine test commands add
+--no-fail-fast while preserving their final failing exit and subsequent build gate.
+
+The reviewed M0 source adds synthetic nonzero SDK/core preparation, conditioning
+and real encoder parity, plus Full/High matrix tests over three tasks. The new
+versioned encode_prepared boundary checks known existing recipe IDs, exact
+caller-declared recipe match and known level before the original encoder. It
+does not authenticate weights, training or custody. Raw APIs remain compatible.
+Formatting/Bash/static1301-source checks pass; new compilation and runtime are
+NOT_RUN until CI qualifies this source. No criteria are promoted from authorship.
+
+The actual1811 signed-engine job succeeded with273 Rust passes,0 failures and
+1 ignored across45 result rows (6 empty rows confer no pass). Its merge tree
+exactly matches1811. That does not qualify the failed graph workers or the new
+M0 source. The1811 full audit scored87 with0caps/high/critical, but its strict
+badge check failed against the committed88 snapshot; preserve that failure.
+Counts remain38PASS/23NOT_RUN/4historicalBLOCKED. See the
+[source and scoped execution receipt](receipts/stage-pin-and-sdk-prepared-surface.json).
