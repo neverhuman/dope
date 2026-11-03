@@ -226,16 +226,21 @@
       "cross_repo_interfaces": [
         "J07 SDK gateway migration after exact parity"
       ],
-      "sha256": "c1ef172b071cf1914eddf188de7101b208a03f3c9b8b29dab8cb4ce51206ef0d",
-      "words": 984,
+      "sha256": "df7a6118f8e0ab0ce6a187b79160169dec8eff28ae733101990daa0780189bd7",
+      "words": 1026,
       "criterion_verdicts": {
         "D03-S1": {
           "verdict": "PASS",
           "evidence": "Hosted CPU SDK surface/build and Rust-only dependency inspection passed at tested merge2b50c78d/treec2f59ae4 equal451; criterion-scoped only. See ../receipts/hosted-native-451-criteria.json."
         },
         "D03-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "SDK surface test compiled; direct-core/facade parity execution pending."
+          "verdict": "PASS",
+          "evidence": "Actual direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder PASS in SDK2/0/0 log1245-1248. Regression/binary/multiclass compare prepared X/Ybits, physical IDs/source digests/classes/task/vocabulary policy, scope/report equality, None/Full/High conditioning bits/column landmarks/digests, direct Core versus checked SDK real nonzero629D encoder output. Perturbation parity and actual routed-latent sensitivity asserted. Root independently read actualbb source assertions, not just helper names.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
         },
         "D03-S3": {
           "verdict": "NOT_RUN",
@@ -270,16 +275,21 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "dc029421274c974a5d072afc76dce163f76cd3717cd4e93e1f424e9561067024",
-      "words": 1016,
+      "sha256": "70b9abc40a5f8dc9ce9f53cebabf6df4420335045a3db588b5a0c66cdee6a885",
+      "words": 1045,
       "criterion_verdicts": {
         "D04-S1": {
           "verdict": "NOT_RUN",
           "evidence": "Shared constants are aliases and all-target compilation passed; actual legacy/golden replay pending."
         },
         "D04-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "High-required native fixture is compiled; actual vector/digest matrix execution pending. Effective vector-only digest is distinguished from mask-bound bundle identity."
+          "verdict": "PASS",
+          "evidence": "Actual full_high_none_policy_matrix_uses_real_loader_and_forward_for_all_tasks plus budget/subsample matrix PASS in2/0/0 log994-996. Real synthetic checkpoint loader/parameter inventory, three tasks, equal policies, identical High conditioning/column tensors/digests and actual encoder output; nonzero outputs and perturbation-sensitive routed latents. Reservation/mask/private report distinctions retained; no scientific performance claim.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
         },
         "D04-S3": {
           "verdict": "PASS",
@@ -325,8 +335,8 @@
         "J05 NC1 intake",
         "J06 owner-private emitter"
       ],
-      "sha256": "37496e66c40052437453600e39ceb3627173097832812e8d8f5b349b44dbbd6a",
-      "words": 1146,
+      "sha256": "db2169e0b5de4b82b51af04e8de67e18964d3ef7331f39d4a23c02ffb54172fa",
+      "words": 1178,
       "criterion_verdicts": {
         "D05-S1": {
           "verdict": "PASS",
@@ -341,8 +351,13 @@
           "evidence": "Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json."
         },
         "D05-S4": {
-          "verdict": "NOT_RUN",
-          "evidence": "Existingreference andpublicSchemaunit canary checks passed. New native actualCLI nc1_refusal_privacy357LOC/3tests/7calls source-adopted at0dfe96a0 for privatepresence/publicredaction and4refusals/nooutputs; actual executionNOT_RUN. See ../receipts/m1-and-high-import-source.json."
+          "verdict": "PASS",
+          "evidence": "Actual M1 three named tests allPASS log819-826,3/0/0. Seven mandatory absolute nativeCLI child invocations with Python environment removed cover positive public-schema/normal-output redaction, malformed JSON/unknownfield/invalidrole/tamperedpublicschema refusal, stable errors, emptystdout/absentoutputdir on failures. Planted private names/vocabulary/extrema absent from public outputs/errors; privatecard explicitly allowed. Synthetic canary closure only, no privacy certification.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
         },
         "D05-S5": {
           "verdict": "PASS",

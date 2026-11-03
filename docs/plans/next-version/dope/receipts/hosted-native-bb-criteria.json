@@ -1,0 +1,31 @@
+{
+  "schema":"dope.scoped-criterion-strong-acceptance/v1",
+  "reviewer":"/root",
+  "decision":"ACCEPT_THREE_NEW_SCOPED_CRITERIA_FROM_ACTUAL_BB_TEST_EXECUTION",
+  "source":"bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+  "tested_merge":"fee51ff5d8296af5027414920dce3444d59ed926",
+  "tested_and_source_tree":"08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+  "source_binding":"Independently GitHub Git commit API verified identical merge/source tree and main59b plus bb parents; primary signed log checkout matches.",
+  "run":41699460902,
+  "job":126138608036,
+  "job_verdict":"SUCCESS",
+  "log_sha256":"c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4",
+  "raw_rust_counts":{"passed":280,"failed":0,"ignored":1,"result_rows":48},
+  "strong_review":"Root independently read actual tested SDK/Core matrix assertions and exact native CLI log names; previous independent M1 source review covers three functions/seven mandatory CLI calls. No promotion from the total280 alone.",
+  "unchanged_component_engine_tree":"bd87d75d65f76606fd8c9a520412c07c7191ed94",
+  "component_closure":"Raw Git confirms complete engine subtree unchanged between testedbb and current492fae914f6151cf32e14dad16699b40019d999a CI-repair source. Owner must recheck before integration.",
+  "actual_test_sources":[
+    {"path":"engine/dope-sdk/tests/legacy_surface_parity.rs","git_blob":"5ceb9c880daa377e76615dd9de706b7fa2896e80","sha256":"2e598e95c4544f864e90359f9baa091389bf6bb043e66758b6059deb75df35eb"},
+    {"path":"engine/dope-core/tests/landmark_high_matrix.rs","git_blob":"466bc758e3a6ea9b9642db990d66fffbfc0291c3","sha256":"b34ed92227c3db2777afada604745bc097a2cd6145392328dcfdcea60ed6ff3a"},
+    {"path":"engine/dope-cli/tests/nc1_refusal_privacy.rs","git_blob":"5b34d6edc6e77a34651ba5fd4c9dcb6866165b4a","sha256":"19f76d87660ef8e51686acbd8d3139ee9c9d77c482b72518a65880cde55a8dfa"}
+  ],
+  "proposal_binding_correction":"Luna proposal references earlier author-packet copy SHA values, which are NOT testedbb file identities after import/assertion/edition corrections. The three raw Git identities above replace those as execution bindings; original proposal is preserved unchanged.",
+  "accepted":[
+    {"id":"D03-S2","evidence":"Actual direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder PASS in SDK2/0/0 log1245-1248. Regression/binary/multiclass compare prepared X/Ybits, physical IDs/source digests/classes/task/vocabulary policy, scope/report equality, None/Full/High conditioning bits/column landmarks/digests, direct Core versus checked SDK real nonzero629D encoder output. Perturbation parity and actual routed-latent sensitivity asserted. Root independently read actualbb source assertions, not just helper names."},
+    {"id":"D04-S2","evidence":"Actual full_high_none_policy_matrix_uses_real_loader_and_forward_for_all_tasks plus budget/subsample matrix PASS in2/0/0 log994-996. Real synthetic checkpoint loader/parameter inventory, three tasks, equal policies, identical High conditioning/column tensors/digests and actual encoder output; nonzero outputs and perturbation-sensitive routed latents. Reservation/mask/private report distinctions retained; no scientific performance claim."},
+    {"id":"D05-S4","evidence":"Actual M1 three named tests allPASS log819-826,3/0/0. Seven mandatory absolute nativeCLI child invocations with Python environment removed cover positive public-schema/normal-output redaction, malformed JSON/unknownfield/invalidrole/tamperedpublicschema refusal, stable errors, emptystdout/absentoutputdir on failures. Planted private names/vocabulary/extrema absent from public outputs/errors; privatecard explicitly allowed. Synthetic canary closure only, no privacy certification."}
+  ],
+  "before":{"PASS":47,"NOT_RUN":14,"historical_BLOCKED":4},
+  "after_if_integrated":{"PASS":50,"NOT_RUN":11,"historical_BLOCKED":4},
+  "limits":["Only these three current NOT_RUN criteria; no duplicate promotions.","Separate nativeCI job126140855993 FAILED at Clippy later; it is not whole-job PASS.","No whole-current-PR/fullCI/release/science/Python-compliance verdict follows.","Remaining11 original criteria, seven additional Rust streams and four separately deferred campaign criteria remain explicit.","Owner integrates receipt/header/inventory/status/hash companions only in current coherent batch if not frozen, rechecking source closure and current verdicts."]
+}

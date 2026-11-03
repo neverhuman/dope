@@ -34,7 +34,7 @@
     },
     "D03": {
       "source": "IMPLEMENTED",
-      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "CPU SDK build/surface and Rust-only dependency criterion S1 accepted at451-equivalent tree; vector/error/legacy remainder pending.",
@@ -44,7 +44,7 @@
     },
     "D04": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Full-reservation spectrum/FINE-not-fabricated criterion S3 accepted; other landmark criteria remain pending.",
@@ -54,7 +54,7 @@
     },
     "D05": {
       "source": "IMPLEMENTED",
-      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "FIT-card poisoning/order and edge/refusal criteria S1/S3 accepted; other NC1/native CLI criteria remain pending.",
@@ -130,10 +130,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 47,
-    "NOT_RUN": 14,
+    "PASS": 50,
+    "NOT_RUN": 11,
     "BLOCKED": 4,
-    "note": "Original65 criteria retained. Nine individually reviewed1811 source/test closures promoted; no generic273/currentSDK/allCI inference. Four campaign criteria separately deferred, neverPASS."
+    "note": "Original65criteria preserved. Three individually reviewedactualbbSDK/High/M1targets promoted, wholeengine/fileidentitiesmatch; no generic280/fullCI/science/Pythoncompliance inference. Fourcampaigncriteria deferredneverPASS."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -657,6 +657,12 @@
       "NOT_RUN": 23,
       "BLOCKED": 4,
       "note": "Historical30/31/4 baseline, six451-tree promotions and two completed ccd metric subtargets. Four campaign criteria separately DEFERRED_CAMPAIGN_QUALIFICATION, never PASS. Current source/new tests need exact-head qualification."
+    },
+    {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "BLOCKED": 4,
+      "note": "Original65 criteria retained. Nine individually reviewed1811 source/test closures promoted; no generic273/currentSDK/allCI inference. Four campaign criteria separately deferred, neverPASS."
     }
   ],
   "hosted_native_1811_acceptance": {
@@ -726,7 +732,7 @@
         "Absolute actualCLI with emptyPATH/removedPythonvars"
       ],
       "criterion": "D05-S4",
-      "criterion_verdict": "NOT_RUN until actualcurrent-source result accepted",
+      "criterion_verdict": "PASS scopedactualbbnativeexecution; seehosted-native-bb-criteria receipt",
       "independent_review": "nc1-cli-canary-m1/REVIEW-STRONG.md: no concrete static blocker; no runtime qualification"
     },
     "scope_preserved": "No dependencies/locks/productionparsers/CLIregistration/Python/guardthreshold/exclusions/frozenfixtures changed",
@@ -853,5 +859,15 @@
       "hosted-audit-1811-snapshot.json",
       "jankurai-451-snapshot.json"
     ]
+  },
+  "hosted_native_bb_acceptance": {
+    "receipt": "dope/receipts/hosted-native-bb-criteria.json",
+    "sha256": "63a99552bb8797726bb2e65e05bab20b3ec47c6865a538f9bf9c515e3d2bf90d",
+    "accepted": [
+      "D03-S2",
+      "D04-S2",
+      "D05-S4"
+    ],
+    "whole_engine_closure_current_verified": "bd87d75d65f76606fd8c9a520412c07c7191ed94"
   }
 }

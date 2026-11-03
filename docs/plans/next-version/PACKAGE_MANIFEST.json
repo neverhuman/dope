@@ -43,16 +43,16 @@
       "sha256": "9feacd6b868bb5ec9056c260f4a97a8e7188a9cab5603405cb41e6bc73da05a9"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
-      "bytes": 8572,
-      "sha256": "c1ef172b071cf1914eddf188de7101b208a03f3c9b8b29dab8cb4ce51206ef0d"
+      "bytes": 8991,
+      "sha256": "df7a6118f8e0ab0ce6a187b79160169dec8eff28ae733101990daa0780189bd7"
     },
     "dope/tasks/d04-high-landmark-dependency-plan.md": {
-      "bytes": 8995,
-      "sha256": "dc029421274c974a5d072afc76dce163f76cd3717cd4e93e1f424e9561067024"
+      "bytes": 9351,
+      "sha256": "70b9abc40a5f8dc9ce9f53cebabf6df4420335045a3db588b5a0c66cdee6a885"
     },
     "dope/tasks/d05-nc1-private-normalization-contract.md": {
-      "bytes": 10124,
-      "sha256": "37496e66c40052437453600e39ceb3627173097832812e8d8f5b349b44dbbd6a"
+      "bytes": 10341,
+      "sha256": "db2169e0b5de4b82b51af04e8de67e18964d3ef7331f39d4a23c02ffb54172fa"
     },
     "dope/tasks/d06-dvs-and-audit-card.md": {
       "bytes": 10540,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 32897,
-      "sha256": "538df0bd8e3690e90d3b4f58a3de299581d6674c70c7d1bd51803ee0fd99a4f9"
+      "bytes": 34802,
+      "sha256": "a1b7bc3291149ae802298a3bb9e7d71f9a185292204598dadf3ce71b81104cd4"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 26800,
-      "sha256": "fc4f47607e5c410f1717bcd208c7c0398e1677456a3cca770000ae01b903f698"
+      "bytes": 27515,
+      "sha256": "b1cc17526a77e221d4daa8264c70eabbec9e2345a5dd3880f78ae62395787d89"
     },
     "STATUS.json": {
-      "bytes": 39442,
-      "sha256": "8b75ba75c0ddbf4fd018b4b397856ea8ffec4ba18605c7eedbc7bd0688429106"
+      "bytes": 40147,
+      "sha256": "429bd424f670e58328c3dcc8634a60d26eb7949ba743d51ea0351c8b138e7125"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -261,6 +261,10 @@
     "dope/receipts/bb-ci-repair-source.json": {
       "bytes": 2665,
       "sha256": "21dd222a47a2b912d65fa2419d5e948373cb3fa4bc13ac6d36ff6b2534d6c383"
+    },
+    "dope/receipts/hosted-native-bb-criteria.json": {
+      "bytes": 4399,
+      "sha256": "63a99552bb8797726bb2e65e05bab20b3ec47c6865a538f9bf9c515e3d2bf90d"
     }
   },
   "historical_status": "PLANNED"

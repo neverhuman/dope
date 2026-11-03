@@ -2,7 +2,7 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
-Current criterion matrix: **47 PASS /14 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+Current criterion matrix: **50 PASS /11 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
 
 ## Latest user language policy: NOT_COMPLIANT
 
@@ -262,3 +262,15 @@ passed the85floor with0caps/high/critical. The new source requires a fresh
 exact-head audit. See the [repair receipt](receipts/bb-ci-repair-source.json)
 and [bb audit witness](receipts/hosted-audit-bb-snapshot.json). Counts stay
 47PASS/14NOT_RUN/4historicalBLOCKED pending individual review.
+
+## Three additional scoped bb native criteria accepted
+
+Exactly D03-S2,D04-S2 and D05-S4 move from NOT_RUN to PASS after individual
+assertion review and verification of the unchanged whole-engine tree and all
+three actual tested file identities. These are the actual corrected SDK/High/M1
+sources, not earlier author-packet copies. The three targets ran2,2and3tests
+respectively, with0failures/0ignored. No promotion follows from280tests alone.
+
+Counts are now50PASS/11NOT_RUN/4historicalBLOCKED. Current required CI, the
+remaining11criteria and seven Rust streams remain open. The four campaign
+criteria remain separately deferred, never PASS. See [the reviewed receipt](receipts/hosted-native-bb-criteria.json).

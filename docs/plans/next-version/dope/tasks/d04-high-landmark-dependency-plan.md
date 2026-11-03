@@ -1,6 +1,6 @@
 # D04 — Skip unused High probes while preserving admitted conditioning
 
-Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below include actual testedbb/mergefee51ff5 native fixtures, with the complete engine subtree unchanged through current CI-only repair. See [bb scoped evidence](../receipts/hosted-native-bb-criteria.json) and [live ledger](../../STATUS.json). Other criteria and current full CI remain pending; no efficacy, privacy certification, scientific qualification or release is implied. One integrator owns the same isolated fast branch.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -61,7 +61,7 @@ Verdicts reflect source-bound engineering receipts. Named1811 native fixtures ar
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D04-S1 | **NOT_RUN** | Shared constants are aliases and all-target compilation passed; actual legacy/golden replay pending. |
-| D04-S2 | **NOT_RUN** | High-required native fixture is compiled; actual vector/digest matrix execution pending. Effective vector-only digest is distinguished from mask-bound bundle identity. |
+| D04-S2 | **PASS** | Actual full_high_none_policy_matrix_uses_real_loader_and_forward_for_all_tasks plus budget/subsample matrix PASS in2/0/0 log994-996. Real synthetic checkpoint loader/parameter inventory, three tasks, equal policies, identical High conditioning/column tensors/digests and actual encoder output; nonzero outputs and perturbation-sensitive routed latents. Reservation/mask/private report distinctions retained; no scientific performance claim. See ../receipts/hosted-native-bb-criteria.json; current fullCI and other criteria remain separate. |
 | D04-S3 | **PASS** | Hosted native tight_spectrum_boundaries_reserve_unused_full_panel_cost and high_omits_fine_marks_readiness_and_preserves_conditioning passed at451-equivalent tested tree; full reservation and NotRequested FINE asserted. See ../receipts/hosted-native-451-criteria.json. |
 | D04-S4 | **PASS** | high_omits_fine_marks_readiness_and_preserves_conditioning actual log981 PASS: FINE no-op before request, progressive Larger/Macro order, report byte/work equality after repeated run_ids/run_required, explicit Full upgrade, later Fine completion and final report/bundle equality. Existing implementation/test closure unchanged; not the new three-task encoder matrix. See ../receipts/hosted-native-1811-criteria.json; current SDK/full required CI remains separate. |
 | D04-S5 | **NOT_RUN** | Historical constructors/default full path unchanged in source; actual legacy report replay pending. |

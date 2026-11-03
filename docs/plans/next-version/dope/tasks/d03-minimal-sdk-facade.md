@@ -1,6 +1,6 @@
 # D03 — Expose a minimal identity-preserving DOPE SDK
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D03/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Named native fixtures below passed at the pinned hosted 451-equivalent tree; final-head full CI and remaining criteria are still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below include actual testedbb/mergefee51ff5 native fixtures, with the complete engine subtree unchanged through current CI-only repair. See [bb scoped evidence](../receipts/hosted-native-bb-criteria.json) and [live ledger](../../STATUS.json). Other criteria and current full CI remain pending; no efficacy, privacy certification, scientific qualification or release is implied. One integrator owns the same isolated fast branch.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -62,7 +62,7 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D03-S1 | **PASS** | Hosted CPU SDK surface/build and Rust-only dependency inspection passed at tested merge2b50c78d/treec2f59ae4 equal451; criterion-scoped only. See ../receipts/hosted-native-451-criteria.json. |
-| D03-S2 | **NOT_RUN** | SDK surface test compiled; direct-core/facade parity execution pending. |
+| D03-S2 | **PASS** | Actual direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder PASS in SDK2/0/0 log1245-1248. Regression/binary/multiclass compare prepared X/Ybits, physical IDs/source digests/classes/task/vocabulary policy, scope/report equality, None/Full/High conditioning bits/column landmarks/digests, direct Core versus checked SDK real nonzero629D encoder output. Perturbation parity and actual routed-latent sensitivity asserted. Root independently read actualbb source assertions, not just helper names. See ../receipts/hosted-native-bb-criteria.json; current fullCI and other criteria remain separate. |
 | D03-S3 | **NOT_RUN** | Native invalid schema/weights/recipe and canary journeys require actual tests. |
 | D03-S4 | **NOT_RUN** | No arithmetic copied; full legacy native replay still pending. |
 | D03-S5 | **PASS** | engine/dope-sdk/README.md, API reexports and workflow guide list v0 legacy types, separate NC1 successor and parity prerequisites; no serving transition. |
