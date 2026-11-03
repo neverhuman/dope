@@ -56,6 +56,9 @@ ci_run u03-sample check target/debug/dope-kernel sample-mixed --artifact "$out/m
 ci_run u03-evaluate check target/ci-python/bin/python -B examples/healthcare-sim/demo.py evaluate --out "$out" --sampled "$out/sampled.json"
 # ci-command:cpu-compat:u03-cleanup 399cd1e593fffdee4029d52a05cd1f26514c510f426128fd89c8e3759321b7c7
 ci_run u03-cleanup check rm -rf "$out"
+# Restore the original constrained plotting dependency on this split guest.
+# ci-command:cpu-compat:claims-plot-dependencies fcd14908a340b792c7d6d7f95ca2b89716d7c8fb32f7e6b1471dff3d18507f95
+ci_run claims-plot-dependencies check uv pip install --python target/ci-python/bin/python --constraint validation/requirements-v1.txt matplotlib==3.10.8
 # ci-command:cpu-compat:public-claims af6f2d1bdfb25fa98897c6acb3e2ab0527d5b53ed88269513c50b5ba0cdc34ec
 ci_run public-claims check target/ci-python/bin/python tools/claims/check.py
 # ci-command:cpu-compat:claims-render 8e17b62df24defabb8a31b6cc4291668c3a53894f163b4d0c565390fcd7b14d0

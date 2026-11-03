@@ -54,9 +54,11 @@ fn normalize(block: &[&str]) -> String {
         .collect::<Vec<_>>()
         .join("\n")
 }
-fn marked(
-    source: &str,
-) -> Result<BTreeMap<String, (String, String, String, String)>, &'static str> {
+// Marker kind, declared hash, actual body hash and exact command text.
+type MarkerFields = (String, String, String, String);
+type MarkedCommands = BTreeMap<String, MarkerFields>;
+
+fn marked(source: &str) -> Result<MarkedCommands, &'static str> {
     let lines: Vec<_> = source.lines().collect();
     let mut rows = BTreeMap::new();
     let mut i = 0;

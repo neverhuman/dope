@@ -230,6 +230,7 @@ pub(super) const RUNTIME_COMMANDS: &[(&str, &str, &str)] = &[
     ("cpu-compat", "u03-sample", "check"),
     ("cpu-compat", "u03-evaluate", "check"),
     ("cpu-compat", "u03-cleanup", "check"),
+    ("cpu-compat", "claims-plot-dependencies", "check"),
     ("cpu-compat", "public-claims", "check"),
     ("cpu-compat", "claims-render", "check"),
     ("cpu-compat", "golden-parity", "check"),
@@ -283,7 +284,7 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "cpu-compat.sh",
-        "faddd35d46a25684a7f7c9e3cb5e0e1a5ef694d676c94e26caf0816f9ff2785c",
+        "75eb595249ee3abfe3a035bf229a218194a074b5c3eef1acb0ab9f8f5f5bc49c",
     ),
     (
         "shared-levels.sh",
