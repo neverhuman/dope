@@ -1,3 +1,6 @@
+use dope_core::nc1::{
+    Cell, DeclaredSchema, FeatureKind, FeatureSpec, InputColumn, InputTable, TargetSpec, Task,
+};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -31,17 +34,55 @@ fn run(args: &[&str]) -> Output {
         .output()
         .unwrap()
 }
-fn table(source: &str, ids: &[u64], feature: &[f64], target: &[f64], category: &[&str]) -> Value {
-    json!({"source_sha256":source.repeat(64),"row_ids":ids,
-    "columns":[
-        {"name":"CANARY_PRIVATE_HEADER_X","values":feature.iter().map(|v|json!({"kind":"number","value":v})).collect::<Vec<_>>()},
-        {"name":"CANARY_PRIVATE_TARGET_LABEL","values":target.iter().map(|v|json!({"kind":"number","value":v})).collect::<Vec<_>>()},
-        {"name":"CANARY_PRIVATE_CATEGORY_HEADER","values":category.iter().map(|v|json!({"kind":"category","value":v})).collect::<Vec<_>>()}
-    ]})
+fn table(
+    source: &str,
+    ids: &[u64],
+    feature: &[f64],
+    target: &[f64],
+    category: &[&str],
+) -> InputTable {
+    InputTable::new(
+        source.repeat(64),
+        ids.to_vec(),
+        vec![
+            InputColumn {
+                name: "CANARY_PRIVATE_HEADER_X".into(),
+                values: feature.iter().copied().map(Cell::Number).collect(),
+            },
+            InputColumn {
+                name: "CANARY_PRIVATE_TARGET_LABEL".into(),
+                values: target.iter().copied().map(Cell::Number).collect(),
+            },
+            InputColumn {
+                name: "CANARY_PRIVATE_CATEGORY_HEADER".into(),
+                values: category
+                    .iter()
+                    .map(|v| Cell::Category((*v).into()))
+                    .collect(),
+            },
+        ],
+    )
+    .unwrap()
 }
 fn fit_request() -> Value {
+    let declared = DeclaredSchema {
+        features: vec![
+            FeatureSpec {
+                column: 0,
+                kind: FeatureKind::Continuous,
+            },
+            FeatureSpec {
+                column: 2,
+                kind: FeatureKind::Nominal,
+            },
+        ],
+        target: TargetSpec {
+            column: 1,
+            task: Task::Regression,
+        },
+    };
     json!({"table":table("a", &[13,33,73,103], &[0.,2.,4.,1.0e300], &[10.,20.,40.,1.0e300], &["CANARY_PRIVATE_CAT_A","CANARY_PRIVATE_CAT_B","CANARY_PRIVATE_CAT_A","CANARY_PRIVATE_CAT_QUERY"]),
-      "declared":{"features":[{"column":0,"kind":"continuous"},{"column":2,"kind":"nominal"}],"target":{"column":1,"task":"regression"}},
+      "declared":declared,
       "fit_rows":[73,13,33]})
 }
 
@@ -116,33 +157,50 @@ fn actual_normalize_cli_private_fit_public_projection_query_roles_and_tail() {
     }
 
     let classification = root.join("classification.json");
-    let numeric_values: Vec<Value> = [0., 1., 2., 3.]
-        .iter()
-        .map(|v| json!({"kind":"number","value":v}))
-        .collect();
-    let label_values: Vec<Value> = [
-        "CANARY_TARGET_NEG",
-        "CANARY_TARGET_POS",
-        "CANARY_TARGET_NEG",
-        "CANARY_TARGET_POS",
-    ]
-    .iter()
-    .map(|v| json!({"kind":"category","value":v}))
-    .collect();
-    let unused_values: Vec<Value> = ["u", "u", "u", "u"]
-        .iter()
-        .map(|v| json!({"kind":"category","value":v}))
-        .collect();
-
+    let binary_table = InputTable::new(
+        "c".repeat(64),
+        vec![17, 37, 77, 117],
+        vec![
+            InputColumn {
+                name: "class-feature".into(),
+                values: [0., 1., 2., 3.].into_iter().map(Cell::Number).collect(),
+            },
+            InputColumn {
+                name: "private-class-target".into(),
+                values: [
+                    "CANARY_TARGET_NEG",
+                    "CANARY_TARGET_POS",
+                    "CANARY_TARGET_NEG",
+                    "CANARY_TARGET_POS",
+                ]
+                .into_iter()
+                .map(|v| Cell::Category(v.into()))
+                .collect(),
+            },
+            InputColumn {
+                name: "unused-after-target".into(),
+                values: vec![Cell::Category("u".into()); 4],
+            },
+        ],
+    )
+    .unwrap();
+    let binary_declared = DeclaredSchema {
+        features: vec![FeatureSpec {
+            column: 0,
+            kind: FeatureKind::Continuous,
+        }],
+        target: TargetSpec {
+            column: 1,
+            task: Task::Binary {
+                positive_label: "CANARY_TARGET_POS".into(),
+            },
+        },
+    };
     write(
         &classification,
         &json!({
-            "table":{"source_sha256":"c".repeat(64),"row_ids":[17,37,77,117],"columns":[
-                {"name":"class-feature","values":numeric_values},
-                {"name":"private-class-target","values":label_values},
-                {"name":"unused-after-target","values":unused_values}
-            ]},
-            "declared":{"features":[{"column":0,"kind":"continuous"}],"target":{"column":1,"task":"binary","positive_label":"CANARY_TARGET_POS"}},
+            "table":binary_table,
+            "declared":binary_declared,
             "fit_rows":[17,37,77,117]
         }),
     );
@@ -168,10 +226,25 @@ fn actual_normalize_cli_private_fit_public_projection_query_roles_and_tail() {
     assert!(!class_public.contains("CANARY_TARGET_NEG"));
     assert!(!String::from_utf8_lossy(&class_result.stdout).contains("CANARY_TARGET"));
 
-    let query = json!({"table":{"source_sha256":"b".repeat(64),"row_ids":[901,401],"columns":[
-        {"name":"CANARY_PRIVATE_CATEGORY_HEADER","values":[{"kind":"category","value":"CANARY_PRIVATE_CAT_QUERY"},{"kind":"category","value":"CANARY_PRIVATE_CAT_A"}]},
-        {"name":"CANARY_PRIVATE_HEADER_X","values":[{"kind":"number","value":6.},{"kind":"number","value":2.}]}
-    ]},"rows":[401,901],"features_only":true});
+    let query_table = InputTable::new(
+        "b".repeat(64),
+        vec![901, 401],
+        vec![
+            InputColumn {
+                name: "CANARY_PRIVATE_CATEGORY_HEADER".into(),
+                values: vec![
+                    Cell::Category("CANARY_PRIVATE_CAT_QUERY".into()),
+                    Cell::Category("CANARY_PRIVATE_CAT_A".into()),
+                ],
+            },
+            InputColumn {
+                name: "CANARY_PRIVATE_HEADER_X".into(),
+                values: vec![Cell::Number(6.), Cell::Number(2.)],
+            },
+        ],
+    )
+    .unwrap();
+    let query = json!({"table":query_table,"rows":[401,901],"features_only":true});
     let query_file = root.join("query.json");
     write(&query_file, &query);
     let query_out = root.join("query-out");
