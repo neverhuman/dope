@@ -2,7 +2,7 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
-Current criterion matrix: **51 PASS /10 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+Current criterion matrix: **52 PASS /9 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
 
 ## Latest user language policy: NOT_COMPLIANT
 
@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `5e4f27b457c8351f3d031d973add1d4536788d75`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `9d407a5f569d7436d6d6beb5f1564584fc6b191c`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -299,3 +299,21 @@ signed-engine component also passed280/0/1. Both share thee5 source tree;
 separate native/compat failures prevent a wholeCI pass. No new badge change
 or new-source qualification is inferred. See [corpus acceptance](receipts/completed-root-goldens-bb.json)
 and [repair/source evidence](receipts/e5-ci-profile-readme-source.json).
+
+## Genuine pytest summary and SDK error source
+
+Source9d407a5f preserves the existing pytest argv, quiet options and strict
+receipt parser. It appends reporting-only verbosity to PYTEST_ADDOPTS before
+the project command and updates only the full-stage hash. The authorized
+single existing DSL fixture produced an actual7passed terminal summary,
+exit0/0failures/0skips in2.712seconds. Caches stayed outside the checkout,
+with nice19/math1/offline controls and no installs. This proves reporting for
+that fixture, not full-project/environment/native qualification.
+
+The reviewed43-line SDK safe-error target adds two native tests for actual
+error variants/fixed messages and canary redaction. It has not executed;
+D03-S3 stays NOT_RUN. D04-S1 is separately accepted from actuale5 immutable
+fixture/coordinate replay after current/59b source checks. Counts52PASS/
+9NOT_RUN/4historicalBLOCKED leave six engineering tasks and seven Rust
+streams open. D03-S4 and D04-S5 remain NOT_RUN. See [source/proof evidence](receipts/pytest-reporting-and-sdk-errors-source.json)
+and [D04 acceptance](receipts/hosted-native-e5-d04-constants.json). New required CI remains pending.

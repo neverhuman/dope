@@ -35,7 +35,7 @@
     },
     "D03": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "focused_checks": "M2_SOURCE_AUTHORED_NOT_RUN_OTHER_SCOPED_NATIVE_PASSES_RETAINED",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "CPU SDK build/surface and Rust-only dependency criterion S1 accepted at451-equivalent tree; vector/error/legacy remainder pending.",
@@ -45,7 +45,7 @@
     },
     "D04": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "focused_checks": "SCOPED_S1_S2_S3_S4_NATIVE_PASS_S5_NOT_RUN",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Full-reservation spectrum/FINE-not-fabricated criterion S3 accepted; other landmark criteria remain pending.",
@@ -131,10 +131,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 51,
-    "NOT_RUN": 10,
+    "PASS": 52,
+    "NOT_RUN": 9,
     "BLOCKED": 4,
-    "note": "D02S1 completed302/0/0 library and strict163corpus accepted with unchangedmetric/fixture objects. WholefailedjobnotPASS. Original65criteria retained; fourcampaigncriteria deferredneverPASS."
+    "note": "D04S1 scopedimmutablefixture/coordinates accepted; D03S3M2authoredNOTRUN; sixengineeringtasks/sevenRuststreams. Fourcampaigncriteria deferredneverPASS."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -277,7 +277,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "5e4f27b457c8351f3d031d973add1d4536788d75",
+  "current_local_source_commit": "9d407a5f569d7436d6d6beb5f1564584fc6b191c",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -669,6 +669,12 @@
       "NOT_RUN": 11,
       "BLOCKED": 4,
       "note": "Original65criteria preserved. Three individually reviewedactualbbSDK/High/M1targets promoted, wholeengine/fileidentitiesmatch; no generic280/fullCI/science/Pythoncompliance inference. Fourcampaigncriteria deferredneverPASS."
+    },
+    {
+      "PASS": 51,
+      "NOT_RUN": 10,
+      "BLOCKED": 4,
+      "note": "D02S1 completed302/0/0 library and strict163corpus accepted with unchangedmetric/fixture objects. WholefailedjobnotPASS. Original65criteria retained; fourcampaigncriteria deferredneverPASS."
     }
   ],
   "hosted_native_1811_acceptance": {
@@ -964,5 +970,89 @@
       "current_requiredCI": "PENDING_NEW_PUSH"
     },
     "remaining": "10engineeringcriteria/6tasks+7Ruststreams/NOT_COMPLIANT/currentfullCI. Fourcampaigncriteria deferredneverPASS; no science/releaseclaim."
+  },
+  "current_pytest_reporting_sdk_source": {
+    "schema": "dope.pytest-reporting-sdk-error-source/v1",
+    "status": "SOURCE_REVIEWED_SELECTED_REPORTING_PROOF_PASS_NORMAL_CI_REQUIRED",
+    "source_commit": "9d407a5f569d7436d6d6beb5f1564584fc6b191c",
+    "base": "6191ba2c5dd96db61dd632ad1af8265932f692d1",
+    "actual6191_failure": {
+      "job": 126181232577,
+      "artifact": 13268932067,
+      "reason": "project-pytest emits onlydots/END0 underini-q plusCLI-q; genuine terminalsummaryabsent, strictfinishrefuses",
+      "new_claims_commands": "public-claims/claims-render/golden-parity actualPASS; no newcheckerbugclaimed"
+    },
+    "reporting_fix": {
+      "files": [
+        "ops/ci/cpu-compat.sh",
+        "ops/merge_guard/ci_shard_inventory.rs"
+      ],
+      "setup": "export PYTEST_ADDOPTS=\"${PYTEST_ADDOPTS:-} -v\" before originalproject-pytest marker",
+      "existing_options": "Preserved; addsreportverbosity only, no filters/warning/mark/configclear",
+      "role_effect": "Any laterpytestsubprocess gets reportverbosity; no laterdirectpytest/selectedsuitepytest.main orverbosityhooks found. Currentotherroles useunittest/Torch/CLI. Extrasuppressioncanstillfailclosed.",
+      "compat_stage_sha256": "ff7ec06cbcf7745f16c15600e1572050adecc22cbdf1a1f894112bdf398b8033",
+      "unchanged": "Originalargv/body/marker/map/verifier/parser/all70origins/83runtime74markers22testkind; no exceptionadapter"
+    },
+    "selected_existing_CPU_proof": {
+      "receipt_external": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-proof-packets/pytest-summary-env-proposal/selected-proof/RECEIPT.json",
+      "receipt_sha256": "bf4a909275bec8afe59141143e7275d995ebab780e4e6a370a415d7b969d12cd",
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "/usr/bin/python3",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_dsl.py",
+        "-o",
+        "cache_dir=/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-proof-packets/pytest-summary-env-proposal/selected-proof/pytest-cache"
+      ],
+      "actual_terminal_summary": "7 passed in 1.50s",
+      "actual_passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0,
+      "seconds": 2.712317682991852,
+      "preflight_MemAvailable_kib": 85272784,
+      "limits": "Onlyexisting7-casepureDSLfixture, notfullproject/env/nativequalification. Nice19/math1/offline/noinstall/CUDAempty/cacheoutside/bytecodeoff; reporemainedclean. Prior39case/dotproofnotreconstructed."
+    },
+    "M2": {
+      "path": "engine/dope-sdk/tests/safe_errors.rs",
+      "sha256": "5feafd2fdf235afb19e9bf318718b75df8edb73b0c1191dc706999de710d0bf7",
+      "lines": 43,
+      "authored_tests": 2,
+      "native_executed": 0,
+      "criterion": "D03-S3",
+      "verdict": "NOT_RUN",
+      "scope": "ActualSDK malformedweights/schema errorvariant/fixedmessage/canary assertions; no prodAPI/math/deps/locks change"
+    },
+    "D04_S1_acceptance": {
+      "receipt": "dope/receipts/hosted-native-e5-d04-constants.json",
+      "current_NOTRUN_verified": true,
+      "59b_and_current_fixture_tree": "2ec9ce02bbc0e3aaa57351a1da982fc998a76074",
+      "59b_and_current_bundle_blob": "78c8d23d2a742b066ebbe7c7ccabf2333a2f5e17",
+      "current_core_and_goldens_vs_e5": "UNCHANGED",
+      "limits": "Fixture-specificcoordinate/immutable replay only; D04-S5historicalreportbyteoracle remainsNOTRUN"
+    },
+    "checks": {
+      "Rust1.88_fmt": "PASSSDKedition2021/inventoryedition2024",
+      "Bash_syntax": "PASScompat",
+      "diff_check": "PASS",
+      "native_build_tests_executed": 0,
+      "full_currentCI": "PENDING"
+    },
+    "criterion_counts": {
+      "PASS": 52,
+      "NOT_RUN": 9,
+      "historical_BLOCKED": 4
+    },
+    "remaining": "6engineeringtasks/7Ruststreams/9engineeringcriteria/currentfullCI; fourcampaigncriteria deferredneverPASS. NoD03-S4/D04-S5promotion/no newbadge or science claim."
+  },
+  "hosted_e5_D04_S1": {
+    "receipt": "dope/receipts/hosted-native-e5-d04-constants.json",
+    "sha256": "73090cf76b6c7b6f72688127b0c0fea1d730f5425531568a851ec4d745164e33",
+    "source_closure_verified": true
   }
 }

@@ -239,8 +239,8 @@
       "cross_repo_interfaces": [
         "J07 SDK gateway migration after exact parity"
       ],
-      "sha256": "df7a6118f8e0ab0ce6a187b79160169dec8eff28ae733101990daa0780189bd7",
-      "words": 1026,
+      "sha256": "6fd26eecf1320e133cb7c7ddbea378f5a64b0ed17970aef811914bfa9d3e0916",
+      "words": 1046,
       "criterion_verdicts": {
         "D03-S1": {
           "verdict": "PASS",
@@ -257,7 +257,7 @@
         },
         "D03-S3": {
           "verdict": "NOT_RUN",
-          "evidence": "Native invalid schema/weights/recipe and canary journeys require actual tests."
+          "evidence": "New safe_errors43LOC2tests source adopted9d407a5f; stableArtifact/Input/message/canaryassertions not executed. D03-S3 remainsNOTRUN pending actualcurrentnative result."
         },
         "D03-S4": {
           "verdict": "NOT_RUN",
@@ -288,12 +288,17 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "70b9abc40a5f8dc9ce9f53cebabf6df4420335045a3db588b5a0c66cdee6a885",
-      "words": 1045,
+      "sha256": "0ddc60796d7d73c278635cdf1e09992b220ba7db3e7b1358b1e510ef83a8c410",
+      "words": 1102,
       "criterion_verdicts": {
         "D04-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "Shared constants are aliases and all-target compilation passed; actual legacy/golden replay pending."
+          "verdict": "PASS",
+          "evidence": "Root independently read 59b conditioning/descriptors old arrays and e5 canonical panel.rs; each Macro/Larger/Fine index and order exact. Read actual constants_have_one_definition_and_legacy_aliases_keep_coordinates assertion body and actual successful six-test binary log973/980. Recomputed raw Git prepare-v1 tree and landmark_bundle_v1 blob at59b/e5 equal. Gitdiff e5->6191 engine+tests/golden empty. GitHub mergeace parentsmain59b/e5 with identical testedtree independently confirmed. Golden/bundle replay assertions and log outcomes mapped in strongreview; allscope fixture-specific.",
+          "receipt": "../receipts/hosted-native-e5-d04-constants.json",
+          "tested_source": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+          "tested_merge": "ace859a8fc2546fba12feeec989bc5004f072741",
+          "job": 126163801942,
+          "log_sha256": "5753c5b48025d9448d400f8e09fd2211587de9d3a5c42553d28e80877a7bbf9b"
         },
         "D04-S2": {
           "verdict": "PASS",
