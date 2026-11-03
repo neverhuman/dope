@@ -42,13 +42,14 @@ def canonical_schema(schema):
     require(schema["target"] in ("regression", "binary", "multiclass"), "invalid_v4_task")
     k = schema["classes"]
     require(type(k) is int and ((schema["target"] == "regression" and k == 0) or
-            (schema["target"] == "binary" and k == 2) or (schema["target"] == "multiclass" and 3 <= k <= 256)), "invalid_v4_classes")
+            (schema["target"] == "binary" and k == 2) or (schema["target"] == "multiclass" and 2 <= k <= 256)), "invalid_v4_classes")
     groups, cursor, ids = [], 0, set()
     for g in schema["groups"]:
         require(type(g) is dict and set(g) == {"id", "kind", "start", "width", "has_missing"}, "invalid_v4_group")
-        require(type(g["id"]) is int and g["id"] >= 0 and g["id"] not in ids and g["kind"] in KINDS and type(g["has_missing"]) is bool, "invalid_v4_group")
+        require(type(g["id"]) is int and g["id"] == len(groups) and g["id"] not in ids and g["kind"] in KINDS and type(g["has_missing"]) is bool, "invalid_v4_group")
         require(type(g["start"]) is int and g["start"] == cursor and type(g["width"]) is int and g["width"] > 0, "invalid_v4_group")
-        require(g["kind"] == "nominal" or g["width"] == 1 + int(g["has_missing"]), "invalid_v4_group")
+        require((g["kind"] == "nominal" and g["width"] >= 1 + int(g["has_missing"])) or
+                (g["kind"] != "nominal" and g["width"] == 1 + int(g["has_missing"])), "invalid_v4_group")
         ids.add(g["id"]); cursor += g["width"]
         groups.append({key: g[key] for key in ("id", "kind", "start", "width", "has_missing")})
     require(cursor == p, "invalid_v4_group")
@@ -193,9 +194,12 @@ class V4Model(nn.Module):
             group_widths[a:a+w] = w / 256
             kind_codes[a:a+w] = KINDS.index(g["kind"]) / (len(KINDS)-1)
             if g["has_missing"]:
-                missing[a:a+w] = x_fit[:, a+w-1].mean()
+                indicator = x_fit[:, a+w-1]
+                require(bool(((indicator == 0) | (indicator == 1)).all()), "invalid_v4_missing_indicator")
+                missing[a:a+w] = indicator.mean()
             if g["kind"] == "nominal":
-                require(bool((x_fit[:, a:a+w].sum(1) - 1).abs().le(1e-6).all()), "invalid_v4_onehot_group")
+                onehot = x_fit[:, a:a+w]
+                require(bool(((onehot == 0) | (onehot == 1)).all()) and bool((onehot.sum(1) == 1).all()), "invalid_v4_onehot_group")
         stats = torch.stack([means, stds, x_fit.min(0).values, x_fit.max(0).values,
                              covariance, missing, group_widths, kind_codes], dim=1)
         columns = self.column_net(stats)

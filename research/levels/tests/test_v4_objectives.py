@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from research.levels.v4_model import (GATE_KEYS, NativeLandmarks, V4Error, V4Model, basis)
 from research.levels.v4_objectives import LossWeights, sample_differentiable, synthesize_then_learn_loss
 from research.levels.v4_encode import export_packet
-from research.levels.v4_wire_reference import basis as reference_basis, sample_with_draws
+from research.levels.v4_wire_reference import basis as reference_basis, decode as reference_decode, sample_with_draws
 
 
 def schema(task="regression", p=2):
@@ -22,7 +22,10 @@ def schema(task="regression", p=2):
 class V4ObjectiveTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        torch.set_num_threads(1)
+        cls.old_threads=torch.get_num_threads();torch.set_num_threads(1)
+
+    @classmethod
+    def tearDownClass(cls):torch.set_num_threads(cls.old_threads)
 
     def setUp(self):
         torch.manual_seed(17)
@@ -42,7 +45,9 @@ class V4ObjectiveTests(unittest.TestCase):
             self.assertTrue(torch.isfinite(gradient),name)
             self.assertGreater(abs(gradient.item()),1e-14,name)
         result["total"].backward()
-        for head in [self.model.gate_head,self.model.coefficient_head[-1],self.model.marginal_head,self.model.noise_head]:
+        for head in [self.model.column_net[0],self.model.group_net[0],self.model.descriptor_net[0],
+                     self.model.task_head,self.model.dist_head,self.model.gate_head,self.model.coefficient_head[-1],
+                     self.model.pair_head[-1],self.model.row_head,self.model.intercept_head,self.model.marginal_head,self.model.noise_head]:
             self.assertIsNotNone(head.weight.grad)
             self.assertGreater(head.weight.grad.abs().sum().item(),1e-14)
         changed=synthesize_then_learn_loss(self.model,state,self.x.flip(0),self.y.flip(0),(draws*.7+.1),weights=self.weights)
@@ -82,10 +87,40 @@ class V4ObjectiveTests(unittest.TestCase):
         packet,_=export_packet(self.model,state,level="16k")
         expected=sample_with_draws(packet,draws.tolist())
         torch.testing.assert_close(result["synthetic"]["y"],torch.tensor(expected["y"],dtype=torch.float64),rtol=0,atol=0)
+        before=state.target["coefficients"].detach().clone()
+        probabilities=torch.softmax(basis(self.x,state.gates)@before.T+state.target["intercepts"].detach(),dim=1).detach()
+        torch.optim.SGD(self.model.parameters(),lr=1e-3).step()
+        updated=self.model.encode(self.x,y,schema("multiclass"),self.native)
+        self.assertFalse(torch.equal(before,updated.target["coefficients"]))
+        next_probabilities=torch.softmax(basis(self.x,updated.gates)@updated.target["coefficients"].T+updated.target["intercepts"],dim=1)
+        self.assertFalse(torch.equal(probabilities,next_probabilities))
         scalar=torch.tensor(.2,dtype=torch.float64,requires_grad=True)
         logits=torch.randn(6,3,dtype=torch.float64)+scalar
         F.cross_entropy(logits,torch.arange(6)%3).backward()
         self.assertLess(abs(scalar.grad.item()),1e-14)  # released-v3 bug negative control
+
+    def test_nc1_schema_and_exclusive_group_fit_semantics_match_native_contract(self):
+        binary_multiclass=schema("multiclass");binary_multiclass["classes"]=2
+        state=self.model.encode(self.x,(torch.arange(len(self.x))%2).double(),binary_multiclass,self.native)
+        self.assertEqual(state.target["coefficients"].shape,(2,10))
+        _,wire=export_packet(self.model,state,level="16k")
+        self.assertEqual(reference_decode(wire)["schema"]["classes"],2)
+        for bad in [dict(schema(),groups=[{"id":7,"kind":"numeric","start":0,"width":2,"has_missing":True}]),
+                    dict(schema(),columns=1,groups=[{"id":0,"kind":"nominal","start":0,"width":1,"has_missing":True}])]:
+            with self.assertRaisesRegex(V4Error,"^invalid_v4_group$"):
+                self.model.encode(self.x[:,:bad["columns"]],self.y,bad,self.native)
+        nominal=dict(schema(),groups=[{"id":0,"kind":"nominal","start":0,"width":2,"has_missing":False}])
+        with self.assertRaisesRegex(V4Error,"^invalid_v4_onehot_group$"):
+            self.model.encode(torch.full_like(self.x,.5),self.y,nominal,self.native)
+        missing=dict(schema(),groups=[{"id":0,"kind":"numeric","start":0,"width":2,"has_missing":True}])
+        with self.assertRaisesRegex(V4Error,"^invalid_v4_missing_indicator$"):
+            self.model.encode(self.x,self.y,missing,self.native)
+        exclusive=F.one_hot(torch.arange(len(self.x))%2,2).double()
+        valid=self.model.encode(exclusive,self.y,nominal,self.native)
+        loss=synthesize_then_learn_loss(self.model,valid,exclusive,self.y,torch.rand(24,3,dtype=torch.float64),weights=self.weights)
+        loss["total"].backward()
+        self.assertIsNotNone(self.model.support_head[-1].weight.grad)
+        self.assertGreater(self.model.support_head[-1].weight.grad.abs().sum().item(),1e-14)
 
     def test_padding_cannot_affect_encoding_and_column_65_is_not_truncated(self):
         baseline=self.model.encode(self.x,self.y,schema(),self.native)

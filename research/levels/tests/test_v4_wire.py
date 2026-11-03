@@ -1,5 +1,8 @@
 """Data-free independent DML4 graph and Rust-export conformance."""
+import copy
 import json
+import struct
+import zlib
 import hashlib
 import math
 import os
@@ -89,6 +92,31 @@ class V4WireReferenceTests(unittest.TestCase):
                 corrupted[-1] ^= 1
                 with self.assertRaises(Dml4Error):
                     decode(bytes(corrupted))
+
+    def test_nested_identity_shape_and_private_metadata_refuse_before_sampling(self):
+        root = _fixture_root()
+        case = _fixture_cases(root)[0]
+        valid = decode((root / case["packet"]).read_bytes())
+        def wire(packet):
+            body = json.dumps(packet, separators=(",", ":")).encode()
+            return b"DML4\x01" + struct.pack("<II", len(body), zlib.crc32(body)) + body
+        mutations = []
+        for key, value in [("schema_sha256", "0"*64), ("groups", [])]:
+            bad=copy.deepcopy(valid);bad[key]=value;mutations.append(bad)
+        bad=copy.deepcopy(valid);bad["identity"]["weights_sha256"]="PRIVATE_CANARY";mutations.append(bad)
+        bad=copy.deepcopy(valid);bad["schema"]["groups"][0]["id"]=17;mutations.append(bad)
+        bad=copy.deepcopy(valid);bad["target"]["coefficients"]=[];mutations.append(bad)
+        bad=copy.deepcopy(valid);bad["groups"][0]["PRIVATE_CANARY"]="PRIVATE_VALUE";mutations.append(bad)
+        bad=copy.deepcopy(valid);bad["gates"]["linear"]=True;mutations.append(bad)
+        for packet in mutations:
+            with self.subTest(packet_keys=tuple(packet)):
+                with self.assertRaises(Dml4Error) as caught:decode(wire(packet))
+                self.assertNotIn("PRIVATE",str(caught.exception))
+                with self.assertRaises(Dml4Error):sample(packet,1,0)
+        body=json.dumps(valid,separators=(",", ":")).encode()
+        body=body[:-1]+b',"contract":"dope.dml4-reference/v1"}'
+        with self.assertRaises(Dml4Error):
+            decode(b"DML4\x01"+struct.pack("<II",len(body),zlib.crc32(body))+body)
 
     def test_required_fixture_missing_is_failure_not_skip(self):
         missing = Path(__file__).resolve().parent / "fixtures" / "__missing_conformance_directory__"
