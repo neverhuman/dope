@@ -116,13 +116,31 @@ fn actual_normalize_cli_private_fit_public_projection_query_roles_and_tail() {
     }
 
     let classification = root.join("classification.json");
+    let numeric_values: Vec<Value> = [0., 1., 2., 3.]
+        .iter()
+        .map(|v| json!({"kind":"number","value":v}))
+        .collect();
+    let label_values: Vec<Value> = [
+        "CANARY_TARGET_NEG",
+        "CANARY_TARGET_POS",
+        "CANARY_TARGET_NEG",
+        "CANARY_TARGET_POS",
+    ]
+    .iter()
+    .map(|v| json!({"kind":"category","value":v}))
+    .collect();
+    let unused_values: Vec<Value> = ["u", "u", "u", "u"]
+        .iter()
+        .map(|v| json!({"kind":"category","value":v}))
+        .collect();
+
     write(
         &classification,
         &json!({
             "table":{"source_sha256":"c".repeat(64),"row_ids":[17,37,77,117],"columns":[
-                {"name":"class-feature","values":[0.,1.,2.,3.].iter().map(|v|json!({"kind":"number","value":v})).collect::<Vec<_>>()},
-                {"name":"private-class-target","values":["CANARY_TARGET_NEG","CANARY_TARGET_POS","CANARY_TARGET_NEG","CANARY_TARGET_POS"].iter().map(|v|json!({"kind":"category","value":v})).collect::<Vec<_>>()},
-                {"name":"unused-after-target","values":["u","u","u","u"].iter().map(|v|json!({"kind":"category","value":v})).collect::<Vec<_>>()}
+                {"name":"class-feature","values":numeric_values},
+                {"name":"private-class-target","values":label_values},
+                {"name":"unused-after-target","values":unused_values}
             ]},
             "declared":{"features":[{"column":0,"kind":"continuous"}],"target":{"column":1,"task":"binary","positive_label":"CANARY_TARGET_POS"}},
             "fit_rows":[17,37,77,117]
