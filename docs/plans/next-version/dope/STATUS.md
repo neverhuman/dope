@@ -2,6 +2,10 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
+## Latest user language policy: NOT_COMPLIANT
+
+Python is permitted only for genuine deep-learning training and necessary training-coupled state. The retained v3 summary/Elo and evaluation/orchestration paths are nontraining migration debt, not approved Python end state. The current snapshot has 890 tracked Python files; 787 runtime-inventory paths exclude103 research/levels files. No inventory or historical exception is a waiver. [The Rust migration queue](language-policy/README.md) tracks seven external source-only lanes and separate LP-/RS-/rs- acceptance IDs. No Rust packet has been adopted or natively qualified by this documentation update. Preserve all compatibility/test/evidence history; the original 65 criteria below remain their historical scoped baseline, not new-policy completion.
+
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.

@@ -1,5 +1,7 @@
 # Next version DOPE tasks
 
+> **Latest language policy: NOT_COMPLIANT.** Python is only for DL training; other responsibilities migrate to Rust. See [the source-only seven-lane program](language-policy/README.md). Its new acceptance IDs are separate from the preserved original 65-criterion baseline.
+
 > **Current execution status:** see [STATUS.md](STATUS.md). The planning text and table below preserve the original planning snapshot; their PLANNED wording is historical, not a current implementation or qualification claim.
 
 DOPE changes are justified, starting with trustworthy measurement and an identity-preserving facade/landmark path. The new normalization/model lane follows those foundations. All 12 tasks are **PLANNED**; none has been implemented or scientifically qualified for this assignment.

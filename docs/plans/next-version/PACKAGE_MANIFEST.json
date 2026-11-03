@@ -27,8 +27,8 @@
       "sha256": "9952fe609fc0a4332092b133c2eb073855d0d6f2a8a2e3b153087718d42bec5e"
     },
     "dope/README.md": {
-      "bytes": 4781,
-      "sha256": "06b79932f8afb9d7fb496b57095d55059463a3dfccf8a7b3fb408ad27dce8504"
+      "bytes": 5055,
+      "sha256": "fdd6d7bd2d6fad5f4f2d014e062eedb2445f7fafcc1f1187ccab41141a552582"
     },
     "dope/tasks/d00-contracts-lineage-and-decision-record.md": {
       "bytes": 8714,
@@ -135,12 +135,76 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 6454,
-      "sha256": "d8086814be1918f8b4aeaae5aec0a9ed5d24f5e2071321f6875897cd121352c7"
+      "bytes": 7257,
+      "sha256": "656d28437ca230aba8141127577597a46f26ccf39ec8d9f8394ba1f02c55e8a6"
     },
     "STATUS.json": {
       "bytes": 8829,
       "sha256": "4e6262f076b027e7d20fa836c5fb26e6bda2150280c5502507431d278c8cfa3d"
+    },
+    "dope/language-policy/README.md": {
+      "bytes": 10323,
+      "sha256": "82465a8e6febc9776e8fa846e47793fce4094c40467521be857c8b4b28c0c8b6"
+    },
+    "dope/language-policy/inventory-coverage.json": {
+      "bytes": 638,
+      "sha256": "36c4ec4165ea6ac395cb5a62fb1f6ea174419114c18affe7409017fb631b1c4f"
+    },
+    "dope/language-policy/migration-manifest.json": {
+      "bytes": 17881,
+      "sha256": "620a0f2e3e452630b9e42850ffcaa45029af99679b6441439127c9b3e19ef02a"
+    },
+    "dope/language-policy/policy.json": {
+      "bytes": 2746,
+      "sha256": "346ef346be435b4e9a0eb483087eebaa6df541c4e2dfa73000d768d410c1df0f"
+    },
+    "dope/language-policy/remote-lanes/rs01.md": {
+      "bytes": 5957,
+      "sha256": "3fa0397e1f923a2aa7518b9f43069d1a81640bcee4617b44265810d2427e6f5c"
+    },
+    "dope/language-policy/remote-lanes/rs02.md": {
+      "bytes": 5814,
+      "sha256": "fd56de4bb6410fb58485e5442b63374da7ab61ee75b549f9048781811e66a8e2"
+    },
+    "dope/language-policy/remote-lanes/rs03.md": {
+      "bytes": 5878,
+      "sha256": "7fd131737b6c6fdb26be82d01f6af54e6f771fcd8884e7fce4e7e49efd270433"
+    },
+    "dope/language-policy/remote-lanes/rs04.md": {
+      "bytes": 5774,
+      "sha256": "6a9149a2122d53fe2d62ea1c305038f8dc705b1e7872e9d5e3f82ab8b2c66638"
+    },
+    "dope/language-policy/remote-lanes/rs05.md": {
+      "bytes": 5816,
+      "sha256": "f44e428562f1b8416dec1a2a6b4937d70643f954677aee3a48e8b61100f5a4d2"
+    },
+    "dope/language-policy/remote-lanes/rs06.md": {
+      "bytes": 5816,
+      "sha256": "c299a0fb852c40b6d5a6c047dcceeb2b6aae4f9697b42daad216f6cc21156611"
+    },
+    "dope/language-policy/remote-lanes/rs07.md": {
+      "bytes": 5865,
+      "sha256": "5b52af9a703ac77e65f93547cc3a28836068d406928bb328c59b96608504de4d"
+    },
+    "dope/language-policy/tasks/RS00-v3-summary-rust-port.md": {
+      "bytes": 5376,
+      "sha256": "4a710b02942b4a55f8775213435bd1c2ef669198ed35f2738c351f9af6c27bde"
+    },
+    "dope/language-policy/tasks/RS01-v3-runner-orchestration-rust-port.md": {
+      "bytes": 6364,
+      "sha256": "0cfdf68c4656a6ca7cd99534624c709948ee442d44f017edebe9b334df650d5f"
+    },
+    "dope/language-policy/tasks/RS02-python-dl-training-boundary.md": {
+      "bytes": 6044,
+      "sha256": "1211bd199c7f17d1b06d97ce471990ac8f0154da5775c972dcca71359e1f4e85"
+    },
+    "dope/language-policy/tasks/V3-RUST-MIGRATION-TASKS.md": {
+      "bytes": 14815,
+      "sha256": "b63a8c5fa5a013ef58b63ee56b86c58822fdf482b9e6d3e8b45017dddaef6c59"
+    },
+    "dope/language-policy/training-boundary-audit.md": {
+      "bytes": 9219,
+      "sha256": "30d085aafed161a46d15aa8ed57d8e40620befdb2bc6aa2a73b0c188b7d15d8a"
     }
   },
   "historical_status": "PLANNED"

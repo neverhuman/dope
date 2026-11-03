@@ -1,5 +1,11 @@
 # Architecture and ownership
 
+## Latest language requirement and migration status
+
+The user's current rule permits Python only for deep-learning training. All nontraining preparation, inference, validation/metrics, reports, orchestration and executable checks must be Rust at end state. Training autograd/loss/optimizer work and necessary training-coupled batching/RNG/checkpoint state may remain Python; standalone prediction/scoring does not become training because it uses a neural model. This overrides the historical V1/advanced-data/Python benchmark exceptions described below as end-state authority.
+
+**DOPE is NOT_COMPLIANT today:** 890 tracked Python files include known active nontraining operators. The 787-path runtime inventory excludes 103 research/levels files and is not full function classification. Preserve old code, tests, fixtures, data/model/results and receipts while Rust parity is proved. Neither a source-only port packet nor an exception-list entry grants compliance. [The tracked migration program](plans/next-version/dope/language-policy/README.md) separates source authorship, review, native tests, caller activation, full CI and policy acceptance. Existing architecture descriptions below record current/historical boundaries, not exemptions from the new rule.
+
 ## DOPE engine (`engine/`)
 
 `engine/` is the deployable product: a standalone pure-Rust workspace with its own
