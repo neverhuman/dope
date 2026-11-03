@@ -325,7 +325,7 @@ class V4Trainer:
         from safetensors.torch import load_file
 
         root = Path(path)
-        try:
+        with _training_helpers.checkpoint_read_boundary(TrainerError):
             pointer = json.loads((root / "CURRENT").read_text(encoding="utf-8"))
             generation = pointer["generation"]
             if not isinstance(generation, str) or not re.fullmatch(r"[0-9a-f]{32}", generation):
@@ -335,8 +335,6 @@ class V4Trainer:
             model_file = root / pointer["model"]
             state_file = root / pointer["state"]
             state = torch.load(state_file, map_location="cpu", weights_only=True)
-        except Exception as exc:
-            raise TrainerError("checkpoint_missing_or_invalid") from exc
         if state.get("format") != "dope.v4-training-resume/v2":
             raise TrainerError("checkpoint_format_mismatch")
         if state.get("identity") != self.identity.as_dict():

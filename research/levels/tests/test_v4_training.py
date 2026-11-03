@@ -372,6 +372,70 @@ class V4TrainingTests(unittest.TestCase):
             for key, tensor in before.items():
                 self.assertTrue(torch.equal(tensor, invalid_target.model.state_dict()[key]))
 
+    def test_checkpoint_read_boundary_translates_ordinary_fault_and_preserves_state(self):
+        class DecoderFailure(Exception):
+            pass
+        class DecoderAbort(BaseException):
+            pass
+        with tempfile.TemporaryDirectory() as tmp:
+            source = trainer()
+            source.save_checkpoint(tmp)
+            target = trainer()
+            model_before = weights(target.model)
+            optimizer_before = copy.deepcopy(target.optimizer.state_dict())
+            scheduler_before = copy.deepcopy(target.scheduler.state_dict())
+            cursor_before = (target.permutation[:], target.cursor, target.update_count,
+                             target.attempt_count, target.failed_update_count)
+            python_rng_before = random.getstate()
+            numpy_rng_before = np.random.get_state()
+            torch_rng_before = torch.get_rng_state().clone()
+            time_before = (target.setup_seconds, target.compute_seconds)
+
+            def assert_unchanged():
+                for key, value in model_before.items():
+                    self.assertTrue(torch.equal(value, target.model.state_dict()[key]), key)
+                self.assertEqual(target.optimizer.state_dict(), optimizer_before)
+                self.assertEqual(target.scheduler.state_dict(), scheduler_before)
+                self.assertEqual((target.setup_seconds, target.compute_seconds), time_before)
+                self.assertEqual((target.permutation, target.cursor, target.update_count,
+                                  target.attempt_count, target.failed_update_count), cursor_before)
+                self.assertEqual(random.getstate(), python_rng_before)
+                numpy_rng_after = np.random.get_state()
+                self.assertEqual(numpy_rng_after[0], numpy_rng_before[0])
+                np.testing.assert_array_equal(numpy_rng_after[1], numpy_rng_before[1])
+                self.assertEqual(numpy_rng_after[2:], numpy_rng_before[2:])
+                self.assertTrue(torch.equal(torch.get_rng_state(), torch_rng_before))
+
+            decoder_failure = DecoderFailure("arbitrary decoder failure")
+            with patch("research.levels.v4_trainer.torch.load", side_effect=decoder_failure):
+                with self.assertRaisesRegex(TrainerError, "checkpoint_missing_or_invalid") as raised:
+                    target.load_checkpoint(tmp)
+            self.assertIs(raised.exception.__cause__, decoder_failure)
+            self.assertEqual(str(raised.exception), "checkpoint_missing_or_invalid")
+            assert_unchanged()
+
+            abort = DecoderAbort("process-control exception")
+            with patch("research.levels.v4_trainer.torch.load", side_effect=abort):
+                with self.assertRaises(DecoderAbort) as raised_abort:
+                    target.load_checkpoint(tmp)
+            self.assertIs(raised_abort.exception, abort)
+            assert_unchanged()
+
+    def test_malformed_checkpoint_pointer_uses_read_boundary_without_state_change(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = trainer()
+            before = weights(target.model)
+            rng_before = torch.get_rng_state().clone()
+            Path(tmp, "CURRENT").write_text("{", encoding="utf-8")
+            with self.assertRaisesRegex(TrainerError, "checkpoint_missing_or_invalid") as raised:
+                target.load_checkpoint(tmp)
+            self.assertIsInstance(raised.exception.__cause__, json.JSONDecodeError)
+            self.assertEqual(target.cursor, 0)
+            self.assertEqual(target.update_count, 0)
+            self.assertTrue(torch.equal(rng_before, torch.get_rng_state()))
+            for key, value in before.items():
+                self.assertTrue(torch.equal(value, target.model.state_dict()[key]), key)
+
     def test_checkpoint_ignores_orphan_generation_and_missing_pointer_preserves_target(self):
         source = trainer()
         source.fit_step()
