@@ -193,3 +193,25 @@ Counts remain38PASS/23NOT_RUN/4historicalBLOCKED. See the
 [source and scoped execution receipt](receipts/stage-pin-and-sdk-prepared-surface.json).
 
 The README score now copies the exact generated87-point SVG from the authentic1811 hosted artifact. Its clean/full report passed the85floor with0caps/high/critical; the original job still failed the old88snapshot comparison. This is historical source-bound evidence, not a fresh pass for the new SDK/CI batch. The earlier451 witness is retained unchanged.
+
+## Frozen command syntax and SDK lock repair
+
+Source5378f87c fixes actualbedf failures without relaxing coverage or --locked.
+Two reviewed workflow origins contain inline YAML run keys; only that exact
+source path removes one literal key for argv comparison, after its unchanged
+full-block hash check. The paper-number test again explicitly receives
+PYTHONPATH=., matching its original command. Only the live command body hashes
+and transfer-stage hash change; frozen origins,70rows and test IDs are retained.
+Independent source comparison checks70of70commands,73markers and all5stagepins.
+
+The SDK lock entry now disambiguates the already locked safetensors0.7.0. Full
+Rust1.88 offline locked metadata succeeds without changing lock bytes, compiling
+or running tests. No package version/source/checksum or dependency is updated.
+The same batch restores the original main-pinned sccache action and two compile
+environment settings to the three X64 workers. Actual cache performance and any
+audit-score effect are unmeasured; the current source needs its own fresh audit.
+
+Formatting, Bash, Actionlint, source-limit and diff checks pass. New native
+execution and required CI remain NOT_RUN/PENDING; actualbedf failures are
+preserved. No acceptance promotions follow from these source checks. See the
+[repair receipt](receipts/bedf-command-and-lock-repair.json).

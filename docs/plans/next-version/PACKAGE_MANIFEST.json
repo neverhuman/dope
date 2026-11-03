@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 21998,
-      "sha256": "d775fe8c1ae5c571658b24bc1334a86891217f57c2a892441176577f548c8e25"
+      "bytes": 23360,
+      "sha256": "82103e9566b4b317de4173e7d845ed3c0ee26f237202f44711d9e69389714940"
     },
     "STATUS.json": {
-      "bytes": 25543,
-      "sha256": "0c21466b090aadf0ebc66091e0c9c531350f6c475adc1eac489164dc8308aa89"
+      "bytes": 29695,
+      "sha256": "0b038c68ae540deb2c986716612ccfb4ccc8b15bd945b6e16a3ad39e66a210e7"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -241,6 +241,10 @@
     "dope/receipts/hosted-audit-1811-snapshot.json": {
       "bytes": 1363,
       "sha256": "c53b1d522af139e07dd985285ddbc83ce83a0bfa12f015b8c860807c8a7ec1b5"
+    },
+    "dope/receipts/bedf-command-and-lock-repair.json": {
+      "bytes": 3558,
+      "sha256": "3f864a7d74007f2ae3badd0cafa287feb667160461461a7f86492b6403c09c52"
     }
   },
   "historical_status": "PLANNED"
