@@ -70,7 +70,19 @@ fn high_equal(table: &PreparedTable, full: &ProgressiveLandmarks, high: &Progres
         .map(|r| r.map(f32::to_bits))
         .collect();
     assert_eq!(a_cols, b_cols);
+    // This effective digest hashes only recipe/level/vec256/64x17. It is
+    // deliberately distinct from the bundle digest (which includes all masks).
     assert_eq!(a.digest(), b.digest());
+    if full.bundle().mask != high.bundle().mask {
+        assert_ne!(
+            full.bundle().conditioning_digest(),
+            high.bundle().conditioning_digest()
+        );
+    }
+    assert_ne!(
+        serde_json::to_vec(&full.report().private_report()).unwrap(),
+        serde_json::to_vec(&high.report().private_report()).unwrap()
+    );
     assert_eq!(
         serde_json::to_vec(&full.report().spectrum).unwrap(),
         serde_json::to_vec(&high.report().spectrum).unwrap(),

@@ -18,7 +18,7 @@ Included: protocol skeleton, evidence/status separation, named hard gates, sourc
 
 ## Identity and evidence boundaries
 
-The planning snapshot lists DOPE source base `59b1e0513683fa4c5c347e4db6465eff84f496ef`. Later implementation commits and their parent chain are not known here; the campaign must bind the actual full source HEAD after all prerequisite work and review. This source identity is separate from the standalone encoder SHA `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c` and JopeDime identity `c51a56d031a4af40cb2b2661e6230109db684fc5cf80743dcad5c2fc770ba814`. These identify different artifacts and must not be substituted.
+The planning snapshot lists DOPE source base `59b1e0513683fa4c5c347e4db6465eff84f496ef`. The manifest records the observed engineering checkpoint and its implementation parent chain. It deliberately leaves the actual campaign source unselected; the campaign must bind its actual full source HEAD after all prerequisite work and review. This source identity is separate from the standalone encoder SHA `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c` and JopeDime identity `c51a56d031a4af40cb2b2661e6230109db684fc5cf80743dcad5c2fc770ba814`. These identify different artifacts and must not be substituted.
 
 The current program snapshot has 22 tasks and 104 success criteria. D11 depends on D00–D10; task count and plan status do not prove any prerequisite passed. Exact-current-head source, evaluator, metrics, NC1, wire, model/trainer graph, checkpoint identity, and their receipts are all unverified for this packet. Every missing/stale item blocks admission.
 
@@ -55,4 +55,4 @@ Stop on stale or mismatched source identity, reused exposure or experiment ID, m
 
 Acceptance for this readiness deliverable means the manifest is syntactically valid, all required keys and explicit blockers are present, source/artifact identities remain distinct, and the receipt records the exact candidate file hashes. It does **not** mean any D11-S criterion passed or that a campaign is ready. Future readiness requires owner review of evidence and an explicit transition to `READY_FOR_OWNER_ADMISSION`; launch still requires separate authorization and an admitted resource slot.
 
-Current handoff: candidate packet only; actual training, campaign, outcomes, exact-head CI, release, and adoption are `NOT_RUN`. All unverified prerequisites and campaign-design/resource fields remain blocking. Do not execute a campaign from this document.
+Current handoff: readiness packet only. Bounded synthetic CPU optimizer fixtures are engineering evidence; actual campaign training, campaign outcomes, exact-head CI, release, and adoption are `NOT_RUN`. All unverified prerequisites and campaign-design/resource fields remain blocking. Do not execute a campaign from this document.
