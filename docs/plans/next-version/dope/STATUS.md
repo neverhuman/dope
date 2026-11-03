@@ -9,10 +9,10 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `4054cef554ff631a47852b9229469fb6f24a8923`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `53c2b0088744b77d6516617b514697dd357df374`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
-- The current static tracked-source inventory covers 1,291 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
+- The current static tracked-source inventory covers 1,292 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
 
 A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; those earlier source-preservation pushes launched no PR or workflow.
 
@@ -99,3 +99,20 @@ The [completed metric receipt](receipts/completed-root-metrics-ccd.json) promote
 D02-S2/S3 only. The enclosing job was cancelled; completed root-library 298/0/0
 and named Python successor subtargets remain scoped evidence. D02-S1 strict
 whole-corpus discovery and D02-S4 actual grouped-member execution remain open.
+
+## Strict native golden caller slice
+
+Source `53c2b0088744b77d6516617b514697dd357df374` routes the two active
+golden validation steps through existing native nonempty-test discovery. Strict
+recursive admission checks 163 standard cases (129 top-level plus 34 driver-v2)
+and the seven differently formatted rank cases separately. IO/missing/symlink,
+duplicate/shape/component errors refuse; no old fixture bytes change. Source
+review, Rust1.88 formatting and static caps pass. Four new Rust test functions,
+the exact 163-case replay and actual caller execution remain **NOT_RUN**;
+D02-S1 stays open. See the [source receipt](receipts/strict-golden-caller.json).
+
+Only the golden step has migrated in public-smoke; its independent historical
+claim/publication checks and the seven migration streams remain open. Python
+originals and old test intent are preserved, and policy status is still
+NOT_COMPLIANT. Criterion counts remain 38 PASS / 23 NOT_RUN / 4 historical
+BLOCKED, with the four campaign criteria separately deferred and never PASS.

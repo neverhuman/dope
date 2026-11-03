@@ -131,12 +131,12 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "12dab8a6a64db44bdcb8c0e356b3006fd0cdd0b7cc96ca43d500cfdf60eec08a",
-      "words": 1169,
+      "sha256": "50bd7513fa1c0146942930a2cca6a2102ab3b2ed9d6dfe67956a7f85f79cf0f7",
+      "words": 1185,
       "criterion_verdicts": {
         "D02-S1": {
           "verdict": "NOT_RUN",
-          "evidence": "Existing root golden and legacy driver targets passed as scoped completed subtargets; the log prints no corpus-case count. Static a23 inventory has129top-level+34nested cases; strict complete discovery/read-error proof remains pending. Historical fixtures unchanged."
+          "evidence": "Strict recursive native corpus/caller source implemented at53c2b008: exact163standard cases (129top+34v2) and seven separate analytic cases, typed IO/symlink/shape refusal. Native execution NOT_RUN; existing completed Rust golden logs print no case count. Historical expected bytes unchanged."
         },
         "D02-S2": {
           "verdict": "PASS",

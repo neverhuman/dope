@@ -39,8 +39,8 @@
       "sha256": "73953978226c862e3a87029089a8646673583e7ad9f946e9b885ff882b65a349"
     },
     "dope/tasks/d02-versioned-driver-rank-successor.md": {
-      "bytes": 9927,
-      "sha256": "12dab8a6a64db44bdcb8c0e356b3006fd0cdd0b7cc96ca43d500cfdf60eec08a"
+      "bytes": 10051,
+      "sha256": "50bd7513fa1c0146942930a2cca6a2102ab3b2ed9d6dfe67956a7f85f79cf0f7"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
       "bytes": 8572,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 27117,
-      "sha256": "bcdb98e1980c2eb61c5365b3b3bc76bace2b3fe18575410aca6d68e9ff4de7d5"
+      "bytes": 27143,
+      "sha256": "525c967607e673e5c01c931590a95a537930121cecd9bcdad6c09e3e6580a9ba"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 15846,
-      "sha256": "6b21a14b2da3e9ebc369608539fbc19a9acf91288acda1fcb6ab413917145204"
+      "bytes": 16888,
+      "sha256": "fc9e8576d5057f035366d8098bae1011d646cf76144c3fdba459644a94476a91"
     },
     "STATUS.json": {
-      "bytes": 11408,
-      "sha256": "9fc27df9577c8da34dde4bbf1e9fabacb0858a8a8853b9e47dcb5414ad689e18"
+      "bytes": 13760,
+      "sha256": "f077e06d443acecc5aef4adb5824c212d8fdcb458bad6ff8f71eabbdc89cf7a6"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -221,6 +221,10 @@
     "dope/receipts/engineering-release-scope-owner-decision.json": {
       "bytes": 1275,
       "sha256": "3bf01d2331dfc0aca1d22b9733cff9caf202e6b0be250d4e7f4d67c9567a4765"
+    },
+    "dope/receipts/strict-golden-caller.json": {
+      "bytes": 2141,
+      "sha256": "f0deb3830b1ebc1762411becc30a3e00e7c2646070549bf5a935b6c11a3d4890"
     }
   },
   "historical_status": "PLANNED"

@@ -1,0 +1,50 @@
+{
+  "schema": "dope.native-caller-source-activation/v1",
+  "status": "SOURCE_IMPLEMENTED_NATIVE_NOT_RUN",
+  "source_commit": "53c2b0088744b77d6516617b514697dd357df374",
+  "base": "664ab442f7083e908bd6bc23dd303aa1e0841e5b",
+  "owner": "/root/dope_audit",
+  "independent_reviewer": "/root/ci_shard_review",
+  "scope": [
+    "rust/metrics/golden.rs",
+    "rust/metrics/golden/discovery.rs",
+    "rust/metrics/golden/discovery_tests.rs",
+    "Justfile:golden-parity",
+    "ops/ci/public-smoke.sh:golden_step"
+  ],
+  "corpus_static_inventory": {
+    "top_level": 129,
+    "drivers_v2": 34,
+    "standard_total": 163,
+    "separate_analytic_rank": 7,
+    "standard_ids_unique": true
+  },
+  "guarantees_authored": [
+    "Required component/v2/rank directories; recursive IO/entry/symlink/special-node refusal",
+    "Exact163andper-componentassertions; seven rank fixture objects separately evaluated",
+    "Explicit outer-schema2 legacy v2 driver dispatch; historical run_case still rejects schema2",
+    "Existing native audit-proof focus refuses zero discovered tests",
+    "Original Python sources and all expected fixture bytes preserved"
+  ],
+  "source_api_note": "discover_cases now returns MetricResult<Vec<PathBuf>> to propagate IO refusal. The sole existing repository caller and new tests handle the result; engineSDK ABI/wires unchanged.",
+  "new_rust_test_functions": 4,
+  "checks": {
+    "rustfmt_1_88_edition2024": "PASS",
+    "bash_syntax": "PASS",
+    "diff_check": "PASS",
+    "static_source_caps": {
+      "governed": 1292,
+      "violations": 0
+    },
+    "new_native_tests_executed": 0,
+    "compile": "NOT_RUN",
+    "checker": "NOT_RUN",
+    "full_current_ci": "PENDING"
+  },
+  "criterion_effect": {
+    "D02-S1": "NOT_RUN until full strict native corpus assertions execute",
+    "D02-S4": "NOT_RUN until separate actual production grouped-member fixture executes"
+  },
+  "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
+  "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
+}
