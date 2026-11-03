@@ -43,24 +43,24 @@
       "sha256": "bf5556ab837b11de6db921fd3a5b614d4f4f0c9593885ce30e177f070759b77c"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
-      "bytes": 8416,
-      "sha256": "50b7bbbdd2629db6fca2d3afa51f3890e6b224d70738ed33800fe165de4253cd"
+      "bytes": 8572,
+      "sha256": "c1ef172b071cf1914eddf188de7101b208a03f3c9b8b29dab8cb4ce51206ef0d"
     },
     "dope/tasks/d04-high-landmark-dependency-plan.md": {
-      "bytes": 8470,
-      "sha256": "3f14107b7c3a1152633cfa984e31e5f7a08b740137cb2142d459ba83c08216f5"
+      "bytes": 8734,
+      "sha256": "2350ca6cefc4b7b628a5b754b2650af394c829602907e995f0467dcbe3c482d0"
     },
     "dope/tasks/d05-nc1-private-normalization-contract.md": {
-      "bytes": 9646,
-      "sha256": "4087a53730f78fed7f3816dc97677d198f230e5f6f76bfc44d3c8f18e291848f"
+      "bytes": 9995,
+      "sha256": "5d8a94699c4f18caf57eddc8b6f1176401d569a9f0a092fd290f6cce1ba710ef"
     },
     "dope/tasks/d06-dvs-and-audit-card.md": {
       "bytes": 8886,
       "sha256": "62549ad16cf329e2b6dfd602f24421120c914c7a568080b3363b94585fd8b9ae"
     },
     "dope/tasks/d07-dml4-wire-reference-sampler-and-hard-caps.md": {
-      "bytes": 9322,
-      "sha256": "664e66a7e375cce7e641b47d31622819c87cbd662577f8f448266a24a0374153"
+      "bytes": 9650,
+      "sha256": "17f4e68afef72bcee644576a3b8024dba0e85300368c2192ec03cf1bcfa32dd0"
     },
     "dope/tasks/d08-batched-resumable-trainer.md": {
       "bytes": 9663,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 24865,
-      "sha256": "594e4cdbc81ab675dbb6ea63f9797c08a9e022c004d057584bb8328fb5526389"
+      "bytes": 25586,
+      "sha256": "cdf7df9b8446dce2fa953d1db072b2e526d93a0c0b863d86819bd359710efa3e"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 11356,
-      "sha256": "a6de06bdaeb33fb53c1bb39c4848ec3b74e23e2aef9d4a06d76a58988095510b"
+      "bytes": 14135,
+      "sha256": "7f39ad3cf570401d8a964409a96a45cdf91c98c5d6c22397f5fad7480218a0a1"
     },
     "STATUS.json": {
-      "bytes": 8829,
-      "sha256": "4e6262f076b027e7d20fa836c5fb26e6bda2150280c5502507431d278c8cfa3d"
+      "bytes": 10119,
+      "sha256": "0e87bd5e8e5d0a7e52fa501a86f071c1366de914539009a8054ee0b593294df0"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -205,6 +205,14 @@
     "dope/language-policy/training-boundary-audit.md": {
       "bytes": 9219,
       "sha256": "30d085aafed161a46d15aa8ed57d8e40620befdb2bc6aa2a73b0c188b7d15d8a"
+    },
+    "dope/receipts/hosted-native-451-criteria.json": {
+      "bytes": 8089,
+      "sha256": "e4b02670e2c63ad9012c5a7c84ccd5e21ad73ef41c38f51ae7cde61668eb597e"
+    },
+    "dope/receipts/jankurai-451-snapshot.json": {
+      "bytes": 1398,
+      "sha256": "f95e76af2c0330ef1e43f62ad5d233e68469863e4dc4b5b196838b8f7b76d39f"
     }
   },
   "historical_status": "PLANNED"

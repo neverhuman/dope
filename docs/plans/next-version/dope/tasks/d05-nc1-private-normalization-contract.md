@@ -1,6 +1,6 @@
 # D05 — Implement additive FIT-only normalization with private owner state
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D05/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D05/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Named native fixtures below passed at the pinned hosted 451-equivalent tree; final-head full CI and remaining criteria are still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -64,9 +64,9 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
-| D05-S1 | **NOT_RUN** | Rust strict fit-card contract fixture compiled; actual poisoning/ordering execution pending. |
+| D05-S1 | **PASS** | Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json. |
 | D05-S2 | **NOT_RUN** | Typed declarations and physical row IDs are implemented; native conversion/CLI role tests pending. |
-| D05-S3 | **NOT_RUN** | Tracked Integer/all-missing/declared-class reference fixtures pass; full native extremes/reserved/high-cardinality matrix pending. |
+| D05-S3 | **PASS** | Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json. |
 | D05-S4 | **NOT_RUN** | Public schema structure and Python malformed-card refusals pass; actual native CLI/error canary journeys pending. |
 | D05-S5 | **PASS** | Three source-bound actual Rust NC1 exports replay in default Python test_nc1 without ENV/skip; private/public JSON schemas validate. This is focused fixture evidence, not full native qualification. |
 | D05-S6 | **NOT_RUN** | Legacy preparation remains separate and SDK NC1 explicit; complete legacy native decoder replay pending. |

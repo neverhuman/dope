@@ -217,12 +217,12 @@
       "cross_repo_interfaces": [
         "J07 SDK gateway migration after exact parity"
       ],
-      "sha256": "50b7bbbdd2629db6fca2d3afa51f3890e6b224d70738ed33800fe165de4253cd",
-      "words": 970,
+      "sha256": "c1ef172b071cf1914eddf188de7101b208a03f3c9b8b29dab8cb4ce51206ef0d",
+      "words": 984,
       "criterion_verdicts": {
         "D03-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "Locked Rust1.88 workspace all-target check PASS at84a55cf9; SDK actual tests and CPU dependency graph test execution pending."
+          "verdict": "PASS",
+          "evidence": "Hosted CPU SDK surface/build and Rust-only dependency inspection passed at tested merge2b50c78d/treec2f59ae4 equal451; criterion-scoped only. See ../receipts/hosted-native-451-criteria.json."
         },
         "D03-S2": {
           "verdict": "NOT_RUN",
@@ -261,8 +261,8 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "3f14107b7c3a1152633cfa984e31e5f7a08b740137cb2142d459ba83c08216f5",
-      "words": 969,
+      "sha256": "2350ca6cefc4b7b628a5b754b2650af394c829602907e995f0467dcbe3c482d0",
+      "words": 990,
       "criterion_verdicts": {
         "D04-S1": {
           "verdict": "NOT_RUN",
@@ -273,8 +273,8 @@
           "evidence": "High-required native fixture is compiled; actual vector/digest matrix execution pending. Effective vector-only digest is distinguished from mask-bound bundle identity."
         },
         "D04-S3": {
-          "verdict": "NOT_RUN",
-          "evidence": "Tight spectrum boundary fixtures compiled; actual full-reservation admission execution pending."
+          "verdict": "PASS",
+          "evidence": "Hosted native tight_spectrum_boundaries_reserve_unused_full_panel_cost and high_omits_fine_marks_readiness_and_preserves_conditioning passed at451-equivalent tested tree; full reservation and NotRequested FINE asserted. See ../receipts/hosted-native-451-criteria.json."
         },
         "D04-S4": {
           "verdict": "NOT_RUN",
@@ -310,20 +310,20 @@
         "J05 NC1 intake",
         "J06 owner-private emitter"
       ],
-      "sha256": "4087a53730f78fed7f3816dc97677d198f230e5f6f76bfc44d3c8f18e291848f",
-      "words": 1116,
+      "sha256": "5d8a94699c4f18caf57eddc8b6f1176401d569a9f0a092fd290f6cce1ba710ef",
+      "words": 1142,
       "criterion_verdicts": {
         "D05-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "Rust strict fit-card contract fixture compiled; actual poisoning/ordering execution pending."
+          "verdict": "PASS",
+          "evidence": "Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json."
         },
         "D05-S2": {
           "verdict": "NOT_RUN",
           "evidence": "Typed declarations and physical row IDs are implemented; native conversion/CLI role tests pending."
         },
         "D05-S3": {
-          "verdict": "NOT_RUN",
-          "evidence": "Tracked Integer/all-missing/declared-class reference fixtures pass; full native extremes/reserved/high-cardinality matrix pending."
+          "verdict": "PASS",
+          "evidence": "Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json."
         },
         "D05-S4": {
           "verdict": "NOT_RUN",
@@ -419,12 +419,12 @@
         "J06 private owner transform contract",
         "J09 optional artifact consumer"
       ],
-      "sha256": "664e66a7e375cce7e641b47d31622819c87cbd662577f8f448266a24a0374153",
-      "words": 1085,
+      "sha256": "17f4e68afef72bcee644576a3b8024dba0e85300368c2192ec03cf1bcfa32dd0",
+      "words": 1102,
       "criterion_verdicts": {
         "D07-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "All six gates serialized in authoritative basis registry; nondefault native basis fixture compiled; execution pending."
+          "verdict": "PASS",
+          "evidence": "Hosted each_active_gate_changes_its_declared_basis_coordinate and fitted_and_decoded_nondefault_gates_match_independent_math passed for all six gates at451-equivalent tree. See ../receipts/hosted-native-451-criteria.json."
         },
         "D07-S2": {
           "verdict": "NOT_RUN",
@@ -439,8 +439,8 @@
           "evidence": "Malformed wire/native bounds fixtures compiled; actual refusal execution pending."
         },
         "D07-S5": {
-          "verdict": "NOT_RUN",
-          "evidence": "Reference source-free sampling passes; actual native and CLI absent-source/card/encoder journeys pending."
+          "verdict": "PASS",
+          "evidence": "Hosted decoded-packet source_free_replay_and_group_validity and fixed_draws_apply_missing_onehot_and_target_exactly passed at451-equivalent tree; no source/encoder/private card used by sampler. See ../receipts/hosted-native-451-criteria.json."
         },
         "D07-S6": {
           "verdict": "NOT_RUN",

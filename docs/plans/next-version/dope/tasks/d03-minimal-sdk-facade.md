@@ -1,6 +1,6 @@
 # D03 — Expose a minimal identity-preserving DOPE SDK
 
-Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D03/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Exact-head native/full CI is still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
+Current status: **SOURCE IMPLEMENTED; VALIDATION IN PROGRESS.** Branch `fast/next-version-dope-20261103` in the same isolated checkout. See [live source/check ledger](../../STATUS.json) and external receipts `/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D03/<full-head>/RECEIPT.json`. Source implementation does not establish every success criterion. Named native fixtures below passed at the pinned hosted 451-equivalent tree; final-head full CI and remaining criteria are still pending; scientific efficacy/release/serving remains unqualified. One integrator owns repository writes; refresh the current owner claim before any further change.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -61,7 +61,7 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
-| D03-S1 | **NOT_RUN** | Locked Rust1.88 workspace all-target check PASS at84a55cf9; SDK actual tests and CPU dependency graph test execution pending. |
+| D03-S1 | **PASS** | Hosted CPU SDK surface/build and Rust-only dependency inspection passed at tested merge2b50c78d/treec2f59ae4 equal451; criterion-scoped only. See ../receipts/hosted-native-451-criteria.json. |
 | D03-S2 | **NOT_RUN** | SDK surface test compiled; direct-core/facade parity execution pending. |
 | D03-S3 | **NOT_RUN** | Native invalid schema/weights/recipe and canary journeys require actual tests. |
 | D03-S4 | **NOT_RUN** | No arithmetic copied; full legacy native replay still pending. |

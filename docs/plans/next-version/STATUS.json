@@ -5,120 +5,120 @@
     "D00": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "ADRs and frozen machine-readable decisions; no campaign authorization",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D01": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Prospective common REAL-FIT route opt-in; historical replay retained; applied Python fixture PASS",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D02": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Additive informative rank; v1/v2 untouched; applied Python fixture PASS; root Rust pending",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D03": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Native facade/no duplicate arithmetic; Rust1.88 SDK compilation pending",
-      "release": "NOT_AUTHORIZED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "notes": "CPU SDK build/surface and Rust-only dependency criterion S1 accepted at451-equivalent tree; vector/error/legacy remainder pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D04": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Explicit High-required execution with full reservation; actual native fixture pending",
-      "release": "NOT_AUTHORIZED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "notes": "Full-reservation spectrum/FINE-not-fabricated criterion S3 accepted; other landmark criteria remain pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D05": {
       "source": "IMPLEMENTED",
-      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Strict NC1 private card/public schema and native CLI; tracked Rust-produced Python fixtures PASS; native CLI pending",
-      "release": "NOT_AUTHORIZED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "notes": "FIT-card poisoning/order and edge/refusal criteria S1/S3 accepted; other NC1/native CLI criteria remain pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D06": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D07": {
       "source": "IMPLEMENTED",
-      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "focused_checks": "ACCEPTED_SCOPED_HOSTED_NATIVE_FIXTURES_AT_451",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Closed six-gate DML4 graph; hard caps; external Rust and applied default Python fixtures PASS; actual engine pending",
-      "release": "NOT_AUTHORIZED",
-      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "notes": "Nondefault gate definition and source-free sampling criteria S1/S5 accepted; remaining wire/CLI/compatibility criteria pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D08": {
       "source": "IMPLEMENTED_CPU_ONLY",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "CPU bounded batching, native23 masks, actual batch2 gradient/padding proof, transactional updates, counters and content-bound checkpointv2. CUDA optimizer training unsupported; no GPU or speed claim.",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D09": {
       "source": "IMPLEMENTED",
       "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Group-aware autograd producer, all served gates, actual classification update, native aux and all intended module gradients, strict NC1/DML4 interop and FP32 AMP Gram/solve; no campaign or model qualification.",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D10": {
       "source": "IMPLEMENTED",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Local combined check-all target; existing hosted engine coverage retained; full local gate pending",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     },
     "D11": {
       "source": "READINESS_HOLD",
       "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
-      "full_ci": "NOT_RUN_WAITING_SEPARATE_ADMISSION",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "Readiness dossier created; no qualification campaign launched; prerequisites and owner admission remain HOLD",
-      "release": "NOT_AUTHORIZED",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
       "criterion_verdicts": "dope/tasks/inventory.json"
     }
@@ -127,12 +127,12 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 30,
-    "NOT_RUN": 31,
+    "PASS": 36,
+    "NOT_RUN": 25,
     "BLOCKED": 4,
-    "note": "Per-criterion evidence lives in dope/tasks/inventory.json; PASS is scoped, never full scientific/release qualification."
+    "note": "Six accepted hosted451-equivalent criterion promotions; historical30/31/4 preserved in dope/receipts/hosted-native-451-criteria.json. PASS is scoped, not fullCI/scientific/release qualification."
   },
-  "capacity_gate": "ALL_LOCAL_CI_GREEN_OR_EXPLICIT_COORDINATOR_CAPACITY_ACK_REQUIRED_BEFORE_NATIVE_TESTS_PR_OR_CI",
+  "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
     "source_sha": "84a55cf95c33b22964e976c49b41cde7144671f1",
     "status": "PASS",
@@ -141,10 +141,16 @@
     "receipt": "node2/engine-check-84a55cf9/RECEIPT.json"
   },
   "native_execution": {
-    "status": "NOT_RUN_FINAL_HEAD",
-    "executed_tests": 0,
-    "admission": "11:36:58 focused source_limits test only if85percentguard admits; fullgates/PRseparateadmission",
-    "note": "Prior compile and interrupted attempts retain their own source pins and receipts."
+    "status": "HOSTED_PARTIAL_FIXTURE_PASS_AT_PINNED_TREE_CURRENT_ACTIVATION_NOT_RUN",
+    "tested_commit": "2b50c78d5ed47bcb02449ec970ab3be44dfa1889",
+    "tested_tree": "c2f59ae4165fad5234b2c8621b8974f2342c0ba9",
+    "equivalent_pr_head": "451ad47423a98db9de104269174dfe26eebf5e9f",
+    "passed": 252,
+    "failed": 0,
+    "ignored": 1,
+    "overall_job": "FAILURE_LICENSE_COLLECTION",
+    "release_job": "SKIPPED",
+    "receipt": "dope/receipts/hosted-native-451-criteria.json"
   },
   "python_legacy_goldens": {
     "status": "PASS",
@@ -181,5 +187,13 @@
     "executed_tests": 0,
     "receipt": "node2/core-fixtures-84a55cf9/CAPACITY_HOLD.json",
     "note": "Compilation only before termination; never count as a test pass."
+  },
+  "rust_frozen_checker_activation": {
+    "source": "ACTIVATED_PENDING_HOSTED_BUILD_TESTS",
+    "binary": "check-frozen-evidence",
+    "ci_route": "first executing guard in ops/ci/cpu.sh; Justfile native-guard-check",
+    "compile_tests_parity": "NOT_RUN_LOCALLY",
+    "python_originals": "PRESERVED",
+    "scope": "C0-reason parity plus minimal root CLI forms; not universal argparse parity"
   }
 }

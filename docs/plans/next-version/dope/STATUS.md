@@ -4,7 +4,7 @@ The twelve engineering packets have implemented source or readiness controls. **
 
 ## Latest user language policy: NOT_COMPLIANT
 
-Python is permitted only for genuine deep-learning training and necessary training-coupled state. The retained v3 summary/Elo and evaluation/orchestration paths are nontraining migration debt, not approved Python end state. The current snapshot has 890 tracked Python files; 787 runtime-inventory paths exclude103 research/levels files. No inventory or historical exception is a waiver. [The Rust migration queue](language-policy/README.md) tracks seven external source-only lanes and separate LP-/RS-/rs- acceptance IDs. No Rust packet has been adopted or natively qualified by this documentation update. Preserve all compatibility/test/evidence history; the original 65 criteria below remain their historical scoped baseline, not new-policy completion.
+Python is permitted only for genuine deep-learning training and necessary training-coupled state. The retained v3 summary/Elo and evaluation/orchestration paths are nontraining migration debt, not approved Python end state. The current snapshot has 890 tracked Python files; 787 runtime-inventory paths exclude103 research/levels files. No inventory or historical exception is a waiver. [The Rust migration queue](language-policy/README.md) tracks seven external source-only lanes and separate LP-/RS-/rs- acceptance IDs. The existing Rust frozen-evidence checker is now activated in the CPU/Justfile routes; its new synthetic tests and compatibility extension still require hosted compilation/execution. The broader seven Rust migration lanes remain incomplete and unqualified. Preserve all compatibility/test/evidence history; the original 65 criteria below remain their historical scoped baseline, not new-policy completion.
 
 ## Source and evidence boundaries
 
@@ -16,11 +16,11 @@ Python is permitted only for genuine deep-learning training and necessary traini
 
 A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; those earlier source-preservation pushes launched no PR or workflow.
 
-The single consolidated [draft PR #356](https://github.com/neverhuman/dope/pull/356) was created at the pushed `8998054913a3ac3bfdc4f9c59da2847a1c61bf5b` checkpoint. Subsequent repair commits append to that same branch and PR. Its hosted CI, native qualification and MAIN HOLD remain separate from the bounded local proofs.
+The single consolidated [draft PR #356](https://github.com/neverhuman/dope/pull/356) was created at the pushed `8998054913a3ac3bfdc4f9c59da2847a1c61bf5b` checkpoint. Subsequent repair commits append to that same branch and PR. Its required CI/review, native qualification and release qualification remain separate from the bounded local proofs.
 
 ## Named acceptance criteria
 
-The preserved 65-criterion baseline is **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED**. PASS describes only the specific evidence cited by that criterion; it never means full CI, scientific efficacy, privacy certification, release or serving approval.
+The historical 65-criterion baseline was **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED**. Six accepted, source-bound hosted native fixture promotions bring the current matrix to **36 scoped PASS / 25 NOT_RUN / 4 BLOCKED**. Only D01, D08 and D10 are fully scoped PASS tasks; nine tasks remain open. The [acceptance receipt](receipts/hosted-native-451-criteria.json) preserves the original counts, exact tested synthetic merge/tree and the failed overall job disposition. PASS describes only the specific evidence cited by that criterion; it never means full CI, scientific efficacy, privacy certification, release or serving approval.
 
 | Task | Implemented scope | Execution disposition | PASS / NOT_RUN / BLOCKED |
 | --- | --- | --- | --- |
@@ -28,16 +28,26 @@ The preserved 65-criterion baseline is **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED
 | D01 | Prospective common REAL-FIT evaluation | Source implemented; validation incomplete | 5 / 0 / 0 |
 | D02 | Additive informative driver rank | Source implemented; validation incomplete | 1 / 4 / 0 |
 | D10 | Explicit local product gate | Source implemented; validation incomplete | 5 / 0 / 0 |
-| D03 | Minimal native SDK facade | Source implemented; validation incomplete | 1 / 4 / 0 |
-| D04 | Opt-in High-required landmarks | Source implemented; validation incomplete | 0 / 5 / 0 |
-| D05 | FIT-only NC1 normalization | Source implemented; validation incomplete | 1 / 5 / 0 |
+| D03 | Minimal native SDK facade | Scoped hosted criterion PASS; remainder pending | 2 / 3 / 0 |
+| D04 | Opt-in High-required landmarks | Scoped hosted criterion PASS; remainder pending | 1 / 4 / 0 |
+| D05 | FIT-only NC1 normalization | Scoped hosted criteria PASS; remainder pending | 3 / 3 / 0 |
 | D06 | DVS receipt and Audit Card | Source implemented; validation incomplete | 0 / 6 / 0 |
-| D07 | Closed DML4 wire and sampler | Source implemented; validation incomplete | 1 / 5 / 0 |
+| D07 | Closed DML4 wire and sampler | Scoped hosted criteria PASS; remainder pending | 3 / 3 / 0 |
 | D08 | Bounded CPU trainer and exact resume | Source implemented; validation incomplete | 5 / 0 / 0 |
 | D09 | V4 model and served-graph objective | Source implemented; validation incomplete | 4 / 2 / 0 |
 | D11 | Qualification readiness controls | Readiness HOLD | 3 / 0 / 3 |
 
 Every success ID and evidence explanation remains in [the machine-readable task inventory](tasks/inventory.json). The counts above have not been promoted merely because source exists or helpers were reorganized. The shared [machine status](../STATUS.json) retains the same distinctions.
+
+## Hosted native fixture evidence and Rust CI activation
+
+Hosted run `41645948435`, job `125951185831`, actually tested synthetic merge `2b50c78d5ed47bcb02449ec970ab3be44dfa1889`. Its tree `c2f59ae4165fad5234b2c8621b8974f2342c0ba9` equals PR head `451ad47423a98db9de104269174dfe26eebf5e9f`. The observed Rust summaries total 252 passed, zero failed and one ignored microbenchmark. The job failed later while collecting the missing dope-norm license; the release job was skipped. These are partial fixture results, never a whole-job or release PASS.
+
+Source review accepts only D03-S1, D04-S3, D05-S1/S3 and D07-S1/S5 from that execution. Each task/inventory entry links the exact tests and criterion scope. The later two-license commit `ccd28bb0122425e625e36323091627267a46af39` preserves those product source bodies but has its own packaging/CI disposition.
+
+The next source batch routes the existing `check-frozen-evidence` Rust binary before evidence-producing CPU steps and through `just native-guard-check`, with the binary included in Clippy/tests. The pinned manifest, recorded map digest, allowlist and all protected evidence bytes remain untouched. Original Python source and tests remain preserved. Added Rust synthetic fixtures cover the former Python scenarios, control-whitespace reasons, non-UTF-8 inventory refusal and the documented split/equal/empty root CLI forms. Compilation, fixture execution and full CLI parity are **NOT_RUN locally**; ordinary PR CI must qualify the activation. Rustfmt, shell syntax and static source/preimage checks are separate evidence.
+
+The README now identifies the historical local Jankurai 1.7.1 score of 88 at source 451 with a [hash-only witness](receipts/jankurai-451-snapshot.json). That report says `dirty_worktree=true` despite independently clean tracked Git status. It is not a clean-source badge attestation or proof for later commits. Existing CI badges, generated SVG and exact-head badge verification remain unchanged.
 
 ## Checks actually completed
 
@@ -57,8 +67,8 @@ These receipts verify transitional compatibility tests. They do **not** establis
 
 ## Remaining gates and stop conditions
 
-The 11:36:58 coordinator ACK admits only one focused source-limit test at nice19/-j1 through the existing semaphore **if the 85% allocation guard admits the existing target**. Quiet source-preservation pushes to the existing fast branch are user-authorized after verifying that no workflow or open PR will trigger CI. The user and the 12:56:37 coordinator handoff admit one consolidated draft DOPE PR after the bounded repair batch, with MAIN HOLD retained. Full native gates and dispatched CI still require their normal capacity admission; draft publication is not a native/full-CI PASS. No alternate target/cache, guard bypass, cleanup of others' storage, or foreign-job signal is authorized. A refused or unstarted test is NOT_RUN, never PASS. Final frozen-head preflight and any refusal are recorded externally.
+The 11:36:58 coordinator ACK admits only one focused source-limit test at nice19/-j1 through the existing semaphore **if the 85% allocation guard admits the existing target**. Quiet source-preservation pushes to the existing fast branch are user-authorized after verifying that no workflow or open PR will trigger CI. The single consolidated draft DOPE PR is #356. The latest user instruction authorizes merge and a new version release after real required CI and review; the old extra human merge-approval hold is superseded. Full native gates and dispatched CI still require their normal capacity admission; draft publication is not a native/full-CI PASS. No alternate target/cache, guard bypass, cleanup of others' storage, or foreign-job signal is authorized. A refused or unstarted test is NOT_RUN, never PASS. Final frozen-head preflight and any refusal are recorded externally.
 
 After capacity admission, execute the focused native guard and required source-bound engine/root checks, then the ordinary full CI routes. `just check-all` covers kernel plus engine; the shared-levels next-version Python/native shards require their own admitted workflow route because the quiet fast branch does not trigger that matrix automatically. Stop on a failing check, renewed reserved ledger activity, allocation refusal or changed source pin; preserve logs and fix forward within ownership.
 
-D00-S4 and D11-S2/S3/S4 remain blocked on actual campaign roster/exposure/custody, frozen owner hypotheses/thresholds/resources and admission. The [readiness manifest](../../v4-qualification-readiness.md) is HOLD. The CPU trainer does not support CUDA optimizer training. No training campaign, protected outcome access, model promotion, privacy certification, merge, release or serving activation has been performed or inferred.
+D00-S4 and D11-S2/S3/S4 remain blocked on actual campaign roster/exposure/custody, frozen owner hypotheses/thresholds/resources and admission. The [readiness manifest](../../v4-qualification-readiness.md) is HOLD. The CPU trainer does not support CUDA optimizer training. No training campaign, protected outcome access, model promotion, privacy certification, merge, release or serving activation has been performed or inferred. Product merge/release authorization does not convert the scientific readiness HOLD into a measured result or waive required checks.

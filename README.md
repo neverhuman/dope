@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Engine: pure Rust](https://img.shields.io/badge/engine-pure%20Rust-orange.svg)](engine/)
 
-The score snapshot is checked against each fresh full-audit CI report; click it for current run status.
+Last completed local full-audit measurement: **88/100 (pass)** with Jankurai 1.7.1 at [source `451ad474`](https://github.com/neverhuman/dope/commit/451ad47423a98db9de104269174dfe26eebf5e9f), with zero caps, HIGH or critical findings ([hash-only witness](docs/plans/next-version/dope/receipts/jankurai-451-snapshot.json)). This historical report marked the worktree dirty despite independently clean tracked Git status; it does not qualify later commits or hosted CI. The generated score snapshot is checked against each fresh exact-head CI audit; click the badges for current run status.
 
 ![Overall multi-auditor tournament Elo and holdout retention by byte-budget tier across the thousand-dataset benchmark: DOPE (v1.0.0) against raw row subsampling, Gaussian copula, tabular diffusion, and adversarial random forests.](bench/real-world/figures/hero.png)
 
