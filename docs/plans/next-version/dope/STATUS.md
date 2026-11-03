@@ -10,6 +10,8 @@ The twelve engineering packets have implemented source or readiness controls. **
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and the code checkpoint above. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The static tracked-source inventory covers 1,289 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
 
+A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; no PR or workflow was launched.
+
 ## Named acceptance criteria
 
 The preserved 65-criterion baseline is **30 scoped PASS / 31 NOT_RUN / 4 BLOCKED**. PASS describes only the specific evidence cited by that criterion; it never means full CI, scientific efficacy, privacy certification, release or serving approval.
@@ -41,7 +43,7 @@ Evidence is retained under `/home/ubuntu/jope_plan/evidence/next-version-impleme
 
 ## Remaining gates and stop conditions
 
-The 11:36:58 coordinator ACK admits only one focused source-limit test at nice19/-j1 through the existing semaphore **if the 85% allocation guard admits the existing target**. Full native gates, PR creation, push and dispatched CI still need separate admission. No alternate target/cache, guard bypass, cleanup of others' storage, or foreign-job signal is authorized. A refused or unstarted test is NOT_RUN, never PASS. Final frozen-head preflight and any refusal are recorded externally.
+The 11:36:58 coordinator ACK admits only one focused source-limit test at nice19/-j1 through the existing semaphore **if the 85% allocation guard admits the existing target**. Quiet source-preservation pushes to the existing fast branch are user-authorized after verifying that no workflow or open PR will trigger CI. Full native gates, PR creation and dispatched CI still need separate admission. No alternate target/cache, guard bypass, cleanup of others' storage, or foreign-job signal is authorized. A refused or unstarted test is NOT_RUN, never PASS. Final frozen-head preflight and any refusal are recorded externally.
 
 After capacity admission, execute the focused native guard and required source-bound engine/root checks, then the ordinary full CI routes. `just check-all` covers kernel plus engine; the shared-levels next-version Python/native shards require their own admitted workflow route because the quiet fast branch does not trigger that matrix automatically. Stop on a failing check, renewed reserved ledger activity, allocation refusal or changed source pin; preserve logs and fix forward within ownership.
 
