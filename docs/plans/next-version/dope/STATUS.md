@@ -2,7 +2,7 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
-Current criterion matrix: **50 PASS /11 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+Current criterion matrix: **51 PASS /10 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
 
 ## Latest user language policy: NOT_COMPLIANT
 
@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `492fae914f6151cf32e14dad16699b40019d999a`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `5e4f27b457c8351f3d031d973add1d4536788d75`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -274,3 +274,28 @@ respectively, with0failures/0ignored. No promotion follows from280tests alone.
 Counts are now50PASS/11NOT_RUN/4historicalBLOCKED. Current required CI, the
 remaining11criteria and seven Rust streams remain open. The four campaign
 criteria remain separately deferred, never PASS. See [the reviewed receipt](receipts/hosted-native-bb-criteria.json).
+
+## D02 scoped completion and reviewed e5 CI repair
+
+D02-S1 is now PASS from the completed302/0/0 root-library subtarget atbb.
+Its real corpus assertion checks163cases, including129top-level and34nested
+driver-v2 cases; seven analytic rank cases and strict refusal tests also ran.
+Metric/fixture identities remain unchanged, and no old fixture was rewritten.
+The enclosing job failed later. D02 has all five scoped criteria PASS; current
+full CI is separate. Counts51PASS/10NOT_RUN/4historicalBLOCKED leave six
+original engineering tasks and seven Rust migration streams open.
+
+Source5e4f27b4 repairs only approved README audit prose/link labels and the
+main-filtered synthetic workflow profile helper. Exactscore/source/job/history
+links remain, the productionguard/claimschecker/workflows/oldJSON fixtures are
+unchanged, and all six helper tests/negative conditions remain. The zero-context
+README patch had a line-number offset; its exactoldtext was verified before the
+approved replacement, without changing scope. Source review/format/diff pass;
+new test execution and current full CI remain pending.
+
+The actuale5 full audit succeeded: clean/full88,0caps/high/critical,11medium,
+strictsecurity5ran0skip0fail,9proofpasses and a matching committed badge. The
+signed-engine component also passed280/0/1. Both share thee5 source tree;
+separate native/compat failures prevent a wholeCI pass. No new badge change
+or new-source qualification is inferred. See [corpus acceptance](receipts/completed-root-goldens-bb.json)
+and [repair/source evidence](receipts/e5-ci-profile-readme-source.json).

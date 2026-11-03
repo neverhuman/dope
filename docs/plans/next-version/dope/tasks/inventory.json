@@ -121,7 +121,7 @@
         "D00"
       ],
       "priority": "P0",
-      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "status": "SCOPED_ENGINEERING_COMPLETE_CURRENT_FULL_CI_PENDING",
       "success_criteria": [
         "D02-S1",
         "D02-S2",
@@ -131,12 +131,24 @@
       ],
       "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/",
       "cross_repo_interfaces": [],
-      "sha256": "9feacd6b868bb5ec9056c260f4a97a8e7188a9cab5603405cb41e6bc73da05a9",
-      "words": 1224,
+      "sha256": "20a1dbf728c263ea0d1f0e2605492bf3f63500e4d9662f55b2a535050445cd26",
+      "words": 1288,
       "criterion_verdicts": {
         "D02-S1": {
-          "verdict": "NOT_RUN",
-          "evidence": "Strict recursive native corpus/caller source implemented at53c2b008: exact163standard cases (129top+34v2) and seven separate analytic cases, typed IO/symlink/shape refusal. Native execution NOT_RUN; existing completed Rust golden logs print no case count. Historical expected bytes unchanged."
+          "verdict": "PASS",
+          "evidence": "Actual metrics::golden::tests::rust_matches_golden_parity_corpus PASS log1339. Root independently read actual tested golden.rs: verify_golden_corpus over real repository tests/golden asserts exactly163 total cases, component totals aggregate30/charge9/drivers48/frontier31/transfer45, exactly34 nested drivers/v2. Thus this is actual129top-level+34v2 corpus, not just a two-case synthetic discovery fixture or an inferred count from a Rust test name. Seven separate analytic rank cases are checked by strict discovery; the actual missing/malformed/duplicate/symlink refusal tests also passed log1320-1324. Frozen existing fixture bytes unchanged versus planning59b: Git diff tests/golden shows only added informative-v1/rank-cases.json, no modified/deleted old fixtures.",
+          "receipt": "../receipts/completed-root-goldens-bb.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "completed_subtarget": {
+            "library": "rust/lib.rs",
+            "passed": 302,
+            "failed": 0,
+            "ignored": 0,
+            "terminal_log_line": 1441
+          },
+          "whole_job": "FAILURE_LATER_CLIPPY_TYPE_COMPLEXITY_NOT_PASS",
+          "log_sha256": "021c5cb16952f9745e6a09686c93b46bf47bc614855963be864454fe6f99d5a3"
         },
         "D02-S2": {
           "verdict": "PASS",
@@ -160,7 +172,8 @@
           "evidence": "test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately."
         }
       },
-      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json",
+      "criteria_complete": true
     },
     {
       "id": "D10",

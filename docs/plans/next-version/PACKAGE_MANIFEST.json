@@ -39,8 +39,8 @@
       "sha256": "73953978226c862e3a87029089a8646673583e7ad9f946e9b885ff882b65a349"
     },
     "dope/tasks/d02-versioned-driver-rank-successor.md": {
-      "bytes": 10411,
-      "sha256": "9feacd6b868bb5ec9056c260f4a97a8e7188a9cab5603405cb41e6bc73da05a9"
+      "bytes": 11036,
+      "sha256": "20a1dbf728c263ea0d1f0e2605492bf3f63500e4d9662f55b2a535050445cd26"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
       "bytes": 8991,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 34802,
-      "sha256": "a1b7bc3291149ae802298a3bb9e7d71f9a185292204598dadf3ce71b81104cd4"
+      "bytes": 35898,
+      "sha256": "383c6eb4ed592961676d5339ff5dabce52cfaae9b8ef496ead839cccbd04c597"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 27515,
-      "sha256": "b1cc17526a77e221d4daa8264c70eabbec9e2345a5dd3880f78ae62395787d89"
+      "bytes": 29107,
+      "sha256": "cda6734410a9361b0ba3d3c1b6c7307f159a46b3c35e5b7e4d2904f8aea2c432"
     },
     "STATUS.json": {
-      "bytes": 40147,
-      "sha256": "429bd424f670e58328c3dcc8634a60d26eb7949ba743d51ea0351c8b138e7125"
+      "bytes": 44646,
+      "sha256": "03b196a0a2655847e7da989ca5bdf5b765560a2461c3be093e3cfeb9ac9edb03"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -265,6 +265,14 @@
     "dope/receipts/hosted-native-bb-criteria.json": {
       "bytes": 4399,
       "sha256": "63a99552bb8797726bb2e65e05bab20b3ec47c6865a538f9bf9c515e3d2bf90d"
+    },
+    "dope/receipts/completed-root-goldens-bb.json": {
+      "bytes": 2825,
+      "sha256": "5b6b83d14dbd80f3c846595f17366442b4795bea4874541409fcd1461e2ae0db"
+    },
+    "dope/receipts/e5-ci-profile-readme-source.json": {
+      "bytes": 3685,
+      "sha256": "90c7c7587a46604ddab0c63521ecd375e7e86dde27a13d4a1897cf819a7a38a5"
     }
   },
   "historical_status": "PLANNED"

@@ -24,13 +24,14 @@
     },
     "D02": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
-      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "focused_checks": "ALL5_CRITERIA_SCOPED_SOURCE_BOUND_PASS",
+      "full_ci": "CURRENT_REQUIRED_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "S2/S3 accepted from completed root Rust/Python subtargets despite later job cancellation. S1/S4 remain pending; current full CI separate.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
-      "criterion_verdicts": "dope/tasks/inventory.json"
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "engineering_criteria": "COMPLETE_SCOPED_PASS"
     },
     "D03": {
       "source": "IMPLEMENTED",
@@ -130,10 +131,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 50,
-    "NOT_RUN": 11,
+    "PASS": 51,
+    "NOT_RUN": 10,
     "BLOCKED": 4,
-    "note": "Original65criteria preserved. Three individually reviewedactualbbSDK/High/M1targets promoted, wholeengine/fileidentitiesmatch; no generic280/fullCI/science/Pythoncompliance inference. Fourcampaigncriteria deferredneverPASS."
+    "note": "D02S1 completed302/0/0 library and strict163corpus accepted with unchangedmetric/fixture objects. WholefailedjobnotPASS. Original65criteria retained; fourcampaigncriteria deferredneverPASS."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -276,7 +277,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "492fae914f6151cf32e14dad16699b40019d999a",
+  "current_local_source_commit": "5e4f27b457c8351f3d031d973add1d4536788d75",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -352,13 +353,12 @@
     ]
   },
   "current_ci_known_failure": {
-    "CI_run": 41699461094,
-    "native_job": 126140855993,
-    "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
-    "compat_job": 126140855691,
-    "compat": "FAIL public-claims tools/claims/check.py\u2192figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
-    "audit_job": 126138603944,
-    "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
+    "CI_run": 41706702071,
+    "native_job": 126163801333,
+    "native": "Two test-onlyworkflow_events mainprofile conversions failed; productionactualworkflowtestpassed",
+    "compat_job": 126163801292,
+    "compat": "Public-numberfirewall3literalversion/historicallabeltokens; notparser/dependency/test-summaryfix",
+    "disposition": "Failuresretained; no guard/regex/fixtureweakening"
   },
   "historical_ci_worker_activation": [
     {
@@ -663,6 +663,12 @@
       "NOT_RUN": 14,
       "BLOCKED": 4,
       "note": "Original65 criteria retained. Nine individually reviewed1811 source/test closures promoted; no generic273/currentSDK/allCI inference. Four campaign criteria separately deferred, neverPASS."
+    },
+    {
+      "PASS": 50,
+      "NOT_RUN": 11,
+      "BLOCKED": 4,
+      "note": "Original65criteria preserved. Three individually reviewedactualbbSDK/High/M1targets promoted, wholeengine/fileidentitiesmatch; no generic280/fullCI/science/Pythoncompliance inference. Fourcampaigncriteria deferredneverPASS."
     }
   ],
   "hosted_native_1811_acceptance": {
@@ -869,5 +875,94 @@
       "D05-S4"
     ],
     "whole_engine_closure_current_verified": "bd87d75d65f76606fd8c9a520412c07c7191ed94"
+  },
+  "engineering_tasks_open": 6,
+  "historical_tasks_open": 8,
+  "completed_root_goldens_bb": {
+    "receipt": "dope/receipts/completed-root-goldens-bb.json",
+    "sha256": "5b6b83d14dbd80f3c846595f17366442b4795bea4874541409fcd1461e2ae0db",
+    "criterion": "D02-S1",
+    "source_objects_verified": true
+  },
+  "current_e5_ci_profile_readme_repair": {
+    "schema": "dope.e5-reviewed-ci-repair-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "5e4f27b457c8351f3d031d973add1d4536788d75",
+    "base": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+    "source_scope": [
+      "README approvedauditparagraphlabels only: pinned auditor/earlierhosted/earlierlocal;88score/source/job/witness/historypreserved; no claimschecker change",
+      "Test-onlyworkflow_eventshelper expands main-filtered synthetic profile to exactcurrent7CI+auditjobs/uniqueIDs; all6testbodies/negativeconditions/oldJSON/prodguard unchanged"
+    ],
+    "reviewed_packets": {
+      "guard_candidate_sha256": "412ed4e59c33db10f91b6d6a16760275b305ff512c947a6cf8efc9caa450417d",
+      "guard_preimage_sha256": "34a073831b68da026de678cfd7ac889a442275cb7f450f616a262fe39fc27d4c",
+      "guard_manifest_sha256": "aa3caf8eaf2a65fc299067a174d1963e84dcd2e523eec34b02ae8f47e30eb988",
+      "README_mechanical_correction": "Authorzero-contexthunkheaderline9; exactprimaryoldparagraphline10. Preflights refusedbeforewrites; appliedonlyexact singleapprovedold\u2192newtext, allURLsunchanged.",
+      "compat_receipt_metadata_correction": "Authorworkflow_run_idwasjobnumber. Actualworkflowrun41706702071/job126163801292; authorreceiptpreserved/rootreviewrecords correction."
+    },
+    "actual_e5_failures": {
+      "CI_run": 41706702071,
+      "native_job": 126163801333,
+      "native": "Two test-onlyworkflow_events mainprofile conversions failed; productionactualworkflowtestpassed",
+      "compat_job": 126163801292,
+      "compat": "Public-numberfirewall3literalversion/historicallabeltokens; notparser/dependency/test-summaryfix",
+      "disposition": "Failuresretained; no guard/regex/fixtureweakening"
+    },
+    "actual_e5_qualified_components": {
+      "source": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+      "tested_merge": "ace859a8fc2546fba12feeec989bc5004f072741",
+      "tested_tree": "f58b7e60c264fc52e39344261cdbd3b8e9cca031",
+      "matches_source_tree": true,
+      "audit": {
+        "run": 41706702169,
+        "job": 126163801917,
+        "job_conclusion": "SUCCESS",
+        "version": "1.7.1",
+        "scope": "full",
+        "dirty": false,
+        "score": 88,
+        "raw": 88,
+        "caps": 0,
+        "high": 0,
+        "critical": 0,
+        "medium": 11,
+        "strict_security": "5ran0skip0fail",
+        "proof_tests": 9,
+        "committed_badge_matches": true,
+        "artifact": 13268015978,
+        "report_sha256": "c894c281a08a36b4cb02945bbb3571bb77b21384bce3fc26b6fce5b97d6ab943"
+      },
+      "Signed": {
+        "run": 41706702083,
+        "job": 126163801942,
+        "conclusion": "SUCCESS",
+        "passed": 280,
+        "failed": 0,
+        "ignored": 1
+      },
+      "other_jobs_at_root_finalreadback": "ARM/paper/securitySUCCESS;transfer-paperstillRUNNING at20:08, no terminalPASS inferred"
+    },
+    "D02_acceptance": {
+      "receipt": "dope/receipts/completed-root-goldens-bb.json",
+      "each_source_object_rechecked": true,
+      "prior_S1": "NOT_RUN",
+      "other4": "PASS already",
+      "new_scoped_D02_status": "COMPLETE_CURRENT_FULL_CI_PENDING",
+      "counts": {
+        "PASS": 51,
+        "NOT_RUN": 10,
+        "historical_BLOCKED": 4
+      },
+      "engineering_tasks_open": 6,
+      "historical_tasks_open": 8
+    },
+    "checks": {
+      "Rust1.88_format": "PASSexact286LOCtestcandidate",
+      "diff_check": "PASS",
+      "source_hash_scope": "Exactcandidate/rootreview/preimages verified; no productionguard/workflow/JSONfixture/dependency/lock/scoreSVG changes",
+      "new_native_tests_executed_locally": 0,
+      "current_requiredCI": "PENDING_NEW_PUSH"
+    },
+    "remaining": "10engineeringcriteria/6tasks+7Ruststreams/NOT_COMPLIANT/currentfullCI. Fourcampaigncriteria deferredneverPASS; no science/releaseclaim."
   }
 }
