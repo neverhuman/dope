@@ -1,0 +1,74 @@
+{
+  "schema": "dope.current-ci-repair-and-required-reference-route/v1",
+  "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
+  "source_commit": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+  "base": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+  "scope": {
+    "R6_paths": 6,
+    "owned_CI_runtime_fixes": [
+      "emit receipt error has ownedString with unchanged safe code",
+      "ARM bootstrap existing prepare-native in checkout; stepPATH/RUSTUP_TOOLCHAIN1.88.0, no sudo or globaldefaults",
+      "NC1 privatecard assertion uses required nested state.numeric.hi f64=4.0; productionserde unchanged"
+    ]
+  },
+  "actual_failing_source_evidence": {
+    "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+    "native_compile_jobs": [
+      126081956713,
+      126081956590
+    ],
+    "portable_job": 126081956650,
+    "signed_job": 126081956450,
+    "signed_run": 41683191770,
+    "disposition": "FAIL retained; no new tests claimed PASS"
+  },
+  "required_reference_route": {
+    "stage": "cpu-compat",
+    "prepare": "bash ops/ci/shared-levels.sh prepare-torch",
+    "test": "env SHARED_PYTHON=target/shared-python/bin/python bash ops/ci/shared-levels.sh torch test_next_version",
+    "separate_environment": true,
+    "actual_test_count": "NOT_RUN; do not substitute source method count",
+    "nonzero_required": true,
+    "skips_allowed": 0,
+    "expected_failures_allowed": 0,
+    "failure_with_exit0_refuses": true,
+    "fixture_and_source_bindings": "existing required tracked fixtures/source hashes unchanged"
+  },
+  "inventory": {
+    "legacy_source_origins": 70,
+    "runtime_ids": 82,
+    "stage_markers": 73,
+    "test_kind_commands": 22
+  },
+  "preserved": [
+    "existing worker/job inventory, fork restriction and ARM30minute quota",
+    "portable twoRustbin commands and requiredall-worker cpu gate",
+    "nativebudget allhistoricalconstraints and unchanged sevenjob quotas",
+    "unchanged oldPython/fixturebytes/producer sources/dependencies/locks"
+  ],
+  "checks": {
+    "Rust1.88_format": "PASS5files",
+    "Bash_syntax": "PASScpu-compat",
+    "Actionlint": {
+      "verdict": "PASS_EXIT0",
+      "ignore_flags": [],
+      "config_git_blob": "de587ea88e7293c83b17cee9f241caad917ce8f5",
+      "workflow_sha256": "3f7c7290781c00edd31ae330e4b2ea4dae9796a65a161a55174dd148267782fd",
+      "scope": "Exactnewworkflow with authentic repo config"
+    },
+    "diff_check": "PASS",
+    "static_source_caps": {
+      "governed": 1300,
+      "violations": 0
+    },
+    "local_native_compile_verifier_tests_executed": 0,
+    "current_full_CI": "PENDING"
+  },
+  "acceptance": "No criterion promoted from source changes. Counts38PASS23NOTRUN4historicalBLOCKED; campaign deferral neverPASS. R0 source route now implemented, actual qualification pending.",
+  "remaining": [
+    "Real current-head required CI/review and actualworker/reference/CLI execution",
+    "M0 SDK/High +actualrecipe-bound forward candidate review/adoption",
+    "Seven Rust migration streams and23engineering acceptance criteria",
+    "Merge/release only after real checks; no science/modelpromotion"
+  ]
+}

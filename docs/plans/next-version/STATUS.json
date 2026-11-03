@@ -276,107 +276,188 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "9a5880c8ed4a28c41b11991c0b7991ecd04981a7",
+  "current_local_source_commit": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
   "ci_worker_activation": {
-    "schema": "dope.native-ci-source-activation/v1",
-    "status": "SOURCE_IMPLEMENTED_NORMAL_CI_REQUIRED",
-    "source_commit": "9a5880c8ed4a28c41b11991c0b7991ecd04981a7",
-    "base_before_ci": "ecce42a0e660922d65bfd0db7270285d64e419e0",
-    "reviewed_composition": "CI R4 then native budget R5",
-    "source_writer": "/root/dope_audit",
-    "source_reviewers": [
-      "/root",
-      "/root/ci_shard_review"
-    ],
-    "topology": {
-      "x64_heavy_workers": [
-        "cpu-native",
-        "cpu-compat",
-        "cpu-transfer-paper"
+    "schema": "dope.current-ci-repair-and-required-reference-route/v1",
+    "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
+    "source_commit": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+    "base": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+    "scope": {
+      "R6_paths": 6,
+      "owned_CI_runtime_fixes": [
+        "emit receipt error has ownedString with unchanged safe code",
+        "ARM bootstrap existing prepare-native in checkout; stepPATH/RUSTUP_TOOLCHAIN1.88.0, no sudo or globaldefaults",
+        "NC1 privatecard assertion uses required nested state.numeric.hi f64=4.0; productionserde unchanged"
+      ]
+    },
+    "actual_failing_source_evidence": {
+      "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+      "native_compile_jobs": [
+        126081956713,
+        126081956590
       ],
-      "portable_worker": "ci-shard-portable-arm64",
-      "required_aggregate": "cpu",
-      "required_workers": 4
+      "portable_job": 126081956650,
+      "signed_job": 126081956450,
+      "signed_run": 41683191770,
+      "disposition": "FAIL retained; no new tests claimed PASS"
     },
-    "completeness": {
-      "legacy_source_commands": 70,
-      "runtime_command_ids": 80,
-      "test_kind_commands": 21,
-      "current_run_and_attempt_only": true,
-      "test_commands_require_nonzero_framework_counts": true,
-      "framework_failures_refuse_even_wrapper_exit_zero": true,
-      "rerun_policy": "Re-run all jobs; no successful receipts reused across attempts"
+    "required_reference_route": {
+      "stage": "cpu-compat",
+      "prepare": "bash ops/ci/shared-levels.sh prepare-torch",
+      "test": "env SHARED_PYTHON=target/shared-python/bin/python bash ops/ci/shared-levels.sh torch test_next_version",
+      "separate_environment": true,
+      "actual_test_count": "NOT_RUN; do not substitute source method count",
+      "nonzero_required": true,
+      "skips_allowed": 0,
+      "expected_failures_allowed": 0,
+      "failure_with_exit0_refuses": true,
+      "fixture_and_source_bindings": "existing required tracked fixtures/source hashes unchanged"
     },
-    "budgets": {
-      "cpu_native": 90,
-      "cpu_compat": 120,
-      "cpu_transfer_paper": 120,
-      "portable_arm64": 30,
-      "cpu_aggregate": 20,
-      "paper": 60,
-      "security": 60,
-      "cpu_role_job_minute_max": 380,
-      "audit": 60,
-      "manual_gpu": 120,
-      "neural_fit_seconds": 600,
-      "gpu_memory_bytes": 17179869184,
-      "fitness_rows": 128,
-      "fitness_dimensions": 32,
-      "capacity_claim": "Finite policy quotas only; no speedup, host placement or resource-admission guarantee"
+    "inventory": {
+      "legacy_source_origins": 70,
+      "runtime_ids": 82,
+      "stage_markers": 73,
+      "test_kind_commands": 22
     },
-    "old_guards_preserved": [
-      "manual-only GPU dispatch",
-      "sealed corpus and artifact input presence",
-      "complete bounded Rust split source closure",
-      "neural600seconds/16GiB/fitness128x32 config and source bounds",
-      "original sequential cpu.sh retained unchanged as source baseline"
+    "preserved": [
+      "existing worker/job inventory, fork restriction and ARM30minute quota",
+      "portable twoRustbin commands and requiredall-worker cpu gate",
+      "nativebudget allhistoricalconstraints and unchanged sevenjob quotas",
+      "unchanged oldPython/fixturebytes/producer sources/dependencies/locks"
     ],
-    "native_budget_profile": "version1 strict supported scalar TOML, unknown/duplicate/missing/unsupported config refuses",
-    "registration": {
-      "existing_ci_shard_binary": true,
-      "new_bins": 0,
-      "new_dependencies": 0,
-      "lock_changes": 0,
-      "new_Python": 0,
-      "Justfile_native_guard": "ci-shard included in existing Clippy/test commands"
-    },
     "checks": {
-      "rustfmt_1_88_edition2024": "PASS13files",
-      "bash_syntax": "PASS5scripts",
-      "actionlint": "Root PASS on byte-identical reviewed workflow using authentic unchanged repo config",
-      "diff_check": "PASS after removing only two trailing blank lines",
+      "Rust1.88_format": "PASS5files",
+      "Bash_syntax": "PASScpu-compat",
+      "Actionlint": {
+        "verdict": "PASS_EXIT0",
+        "ignore_flags": [],
+        "config_git_blob": "de587ea88e7293c83b17cee9f241caad917ce8f5",
+        "workflow_sha256": "3f7c7290781c00edd31ae330e4b2ea4dae9796a65a161a55174dd148267782fd",
+        "scope": "Exactnewworkflow with authentic repo config"
+      },
+      "diff_check": "PASS",
       "static_source_caps": {
         "governed": 1300,
         "violations": 0
       },
-      "local_native_compile_tests_executed": 0,
-      "native_compile": "NOT_RUN",
-      "worker_runtime": "NOT_RUN",
-      "current_full_ci": "PENDING"
+      "local_native_compile_verifier_tests_executed": 0,
+      "current_full_CI": "PENDING"
     },
-    "nc1_fixture_repair": {
-      "source_commit": "ecce42a0e660922d65bfd0db7270285d64e419e0",
-      "published_failing_head": "d9540a6f7de559129b9bad79f87ace040dcd2912",
-      "run_id": 41678411412,
-      "job_id": 126065167647,
-      "reason": "Fixture flattened internally tagged FeatureKind and Task JSON incorrectly",
-      "fix": "Valid requests now serialize actual public InputTable/Cell and DeclaredSchema/FeatureSpec/FeatureKind/TargetSpec/Task values. Production parser and all unknown-field/semantic refusal assertions unchanged.",
-      "current_execution": "NOT_RUN"
-    },
-    "limits": [
-      "Shared next-version Torch/reference/training ordinary-PR route remains open; no implicit coverage from splitting old commands",
-      "M0 SDK/High matrix packet not yet adopted",
-      "Seven Rust migration streams and23engineering criteria remain open",
-      "Four campaign criteria deferred, never PASS",
-      "No local native/host control changes, manual CI dispatch, scientific campaign or model promotion"
+    "acceptance": "No criterion promoted from source changes. Counts38PASS23NOTRUN4historicalBLOCKED; campaign deferral neverPASS. R0 source route now implemented, actual qualification pending.",
+    "remaining": [
+      "Real current-head required CI/review and actualworker/reference/CLI execution",
+      "M0 SDK/High +actualrecipe-bound forward candidate review/adoption",
+      "Seven Rust migration streams and23engineering acceptance criteria",
+      "Merge/release only after real checks; no science/modelpromotion"
     ]
   },
   "current_ci_known_failure": {
-    "head": "d9540a6f7de559129b9bad79f87ace040dcd2912",
-    "signed_run": 41678411412,
-    "job": 126065167647,
-    "status": "FAIL_RUNTIME_NC1_TYPED_SERDE_FIXTURE",
-    "fixed_source": "ecce42a0e660922d65bfd0db7270285d64e419e0",
-    "new_fix_tests": "NOT_RUN"
+    "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+    "receipt_emit_compile": "FAIL",
+    "ARM_privileged_setup": "FAIL",
+    "NC1_private_card_assertion": "FAIL",
+    "fix_source": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+    "current_qualification": "NOT_RUN"
+  },
+  "historical_ci_worker_activation": [
+    {
+      "schema": "dope.native-ci-source-activation/v1",
+      "status": "SOURCE_IMPLEMENTED_NORMAL_CI_REQUIRED",
+      "source_commit": "9a5880c8ed4a28c41b11991c0b7991ecd04981a7",
+      "base_before_ci": "ecce42a0e660922d65bfd0db7270285d64e419e0",
+      "reviewed_composition": "CI R4 then native budget R5",
+      "source_writer": "/root/dope_audit",
+      "source_reviewers": [
+        "/root",
+        "/root/ci_shard_review"
+      ],
+      "topology": {
+        "x64_heavy_workers": [
+          "cpu-native",
+          "cpu-compat",
+          "cpu-transfer-paper"
+        ],
+        "portable_worker": "ci-shard-portable-arm64",
+        "required_aggregate": "cpu",
+        "required_workers": 4
+      },
+      "completeness": {
+        "legacy_source_commands": 70,
+        "runtime_command_ids": 80,
+        "test_kind_commands": 21,
+        "current_run_and_attempt_only": true,
+        "test_commands_require_nonzero_framework_counts": true,
+        "framework_failures_refuse_even_wrapper_exit_zero": true,
+        "rerun_policy": "Re-run all jobs; no successful receipts reused across attempts"
+      },
+      "budgets": {
+        "cpu_native": 90,
+        "cpu_compat": 120,
+        "cpu_transfer_paper": 120,
+        "portable_arm64": 30,
+        "cpu_aggregate": 20,
+        "paper": 60,
+        "security": 60,
+        "cpu_role_job_minute_max": 380,
+        "audit": 60,
+        "manual_gpu": 120,
+        "neural_fit_seconds": 600,
+        "gpu_memory_bytes": 17179869184,
+        "fitness_rows": 128,
+        "fitness_dimensions": 32,
+        "capacity_claim": "Finite policy quotas only; no speedup, host placement or resource-admission guarantee"
+      },
+      "old_guards_preserved": [
+        "manual-only GPU dispatch",
+        "sealed corpus and artifact input presence",
+        "complete bounded Rust split source closure",
+        "neural600seconds/16GiB/fitness128x32 config and source bounds",
+        "original sequential cpu.sh retained unchanged as source baseline"
+      ],
+      "native_budget_profile": "version1 strict supported scalar TOML, unknown/duplicate/missing/unsupported config refuses",
+      "registration": {
+        "existing_ci_shard_binary": true,
+        "new_bins": 0,
+        "new_dependencies": 0,
+        "lock_changes": 0,
+        "new_Python": 0,
+        "Justfile_native_guard": "ci-shard included in existing Clippy/test commands"
+      },
+      "checks": {
+        "rustfmt_1_88_edition2024": "PASS13files",
+        "bash_syntax": "PASS5scripts",
+        "actionlint": "Root PASS on byte-identical reviewed workflow using authentic unchanged repo config",
+        "diff_check": "PASS after removing only two trailing blank lines",
+        "static_source_caps": {
+          "governed": 1300,
+          "violations": 0
+        },
+        "local_native_compile_tests_executed": 0,
+        "native_compile": "NOT_RUN",
+        "worker_runtime": "NOT_RUN",
+        "current_full_ci": "PENDING"
+      },
+      "nc1_fixture_repair": {
+        "source_commit": "ecce42a0e660922d65bfd0db7270285d64e419e0",
+        "published_failing_head": "d9540a6f7de559129b9bad79f87ace040dcd2912",
+        "run_id": 41678411412,
+        "job_id": 126065167647,
+        "reason": "Fixture flattened internally tagged FeatureKind and Task JSON incorrectly",
+        "fix": "Valid requests now serialize actual public InputTable/Cell and DeclaredSchema/FeatureSpec/FeatureKind/TargetSpec/Task values. Production parser and all unknown-field/semantic refusal assertions unchanged.",
+        "current_execution": "NOT_RUN"
+      },
+      "limits": [
+        "Shared next-version Torch/reference/training ordinary-PR route remains open; no implicit coverage from splitting old commands",
+        "M0 SDK/High matrix packet not yet adopted",
+        "Seven Rust migration streams and23engineering criteria remain open",
+        "Four campaign criteria deferred, never PASS",
+        "No local native/host control changes, manual CI dispatch, scientific campaign or model promotion"
+      ]
+    }
+  ],
+  "required_next_version_PR_route": {
+    "source": "IMPLEMENTED_R6",
+    "actual_runtime": "NOT_RUN",
+    "receipt": "dope/receipts/ci-r6-required-reference-route.json"
   }
 }

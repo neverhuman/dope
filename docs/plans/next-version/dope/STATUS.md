@@ -9,7 +9,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `9a5880c8ed4a28c41b11991c0b7991ecd04981a7`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `9484dd2e3c6c68ab390ee7f1b6c4231918f34df8`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,300 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -141,3 +141,29 @@ pass; current-source Rust compilation, budget verifier, worker lifecycle and
 full required CI/review remain pending. The shared next-version Torch PR route,
 M0 fixtures and the seven Rust migration streams remain open. Criterion counts
 stay 38 PASS / 23 NOT_RUN / 4 historical BLOCKED; campaign deferral is not PASS.
+
+## Current R6 route and actual CI failures
+
+At 4b2, CI caught an owned-String mismatch in the receipt writer, unavailable
+passworded apt setup in the ARM guest, and an NC1 test assertion missing the
+private FeatureState nesting. Source 9484dd2e fixes these exact failures. The
+NC1 assertion still requires numeric upper bound4.0, through state.numeric.hi;
+production parsing and serialization remain strict. The ARM job uses the
+existing user-space prepare-native with explicit checkout/PATH/toolchain while
+retaining its fork policy,30minute limit, both Rust binaries and aggregate gate.
+
+The shared next-version ordinary-PR route is now source-wired into cpu-compat:
+existing CPU Torch setup in a separate environment, then the seven-suite
+test_next_version entry. Its receipts require nonzero tests, no skipped or
+expected-failure cases, and no framework failures even when a wrapper exits0.
+The inventory is now70source origins/82runtime IDs/73markers/22test commands.
+No existing compatibility check or frozen fixture/source binding was removed.
+
+Actionlint passed the exact new workflow with the authentic config and no
+ignore flags; Rust1.88 format, Bash and static source checks pass. Actual new
+compilation, native verifier/tests, reference suite and full CI are NOT_RUN
+until source-bound execution succeeds. R0's source-route gap is addressed;
+qualification remains open. M0 and the seven Rust migration streams remain
+unfinished. Criterion counts remain38PASS/23NOT_RUN/4historicalBLOCKED, with
+campaign deferral separately recorded and never PASS. See the
+[repair/route receipt](receipts/ci-r6-required-reference-route.json).

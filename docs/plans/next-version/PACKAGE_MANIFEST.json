@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 18469,
-      "sha256": "62771b1a615a833f57b82e188006ccd89829a08f64740a834421752d6572294e"
+      "bytes": 20109,
+      "sha256": "f45650c58f9f0facd84742b4e8c01d2b5b6c29b755597ced8bd83a760f36e52d"
     },
     "STATUS.json": {
-      "bytes": 17790,
-      "sha256": "cb085dbe543a5c4dbcd5def73bc0a6adf8d35a951c3397705d03976f42e90967"
+      "bytes": 21437,
+      "sha256": "b6f9d6e35093ebdb54a6d18fa7d78078fa806a273e2d7fe141a38ca2b798612c"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -229,6 +229,10 @@
     "dope/receipts/ci-worker-source-activation.json": {
       "bytes": 3656,
       "sha256": "69cdfb6f4af274954d7724a37c0b3090604b0b3509ed6d103378d239dcb0db20"
+    },
+    "dope/receipts/ci-r6-required-reference-route.json": {
+      "bytes": 3082,
+      "sha256": "0331fd3c5818adfb884f75f5e7ef40a4b6c06d96cf62a75134b5d569a638aba5"
     }
   },
   "historical_status": "PLANNED"
