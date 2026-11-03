@@ -23,7 +23,7 @@ cargo tree --manifest-path "$manifest" --locked --no-default-features -p dope-cl
   --target "$target" -e normal,build --prefix none --format '{p}' | \
   awk '{print $1 " " $2}' | sort -u > "$stage/DEPENDENCIES.txt"
 bash ops/ci/engine-runtime-graph.sh "$stage/DEPENDENCIES.txt"
-cargo test --manifest-path "$manifest" --locked --no-default-features --target "$target"
+cargo test --manifest-path "$manifest" --locked --no-default-features --target "$target" --no-fail-fast
 cargo build --manifest-path "$manifest" --locked --release --no-default-features --target "$target" --bin dope
 binary="$CARGO_TARGET_DIR/$target/release/dope"
 bash ops/ci/engine-release-smoke.sh "$binary"

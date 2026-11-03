@@ -3867,6 +3867,18 @@
     "ops/merge_guard/ci_shard_budget_toml.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
       "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "engine/dope-sdk/src/checked.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test legacy_surface_parity",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-sdk/tests/legacy_surface_parity.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test legacy_surface_parity",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-core/tests/landmark_high_matrix.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_high_matrix",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
     }
   },
   "workspace": "dope"

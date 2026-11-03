@@ -1,6 +1,7 @@
 //! Versioned DOPE integration facade. No model arithmetic or preparation is duplicated.
 //! New input semantics require a new recipe and qualification, not a facade version bump.
 
+pub mod checked;
 mod nc1_view;
 
 pub const SDK_CONTRACT: &str = "dope-sdk/v0";
@@ -8,6 +9,7 @@ pub const SDK_CONTRACT: &str = "dope-sdk/v0";
 /// Lane-A integration surface. Types are the original engine types, preserving numerical
 /// behavior, source scopes, cancellation and private/public report boundaries.
 pub mod v0 {
+    pub use crate::checked::encode_prepared;
     pub use dope_core::{DopeError, Result, Task};
 
     pub mod target {
@@ -46,8 +48,8 @@ pub mod v0 {
             prepare_table_mixed_with_policy, prepare_table_timed, prepare_table_with_ids,
             prepare_table_with_ids_timed, prepare_table_with_policy,
             progressive_landmarks_for_table, ClassVocabPolicy, ColumnKind, DopeConditioning,
-            FitOnlyTableTransform, NativeReportView, PrepTask, PrepareStageTimings, PreparedTable,
-            COL_LANDMARK_DIM, FULL_REPORT_RECIPE, MAX_COLS, OBSERVED_RECIPE,
+            FitOnlyTableTransform, Level, NativeReportView, PrepTask, PrepareStageTimings,
+            PreparedTable, COL_LANDMARK_DIM, FULL_REPORT_RECIPE, MAX_COLS, OBSERVED_RECIPE,
         };
         pub mod scaling {
             pub use dope_core::prepare::scaling::{ClassVocabPolicy, ColumnKind, PrepTask};

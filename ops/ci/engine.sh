@@ -6,4 +6,4 @@ cd "$(dirname "$0")/../.."
 manifest=engine/Cargo.toml
 cargo fmt --manifest-path "$manifest" --all -- --check
 cargo clippy --manifest-path "$manifest" --all-targets --locked -- -D warnings
-cargo test --manifest-path "$manifest" --locked
+cargo test --manifest-path "$manifest" --locked --no-fail-fast

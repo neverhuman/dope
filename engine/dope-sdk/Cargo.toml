@@ -14,3 +14,7 @@ cuda = ["dope-core/cuda"]
 dope-core = { path = "../dope-core" }
 
 dope-norm = { path = "../dope-norm" }
+
+[dev-dependencies]
+safetensors.workspace = true
+serde_json.workspace = true
