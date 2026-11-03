@@ -73,7 +73,10 @@ fn git_sha40(s: &str) -> bool {
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 fn is_test_kind(kind: &str) -> bool {
-    matches!(kind, "cargo-test" | "unittest" | "pytest" | "readiness")
+    matches!(
+        kind,
+        "cargo-test" | "unittest" | "unittest-required" | "pytest" | "readiness"
+    )
 }
 /// Each block is emitted by run-ci-command.sh with an explicit end status.
 /// Grammar: @@CI-BEGIN ID KIND@@ ... @@CI-END ID EXIT@@
@@ -308,7 +311,7 @@ fn main_result(args: &[String]) -> Result<(), String> {
             let run = args[4].parse().map_err(|_| "run_id_invalid")?;
             let attempt = args[5].parse().map_err(|_| "run_attempt_invalid")?;
             let r = make_receipt(&args[2], &args[3], run, attempt, &args[6], &log).map_err(str::to_owned)?;
-            fs::write(&args[8], serde_json::to_vec(&r).map_err(|_| "receipt_encode_failed")?).map_err(|_| "receipt_write_failed")
+            fs::write(&args[8], serde_json::to_vec(&r).map_err(|_| "receipt_encode_failed")?).map_err(|_| "receipt_write_failed".to_owned())
         }
         Some("aggregate") if args.len() == 7 => {
             let needs_bytes = read_bounded(Path::new(&args[2]), 1024 * 1024, "needs_too_large", "needs_read_failed")?;

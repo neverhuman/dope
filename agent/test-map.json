@@ -3794,7 +3794,7 @@
     },
     "ops/ci/cpu-compat.sh": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
-      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+      "purpose": "existing compatibility commands plus separate CPU Torch next-version reference/training suite; required nonzero/zero-skip/zero-expected-failure receipts"
     },
     "ops/ci/cpu-transfer-paper.sh": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",

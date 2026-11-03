@@ -33,6 +33,10 @@ ci_run tabsyn-tests unittest env PYTHONPATH=. target/ci-python/bin/python -B -m 
 ci_run mfs-tests unittest env PYTHONPATH=. target/ci-python/bin/python -B -m unittest research.benchmark.tests.test_mfs_v3 research.benchmark.tests.test_mfs_v3_panel research.benchmark.tests.test_fetch_jope research.benchmark.tests.test_fetch_pmlb -q
 # ci-command:cpu-compat:fit-ledger-test 30e4c7f856bfef4b516bf8bdfa9f6878a6f13999d8ecb0f05a0134244dafa5d5
 ci_run fit-ledger-test unittest env PYTHONPATH=. python3 -m unittest research.benchmark.tests.test_dope_refinement_fits.RefinementFits.test_committed_fit_ledger_tracks_publisher -v
+# ci-command:cpu-compat:shared-levels-prepare 164a9c5bb6dacd80c7f6b2bbff5d86076ae24b3de1756873b613d17cdb94ebca
+ci_run shared-levels-prepare check bash ops/ci/shared-levels.sh prepare-torch
+# ci-command:cpu-compat:next-version-reference 04aeb858ee9f7714d22e6540431a71842dd5dddab58c77ebfc15699431d04303
+ci_run next-version-reference unittest-required env SHARED_PYTHON=target/shared-python/bin/python bash ops/ci/shared-levels.sh torch test_next_version
 # ci-command:cpu-compat:r10-tests 97e8d3665264c7218b1f0b07f9c0cbaa8b57877c1f58915d19fd9e4e67940af9
 ci_run r10-tests unittest target/ci-python/bin/python -B -m unittest research.transfer.privacy.test_summary_study -v
 # ci-command:cpu-compat:u04-admissions 5732c95b52c02335262fb2a77bcb46750f304f4f4666c4901d2aaa34b4490f92

@@ -657,6 +657,7 @@
       "tabsyn-tests",
       "mfs-tests",
       "fit-ledger-test",
+      "next-version-reference",
       "r10-tests",
       "u04-admissions"
     ],

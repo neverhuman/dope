@@ -7,6 +7,7 @@ fn fake_summary(id: &str, kind: &str) -> String {
         ("unittest", "engine-benchmark") => "Ran 5 tests in 0.001s\n\nOK\n".into(),
         ("unittest", "u04-admissions") => "Ran 7 tests in 0.001s\n\nOK\n".into(),
         ("unittest", "review-fixes") => "Ran 24 tests in 0.001s\n\nOK\nRan 1 test in 0.001s\n\nOK\nRan 2 tests in 0.001s\n\nOK\n".into(),
+        ("unittest-required", "next-version-reference") => "Ran 11 tests in 0.001s\n\nOK\n".into(),
         ("unittest", _) => "Ran 3 tests in 0.001s\n\nOK\n".into(),
         ("pytest", _) => "3 passed in 0.01s\n".into(),
         ("readiness", _) => "CPU tool readiness: 12 real-entry refusals passed\n".into(),
@@ -66,6 +67,13 @@ fn accepts_complete_fresh_receipts_and_sums_only_real_test_framework_counts() {
             .find(|command| command.id == "u04-admissions")
             .map(|c| c.passed),
         Some(7)
+    );
+    assert_eq!(
+        compat
+            .iter()
+            .find(|command| command.id == "next-version-reference")
+            .map(|c| c.passed),
+        Some(11)
     );
     let transfer = parse_log(std::str::from_utf8(&rows[2].2).unwrap()).unwrap();
     assert_eq!(
@@ -380,5 +388,73 @@ fn unexpected_successes_and_unrecognized_failed_results_are_not_passes() {
             ]
         ),
         Ok((1, 1))
+    );
+}
+
+#[test]
+fn required_next_version_suite_rejects_skip_zero_and_failed_summary_even_with_end_zero() {
+    let good = String::from_utf8(log("cpu-compat")).unwrap();
+    assert!(make_receipt("cpu-compat", HEAD, 41, 2, "success", good.as_bytes()).is_ok());
+
+    let skipped = good.replace(
+        "Ran 11 tests in 0.001s\n\nOK",
+        "Ran 11 tests in 0.001s\n\nOK (skipped=1)",
+    );
+    assert_ne!(skipped, good);
+    assert_eq!(
+        make_receipt("cpu-compat", HEAD, 41, 2, "success", skipped.as_bytes()),
+        Err("required_test_skip_or_expected_failure")
+    );
+
+    let expected_failure = good.replace(
+        "Ran 11 tests in 0.001s\n\nOK",
+        "Ran 11 tests in 0.001s\n\nOK (expected failures=1)",
+    );
+    assert_ne!(expected_failure, good);
+    assert_eq!(
+        make_receipt(
+            "cpu-compat",
+            HEAD,
+            41,
+            2,
+            "success",
+            expected_failure.as_bytes()
+        ),
+        Err("required_test_skip_or_expected_failure")
+    );
+
+    let zero = good.replace(
+        "Ran 11 tests in 0.001s\n\nOK",
+        "Ran 0 tests in 0.001s\n\nOK",
+    );
+    assert_ne!(zero, good);
+    assert_eq!(
+        make_receipt("cpu-compat", HEAD, 41, 2, "success", zero.as_bytes()),
+        Err("zero_test_command")
+    );
+
+    let failed_with_zero_exit = good.replace(
+        "Ran 11 tests in 0.001s\n\nOK",
+        "Ran 11 tests in 0.001s\n\nFAILED (failures=1)",
+    );
+    assert_ne!(failed_with_zero_exit, good);
+    assert_eq!(
+        make_receipt(
+            "cpu-compat",
+            HEAD,
+            41,
+            2,
+            "success",
+            failed_with_zero_exit.as_bytes()
+        ),
+        Err("test_command_failed")
+    );
+    assert_eq!(
+        summary("unittest", &["Ran 11 tests", "OK (skipped=1)"]),
+        Ok((10, 0))
+    );
+    assert_eq!(
+        summary("unittest", &["Ran 11 tests", "OK (expected failures=1)"]),
+        Ok((10, 0))
     );
 }

@@ -51,7 +51,8 @@ pub(super) fn summary(kind: &str, lines: &[&str]) -> Result<(u64, u64), &'static
                 fail("test_summary_missing")
             }
         }
-        "unittest" => {
+        "unittest" | "unittest-required" => {
+            let required = kind == "unittest-required";
             let mut total = (0u64, 0u64);
             let starts: Vec<usize> = lines
                 .iter()
@@ -91,10 +92,16 @@ pub(super) fn summary(kind: &str, lines: &[&str]) -> Result<(u64, u64), &'static
                     )
                 };
                 let failures = failure_count.saturating_add(errors);
+                if required && skipped != 0 {
+                    return fail("required_test_skip_or_expected_failure");
+                }
                 let expected = block
                     .iter()
                     .find_map(|line| count_eq(line, "expected failures="))
                     .unwrap_or(0);
+                if required && expected != 0 {
+                    return fail("required_test_skip_or_expected_failure");
+                }
                 if (failed.is_some() && failures == 0)
                     || failures.saturating_add(skipped).saturating_add(expected) > n
                 {

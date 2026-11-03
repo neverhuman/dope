@@ -219,6 +219,8 @@ pub(super) const RUNTIME_COMMANDS: &[(&str, &str, &str)] = &[
     ("cpu-compat", "tabsyn-tests", "unittest"),
     ("cpu-compat", "mfs-tests", "unittest"),
     ("cpu-compat", "fit-ledger-test", "unittest"),
+    ("cpu-compat", "shared-levels-prepare", "check"),
+    ("cpu-compat", "next-version-reference", "unittest-required"),
     ("cpu-compat", "r10-tests", "unittest"),
     ("cpu-compat", "u04-admissions", "unittest"),
     ("cpu-compat", "u03-prepare", "check"),
@@ -281,7 +283,11 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "cpu-compat.sh",
-        "8ba4b21e5ef8f42854cd516f1bca266cf4e8d4fca691c1f6bfe90603408d0248",
+        "faddd35d46a25684a7f7c9e3cb5e0e1a5ef694d676c94e26caf0816f9ff2785c",
+    ),
+    (
+        "shared-levels.sh",
+        "201df3a2d5f5d779fb0de2f6bc762dc41e3ddd7f1f77e6591538e971b0801031",
     ),
     (
         "cpu-transfer-paper.sh",

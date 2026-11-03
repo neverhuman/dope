@@ -131,7 +131,12 @@ fn actual_normalize_cli_private_fit_public_projection_query_roles_and_tail() {
         );
     }
     let private_value: Value = serde_json::from_slice(&private_card).unwrap();
-    assert_eq!(private_value["features"][0]["numeric"]["hi"], 4.0);
+    assert_eq!(
+        private_value["features"][0]["state"]["numeric"]["hi"]
+            .as_f64()
+            .expect("fitted numeric state has a numeric upper bound"),
+        4.0
+    );
     let public_bytes = std::fs::read(out.join("schema.public.json")).unwrap();
     let public = String::from_utf8(public_bytes.clone()).unwrap();
     for canary in [

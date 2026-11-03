@@ -146,13 +146,9 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {path: ci-source, persist-credentials: false}
-      - name: Install Rust in the disposable guest
-        run: |
-          sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
-          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
-          sudo apt-get update
-          sudo apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup
-      - run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Prepare pinned user-space Rust in the disposable guest
+        working-directory: ci-source
+        run: bash ops/ci/shared-levels.sh prepare-native
       - name: Check frozen evidence and run portable Rust receipt fixtures
         working-directory: ci-source
         env:
@@ -160,7 +156,9 @@ jobs:
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
           CARGO_BUILD_JOBS: '2'
           RUST_TEST_THREADS: '2'
+          RUSTUP_TOOLCHAIN: '1.88.0'
         run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
           cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root "$PWD"
           cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence --bin ci-shard
 
