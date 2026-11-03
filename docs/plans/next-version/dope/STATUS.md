@@ -9,10 +9,10 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `53c2b0088744b77d6516617b514697dd357df374`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `9a5880c8ed4a28c41b11991c0b7991ecd04981a7`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
-- The current static tracked-source inventory covers 1,292 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
+- The current static tracked-source inventory covers 1,300 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
 
 A normal fast-forward source-preservation push was independently read back at `c74320ce032008b1bca841daab0ec8d2b4460756` on the existing fast branch. Final documentation-only successors and their exact remote-head proof are recorded in the stopped checkpoint receipt; those earlier source-preservation pushes launched no PR or workflow.
 
@@ -116,3 +116,28 @@ claim/publication checks and the seven migration streams remain open. Python
 originals and old test intent are preserved, and policy status is still
 NOT_COMPLIANT. Criterion counts remain 38 PASS / 23 NOT_RUN / 4 historical
 BLOCKED, with the four campaign criteria separately deferred and never PASS.
+
+## Current CI repair and worker graph
+
+The signed-engine check at published d954 compiled the earlier macro repair,
+then failed the NC1 CLI fixture because its hand-written declaration flattened
+internally tagged Rust enums. Commit ecce42a0 serializes every valid regression,
+binary and feature-only request through the actual public types. The strict
+production parser, data and refusal assertions remain unchanged. This is an
+authored repair; new-source native execution is NOT_RUN. Named native-landmark
+and deployment workflow successes at d954 do not qualify this failed signed job.
+
+Source 9a5880c8 adopts the reviewed three-X64-worker split, portable ARM proof,
+required aggregate and native budget guard. All original mapped commands stay
+represented; test receipts require actual nonzero framework counts and reject
+framework failures independently of process exit. Current-attempt artifacts
+and all-worker success are required. All original GPU/manual/neural/fitness
+bounds remain, with explicit finite quotas for the seven job roles. No host
+capacity, wall-time speedup or current CI success is asserted. See the
+[source receipt](receipts/ci-worker-source-activation.json).
+
+Rust1.88 formatting, Bash syntax, source-map/diff inspection and static caps
+pass; current-source Rust compilation, budget verifier, worker lifecycle and
+full required CI/review remain pending. The shared next-version Torch PR route,
+M0 fixtures and the seven Rust migration streams remain open. Criterion counts
+stay 38 PASS / 23 NOT_RUN / 4 historical BLOCKED; campaign deferral is not PASS.

@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 16888,
-      "sha256": "fc9e8576d5057f035366d8098bae1011d646cf76144c3fdba459644a94476a91"
+      "bytes": 18469,
+      "sha256": "62771b1a615a833f57b82e188006ccd89829a08f64740a834421752d6572294e"
     },
     "STATUS.json": {
-      "bytes": 13760,
-      "sha256": "f077e06d443acecc5aef4adb5824c212d8fdcb458bad6ff8f71eabbdc89cf7a6"
+      "bytes": 17790,
+      "sha256": "cb085dbe543a5c4dbcd5def73bc0a6adf8d35a951c3397705d03976f42e90967"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -225,6 +225,10 @@
     "dope/receipts/strict-golden-caller.json": {
       "bytes": 2141,
       "sha256": "f0deb3830b1ebc1762411becc30a3e00e7c2646070549bf5a935b6c11a3d4890"
+    },
+    "dope/receipts/ci-worker-source-activation.json": {
+      "bytes": 3656,
+      "sha256": "69cdfb6f4af274954d7724a37c0b3090604b0b3509ed6d103378d239dcb0db20"
     }
   },
   "historical_status": "PLANNED"
