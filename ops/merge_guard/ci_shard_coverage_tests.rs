@@ -179,3 +179,40 @@ fn candidate_stage_pins_reject_control_flow_drift() {
     changed.push(b' ');
     assert!(!super::pinned_stage_matches("shard-runtime.sh", &changed));
 }
+
+#[test]
+fn inline_yaml_run_key_is_source_syntax_only() {
+    let command = "target/ci-python/bin/python -B -m unittest example -v";
+    assert_eq!(
+        source_invocation(".github/workflows/ci.yml", &format!("run: {command}")),
+        command
+    );
+    assert_eq!(
+        source_invocation("ops/ci/cpu.sh", "run: echo x"),
+        "run: echo x"
+    );
+    assert_eq!(
+        source_invocation(".github/workflows/ci.yml", "run:echo x"),
+        "run:echo x"
+    );
+    assert_eq!(
+        source_invocation(".github/workflows/ci.yml", "run: run: echo x"),
+        "run: echo x"
+    );
+    assert_eq!(
+        same_invocation(
+            "PYTHONPATH=. python3 -m unittest x",
+            "ci_run x unittest env PYTHONPATH=. python3 -m unittest x",
+            false
+        ),
+        Ok(true)
+    );
+    assert_eq!(
+        same_invocation(
+            "PYTHONPATH=. python3 -m unittest x",
+            "ci_run x unittest python3 -m unittest x",
+            false
+        ),
+        Ok(false)
+    );
+}

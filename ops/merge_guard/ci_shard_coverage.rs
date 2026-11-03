@@ -116,6 +116,15 @@ fn compare(
     }
     Ok(())
 }
+// An inline run key is YAML syntax in this pinned source, not shell argv.
+fn source_invocation(path: &str, block: &str) -> String {
+    if path == ".github/workflows/ci.yml" {
+        block.strip_prefix("run: ").unwrap_or(block).to_owned()
+    } else {
+        block.to_owned()
+    }
+}
+
 fn same_invocation(
     origin: &str,
     marked_line: &str,
@@ -296,7 +305,10 @@ pub fn verify(
         {
             return refused("coverage_origin_mismatch");
         }
-        origins.insert(id.to_owned(), normalize(&lines[start - 1..end]));
+        origins.insert(
+            id.to_owned(),
+            source_invocation(origin, &normalize(&lines[start - 1..end])),
+        );
         if hash.len() != 64
             || expected
                 .insert(id.to_owned(), (shard.to_owned(), hash.to_owned()))

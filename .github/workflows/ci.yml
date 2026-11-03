@@ -32,6 +32,9 @@ jobs:
           sudo apt-get update
           sudo apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup python3 ripgrep
       - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
+        with:
+          version: v0.16.0
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
         with:
           path: |
@@ -44,6 +47,8 @@ jobs:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
           RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
         run: bash ops/ci/cpu-native.sh
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -71,6 +76,9 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.12'}
       - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
+        with:
+          version: v0.16.0
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
         with:
           path: |
@@ -85,6 +93,8 @@ jobs:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
           RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
         run: bash ops/ci/cpu-compat.sh
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -112,6 +122,9 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.12'}
       - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
+        with:
+          version: v0.16.0
       - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
         with:
           path: |
@@ -126,6 +139,8 @@ jobs:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
           RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
         run: bash ops/ci/cpu-transfer-paper.sh
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

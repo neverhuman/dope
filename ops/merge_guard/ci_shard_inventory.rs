@@ -291,6 +291,6 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "cpu-transfer-paper.sh",
-        "0bdcf74e1fd35a610768701435c05c79d1043a1f877affe50bdac94f9a1b1424",
+        "7cee4f0de5da3b5994f9130e2c0160823bb6a362e968c8a7eca5b3730a620b3d",
     ),
 ];

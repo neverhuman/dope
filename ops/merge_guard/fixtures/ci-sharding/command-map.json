@@ -599,7 +599,7 @@
     {
       "id": "cpu-transfer-paper:paper-number-tests",
       "shard": "cpu-transfer-paper",
-      "body_sha256": "1090c3de128719d81eb9b99e13798ccf93576e387d35e3db22ae678d8816c186",
+      "body_sha256": "13f781bcdd59b4cf2c47bc39dac96b041bbd7b1418dbc2a25e982691ebffe276",
       "origin_path": "ops/ci/cpu.sh",
       "origin_start": 66,
       "origin_end": 66,

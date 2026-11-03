@@ -670,7 +670,7 @@ version = "0.1.0"
 dependencies = [
  "dope-core",
  "dope-norm",
- "safetensors",
+ "safetensors 0.7.0",
  "serde_json",
 ]
 
