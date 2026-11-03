@@ -43,20 +43,20 @@
       "sha256": "20a1dbf728c263ea0d1f0e2605492bf3f63500e4d9662f55b2a535050445cd26"
     },
     "dope/tasks/d03-minimal-sdk-facade.md": {
-      "bytes": 9228,
-      "sha256": "6fd26eecf1320e133cb7c7ddbea378f5a64b0ed17970aef811914bfa9d3e0916"
+      "bytes": 9360,
+      "sha256": "4c668747f858aa0a9dd971e11ce1faae279185084013aa1a6e979e1840366d9e"
     },
     "dope/tasks/d04-high-landmark-dependency-plan.md": {
       "bytes": 9957,
       "sha256": "0ddc60796d7d73c278635cdf1e09992b220ba7db3e7b1358b1e510ef83a8c410"
     },
     "dope/tasks/d05-nc1-private-normalization-contract.md": {
-      "bytes": 10341,
-      "sha256": "db2169e0b5de4b82b51af04e8de67e18964d3ef7331f39d4a23c02ffb54172fa"
+      "bytes": 10327,
+      "sha256": "407ac28f2c1904e4fe245d74deb5fe7fc5502fc3003d2c420113d2fb163d29e4"
     },
     "dope/tasks/d06-dvs-and-audit-card.md": {
-      "bytes": 10540,
-      "sha256": "d8f54713bc5926fa3c7d3f46f061c8b1d4b399714849afb0507c5f84212f9e3a"
+      "bytes": 10896,
+      "sha256": "fa0eb904c6a55632270980d34a6b60a5882b07dc33a34b8e7c4ea6bdddf94588"
     },
     "dope/tasks/d07-dml4-wire-reference-sampler-and-hard-caps.md": {
       "bytes": 10256,
@@ -79,8 +79,8 @@
       "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
     },
     "dope/tasks/inventory.json": {
-      "bytes": 36807,
-      "sha256": "151e46bded4e7b9481c438871a2a3e467b88249d566a67c90a69712bd05b3ec0"
+      "bytes": 38370,
+      "sha256": "92495ff3e36f9809d411d9e44f471c37bf49b488cd50fe949daa70394cf589c8"
     },
     "jopedime/README.md": {
       "bytes": 4608,
@@ -135,12 +135,12 @@
       "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
     },
     "dope/STATUS.md": {
-      "bytes": 30271,
-      "sha256": "3c218019ebf03ce8aa1f5b94dfd3866deb1267a8bdca6ab0c8af7babb4bc4b75"
+      "bytes": 31284,
+      "sha256": "d4217ca120de03cfb82d45490aea798e00593aaa771a186c21b89b4fd4292c6e"
     },
     "STATUS.json": {
-      "bytes": 49017,
-      "sha256": "3e4e82fab2814ded21d2f9db59046ba6cd35e8836d93d7b28b3d30cada516894"
+      "bytes": 51019,
+      "sha256": "2dddd8809dde7658209016399771b14230b29b6b9f676588302a7cccf77da565"
     },
     "dope/language-policy/README.md": {
       "bytes": 10323,
@@ -281,6 +281,18 @@
     "dope/receipts/pytest-reporting-and-sdk-errors-source.json": {
       "bytes": 3734,
       "sha256": "ba8476b3da8de41d5d160572662091e41c510ff34630c65c0efe28f56294336a"
+    },
+    "dope/receipts/hosted-native-bdea-sdk-errors.json": {
+      "bytes": 2243,
+      "sha256": "8a7db5505250d6305080a193223375fc1c2d4dc1a4b0e02049b71f8f62a05c61"
+    },
+    "dope/receipts/hosted-native-bdea-normalization-views.json": {
+      "bytes": 2576,
+      "sha256": "64adb117f9288ce444323ec444d78c5dba6464b8ab26045ac380f5d32ced4892"
+    },
+    "dope/receipts/d06-policy-requirement-source.json": {
+      "bytes": 1684,
+      "sha256": "40ba6c6ac315a5be1d578c38fc5525c434f497d16b741362a61e159818618169"
     }
   },
   "historical_status": "PLANNED"

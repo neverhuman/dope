@@ -239,8 +239,8 @@
       "cross_repo_interfaces": [
         "J07 SDK gateway migration after exact parity"
       ],
-      "sha256": "6fd26eecf1320e133cb7c7ddbea378f5a64b0ed17970aef811914bfa9d3e0916",
-      "words": 1046,
+      "sha256": "4c668747f858aa0a9dd971e11ce1faae279185084013aa1a6e979e1840366d9e",
+      "words": 1067,
       "criterion_verdicts": {
         "D03-S1": {
           "verdict": "PASS",
@@ -256,8 +256,13 @@
           "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
         },
         "D03-S3": {
-          "verdict": "NOT_RUN",
-          "evidence": "New safe_errors43LOC2tests source adopted9d407a5f; stableArtifact/Input/message/canaryassertions not executed. D03-S3 remainsNOTRUN pending actualcurrentnative result."
+          "verdict": "PASS",
+          "evidence": "Root read both new exact Artifact/Input variant, fixed display and privacy-canary assertions and actual two PASS outcomes. Existing three-task nonzero model journey invokes exact stable recipe-mismatch/unknown-recipe/unknown-expected/invalid-tier/63x17-shape safe refusals; its actual PASS implies HighRequiredV1 branch executed via required high_condition_pair.expect. Existing SDK/core production sources and legacy parity test are unchanged from qualifiede5, independently Git-diffed. GitHub merge/source tree identity independently verified.",
+          "receipt": "../receipts/hosted-native-bdea-sdk-errors.json",
+          "tested_source": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+          "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+          "job": 126212969403,
+          "log_sha256": "9b7e7123c1289c2a74db2da11d17bf0777dbf8b6693b3e49d561e7f1dd00ef3c"
         },
         "D03-S4": {
           "verdict": "NOT_RUN",
@@ -353,16 +358,21 @@
         "J05 NC1 intake",
         "J06 owner-private emitter"
       ],
-      "sha256": "db2169e0b5de4b82b51af04e8de67e18964d3ef7331f39d4a23c02ffb54172fa",
-      "words": 1178,
+      "sha256": "407ac28f2c1904e4fe245d74deb5fe7fc5502fc3003d2c420113d2fb163d29e4",
+      "words": 1179,
       "criterion_verdicts": {
         "D05-S1": {
           "verdict": "PASS",
           "evidence": "Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json."
         },
         "D05-S2": {
-          "verdict": "NOT_RUN",
-          "evidence": "Typed declarations and physical row IDs are implemented; native conversion/CLI role tests pending."
+          "verdict": "PASS",
+          "evidence": "Typed target/role refusal, physical row ordering, SDK target-last conversions and three task kinds executed on exact current tree; source+line assertions in SOURCE-REVIEW.md",
+          "receipt": "../receipts/hosted-native-bdea-normalization-views.json",
+          "tested_source": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+          "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+          "job": 126212971176,
+          "log_sha256": "ee168fbba820013486cf5538302b57a5ad8087b251b34a30c8c3488ca2dc93cf"
         },
         "D05-S3": {
           "verdict": "PASS",
@@ -413,8 +423,8 @@
         "J08 JopeDime auditor",
         "J09 conditional artifact/curriculum growth"
       ],
-      "sha256": "d8f54713bc5926fa3c7d3f46f061c8b1d4b399714849afb0507c5f84212f9e3a",
-      "words": 1214,
+      "sha256": "fa0eb904c6a55632270980d34a6b60a5882b07dc33a34b8e7c4ea6bdddf94588",
+      "words": 1251,
       "criterion_verdicts": {
         "D06-S1": {
           "verdict": "PASS",
@@ -445,7 +455,9 @@
         },
         "D06-S4": {
           "verdict": "NOT_RUN",
-          "evidence": "Legacy source goldens unchanged; current root and engine exact-head C02 execution pending."
+          "evidence": "Root/engine C02 and legacy loops actually passed atbdea. New typed DriverPolicyBinding requirement/fivepins/closed historical-optional schema is source-authored in R2; native and schema-engine execution NOT_RUN. Presence is not verified inference, authenticated custody or complete per-cell provenance; full identity/multiplicity clause still requires review. No PASS from source or test names.",
+          "source_status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+          "receipt": "../receipts/d06-policy-requirement-source.json"
         },
         "D06-S5": {
           "verdict": "PASS",

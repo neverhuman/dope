@@ -35,7 +35,7 @@
     },
     "D03": {
       "source": "IMPLEMENTED",
-      "focused_checks": "M2_SOURCE_AUTHORED_NOT_RUN_OTHER_SCOPED_NATIVE_PASSES_RETAINED",
+      "focused_checks": "SCOPED_SAFE_ERROR_MATRIX_PASS_D03_S4_OPEN",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "CPU SDK build/surface and Rust-only dependency criterion S1 accepted at451-equivalent tree; vector/error/legacy remainder pending.",
@@ -55,7 +55,7 @@
     },
     "D05": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_BB_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "focused_checks": "SCOPED_ROW_ROLE_TARGETLAST_CONVERSION_PASS_D05_S6_OPEN",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "FIT-card poisoning/order and edge/refusal criteria S1/S3 accepted; other NC1/native CLI criteria remain pending.",
@@ -66,7 +66,7 @@
     },
     "D06": {
       "source": "IMPLEMENTED",
-      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "focused_checks": "LEGACY_C02_ACTUALPASS_NEW_REQUIREMENT_SOURCE_AUTHORED_NOTRUN",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
       "notes": "C02-compatible bounded DVS and honest AuditCard; external small Rust harness PASS; actual engine and CLI pending",
@@ -131,10 +131,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 52,
-    "NOT_RUN": 9,
+    "PASS": 54,
+    "NOT_RUN": 7,
     "BLOCKED": 4,
-    "note": "D04S1 scopedimmutablefixture/coordinates accepted; D03S3M2authoredNOTRUN; sixengineeringtasks/sevenRuststreams. Fourcampaigncriteria deferredneverPASS."
+    "note": "OnlyactualbdeaD03S3+D05S2promoted; D06S4newmetadataSOURCE_AUTHORED_NOTRUN. Sixengineeringtasks/sevenRuststreams; fourcampaigncriteria deferredneverPASS."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -277,7 +277,7 @@
     "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
     "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
   },
-  "current_local_source_commit": "9d407a5f569d7436d6d6beb5f1564584fc6b191c",
+  "current_local_source_commit": "5cb20de52868b11cf71d544e62579271bd06b35a",
   "ci_worker_activation": {
     "schema": "dope.current-ci-repair-and-required-reference-route/v1",
     "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
@@ -675,6 +675,12 @@
       "NOT_RUN": 10,
       "BLOCKED": 4,
       "note": "D02S1 completed302/0/0 library and strict163corpus accepted with unchangedmetric/fixture objects. WholefailedjobnotPASS. Original65criteria retained; fourcampaigncriteria deferredneverPASS."
+    },
+    {
+      "PASS": 52,
+      "NOT_RUN": 9,
+      "BLOCKED": 4,
+      "note": "D04S1 scopedimmutablefixture/coordinates accepted; D03S3M2authoredNOTRUN; sixengineeringtasks/sevenRuststreams. Fourcampaigncriteria deferredneverPASS."
     }
   ],
   "hosted_native_1811_acceptance": {
@@ -772,7 +778,7 @@
       "native_job": 126140855993,
       "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
       "compat_job": 126140855691,
-      "compat": "FAIL public-claims tools/claims/check.py\u2192figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
+      "compat": "FAIL public-claims tools/claims/check.py→figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
       "audit_job": 126138603944,
       "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
     },
@@ -903,7 +909,7 @@
       "guard_candidate_sha256": "412ed4e59c33db10f91b6d6a16760275b305ff512c947a6cf8efc9caa450417d",
       "guard_preimage_sha256": "34a073831b68da026de678cfd7ac889a442275cb7f450f616a262fe39fc27d4c",
       "guard_manifest_sha256": "aa3caf8eaf2a65fc299067a174d1963e84dcd2e523eec34b02ae8f47e30eb988",
-      "README_mechanical_correction": "Authorzero-contexthunkheaderline9; exactprimaryoldparagraphline10. Preflights refusedbeforewrites; appliedonlyexact singleapprovedold\u2192newtext, allURLsunchanged.",
+      "README_mechanical_correction": "Authorzero-contexthunkheaderline9; exactprimaryoldparagraphline10. Preflights refusedbeforewrites; appliedonlyexact singleapprovedold→newtext, allURLsunchanged.",
       "compat_receipt_metadata_correction": "Authorworkflow_run_idwasjobnumber. Actualworkflowrun41706702071/job126163801292; authorreceiptpreserved/rootreviewrecords correction."
     },
     "actual_e5_failures": {
@@ -1054,5 +1060,41 @@
     "receipt": "dope/receipts/hosted-native-e5-d04-constants.json",
     "sha256": "73090cf76b6c7b6f72688127b0c0fea1d730f5425531568a851ec4d745164e33",
     "source_closure_verified": true
+  },
+  "current_D06_required_policy_source": {
+    "schema": "Strictlyadditive optionalhistoricalproperty; newissuance always includes requirement. Fullschemaengine NOT_RUN; staticJSONparse only.",
+    "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+    "source_commit": "5cb20de52868b11cf71d544e62579271bd06b35a",
+    "base": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+    "frozen_patch_sha256": "129f60ad1f8867c1d0bf0b85e5a34108909f1aba2e2c6571c82c0c2c5a4f3490",
+    "scope": "Exact4R2files; typed requiredpolicy only, not verifiedinference/custody/per-cellprovenance; oldnumericaldrivers/legacy/deps/locks/CLI unchanged",
+    "requirement": {
+      "state": "required_for_complete_driver_evidence",
+      "driver_protocol": "driver-rank-informative-v1",
+      "bound_method": "full_family_max_t",
+      "pins": "Validatedexisting5DataPins copied; complete identity coverage remains acceptance review"
+    },
+    "new_native_tests": "NOT_RUN",
+    "D06_S4": "NOT_RUN even if newtest laterpasses until full identity/multiplicitycoverage reviewed",
+    "promotions": {
+      "D03_S3": "Actualbdeasafeerror/nativefixture accepted with unchangedrelevant sources",
+      "D05_S2": "Actualbdea target-role/rowID/SDKtargetlast conversions accepted with unchangedrelevant sources"
+    },
+    "counts": {
+      "PASS": 54,
+      "NOT_RUN": 7,
+      "historical_BLOCKED": 4
+    },
+    "checks": {
+      "Rust1_88_fmt": "PASSexactR2files",
+      "JSON": "parsePASS",
+      "preimages": "all4MATCH",
+      "candidate": "all4MATCH",
+      "native_compiler_tests": 0,
+      "Python_tests": 0,
+      "schema_engine": "NOT_RUN",
+      "current_full_CI": "PENDING_NEW_PUSH"
+    },
+    "remaining": "6engineeringtasks/7Ruststreams/currentrequiredCI,4campaigncriteria deferredneverPASS; no efficacy/release claim"
   }
 }

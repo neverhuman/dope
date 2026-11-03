@@ -1,6 +1,6 @@
 # D05 — Implement additive FIT-only normalization with private owner state
 
-Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below include actual testedbb/mergefee51ff5 native fixtures, with the complete engine subtree unchanged through current CI-only repair. See [bb scoped evidence](../receipts/hosted-native-bb-criteria.json) and [live ledger](../../STATUS.json). Other criteria and current full CI remain pending; no efficacy, privacy certification, scientific qualification or release is implied. One integrator owns the same isolated fast branch.
+Current status: **SOURCE IMPLEMENTED; SCOPED BDEA NATIVE CRITERIA PASS; CURRENT FULL CI PENDING.** Referenced SDK/normalization API and test sources remain unchanged from the actual bdea proof. Accepted individual criteria are mapped below; new DVS metadata is authored and unqualified. No scientific, custody, universal malformed-input or release proof follows.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 
@@ -65,7 +65,7 @@ Verdicts reflect scoped engineering receipts; the exact stopped HEAD is recorded
 | Criterion | Verdict | Evidence and limitation |
 | :--- | :--- | :--- |
 | D05-S1 | **PASS** | Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json. |
-| D05-S2 | **NOT_RUN** | Typed declarations and physical row IDs are implemented; native conversion/CLI role tests pending. |
+| D05-S2 | **PASS** | Typed target/role refusal, physical row ordering, SDK target-last conversions and three task kinds executed on exact current tree; source+line assertions in SOURCE-REVIEW.md See ../receipts/hosted-native-bdea-normalization-views.json; whole new-source CI remains separate. |
 | D05-S3 | **PASS** | Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json. |
 | D05-S4 | **PASS** | Actual M1 three named tests allPASS log819-826,3/0/0. Seven mandatory absolute nativeCLI child invocations with Python environment removed cover positive public-schema/normal-output redaction, malformed JSON/unknownfield/invalidrole/tamperedpublicschema refusal, stable errors, emptystdout/absentoutputdir on failures. Planted private names/vocabulary/extrema absent from public outputs/errors; privatecard explicitly allowed. Synthetic canary closure only, no privacy certification. See ../receipts/hosted-native-bb-criteria.json; current fullCI and other criteria remain separate. |
 | D05-S5 | **PASS** | Three source-bound actual Rust NC1 exports replay in default Python test_nc1 without ENV/skip; private/public JSON schemas validate. This is focused fixture evidence, not full native qualification. |

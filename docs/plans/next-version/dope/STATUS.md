@@ -2,7 +2,7 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
-Current criterion matrix: **52 PASS /9 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+Current criterion matrix: **54 PASS /7 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
 
 ## Latest user language policy: NOT_COMPLIANT
 
@@ -11,7 +11,7 @@ Python is permitted only for genuine deep-learning training and necessary traini
 ## Source and evidence boundaries
 
 - Planning base: `59b1e0513683fa4c5c347e4db6465eff84f496ef`.
-- Current code checkpoint: `9d407a5f569d7436d6d6beb5f1564584fc6b191c`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
+- Current code checkpoint: `5cb20de52868b11cf71d544e62579271bd06b35a`, on the same `fast/next-version-dope-20261103` branch and isolated worktree. Later documentation-only commits do not constitute new source qualification.
 - Main/default-branch README CI failed at the planning base because `test_lineage.py` had 505 lines while the unchanged guard requires strictly fewer than 500. Local commit `63c24d02974a14767eb9b96314831268be8ca762` reduces it to 499 with an identical Python AST.
 - Four additional branch source-cap violations were repaired by private helper extraction in `35d2f7955312b7293a749d70c077992a7425ccf4` and `409c84e3486fe820776aa781a37b373954653c94`. Numerical bodies, existing tests, public training classes/checkpoint schema and metric v1/v2 dispatch remain preserved. The new v3 summary helper enters future producer source hashes; historical receipts and identity records were not changed.
 - The current static tracked-source inventory covers 1,301 governed source files and reports zero cap violations. This is a source inspection, **not execution of the Rust guard**. Its threshold and exemptions remain unchanged.
@@ -317,3 +317,18 @@ fixture/coordinate replay after current/59b source checks. Counts52PASS/
 9NOT_RUN/4historicalBLOCKED leave six engineering tasks and seven Rust
 streams open. D03-S4 and D04-S5 remain NOT_RUN. See [source/proof evidence](receipts/pytest-reporting-and-sdk-errors-source.json)
 and [D04 acceptance](receipts/hosted-native-e5-d04-constants.json). New required CI remains pending.
+
+## DVS required-policy metadata and two scoped native acceptances
+
+Source5cb20de5 adds only the reviewed R2 required-policy/five-pin receipt field,
+its issuer, schema and real-evaluator fixture. This states a requirement; it
+does not verify inference, authenticated custody or full per-cell provenance.
+Historical schema omission remains allowed. D06-S4 stays NOT_RUN, and any
+future native test pass still needs full identity/multiplicity acceptance review.
+
+Actualbdea D03-S3 and D05-S2 proofs are accepted after current relevant API/test
+closure checks. Counts54PASS/7NOT_RUN/4historicalBLOCKED leave six engineering
+tasks and seven Rust migration streams open. New native/schema-engine/full CI
+are NOT_RUN/PENDING. No driver math, legacy fixture, dependency, lock, CLI,
+Python source or badge changed. See [source receipt](receipts/d06-policy-requirement-source.json),
+[SDK errors](receipts/hosted-native-bdea-sdk-errors.json) and [normalization views](receipts/hosted-native-bdea-normalization-views.json).
