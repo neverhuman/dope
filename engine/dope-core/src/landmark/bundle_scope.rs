@@ -198,12 +198,8 @@ pub enum LandmarkGroup {
     Fine,
 }
 
-/// descriptors.MACRO_INDICES (0-based slots).
-pub const MACRO_SLOTS: [usize; 9] = [0, 1, 2, 3, 4, 5, 13, 14, 21];
-/// descriptors.LARGER_ADDED_INDICES.
-pub const LARGER_SLOTS: [usize; 9] = [6, 7, 8, 9, 10, 11, 12, 15, 16];
-/// descriptors.FINE_ADDED_INDICES.
-pub const FINE_SLOTS: [usize; 5] = [17, 18, 19, 20, 22];
+// Preserve bundle/bundle_scope public paths while keeping one coordinate table.
+pub use super::panel::{FINE_SLOTS, LARGER_SLOTS, MACRO_SLOTS};
 /// Progressive computation order.
 pub const PROGRESSIVE_ORDER: [LandmarkGroup; 3] = [
     LandmarkGroup::Macro,

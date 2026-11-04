@@ -1,0 +1,40 @@
+{
+  "schema": "dope.scoped-criterion-acceptance/v1",
+  "reviewer": "/root",
+  "observed_utc": "2026-11-03T21:34:41.972Z",
+  "criterion": "D03-S3",
+  "decision": "ACCEPT_SCOPED_SAFE_ERROR_FIXTURES_PENDING_NEXT_COHERENT_LEDGER_INTEGRATION",
+  "source": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+  "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+  "tested_tree": "6f4a4264d82b8d747e820e115e6e8b3ff456864f",
+  "run": 41720870509,
+  "job": 126212969403,
+  "conclusion": "SUCCESS",
+  "log_sha256": "9b7e7123c1289c2a74db2da11d17bf0777dbf8b6693b3e49d561e7f1dd00ef3c",
+  "source_objects": {
+    "safe_errors": "34080f5149c8d61f017136b1da6691a36774d401",
+    "legacy_surface_parity": "5ceb9c880daa377e76615dd9de706b7fa2896e80"
+  },
+  "review": "Root read both new exact Artifact/Input variant, fixed display and privacy-canary assertions and actual two PASS outcomes. Existing three-task nonzero model journey invokes exact stable recipe-mismatch/unknown-recipe/unknown-expected/invalid-tier/63x17-shape safe refusals; its actual PASS implies HighRequiredV1 branch executed via required high_condition_pair.expect. Existing SDK/core production sources and legacy parity test are unchanged from qualifiede5, independently Git-diffed. GitHub merge/source tree identity independently verified.",
+  "scope": "Engineering public synthetic malformed-weight, recipe/tier/conditioning-shape and preparation-schema fixture matrix. Not universal proof for every malformed input, model quality or released-checkpoint legacy replay.",
+  "before_tracked": {
+    "PASS": 52,
+    "NOT_RUN": 9,
+    "historical_BLOCKED": 4
+  },
+  "after_if_later_integrated": {
+    "PASS": 53,
+    "NOT_RUN": 8,
+    "historical_BLOCKED": 4,
+    "engineering_tasks_open": 6
+  },
+  "preserved_gaps": [
+    "D03-S4 exact trained reference bundle/legacy conditional-tail execution",
+    "D04-S5 historical report-byte binding"
+  ],
+  "limits": [
+    "Do not cause a docs-only push or reopen frozenbdea. Solewriter rechecks current criterion/source closure before next necessary batch.",
+    "Current task ledger remains52/9/4 until integration. No native job or new source/index/ref mutation byroot.",
+    "Full currentCI and Rust language migration remain incomplete."
+  ]
+}

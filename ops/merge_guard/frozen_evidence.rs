@@ -41,6 +41,14 @@ fn valid_hash(value: &Value) -> bool {
     })
 }
 
+// Python str.strip() also treats U+001C..U+001F as whitespace, unlike Rust trim().
+fn valid_reason(reason: &str) -> bool {
+    !reason.is_empty()
+        && !reason
+            .chars()
+            .all(|character| character.is_whitespace() || matches!(character, '\u{1c}'..='\u{1f}'))
+}
+
 fn replacement_hashes(allowlist: &Value) -> Result<Hashes, String> {
     let entries = allowlist.as_object().ok_or_else(|| {
         "allowlist must map exact paths to replacement hashes and reasons".to_owned()
@@ -57,7 +65,7 @@ fn replacement_hashes(allowlist: &Value) -> Result<Hashes, String> {
             || !valid_hash(&fields["sha256"])
             || fields["reason"]
                 .as_str()
-                .is_none_or(|s| s.trim().is_empty())
+                .is_none_or(|reason| !valid_reason(reason))
         {
             return Err(format!("invalid frozen-evidence allowlist entry: {name}"));
         }
@@ -219,22 +227,52 @@ fn run(root: &Path) -> Result<(usize, usize), String> {
     Ok((recorded.len(), allowlist.len()))
 }
 
+#[derive(Debug, PartialEq, Eq)]
+enum CliRequest {
+    Run(PathBuf),
+    Help,
+    UsageError,
+}
+// Match the current internal CLI forms and Python argparse's --root=PATH spelling.
+// The equals spelling accepts UTF-8 values; split --root PATH preserves OsString paths.
+fn parse_args<I>(arguments: I) -> CliRequest
+where
+    I: IntoIterator<Item = std::ffi::OsString>,
+{
+    let mut args = arguments.into_iter();
+    match args.next() {
+        None => CliRequest::Run(repository_root()),
+        Some(flag) if flag == "--help" || flag == "-h" => CliRequest::Help,
+        Some(flag) if flag == "--root" => match args.next() {
+            Some(path) if args.next().is_none() => {
+                let path = if path.is_empty() {
+                    std::ffi::OsString::from(".")
+                } else {
+                    path
+                };
+                CliRequest::Run(PathBuf::from(path))
+            }
+            _ => CliRequest::UsageError,
+        },
+        Some(flag) => match flag
+            .to_str()
+            .and_then(|value| value.strip_prefix("--root="))
+        {
+            Some(path) if args.next().is_none() => {
+                CliRequest::Run(PathBuf::from(if path.is_empty() { "." } else { path }))
+            }
+            _ => CliRequest::UsageError,
+        },
+    }
+}
 fn main() {
-    let mut args = env::args_os().skip(1);
-    let root = match args.next() {
-        None => repository_root(),
-        Some(flag) if flag == "--help" || flag == "-h" => {
+    let root = match parse_args(env::args_os().skip(1)) {
+        CliRequest::Run(root) => root,
+        CliRequest::Help => {
             println!("Usage: check-frozen-evidence [--root REPOSITORY_ROOT]");
             return;
         }
-        Some(flag) if flag == "--root" => match args.next() {
-            Some(path) if args.next().is_none() => PathBuf::from(path),
-            _ => {
-                eprintln!("usage: check-frozen-evidence [--root REPOSITORY_ROOT]");
-                std::process::exit(2);
-            }
-        },
-        _ => {
+        CliRequest::UsageError => {
             eprintln!("usage: check-frozen-evidence [--root REPOSITORY_ROOT]");
             std::process::exit(2);
         }
@@ -249,29 +287,6 @@ fn main() {
         }
     }
 }
-
 #[cfg(test)]
-mod tests {
-    use super::{protected, valid_path};
-
-    #[test]
-    fn frozen_path_scope_matches_the_python_guard() {
-        assert!(valid_path("docs/whitepaper/generated/figure-one.svg"));
-        assert!(valid_path("research/benchmark/results/run/report.json"));
-        assert!(valid_path(
-            "research/benchmark/review_fixes/predeclare.json"
-        ));
-        assert!(valid_path("ops/ci/paper-review-inputs.json"));
-        for path in [
-            "../docs/whitepaper/generated/x",
-            "docs//whitepaper/generated/x",
-            "docs/whitepaper/generated/../secret",
-            "docs/whitepaper/generated/x?.json",
-            "docs/whitepaper/generated/x\\y",
-            "README.md",
-        ] {
-            assert!(!valid_path(path), "accepted {path}");
-        }
-        assert!(!protected("ops/ci/frozen-evidence.json"));
-    }
-}
+#[path = "frozen_evidence_tests.rs"]
+mod tests;

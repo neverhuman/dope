@@ -1,0 +1,52 @@
+{
+  "schema": "dope.root-criterion-acceptance/v1",
+  "observed_utc": "2026-11-03T22:14:06.568Z",
+  "reviewer": "/root",
+  "source_head": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+  "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+  "source_and_tested_tree_git_sha1": "6f4a4264d82b8d747e820e115e6e8b3ff456864f",
+  "run": 41720870861,
+  "attempt": 1,
+  "job": 126212971176,
+  "artifact": 13272837496,
+  "log_sha256": "ee168fbba820013486cf5538302b57a5ad8087b251b34a30c8c3488ca2dc93cf",
+  "root_independent_checks": [
+    "Authenticated original artifact/log and same-head/run/attempt receipts",
+    "Read source task criteria D05-S2 and D06-S4",
+    "Read pinned SDK row-ID, target-last, identity/role assertions",
+    "Read root legacy/v2 corpus loop and engine34-C02 legacy fixture assertions",
+    "Independently located seven exact named test outcomes in authentic log, all ok"
+  ],
+  "criteria": {
+    "D05-S2": {
+      "verdict": "ROOT_ACCEPTED_FOR_NEXT_NECESSARY_COHERENT_LEDGER_BATCH",
+      "evidence": "Typed target/role refusal, physical row ordering, SDK target-last conversions and three task kinds executed on exact current tree; source+line assertions in SOURCE-REVIEW.md",
+      "tracked_now": false
+    },
+    "D06-S4": {
+      "verdict": "PARTIAL_EXECUTION_CLOSURE_KEEP_WHOLE_CRITERION_OPEN",
+      "evidence": "Current root and engine C02/legacy assertions actually passed, including all34legacy cases; no longer a NOT_RUN execution gap for those assertions",
+      "remaining": "Full criterion additionally requires successor receipt identities/multiplicity-policy binding. Role identities and rejection of non-full-family bounds were observed, but explicit receipt-policy binding coverage was not independently established in this bounded review. Do not promote whole criterion solely from legacy loop."
+    }
+  },
+  "metadata_erratum": "Frozen reviewer RESULT fields source_tree_sha256_git/tested_merge_tree_sha256_git are misnamed: supplied40hex values are Git SHA-1 tree IDs, not SHA256. Actual values agree with primary Git objects; root uses correctly named field without rewriting frozen packet.",
+  "counts": {
+    "tracked": {
+      "PASS": 52,
+      "NOT_RUN": 9,
+      "historical_BLOCKED": 4
+    },
+    "previous_pending_acceptance": "D03-S3",
+    "new_pending_acceptance": "D05-S2",
+    "prospective_only_if_both_integrated": {
+      "PASS": 54,
+      "NOT_RUN": 7,
+      "historical_BLOCKED": 4
+    }
+  },
+  "actions": {
+    "source_index_ref_or_ledger_changes": 0,
+    "new_tests_builds_CI": 0,
+    "no_docs_only_push": true
+  }
+}

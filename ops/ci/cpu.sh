@@ -6,9 +6,8 @@ source ops/ci/lib.sh
 for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg strace tar gzip; do
   ci_require_command "$tool"
 done
-python3 -B -m unittest discover -s ops/ci -p test_frozen_evidence.py -v
+cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root "$root"
 python3 -B -m unittest discover -s research/landmark_cache/tests -v
-python3 -B ops/ci/check-frozen-evidence.py
 bash ops/ci/test-cpu-tool-readiness.sh
 sha256sum --check --status scripts/native-legal.sha256
 bash ops/ci/check-budgets.sh
@@ -20,8 +19,8 @@ cargo test --locked
 bash ops/ci/engine.sh
 cargo run --locked --offline --bin dope-native-notices -- --check
 cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
-cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof -- -D warnings
-cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof
+cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence -- -D warnings
+cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence
 /usr/bin/python3 -m venv --system-site-packages target/ci-python
 bash ops/ci/install-python-v1.sh target/ci-python/bin/python
 bash ops/ci/engine-benchmark.sh target/ci-python/bin/python

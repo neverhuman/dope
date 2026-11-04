@@ -1,0 +1,38 @@
+{
+  "schema": "dope.hosted-audit-snapshot/v1",
+  "source_head": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+  "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+  "tested_tree": "f3b5f5ebe4541bdf17f2110661f7f91ee0c4f362",
+  "tree_matches_source": true,
+  "audit_job_id": 126098370448,
+  "artifact_id": 13257786615,
+  "report": {
+    "sha256": "0cfb18f386fa26a663e58fab70298617cbb706c7b46ede06d119a4ced7df35ed",
+    "bytes": 154620,
+    "version": "1.7.1",
+    "scope": "full",
+    "dirty_worktree": false,
+    "score": 87,
+    "raw_score": 87,
+    "minimum_score": 85,
+    "report_decision": "pass",
+    "caps": 0,
+    "high": 0,
+    "critical": 0,
+    "medium": 11
+  },
+  "generated_svg": {
+    "sha256": "753d123d1f3386e5aef3f9fb5eb947abe054638743cb467b4c39b556731b45e7",
+    "bytes": 437,
+    "generator": "Unchanged audit-proof in authentic hosted job",
+    "adoption": "Exact artifact bytes; no manually edited score"
+  },
+  "score_receipt": {
+    "sha256": "ad214f286783673a62971164426c7c01b86828e7fa8ab8562f23c1783fa40c66",
+    "report_status": "pass",
+    "committed_badge_matches": false
+  },
+  "job_conclusion": "FAIL final badge mismatch against former88snapshot; not wholejobPASS",
+  "later_source_qualification": "PENDING; no inherited exact-head audit claim",
+  "historical_local_witness": "jankurai-451-snapshot.json retained unchanged"
+}

@@ -3,6 +3,12 @@ use serde::Serialize;
 // This implementation uses a new identity deliberately: fold-local scaling,
 // nested lambda selection and the bounded T03 policy differ from the proposal.
 pub const PANEL_V1: &str = "landmarks-native-v1";
+/// Canonical zero-based MACRO slots. Old import paths re-export this table.
+pub const MACRO_SLOTS: [usize; 9] = [0, 1, 2, 3, 4, 5, 13, 14, 21];
+/// Canonical zero-based additions required by High conditioning.
+pub const LARGER_SLOTS: [usize; 9] = [6, 7, 8, 9, 10, 11, 12, 15, 16];
+/// Canonical zero-based FINE slots unused by High conditioning.
+pub const FINE_SLOTS: [usize; 5] = [17, 18, 19, 20, 22];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]

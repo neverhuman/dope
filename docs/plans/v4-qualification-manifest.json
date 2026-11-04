@@ -1,0 +1,191 @@
+{
+  "schema": "dope.v4-qualification-readiness/v1",
+  "state": "HOLD",
+  "qualification_status": "qualification-not-run",
+  "ready_for_owner_admission": false,
+  "campaign_authorized": false,
+  "model_release_authorized": false,
+  "serving_adoption_authorized": false,
+  "program_snapshot": {
+    "task_count": 22,
+    "success_criterion_count": 104,
+    "d11_dependencies": [
+      "D00",
+      "D01",
+      "D02",
+      "D03",
+      "D04",
+      "D05",
+      "D06",
+      "D07",
+      "D08",
+      "D09",
+      "D10"
+    ]
+  },
+  "identities": {
+    "dope_source_base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+    "dope_actual_campaign_source_head_sha": null,
+    "new_implementation_commits_and_parent_chain": [
+      "0bfdff6417b876fc044856db7fd15ed3b7cec01c",
+      "53e812b948397100b1e486f14c79329e29b783d1",
+      "ab188938f3353848072eeb402d9d9835769335e2"
+    ],
+    "standalone_encoder_sha": "d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c",
+    "jopedime_identity_sha": "c51a56d031a4af40cb2b2661e6230109db684fc5cf80743dcad5c2fc770ba814",
+    "identity_note": "DOPE source, standalone encoder asset, and JopeDime identity are distinct objects; none substitutes for another.",
+    "engineering_source_checkpoint_sha": "ab188938f3353848072eeb402d9d9835769335e2"
+  },
+  "fixed_contracts": {
+    "normalization": "nc1-minmax-onehot-v1",
+    "owner_transform": {
+      "name": "privateownerScaleCard",
+      "precision": "f64",
+      "clip": false,
+      "vocabulary_scope": "full FIT vocabulary",
+      "max_expanded_features": 256,
+      "publicly_exposed": false
+    },
+    "wire": {
+      "name": "DML4",
+      "hard_caps": [
+        "2k",
+        "16k",
+        "64k"
+      ],
+      "implicit_4k_retirement": false
+    },
+    "historical_compatibility": {
+      "legacy_v3_unchanged": true,
+      "v1_metrics_unchanged": true,
+      "v2_metrics_unchanged": true
+    },
+    "prospective_dvs": "dope-dvs-v1",
+    "successor_driver_rank": {
+      "name": "driver-rank-informative-v1",
+      "preserves_C02_full_family_maximum_T": true
+    }
+  },
+  "evidence_states": {
+    "source_implementation": "NOT_VERIFIED",
+    "fixture": "NOT_VERIFIED",
+    "exact_head_ci": "NOT_RUN",
+    "scientific_efficacy": "NOT_RUN",
+    "release_qualification": "NOT_RUN",
+    "serving_or_retrieval_adoption": "NOT_RUN"
+  },
+  "required_readiness": {
+    "engineering_prerequisites": {
+      "status": "BLOCKED",
+      "required_receipt_inventory": [
+        "D00",
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D09",
+        "D10"
+      ],
+      "all_current_exact_head_pass_receipts": null,
+      "blocking_condition": "Implementation checkpoints are recorded, but current exact-head passing native/full-CI receipts for every prerequisite remain absent or unverified. CPU trainer support does not establish CUDA qualification."
+    },
+    "cohort_and_exposure": {
+      "status": "BLOCKED",
+      "finite_family_roster_hash": null,
+      "roles": {
+        "fit_train": null,
+        "development_tune": null,
+        "independent_confirmation": null,
+        "sealed_custodian": null
+      },
+      "raw_provenance_verified": null,
+      "historical_exposure_ledger_hash": null,
+      "blocking_condition": "No source-cohort provenance or physical-family role/exposure ledger has been verified; unknown provenance cannot support a claim."
+    },
+    "preregistration": {
+      "status": "BLOCKED",
+      "preregistration_id": null,
+      "preregistration_hash": null,
+      "frozen_before_outcome_exposure": null,
+      "hypotheses_and_matched_control": null,
+      "task_family_bootstrap_and_uncertainty": null,
+      "endpoints_harm_tails_multiplicity_and_denominators": null,
+      "epsilon_macro_n_architecture_steps_thresholds_tolerances": null,
+      "blocking_condition": "Exact matched baseline/control, family-level inference, all endpoints and failure rules, and development-frozen choices must be preregistered before any outcome exposure."
+    },
+    "campaign_execution_plan": {
+      "status": "BLOCKED",
+      "finite_scheduled_cells_and_seeds": null,
+      "synthetic_row_policy": null,
+      "equal_complete_byte_accounting": null,
+      "checkpoint_selection_and_termination": null,
+      "retry_repair_resume_and_fresh_attempt_rules": null,
+      "blocking_condition": "Finite cells, comparator byte accounting, checkpoint selection, termination, retry/repair, and resume semantics are unspecified."
+    },
+    "owner_budget_and_host": {
+      "status": "BLOCKED",
+      "accountable_owner": null,
+      "host_device_threads_memory_disk_wall_limits": null,
+      "budget": null,
+      "admission_lock_and_decision": null,
+      "containment_and_output_custody": null,
+      "capability_evidence_hash": null,
+      "blocking_condition": "No owner, host capability evidence, resource limits, budget, admission lock, or custody assignment is recorded."
+    },
+    "recovery_and_artifact_custody": {
+      "status": "BLOCKED",
+      "durable_checkpoint_and_raw_log_location": null,
+      "per_cell_identity_cost_manifest_hash": null,
+      "restore_verification": null,
+      "recovery_owner": null,
+      "blocking_condition": "No durable recovery route, immutable artifact manifest, restore verification, or recovery owner is recorded."
+    },
+    "owner_admission": {
+      "status": "BLOCKED",
+      "reviewed_manifest_sha256": null,
+      "owner_decision": null,
+      "decision_timestamp": null,
+      "blocking_condition": "Owner admission cannot occur until all preceding blockers are cleared and the exact manifest hash is reviewed."
+    }
+  },
+  "costs": {
+    "requested_budget": null,
+    "expected_cost": null,
+    "actual_cost": null,
+    "elapsed_time": null
+  },
+  "campaign_outcomes": null,
+  "blocking_conditions": [
+    "No current exact-head D00-D10 passing receipt inventory.",
+    "No verified source-cohort provenance, finite physical-family roster, or exposure ledger.",
+    "No frozen preregistration with exact matched baseline/control and family-level inference.",
+    "No admitted owner, budget, host/device capability evidence, or resource limits.",
+    "No verified recovery route, artifact custody, or restore proof.",
+    "No owner-reviewed exact-manifest admission decision."
+  ],
+  "source_file_manifest": [
+    "docs/plans/v4-qualification-readiness.md",
+    "docs/plans/v4-qualification-manifest.json"
+  ],
+  "acceptance_receipt": {
+    "evidence_part_done": [
+      "Readiness plan drafted",
+      "Machine-readable readiness manifest drafted with explicit nulls and blockers",
+      "No campaign or outcome claim made"
+    ],
+    "blocked": [
+      "D11-S1",
+      "D11-S2",
+      "D11-S3",
+      "D11-S4",
+      "D11-S5",
+      "D11-S6"
+    ],
+    "validation": "JSON syntax valid via rtk proxy python3 -m json.tool; no schema, prerequisite, or efficacy validation implied",
+    "candidate_file_sha256": null
+  }
+}

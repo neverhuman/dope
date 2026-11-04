@@ -614,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "dope-cli"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "clap",
  "dope-core",
@@ -626,12 +626,13 @@ dependencies = [
 
 [[package]]
 name = "dope-core"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "brotli",
  "candle-core",
  "candle-nn",
  "csv",
+ "dope-norm",
  "half",
  "rayon",
  "safetensors 0.7.0",
@@ -642,8 +643,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "dope-norm"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "dope-probes"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "brotli",
  "clap",
@@ -652,6 +662,16 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "dope-sdk"
+version = "0.1.0"
+dependencies = [
+ "dope-core",
+ "dope-norm",
+ "safetensors 0.7.0",
+ "serde_json",
 ]
 
 [[package]]

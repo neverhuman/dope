@@ -1,5 +1,11 @@
 # Architecture and ownership
 
+## Latest language requirement and migration status
+
+The user's current rule permits Python only for deep-learning training. All nontraining preparation, inference, validation/metrics, reports, orchestration and executable checks must be Rust at end state. Training autograd/loss/optimizer work and necessary training-coupled batching/RNG/checkpoint state may remain Python; standalone prediction/scoring does not become training because it uses a neural model. This overrides the historical V1/advanced-data/Python benchmark exceptions described below as end-state authority.
+
+**DOPE is NOT_COMPLIANT today:** 890 tracked Python files include known active nontraining operators. The 787-path runtime inventory excludes 103 research/levels files and is not full function classification. Preserve old code, tests, fixtures, data/model/results and receipts while Rust parity is proved. Neither a source-only port packet nor an exception-list entry grants compliance. [The tracked migration program](plans/next-version/dope/language-policy/README.md) separates source authorship, review, native tests, caller activation, full CI and policy acceptance. Existing architecture descriptions below record current/historical boundaries, not exemptions from the new rule.
+
 ## DOPE engine (`engine/`)
 
 `engine/` is the deployable product: a standalone pure-Rust workspace with its own
@@ -140,3 +146,7 @@ portable levels, DPK3.2/v1 readers and defaults remain independent. See
 
 Private split-bound CV input caches are implemented in `research/levels/precalc`; see [fit-CV cache](fit-cv-landmark-cache.md).
 `engine/dope-core/src/mlc_v3/` and `engine/dope-cli/src/mlc_v3.rs` implement 100% pure-Rust CPU inference and `DML3`/`CSC1` synthetic sampling from `.safetensors` weights (`dope mlc-v3`) with zero Python at inference time (`< 1e-5` trained-checkpoint tensor forward parity [`max_abs_err = 1.33e-6`] and `< 1e-5` deterministic fixed-draw `DML3`/`CSC1` sampling parity [`max_abs_err = 1.11e-6`] verified in `research/levels/rust_v3_parity.py`; the `1,000`-dataset `v2` and `1,069`-dataset `v3` downstream auditor Elo benchmarks were measured in the Python reference pipeline, and their study quality claims are not transferred to standalone Rust statistical sampling prior to dedicated end-to-end campaign measurement).
+
+## Additive NC1, DML4 and evidence surfaces
+
+`engine/dope-sdk` is a versioned facade over existing native types. `engine/dope-norm` owns NC1 FIT-only private transforms and value-free public group schemas. `engine/dope-core/src/mlc_v4` owns the bounded closed six-gate DML4 recipient graph, while `dvs` owns prepared-evidence reduction and honest AuditCard receipts. New opt-in CLI commands use these native modules. Historical v3 and metric v1/v2 dispatch remain available. Research-only autograd producer/trainer code is confined to the existing `research/levels/` exception; no Python process is required for recipient sampling. See [the workflows](next-version-workflows.md) and [contract decisions](adr/normalize-once-and-dvs-v1.md).

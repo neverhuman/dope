@@ -1,0 +1,307 @@
+{
+  "schema": "dope.rust-language-migration-queue/v1",
+  "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+  "source_archive_sha256": "59746cb0d132b14f440de13a0d2a95bb51bd48311c977b109183b41bee148dff",
+  "model": "gpt-6-luna",
+  "integration_writer": "/root/dope_audit",
+  "worktree": "/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102",
+  "branch": "fast/next-version-dope-20261103",
+  "policy_status": "NOT_COMPLIANT",
+  "original_criterion_baseline": {
+    "PASS": 30,
+    "NOT_RUN": 31,
+    "BLOCKED": 4,
+    "total": 65,
+    "scope": "preserved original engineering baseline, not new language-policy acceptance"
+  },
+  "source_inputs": {
+    "dope-rust-boundary/training-audit/tasks/RS00-v3-summary-rust-port.md": {
+      "sha256": "85be026291a052d323dfc75858e2aeaef01c2d5e4f64169ce7ab1abf6f6ffdb7",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/tasks/RS00-v3-summary-rust-port.md",
+      "tracked_sha256": "4a710b02942b4a55f8775213435bd1c2ef669198ed35f2738c351f9af6c27bde"
+    },
+    "dope-rust-boundary/training-audit/tasks/RS01-v3-runner-orchestration-rust-port.md": {
+      "sha256": "1363371213ff8d602557e82c2d4f7a5cadde75c0b1c4678f35f9d87a5e5c5bb9",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/tasks/RS01-v3-runner-orchestration-rust-port.md",
+      "tracked_sha256": "0cfdf68c4656a6ca7cd99534624c709948ee442d44f017edebe9b334df650d5f"
+    },
+    "dope-rust-boundary/training-audit/tasks/RS02-python-dl-training-boundary.md": {
+      "sha256": "3b88a087096fc5d29432935425f57ddfc1d11d8b329c8d3aaeadc4d721de89e5",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/tasks/RS02-python-dl-training-boundary.md",
+      "tracked_sha256": "1211bd199c7f17d1b06d97ce471990ac8f0154da5775c972dcca71359e1f4e85"
+    },
+    "dope-python-policy/V3-RUST-MIGRATION-TASKS.md": {
+      "sha256": "66b2b85fe3924632d1e3fec44531c73b5cf041697b91611c685ec5339e104aeb",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/tasks/V3-RUST-MIGRATION-TASKS.md",
+      "tracked_sha256": "b63a8c5fa5a013ef58b63ee56b86c58822fdf482b9e6d3e8b45017dddaef6c59"
+    },
+    "dope-rust-boundary/training-audit/AUDIT.md": {
+      "sha256": "7c6f599440eff431402cce1162b63bfed8954bb497ea8b8113716a836c8cf5b3",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/training-boundary-audit.md",
+      "tracked_sha256": "30d085aafed161a46d15aa8ed57d8e40620befdb2bc6aa2a73b0c188b7d15d8a"
+    },
+    "dope-rust-boundary/remote-lanes/rs01/TASK.md": {
+      "sha256": "338f6c0016c32d58b1241b87d36f30ec43ab36628c42319899aecd662a478b74",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs01.md",
+      "tracked_sha256": "3fa0397e1f923a2aa7518b9f43069d1a81640bcee4617b44265810d2427e6f5c"
+    },
+    "dope-rust-boundary/remote-lanes/rs02/TASK.md": {
+      "sha256": "81875537969a5d85549eb1551472381642fe5c7b74393212a306e294c92d656f",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs02.md",
+      "tracked_sha256": "fd56de4bb6410fb58485e5442b63374da7ab61ee75b549f9048781811e66a8e2"
+    },
+    "dope-rust-boundary/remote-lanes/rs03/TASK.md": {
+      "sha256": "41a81f77abe9cf15c9a3bbd0e40aed314eef55eec8ef270292592a26ca16559d",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs03.md",
+      "tracked_sha256": "7fd131737b6c6fdb26be82d01f6af54e6f771fcd8884e7fce4e7e49efd270433"
+    },
+    "dope-rust-boundary/remote-lanes/rs04/TASK.md": {
+      "sha256": "eee331155c190e04c0069693ab6ee81e32ec30b251ec45b5e530fadef9d3a8c0",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs04.md",
+      "tracked_sha256": "6a9149a2122d53fe2d62ea1c305038f8dc705b1e7872e9d5e3f82ab8b2c66638"
+    },
+    "dope-rust-boundary/remote-lanes/rs05/TASK.md": {
+      "sha256": "074596f7e5698fd6f8c13917860ad3a3b2acf324ee99216b0c1eafaf2d7a1d2a",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs05.md",
+      "tracked_sha256": "f44e428562f1b8416dec1a2a6b4937d70643f954677aee3a48e8b61100f5a4d2"
+    },
+    "dope-rust-boundary/remote-lanes/rs06/TASK.md": {
+      "sha256": "90d78ddf743ea91e720ee1f170e07fc6d1f918544596c20748e5990ecc507cf0",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs06.md",
+      "tracked_sha256": "c299a0fb852c40b6d5a6c047dcceeb2b6aae4f9697b42daad216f6cc21156611"
+    },
+    "dope-rust-boundary/remote-lanes/rs07/TASK.md": {
+      "sha256": "e28ff4ba011a8771203ac895b15187e8ac5be19c5cf5b46074b1a354e362276c",
+      "tracked_destination": "docs/plans/next-version/dope/language-policy/remote-lanes/rs07.md",
+      "tracked_sha256": "5b52af9a703ac77e65f93547cc3a28836068d406928bb328c59b96608504de4d"
+    }
+  },
+  "pcg64_reference": {
+    "repository": "neverhuman/JopeDime",
+    "source_head": "8a1c0046d1c8a64fa1a7795fc0071705089ef8a0",
+    "files": [
+      "LICENSE",
+      "crates/numpy-pcg64/Cargo.toml",
+      "crates/numpy-pcg64/src/blake2b.rs",
+      "crates/numpy-pcg64/src/document.rs",
+      "crates/numpy-pcg64/src/generator.rs",
+      "crates/numpy-pcg64/src/lib.rs",
+      "crates/numpy-pcg64/src/pcg64.rs",
+      "crates/numpy-pcg64/src/recipes.rs",
+      "crates/numpy-pcg64/src/seed_sequence.rs",
+      "crates/numpy-pcg64/tests/first_outputs.rs",
+      "crates/numpy-pcg64/tests/sampling_golden.rs"
+    ],
+    "sha256": "58df9897138f760eea5075652b77f2835073c9c1aca456d2debfb88ecac4e567",
+    "purpose": "Read-only Rust NumPy PCG64 compatibility reference; no permission to edit Jope, dependency graph, goldens or license terms."
+  },
+  "author_admission": {
+    "source_only": true,
+    "native": "NONE_FOR_AUTHORS",
+    "repo_source_index_ref_writes": false,
+    "new_clones_worktrees_branches": false
+  },
+  "lanes": [
+    {
+      "id": "rs01",
+      "host": "xbabe1",
+      "title": "Canonical ledger summary and exact numerical compatibility",
+      "screen": "luna_dope_rs01_xbabe1",
+      "scope": "rust/ports/canonical_summary/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs01.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs01",
+      "task_definition_sha256": "89cd3e5bd29e5501882abca65dff414bf1b133578de9bc5fefdf23d26c861b69",
+      "task_source_sha256": "338f6c0016c32d58b1241b87d36f30ec43ab36628c42319899aecd662a478b74",
+      "source_only_status": "AUTHOR_ACTIVE_REPORTED_BY_ROOT",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs01-S1",
+        "rs01-S2",
+        "rs01-S3",
+        "rs01-S4",
+        "rs01-S5",
+        "rs01-S6"
+      ],
+      "read_first": "research/levels/v3_canonical_summary.py; summary functions in v3_canonical_runner.py; read-only numpy-pcg64-reference",
+      "implementation_objective": "Port _arr_mean, _compute_elo_and_paired_block, summarize_canonical_ledger_and_elo to typed Rust. Preserve failures, complete-case denominators, comparator exclusions, per-role/overall output, PCG64 choice stream, percentile interpolation and ties-to-even rounding. Study the provided Rust NumPy PCG64 reference with license/provenance before reuse. Same seed with a different RNG is NOT parity. Deliver a coherent reducer slice with authored synthetic compatibility/refusal tests and explicit remaining RNG or protocol gaps. Do not switch production callers or invent a new statistical baseline."
+    },
+    {
+      "id": "rs02",
+      "host": "xbabe1",
+      "title": "Legacy v1 input/DSL and CLI compatibility",
+      "screen": "luna_dope_rs02_xbabe1",
+      "scope": "rust/ports/legacy_v1/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs02.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs02",
+      "task_definition_sha256": "f9ab8c69e311143e7efbd9071067da71bb7dd79e482beb52346e7a2d874799c7",
+      "task_source_sha256": "81875537969a5d85549eb1551472381642fe5c7b74393212a306e294c92d656f",
+      "source_only_status": "AUTHOR_ACTIVE_REPORTED_BY_ROOT",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs02-S1",
+        "rs02-S2",
+        "rs02-S3",
+        "rs02-S4",
+        "rs02-S5",
+        "rs02-S6"
+      ],
+      "read_first": "src/dope_kernel/{cli.py,io.py,utils.py,dsl.py,__main__.py}; existing rust/main*/ and engine intake APIs",
+      "implementation_objective": "Port one complete nontraining vertical slice (typed input/DSL validation and its legacy CLI request/result contract) to Rust, preserving errors, explicit target declaration, row identities, canonical serialization and defaults. Map existing Rust equivalents precisely; do not silently substitute a different model/wire algorithm. Author positive/negative synthetic fixtures. Provide the remaining fit/sample/eval/gp-search migration map; DL train-tuner execution is outside your write scope."
+    },
+    {
+      "id": "rs03",
+      "host": "xbabe1",
+      "title": "Tuner training boundary and Rust preparation orchestration",
+      "screen": "luna_dope_rs03_xbabe1",
+      "scope": "rust/ports/tuner_boundary/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs03.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs03",
+      "task_definition_sha256": "c13ff7e46a02c51c8a97cf75617164a7bce070687600e24df546789423e6f3d7",
+      "task_source_sha256": "41a81f77abe9cf15c9a3bbd0e40aed314eef55eec8ef270292592a26ca16559d",
+      "source_only_status": "AUTHOR_ACTIVE_REPORTED_BY_ROOT",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs03-S1",
+        "rs03-S2",
+        "rs03-S3",
+        "rs03-S4",
+        "rs03-S5",
+        "rs03-S6"
+      ],
+      "read_first": "src/dope_kernel/tuner.py; cli.py train-tuner path; tests/test_tuner.py; rust/typed_data.rs and deep_campaign.rs",
+      "implementation_objective": "Keep actual neural model/optimizer/backprop training in Python. Port a coherent nontraining surrounding slice (typed episode/corpus input, split/role validation, cache identity or result validation) to Rust. Define an explicit data-free DTO boundary: no validation/test targets in training selection. Preserve checkpoint class identity and current numeric training behavior. Do not write replacement Python or run training. Give source-function ownership and synthetic leak/refusal tests; stop on unknown scientific protocol."
+    },
+    {
+      "id": "rs04",
+      "host": "xbabe2",
+      "title": "Benchmark metric adapters and deterministic accounting",
+      "screen": "luna_dope_rs04_xbabe2",
+      "scope": "rust/ports/bench_metrics/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs04.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs04",
+      "task_definition_sha256": "e930b44b29198856218fa35982ec304736ff8399fa677c190d25cb9b6eeef33b",
+      "task_source_sha256": "eee331155c190e04c0069693ab6ee81e32ec30b251ec45b5e530fadef9d3a8c0",
+      "source_only_status": "SOURCE_PACKET_DELIVERED_NOT_REVIEWED",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs04-S1",
+        "rs04-S2",
+        "rs04-S3",
+        "rs04-S4",
+        "rs04-S5",
+        "rs04-S6"
+      ],
+      "read_first": "bench/metrics/{aggregate,charge,drivers,frontier,qualification,transfer}.py; rust/metrics/**",
+      "implementation_objective": "Implement one complete nontraining metric/qualification adapter slice in Rust, reusing exact existing Rust metrics when semantically equal. Preserve row/family failure accounting, tier byte charges, control denominators and legacy-v1/v2 behavior. Do not port canonical Elo (rs01 owns it), relabel proxy scores, read real benchmark results, or weaken gates. Include typed schemas and synthetic golden/refusal tests plus precise integration notes."
+    },
+    {
+      "id": "rs05",
+      "host": "xbabe2",
+      "title": "Claims and deterministic report checker port",
+      "screen": "luna_dope_rs05_xbabe2",
+      "scope": "ops/rust_tools/src/claims/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs05.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs05",
+      "task_definition_sha256": "6796e237b4673f34d4b46796f995236b9dd885d9005ed876c74189d45e46f3d9",
+      "task_source_sha256": "074596f7e5698fd6f8c13917860ad3a3b2acf324ee99216b0c1eafaf2d7a1d2a",
+      "source_only_status": "SOURCE_PACKET_DELIVERED_NOT_REVIEWED",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs05-S1",
+        "rs05-S2",
+        "rs05-S3",
+        "rs05-S4",
+        "rs05-S5",
+        "rs05-S6"
+      ],
+      "read_first": "tools/claims/**; docs/whitepaper/scripts/**; paper/scripts/**; existing Rust evidence/contract/ledger APIs",
+      "implementation_objective": "Port the bounded claims check path first to Rust with equivalent pass/fail/error behavior and synthetic inputs. Build reusable deterministic report-checking primitives, not new scientific claims or figure outcomes. Inventory remaining render/check scripts with exact dependency/output contracts. Do not modify scientific text, committed figures, numbers, evidence, private records or workflow registrations. Deliver source-only Rust and meaningful missing/drift/invalid-input tests."
+    },
+    {
+      "id": "rs06",
+      "host": "xbabe3",
+      "title": "CI frozen-evidence and paper preparation utilities port",
+      "screen": "luna_dope_rs06_xbabe3",
+      "scope": "ops/rust_tools/src/ci/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs06.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs06",
+      "task_definition_sha256": "17c4024b4978fba6a336080fa0b4aa78c4460833a73b7d6949e8e053bd326e26",
+      "task_source_sha256": "90d78ddf743ea91e720ee1f170e07fc6d1f918544596c20748e5990ecc507cf0",
+      "source_only_status": "AUTHOR_ACTIVE_REPORTED_BY_ROOT",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs06-S1",
+        "rs06-S2",
+        "rs06-S3",
+        "rs06-S4",
+        "rs06-S5",
+        "rs06-S6"
+      ],
+      "read_first": "ops/ci/check-frozen-evidence.py; ops/ci/paper-prepare.py; ops/ci/paper-review-outputs.py; associated source tests and ops AGENTS",
+      "implementation_objective": "Port the frozen-evidence checker as a coherent Rust CLI/library slice, preserving strict hashing/path/fixture checks and nonzero refusals. Use synthetic source/manifest fixtures only. Map other CI Python utilities, retaining all current checks. Do not alter real frozen manifests, pins, runner settings, CI permissions, guards or workflow calls; integration writer owns activation. No result can become green by dropping checks or evidence requirements."
+    },
+    {
+      "id": "rs07",
+      "host": "xbabe3",
+      "title": "Examples and nontraining executable test migration",
+      "screen": "luna_dope_rs07_xbabe3",
+      "scope": "rust/ports/examples/**",
+      "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+      "task_file": "remote-lanes/rs07.md",
+      "packet_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-rust-boundary/remote-lanes/rs07",
+      "task_definition_sha256": "281a7922d7f64326bf31cf9065aa8081501f69900f809c6c77c7d498968260bd",
+      "task_source_sha256": "e28ff4ba011a8771203ac895b15187e8ac5be19c5cf5b46074b1a354e362276c",
+      "source_only_status": "AUTHOR_ACTIVE_REPORTED_BY_ROOT",
+      "candidate_review": "PENDING",
+      "native_tests": "NOT_RUN",
+      "caller_activation": "NOT_ADMITTED",
+      "acceptance_ids": [
+        "rs07-S1",
+        "rs07-S2",
+        "rs07-S3",
+        "rs07-S4",
+        "rs07-S5",
+        "rs07-S6"
+      ],
+      "read_first": "examples/quickstart/dope_tables.py and test_dope_tables.py; examples/adult/{prepare,evaluate,walkthrough}.py; healthcare-sim source only",
+      "implementation_objective": "Port the deterministic quickstart table/input-report helper and matching assertions to Rust first, preserving serialization/text ordering/refusals. Reuse native DOPE CLI/schema functions where exactly equal. Map remaining examples and test coverage; no raw/private data or real outcomes, no neural training, no Python bridge. Avoid RNG changes: mark dependence on rs01 compatibility if a later example needs NumPy sampling. Do not remove any existing Python/test until replacement parity is qualified."
+    }
+  ],
+  "coordinator_runtime_observation": {
+    "recorded_utc": "2026-11-03T12:24:19.420995+00:00",
+    "reported_by": "/root",
+    "launched": 7,
+    "source_packets_delivered": [
+      "rs04",
+      "rs05"
+    ],
+    "source_authors_active": [
+      "rs01",
+      "rs02",
+      "rs03",
+      "rs06",
+      "rs07"
+    ],
+    "native_tests": "NOT_RUN",
+    "repo_integration": "NONE",
+    "note": "Root-reported source-only progress, not native qualification or direct process audit."
+  }
+}

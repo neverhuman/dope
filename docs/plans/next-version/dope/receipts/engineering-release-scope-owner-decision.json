@@ -1,0 +1,13 @@
+{
+  "observed_utc": "2026-11-03T16:00:00Z",
+  "question_status": "RESOLVED_OWNER_DECISION",
+  "user_answer_exact": "Please do what you think is best, act like an owner and take charge please.",
+  "decision": "Complete the engineering release; defer only campaign qualification.",
+  "deferred_campaign_criteria": ["D00-S4", "D11-S2", "D11-S3", "D11-S4"],
+  "release_scope_verdict": "DEFERRED_CAMPAIGN_QUALIFICATION",
+  "historical_criterion_verdicts": "Preserve original 65-criterion baseline and BLOCKED/null/HOLD records. Deferral is never PASS.",
+  "engineering_remaining_at_a23": {"original_tasks": ["D02", "D03", "D04", "D05", "D06", "D07", "D09"], "open_criteria": 25, "separate_rust_migration_workstreams": 7},
+  "next_evidence_promotions": {"criteria": ["D02-S2", "D02-S3"], "status": "STRONG_REVIEW_ACCEPTED_NOT_YET_INTEGRATED", "resulting_historical_counts_if_integrated": {"PASS": 38, "NOT_RUN": 23, "BLOCKED": 4}},
+  "not_authorized_or_claimed": ["Inventing cohort/exposure history, hypotheses, thresholds, fresh experiment identity, resource/custody/recovery owner", "Scientific campaign launch or model promotion", "Treating absent campaign contracts as passing", "Treating Rust source packets as qualified caller migration"],
+  "pending_user_question": false
+}

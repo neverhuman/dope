@@ -1,8 +1,8 @@
-//! Golden parity runner across `tests/golden/{transfer,aggregate,drivers,frontier,charge}/*.json` (T-037).
+//! Golden parity runner across recursive component JSON cases (T-037).
 
 use std::collections::BTreeSet;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use serde_json::Value;
 
@@ -45,8 +45,16 @@ pub fn run_versioned_case(case: &Value) -> MetricResult<Value> {
         .ok_or(MetricError::new("unknown_component"))?;
     let input = obj.get("input").unwrap_or(&Value::Null);
     if obj["schema_version"] == 2 {
-        require(component == "transfer", "invalid_golden_schema")?;
-        return Ok(transfer::evaluate_tdl(input));
+        return match component {
+            "transfer" => Ok(transfer::evaluate_tdl(input)),
+            // These existing nested fixtures use schema2 with explicit legacy v2
+            // driver input. Historical run_case still refuses every schema2 case.
+            "drivers" => {
+                require(input["protocol_version"] == "v2", "invalid_golden_schema")?;
+                Ok(drivers::evaluate(input))
+            }
+            _ => Err(MetricError::new("invalid_golden_schema")),
+        };
     }
     match component {
         "transfer" => Ok(transfer::evaluate(input)),
@@ -58,25 +66,12 @@ pub fn run_versioned_case(case: &Value) -> MetricResult<Value> {
     }
 }
 
-pub fn discover_cases(root: &Path) -> Vec<PathBuf> {
-    let mut paths = Vec::new();
-    for component in COMPONENTS {
-        let dir = root.join(component);
-        if let Ok(entries) = fs::read_dir(dir) {
-            for entry in entries.flatten() {
-                let p = entry.path();
-                if p.extension().and_then(|s| s.to_str()) == Some("json") {
-                    paths.push(p);
-                }
-            }
-        }
-    }
-    paths.sort();
-    paths
-}
+#[path = "golden/discovery.rs"]
+mod discovery;
+pub use discovery::discover_cases;
 
 pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
-    let paths = discover_cases(root);
+    let paths = discover_cases(root)?;
     require(!paths.is_empty(), "empty_golden_corpus")?;
     let mut ids = BTreeSet::new();
     for path in &paths {
@@ -87,6 +82,15 @@ pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
             .ok_or(MetricError::new("invalid_case_id"))?
             .to_owned();
         require(ids.insert(case_id), "duplicate_case_id")?;
+        let component = path
+            .strip_prefix(root)
+            .ok()
+            .and_then(|p| p.components().next())
+            .and_then(|c| c.as_os_str().to_str());
+        require(
+            component == case["component"].as_str(),
+            "golden_component_path_mismatch",
+        )?;
         let actual = run_versioned_case(&case)?;
         let expected = case
             .get("expected")
@@ -101,6 +105,7 @@ pub fn verify_golden_corpus(root: &Path) -> MetricResult<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     #[test]
     fn historical_replay_refuses_t90_cases() {
@@ -117,7 +122,33 @@ mod tests {
         let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let root = manifest_dir.join("tests/golden");
         let count = verify_golden_corpus(&root).expect("golden parity corpus must pass in Rust");
-        assert!(count >= 40, "expected full golden corpus, got {count}");
+        assert_eq!(
+            count, 163,
+            "all 129 top-level and 34 v2 driver cases must replay"
+        );
+        let paths = discover_cases(&root).unwrap();
+        for (component, expected) in [
+            ("aggregate", 30),
+            ("charge", 9),
+            ("drivers", 48),
+            ("frontier", 31),
+            ("transfer", 45),
+        ] {
+            assert_eq!(
+                paths
+                    .iter()
+                    .filter(|p| p.strip_prefix(&root).unwrap().starts_with(component))
+                    .count(),
+                expected
+            );
+        }
+        assert_eq!(
+            paths
+                .iter()
+                .filter(|p| p.starts_with(root.join("drivers/v2")))
+                .count(),
+            34
+        );
     }
 
     #[test]
@@ -146,3 +177,7 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "golden/discovery_tests.rs"]
+mod discovery_tests;

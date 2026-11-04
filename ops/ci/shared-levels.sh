@@ -14,7 +14,11 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629|test_optional_landmarks) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629|test_optional_landmarks|test_next_version) ;; *) exit 2;; esac
+    if [[ "$2" == test_next_version ]]; then
+      "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest research.levels.tests.test_transfer_evaluation research.transfer.tests.test_driver_rank_successor research.levels.tests.test_nc1 research.levels.tests.test_v4_wire research.levels.tests.test_v4_objectives research.levels.tests.test_v4_training research.levels.tests.test_v4_training_model -v
+      exit $?
+    fi
     if [[ "$2" == test_encoder_629 ]]; then
       mkdir -p target/encoder-629
       export DOPE_ENCODER_WEIGHTS="$PWD/target/encoder-629/dope_mlc_v3_multitask_best.safetensors"
@@ -48,6 +52,9 @@ case "${1:-all}" in
     cargo +1.88.0 clippy --manifest-path engine/Cargo.toml --locked -p dope-core -p dope-cli --all-targets -j2 -- -D warnings
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2 --test learned_landmark_inputs --test landmark_bundle --test prepare_parity_a --test prepare_parity_b -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_cli --test learned_v2_cli --test learned_landmark_cli -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-norm -p dope-sdk -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_high_required --test dvs --test mlc_v4_wire --test mlc_v4_sampling --test mlc_v4_producer_parity -j2
+    cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-probes --test private_errors -j2
     cargo +1.88.0 test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors -j2
     ;;
@@ -64,6 +71,7 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh torch test_landmark_views
     bash ops/ci/shared-levels.sh torch test_encoder_629
     bash ops/ci/shared-levels.sh torch test_optional_landmarks
+    bash ops/ci/shared-levels.sh torch test_next_version
     bash ops/ci/shared-levels.sh native
     ;;
   *) echo 'Usage: shared-levels.sh contracts|prepare-torch|torch SHARD|prepare-native|native|all' >&2;exit 2;;

@@ -1,0 +1,178 @@
+{
+  "schema": "dope-jope.task-inventory/v1",
+  "repository": "JopeDime",
+  "source_sha": "4548321f0f6c2baabbbec6c33a4a143fa8242800",
+  "status": "PLANNED",
+  "task_order": [
+    "J00",
+    "J01",
+    "J02",
+    "J03",
+    "J04",
+    "J05",
+    "J06",
+    "J07",
+    "J08",
+    "J09"
+  ],
+  "tasks": [
+    {
+      "id": "J00",
+      "title": "Lock baseline identities and establish the execution checkpoint",
+      "file": "J00-baseline-identities.md",
+      "priority": "P0",
+      "status": "PLANNED",
+      "dependencies": [
+        "D00"
+      ],
+      "word_count": 746,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J00/<full-head>/",
+      "cross_repo_notes": "D00 shared lineage, naming and role decisions; retain current engine/model bytes",
+      "sha256": "563f3bd1af190edf1c5b6843d6799a29b9c3634ac032edf860b7ae41a80b3db2"
+    },
+    {
+      "id": "J01",
+      "title": "Carry existing v2 seed provenance into real generation zero",
+      "file": "J01-v2-seed-transport.md",
+      "priority": "P0",
+      "status": "PLANNED",
+      "dependencies": [
+        "J00"
+      ],
+      "word_count": 918,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J01/<full-head>/",
+      "cross_repo_notes": "none; retain existing DOPE engine/model pin",
+      "sha256": "2688dd863dee6f62447e8e2e5858677374f482df121484937908e2c5711255e7"
+    },
+    {
+      "id": "J02",
+      "title": "Add identity-bound DOPE bank retrieval and decisive controls",
+      "file": "J02-controlled-retrieval.md",
+      "priority": "P0",
+      "status": "PLANNED",
+      "dependencies": [
+        "J01"
+      ],
+      "word_count": 905,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J02/<full-head>/",
+      "cross_repo_notes": "none; released-v3 lane only",
+      "sha256": "3ffa390e091613a23fcdfad13032e84260420c046173ba2db329c2129019387c"
+    },
+    {
+      "id": "J03",
+      "title": "Prepare the smallest unanswered matched retrieval study",
+      "file": "J03-retrieval-study-protocol.md",
+      "priority": "P0",
+      "status": "PLANNED",
+      "dependencies": [
+        "J02",
+        "D00"
+      ],
+      "word_count": 882,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J03/<full-head>/",
+      "cross_repo_notes": "D00 exposure/identity decisions; D01 corrected evaluation and D02 versioned rank semantics are required if those DOPE endpoints are used",
+      "sha256": "0b27b01bc83921e4cf89c9387fde6c9be59a633f39405a43f0fca83cdece42aa"
+    },
+    {
+      "id": "J04",
+      "title": "Qualify CPU packaging and explicit landmark/device semantics",
+      "file": "J04-cpu-packaging-defaults.md",
+      "priority": "P1",
+      "status": "PLANNED",
+      "dependencies": [
+        "J02",
+        "J03"
+      ],
+      "word_count": 838,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J04/<full-head>/",
+      "cross_repo_notes": "no new DOPE source prerequisite; actual separately admitted positive study and measured packaging/latency gates remain external",
+      "external_gates": [
+        "Actual separately admitted study ADVANCE registered under J03",
+        "Measured package/dependency/latency acceptance; J03 protocol completion alone is insufficient"
+      ],
+      "sha256": "8b1ccac7006f755121712d82172f1c083016fe2f72c5a7cf1b7616ed94fb8280"
+    },
+    {
+      "id": "J05",
+      "title": "Recover raw provenance and add frozen NC1 dataset views",
+      "file": "J05-nc1-additive-intake.md",
+      "priority": "P1",
+      "status": "PLANNED",
+      "dependencies": [
+        "J00",
+        "D05"
+      ],
+      "word_count": 842,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J05/<full-head>/",
+      "cross_repo_notes": "D05 qualified NC1 normalization contract/schema; D01 corrected evaluation when measuring retention",
+      "sha256": "e3a180f29357c543d1335723245df6843d7eb40e796af104614e39a09e57ac61"
+    },
+    {
+      "id": "J06",
+      "title": "Emit owner-side ScaleCard stages for raw-row prediction",
+      "file": "J06-private-scalecard-emission.md",
+      "priority": "P1",
+      "status": "PLANNED",
+      "dependencies": [
+        "J05",
+        "D05"
+      ],
+      "word_count": 829,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J06/<full-head>/",
+      "cross_repo_notes": "D05 frozen NC1 apply/inverse/group contracts",
+      "sha256": "c9adc90e55650a5b4f4b9b9c97c77d8b9db47ab708b738c4c738cad4ab991263"
+    },
+    {
+      "id": "J07",
+      "title": "Adopt the qualified SDK facade without changing frozen semantics",
+      "file": "J07-facade-migration.md",
+      "priority": "P1",
+      "status": "PLANNED",
+      "dependencies": [
+        "J00",
+        "D03"
+      ],
+      "word_count": 835,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J07/<full-head>/",
+      "cross_repo_notes": "D03 immutable facade-v0 surface with source/parity qualification",
+      "sha256": "6274ba44b6b8dc9c2cf72a4edc4c2ad7d346e99af70341510577f3a15393a48b"
+    },
+    {
+      "id": "J08",
+      "title": "Expose bounded JopeDime search as a DOPE downstream auditor",
+      "file": "J08-dope-auditor.md",
+      "priority": "P2",
+      "status": "PLANNED",
+      "dependencies": [
+        "J05",
+        "J07",
+        "D06"
+      ],
+      "word_count": 872,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J08/<full-head>/",
+      "cross_repo_notes": "D06 frozen DVS roster/receipt and FIT-TUNE-TEST contract",
+      "sha256": "24f983d70e0fe6d4fcf37722c85c3e26a61b0a6c0981e0572b908965348c6e64"
+    },
+    {
+      "id": "J09",
+      "title": "Route optional growth through evidence-backed GO or HOLD decisions",
+      "file": "J09-growth-readiness-routing.md",
+      "priority": "P2",
+      "status": "PLANNED",
+      "dependencies": [
+        "J03",
+        "J06",
+        "J08",
+        "D07"
+      ],
+      "word_count": 900,
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version/J09/<full-head>/",
+      "cross_repo_notes": "D07 codec/sampler contract; actual qualified model release/DVS evidence when relevant; D11 readiness alone is not qualification",
+      "external_gates": [
+        "Actual qualified release where relevant; D11 readiness is insufficient",
+        "Separate task file and execution assignment per GO feature"
+      ],
+      "sha256": "7b6b7749048d9c5d6bc73667a1d144951eccdee6b73b8c4d122c559f92c0d36e"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "dope.nc1-public/v1"
+    },
+    "recipe": {
+      "const": "nc1-minmax-onehot-v1"
+    },
+    "columns": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 256
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "kind": {
+            "enum": [
+              "numeric",
+              "integer",
+              "boolean",
+              "ordinal",
+              "nominal"
+            ]
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 256
+          },
+          "has_missing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "start",
+          "width",
+          "has_missing"
+        ]
+      },
+      "maxItems": 256,
+      "minItems": 1
+    },
+    "target": {
+      "enum": [
+        "regression",
+        "binary",
+        "multiclass"
+      ]
+    },
+    "classes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 256
+    }
+  },
+  "required": [
+    "schema",
+    "recipe",
+    "columns",
+    "groups",
+    "target",
+    "classes"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dope-nc1-public-schema-v1",
+  "description": "Structural projection only; no source headers, vocabulary, extrema, or real rows."
+}

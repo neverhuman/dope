@@ -35,14 +35,47 @@ fn live_and_collected_definitions_reject_out_of_scope_jobs() {
     );
 }
 
-fn main_push(evidence: &mut Value) {
-    for (path, _) in runs::WORKFLOWS {
-        let definition = evidence["workflow_definitions"][path]
-            .as_str()
+// Historical JSON fixtures intentionally retain the former three-job CI profile.
+// A main-only profile must instead include every current required workflow job.
+fn current_jobs(records: &mut Value) {
+    for run in records.as_array_mut().unwrap() {
+        let path = run["path"].as_str().unwrap();
+        let expected = runs::WORKFLOWS
+            .iter()
+            .find(|(expected_path, _)| *expected_path == path)
             .unwrap()
-            .replace("  push:\n", "  push:\n    branches:\n      - main\n");
+            .1;
+        let jobs = run["jobs"].as_array_mut().unwrap();
+        let template = jobs.first().unwrap().clone();
+        let mut next_id = jobs
+            .iter()
+            .map(|job| job["id"].as_u64().unwrap())
+            .max()
+            .unwrap();
+        for name in expected {
+            if jobs.iter().any(|job| job["name"] == *name) {
+                continue;
+            }
+            next_id += 1;
+            let mut job = template.clone();
+            job["id"] = json!(next_id);
+            job["name"] = json!(name);
+            jobs.push(job);
+        }
+    }
+}
+
+fn main_push(evidence: &mut Value) {
+    for (path, jobs) in runs::WORKFLOWS {
+        let mut definition = String::from(
+            "name: fixture\non:\n  push:\n    branches:\n      - main\n  pull_request:\n\njobs:\n",
+        );
+        for name in jobs {
+            definition.push_str(&format!("  {name}:\n    runs-on: fixture\n"));
+        }
         evidence["workflow_definitions"][path] = json!(definition);
     }
+    current_jobs(&mut evidence["runs"]);
 }
 
 fn pr_only(evidence: &mut Value, receipt: &mut Value) {
@@ -75,7 +108,16 @@ fn main_push_profile_requires_both_source_pr_workflows_and_exact_jobs() {
     main_push(&mut original);
     pr_only(&mut original, &mut receipt);
     assert!(evidence::evaluate_preflight(&original, &pins, &receipt).is_ok());
-    for name in ["cpu", "paper-clean", "security", "jankurai-audit"] {
+    for name in [
+        "cpu",
+        "cpu-native",
+        "cpu-compat",
+        "cpu-transfer-paper",
+        "ci-shard-portable-arm64",
+        "paper-clean",
+        "security",
+        "jankurai-audit",
+    ] {
         for condition in ["missing", "cancelled", "wrong-source"] {
             let mut candidate = original.clone();
             for run in candidate["runs"].as_array_mut().unwrap() {
@@ -170,6 +212,7 @@ fn main_push_profile_keeps_receiving_main_checks_and_app_bindings() {
     pr_only(&mut source, &mut receipt);
     prior["evidence"] = source;
     prior["review_receipt"] = receipt;
+    current_jobs(&mut receiving["receiving_runs"]);
     assert_eq!(
         evidence::evaluate_merge(&receiving, &prior).err(),
         Some(Refused("approval_body_mismatch"))

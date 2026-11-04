@@ -1,0 +1,37 @@
+{
+  "schema": "dope.scoped-criterion-acceptance/v1",
+  "reviewer": "/root",
+  "observed_utc": "2026-11-03T20:18:35.577Z",
+  "criterion": "D04-S1",
+  "decision": "ACCEPT_SCOPED_FIXTURE_PASS_PENDING_NEXT_COHERENT_LEDGER_INTEGRATION",
+  "source": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+  "tested_merge": "ace859a8fc2546fba12feeec989bc5004f072741",
+  "tested_tree": "f58b7e60c264fc52e39344261cdbd3b8e9cca031",
+  "run": 41706702083,
+  "job": 126163801942,
+  "job_conclusion": "SUCCESS",
+  "log_sha256": "5753c5b48025d9448d400f8e09fd2211587de9d3a5c42553d28e80877a7bbf9b",
+  "strong_review": "REVIEW.md",
+  "strong_review_sha256": "d378bc22b1207090f8cc4331f0deb82cc39ff5319b955a42e88b6e071931e547",
+  "root_readback": "Root independently read 59b conditioning/descriptors old arrays and e5 canonical panel.rs; each Macro/Larger/Fine index and order exact. Read actual constants_have_one_definition_and_legacy_aliases_keep_coordinates assertion body and actual successful six-test binary log973/980. Recomputed raw Git prepare-v1 tree and landmark_bundle_v1 blob at59b/e5 equal. Gitdiff e5->6191 engine+tests/golden empty. GitHub mergeace parentsmain59b/e5 with identical testedtree independently confirmed. Golden/bundle replay assertions and log outcomes mapped in strongreview; allscope fixture-specific.",
+  "fixture_tree": "2ec9ce02bbc0e3aaa57351a1da982fc998a76074",
+  "bundle_fixture_blob": "78c8d23d2a742b066ebbe7c7ccabf2333a2f5e17",
+  "counts_if_later_integrated_after_51": {
+    "PASS": 52,
+    "NOT_RUN": 9,
+    "historical_BLOCKED": 4,
+    "engineering_tasks_open": 6
+  },
+  "retained_NOT_RUN": [
+    "D03-S3",
+    "D03-S4",
+    "D04-S5"
+  ],
+  "limits": [
+    "No docs-only push or reopening current frozen6191 repair batch. Solewriter can integrate next necessary coherent batch only after checking currentsourceclosure/criterionstate.",
+    "No universal numerical/crossplatform/latency/modelquality proof, no whole newer-head CI claim, no campaign/science promotion.",
+    "D04-S5 current.signature reportoracle is not independently frozen historical report evidence; do not promote."
+  ],
+  "root_source_index_ref_mutations": 0,
+  "root_native_tests_builds": 0
+}
