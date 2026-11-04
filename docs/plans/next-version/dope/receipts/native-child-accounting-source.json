@@ -1,0 +1,56 @@
+{
+  "schema": "dope.native-child-accounting-source/v1",
+  "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+  "base": "f44073230ecffed14b8d1832e0dae8db00066678",
+  "source_commit": "NOT_COMMITTED_PENDING_STRONG_REVIEW",
+  "cause": "Per-call Python receipt used process-lifetime RUSAGE_CHILDREN high-water, contaminating later calls. No delta/max subtraction/cap raise.",
+  "scope": "Rust per-command wait4/owned-tree supervisor, minimal existing Python transport, existing seam migration; explicit preflight build outsideinvoke; original70/frozenbytes unchanged.",
+  "limits": {
+    "environment": "ExistingPATH/LC_ALL/math1/offline/GPUrestrictions retained",
+    "nice_floor": 10,
+    "allowed_CPUs": 1,
+    "AS": "unchangedram_bytes",
+    "CPU": "max1/ceilwallseconds+1",
+    "FSIZE_bytes": 33554432,
+    "capture_hash_admission_bytes": 8388608,
+    "poll_max_sleep_ms": 50,
+    "cleanup": "onlyownedgroup/pidfds/adoptedchildren; failclosedunsupportedplatform ormonitoringerror"
+  },
+  "new_Rust_tests": {
+    "ordinary_scenarios": 13,
+    "ignored_payload_entrypoints": 12,
+    "executed": 0
+  },
+  "checks": {
+    "Rust1_88_fmt": "PASS",
+    "Bashsyntax": "PASS",
+    "NodeJSON": "PASS",
+    "Cargo_rustc_Python_tests_native_schema_scanners": 0
+  },
+  "product_sha256": {
+    "ops/merge_guard/Cargo.toml": "2b1ca4992d716480715d4d245dde8e407156639800c6e9c42e1b7bd88406887d",
+    "ops/merge_guard/native_process.rs": "9dbe0e006a1d374e5415b98d37e8af981577fe4b638cc8d1c771e40cbf016a68",
+    "ops/merge_guard/native_process_io.rs": "86cc15e0101d47b228a70abe2830b1ed4d3bbc6caba0f716113f9676d4deb001",
+    "ops/merge_guard/native_process_tree.rs": "8d362a1e0d57e28b7b5d1483bd18c53c9a9c834237d7fca1cc1802c44e0b9415",
+    "ops/merge_guard/native_process_supervisor.rs": "bfda332288d3e66235d742a3c207b322d0d03c2b320fed86f9e094b4c912a0de",
+    "ops/merge_guard/native_process_tests.rs": "5c0763c69e8866f0b0f0e5a08b27aa86a377d997bf8679df71b186ff6f406da4",
+    "ops/merge_guard/ci_shard_inventory.rs": "57ca12124d2ba2924df0183e5dcc1784ee67e4fbdf34712b7218db59895dd0de",
+    "research/transfer/campaign_native.py": "6a314625039cf49bd7b4f5f713254c03fa014cff6f4fc1340f2d6e284eeb73ac",
+    "research/transfer/tests/test_campaign_execution.py": "c0c38af88cfaacbd4933777210371b8d8a63b3993fcd52e0db822ed7ab0a8338",
+    "ops/ci/cpu-native.sh": "da51230912acc117dd787a4d584ddfe9b0f61579eb4d630d69a9e2e8795ae699",
+    "ops/ci/cpu-transfer-paper.sh": "866582ccf7468e3a44091aef839161c1b9332490d4e3771395647e331611ccc1",
+    "scripts/ci-local.sh": "7496a6a83971d92edfbeb6e5c4757183d1a697c96b70bb8ce34f3d77306f5226",
+    "Justfile": "54ce2543973db9259b82065a292a4b4df88da09b9266649f25ec157c768919ee",
+    "ops/merge_guard/fixtures/ci-sharding/command-map.json": "7120fff7e9faca2b4cf871fafb609b588426cea4206a6a7dc6155becebd5c91a",
+    "ops/merge_guard/native_process_correction_tests.rs": "106ecb02c91052111ed842ba23529e844f2ba43856a2166a488a9966bf8e1ae1"
+  },
+  "criterion_changes": "Only separately accepted D06S4 actualf440prooftoPASS, not fromthisunexecutedresource repair;55/6/4,5engineeringtasks+7Ruststreamsopen; policyNOT_COMPLIANT",
+  "review_corrections": {
+    "capture_path_integrity": "Root and both current capture basenames must match held dev+ino with nofollow/nonblock checks before/afterhash; real rename/replacement negatives authored.",
+    "cleanup": "wait4 drain independent of observer success; persistent observer-error fixture spawns known real child and asserts reaped PID/empty children. Cleanup also records any observed/reaped nonleader and refuses completed if a late orphan appears after the presampling snapshot.",
+    "polling": "50ms targetcadence/truewallRSSlimits preserved; hardobserverlatencyfailure removed.",
+    "wall_contract": "Positive u64helperduration; existingcampaign/pilot validation unchanged;120001ms quickexit fixture authored.",
+    "initialization": "All9 Ownedfields initialized, including actualChild and observer_fault; staticfieldset checkPASS, compilerNOT_RUN.",
+    "child_ownership": "Actual std::process::Child moves intoOwned, itsid checked againstleader in realcleanup; customwait4 reaps; no fakewait/forget/allow or lint suppression."
+  }
+}

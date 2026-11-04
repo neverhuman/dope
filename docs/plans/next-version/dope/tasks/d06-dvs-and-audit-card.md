@@ -1,6 +1,6 @@
 # D06 — Implement one versioned downstream-value receipt and Audit Card
 
-Current status: **SOURCE IMPLEMENTED; SCOPED NATIVE FIXTURES PASS; REMAINING VALIDATION IN PROGRESS.** Mapped criteria below passed at1811/tested merge8efd1a1e, with relevant production/test closure unchanged through the current SDK repair. See [the reviewed receipt](../receipts/hosted-native-1811-criteria.json) and [live ledger](../../STATUS.json). Other criteria, new SDK runtime and current full CI remain pending. No efficacy, custody authentication, scientific qualification or release is implied. The same isolated fast branch remains integrator-owned.
+Current status: **ALL SIX SCOPED ENGINEERING CRITERIA PASS; CURRENT WHOLE CI AND RELEASE REMAIN SEPARATE.** D06-S4 is accepted from actual f440 Signed identity/policy fixtures and strict163 legacy golden replay, with relevant source closure unchanged in the native-child accounting repair. [Accepted evidence](../receipts/hosted-native-f440-driver-bindings.json). Earlier source-only sections below are historical witnesses, not current NOT_RUN overrides. Declared hashes do not authenticate custody or scientific inference. The whole f440 CI failed in the unrelated transfer resource-accounting lane; the next source still needs ordinary CI.
 
 Historical planning baseline (retained for audit; current assignment and lane above govern):
 

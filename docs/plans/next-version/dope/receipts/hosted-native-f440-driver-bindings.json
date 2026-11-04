@@ -1,0 +1,75 @@
+{
+  "schema": "next-version.root-criterion-acceptance/v2",
+  "observed_utc": "2026-11-04 01:00:30 UTC",
+  "criterion": "D06-S4",
+  "exact_text": "Existing v1/v2 metric/inference goldens remain unchanged, and successor receipts bind required identities/multiplicity policy.",
+  "decision": "ACCEPT_SCOPED_PASS_FOR_NEXT_NECESSARY_COHERENT_BATCH",
+  "source_head": "f44073230ecffed14b8d1832e0dae8db00066678",
+  "tested_merge": "e4b161e159580b7d5a8c0b31b430fdd081153d4e",
+  "source_and_tested_tree_git_sha1": "2d12f88f1a09f3b37f6f2b94e2c9737e81614260",
+  "evidence": {
+    "engine": {
+      "workflow": 41743987771,
+      "attempt": 1,
+      "job": 126292274398,
+      "conclusion": "SUCCESS",
+      "tests": {
+        "passed": 284,
+        "failed": 0,
+        "ignored": 1
+      },
+      "log_sha256": "dc2a5a68fd56757ce33f825ae1860927b8310792b47564b8ec59bb10f0d69dd0",
+      "bytes": 108868,
+      "assertions": "Same-source global required-policy and per-cell query/groups/perturbation/prepared-view binding equality, changed perturbation, missing/malformed/wrong-policy/failed absence, private-canary and historical omission behavior executed."
+    },
+    "goldens": {
+      "workflow": 41743987755,
+      "attempt": 1,
+      "job": 126292276311,
+      "artifact": 13282403904,
+      "artifact_sha256": "16c0a645183d63c4acecc42910b581d94d480947ef4f3ca3057a80ec137f5388",
+      "original_log_sha256": "bd74a545dddd93f015db05fa1d119dba33e44a60a5c387ae51211c7d11d47999",
+      "original_receipt_status": "success",
+      "actual_test": "metrics::golden::tests::rust_matches_golden_parity_corpus ... ok",
+      "cases": 163,
+      "v1": 129,
+      "v2": 34,
+      "source_git_blob": "a6951c4c28a9e1573756464f4e9da77f801048c6",
+      "predicate": "Strict versioned load, evaluate each case and compare current output to unchanged expected corpus; component/subset counts asserted."
+    },
+    "review": "ci-assist/f440-signed/REVIEW.md",
+    "review_receipt": "ci-assist/f440-signed/RECEIPT.json",
+    "root_independent_verification": "Root verified actual engine log size/hash/counts, native ZIP primary digest, embedded current merge/run/attempt/status/log hash and actual golden-test success. Primary Git objects prove both workflows tested exact source tree."
+  },
+  "metadata_errata": [
+    "Frozen reviewer receipt legacy_golden_evidence.workflow_run_id incorrectly names Signed41743987771. Actual embedded native receipt and artifact bind CI41743987755 attempt1. These are separate workflows on identical source/tested tree, not one workflow or mixed attempts; root corrected IDs above govern.",
+    "R1 missing-v1 and extra-matrix concerns were disproved/superseded; R1 retained. Character length108866 corrected to actual UTF8 bytes108868."
+  ],
+  "scope_limits": [
+    "Structural declared identity/policy binding and fixture compatibility only; no authenticated custody, executed scientific inference, privacy certification or outcome claim.",
+    "Current full CI41743987755 remains FAILURE due unrelated transfer child-RSS accounting; no whole-CI pass or merge/release qualification.",
+    "No schema-engine execution is claimed or invented as an extra criterion gate."
+  ],
+  "integration": {
+    "current_tracked": {
+      "PASS": 54,
+      "NOT_RUN": 7,
+      "historical_BLOCKED": 4
+    },
+    "after_if_integrated": {
+      "PASS": 55,
+      "NOT_RUN": 6,
+      "historical_BLOCKED": 4
+    },
+    "original_engineering_tasks_open_after": 5,
+    "additional_rust_streams_open": 7,
+    "policy": "NOT_COMPLIANT",
+    "instructions": "Only sole source writer; verify still NOT_RUN, exact relevant DVS/golden/test source closure unchanged, then integrate criterion/task/status/receipt and required hash companions in current necessary Rust child-accounting fix batch. No documentation-only push and no double count. Update stale local-preparation prose as historical source-only witness, preserving old receipts."
+  },
+  "root_actions": {
+    "source_index_ref_changes": 0,
+    "tests_native_manualCI": 0,
+    "commits_pushes": 0,
+    "merge_tag_release": 0
+  }
+}

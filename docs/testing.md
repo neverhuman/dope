@@ -697,3 +697,12 @@ qualification. These source changes do not bypass local capacity/runner
 controls or establish full Rust-language compliance. The shared next-version
 Torch reference/training suite still needs its ordinary-PR route; this worker
 split alone does not silently count that missing route as passed.
+
+
+## Per-command native process supervisor
+
+Before direct existing transfer compatibility tests, explicitly build the Rust helper with `cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1`. Set `DOPE_NATIVE_PROCESS` to its absolute path, or use the documented repository `target/debug/native-process` default. The adapter refuses a missing helper; it never builds inside measured work. Linux procfs, pidfd and close_range/CLOEXEC support are required; unsupported hosts fail closed. Native correctness proof is `cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1`. This dedicated supervisor owns only its new command session and adopted descendants; parent campaign RUSAGE_SELF accounting is unchanged.
+
+Rust tests use public synthetic subprocesses and separate isolated test entrypoints. Preserve the13 ordinary scenario assertions separately from12 ignored helper/payload entrypoints; no ignored entrypoint is a passing qualification. Captures retain32MiB per-file FSIZE and the historical8MiB hash admission. No GPU, science or private inputs are involved. Existing Python compatibility tests remain migration debt under the latest Rust-only end state, not a new Python waiver. Newly authored supervisor tests require actual normal-CI execution before qualification.
+
+The process supervisor validates the current root and capture basenames against held directory/file device+inode identities before and after hashing; replacement is a fixed safe refusal. Cleanup drains owned wait4 even if observation persistently fails and retains the error. Polling retains a50ms target cadence, not an invented observer-latency rejection; helper wall durations remain positive while existing campaign/pilot callers retain their own reservation limits. The120001ms fixture exits immediately and does not run a long campaign. These focused correction tests are authored, not executed locally.

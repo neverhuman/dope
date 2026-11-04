@@ -204,6 +204,8 @@ pub(super) const RUNTIME_COMMANDS: &[(&str, &str, &str)] = &[
     ("cpu-native", "merge-guard-format", "check"),
     ("cpu-native", "merge-guard-clippy", "check"),
     ("cpu-native", "merge-guard-test", "cargo-test"),
+    ("cpu-native", "native-process-clippy", "check"),
+    ("cpu-native", "native-process-test", "cargo-test"),
     ("cpu-compat", "frozen-evidence", "check"),
     ("cpu-compat", "ci-shard-build", "check"),
     ("cpu-compat", "ci-shard-coverage", "check"),
@@ -237,6 +239,7 @@ pub(super) const RUNTIME_COMMANDS: &[(&str, &str, &str)] = &[
     ("cpu-transfer-paper", "frozen-evidence", "check"),
     ("cpu-transfer-paper", "ci-shard-build", "check"),
     ("cpu-transfer-paper", "ci-shard-coverage", "check"),
+    ("cpu-transfer-paper", "native-process-build", "check"),
     ("cpu-transfer-paper", "cpu-tool-readiness", "readiness"),
     ("cpu-transfer-paper", "python-v1-venv", "check"),
     ("cpu-transfer-paper", "python-v1-install", "check"),
@@ -280,7 +283,7 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "cpu-native.sh",
-        "1ce1a5791a12fffb2fbd3adab65d791104fd08673abdf6205c5207cd4001624b",
+        "da51230912acc117dd787a4d584ddfe9b0f61579eb4d630d69a9e2e8795ae699",
     ),
     (
         "cpu-compat.sh",
@@ -292,6 +295,6 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "cpu-transfer-paper.sh",
-        "7cee4f0de5da3b5994f9130e2c0160823bb6a362e968c8a7eca5b3730a620b3d",
+        "866582ccf7468e3a44091aef839161c1b9332490d4e3771395647e331611ccc1",
     ),
 ];

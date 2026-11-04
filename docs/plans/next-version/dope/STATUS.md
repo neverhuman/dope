@@ -2,7 +2,7 @@
 
 The twelve engineering packets have implemented source or readiness controls. **The assignment is not fully qualified and ALL CI is not passing.** Full exact-head CI, native execution and the blocked qualification prerequisites remain open. The original task text is a historical planning baseline; this page and the [criterion matrix](tasks/inventory.json) describe execution separately.
 
-Current criterion matrix: **54 PASS /7 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Seven original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
+Current criterion matrix: **55 PASS /6 NOT_RUN /4 historical BLOCKED**. Nine additional source-bound1811 criteria passed independent assertion/closure review. This does not qualify new SDK source or all CI. Five original engineering tasks and seven Rust migration streams remain open. Only D00-S4 and D11-S2/S3/S4 are deferred campaign qualification, never PASS. [Mapped evidence](receipts/hosted-native-1811-criteria.json).
 
 ## Latest user language policy: NOT_COMPLIANT
 
@@ -337,3 +337,10 @@ Python source or badge changed. See [source receipt](receipts/d06-policy-require
 ## Local D06 per-cell identity preparation; publication held
 
 Source `b3427f89a0cd87bc2e558543d6262d571f2982fc` adds the exact reviewed typed per-cell query/groups/perturbation/prepared-view metadata only after a complete validated successor driver result, sharing the global required policy. Common-pin scope is checked; perturbation remains caller-declared, with no custody or inference-verification claim. A new Rust evaluator fixture covers changed perturbation and malformed/missing/wrong-method/failed/no-driver/privacy paths. Native/compiler/tests and schema-engine execution are **NOT_RUN**. Counts remain **54 PASS /7 NOT_RUN /4 historical BLOCKED**; D06-S4 remains NOT_RUN. The previously published128a Signed283/0/1 and full-audit88 observations are exact prior-tree witnesses, not this new source qualification. Published/remote remains `128a99657cf274b3cda2cb3943625619f25f682c`; local commits are held while its CI is active. [Source receipt](receipts/d06-per-cell-identities-source.json).
+
+
+## Necessary native-child resource-accounting repair and scoped D06 completion
+
+The f440 whole CI failed in transfer tests because the former Python supervisor reported a lifetime RUSAGE_CHILDREN high-water mark from unrelated earlier children. The Rust candidate accounts for each command using owned-tree RSS and terminal wait4 usage, preserving the existing budgets, sanitized environment, affinity/nice/AS/CPU/FSIZE controls and private captures. The 32MiB per-file write cap and 8MiB hash-admission limit remain distinct. The existing Python function is only an activation transport; it never builds the helper or implements resource supervision. The new Rust process fixtures, bridge seam migration and explicit CI preflight still require actual compilation/runtime qualification. Local execution is NOT_RUN; no new whole-CI or policy-compliance claim.
+
+Separately, actual f440 Signed284/0/1 global/per-cell required identity/policy fixtures and the strict163=129v1+34v2 corpus support D06-S4 scoped PASS with unchanged relevant source. [Root acceptance](receipts/hosted-native-f440-driver-bindings.json) preserves separate workflow identities and original errata. D06 is scoped complete; **55 PASS /6 NOT_RUN /4 historical BLOCKED**, five engineering tasks and seven Rust migration streams remain. Four campaign criteria remain deferred, never PASS.

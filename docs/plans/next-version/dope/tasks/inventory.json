@@ -409,7 +409,7 @@
         "D10"
       ],
       "priority": "P1",
-      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "status": "SCOPED_ENGINEERING_COMPLETE_CURRENT_FULL_CI_PENDING",
       "success_criteria": [
         "D06-S1",
         "D06-S2",
@@ -423,8 +423,8 @@
         "J08 JopeDime auditor",
         "J09 conditional artifact/curriculum growth"
       ],
-      "sha256": "e747b8cedf75f13e6e69fb1634420ce9f900b4317047f5c81f266f01b3819d37",
-      "words": 1345,
+      "sha256": "0069f7656d5ff9b46e5af1a774aad1c8cfc5f85a224704ed5bc73e6160b5992f",
+      "words": 1361,
       "criterion_verdicts": {
         "D06-S1": {
           "verdict": "PASS",
@@ -454,10 +454,14 @@
           "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
         },
         "D06-S4": {
-          "verdict": "NOT_RUN",
-          "evidence": "Historical C02/legacy execution remains actual PASS; required-policy issuance test passed at128a, not whole D06-S4. New four declared per-cell C02 identity projection/perturbation refusal fixture is SOURCE_AUTHORED_RUNTIME_NOT_RUN. No authenticated custody/inference claim; whole identity/multiplicity acceptance remains open.",
-          "source_status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
-          "receipt": "../receipts/d06-per-cell-identities-source.json"
+          "verdict": "PASS",
+          "evidence": "Root-accepted actual f440 Signed global/per-cell identity and required multiplicity-policy assertions plus strict163 unchanged v1/v2 goldens; exact relevant DVS/metric/fixture closure unchanged in this native resource-accounting repair. Structural declared integrity only; no custody/inference/science claim. Full f440 CI remains failed in unrelated transfer accounting.",
+          "receipt": "../receipts/hosted-native-f440-driver-bindings.json",
+          "tested_source": "f44073230ecffed14b8d1832e0dae8db00066678",
+          "tested_merge": "e4b161e159580b7d5a8c0b31b430fdd081153d4e",
+          "engine_job": 126292274398,
+          "golden_job": 126292276311,
+          "source_status": "SCOPED_ENGINEERING_PASS"
         },
         "D06-S5": {
           "verdict": "PASS",

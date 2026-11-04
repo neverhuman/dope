@@ -20,6 +20,9 @@ native-guard-check:
     cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard -- -D warnings
     cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard
 
+    cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1
 fast: native-guard-check
     bash ops/ci/test-cpu-tool-readiness.sh
     sha256sum --check --status scripts/native-legal.sha256

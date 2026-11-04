@@ -6,6 +6,9 @@ ci_shard_init cpu-transfer-paper
 for tool in cargo python3 uv just latexmk pdffonts pdfinfo pdftotext rg strace tar gzip; do ci_require_command "$tool"; done
 ci_frozen_check
 ci_prepare_receipts
+# ci-command:cpu-transfer-paper:native-process-build 8e2dbba655f0da93b85eec73c9f53edad2f8866a393ac2f5023969e0823e0086
+ci_run native-process-build check cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1
+export DOPE_NATIVE_PROCESS="$PWD/target/debug/native-process"
 # ci-command:cpu-transfer-paper:cpu-tool-readiness f414d47701dc5f42592be8111e602f176347e276c32eb9715c6fe4b5eba5d81b
 ci_run cpu-tool-readiness readiness bash ops/ci/test-cpu-tool-readiness.sh
 # ci-command:cpu-transfer-paper:python-v1-venv 5d99194eb3c43f3c411b64a193c56695ffd1245a1f072014d7ad17a504ccab3b

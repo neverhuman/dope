@@ -647,7 +647,8 @@
       "landmark-cache",
       "root-cargo-test",
       "engine-test",
-      "merge-guard-test"
+      "merge-guard-test",
+      "native-process-test"
     ],
     "cpu-compat": [
       "engine-benchmark",

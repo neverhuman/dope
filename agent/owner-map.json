@@ -959,7 +959,13 @@
     "engine/dope-sdk/tests/legacy_surface_parity.rs": "rust-core",
     "engine/dope-core/tests/landmark_high_matrix.rs": "rust-core",
     "engine/dope-cli/tests/nc1_refusal_privacy.rs": "rust-core",
-    "engine/dope-sdk/tests/safe_errors.rs": "rust-core"
+    "engine/dope-sdk/tests/safe_errors.rs": "rust-core",
+    "ops/merge_guard/native_process.rs": "governance",
+    "ops/merge_guard/native_process_io.rs": "governance",
+    "ops/merge_guard/native_process_tree.rs": "governance",
+    "ops/merge_guard/native_process_supervisor.rs": "governance",
+    "ops/merge_guard/native_process_tests.rs": "governance",
+    "ops/merge_guard/native_process_correction_tests.rs": "governance"
   },
   "workspace": "dope"
 }

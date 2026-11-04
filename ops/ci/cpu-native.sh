@@ -32,3 +32,7 @@ ci_run merge-guard-format check cargo fmt --manifest-path ops/merge_guard/Cargo.
 ci_run merge-guard-clippy check cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard -- -D warnings
 # ci-command:cpu-native:merge-guard-test 129dfb7b509d1d3da8d1edbe8c0c71ace0c93ae73de9381966b76d5db3313d4e
 ci_run merge-guard-test cargo-test cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard
+# ci-command:cpu-native:native-process-clippy 5c96b3d4fe49317e10979092b69bb529d5291110fe7b3fccc84b5345e3c7ad7c
+ci_run native-process-clippy check cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- -D warnings
+# ci-command:cpu-native:native-process-test 62144d2633e8d853615a0e7ece6ec9ca27e624c000b607f79ee645b41a351d27
+ci_run native-process-test cargo-test cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1

@@ -3899,6 +3899,30 @@
     "engine/dope-core/tests/dvs_identity_binding.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_identity_binding",
       "purpose": "Actual evaluator four declared C02 identity hashes including per-cell perturbation, common policy/pin scope, malformed/missing/wrong-bound/failed/no-driver privacy refusal; runtime and schema-engine NOT_RUN, no custody attestation."
+    },
+    "ops/merge_guard/native_process.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_io.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_tree.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_supervisor.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_correction_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Real owned capture-name/root-directory rename/replacement refusal, persistent observer-error wait4 reaping of known child and valid120001ms quick-exit reservation. Authored NOT_RUN; no guards weakened and no payload entrypoint counted as qualification."
     }
   },
   "workspace": "dope"

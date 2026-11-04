@@ -66,10 +66,10 @@
     },
     "D06": {
       "source": "IMPLEMENTED",
-      "focused_checks": "PER_CELL_DECLARED_IDENTITY_SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+      "focused_checks": "ALL6_CRITERIA_SCOPED_ENGINEERING_PASS",
       "full_ci": "NEW_BATCH_PR_CI_PENDING",
       "efficacy": "NOT_RUN",
-      "notes": "Prior required-policy actual128a test PASS is scoped, not whole D06-S4. New declared per-cell query/groups/perturbation/prepared binding and actual-evaluator fixture prepared locally; no numeric/legacy change or custody/inference verification.",
+      "notes": "Actual f440 global and per-cell four-identity/policy assertions and163 goldens accepted; no custody/science/whole-CI claim. Native resource-accounting repair is separate pending-source qualification.",
       "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
       "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
       "criterion_verdicts": "dope/tasks/inventory.json",
@@ -133,10 +133,10 @@
   "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
   "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
   "success_criteria": {
-    "PASS": 54,
-    "NOT_RUN": 7,
+    "PASS": 55,
+    "NOT_RUN": 6,
     "BLOCKED": 4,
-    "note": "OnlyactualbdeaD03S3+D05S2promoted; D06S4newmetadataSOURCE_AUTHORED_NOTRUN. Sixengineeringtasks/sevenRuststreams; fourcampaigncriteria deferredneverPASS."
+    "note": "D06-S4 accepted from actual f440 engine/global-cell binding and163 legacy goldens; original5engineeringtasks+7Ruststreams remain, four campaign criteria deferred neverPASS. New native-process repair authored, no runtime qualification."
   },
   "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
   "native_compile": {
@@ -890,8 +890,8 @@
     ],
     "whole_engine_closure_current_verified": "bd87d75d65f76606fd8c9a520412c07c7191ed94"
   },
-  "engineering_tasks_open": 6,
-  "historical_tasks_open": 8,
+  "engineering_tasks_open": 5,
+  "historical_tasks_open": 7,
   "completed_root_goldens_bb": {
     "receipt": "dope/receipts/completed-root-goldens-bb.json",
     "sha256": "5b6b83d14dbd80f3c846595f17366442b4795bea4874541409fcd1461e2ae0db",
@@ -1098,5 +1098,18 @@
       "current_full_CI": "PENDING_NEW_PUSH"
     },
     "remaining": "6engineeringtasks/7Ruststreams/currentrequiredCI,4campaigncriteria deferredneverPASS; no efficacy/release claim"
+  },
+  "hosted_f440_D06_S4": {
+    "receipt": "dope/receipts/hosted-native-f440-driver-bindings.json",
+    "source": "f44073230ecffed14b8d1832e0dae8db00066678",
+    "same_relevant_closure_verified": true,
+    "verdict": "PASS_SCOPED_ONLY"
+  },
+  "current_native_process_repair": {
+    "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+    "base": "f44073230ecffed14b8d1832e0dae8db00066678",
+    "cause": "Python RUSAGE_CHILDREN lifetime peak contaminated subsequent native calls; budgets unchanged",
+    "source": "Rust per-command wait4 +owned tree supervisor; existing Python invoke is transport only; explicit CI build outside measured invocation",
+    "local_build_tests_native_Python": 0
   }
 }
