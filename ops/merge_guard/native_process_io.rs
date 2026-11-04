@@ -84,8 +84,8 @@ pub(super) fn parse_request(raw: &[u8]) -> Result<Request> {
 
 pub(super) struct Captures {
     pub directory: File,
-    pub out: File,
-    pub err: File,
+    out: File,
+    err: File,
     root: PathBuf,
     label: String,
 }
@@ -150,6 +150,49 @@ impl Captures {
             label: r.label.clone(),
         })
     }
+    fn open_matching(
+        &self,
+        directory: &File,
+        suffix: &str,
+        held: &File,
+        access: libc::c_int,
+    ) -> Result<File> {
+        let name = std::ffi::CString::new(format!("{}.{suffix}", self.label))
+            .map_err(|_| "native_file_unavailable")?;
+        // SAFETY: the directory fd is live, the basename is sanitized, and
+        // NOFOLLOW/NONBLOCK admit the named capture without following a symlink
+        // or waiting on a replacement FIFO.
+        let fd = unsafe {
+            libc::openat(
+                directory.as_raw_fd(),
+                name.as_ptr(),
+                access | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
+            )
+        };
+        if fd < 0 {
+            return Err("native_file_unavailable");
+        }
+        // SAFETY: successful openat returned a newly owned fd, closed once by File.
+        let capture = unsafe { File::from_raw_fd(fd) };
+        let named = capture.metadata().map_err(|_| "native_file_unavailable")?;
+        let original = held.metadata().map_err(|_| "native_file_unavailable")?;
+        if !named.is_file()
+            || named.nlink() != 1
+            || named.len() > HASH_LIMIT
+            || named.dev() != original.dev()
+            || named.ino() != original.ino()
+        {
+            return Err("native_file_unavailable");
+        }
+        Ok(capture)
+    }
+    pub fn child_writers(&self) -> Result<(File, File)> {
+        // Native isolation requires write-only stdout and stderr. Keep the
+        // original read/write descriptors in the supervisor for sync and hash.
+        let out = self.open_matching(&self.directory, "stdout", &self.out, libc::O_WRONLY)?;
+        let err = self.open_matching(&self.directory, "stderr", &self.err, libc::O_WRONLY)?;
+        Ok((out, err))
+    }
     fn validate_paths(&self) -> Result<()> {
         let path = std::ffi::CString::new(self.root.as_os_str().as_encoded_bytes())
             .map_err(|_| "native_file_unavailable")?;
@@ -183,32 +226,7 @@ impl Captures {
             return Err("native_file_unavailable");
         }
         for (suffix, held) in [("stdout", &self.out), ("stderr", &self.err)] {
-            let name = std::ffi::CString::new(format!("{}.{suffix}", self.label))
-                .map_err(|_| "native_file_unavailable")?;
-            // SAFETY: current is an admitted live directory fd, basename is sanitized,
-            // and NOFOLLOW/NONBLOCK refuse unsafe final components without blocking.
-            let fd = unsafe {
-                libc::openat(
-                    current.as_raw_fd(),
-                    name.as_ptr(),
-                    libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
-                )
-            };
-            if fd < 0 {
-                return Err("native_file_unavailable");
-            }
-            // SAFETY: successful openat returned a newly owned fd, closed once by File.
-            let capture = unsafe { File::from_raw_fd(fd) };
-            let named = capture.metadata().map_err(|_| "native_file_unavailable")?;
-            let original = held.metadata().map_err(|_| "native_file_unavailable")?;
-            if !named.is_file()
-                || named.nlink() != 1
-                || named.len() > HASH_LIMIT
-                || named.dev() != original.dev()
-                || named.ino() != original.ino()
-            {
-                return Err("native_file_unavailable");
-            }
+            self.open_matching(&current, suffix, held, libc::O_RDONLY)?;
         }
         Ok(())
     }

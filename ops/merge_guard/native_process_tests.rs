@@ -160,6 +160,8 @@ fn child_environment_affinity_nice_limits_and_capture_are_real() {
     assert_eq!(proof["CPU"], 4);
     assert_eq!(proof["FSIZE"], 32 << 20);
     assert_eq!(proof["extra_fds"], 0);
+    assert_eq!(proof["stdout_access_mode"], libc::O_WRONLY);
+    assert_eq!(proof["stderr_access_mode"], libc::O_WRONLY);
     assert_eq!(proof["cwd"], case.0.to_str().unwrap());
     for key in [
         "RAYON_NUM_THREADS",
@@ -329,6 +331,14 @@ fn payload_limits() {
             .count()
             .saturating_sub(4);
         limits.insert("extra_fds".to_owned(), json!(fds));
+        for (name, fd) in [
+            ("stdout_access_mode", libc::STDOUT_FILENO),
+            ("stderr_access_mode", libc::STDERR_FILENO),
+        ] {
+            let flags = libc::fcntl(fd, libc::F_GETFL);
+            assert!(flags >= 0);
+            limits.insert(name.to_owned(), json!(flags & libc::O_ACCMODE));
+        }
         limits.insert("cpu_count".to_owned(), json!(count));
         limits.insert(
             "nice".to_owned(),
@@ -339,7 +349,7 @@ fn payload_limits() {
             "env".to_owned(),
             json!(std::env::vars().collect::<std::collections::BTreeMap<_, _>>()),
         );
-        println!("LIMITS_JSON:{}", Value::Object(limits));
+        println!("\nLIMITS_JSON:{}", Value::Object(limits));
     }
 }
 

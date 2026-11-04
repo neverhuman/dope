@@ -30,10 +30,10 @@
   "product_sha256": {
     "ops/merge_guard/Cargo.toml": "2b1ca4992d716480715d4d245dde8e407156639800c6e9c42e1b7bd88406887d",
     "ops/merge_guard/native_process.rs": "9dbe0e006a1d374e5415b98d37e8af981577fe4b638cc8d1c771e40cbf016a68",
-    "ops/merge_guard/native_process_io.rs": "86cc15e0101d47b228a70abe2830b1ed4d3bbc6caba0f716113f9676d4deb001",
+    "ops/merge_guard/native_process_io.rs": "6cc9a8bea3b89588ffa490f1fa51138f54cb07daae8ac0b7028ad65910315c27",
     "ops/merge_guard/native_process_tree.rs": "8d362a1e0d57e28b7b5d1483bd18c53c9a9c834237d7fca1cc1802c44e0b9415",
-    "ops/merge_guard/native_process_supervisor.rs": "bfda332288d3e66235d742a3c207b322d0d03c2b320fed86f9e094b4c912a0de",
-    "ops/merge_guard/native_process_tests.rs": "5c0763c69e8866f0b0f0e5a08b27aa86a377d997bf8679df71b186ff6f406da4",
+    "ops/merge_guard/native_process_supervisor.rs": "3001c2bd5cb019b094b0ca14cb0c5e3773c95f626b99f942aba5b14d8b0e2212",
+    "ops/merge_guard/native_process_tests.rs": "0aa32aa202ecae558847c925fb15402972666edaf369bde6d0018a21c48a63f9",
     "ops/merge_guard/ci_shard_inventory.rs": "57ca12124d2ba2924df0183e5dcc1784ee67e4fbdf34712b7218db59895dd0de",
     "research/transfer/campaign_native.py": "6a314625039cf49bd7b4f5f713254c03fa014cff6f4fc1340f2d6e284eeb73ac",
     "research/transfer/tests/test_campaign_execution.py": "c0c38af88cfaacbd4933777210371b8d8a63b3993fcd52e0db822ed7ab0a8338",

@@ -233,6 +233,7 @@ fn invoke_inner(
         }
     }
     let mut captures = Captures::create(&r)?;
+    let (stdout, stderr) = captures.child_writers()?;
     let setup = limits(&r, captures.directory.as_raw_fd())?;
     let start = Instant::now();
     let mut command = Command::new(&r.argv[0]);
@@ -249,18 +250,8 @@ fn invoke_inner(
         .env("HF_HUB_OFFLINE", "1")
         .env("TRANSFORMERS_OFFLINE", "1")
         .stdin(Stdio::null())
-        .stdout(
-            captures
-                .out
-                .try_clone()
-                .map_err(|_| "native_process_unavailable")?,
-        )
-        .stderr(
-            captures
-                .err
-                .try_clone()
-                .map_err(|_| "native_process_unavailable")?,
-        );
+        .stdout(stdout)
+        .stderr(stderr);
     // SAFETY: setup contains only child-local syscall operations, with copied scalar data.
     unsafe {
         command.pre_exec(setup);
