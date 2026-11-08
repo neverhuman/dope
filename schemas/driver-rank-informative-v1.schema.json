@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dope.driver-rank-informative/v1",
+  "title": "Informative grouped rank result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "reason",
+    "value",
+    "informative_pairs",
+    "total_pairs"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "complete",
+        "uninformative",
+        "failed"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "no_informative_rank_pairs",
+        "invalid_rank_evidence"
+      ]
+    },
+    "value": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "informative_pairs": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "total_pairs": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "type": "null"
+          },
+          "value": {
+            "type": "number"
+          },
+          "informative_pairs": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "total_pairs": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "value": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

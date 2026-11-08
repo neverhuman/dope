@@ -1,0 +1,52 @@
+{
+  "schema": "dope.bb-ci-repair-source/v1",
+  "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+  "source_commit": "492fae914f6151cf32e14dad16699b40019d999a",
+  "base": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+  "actual_bb_failures": {
+    "CI_run": 41699461094,
+    "native_job": 126140855993,
+    "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
+    "compat_job": 126140855691,
+    "compat": "FAIL public-claims tools/claims/check.py\u2192figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
+    "audit_job": 126138603944,
+    "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
+  },
+  "repairs": {
+    "coverage": "SemanticMarkerFields4Stringtuple andMarkedCommandsmapaliases; exactfieldorder/bodiesunchanged, no lintallow",
+    "compat": "ONE claims-plot-dependencies check installs existingmatplotlib==3.10.8 withunchanged validation/requirements-v1.txt intoownci-python beforepublic-claims. Originalmonolith provisioned it in sameenv beforeclaims; splitotherguest cannot supply it. No localinstall/newversion/lock.",
+    "inventory": "83runtimeIDs/74markers/22testcommands; original70origins/testIDs/frozenpreimages/sourcehashes unchanged. Newcheckhasactualreceipt/fatalfailure, no fakeframeworkcounts.",
+    "badge": "Copyexactauthenticbb88SVG withhashonlysourcewitness; preserveoldjobFAIL andolder87/451witnesses"
+  },
+  "checks": {
+    "Rust1.88_format": "PASS2files",
+    "Bash_syntax": "PASScompatstage",
+    "independent_source_review": "APPROVED exact3CIpathdiff;74marker/order/kind/bodyhashes+all5stagepinsmatch",
+    "diff_check": "PASS",
+    "static_governed_sources": 1301,
+    "source_cap_violations": 0,
+    "new_build_tests_executed_locally": 0,
+    "new_required_CI": "PENDING_NEW_PUSH"
+  },
+  "bb_Signed_evidence": {
+    "run": 41699460902,
+    "job": 126138608036,
+    "conclusion": "SUCCESS",
+    "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+    "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+    "same_as_bb": true,
+    "passed": 280,
+    "failed": 0,
+    "ignored": 1,
+    "result_rows": 48,
+    "includes": "M0actualSDK/Highmatrix andM1CLI3tests executed; rootcriterionreview separate",
+    "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+  },
+  "criterion_counts": {
+    "PASS": 47,
+    "NOT_RUN": 14,
+    "historical_BLOCKED": 4
+  },
+  "qualification": "No automaticcriterionpromotion from280total orsourcechanges; actualper-criterionreviewrequired. NewheadfullCIpending.",
+  "remaining": "Sevenengineeringtasks/sevenRuststreams/14engineeringcriteria; only4campaigncriteria deferredneverPASS; no model/sciencepromotion"
+}

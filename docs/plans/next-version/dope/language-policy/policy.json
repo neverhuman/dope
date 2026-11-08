@@ -1,0 +1,64 @@
+{
+  "schema": "dope.language-policy/v1",
+  "authority": "latest explicit user direction 2026-11-03",
+  "rule": "Python ONLY for deep-learning TRAINING; all other active DOPE responsibilities must be Rust.",
+  "status": "NOT_COMPLIANT",
+  "source_snapshot_head": "a84bba031240582921b00532b23cab6d56f150ac",
+  "tracked_python_files": 890,
+  "inventory_is_not_waiver": true,
+  "supersedes_end_state_exceptions": [
+    "V1 Python compatibility",
+    "advanced-data/external learner evidence",
+    "benchmark/report/research orchestration",
+    "Python tests, CI/checker and example utilities"
+  ],
+  "preserve": [
+    "all existing source and compatibility readers",
+    "all fixtures, test intent and source pins",
+    "all models, datasets, results, historical receipts and custody"
+  ],
+  "permitted_python": "actual neural model/loss/autograd/optimizer steps and necessary training-coupled batch/RNG/checkpoint state; a mixed module is not automatically permitted",
+  "rust_responsibilities": [
+    "input/role/split preparation",
+    "standalone inference/predict and classical evaluator fitting",
+    "validation/scoring/metrics/Elo/qualification",
+    "CLI/process orchestration/cache or receipt reporting",
+    "CI/claims/paper/example utilities and new nontraining tests"
+  ],
+  "acceptance": {
+    "LP-S1": {
+      "verdict": "PASS_SCOPED_DOCS",
+      "evidence": "Latest user rule recorded in AGENTS.md, architecture and this policy package; source-only criteria, no runtime claim."
+    },
+    "LP-S2": {
+      "verdict": "NOT_RUN",
+      "evidence": "Full890-file function/caller classification incomplete;787path inventory excludes103research/levels."
+    },
+    "LP-S3": {
+      "verdict": "NOT_RUN",
+      "evidence": "Seven candidate slices require strong review and exact source/scope/interface proof."
+    },
+    "LP-S4": {
+      "verdict": "NOT_RUN",
+      "evidence": "Exact native numerical/RNG/refusal parity and Rust1.88 tests require capacity admission."
+    },
+    "LP-S5": {
+      "verdict": "NOT_RUN",
+      "evidence": "All active nontraining operations and checks must have native routes without Python fallback."
+    },
+    "LP-S6": {
+      "verdict": "NOT_RUN",
+      "evidence": "Legacy test intent/fixtures must remain and equivalent native coverage must be demonstrated."
+    },
+    "LP-S7": {
+      "verdict": "NOT_RUN",
+      "evidence": "Full exact-head CI and any caller/workflow activation remain separately admitted."
+    },
+    "LP-S8": {
+      "verdict": "BLOCKED",
+      "evidence": "Historical custody/retirement disposition is a separate owner decision after native replacement; no deletion authorized."
+    }
+  },
+  "original65_baseline_unchanged": true,
+  "migration_queue": "migration-manifest.json"
+}

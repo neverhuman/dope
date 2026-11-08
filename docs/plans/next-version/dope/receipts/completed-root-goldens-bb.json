@@ -1,0 +1,21 @@
+{
+  "schema":"dope.completed-subtarget-criterion-acceptance/v1",
+  "reviewer":"/root",
+  "decision":"ACCEPT_D02_S1_PENDING_NEXT_COHERENT_LEDGER_INTEGRATION",
+  "source":"bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+  "tested_merge":"fee51ff5d8296af5027414920dce3444d59ed926",
+  "tested_source_tree":"08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+  "run":41699461094,
+  "job":126140855993,
+  "whole_job":"FAILURE_LATER_CLIPPY_TYPE_COMPLEXITY_NOT_PASS",
+  "completed_subtarget":{"library":"rust/lib.rs","passed":302,"failed":0,"ignored":0,"terminal_log_line":1441},
+  "log_sha256":"021c5cb16952f9745e6a09686c93b46bf47bc614855963be864454fe6f99d5a3",
+  "source_binding":"Primary log exact fee51ff checkout and independent GitHub merge/source tree identity. Source+fixture trees unchanged through e5 CI repair.",
+  "criterion":"D02-S1",
+  "evidence":"Actual metrics::golden::tests::rust_matches_golden_parity_corpus PASS log1339. Root independently read actual tested golden.rs: verify_golden_corpus over real repository tests/golden asserts exactly163 total cases, component totals aggregate30/charge9/drivers48/frontier31/transfer45, exactly34 nested drivers/v2. Thus this is actual129top-level+34v2 corpus, not just a two-case synthetic discovery fixture or an inferred count from a Rust test name. Seven separate analytic rank cases are checked by strict discovery; the actual missing/malformed/duplicate/symlink refusal tests also passed log1320-1324. Frozen existing fixture bytes unchanged versus planning59b: Git diff tests/golden shows only added informative-v1/rank-cases.json, no modified/deleted old fixtures.",
+  "exact_source_objects":{"golden_rs":"a6951c4c28a9e1573756464f4e9da77f801048c6","discovery_rs":"0cea73c4f3ff5a06360585393d61b7b39e07cf9e","metrics_tree":"0995e99e214bd0f971084e599cb2c59f07eec0f7","golden_fixture_tree":"c05852018f23aeca689c23c80556c439b403f39b"},
+  "before_tracked":{"PASS":50,"NOT_RUN":11,"historical_BLOCKED":4},
+  "after_if_integrated":{"PASS":51,"NOT_RUN":10,"historical_BLOCKED":4},
+  "task_effect":"D02 becomes fully scoped PASS if sole owner integrates this final remaining criterion after rechecking inventory/source closure; original engineering tasks still open would decrease7->6. Rust migration streams remain7 and NOT_COMPLIANT.",
+  "limits":["No D06-S4 or other broad legacy/inference/multiplicity criterion is promoted from this proof alone.","Completed library subtarget only; failed overall native job remains FAIL, new current-source full CI remains pending.","Do not trigger a separate doc-only push/CI cancellation solely for this status; sole writer integrates with the next necessary coherent batch if no freeze is already active.","No new execution/native job, source/index/ref mutation, fixture edits, numerical rebaseline, science/privacy/production qualification."]
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "dope.python-inventory-coverage/v1",
+  "source_head": "a84bba031240582921b00532b23cab6d56f150ac",
+  "full_tracked_python": 890,
+  "runtime_path_inventory": 787,
+  "excluded_research_levels": 103,
+  "runtime_inventory_sha256": "284055ff2c575537d3f55689b6aa2b59e9b075f32caec15d32ab08d4f091f780",
+  "runtime_inventory_scope": "787 paths; mostly path classification. research/levels103 explicitly excluded and only partially function-reviewed separately.",
+  "training_function_review": "training-boundary-audit.md; not a full103-file function inventory",
+  "policy_status": "NOT_COMPLIANT",
+  "inventory_is_not_waiver": true
+}

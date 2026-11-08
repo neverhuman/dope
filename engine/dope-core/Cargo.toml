@@ -8,6 +8,7 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+dope-norm = { path = "../dope-norm" }
 candle-core.workspace = true
 candle-nn.workspace = true
 safetensors.workspace = true

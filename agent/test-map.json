@@ -1,10 +1,117 @@
 {
   "tests": {
-    "engine/dope-cli/src/mlc_v3_encode/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli", "purpose": "verify typed snapshot serialization, effective conditioning versions and primary encode compatibility"},
-    "engine/dope-cli/tests/fixtures/landmark-encoding-v1.jsonl": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test cli encoding_receipts && python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "bind real CPU CLI snapshots to the named schema and frozen wire fixture"},
-    "schemas/landmark-encoding-receipt-v1.schema.json": {"command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "validate High629 snapshot schema and refuse incompatible identities, masks and incomplete evidence"},
-    "research/transfer/tests/test_landmark_encoding_schema.py": {"command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v", "purpose": "verify named encoding snapshot schema using actual Rust CLI fixtures"},
-    "docs/landmark-encoding-receipts.md": {"command": "just fast", "purpose": "verify encoding receipt contract documentation"},
+    "catboost_info/catboost_training.json": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
+      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
+    },
+    "catboost_info/learn/events.out.tfevents": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
+      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
+    },
+    "catboost_info/learn_error.tsv": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
+      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
+    },
+    "catboost_info/time_left.tsv": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
+      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
+    },
+    "research/levels/v3_canonical_summary.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify canonical ledger summary and Elo reducer compatibility"
+    },
+    "research/levels/v4_training_helpers.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_v4_training research.levels.tests.test_v4_training_model -v",
+      "purpose": "verify helper extraction retains masks, exact resume, errors and actual-model training"
+    },
+    "engine/dope-cli/src/dvs.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
+      "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
+    },
+    "engine/dope-cli/src/mlc_v4.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
+      "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
+    },
+    "engine/dope-cli/src/normalize.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
+      "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
+    },
+    "engine/dope-cli/src/safe_io.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
+      "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
+    },
+    "engine/dope-cli/tests/next_version_cli.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
+      "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
+    },
+    "engine/dope-core/src/dvs/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
+      "purpose": "verify C02 simultaneous reducer, informative ranks, scheduled denominator and honest AuditCard"
+    },
+    "engine/dope-core/src/mlc_v4/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v4_wire --test mlc_v4_sampling --test mlc_v4_producer_parity",
+      "purpose": "verify closed six-gate wire, hard caps and Python producer parity"
+    },
+    "engine/dope-core/tests/landmark_high_required.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_high_required",
+      "purpose": "verify required High execution, full reservation, spectrum admission and legacy full replay"
+    },
+    "engine/dope-norm/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-norm",
+      "purpose": "verify strict FIT-only NC1 and private/public boundary"
+    },
+    "research/levels/nc1_reference.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_nc1 -v",
+      "purpose": "verify actual Rust NC1 fixtures including Integer and all-missing nominal"
+    },
+    "research/levels/transfer_evaluation.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_evaluation -v",
+      "purpose": "verify common REAL-FIT coordinates without synthetic refitting and historical opt-in identity"
+    },
+    "research/levels/v4_model.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_v4_objectives -v",
+      "purpose": "verify actual synthesized-data gradients, served basis and strict export"
+    },
+    "research/levels/v4_trainer.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_v4_training research.levels.tests.test_v4_training_model -v",
+      "purpose": "verify actual v4 model two-step CPU updates, native masks and content-bound exact resume"
+    },
+    "research/levels/v4_training_adapter.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_v4_training_model -v",
+      "purpose": "verify actual-model padding removal, explicit native23 dropout and frozen objective adapter"
+    },
+    "research/levels/v4_wire_reference.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_v4_wire -v",
+      "purpose": "verify actual Rust fixed-draw fixtures fail closed on missing bytes/source drift"
+    },
+    "research/transfer/tests/test_driver_rank_successor.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_driver_rank_successor -v",
+      "purpose": "verify versioned informative rank preserves v1/v2 reducer dispatch and C02 contracts"
+    },
+    "engine/dope-sdk/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk",
+      "purpose": "verify versioned facade preserves preparation, physical row identity and refusals"
+    },
+    "engine/dope-cli/src/mlc_v3_encode/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli",
+      "purpose": "verify typed snapshot serialization, effective conditioning versions and primary encode compatibility"
+    },
+    "engine/dope-cli/tests/fixtures/landmark-encoding-v1.jsonl": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test cli encoding_receipts && python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v",
+      "purpose": "bind real CPU CLI snapshots to the named schema and frozen wire fixture"
+    },
+    "schemas/landmark-encoding-receipt-v1.schema.json": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v",
+      "purpose": "validate High629 snapshot schema and refuse incompatible identities, masks and incomplete evidence"
+    },
+    "research/transfer/tests/test_landmark_encoding_schema.py": {
+      "command": "python3 -B -m unittest research.transfer.tests.test_landmark_encoding_schema -v",
+      "purpose": "verify named encoding snapshot schema using actual Rust CLI fixtures"
+    },
+    "docs/landmark-encoding-receipts.md": {
+      "command": "just fast",
+      "purpose": "verify encoding receipt contract documentation"
+    },
     ".cargo/": {
       "command": "just check",
       "purpose": "verify Cargo configuration"
@@ -566,8 +673,8 @@
       "purpose": "run deterministic review statistics, sealed-admission and sample-path negative tests using target-only fixtures without reading benchmark partitions or the actual sealed registry"
     },
     "ops/ci/cpu.sh": {
-      "command": "just fast && just check",
-      "purpose": "verify early tool readiness, full locked Rust/native discovery, provisioned V1 interpreter for NumPy-dependent paper-log tests and complete offline transfer discovery without late apt transactions or changed budgets"
+      "command": "bash ops/ci/cpu.sh",
+      "purpose": "run the Rust frozen-evidence checker before evidence-producing CI steps, then preserve the full locked CPU lane"
     },
     "ops/ci/deployment.sh": {
       "command": "bash -n ops/ci/deployment.sh && bash ops/ci/deployment.sh check && bash ops/ci/deployment.sh audit",
@@ -606,8 +713,8 @@
       "purpose": "prepare both full locked graphs before mandatory offline feature, workspace, dependency and checksum boundary proofs; CPU uses the same bounded setup"
     },
     "ops/ci/public-smoke.sh": {
-      "command": "actionlint .github/workflows/*.yml",
-      "purpose": "verify thin public fork smoke script and workflow wiring"
+      "command": "bash ops/ci/public-smoke.sh",
+      "purpose": "native public compile/inspect/sample and strict nonempty Rust golden consumer plus remaining historical claim checks"
     },
     "ops/ci/test-cpu-tool-readiness.sh": {
       "command": "bash ops/ci/test-cpu-tool-readiness.sh",
@@ -615,15 +722,15 @@
     },
     "ops/merge_guard/": {
       "command": "just native-guard-check",
-      "purpose": "prove all 51 legacy guard scenarios and 196 subcases, native read-only transport, receipt integrity, malformed data, Unicode hashing and timestamp boundaries without GitHub access"
+      "purpose": "verify all existing merge-guard scenarios plus Rust frozen-evidence admission, manifest lock, inventory, symlink, UTF-8 and refusal cases"
     },
     "ops/merge_guard/Cargo.lock": {
       "command": "just native-guard-check && just security",
       "purpose": "prove pinned isolated tool dependencies and require independent lock advisory coverage in the canonical security lane"
     },
     "ops/merge_guard/Cargo.toml": {
-      "command": "just native-guard-check",
-      "purpose": "merge-guard and audit-proof manifest: format, Clippy and both native tools' fail-closed tests"
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
     },
     "ops/merge_guard/audit_proof.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
@@ -642,8 +749,8 @@
       "purpose": "native focused-proof and badge fail-closed controls"
     },
     "ops/merge_guard/tests/workflow_events.rs": {
-      "command": "just native-guard-check",
-      "purpose": "verify current PR-only source event admission with mandatory main pushes, historical dual-source events, exact four-job/source/app binding and stale-review/receiving-check refusal; preserve all original scenarios and canonical version1 receipts"
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
     },
     "ops/native_control/Cargo.lock": {
       "command": "python3 -B -m unittest research.transfer.tests.test_native_control -v",
@@ -1479,15 +1586,15 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
@@ -3297,91 +3404,526 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-probes",
       "purpose": "verify the NumPy-exact probe split, receipt replay of every cited levels/landmark number and the committed replay output"
     },
-    "engine/dope-core/src/budget.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify full-generator scalar accounting and hard caps through decoded artifacts"},
-    "engine/dope-core/tests/budgets.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify forced architectures, preset precedence and impossible-cap refusals"},
-    "engine/dope-cli/src/tiers.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify all three portable artifacts, catalog integrity and existing-output refusal"},
-    "docs/model-sizes-and-elo.md": {"command": "bash ops/ci/engine.sh", "purpose": "verify documented presets, parameter budgets, catalogs and descriptive ranking protocol"},
-    "engine/dope-cli/src/runtime.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify CPU worker settings, JSON diagnostics and executable identity"},
-    "engine/dope-cli/tests/native_cli.rs": {"command": "bash ops/ci/engine.sh", "purpose": "exercise customer commands with an empty tool PATH and validate JSON/worker controls"},
-    "engine/dope-cli/tests/release_policy.rs": {"command": "bash ops/ci/engine.sh", "purpose": "verify signature policy invocation, failure propagation, inventory/hash checks and graph refusals"},
-    "engine/dope-cli/tests/installer_policy.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test installer_policy", "purpose": "verify independent engine/model inventories, early GitHub CLI compatibility refusal and strict pre-install integrity/provenance checks"},
-    "ops/ci/engine-release.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"},
-    "ops/ci/engine-release-smoke.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "exercise all commands of the actual optimized deliverable without external tool lookup"},
-    "ops/ci/engine-runtime-graph.sh": {"command": "bash ops/ci/engine.sh", "purpose": "reject training bindings and GPU dependencies from the CPU release closure"},
-    "ops/ci/engine-notices.sh": {"command": "bash ops/ci/engine-release.sh", "purpose": "collect upstream license bytes for the actual normal/build graph"},
-    "scripts/verify-engine-release.sh": {"command": "bash ops/ci/engine.sh", "purpose": "verify expected signer/source identity and fixed hash inventory before execution"},
-    ".github/workflows/engine-release.yml": {"command": "actionlint .github/workflows/engine-release.yml", "purpose": "verify read-only PR checks and tag-only signing/publication policy"},
-    "docs/signed-engine-release.md": {"command": "bash ops/ci/engine-release.sh", "purpose": "verify documented Rust runtime, CLI and release packaging/verification commands"},
-    "ops/ci/kernel-release.sh": {"command": "bash ops/ci/kernel-release.sh HEAD", "purpose": "reproducibly build one commit's dope-kernel in the pinned builder; check linkage, glibc ceiling and version"},
-    "scripts/verify-kernel-release.sh": {"command": "shellcheck scripts/verify-kernel-release.sh", "purpose": "verify signer/source identity, fixed inventory and the built commit before execution"},
-    ".github/workflows/kernel-release.yml": {"command": "actionlint .github/workflows/kernel-release.yml", "purpose": "verify dispatch-only, main-only signing of a commit already on main"},
-    "docs/signed-kernel-release.md": {"command": "bash ops/ci/kernel-release.sh HEAD", "purpose": "verify the documented reproducible build and verification commands"},
-    "ops/ci/engine-benchmark.sh": {"command": "bash ops/ci/engine-benchmark.sh", "purpose": "verify Elo evidence only after its Python/NumPy interpreter is provisioned"},
-    "ops/licenses/engine/": {"command": "bash ops/ci/engine-release.sh", "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"},
-    "research/landmark_cache/": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify TRAIN-only schedules, native recipe bindings, immutable private cache, interruption accounting and dashboard redaction"},
-    "docs/landmark-precalculation.md": {"command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v", "purpose": "verify documented cache and source-role contracts without opening real data"},
-    "docs/fit-cv-landmark-cache.md": {"command": "python3 -B -m unittest research.levels.tests.test_precalc -v", "purpose": "verify documented FIT-CV landmark cache contracts"},
-    "engine/dope-core/src/learned/landmark_features.rs": {"command": "bash ops/ci/shared-levels.sh native", "purpose": "verify private fit-only CV input/CSV/recipe/report binding and native feature influence, frozen distribution, prefix parity and decoder-only recipient"},
-    "engine/dope-core/tests/learned_landmark_inputs.rs": {"command": "bash ops/ci/shared-levels.sh native", "purpose": "verify native landmark feature input bindings"},
-    "engine/dope-cli/tests/learned_landmark_cli.rs": {"command": "bash ops/ci/shared-levels.sh native", "purpose": "verify CLI landmark feature input bindings"},
+    "engine/dope-core/src/budget.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify full-generator scalar accounting and hard caps through decoded artifacts"
+    },
+    "engine/dope-core/tests/budgets.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify forced architectures, preset precedence and impossible-cap refusals"
+    },
+    "engine/dope-cli/src/tiers.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify all three portable artifacts, catalog integrity and existing-output refusal"
+    },
+    "docs/model-sizes-and-elo.md": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify documented presets, parameter budgets, catalogs and descriptive ranking protocol"
+    },
+    "engine/dope-cli/src/runtime.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify CPU worker settings, JSON diagnostics and executable identity"
+    },
+    "engine/dope-cli/tests/native_cli.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "exercise customer commands with an empty tool PATH and validate JSON/worker controls"
+    },
+    "engine/dope-cli/tests/release_policy.rs": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify signature policy invocation, failure propagation, inventory/hash checks and graph refusals"
+    },
+    "engine/dope-cli/tests/installer_policy.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test installer_policy",
+      "purpose": "verify independent engine/model inventories, early GitHub CLI compatibility refusal and strict pre-install integrity/provenance checks"
+    },
+    "ops/ci/engine-release.sh": {
+      "command": "bash ops/ci/engine-release.sh",
+      "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"
+    },
+    "ops/ci/engine-release-smoke.sh": {
+      "command": "bash ops/ci/engine-release.sh",
+      "purpose": "exercise all commands of the actual optimized deliverable without external tool lookup"
+    },
+    "ops/ci/engine-runtime-graph.sh": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "reject training bindings and GPU dependencies from the CPU release closure"
+    },
+    "ops/ci/engine-notices.sh": {
+      "command": "bash ops/ci/engine-release.sh",
+      "purpose": "collect upstream license bytes for the actual normal/build graph"
+    },
+    "scripts/verify-engine-release.sh": {
+      "command": "bash ops/ci/engine.sh",
+      "purpose": "verify expected signer/source identity and fixed hash inventory before execution"
+    },
+    ".github/workflows/engine-release.yml": {
+      "command": "actionlint .github/workflows/engine-release.yml",
+      "purpose": "verify read-only PR checks and tag-only signing/publication policy"
+    },
+    "docs/signed-engine-release.md": {
+      "command": "bash ops/ci/engine-release.sh",
+      "purpose": "verify documented Rust runtime, CLI and release packaging/verification commands"
+    },
+    "ops/ci/kernel-release.sh": {
+      "command": "bash ops/ci/kernel-release.sh HEAD",
+      "purpose": "reproducibly build one commit's dope-kernel in the pinned builder; check linkage, glibc ceiling and version"
+    },
+    "scripts/verify-kernel-release.sh": {
+      "command": "shellcheck scripts/verify-kernel-release.sh",
+      "purpose": "verify signer/source identity, fixed inventory and the built commit before execution"
+    },
+    ".github/workflows/kernel-release.yml": {
+      "command": "actionlint .github/workflows/kernel-release.yml",
+      "purpose": "verify dispatch-only, main-only signing of a commit already on main"
+    },
+    "docs/signed-kernel-release.md": {
+      "command": "bash ops/ci/kernel-release.sh HEAD",
+      "purpose": "verify the documented reproducible build and verification commands"
+    },
+    "ops/ci/engine-benchmark.sh": {
+      "command": "bash ops/ci/engine-benchmark.sh",
+      "purpose": "verify Elo evidence only after its Python/NumPy interpreter is provisioned"
+    },
+    "ops/licenses/engine/": {
+      "command": "bash ops/ci/engine-release.sh",
+      "purpose": "bundle source-pinned upstream license text omitted from locked crate archives"
+    },
+    "research/landmark_cache/": {
+      "command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v",
+      "purpose": "verify TRAIN-only schedules, native recipe bindings, immutable private cache, interruption accounting and dashboard redaction"
+    },
+    "docs/landmark-precalculation.md": {
+      "command": "python3 -B -m unittest discover -s research/landmark_cache/tests -v",
+      "purpose": "verify documented cache and source-role contracts without opening real data"
+    },
+    "docs/fit-cv-landmark-cache.md": {
+      "command": "python3 -B -m unittest research.levels.tests.test_precalc -v",
+      "purpose": "verify documented FIT-CV landmark cache contracts"
+    },
+    "engine/dope-core/src/learned/landmark_features.rs": {
+      "command": "bash ops/ci/shared-levels.sh native",
+      "purpose": "verify private fit-only CV input/CSV/recipe/report binding and native feature influence, frozen distribution, prefix parity and decoder-only recipient"
+    },
+    "engine/dope-core/tests/learned_landmark_inputs.rs": {
+      "command": "bash ops/ci/shared-levels.sh native",
+      "purpose": "verify native landmark feature input bindings"
+    },
+    "engine/dope-cli/tests/learned_landmark_cli.rs": {
+      "command": "bash ops/ci/shared-levels.sh native",
+      "purpose": "verify CLI landmark feature input bindings"
+    },
     "research/levels/precalc/": {
       "command": "python3 -B -m unittest research.levels.tests.test_precalc -v",
       "purpose": "verify TRAIN-only finite split schedules, held-out poisoning isolation, immutable private S3 publication, exact cache reuse/materialization and whole-schedule coverage"
     },
-    "docs/observed-landmark-inputs.md": {"command": "python3 -B -m unittest research.levels.tests.test_observed_landmarks research.levels.tests.test_landmark_views -v", "purpose": "verify versioned finite weak/negative CV input masks, immutable report-only views, full source denominators, cache/graph recipe and exact resume bindings; no scientific qualification"},
-    "research/levels/": {"command": "python3 -B -m unittest discover -s research/levels/tests -v", "purpose": "verify stable physical row identities, fit-only landmark scope and native failure receipts, family contracts, gradient paths, frozen residuals, exact checkpoint resume, matched comparison denominator/determinism/failure journeys and monitor/allocation refusals; versioned prior exposure, fixed development draws, source provenance and cross-recipe resume refusal; bounded matched neural unroll counts, default objective replay, long higher-order gradients and cross-unroll checkpoint refusal; legacy observer replay, opt-in balanced distinct physical development panels, role lineage, zero-update/RNG isolation, full tensor resume and interrupted-panel refusal; versioned v2 layout refusals, slot versus pooled information, isolated upper queries and frozen residual-query learning; explicit bounded readout identities, exact bounded prefixes and malicious out-of-range carrier refusals; CV landmark inputs/masks, held-out poisoning isolation, bound cache identity and feature-gradient/resume paths"},
-    "engine/dope-core/src/learned/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2", "purpose": "verify native encoder/decoder fixture parity, exact admitted prefix, typed intake and source-free recipient sampling"},
-    "engine/dope-core/tests/learned_v2.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_v2", "purpose": "verify all v2 graphs and tier widths against synthetic PyTorch code/decoder fixtures, byte-identical selected prefixes, target-free states, explicit bounded ranges/adversarial carrier refusals and encoder-free recipient sampling"},
-    "engine/dope-cli/tests/learned_v2_cli.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_v2_cli", "purpose": "verify version-bound native encode and all-four-tier sampling with absent source/encoder and empty tool PATH"},
-    "engine/dope-core/tests/seeded_auditors.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors", "purpose": "verify versioned CPU neural replay under interleaved seeds and thread pools, malformed-input refusals and tree feature-tie replay"},
-    "docs/multilevel-landmark-dl-study.md": {"command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_multilevel_model research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify train-only column scaling, 3-level and 4-tier landmark and data descriptor extraction, source-free encoding and unlimited synthetic generation"},
-    "research/levels/scaling.py": {"command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify leak-free train-only column scaling, inverse transform and categorical encoding without raw string echo"},
-    "research/levels/descriptors.py": {"command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify Medium/High/Ultra landmark hierarchy, building-block probes, inter-landmark summary stats and table descriptor extraction"},
-    "research/levels/rapid_validate.py": {"command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors -v", "purpose": "verify rapid CatBoost and regression validation inputs"},
-    "research/levels/multilevel_model.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify unified 3-level and 4-tier landmark model encoding, active column gating, gradient convergence and unlimited synthetic sampling"},
-    "research/levels/encoder.py": {"command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v", "purpose": "verify 40-tensor DopeEncoder629 pruning, SHA-256 pre-parse verification, alphabetical 14-gate ordering and [B, 256] + [B, 64, 17] -> [B, 629] parity"},
-    "research/levels/s3_multilevel_trainer.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify multi-level conditioning objective and gradient flow"},
-    "research/levels/world_class_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify synthetic-to-real transfer and Bradley-Terry Elo solver"},
-    "research/levels/strata_audit.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify cohort strata decomposition, bootstrap CIs, and local-attention auditor alias attribution"},
-    "research/levels/disjoint_reconcile.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify strictly dataset-disjoint cohort reconciliation and dev-val checkpoint selection separation"},
-    "research/levels/render_multilevel_evidence.py": {"command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v", "purpose": "verify multilevel evidence rendering"},
-    "research/levels/building_block_landmarks.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify 16 mathematical building-block probes, row summaries and 48 inter-landmark summary statistics"},
-    "research/levels/multiclass_head.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify inter-landmark attention block and LR-VLOT multiclass synthesis"},
-    "research/levels/budget_planner.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify 4-tier DML3 complete byte envelope and CSC1 compact scaler sidecar"},
-    "research/levels/v3_ablation_and_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify v3 corpus exposure manifest and A0..A3 ablation pipeline"},
-    "research/levels/v3_ledger_replay.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify frozen-checkpoint per-dataset multitask ledger and CSC1 raw-domain inverse replay"},
-    "research/levels/v3_canonical_roster_eval.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify canonical 6-auditor roster, LocalGatedAttentionAuditor identity, driver fidelity and equal-wire rows_wire/copula_wire comparators"},
-    "research/levels/v3_canonical_runner.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify process-group bounded canonical runner, CSC1 vs diagnostic fp64 raw-receiver separation and paired Elo/bootstrap reducer"},
-    "research/levels/rust_v3_parity.py": {"command": "DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify fail-closed trained-checkpoint SafeTensors export, 4-tier forward parity (<1e-5) and 12-cell DML3/CSC1 cross-runtime sampling parity"},
-    "research/levels/tests/test_dope_mlc_v3.py": {"command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v", "purpose": "verify DOPE-MLC-v3 landmarks, inter-landmark stats, active col_gate_head, 4-tier DML3/CSC1 wire envelope, LR-VLOT multiclass and trained Rust SafeTensors parity"},
-    "research/levels/tests/test_encoder_629.py": {"command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v", "purpose": "verify DopeEncoder629 40-tensor pruning, SHA-256 pre-parse check, and 629D composite encoder parity"},
-    "research/levels/optional_landmarks.py": {"command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v", "purpose": "verify LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and MLC-v3 optional/progressive conditioning"},
-    "research/levels/observed_conditioning.py": {"command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v", "purpose": "verify observed-only-v1 and legacy-full-v1 256D+64x17 conditioning builders and progressive stream helpers"},
-    "research/levels/train_landmark_dropout.py": {"command": "python3 -B -m unittest research.levels.tests.test_multiclass_and_dropout -v", "purpose": "verify full-partition landmark-dropout conditioning parity and K>=33 multiclass support"},
-    "research/levels/tests/test_multiclass_and_dropout.py": {"command": "python3 -B -m unittest research.levels.tests.test_multiclass_and_dropout -v", "purpose": "verify K>=33 multiclass vocabulary preservation, absent query classes, and decoupled supervision_desc_vec"},
-    "research/levels/tools/optional_landmarks_qa/": {"command": "python3 -B -m py_compile research/levels/tools/optional_landmarks_qa/*.py", "purpose": "compile the optional-landmarks qualification harness (retention arms, subsample ablation, identity sweeps, A/B timing); results live in docs/evidence/optional-landmarks"},
-    "engine/dope-core/examples/landmark_mode_bench.rs": {"command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example landmark_mode_bench --example mlc_v3_device_bench", "purpose": "build the stage-timed landmark-mode and MLC-v3 device latency examples used for qualification"},
-    "engine/dope-core/examples/mlc_v3_device_bench.rs": {"command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example landmark_mode_bench --example mlc_v3_device_bench", "purpose": "build the stage-timed landmark-mode and MLC-v3 device latency examples used for qualification"},
-    "engine/dope-core/examples/resident_release_check.rs": {"command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example resident_release_check && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits", "purpose": "compile the real resident/session measurement entry and verify its accepted limits and refusal contract; runtime proof requires the declared local D0 checkpoint and fit fixture"},
-    "engine/dope-core/examples/resident_release_check/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits", "purpose": "verify the accepted six-run resident reduction, maximum warm overhead, median complete latency and invalid-evidence refusals"},
-    "engine/dope-core/tests/resident_release_limits.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits", "purpose": "verify closed 5ms/30ms bounds, warm-up discard, fixed observation counts and finite source timings"},
-    "research/levels/tests/test_optional_landmarks.py": {"command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v", "purpose": "verify LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and MLC-v3 optional/progressive conditioning"},
-    "engine/dope-core/tests/fixtures/landmark_bundle_v1.json": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_bundle && python3 -B -m unittest research.levels.tests.test_optional_landmarks -v", "purpose": "verify cross-repo LandmarkBundle v1 golden JSON serialization and conditioning digests"},
-    "engine/dope-core/src/prepare/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b", "purpose": "verify pure-Rust MLC-v3 scaling, descriptors, building-block probes, inter-landmark stats, and legacy/observed conditioning parity"},
-    "engine/dope-core/tests/landmark_bundle.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_bundle", "purpose": "verify LandmarkBundle v1 sanitation, lattice merge, stratified subsampling, and ProgressiveLandmarks driver parity"},
-    "engine/dope-core/tests/prepare_parity_a.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a", "purpose": "verify FitOnlyTableTransform scaling, 24D table descriptors, and 116D native report descriptors against Python goldens"},
-    "engine/dope-core/tests/prepare_parity_b.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_b", "purpose": "verify 16 building-block probes, 48 inter-landmark stats, and 256D+64x17 legacy-full-v1 and observed-only-v1 conditioning against Python goldens"},
-    "engine/dope-core/tests/fixtures/prepare-v1/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b", "purpose": "verify golden fixtures for pure-Rust MLC-v3 preparation parity"},
-    "engine/dope-core/tests/mlc_v3_resident/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify device-resident MlcV3Model 629D tensor encoding and host parity"},
-    "research/levels/cli.py": {"command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v", "purpose": "verify research.levels.cli encode with optional/progressive landmark modes"},
-    "research/levels/tools/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b", "purpose": "verify prepare-v1 golden fixture generators against Rust parity suites"},
-    "engine/dope-core/src/mlc_v3/": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors inference, LandmarkHyperRouter/ConditionalHyperTargetNet/CovariateRefinementNet forward passes, DML3/CSC1 wire decoding and synthetic sampling"},
-    "engine/dope-cli/src/mlc_v3.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope", "purpose": "verify dope mlc-v3 CLI inspect-weights, inspect-wire, route, sample and fetch-weights commands"},
-    "engine/dope-cli/src/mlc_v3_encode.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli", "purpose": "verify dope mlc-v3 encode optional/progressive landmark modes and bundle JSONL output"},
-    "engine/dope-cli/src/style.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli", "purpose": "verify zero-dependency ANSI terminal styling, TTY auto-detection, NO_COLOR and --color flags"},
-    "engine/dope-core/examples/encoder_629.rs": {"command": "cargo check --manifest-path engine/Cargo.toml --locked -p dope-core --example encoder_629", "purpose": "compile the checksummed FP32 High 629D integration example"},
-    "engine/dope-core/tests/mlc_v3_safetensors.rs": {"command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors", "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors loading, 4-tier routing, CRC32 wire tamper refusal and synthetic table sampling"},
-    "scripts/install.sh": {"command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy", "purpose": "verify independent concrete engine/model tags, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"}
+    "docs/observed-landmark-inputs.md": {
+      "command": "python3 -B -m unittest research.levels.tests.test_observed_landmarks research.levels.tests.test_landmark_views -v",
+      "purpose": "verify versioned finite weak/negative CV input masks, immutable report-only views, full source denominators, cache/graph recipe and exact resume bindings; no scientific qualification"
+    },
+    "research/levels/": {
+      "command": "python3 -B -m unittest discover -s research/levels/tests -v",
+      "purpose": "verify stable physical row identities, fit-only landmark scope and native failure receipts, family contracts, gradient paths, frozen residuals, exact checkpoint resume, matched comparison denominator/determinism/failure journeys and monitor/allocation refusals; versioned prior exposure, fixed development draws, source provenance and cross-recipe resume refusal; bounded matched neural unroll counts, default objective replay, long higher-order gradients and cross-unroll checkpoint refusal; legacy observer replay, opt-in balanced distinct physical development panels, role lineage, zero-update/RNG isolation, full tensor resume and interrupted-panel refusal; versioned v2 layout refusals, slot versus pooled information, isolated upper queries and frozen residual-query learning; explicit bounded readout identities, exact bounded prefixes and malicious out-of-range carrier refusals; CV landmark inputs/masks, held-out poisoning isolation, bound cache identity and feature-gradient/resume paths"
+    },
+    "engine/dope-core/src/learned/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_parity --test learned_v2",
+      "purpose": "verify native encoder/decoder fixture parity, exact admitted prefix, typed intake and source-free recipient sampling"
+    },
+    "engine/dope-core/tests/learned_v2.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test learned_v2",
+      "purpose": "verify all v2 graphs and tier widths against synthetic PyTorch code/decoder fixtures, byte-identical selected prefixes, target-free states, explicit bounded ranges/adversarial carrier refusals and encoder-free recipient sampling"
+    },
+    "engine/dope-cli/tests/learned_v2_cli.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test learned_v2_cli",
+      "purpose": "verify version-bound native encode and all-four-tier sampling with absent source/encoder and empty tool PATH"
+    },
+    "engine/dope-core/tests/seeded_auditors.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test seeded_auditors",
+      "purpose": "verify versioned CPU neural replay under interleaved seeds and thread pools, malformed-input refusals and tree feature-tie replay"
+    },
+    "docs/multilevel-landmark-dl-study.md": {
+      "command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_multilevel_model research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify train-only column scaling, 3-level and 4-tier landmark and data descriptor extraction, source-free encoding and unlimited synthetic generation"
+    },
+    "research/levels/scaling.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify leak-free train-only column scaling, inverse transform and categorical encoding without raw string echo"
+    },
+    "research/levels/descriptors.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify Medium/High/Ultra landmark hierarchy, building-block probes, inter-landmark summary stats and table descriptor extraction"
+    },
+    "research/levels/rapid_validate.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_scaling_and_descriptors -v",
+      "purpose": "verify rapid CatBoost and regression validation inputs"
+    },
+    "research/levels/multilevel_model.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify unified 3-level and 4-tier landmark model encoding, active column gating, gradient convergence and unlimited synthetic sampling"
+    },
+    "research/levels/encoder.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
+      "purpose": "verify 40-tensor DopeEncoder629 pruning, SHA-256 pre-parse verification, alphabetical 14-gate ordering and [B, 256] + [B, 64, 17] -> [B, 629] parity"
+    },
+    "research/levels/s3_multilevel_trainer.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
+      "purpose": "verify multi-level conditioning objective and gradient flow"
+    },
+    "research/levels/world_class_eval.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
+      "purpose": "verify synthetic-to-real transfer and Bradley-Terry Elo solver"
+    },
+    "research/levels/strata_audit.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
+      "purpose": "verify cohort strata decomposition, bootstrap CIs, and local-attention auditor alias attribution"
+    },
+    "research/levels/disjoint_reconcile.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
+      "purpose": "verify strictly dataset-disjoint cohort reconciliation and dev-val checkpoint selection separation"
+    },
+    "research/levels/render_multilevel_evidence.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
+      "purpose": "verify multilevel evidence rendering"
+    },
+    "research/levels/building_block_landmarks.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify 16 mathematical building-block probes, row summaries and 48 inter-landmark summary statistics"
+    },
+    "research/levels/multiclass_head.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify inter-landmark attention block and LR-VLOT multiclass synthesis"
+    },
+    "research/levels/budget_planner.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify 4-tier DML3 complete byte envelope and CSC1 compact scaler sidecar"
+    },
+    "research/levels/v3_ablation_and_eval.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify v3 corpus exposure manifest and A0..A3 ablation pipeline"
+    },
+    "research/levels/v3_ledger_replay.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify frozen-checkpoint per-dataset multitask ledger and CSC1 raw-domain inverse replay"
+    },
+    "research/levels/v3_canonical_roster_eval.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify canonical 6-auditor roster, LocalGatedAttentionAuditor identity, driver fidelity and equal-wire rows_wire/copula_wire comparators"
+    },
+    "research/levels/v3_canonical_runner.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify process-group bounded canonical runner, CSC1 vs diagnostic fp64 raw-receiver separation and paired Elo/bootstrap reducer"
+    },
+    "research/levels/rust_v3_parity.py": {
+      "command": "DOPE_REQUIRE_RUST_PARITY=1 python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify fail-closed trained-checkpoint SafeTensors export, 4-tier forward parity (<1e-5) and 12-cell DML3/CSC1 cross-runtime sampling parity"
+    },
+    "research/levels/tests/test_dope_mlc_v3.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
+      "purpose": "verify DOPE-MLC-v3 landmarks, inter-landmark stats, active col_gate_head, 4-tier DML3/CSC1 wire envelope, LR-VLOT multiclass and trained Rust SafeTensors parity"
+    },
+    "research/levels/tests/test_encoder_629.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
+      "purpose": "verify DopeEncoder629 40-tensor pruning, SHA-256 pre-parse check, and 629D composite encoder parity"
+    },
+    "research/levels/optional_landmarks.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",
+      "purpose": "verify LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and MLC-v3 optional/progressive conditioning"
+    },
+    "research/levels/observed_conditioning.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",
+      "purpose": "verify observed-only-v1 and legacy-full-v1 256D+64x17 conditioning builders and progressive stream helpers"
+    },
+    "research/levels/train_landmark_dropout.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multiclass_and_dropout -v",
+      "purpose": "verify full-partition landmark-dropout conditioning parity and K>=33 multiclass support"
+    },
+    "research/levels/tests/test_multiclass_and_dropout.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_multiclass_and_dropout -v",
+      "purpose": "verify K>=33 multiclass vocabulary preservation, absent query classes, and decoupled supervision_desc_vec"
+    },
+    "research/levels/tools/optional_landmarks_qa/": {
+      "command": "python3 -B -m py_compile research/levels/tools/optional_landmarks_qa/*.py",
+      "purpose": "compile the optional-landmarks qualification harness (retention arms, subsample ablation, identity sweeps, A/B timing); results live in docs/evidence/optional-landmarks"
+    },
+    "engine/dope-core/examples/landmark_mode_bench.rs": {
+      "command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example landmark_mode_bench --example mlc_v3_device_bench",
+      "purpose": "build the stage-timed landmark-mode and MLC-v3 device latency examples used for qualification"
+    },
+    "engine/dope-core/examples/mlc_v3_device_bench.rs": {
+      "command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example landmark_mode_bench --example mlc_v3_device_bench",
+      "purpose": "build the stage-timed landmark-mode and MLC-v3 device latency examples used for qualification"
+    },
+    "engine/dope-core/examples/resident_release_check.rs": {
+      "command": "cargo build --release --manifest-path engine/Cargo.toml --locked -p dope-core --example resident_release_check && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits",
+      "purpose": "compile the real resident/session measurement entry and verify its accepted limits and refusal contract; runtime proof requires the declared local D0 checkpoint and fit fixture"
+    },
+    "engine/dope-core/examples/resident_release_check/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits",
+      "purpose": "verify the accepted six-run resident reduction, maximum warm overhead, median complete latency and invalid-evidence refusals"
+    },
+    "engine/dope-core/tests/resident_release_limits.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test resident_release_limits",
+      "purpose": "verify closed 5ms/30ms bounds, warm-up discard, fixed observation counts and finite source timings"
+    },
+    "research/levels/tests/test_optional_landmarks.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",
+      "purpose": "verify LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and MLC-v3 optional/progressive conditioning"
+    },
+    "engine/dope-core/tests/fixtures/landmark_bundle_v1.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_bundle && python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",
+      "purpose": "verify cross-repo LandmarkBundle v1 golden JSON serialization and conditioning digests"
+    },
+    "engine/dope-core/src/prepare/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b",
+      "purpose": "verify pure-Rust MLC-v3 scaling, descriptors, building-block probes, inter-landmark stats, and legacy/observed conditioning parity"
+    },
+    "engine/dope-core/tests/landmark_bundle.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_bundle",
+      "purpose": "verify LandmarkBundle v1 sanitation, lattice merge, stratified subsampling, and ProgressiveLandmarks driver parity"
+    },
+    "engine/dope-core/tests/prepare_parity_a.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a",
+      "purpose": "verify FitOnlyTableTransform scaling, 24D table descriptors, and 116D native report descriptors against Python goldens"
+    },
+    "engine/dope-core/tests/prepare_parity_b.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_b",
+      "purpose": "verify 16 building-block probes, 48 inter-landmark stats, and 256D+64x17 legacy-full-v1 and observed-only-v1 conditioning against Python goldens"
+    },
+    "engine/dope-core/tests/fixtures/prepare-v1/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b",
+      "purpose": "verify golden fixtures for pure-Rust MLC-v3 preparation parity"
+    },
+    "engine/dope-core/tests/mlc_v3_resident/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors",
+      "purpose": "verify device-resident MlcV3Model 629D tensor encoding and host parity"
+    },
+    "research/levels/cli.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",
+      "purpose": "verify research.levels.cli encode with optional/progressive landmark modes"
+    },
+    "research/levels/tools/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test prepare_parity_a --test prepare_parity_b",
+      "purpose": "verify prepare-v1 golden fixture generators against Rust parity suites"
+    },
+    "engine/dope-core/src/mlc_v3/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors",
+      "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors inference, LandmarkHyperRouter/ConditionalHyperTargetNet/CovariateRefinementNet forward passes, DML3/CSC1 wire decoding and synthetic sampling"
+    },
+    "engine/dope-cli/src/mlc_v3.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope",
+      "purpose": "verify dope mlc-v3 CLI inspect-weights, inspect-wire, route, sample and fetch-weights commands"
+    },
+    "engine/dope-cli/src/mlc_v3_encode.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli",
+      "purpose": "verify dope mlc-v3 encode optional/progressive landmark modes and bundle JSONL output"
+    },
+    "engine/dope-cli/src/style.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope --test cli",
+      "purpose": "verify zero-dependency ANSI terminal styling, TTY auto-detection, NO_COLOR and --color flags"
+    },
+    "engine/dope-core/examples/encoder_629.rs": {
+      "command": "cargo check --manifest-path engine/Cargo.toml --locked -p dope-core --example encoder_629",
+      "purpose": "compile the checksummed FP32 High 629D integration example"
+    },
+    "engine/dope-core/tests/mlc_v3_safetensors.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v3_safetensors",
+      "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors loading, 4-tier routing, CRC32 wire tamper refusal and synthetic table sampling"
+    },
+    "scripts/install.sh": {
+      "command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy",
+      "purpose": "verify independent concrete engine/model tags, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"
+    },
+    "ops/merge_guard/frozen_evidence.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",
+      "purpose": "test frozen path scope, strict manifest/hash admission, reason validation, protected inventory and evidence-byte refusal"
+    },
+    "ops/merge_guard/frozen_evidence_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",
+      "purpose": "exercise all synthetic frozen-evidence Python scenarios in Rust plus non-UTF-8 Git path refusal"
+    },
+    "engine/dope-sdk/src/nc1_view.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk",
+      "purpose": "native private target-last bounded conversion, roles and physical identity"
+    },
+    "engine/dope-sdk/tests/nc1_boundaries.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test nc1_boundaries",
+      "purpose": "actual SDK NC1 roles, private view, schema canaries and declared three-task targets"
+    },
+    "engine/dope-cli/tests/nc1_boundaries.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test nc1_boundaries",
+      "purpose": "actual normalization CLI with empty PATH and safe public/error surfaces"
+    },
+    "engine/dope-core/src/dvs/roles.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_contract",
+      "purpose": "required declared view-role digest/pin refusal before selection; no principal authentication claim"
+    },
+    "engine/dope-core/tests/dvs_contract.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_contract",
+      "purpose": "unclipped R, real grouped permutations/member duplication and all scheduled null-cost failures"
+    },
+    "engine/dope-cli/tests/dvs_contract.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test dvs_contract",
+      "purpose": "actual DVS CLI byte hashes, canary-safe Card consistency and complete/incomplete/refusal journeys"
+    },
+    "engine/dope-core/tests/mlc_v4_wire.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v4_wire",
+      "purpose": "complete 2/16/64KiB envelope boundaries and bounded malformed-packet safe errors"
+    },
+    "rust/metrics/golden.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    "rust/metrics/golden/discovery.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    "rust/metrics/golden/discovery_tests.rs": {
+      "command": "cargo test --locked --lib metrics::golden",
+      "purpose": "strict129top+34nested legacy golden replay and seven separate rank cases, IO/symlink/shape refusal; no fixture generation"
+    },
+    ".github/workflows/ci.yml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/runs.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/cpu-native.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/cpu-compat.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "existing compatibility commands plus separate CPU Torch next-version reference/training suite; required nonzero/zero-skip/zero-expected-failure receipts"
+    },
+    "ops/ci/cpu-transfer-paper.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/shard-runtime.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_coverage.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_coverage_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_inventory.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_shell.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/command-map.json": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/source/.github/workflows/ci.yml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/fixtures/ci-sharding/source/ops/ci/cpu.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_summary.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_workflow.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "agent/cost-budget.toml": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/ci/check-budgets.sh": {
+      "command": "bash ops/ci/check-budgets.sh",
+      "purpose": "native exact named finite workflow quotas, manual GPU, neural600s/16GiB/fitness128x32 and bounded complete source closure"
+    },
+    "ops/merge_guard/ci_shard_budget.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_budget_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "ops/merge_guard/ci_shard_budget_toml.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard",
+      "purpose": "native CI command/receipt/framework-count/portable-gate and strict cost-policy source fixtures; actual worker execution and qualification require ordinary current-head CI"
+    },
+    "engine/dope-sdk/src/checked.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test legacy_surface_parity",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-sdk/tests/legacy_surface_parity.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test legacy_surface_parity",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-core/tests/landmark_high_matrix.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test landmark_high_matrix",
+      "purpose": "synthetic nonzero native SDK/core preparation/conditioning/actual-forward and High execution matrix; actual runtime required before criterion qualification"
+    },
+    "engine/dope-cli/tests/nc1_refusal_privacy.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test nc1_refusal_privacy",
+      "purpose": "native actualCLI FIT privatepresence/publicredaction and4parser/schema/role refusals/no-partial-output; D05-S4 remainsNOT_RUN until executed"
+    },
+    "engine/dope-sdk/tests/safe_errors.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-sdk --test safe_errors",
+      "purpose": "actualSDK malformedweight/schemafixedvariant/message/canaryrefusals;D03-S3remainsNOTRUNuntilnewnativeexecution"
+    },
+    "engine/dope-core/tests/dvs.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
+      "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
+    },
+    "schemas/dope-dvs-receipt-v1.schema.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_identity_binding",
+      "purpose": "actual evaluator required-driver-policy receipt and closed historical-optional schema shape assertions; no inference/custody certification; new runtime NOT_RUN"
+    },
+    "engine/dope-core/tests/dvs_identity_binding.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_identity_binding",
+      "purpose": "Actual evaluator four declared C02 identity hashes including per-cell perturbation, common policy/pin scope, malformed/missing/wrong-bound/failed/no-driver privacy refusal; runtime and schema-engine NOT_RUN, no custody attestation."
+    },
+    "ops/merge_guard/native_process.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_io.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_tree.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_supervisor.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Actual per-command wait4/owned process-tree cleanup, prior high-water isolation, environment/affinity/nice/limits, capture8MiB/32MiB boundaries and failure/privacy fixtures. New runtime NOT_RUN; ignored Rust fixtures are explicit subprocess entrypoints, not independent passing tests."
+    },
+    "ops/merge_guard/native_process_correction_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
+      "purpose": "Real owned capture-name/root-directory rename/replacement refusal, persistent observer-error wait4 reaping of known child and valid120001ms quick-exit reservation. Authored NOT_RUN; no guards weakened and no payload entrypoint counted as qualification."
+    }
   },
   "workspace": "dope"
 }

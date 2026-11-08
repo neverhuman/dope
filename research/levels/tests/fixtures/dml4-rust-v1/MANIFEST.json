@@ -1,0 +1,55 @@
+{
+  "schema": "dope.reference-fixtures/v1",
+  "kind": "dml4",
+  "scope": "public synthetic correctness fixtures, no quality or privacy claim",
+  "producer": {
+    "base_head": "0bfdff6417b876fc044856db7fd15ed3b7cec01c",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "rust_source_files": {
+      "engine/dope-norm/Cargo.toml": "1f71304cc25d01e3a543e36799c9c43ec8d246571a3d20a170a45fda1c528503",
+      "engine/dope-norm/src/card.rs": "7b78d13c27bfec1377f5cbd2dd9d5b3be6c8fe058d5c3f64e50013e2a5a295e7",
+      "engine/dope-norm/src/apply.rs": "2beefd67a883509b90f86551e17b5c017f9afcc4e51377658d974869d8973a98",
+      "engine/dope-norm/src/public_schema.rs": "4b9388aa90247d88d5b58a0e87446d586a5708aef081da81907554f573ebd381",
+      "engine/dope-norm/src/lib.rs": "40a2ba0439c8fef1fd81e35f77d7304a273ee93331e1cf7e34aed10a352b12b0",
+      "engine/dope-norm/src/fit.rs": "9d3de463fc68464549e696007ad7127c9e6c39c36836100eb3a53f5f3cde2842",
+      "engine/dope-core/src/mlc_v4/sample.rs": "a3216265bb9cebb7550835cf804cabcf07b2b46e2e0d202425ffe54aac2f7089",
+      "engine/dope-core/src/mlc_v4/basis.rs": "d4e1f165decfe59e979b3b23e1dc0bea599704c9cd460cbacfc5f77339110a45",
+      "engine/dope-core/src/mlc_v4/mod.rs": "283fb9fb743b533c1180270e8ae7d9e55b6b6fea40832ff6fa9de479668947af",
+      "engine/dope-core/src/mlc_v4/rd_pack.rs": "8a90f20d45e4552b980ffe9032b2363635cfc3af75255d510e34726ac1ac46ab",
+      "engine/dope-core/src/mlc_v4/basis_registry.json": "a720f489df093f0a3a528409bb0fd2548c87a3f21f33430503dfc521f680c455",
+      "engine/dope-core/src/mlc_v4/wire.rs": "23e5bf771366e126542e51c83790c87f923324c74b4258b0be385f8100f84d90",
+      "engine/dope-core/examples/dml4_conformance_export.rs": "8addc485d3c859aa134eabf34a266d001d016c5113599d6f321d6893dce2dc12"
+    },
+    "source_snapshot_sha256": "64510c520d464c6f3ce89c8fd7ed416d27043f9207f99327185611342207c497",
+    "command": "cargo run --example dml4_conformance_export -- --out NEW_DIRECTORY",
+    "execution": "actual source-bound lightweight Rust harness; no model/source data/Candle/GPU",
+    "dependency_lock_sha256": "1cd54ab1dc4e8c7103dde649c0166e35d0f8c622f6cfb919217f41a6eb11c25b",
+    "generator_binary_sha256": "c1c4450eaf6a3730b497bfac3b88d584f831824b3b5bc8eaceee6b2e2a899575"
+  },
+  "files": {
+    "grouped-classification/input.json": "2af1956d34b2a09a9c71490335c76de71d8b68a294ab65c011ebecfa556291ad",
+    "grouped-classification/packet.dml4": "663a2fee58943e3195dfefe50b543703ab4c6d990ea4c42c07dfcbd4387827d3",
+    "grouped-classification/packet.json": "3bd5312d3e47ac74777ebd4810003b22319c15e02785ba7f21e144bd3954309a",
+    "grouped-classification/samples.json": "d687bd2a928302b44faa70636b6b82920b243cbc392b0ab06b58baef0115e2cc",
+    "input.json": "f0d4158b5b5c6a5440f03b3531fd04e6becebb36882d7529e914f6b024d1fa63",
+    "packet.dml4": "4c6181481763800e4f784fb5584fa7c1d3e7c24ae0c3b6c56c015e39c8cf7ea7",
+    "packet.json": "7c30e1203b0d1e75a00be12ac11aa203c2c41ce46d192e34e1bb5b3273108c3b",
+    "samples.json": "3eeccad2121d22c36de0f388a7e949b6af876030d67cb660f735db5360cd9fff"
+  },
+  "cases": [
+    {
+      "id": "regression",
+      "packet": "packet.dml4",
+      "json": "packet.json",
+      "samples": "samples.json",
+      "input": "input.json"
+    },
+    {
+      "id": "grouped-classification",
+      "packet": "grouped-classification/packet.dml4",
+      "json": "grouped-classification/packet.json",
+      "samples": "grouped-classification/samples.json",
+      "input": "grouped-classification/input.json"
+    }
+  ]
+}

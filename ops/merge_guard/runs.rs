@@ -7,7 +7,15 @@ pub const LEGACY_CI_JOBS: &[&str] = &["cpu", "paper-clean", "security"];
 pub const WORKFLOWS: [(&str, &[&str]); 2] = [
     (
         ".github/workflows/ci.yml",
-        &["cpu", "paper-clean", "security"],
+        &[
+            "cpu",
+            "cpu-native",
+            "cpu-compat",
+            "cpu-transfer-paper",
+            "ci-shard-portable-arm64",
+            "paper-clean",
+            "security",
+        ],
     ),
     (".github/workflows/jankurai.yml", &["jankurai-audit"]),
 ];

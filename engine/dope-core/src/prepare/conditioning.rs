@@ -35,12 +35,12 @@ pub const COL_LANDMARK_DIM: usize = 17;
 /// `f32::MAX` widened to `f64`, matching Python `F32_MAX`.
 pub const F32_MAX_F64: f64 = 3.4028234663852886e38;
 
-/// `descriptors.MACRO_INDICES` (0-based slots).
-pub const MACRO_INDICES: [usize; 9] = [0, 1, 2, 3, 4, 5, 13, 14, 21];
-/// `descriptors.LARGER_ADDED_INDICES` (0-based slots).
-pub const LARGER_ADDED_INDICES: [usize; 9] = [6, 7, 8, 9, 10, 11, 12, 15, 16];
 /// `descriptors.FINE_ADDED_INDICES` (0-based slots).
-pub const FINE_ADDED_INDICES: [usize; 5] = [17, 18, 19, 20, 22];
+pub use crate::landmark::bundle::FINE_SLOTS as FINE_ADDED_INDICES;
+/// `descriptors.LARGER_ADDED_INDICES` (0-based slots).
+pub use crate::landmark::bundle::LARGER_SLOTS as LARGER_ADDED_INDICES;
+/// `descriptors.MACRO_INDICES` (0-based slots).
+pub use crate::landmark::bundle::MACRO_SLOTS as MACRO_INDICES;
 
 pub(crate) fn bad(msg: impl Into<String>) -> DopeError {
     DopeError::Input(msg.into())

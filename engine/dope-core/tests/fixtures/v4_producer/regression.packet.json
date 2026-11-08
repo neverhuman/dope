@@ -1,0 +1,93 @@
+{
+  "contract": "dope.dml4-reference/v1",
+  "level": "16k",
+  "schema": {
+    "schema": "dope.nc1-public/v1",
+    "recipe": "nc1-minmax-onehot-v1",
+    "columns": 2,
+    "groups": [
+      {
+        "id": 0,
+        "kind": "numeric",
+        "start": 0,
+        "width": 1,
+        "has_missing": false
+      },
+      {
+        "id": 1,
+        "kind": "numeric",
+        "start": 1,
+        "width": 1,
+        "has_missing": false
+      }
+    ],
+    "target": "regression",
+    "classes": 0
+  },
+  "schema_sha256": "21005d90c1c28e26cb46856bd88a13fbb08f0d3d3f0929e74b640c8cc15eabe3",
+  "identity": {
+    "weights_sha256": "9e77f66e35a13c765df9dfcbdb4d531eac88d27003f660701bda026738c1ac18",
+    "encoder_recipe_sha256": "dceff64cd9e2d4b683273bb4d535f03f90daf9bfaf9cb967cfae8ca07d4e8387",
+    "conditioning_sha256": "5ab63c6ce6cece63d0bc39bd6638cd40f499dcc497b4e5d3253c4e7b71db2957",
+    "fit_scope_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "gates": {
+    "linear": 2.0585626687333614,
+    "asinh": 2.0255809358460324,
+    "periodic": 1.9636329701202715,
+    "hinge": 1.9968267669727329,
+    "pair": 2.016479239644268,
+    "row_mean": 1.994089052401696
+  },
+  "groups": [
+    {
+      "kind": "numeric",
+      "knots": [
+        0.01994637752975919,
+        0.13967049664943737,
+        0.25947327847650287,
+        0.37935480056243437,
+        0.49931514056068593,
+        0.6193543762268534,
+        0.7394725854188436,
+        0.859669846097042,
+        0.9799462363244813
+      ],
+      "missing_probability": 0.0,
+      "imputation": 0.47913043478260864
+    },
+    {
+      "kind": "numeric",
+      "knots": [
+        0.025930018200232,
+        0.11222402006220933,
+        0.19855929693461954,
+        0.28493587843772555,
+        0.3763503137761252,
+        0.5190592710559877,
+        0.6428649577558967,
+        0.8048156925981815,
+        0.9097731185763234
+      ],
+      "missing_probability": 0.0,
+      "imputation": 0.33399999999999996
+    }
+  ],
+  "target": {
+    "task": "regression",
+    "intercept": 0.22078954601828849,
+    "coefficients": [
+      0.08260638081167927,
+      -0.010867900069485388,
+      0.0672529141294104,
+      -0.016050596091066294,
+      -0.00026612863910295635,
+      0.05440940129146574,
+      0.023141772073517163,
+      -0.007065185748195799,
+      -0.009133959951155879,
+      0.036900903348983376
+    ],
+    "noise_scale": 0.0737716413217705
+  }
+}

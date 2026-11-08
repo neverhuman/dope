@@ -12,11 +12,15 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod args;
+mod dvs;
 mod landmarks;
 mod learned;
 mod levels;
 mod mlc_v3;
+mod mlc_v4;
+mod normalize;
 mod runtime;
+mod safe_io;
 mod style;
 mod tiers;
 use args::*;
@@ -66,6 +70,9 @@ fn run(cli: Cli) -> Result<(), String> {
         )
     };
     match cli.command {
+        Command::Normalize(a) => normalize::run(a)?,
+        Command::TransferReport(a) => dvs::run(a)?,
+        Command::MlcV4(a) => mlc_v4::run(a)?,
         Command::Landmarks(a) => landmarks::run(a)?,
         Command::Learned(a) => learned::run(a)?,
         Command::MlcV3(a) => mlc_v3::run(a, style)?,

@@ -15,10 +15,14 @@ setup:
 
 native-guard-check:
     bash ops/ci/prepare-merge-guard.sh
+    cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root .
     cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
-    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof -- -D warnings
-    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin dope-merge-guard --bin audit-proof --bin check-frozen-evidence --bin ci-shard
 
+    cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1
 fast: native-guard-check
     bash ops/ci/test-cpu-tool-readiness.sh
     sha256sum --check --status scripts/native-legal.sha256
@@ -52,6 +56,10 @@ fast-audit:
 # The DOPE engine: fmt, clippy -D warnings, tests (CPU).
 engine:
     bash ops/ci/engine.sh
+
+# Complete local correctness gate. Hosted CPU already runs the engine separately.
+# Kept explicit so routine kernel focus work does not accidentally rebuild every product.
+check-all: check engine
 
 # Stage and smoke-test the optimized Rust-only CPU CLI; signing runs only for admitted tags.
 engine-release:
@@ -89,8 +97,7 @@ score:
     bash ops/ci/audit.sh run
 
 golden-parity:
-    python3 -B -m research.transfer.tdl.golden --check
-    cargo test --locked --lib metrics::golden
+    just focus metrics::golden
 
 paper-tdl:
     bash paper/build.sh

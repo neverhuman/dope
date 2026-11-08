@@ -1,0 +1,524 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "dope.nc1-private/v1"
+    },
+    "recipe": {
+      "const": "nc1-minmax-onehot-v1"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "fit_scope_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "transform_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_level_count": {
+          "const": 1
+        },
+        "max_levels": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        }
+      },
+      "required": [
+        "min_level_count",
+        "max_levels"
+      ]
+    },
+    "declared": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "column": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kind": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "continuous"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "integer"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "boolean"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "nominal"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "ordinal"
+                      },
+                      "levels": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "maxItems": 4096,
+                        "minItems": 2
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "levels"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "column",
+              "kind"
+            ]
+          },
+          "maxItems": 256,
+          "minItems": 1
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "task": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "task": {
+                      "const": "regression"
+                    }
+                  },
+                  "required": [
+                    "task"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "task": {
+                      "const": "binary"
+                    },
+                    "positive_label": {
+                      "type": "string",
+                      "maxLength": 65536
+                    }
+                  },
+                  "required": [
+                    "task",
+                    "positive_label"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "task": {
+                      "const": "multiclass"
+                    },
+                    "labels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 65536
+                      },
+                      "maxItems": 256,
+                      "minItems": 2
+                    }
+                  },
+                  "required": [
+                    "task",
+                    "labels"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "column",
+            "task"
+          ]
+        }
+      },
+      "required": [
+        "features",
+        "target"
+      ]
+    },
+    "names": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 65536
+      },
+      "maxItems": 4096,
+      "minItems": 1
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "column": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 65536
+          },
+          "has_missing": {
+            "type": "boolean"
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "state": {
+                    "const": "numeric"
+                  },
+                  "numeric": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "lo": {
+                        "type": "number"
+                      },
+                      "hi": {
+                        "type": "number"
+                      },
+                      "median": {
+                        "type": "number"
+                      },
+                      "all_missing": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "lo",
+                      "hi",
+                      "median",
+                      "all_missing"
+                    ]
+                  }
+                },
+                "required": [
+                  "state",
+                  "numeric"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "state": {
+                    "const": "boolean"
+                  }
+                },
+                "required": [
+                  "state"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "state": {
+                    "const": "ordinal"
+                  },
+                  "levels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    "maxItems": 4096,
+                    "minItems": 2
+                  },
+                  "median": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "state",
+                  "levels",
+                  "median"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "state": {
+                    "const": "nominal"
+                  },
+                  "levels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    "maxItems": 255,
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "state",
+                  "levels"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "column",
+          "name",
+          "has_missing",
+          "state"
+        ]
+      },
+      "maxItems": 256,
+      "minItems": 1
+    },
+    "target": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "regression"
+            },
+            "numeric": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "lo": {
+                  "type": "number"
+                },
+                "hi": {
+                  "type": "number"
+                },
+                "median": {
+                  "type": "number"
+                },
+                "all_missing": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "lo",
+                "hi",
+                "median",
+                "all_missing"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "numeric"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "classification"
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 65536
+              },
+              "maxItems": 256,
+              "minItems": 2
+            }
+          },
+          "required": [
+            "state",
+            "labels"
+          ]
+        }
+      ]
+    },
+    "fit_class_counts": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "maxItems": 256,
+      "minItems": 0
+    },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "dope.nc1-public/v1"
+        },
+        "recipe": {
+          "const": "nc1-minmax-onehot-v1"
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "kind": {
+                "enum": [
+                  "numeric",
+                  "integer",
+                  "boolean",
+                  "ordinal",
+                  "nominal"
+                ]
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 256
+              },
+              "has_missing": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "start",
+              "width",
+              "has_missing"
+            ]
+          },
+          "maxItems": 256,
+          "minItems": 1
+        },
+        "target": {
+          "enum": [
+            "regression",
+            "binary",
+            "multiclass"
+          ]
+        },
+        "classes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        }
+      },
+      "required": [
+        "schema",
+        "recipe",
+        "columns",
+        "groups",
+        "target",
+        "classes"
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "dope-nc1-public-schema-v1",
+      "description": "Structural projection only; no source headers, vocabulary, extrema, or real rows."
+    }
+  },
+  "required": [
+    "schema",
+    "recipe",
+    "source_sha256",
+    "fit_scope_sha256",
+    "transform_sha256",
+    "options",
+    "declared",
+    "names",
+    "features",
+    "target",
+    "fit_class_counts",
+    "public"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dope-nc1-private-card-v1",
+  "description": "Owner-private fitted state. Never include this object in a public artifact."
+}

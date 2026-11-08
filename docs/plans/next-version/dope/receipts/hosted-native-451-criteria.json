@@ -1,0 +1,156 @@
+{
+  "schema": "dope.scoped-native-criterion-acceptance/v1",
+  "decision": "ACCEPT_SIX_SCOPED_PROMOTIONS",
+  "reviewer": "/root/dope_audit",
+  "recorded_at": "2026-11-03T14:41:28.024162+00:00",
+  "source_pin": {
+    "pr_head": "451ad47423a98db9de104269174dfe26eebf5e9f",
+    "tested_commit": "2b50c78d5ed47bcb02449ec970ab3be44dfa1889",
+    "tested_tree": "c2f59ae4165fad5234b2c8621b8974f2342c0ba9",
+    "pr_head_tree": "c2f59ae4165fad5234b2c8621b8974f2342c0ba9",
+    "tree_match": true,
+    "run_id": 41645948435,
+    "job_id": 125951185831,
+    "hosted_test_outcome": {
+      "passed": 252,
+      "failed": 0,
+      "ignored": 1
+    },
+    "overall_job_outcome": "failure",
+    "final_blocker": "engine_upstream_license_file_missing: dope-norm",
+    "separate_release_job": "skipped"
+  },
+  "source_url": "https://github.com/neverhuman/dope/commit/451ad47423a98db9de104269174dfe26eebf5e9f",
+  "job_url": "https://github.com/neverhuman/dope/actions/runs/41645948435/job/125951185831",
+  "proposal_sha256": "0d2979a739ac6eb3cdfb6924ed5916e5b1490235af8dee60e7589cd4b38b20a9",
+  "criterion_clauses": {
+    "D03-S1": "SDK builds/tests on CPU with no Python or JopeDime dependency.",
+    "D04-S3": "Spectrum admitted cells/budget decisions match full-reservation baseline; missing FINE cells are not fabricated.",
+    "D05-S1": "TEST/TUNE extrema, labels, categories and ordering mutations cannot alter FIT card/schema bytes.",
+    "D05-S3": "Constants/missing/unseen/reserved tokens/finite extremes/high cardinality behave deterministically or refuse safely; no silent truncation.",
+    "D07-S1": "Every active gate has one authoritative fitted/encoded/decoded definition, tested with nondefault values.",
+    "D07-S5": "Sampling works without source/encoder/private card and preserves one-hot exclusivity/missing semantics."
+  },
+  "accepted": [
+    {
+      "id": "D03-S1",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "Exact tree 451ad47423a98db9de104269174dfe26eebf5e9f (tested via synthetic merge with identical tree c2f59ae4165fad5234b2c8621b8974f2342c0ba9).",
+        "Hosted check job completed the Rust workspace test/build sequence on CPU; dope-sdk/tests/surface.rs ran both tests successfully.",
+        "engine/dope-sdk/Cargo.toml at this tree declares only dope-core and dope-norm Rust crate dependencies; no Python or JopeDime dependency. The customer-command smoke also reported success under empty PATH."
+      ],
+      "limit": "This closes only the exact CPU SDK build/test and dependency-isolation criterion. The whole workflow still failed later at the license collector."
+    },
+    {
+      "id": "D04-S3",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "dope-core/tests/landmark_high_required.rs::tight_spectrum_boundaries_reserve_unused_full_panel_cost passed; assertions compare full and High spectrum admission and work at below/at/above budget boundaries.",
+        "dope-core/tests/landmark_high_required.rs::high_omits_fine_marks_readiness_and_preserves_conditioning passed; it checks omitted FINE cells remain NotRequested/unmasked and compares conditioning against the full baseline."
+      ],
+      "limit": "Criterion-specific synthetic fixture evidence only; does not close D04 as a task."
+    },
+    {
+      "id": "D05-S1",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "dope-norm/tests/contract.rs::fit_only_query_poisoning_and_canonical_rows passed and compares serialized FIT card bytes after mutating non-FIT numeric feature values, categorical values, and target values.",
+        "dope-norm/tests/contract.rs::fit_table_physical_presentation_order_does_not_change_card passed and compares serialized card bytes under reversed presentation order."
+      ],
+      "limit": "These fixtures exercise the criterion's fit-only poisoning and ordering invariance. They do not imply any private-data or scientific campaign result."
+    },
+    {
+      "id": "D05-S3",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "dope-norm/tests/contract.rs passed tests for constant/all-missing channels, reserved nominal tokens and unseen levels, full f64/tiny numeric spans, and the expansion cap.",
+        "Relevant passing names: constants_and_all_missing_keep_zero_channels_and_indicator; nominal_reserved_strings_are_ordinary_distinct_levels; full_f64_span_and_tiny_span_do_not_overflow; expansion_cap_refuses_instead_of_truncation; strict_fit_vocabulary_never_pools_or_silently_truncates; explicit_boolean_ordinal_and_integer_semantics."
+      ],
+      "limit": "This is the complete declared deterministic-or-refuse fixture set for the D05-S3 contract at this tree; no broader application behavior is inferred."
+    },
+    {
+      "id": "D07-S1",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "dope-core/tests/mlc_v4_sampling.rs::each_active_gate_changes_its_declared_basis_coordinate passed for the six registered active gates with nondefault values.",
+        "dope-core/tests/mlc_v4_wire.rs::fitted_and_decoded_nondefault_gates_match_independent_math passed, checking independent expected feature values for encoded and decoded gates."
+      ],
+      "limit": "Only the D07-S1 gate/basis criterion is covered; this does not imply D07 wire caps, cross-language parity, or compatibility criteria are all met."
+    },
+    {
+      "id": "D07-S5",
+      "baseline_verdict": "NOT_RUN",
+      "proposed_verdict": "PASS",
+      "evidence": [
+        "dope-core/tests/mlc_v4_sampling.rs::source_free_replay_and_group_validity passed using only the serialized packet, then checks deterministic replay and one-hot group validity.",
+        "dope-core/tests/mlc_v4_sampling.rs::fixed_draws_apply_missing_onehot_and_target_exactly passed with explicit expected sampled features and targets."
+      ],
+      "limit": "This demonstrates the sampler criterion on the bounded packet fixture; it does not certify every CLI or absent-card user journey."
+    }
+  ],
+  "source_assertions_reviewed": [
+    {
+      "path": "engine/dope-sdk/Cargo.toml",
+      "sha256": "7c04d96b93b914e2fe7c6ca84aa1ad98545d2ebcd948613d86c7087d0e6d63a1",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-sdk/tests/surface.rs",
+      "sha256": "bd114db03e707dd1170f486ee7c98894507213bc19a589c45a725934e7bd4256",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-core/tests/landmark_high_required.rs",
+      "sha256": "0b4a29a3749ebd3cd1f9202a7b1388e9da66fe580dd9120fc615497e741d94ce",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-norm/tests/contract.rs",
+      "sha256": "0e8c048dce8b6c5b870fafabf00dfcfe8e0befec99827dab13d272f409a9723e",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-norm/src/card.rs",
+      "sha256": "7b78d13c27bfec1377f5cbd2dd9d5b3be6c8fe058d5c3f64e50013e2a5a295e7",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-core/tests/mlc_v4_sampling.rs",
+      "sha256": "c98f16eb587c627cf833da78fb8d9cb2f75273b3f4f02ab4c29af52ce3a50fe7",
+      "matches_tested_pr_head": true
+    },
+    {
+      "path": "engine/dope-core/tests/mlc_v4_wire.rs",
+      "sha256": "bd3517a7f56d1d8af5b6e15b37a0483685b5b2dd634667f991fff21f3a63c591",
+      "matches_tested_pr_head": true
+    }
+  ],
+  "counts_before": {
+    "PASS": 30,
+    "NOT_RUN": 31,
+    "BLOCKED": 4
+  },
+  "counts_after": {
+    "PASS": 36,
+    "NOT_RUN": 25,
+    "BLOCKED": 4
+  },
+  "fully_scoped_pass_tasks": [
+    "D01",
+    "D08",
+    "D10"
+  ],
+  "tasks_still_open": 9,
+  "limits": [
+    "Hosted synthetic merge commit identity differs from PR head; tree equality is explicit.",
+    "The job failed after passing tests at license collection; release job was skipped.",
+    "No whole-task, full-CI, scientific, performance, privacy or release qualification is promoted.",
+    "All other criterion verdicts remain unchanged."
+  ]
+}

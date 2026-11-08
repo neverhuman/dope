@@ -1,0 +1,84 @@
+{
+  "schema": "dope-jope.next-version-decisions/v1",
+  "status": "engineering_contract_frozen_science_unqualified",
+  "delivery": {
+    "dope": "single consolidated implementation PR",
+    "jopedime": "existing PR 2071 / v1/fastlane",
+    "full_ci": "after feature integration; focused checks incremental",
+    "merge_release_serving": "not authorized by this batch"
+  },
+  "identities": {
+    "engine_source": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+    "legacy_consumer_engine_source": "15e12aa3dc33851655580f6aa7c9c66353143f23",
+    "sdk_contract": "dope-sdk/v0",
+    "standalone_model_sha256": "d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c",
+    "jopedime_fused_composite_sha256": "c51a56d031a4af40cb2b2661e6230109db684fc5cf80743dcad5c2fc770ba814",
+    "normalization_recipe": "nc1-minmax-onehot-v1",
+    "prospective_evaluation": "dope-dvs-v1",
+    "rank_semantics": "driver-rank-informative-v1",
+    "legacy_preparation": "unchanged released MLC-v3 preparation",
+    "landmark_panel": "landmarks-native-v1",
+    "legacy_packet": "DML3/CSC1 unchanged",
+    "successor_packet": "DML4 independent hard-capped packets",
+    "confirmation_cohort_sha256": null
+  },
+  "lanes": {
+    "A": {
+      "model": "released-v3",
+      "preparation": "legacy unchanged",
+      "allowed_use": "existing encoding/retrieval bridge",
+      "nc1_compliant": false
+    },
+    "B": {
+      "model": "v4 unqualified",
+      "preparation": "NC1",
+      "allowed_use": "additive engineering and admitted future qualification",
+      "serving_adopted": false
+    },
+    "shim": "No automatic legacy-to-NC1 reinterpretation; per-input equality proof and explicit unsupported refusal required"
+  },
+  "normalization": {
+    "crate": "dope-norm",
+    "fit_scope": "declared physical FIT row ids only, canonical sorted reductions",
+    "numeric": "min-max, unclipped apply, constant zero channel retained",
+    "missing": "FIT-derived numeric missing indicator; all-missing zero plus indicator",
+    "nominal": "grouped one-hot; always other, missing channel if FIT missing; no target encoding",
+    "kinds_target": "explicit declaration; no positional or cardinality task inference",
+    "class_order": "declared multiclass labels; binary positive label explicit; no minority inversion",
+    "matrix_dtype": "f64; no raw-f64 ULP promise through f32",
+    "max_expanded_columns": 256,
+    "private": [
+      "ScaleCard names/vocabulary/extrema",
+      "real normalized matrix and row identity payload"
+    ],
+    "public": "structural kind/group/shape metadata only; safe fixed diagnostics"
+  },
+  "metrics": {
+    "history": "v1/v2 dispatch, fixtures, C02 simultaneous full_family_max_t bounds and aligned identity pins preserved",
+    "s_select": "select using synthetic validation only; real test assesses choice/regret",
+    "s_transfer": "compare synthetic-trained and real-trained learner ranking on common real test",
+    "uninformative_rank": "typed ineligible/null; never perfect agreement or implicit zero",
+    "privacy": "empirical diagnostics only; byte counts are not formal memorization or privacy bounds"
+  },
+  "levels": {
+    "caps_bytes": {
+      "2k": 2048,
+      "16k": 16384,
+      "64k": 65536
+    },
+    "4k_compatibility": "retained until separately qualified retirement",
+    "prefix_nesting": "deferred experiment"
+  },
+  "scientific_parameters": {
+    "parsimony_epsilon": null,
+    "macro_subsample_n": null,
+    "synthetic_count_policy": null,
+    "reason": "choose on development and freeze in a separately admitted qualification manifest before outcomes"
+  },
+  "exposure": {
+    "historical_panels": "selection-exposed unless provenance proves otherwise",
+    "confirmation": "unassigned; cannot be made sealed by renaming",
+    "physical_family_roles": "FIT/TUNE/TEST membership and source-to-view identity retained",
+    "h228": "occupied; no overwrite or retry"
+  }
+}

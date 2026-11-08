@@ -1,5 +1,12 @@
 version = 1
+# Historical heavy-CPU upper bound retained for policy compatibility.
 cpu_pr_minutes = 120
+# Explicit finite roles in the adopted parallel CPU graph (380 job-minutes).
+cpu_native_minutes = 90
+cpu_compat_minutes = 120
+cpu_transfer_paper_minutes = 120
+cpu_arm_portable_minutes = 30
+cpu_aggregate_minutes = 20
 paper_clean_minutes = 60
 security_minutes = 60
 audit_minutes = 60

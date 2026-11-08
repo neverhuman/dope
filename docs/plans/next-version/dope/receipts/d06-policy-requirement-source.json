@@ -1,0 +1,36 @@
+{
+  "schema": "Strictlyadditive optionalhistoricalproperty; newissuance always includes requirement. Fullschemaengine NOT_RUN; staticJSONparse only.",
+  "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+  "source_commit": "5cb20de52868b11cf71d544e62579271bd06b35a",
+  "base": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+  "frozen_patch_sha256": "129f60ad1f8867c1d0bf0b85e5a34108909f1aba2e2c6571c82c0c2c5a4f3490",
+  "scope": "Exact4R2files; typed requiredpolicy only, not verifiedinference/custody/per-cellprovenance; oldnumericaldrivers/legacy/deps/locks/CLI unchanged",
+  "requirement": {
+    "state": "required_for_complete_driver_evidence",
+    "driver_protocol": "driver-rank-informative-v1",
+    "bound_method": "full_family_max_t",
+    "pins": "Validatedexisting5DataPins copied; complete identity coverage remains acceptance review"
+  },
+  "new_native_tests": "NOT_RUN",
+  "D06_S4": "NOT_RUN even if newtest laterpasses until full identity/multiplicitycoverage reviewed",
+  "promotions": {
+    "D03_S3": "Actualbdeasafeerror/nativefixture accepted with unchangedrelevant sources",
+    "D05_S2": "Actualbdea target-role/rowID/SDKtargetlast conversions accepted with unchangedrelevant sources"
+  },
+  "counts": {
+    "PASS": 54,
+    "NOT_RUN": 7,
+    "historical_BLOCKED": 4
+  },
+  "checks": {
+    "Rust1_88_fmt": "PASSexactR2files",
+    "JSON": "parsePASS",
+    "preimages": "all4MATCH",
+    "candidate": "all4MATCH",
+    "native_compiler_tests": 0,
+    "Python_tests": 0,
+    "schema_engine": "NOT_RUN",
+    "current_full_CI": "PENDING_NEW_PUSH"
+  },
+  "remaining": "6engineeringtasks/7Ruststreams/currentrequiredCI,4campaigncriteria deferredneverPASS; no efficacy/release claim"
+}

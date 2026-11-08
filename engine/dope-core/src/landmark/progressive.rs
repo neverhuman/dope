@@ -7,7 +7,9 @@
 //! computed it is byte-identical to `signature()` on the same (subsampled)
 //! frame and options: the full-panel plan decides over-budget cells exactly as
 //! the full path does, and the feature spectrum is computed when the panel
-//! completes (intermediate reports carry no spectrum).
+//! completes (intermediate reports carry no spectrum). The explicit
+//! HighRequiredV1 plan may finish High dependencies earlier, reserving the same
+//! full-panel work for spectrum admission. Legacy constructors remain FullPanelV1.
 
 use super::{
     bundle::{RowSelection, REPORT_RECIPE_OBSERVED},
@@ -18,6 +20,48 @@ use super::{
 };
 use crate::Result;
 use rayon::prelude::*;
+use serde::Serialize;
+
+/// Execution requirements only; this does not change the landmark recipe math.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ExecutionPlan {
+    /// Legacy all-23-cell execution, used by every existing constructor.
+    #[default]
+    FullPanelV1,
+    /// MACRO+LARGER only, retaining full-panel spectrum budget reservation.
+    HighRequiredV1,
+}
+impl ExecutionPlan {
+    /// Explicit identity for receipts/caches; not a replacement panel identity.
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::FullPanelV1 => "dope.landmark-execution/full-panel-v1",
+            Self::HighRequiredV1 => "dope.landmark-execution/high-required-v1",
+        }
+    }
+    /// Requested dependency slots. Omitted cells remain NotRequested.
+    pub fn required_mask(self) -> [bool; 23] {
+        let mut mask = [true; 23];
+        if self == Self::HighRequiredV1 {
+            for slot in super::panel::FINE_SLOTS {
+                mask[slot] = false;
+            }
+        }
+        mask
+    }
+}
+
+/// Source-free accounting separating conservative reservation from actual work.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ExecutionWork {
+    pub execution_plan: &'static str,
+    pub reserved_panel_units: u64,
+    pub computed_cell_units: u64,
+    pub spectrum_units: u64,
+    pub computed_cells: usize,
+    pub spectrum_cells: usize,
+}
 
 pub struct ProgressiveLandmarks {
     frame: LandmarkFrame,
@@ -32,6 +76,9 @@ pub struct ProgressiveLandmarks {
     small: Option<Vec<Fold>>,
     computed: [bool; 23],
     spectrum_computed: bool,
+    execution_plan: ExecutionPlan,
+    spectrum_units: u64,
+    spectrum_cells: usize,
     report: Signature,
     bundle: LandmarkBundle,
 }
@@ -72,6 +119,29 @@ impl ProgressiveLandmarks {
         frame: &LandmarkFrame,
         opts: &LandmarkOptions,
         scope: LandmarkScope,
+    ) -> Result<Self> {
+        Self::new_with_scope_and_plan(frame, opts, scope, ExecutionPlan::FullPanelV1)
+    }
+
+    /// Opt in to a dependency plan. Legacy constructors never choose this for callers.
+    pub fn new_with_plan(
+        frame: &LandmarkFrame,
+        opts: &LandmarkOptions,
+        subsample: Option<SubsampleSpec>,
+        execution_plan: ExecutionPlan,
+    ) -> Result<Self> {
+        opts.validate()?;
+        frame.validate()?;
+        let scope = LandmarkScope::for_frame(frame, opts, subsample);
+        Self::new_with_scope_and_plan(frame, opts, scope, execution_plan)
+    }
+
+    /// Bind an explicit source-row scope and execution plan separately.
+    pub fn new_with_scope_and_plan(
+        frame: &LandmarkFrame,
+        opts: &LandmarkOptions,
+        scope: LandmarkScope,
+        execution_plan: ExecutionPlan,
     ) -> Result<Self> {
         opts.validate()?;
         frame.validate()?;
@@ -118,6 +188,9 @@ impl ProgressiveLandmarks {
             small: None,
             computed: [false; 23],
             spectrum_computed: false,
+            execution_plan,
+            spectrum_units: 0,
+            spectrum_cells: 0,
             report,
             bundle: LandmarkBundle::zero(),
         })
@@ -132,8 +205,9 @@ impl ProgressiveLandmarks {
     /// Compute arbitrary landmark ids (1..=23), reusing everything cached.
     pub fn run_ids(&mut self, ids: &[u8]) -> Result<(LandmarkBundle, &Signature)> {
         let requested = signature::requested_mask(Some(ids))?;
+        let required = self.execution_plan.required_mask();
         let pending: Vec<usize> = (0..23)
-            .filter(|&i| requested[i] && !self.computed[i])
+            .filter(|&i| requested[i] && required[i] && !self.computed[i])
             .collect();
         if pending.is_empty() {
             return Ok((self.bundle.clone(), &self.report));
@@ -184,7 +258,7 @@ impl ProgressiveLandmarks {
             .filter(|&i| self.computed[i] && self.enabled[i])
             .map(|i| self.costs[i])
             .fold(0u64, u64::saturating_add);
-        let spectrum = if self.is_complete() && !self.spectrum_computed {
+        let spectrum = if self.required_cells_complete() && !self.spectrum_computed {
             if self.ridge.is_none() {
                 self.ridge = Some(signature::ridge_folds(
                     &self.frame,
@@ -192,16 +266,28 @@ impl ProgressiveLandmarks {
                     &self.opts,
                 )?);
             }
-            self.spectrum_computed = true;
-            signature::spectrum(
+            // Admission always starts from the SAME enabled full-panel reservation
+            // as the legacy path, never from cheaper actual High-only work.
+            let mut admission = self.plan.clone();
+            let spectrum = signature::spectrum(
                 &self.frame,
                 &self.opts,
                 self.ridge.as_deref().unwrap_or(&[]),
-                &mut work,
-            )
+                &mut admission,
+            );
+            self.spectrum_computed = true;
+            self.spectrum_units = admission
+                .estimated_units
+                .saturating_sub(self.plan.estimated_units);
+            self.spectrum_cells = admission.spectrum_run;
+            spectrum
         } else {
             std::mem::take(&mut self.report.spectrum)
         };
+        // Report actual evaluated cells plus spectrum work. Reservation remains
+        // separately inspectable, including after an explicit upgrade to Full.
+        work.estimated_units = work.estimated_units.saturating_add(self.spectrum_units);
+        work.spectrum_run = self.spectrum_cells;
         self.report = signature::assemble(&self.frame, &self.opts, cells, spectrum, work);
         let incoming = LandmarkBundle::from_report_with_scope(
             &self.report.private_report(),
@@ -214,6 +300,53 @@ impl ProgressiveLandmarks {
             self.bundle.merge(&incoming)?
         };
         Ok((self.bundle.clone(), &self.report))
+    }
+
+    /// Evaluate all dependencies of the selected plan, in panel order.
+    pub fn run_required(&mut self) -> Result<(LandmarkBundle, &Signature)> {
+        let required = self.execution_plan.required_mask();
+        let ids: Vec<u8> = (0..23)
+            .filter(|&i| required[i])
+            .map(|i| i as u8 + 1)
+            .collect();
+        self.run_ids(&ids)
+    }
+
+    fn required_cells_complete(&self) -> bool {
+        let required = self.execution_plan.required_mask();
+        (0..23).all(|i| !required[i] || self.computed[i])
+    }
+
+    /// True once selected dependencies and spectrum admission have completed.
+    /// High completion does NOT assert that omitted FINE probes were measured.
+    pub fn is_execution_complete(&self) -> bool {
+        self.required_cells_complete() && self.spectrum_computed
+    }
+
+    /// Selected execution identity; callers must record it separately from panel/options.
+    pub fn execution_plan(&self) -> ExecutionPlan {
+        self.execution_plan
+    }
+
+    /// Explicitly admit the missing full-panel cells. No fold or spectrum is rerun.
+    /// Call run_required() or request FINE afterward; legacy full output is recoverable.
+    pub fn upgrade_to_full_panel(&mut self) {
+        self.execution_plan = ExecutionPlan::FullPanelV1;
+    }
+
+    /// Conservative full-panel reservation and actual spent work remain distinct.
+    pub fn execution_work(&self) -> ExecutionWork {
+        ExecutionWork {
+            execution_plan: self.execution_plan.id(),
+            reserved_panel_units: self.plan.estimated_units,
+            computed_cell_units: (0..23)
+                .filter(|&i| self.computed[i] && self.enabled[i])
+                .map(|i| self.costs[i])
+                .fold(0u64, u64::saturating_add),
+            spectrum_units: self.spectrum_units,
+            computed_cells: self.report.work.cells_run,
+            spectrum_cells: self.spectrum_cells,
+        }
     }
 
     /// True once every panel cell has been computed (or ruled over budget).

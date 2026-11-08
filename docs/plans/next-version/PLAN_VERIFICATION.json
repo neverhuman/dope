@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "scope": "Documentation/package verification only; product tests, builds, scientific campaigns, hardware qualification and CI NOT_RUN",
+  "task_count": 22,
+  "success_criterion_count": 104,
+  "markdown_files": 28,
+  "relative_links_checked": 44,
+  "dependency_cycle": false,
+  "inventory_hashes_match": true,
+  "all_tasks_planned": true
+}

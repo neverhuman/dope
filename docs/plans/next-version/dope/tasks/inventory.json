@@ -1,0 +1,733 @@
+{
+  "schema_version": 1,
+  "program": "DOPE next-version engineering plan",
+  "status": "IMPLEMENTATION_IN_PROGRESS",
+  "audited_base": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+  "repository_root": "/home/ubuntu/dope",
+  "planning_worktree": "/home/ubuntu/dope/.agent/worktrees/codex-value-plan-20261102",
+  "branch": "fast/next-version-dope-20261103",
+  "execution_order": [
+    "D00",
+    "D01",
+    "D02",
+    "D10",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09",
+    "D11"
+  ],
+  "authorization_boundary": "User authorizes engineering completion, normal same-PR CI, merge and release after required CI/review. No bypass, scientific campaign or model promotion. Four campaign criteria separately deferred, never PASS.",
+  "shared_integration_owner": "One integrator serializes workspace/lockfiles/module registration/maps/Python boundary inventories; no parallel writes to those files.",
+  "tasks": [
+    {
+      "id": "D00",
+      "title": "Freeze contracts, lineage and exposure decisions",
+      "file": "d00-contracts-lineage-and-decision-record.md",
+      "dependencies": [],
+      "priority": "P0",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D00-S1",
+        "D00-S2",
+        "D00-S3",
+        "D00-S4",
+        "D00-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D00/<full-head>/",
+      "cross_repo_interfaces": [
+        "J00 identity/lineage agreement",
+        "J03 independent study registry/exposure contract"
+      ],
+      "sha256": "d1a3baaab7ac5b6ea562b609a00ed1dca458fb1e4cab69ba5d36f99dec67daa3",
+      "words": 1015,
+      "criterion_verdicts": {
+        "D00-S1": {
+          "verdict": "PASS",
+          "evidence": "Distinct source/model/recipe/FIT/query identities and null confirmation provenance in docs/plans/dope-jope-contract-decisions.json; D00 frozen SHA c371bbc8dc4e2be3b515b9b786745777fa021673ec0888b39477da370f401240."
+        },
+        "D00-S2": {
+          "verdict": "PASS",
+          "evidence": "ADR normalize-once-and-dvs-v1 and decision lanes A/B explicitly reject automatic reinterpretation; legacy-real-fit receiver identity differs from NC1."
+        },
+        "D00-S3": {
+          "verdict": "PASS",
+          "evidence": "Frozen decisions record normalization, schema privacy, hard caps, historic v1/v2, undefined science parameters and one integrator; no numeric campaign threshold invented."
+        },
+        "D00-S4": {
+          "verdict": "BLOCKED",
+          "evidence": "Exposure roles are recorded; no new campaign family roster, source custody/fresh experiment-ID admission is authorized or evidenced. D11 HOLD enforces this."
+        },
+        "D00-S5": {
+          "verdict": "PASS",
+          "evidence": "Integrator and normalization/metric/producer packet INTEGRATION notes acknowledge frozen D00 SHA; later engineering writes use that contract."
+        }
+      },
+      "release_scope_disposition": {
+        "D00-S4": "DEFERRED_CAMPAIGN_QUALIFICATION"
+      }
+    },
+    {
+      "id": "D01",
+      "title": "Repair prospective evaluation coordinate identity",
+      "file": "d01-prospective-evaluation-coordinate-repair.md",
+      "dependencies": [
+        "D00"
+      ],
+      "priority": "P0",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D01-S1",
+        "D01-S2",
+        "D01-S3",
+        "D01-S4",
+        "D01-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D01/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "73953978226c862e3a87029089a8646673583e7ad9f946e9b885ff882b65a349",
+      "words": 1059,
+      "criterion_verdicts": {
+        "D01-S1": {
+          "verdict": "PASS",
+          "evidence": "test_real_fit_map_is_shared_and_synthetic_refit_reproduces_bug demonstrates old mismatch and corrected common map."
+        },
+        "D01-S2": {
+          "verdict": "PASS",
+          "evidence": "Same test and canonical receiver bridge assert shared real-test arrays, common FIT identity and protocol-tagged prepared views."
+        },
+        "D01-S3": {
+          "verdict": "PASS",
+          "evidence": "test_test_and_synthetic_poisoning_never_changes_fitted_metadata plus double-transform/mutation/mismatched-space refusals."
+        },
+        "D01-S4": {
+          "verdict": "PASS",
+          "evidence": "CanonicalReceiverBridgeTests executes actual extracted orchestration with deterministic callbacks under both named routes; default historical replay remains explicit. Full legacy suite pending separately."
+        },
+        "D01-S5": {
+          "verdict": "PASS",
+          "evidence": "Held-out target190 maps to10 without clipping; bridge asserts real query targets exceed1. No current-engine repair is claimed."
+        }
+      }
+    },
+    {
+      "id": "D02",
+      "title": "Add informative driver-rank semantics without rewriting history",
+      "file": "d02-versioned-driver-rank-successor.md",
+      "dependencies": [
+        "D00"
+      ],
+      "priority": "P0",
+      "status": "SCOPED_ENGINEERING_COMPLETE_CURRENT_FULL_CI_PENDING",
+      "success_criteria": [
+        "D02-S1",
+        "D02-S2",
+        "D02-S3",
+        "D02-S4",
+        "D02-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D02/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "20a1dbf728c263ea0d1f0e2605492bf3f63500e4d9662f55b2a535050445cd26",
+      "words": 1288,
+      "criterion_verdicts": {
+        "D02-S1": {
+          "verdict": "PASS",
+          "evidence": "Actual metrics::golden::tests::rust_matches_golden_parity_corpus PASS log1339. Root independently read actual tested golden.rs: verify_golden_corpus over real repository tests/golden asserts exactly163 total cases, component totals aggregate30/charge9/drivers48/frontier31/transfer45, exactly34 nested drivers/v2. Thus this is actual129top-level+34v2 corpus, not just a two-case synthetic discovery fixture or an inferred count from a Rust test name. Seven separate analytic rank cases are checked by strict discovery; the actual missing/malformed/duplicate/symlink refusal tests also passed log1320-1324. Frozen existing fixture bytes unchanged versus planning59b: Git diff tests/golden shows only added informative-v1/rank-cases.json, no modified/deleted old fixtures.",
+          "receipt": "../receipts/completed-root-goldens-bb.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "completed_subtarget": {
+            "library": "rust/lib.rs",
+            "passed": 302,
+            "failed": 0,
+            "ignored": 0,
+            "terminal_log_line": 1441
+          },
+          "whole_job": "FAILURE_LATER_CLIPPY_TYPE_COMPLEXITY_NOT_PASS",
+          "log_sha256": "021c5cb16952f9745e6a09686c93b46bf47bc614855963be864454fe6f99d5a3"
+        },
+        "D02-S2": {
+          "verdict": "PASS",
+          "evidence": "Accepted completed subtargets at tested synthetic merge07887a13b1f9bc60ac085bde85a502ca2924b599 (head ccd28bb0122425e625e36323091627267a46af39): root Rust rank_successor_shared_analytic_cases and Python shared/all-tied successor tests passed. Every seven-case expected object includes informative/total counts. Overall job41651340409/job125970478639 cancelled later; not whole-job CI PASS. D02 metric/dependency/fixture closure unchanged through a23 and4054; scoped evidence only."
+        },
+        "D02-S3": {
+          "verdict": "PASS",
+          "evidence": "The same completed Rust and Python analytic subtargets compare all seven shared fixture objects at tolerance1e-12, including informative-pair counts; no analytic case is skipped. See completed-root-metrics-ccd.json and external source report hash d6f7508cd8e04c1f2bb0e306c98c45030561284d212cbeb1c0ad3bad84a60581. Overall CI cancelled; current full exact-head CI remains pending."
+        },
+        "D02-S4": {
+          "verdict": "PASS",
+          "evidence": "Actual production grouped permutation test in engine/dope-core/tests/dvs_contract.rs duplicates one-hot member within same declared group, asserts identical loss increases, mass agreement1, successor rank equal identical-input rank/value1/informative_pairs1 and tied refusal. Authentic log929 PASS. Prior malformed/unsupported metric component evidence preserved; fixture/root/engine bridges retain prior analytic parity. No arbitrary duplicate-group invariance claim.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D02-S5": {
+          "verdict": "PASS",
+          "evidence": "test_legacy_joint_ties_and_v2_fixture_are_unchanged and tagged dispatch preserve historical defaults; new protocol ID remains explicit. Full native legacy replay pending separately."
+        }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json",
+      "criteria_complete": true
+    },
+    {
+      "id": "D10",
+      "title": "Close the local product-check routing gap",
+      "file": "d10-local-product-gate-routing.md",
+      "dependencies": [
+        "D00"
+      ],
+      "priority": "P0",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D10-S1",
+        "D10-S2",
+        "D10-S3",
+        "D10-S4",
+        "D10-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D10/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "130fb57c84861973641b64e01d9a0679c0f02155a02ccdd80526d396c2150364",
+      "words": 1086,
+      "criterion_verdicts": {
+        "D10-S1": {
+          "verdict": "PASS",
+          "evidence": "Source inspection confirms hosted cpu.sh already calls engine.sh and baseline local check omitted it; check-all adds explicit check+engine dependencies."
+        },
+        "D10-S2": {
+          "verdict": "PASS",
+          "evidence": "Real just --dry-run check-all exits 0 and expands 29 commands with exactly one bash ops/ci/engine.sh; routing/just-check-all-dry-run.log. No native command ran."
+        },
+        "D10-S3": {
+          "verdict": "PASS",
+          "evidence": "Byte-identical actual Justfile executes under explicit shell test double in an empty owned directory; injected engine exit 37 propagates as 37, engine reached exactly once. routing/failure-propagation/RECEIPT.json. This is routing proof, not native gate success."
+        },
+        "D10-S4": {
+          "verdict": "PASS",
+          "evidence": "Historical fast/check recipes retained; only explicit check-all added. Existing required workflows/protections untouched; shared conformance gets additive bounded checks."
+        },
+        "D10-S5": {
+          "verdict": "PASS",
+          "evidence": "Owner/test maps, docs/testing.md and workflow guide give exact commands and distinguish correctness, GPU support and scientific qualification."
+        }
+      }
+    },
+    {
+      "id": "D03",
+      "title": "Expose a minimal identity-preserving DOPE SDK",
+      "file": "d03-minimal-sdk-facade.md",
+      "dependencies": [
+        "D00",
+        "D10"
+      ],
+      "priority": "P0",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D03-S1",
+        "D03-S2",
+        "D03-S3",
+        "D03-S4",
+        "D03-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D03/<full-head>/",
+      "cross_repo_interfaces": [
+        "J07 SDK gateway migration after exact parity"
+      ],
+      "sha256": "4c668747f858aa0a9dd971e11ce1faae279185084013aa1a6e979e1840366d9e",
+      "words": 1067,
+      "criterion_verdicts": {
+        "D03-S1": {
+          "verdict": "PASS",
+          "evidence": "Hosted CPU SDK surface/build and Rust-only dependency inspection passed at tested merge2b50c78d/treec2f59ae4 equal451; criterion-scoped only. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D03-S2": {
+          "verdict": "PASS",
+          "evidence": "Actual direct_core_and_sdk_match_prepared_views_conditioning_and_nonzero_encoder PASS in SDK2/0/0 log1245-1248. Regression/binary/multiclass compare prepared X/Ybits, physical IDs/source digests/classes/task/vocabulary policy, scope/report equality, None/Full/High conditioning bits/column landmarks/digests, direct Core versus checked SDK real nonzero629D encoder output. Perturbation parity and actual routed-latent sensitivity asserted. Root independently read actualbb source assertions, not just helper names.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+        },
+        "D03-S3": {
+          "verdict": "PASS",
+          "evidence": "Root read both new exact Artifact/Input variant, fixed display and privacy-canary assertions and actual two PASS outcomes. Existing three-task nonzero model journey invokes exact stable recipe-mismatch/unknown-recipe/unknown-expected/invalid-tier/63x17-shape safe refusals; its actual PASS implies HighRequiredV1 branch executed via required high_condition_pair.expect. Existing SDK/core production sources and legacy parity test are unchanged from qualifiede5, independently Git-diffed. GitHub merge/source tree identity independently verified.",
+          "receipt": "../receipts/hosted-native-bdea-sdk-errors.json",
+          "tested_source": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+          "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+          "job": 126212969403,
+          "log_sha256": "9b7e7123c1289c2a74db2da11d17bf0777dbf8b6693b3e49d561e7f1dd00ef3c"
+        },
+        "D03-S4": {
+          "verdict": "NOT_RUN",
+          "evidence": "No arithmetic copied; full legacy native replay still pending."
+        },
+        "D03-S5": {
+          "verdict": "PASS",
+          "evidence": "engine/dope-sdk/README.md, API reexports and workflow guide list v0 legacy types, separate NC1 successor and parity prerequisites; no serving transition."
+        }
+      }
+    },
+    {
+      "id": "D04",
+      "title": "Skip unused High probes while preserving admitted conditioning",
+      "file": "d04-high-landmark-dependency-plan.md",
+      "dependencies": [
+        "D00",
+        "D10"
+      ],
+      "priority": "P1",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D04-S1",
+        "D04-S2",
+        "D04-S3",
+        "D04-S4",
+        "D04-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D04/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "0ddc60796d7d73c278635cdf1e09992b220ba7db3e7b1358b1e510ef83a8c410",
+      "words": 1102,
+      "criterion_verdicts": {
+        "D04-S1": {
+          "verdict": "PASS",
+          "evidence": "Root independently read 59b conditioning/descriptors old arrays and e5 canonical panel.rs; each Macro/Larger/Fine index and order exact. Read actual constants_have_one_definition_and_legacy_aliases_keep_coordinates assertion body and actual successful six-test binary log973/980. Recomputed raw Git prepare-v1 tree and landmark_bundle_v1 blob at59b/e5 equal. Gitdiff e5->6191 engine+tests/golden empty. GitHub mergeace parentsmain59b/e5 with identical testedtree independently confirmed. Golden/bundle replay assertions and log outcomes mapped in strongreview; allscope fixture-specific.",
+          "receipt": "../receipts/hosted-native-e5-d04-constants.json",
+          "tested_source": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+          "tested_merge": "ace859a8fc2546fba12feeec989bc5004f072741",
+          "job": 126163801942,
+          "log_sha256": "5753c5b48025d9448d400f8e09fd2211587de9d3a5c42553d28e80877a7bbf9b"
+        },
+        "D04-S2": {
+          "verdict": "PASS",
+          "evidence": "Actual full_high_none_policy_matrix_uses_real_loader_and_forward_for_all_tasks plus budget/subsample matrix PASS in2/0/0 log994-996. Real synthetic checkpoint loader/parameter inventory, three tasks, equal policies, identical High conditioning/column tensors/digests and actual encoder output; nonzero outputs and perturbation-sensitive routed latents. Reservation/mask/private report distinctions retained; no scientific performance claim.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+        },
+        "D04-S3": {
+          "verdict": "PASS",
+          "evidence": "Hosted native tight_spectrum_boundaries_reserve_unused_full_panel_cost and high_omits_fine_marks_readiness_and_preserves_conditioning passed at451-equivalent tested tree; full reservation and NotRequested FINE asserted. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D04-S4": {
+          "verdict": "PASS",
+          "evidence": "high_omits_fine_marks_readiness_and_preserves_conditioning actual log981 PASS: FINE no-op before request, progressive Larger/Macro order, report byte/work equality after repeated run_ids/run_required, explicit Full upgrade, later Fine completion and final report/bundle equality. Existing implementation/test closure unchanged; not the new three-task encoder matrix.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D04-S5": {
+          "verdict": "NOT_RUN",
+          "evidence": "Historical constructors/default full path unchanged in source; actual legacy report replay pending."
+        }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
+    },
+    {
+      "id": "D05",
+      "title": "Implement additive FIT-only normalization with private owner state",
+      "file": "d05-nc1-private-normalization-contract.md",
+      "dependencies": [
+        "D00",
+        "D03",
+        "D10"
+      ],
+      "priority": "P1",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D05-S1",
+        "D05-S2",
+        "D05-S3",
+        "D05-S4",
+        "D05-S5",
+        "D05-S6"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D05/<full-head>/",
+      "cross_repo_interfaces": [
+        "J05 NC1 intake",
+        "J06 owner-private emitter"
+      ],
+      "sha256": "407ac28f2c1904e4fe245d74deb5fe7fc5502fc3003d2c420113d2fb163d29e4",
+      "words": 1179,
+      "criterion_verdicts": {
+        "D05-S1": {
+          "verdict": "PASS",
+          "evidence": "Hosted fit_only_query_poisoning_and_canonical_rows and fit_table_physical_presentation_order_does_not_change_card passed; full private card includes public schema and remains byte-identical. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D05-S2": {
+          "verdict": "PASS",
+          "evidence": "Typed target/role refusal, physical row ordering, SDK target-last conversions and three task kinds executed on exact current tree; source+line assertions in SOURCE-REVIEW.md",
+          "receipt": "../receipts/hosted-native-bdea-normalization-views.json",
+          "tested_source": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+          "tested_merge": "c9996e1d964293b45ee23b3abf3df154b93bacc8",
+          "job": 126212971176,
+          "log_sha256": "ee168fbba820013486cf5538302b57a5ad8087b251b34a30c8c3488ca2dc93cf"
+        },
+        "D05-S3": {
+          "verdict": "PASS",
+          "evidence": "Hosted native constant/missing/unseen/reserved-token/extreme-span/expansion-cap/strict-vocabulary fixtures passed at451-equivalent tree; deterministic behavior or explicit refusal, no truncation. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D05-S4": {
+          "verdict": "PASS",
+          "evidence": "Actual M1 three named tests allPASS log819-826,3/0/0. Seven mandatory absolute nativeCLI child invocations with Python environment removed cover positive public-schema/normal-output redaction, malformed JSON/unknownfield/invalidrole/tamperedpublicschema refusal, stable errors, emptystdout/absentoutputdir on failures. Planted private names/vocabulary/extrema absent from public outputs/errors; privatecard explicitly allowed. Synthetic canary closure only, no privacy certification.",
+          "receipt": "../receipts/hosted-native-bb-criteria.json",
+          "tested_source": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+          "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+          "job": 126138608036,
+          "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+        },
+        "D05-S5": {
+          "verdict": "PASS",
+          "evidence": "Three source-bound actual Rust NC1 exports replay in default Python test_nc1 without ENV/skip; private/public JSON schemas validate. This is focused fixture evidence, not full native qualification."
+        },
+        "D05-S6": {
+          "verdict": "NOT_RUN",
+          "evidence": "Legacy preparation remains separate and SDK NC1 explicit; complete legacy native decoder replay pending."
+        }
+      }
+    },
+    {
+      "id": "D06",
+      "title": "Implement one versioned downstream-value receipt and Audit Card",
+      "file": "d06-dvs-and-audit-card.md",
+      "dependencies": [
+        "D00",
+        "D01",
+        "D02",
+        "D05",
+        "D10"
+      ],
+      "priority": "P1",
+      "status": "SCOPED_ENGINEERING_COMPLETE_CURRENT_FULL_CI_PENDING",
+      "success_criteria": [
+        "D06-S1",
+        "D06-S2",
+        "D06-S3",
+        "D06-S4",
+        "D06-S5",
+        "D06-S6"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D06/<full-head>/",
+      "cross_repo_interfaces": [
+        "J08 JopeDime auditor",
+        "J09 conditional artifact/curriculum growth"
+      ],
+      "sha256": "0069f7656d5ff9b46e5af1a774aad1c8cfc5f85a224704ed5bc73e6160b5992f",
+      "words": 1361,
+      "criterion_verdicts": {
+        "D06-S1": {
+          "verdict": "PASS",
+          "evidence": "Core dvs10PASS and dvs_contract4PASS log912-934: hand R0.75/1.25/-0.25, grouped mass0.5, selected index0/regret2/transfer-rank1, ties/no-choice, zero-gain uninformativeness and failed schedules asserted explicitly. This is fixture correctness, not scientific qualification.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D06-S2": {
+          "verdict": "PASS",
+          "evidence": "dvs_role_binding_refuses_missing_wrong_or_reused_views_before_selection and dvs_real_test_poison_changes_assessment_but_not_synthetic_choice log918/921 PASS, plus common-view identity refusal log917. Poisoned TEST changes assessment but leaves model choice0; malformed role/usage/shared pins fail before empty selection is consumed. Binding remains caller_declared_hash_checked, no authenticated custody claim.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D06-S3": {
+          "verdict": "PASS",
+          "evidence": "Core missing/uninformative schedule test log919, four-outcome failed/timed_out/unsupported/missing test log931 and actual incomplete CLI log743 retain every scheduled cell, failed/missing counts, null unknown wall/fit/result and incomplete robust score. No missing result is converted to zero or success.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D06-S4": {
+          "verdict": "PASS",
+          "evidence": "Root-accepted actual f440 Signed global/per-cell identity and required multiplicity-policy assertions plus strict163 unchanged v1/v2 goldens; exact relevant DVS/metric/fixture closure unchanged in this native resource-accounting repair. Structural declared integrity only; no custody/inference/science claim. Full f440 CI remains failed in unrelated transfer accounting.",
+          "receipt": "../receipts/hosted-native-f440-driver-bindings.json",
+          "tested_source": "f44073230ecffed14b8d1832e0dae8db00066678",
+          "tested_merge": "e4b161e159580b7d5a8c0b31b430fdd081153d4e",
+          "engine_job": 126292274398,
+          "golden_job": 126292276311,
+          "source_status": "SCOPED_ENGINEERING_PASS"
+        },
+        "D06-S5": {
+          "verdict": "PASS",
+          "evidence": "Actual transfer_report_serializes_actual_parts_and_card_without_python log744 PASS. Fixed literal serialized components independently assert payload63/shared17/closure80/private37, five part byte lengths and known SHA256s; card fields/role digest/selection/privacy match actual receipt; private CANARY value absent in receipt/card/stdout/stderr. Root independently read the complete test body, not only its name.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D06-S6": {
+          "verdict": "PASS",
+          "evidence": "Actual native CLI log742-744 and816-817 PASS: complete report and incomplete denominator paths, missing-role/no-partial-output refusal, parsed-error redaction. Test child launches absolute built CLI with PATH empty and Python environment removed. No Python product process dependency for this bounded journey.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
+    },
+    {
+      "id": "D07",
+      "title": "Freeze DML4 wire, basis and reference sampler before training",
+      "file": "d07-dml4-wire-reference-sampler-and-hard-caps.md",
+      "dependencies": [
+        "D00",
+        "D03",
+        "D05",
+        "D10"
+      ],
+      "priority": "P1",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D07-S1",
+        "D07-S2",
+        "D07-S3",
+        "D07-S4",
+        "D07-S5",
+        "D07-S6"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D07/<full-head>/",
+      "cross_repo_interfaces": [
+        "J06 private owner transform contract",
+        "J09 optional artifact consumer"
+      ],
+      "sha256": "da895ca6ea5439b629702b709aad82f5f41ae4219ea94f0a2e5401934b3f54d1",
+      "words": 1165,
+      "criterion_verdicts": {
+        "D07-S1": {
+          "verdict": "PASS",
+          "evidence": "Hosted each_active_gate_changes_its_declared_basis_coordinate and fitted_and_decoded_nondefault_gates_match_independent_math passed for all six gates at451-equivalent tree. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D07-S2": {
+          "verdict": "PASS",
+          "evidence": "Actual mlc_v4_wire15PASS log1065-1082 includes all three complete envelope caps2048/16384/65536, exact-boundary CRC-framed decode, one-byte-over refusals, typed impossible-cap refusal and real80-group65-knot graph encoded above16k and below64k. Root independently read those four substantive functions. Optional conformance_export no-op is not relied upon.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D07-S3": {
+          "verdict": "PASS",
+          "evidence": "Default source-bound actual Rust regression and grouped-classification packets/fixed draws replay in Python test_v4_wire with 0 SKIP; engine native execution pending separately."
+        },
+        "D07-S4": {
+          "verdict": "PASS",
+          "evidence": "Actual wire tests log1069-1079 PASS: truncated/unknown-version/corrupt checksums, u32MAX header length preflight with13byte buffer, invalid semantic gate with valid CRC, unknown private key/value redaction, 257-column scalar bound refusal and >64k envelope refusal. Root independently read implementation-bound assertions; no huge allocation launched.",
+          "receipt": "../receipts/hosted-native-1811-criteria.json",
+          "tested_source": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+          "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+          "job": 126098368662,
+          "log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+        },
+        "D07-S5": {
+          "verdict": "PASS",
+          "evidence": "Hosted decoded-packet source_free_replay_and_group_validity and fixed_draws_apply_missing_onehot_and_target_exactly passed at451-equivalent tree; no source/encoder/private card used by sampler. See ../receipts/hosted-native-451-criteria.json."
+        },
+        "D07-S6": {
+          "verdict": "NOT_RUN",
+          "evidence": "D07 graph contract frozen before producer/trainer. Complete DML3/CSC1/DPK compatibility replay pending."
+        }
+      },
+      "native_scoped_receipt": "../receipts/hosted-native-1811-criteria.json"
+    },
+    {
+      "id": "D08",
+      "title": "Build bounded batched training and exact resume around frozen wire",
+      "file": "d08-batched-resumable-trainer.md",
+      "dependencies": [
+        "D00",
+        "D05",
+        "D07",
+        "D10"
+      ],
+      "priority": "P1",
+      "status": "CPU_SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D08-S1",
+        "D08-S2",
+        "D08-S3",
+        "D08-S4",
+        "D08-S5"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D08/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "d4120ca21d383eec71415d6542ac4403a3d678ddae1e40383f67bc2383da707f",
+      "words": 1105,
+      "criterion_verdicts": {
+        "D08-S1": {
+          "verdict": "PASS",
+          "evidence": "test_shape_buckets_padding_masks_and_no_truncation and real model native23/dropout/outer-role tests pass; explicit max padded allocation refusal."
+        },
+        "D08-S2": {
+          "verdict": "PASS",
+          "evidence": "Actual V4ObjectiveAdapter batch 2 weighted loss and every compared parameter gradient agree with per-cell references; NaN-poisoned padding leaves exact loss/grad unchanged."
+        },
+        "D08-S3": {
+          "verdict": "PASS",
+          "evidence": "Actual V4Model AdamW two-step interrupted/uninterrupted checkpoint replay gives exact weights/cursor/Torch RNG; generic test covers Python/NumPy/Torch RNG."
+        },
+        "D08-S4": {
+          "verdict": "PASS",
+          "evidence": "Data/schema/role/membership/weight drift, orphan/missing checkpoint generation, owned prefetch interruption, nonfinite gradients and mutating optimizer failures are exercised with retained model/optimizer/scheduler/RNG/cursor. Checkpoint v2 counters are validated."
+        },
+        "D08-S5": {
+          "verdict": "PASS",
+          "evidence": "attempt_count, failed_update_count, update_count and measured setup/compute seconds survive checkpoint; only accumulation_steps=1 is supported and other values refuse. No CUDA optimizer or speedup claim."
+        }
+      }
+    },
+    {
+      "id": "D09",
+      "title": "Implement v4 objective and model against the served graph",
+      "file": "d09-v4-train-what-ships-objective.md",
+      "dependencies": [
+        "D00",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08"
+      ],
+      "priority": "P1",
+      "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+      "success_criteria": [
+        "D09-S1",
+        "D09-S2",
+        "D09-S3",
+        "D09-S4",
+        "D09-S5",
+        "D09-S6"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D09/<full-head>/",
+      "cross_repo_interfaces": [],
+      "sha256": "3a5d53dc875b6d0b107d07892c6a01864e301bf30323cb18b8198e98279c2fad",
+      "words": 1159,
+      "criterion_verdicts": {
+        "D09-S1": {
+          "verdict": "PASS",
+          "evidence": "Class-specific heads have useful gradients; actual SGD update changes coefficients/probabilities. Common-logit-shift negative control has zero useful gradient. Valid NC1 multiclass2 export is admitted."
+        },
+        "D09-S2": {
+          "verdict": "PASS",
+          "evidence": "Applied test_tstr_uses_synthetic_rows_and_all_six_gate_gradients perturbs draws and verifies changed learner-query TSTR loss and finite gradients."
+        },
+        "D09-S3": {
+          "verdict": "PASS",
+          "evidence": "All six gates and column/group/descriptor/task/dist/coefficient/pair/row/intercept/marginal/noise modules have finite useful-gradient evidence. Categorical support and observed native auxiliary head are tested separately; native auxiliary is explicitly inactive for none."
+        },
+        "D09-S4": {
+          "verdict": "PASS",
+          "evidence": "Native recipe/dropout provenance, explicit outer-role refusal and query poisoning tests pass. Query poison changes loss, not fitted state."
+        },
+        "D09-S5": {
+          "verdict": "NOT_RUN",
+          "evidence": "Python independent basis/fixed-draw precision fixtures pass; current native producer packet parity execution pending."
+        },
+        "D09-S6": {
+          "verdict": "NOT_RUN",
+          "evidence": "Actual CPU update/resume passes; full v3 hashes/decoder replay pending. No trained-v4 quality claim is made."
+        }
+      }
+    },
+    {
+      "id": "D11",
+      "title": "Prepare qualification gates without launching or promoting a model",
+      "file": "d11-qualification-campaign-readiness.md",
+      "dependencies": [
+        "D00",
+        "D01",
+        "D02",
+        "D10",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D09"
+      ],
+      "priority": "P1-gated",
+      "status": "READINESS_HOLD",
+      "success_criteria": [
+        "D11-S1",
+        "D11-S2",
+        "D11-S3",
+        "D11-S4",
+        "D11-S5",
+        "D11-S6"
+      ],
+      "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/D11/<full-head>/",
+      "cross_repo_interfaces": [
+        "J00 distinct consumer identities",
+        "J03 separate study readiness",
+        "J07 qualified facade adoption"
+      ],
+      "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e",
+      "words": 1129,
+      "criterion_verdicts": {
+        "D11-S1": {
+          "verdict": "PASS",
+          "evidence": "Readiness state HOLD and ready_for_owner_admission=false until exact-head passing prerequisite inventory exists; nulls/blockers are explicit."
+        },
+        "D11-S2": {
+          "verdict": "BLOCKED",
+          "evidence": "Finite cohort/family/exposure/fresh-ID verification unavailable; no protected outcome opened."
+        },
+        "D11-S3": {
+          "verdict": "BLOCKED",
+          "evidence": "No owner-frozen campaign hypotheses/thresholds/comparators/resources yet; no guessed values or outcome exposure."
+        },
+        "D11-S4": {
+          "verdict": "BLOCKED",
+          "evidence": "Owner, host, budget/custody/recovery admission remain explicit nulls; no campaign authorization."
+        },
+        "D11-S5": {
+          "verdict": "PASS",
+          "evidence": "Manifest separates source, fixture, exact-head CI, efficacy, release and serving adoption. CPU synthetic update fixtures are engineering evidence only."
+        },
+        "D11-S6": {
+          "verdict": "PASS",
+          "evidence": "Readiness docs/manifest are reviewable and HOLD; no campaign/model publication/live pointer action was taken."
+        }
+      },
+      "release_scope_disposition": {
+        "D11-S2": "DEFERRED_CAMPAIGN_QUALIFICATION",
+        "D11-S3": "DEFERRED_CAMPAIGN_QUALIFICATION",
+        "D11-S4": "DEFERRED_CAMPAIGN_QUALIFICATION"
+      }
+    }
+  ],
+  "historical_planning_branch": "codex/dope-jope-master-plan-20261102",
+  "engineering_release_scope": {
+    "decision": "ENGINEERING_RELEASE",
+    "deferred_campaign_criteria": [
+      "D00-S4",
+      "D11-S2",
+      "D11-S3",
+      "D11-S4"
+    ],
+    "verdict": "DEFERRED_CAMPAIGN_QUALIFICATION",
+    "historical_verdicts_preserved": true,
+    "receipt": "../receipts/engineering-release-scope-owner-decision.json",
+    "pending_user_question": false
+  }
+}

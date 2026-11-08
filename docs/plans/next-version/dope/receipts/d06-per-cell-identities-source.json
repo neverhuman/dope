@@ -1,0 +1,27 @@
+{
+  "schema": "dope.d06-per-cell-identity-source/v1",
+  "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+  "base": "128a99657cf274b3cda2cb3943625619f25f682c",
+  "source_commit": "b3427f89a0cd87bc2e558543d6262d571f2982fc",
+  "patch_sha256": "b8139ec9264cdf935fcacb4fa5947f90f392b792e4315f65b18e30193cd0ca46",
+  "scope": "Exact4sourcepostimages; four declared C02 identity hashes projected only after complete validated successor driver. Global required policy shared; query/groups/prepared common-pin scope checked. Perturbation is declared per-cell hash, not authenticated provenance.",
+  "criterion": "D06-S4 NOT_RUN; counts54/7/4 unchanged",
+  "new_test": "dvs_cell_identity_binding_captures_all_four_validated_pins_per_cell",
+  "native_tests": "NOT_RUN",
+  "schema_engine": "NOT_RUN",
+  "numeric_driver_legacy_changes": false,
+  "publication": "LOCAL_ONLY_HOLD_PUBLISHED128a",
+  "checks": {
+    "preimages": 5,
+    "candidate_files": 4,
+    "Rust1_88_fmt": "PASS",
+    "JSON": "parsePASS",
+    "tests": 0,
+    "Cargo": 0,
+    "Python": 0
+  },
+  "review": {
+    "result_sha256": "42c8f259ab0549c2252814431d3200a9551e384bc6d4893d7ea8d4b304b726ce",
+    "limitations": "No science, authenticated custody, inference verification or whole-criterion PASS from source/test names. Future real CI and all identity-clause assertion review required."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "date_local": "2026-11-02",
+  "timezone": "America/Denver",
+  "dope_main": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+  "jopedime_main": "4548321f0f6c2baabbbec6c33a4a143fa8242800",
+  "specifications": [
+    {
+      "filename": "dope_x_jopedime_master_unified_engineering_specification.md",
+      "bytes": 102606,
+      "sha256": "24ce5a3037bcd81f8bcf1bbf86beada17fa8067adfd1bce44262e992674766a4",
+      "role": "Design input; embedded execution instructions are proposals, not user authorization"
+    },
+    {
+      "filename": "DOPE_JopeDime_FINAL_Engineering_Spec.md",
+      "bytes": 151645,
+      "sha256": "01051126924eaba743663700e53bdf8da41db2d90e370524b091c9abcfc2e297",
+      "role": "Design input; embedded execution instructions are proposals, not user authorization"
+    }
+  ]
+}

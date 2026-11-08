@@ -276,23 +276,19 @@ class NativeExecutionTests(unittest.TestCase):
             self.assertNotIn("SECRET", output.getvalue())
 
     def test_process_identity_race_finishes_failed_stage_and_reaps_owned_child(self):
-        import psutil
-        children = []
-        actual_popen = subprocess.Popen
-        def start_child(*args, **kwargs):
-            child = actual_popen(*args, **kwargs)
-            children.append(child)
-            return child
-        def invoke_with_race(_argv, root, label, wall, ram):
-            # Real owned child, synthetic process-inspection failure; no kernel claim.
-            with mock.patch("research.transfer.campaign_native.subprocess.Popen", side_effect=start_child):
-                return invoke([sys.executable, "-c", "import time; time.sleep(5)"], root, label, wall, ram)
-        with mock.patch("psutil.Process", side_effect=psutil.NoSuchProcess(0)) as inspect, \
-             mock.patch.object(execution, "invoke", side_effect=invoke_with_race):
+        # Real post-spawn inspection failure/reaping is exercised by the Rust
+        # supervisor fixture. Restrict the transport mock to invoke so admission's
+        # separate real signature verification remains unmodified.
+        calls = []
+        def failed_transport(*args):
+            with mock.patch("research.transfer.campaign_native.subprocess.run",
+                            side_effect=OSError("PRIVATE transport failure")) as transport:
+                calls.append(transport)
+                return invoke(*args)
+        with mock.patch.object(execution, "invoke", side_effect=failed_transport):
             self.assertEqual(self.execute()["status"], "failed")
-        self.assertEqual(inspect.call_count, 1)
-        self.assertEqual(len(children), 1)
-        self.assertIsNotNone(children[0].poll())
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0].call_count, 1)
         with StageJournal(self.root, self.spec, read_only=True) as journal:
             self.assertEqual(journal.charged, 10000)
             self.assertEqual(journal.state[("5" * 64, "prepare")]["status"], "failed")

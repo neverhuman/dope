@@ -1,0 +1,45 @@
+{
+  "schema": "dope.dml4-basis/v1",
+  "packet_contract": "dope.dml4-reference/v1",
+  "columns_max": 256,
+  "blocks": [
+    {
+      "gate": "linear",
+      "width": "p",
+      "formula": "g*x[j]"
+    },
+    {
+      "gate": "asinh",
+      "width": "p",
+      "formula": "g*asinh(x[j])"
+    },
+    {
+      "gate": "periodic",
+      "width": "p",
+      "formula": "g*sin(2*pi*x[j])"
+    },
+    {
+      "gate": "hinge",
+      "width": "p",
+      "formula": "g*max(x[j]-0.5,0)"
+    },
+    {
+      "gate": "pair",
+      "width": "p-1",
+      "formula": "g*x[j]*x[j+1]"
+    },
+    {
+      "gate": "row_mean",
+      "width": "1",
+      "formula": "g*mean(x)"
+    }
+  ],
+  "gate_range": [
+    0,
+    4
+  ],
+  "basis_width": "5*p",
+  "regression_noise": "noise_scale*(2*u-1)*sqrt(3); explicit field on wire",
+  "draw_schedule": "2*groups+1 uniforms per row; numeric/discrete rank then missing; categorical rank; final target draw",
+  "sampler": "independent group marginals; no private normalization; no per-sample restatistics"
+}

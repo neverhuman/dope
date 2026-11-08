@@ -27,17 +27,60 @@ def rank_agreement(real, synthetic):
     return score / pairs if pairs else 1.0
 
 
+INFORMATIVE_RANK_PROTOCOL = "driver-rank-informative-v1"
+
+
+def rank_agreement_informative(real, synthetic):
+    """Rank already-grouped evidence; only strict real-order pairs inform it.
+
+    Real ties are excluded. A synthetic tie on an informative real pair receives
+    half credit. No informative real pairs produces null/ineligible, never 1.
+    """
+    try:
+        r, s = vector(real, True), vector(synthetic, True)
+        require(len(r) == len(s), "importance_shape_mismatch")
+        informative, score = 0, 0.0
+        total = len(r) * (len(r) - 1) // 2
+        for i in range(len(r)):
+            for j in range(i + 1, len(r)):
+                a = (r[i] > r[j]) - (r[i] < r[j])
+                if a == 0:
+                    continue
+                b = (s[i] > s[j]) - (s[i] < s[j])
+                informative += 1
+                score += 1.0 if a == b else (0.5 if b == 0 else 0.0)
+        return {"status": "complete" if informative else "uninformative",
+                "reason": None if informative else "no_informative_rank_pairs",
+                "value": score / informative if informative else None,
+                "informative_pairs": informative, "total_pairs": total}
+    except (MetricError, OverflowError):
+        return {"status": "failed", "reason": "invalid_rank_evidence", "value": None,
+                "informative_pairs": None, "total_pairs": None}
+
+
+def _evaluate_informative(data):
+    require(data.get("importance_unit") == "declared_group", "grouped_importance_required")
+    groups = data.get("group_ids")
+    require(type(groups) is list and bool(groups)
+            and all(type(g) is int and 0 <= g <= (1 << 53) - 1 for g in groups)
+            and len(set(groups)) == len(groups), "invalid_driver_groups")
+    require(type(data.get("real_importances")) is list
+            and len(groups) == len(data["real_importances"]), "importance_shape_mismatch")
+    return _evaluate_v2(data, informative_rank=True)
+
+
 def evaluate(data):
     version = data.get("protocol_version", "v1") if type(data) is dict else "v1"
     if version == "v1":
         return _evaluate_v1(data)
-    if version != "v2":
+    if version not in ("v2", INFORMATIVE_RANK_PROTOCOL):
         return failure("unsupported_driver_protocol")
     try:
-        out = _evaluate_v2(data)
+        out = _evaluate_informative(data) if version == INFORMATIVE_RANK_PROTOCOL else _evaluate_v2(data)
     except (MetricError, OverflowError) as error:
         out = failure(str(error) if isinstance(error, MetricError) else "nonfinite_or_invalid_number")
-    return {"format": "driver-result-v1", "protocol_version": "v2", **out}
+    return {"format": "driver-result-informative-v1" if version == INFORMATIVE_RANK_PROTOCOL else "driver-result-v1",
+            "protocol_version": version, **out}
 
 
 def _evaluate_v1(data):
@@ -103,7 +146,7 @@ def _evaluate_v1(data):
         return failure(str(error) if isinstance(error, MetricError) else "nonfinite_or_invalid_number")
 
 
-def _evaluate_v2(data):
+def _evaluate_v2(data, *, informative_rank=False):
     """Consume evaluator-owned C02 full-family bounds, never infer from a ratio.
 
     Components and positive floors are explicit draft inputs. Common pins bind
@@ -159,8 +202,18 @@ def _evaluate_v2(data):
         rt, st, ct = [sum_checked(v) for v in (r, s, c)]
         if rt < importance_floor or ct < importance_floor:
             return failure("degenerate_real_importance", "uninformative")
+        rank_diagnostics = None
         if name == "rank":
-            rs, rr = rank_agreement(r, s), rank_agreement(r, c)
+            if informative_rank:
+                rank_diagnostics = {"real_synthetic": rank_agreement_informative(r, s),
+                                    "real_control": rank_agreement_informative(r, c)}
+                if any(v["status"] != "complete" for v in rank_diagnostics.values()):
+                    return {"status": "uninformative", "reason": "no_informative_rank_pairs",
+                            "driver_fidelity": None, "driver_pass": None,
+                            "rank_diagnostics": rank_diagnostics}
+                rs, rr = [rank_diagnostics[k]["value"] for k in ("real_synthetic", "real_control")]
+            else:
+                rs, rr = rank_agreement(r, s), rank_agreement(r, c)
         elif name == "sign":
             a, b, d = [data[k] for k in ("real_signs", "synthetic_signs", "real_control_signs")]
             require(all(type(v) is list and len(v) == len(r) for v in (a, b, d)), "sign_shape_mismatch")
@@ -196,5 +249,7 @@ def _evaluate_v2(data):
         fidelity = min(fidelity, ratio)
         components[name] = {"a_rs": rs, "a_rr": rr, "margin": margin,
                             "descriptive_ratio": ratio, "lcbs": lcbs}
+        if rank_diagnostics is not None:
+            components[name]["rank_diagnostics"] = rank_diagnostics
     return {"status": "complete", "reason": None, "components": components,
             "driver_fidelity": fidelity, "driver_pass": bool(passed)}

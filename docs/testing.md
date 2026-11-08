@@ -47,6 +47,12 @@ These CPU synthetic-checkpoint tests check primary-output compatibility, exact
 wire fixtures, coverage/version semantics, sampling identity and failure handling.
 They do not establish retention or latency qualification.
 
+The explicit local `just check-all` target runs both `just check` and `just engine`,
+propagating either failure. Hosted CPU already runs the standalone product engine;
+this target closes the local combined-command gap without changing historical
+fast/check scope. Next-version source additions use focused checks while the
+consolidated batch is built, followed by full exact-head stabilization.
+
 ## Repository and research-kernel gates
 
 `just deployment-check` verifies the separate locked `deploy/` CPU graph, typed
@@ -641,3 +647,62 @@ verifies the 100% pure-Rust `DOPE-MLC-v3` SafeTensors inference engine and `DML3
 and `python3 -B -m research.levels.rust_v3_parity` (plus `DOPE_REQUIRE_RUST_PARITY=1` in both the
 Rust and Python test suites) enforces fail-closed trained-checkpoint tensor forward (`< 1e-5`) and
 fixed-draw `DML3`/`CSC1` sampling (`< 1e-5`) parity across all four tiers and three tasks.
+
+## Additive next-version checks
+
+The `test_next_version` shared CPU reference shard covers prospective evaluation, versioned informative rank, actual Rust NC1/DML4 fixtures, actual synthesized-data gradients and actual-model CPU checkpoint replay. The native shard adds normalization/SDK, High-required execution, DVS, DML4 and CLI journey tests; ordinary engine discovery remains intact. See [workflow commands and private/public boundaries](next-version-workflows.md). Missing tracked parity fixtures fail rather than skip. GPU training and scientific qualification remain unrun.
+
+## Strict native shared-golden validation
+
+`just golden-parity` and the golden step in `ops/ci/public-smoke.sh` now use
+the existing Rust `audit-proof focus metrics::golden` route, which refuses zero
+test discovery. The consumer recursively validates all 163 standard cases
+(129 top-level plus 34 driver-v2 cases), with exact per-component counts, and
+separately checks the seven informative-rank cases. Missing/unreadable required
+directories, entry failures, symlinks/special nodes, duplicate IDs, wrong
+component paths, malformed cases and expected-value mismatches fail closed.
+Outer schema2 driver fixtures call the unchanged explicit v2 reducer; historical
+`run_case` continues to reject schema2. Golden arithmetic stays at 1e-12.
+
+The Python golden implementation and historical tests remain preserved. Other
+Python claim/publication checks are still active migration work; this native
+caller slice does not establish repository-wide language compliance. New
+discovery fixtures and caller changes require actual source-bound native
+execution and final required CI/review. No fixture is regenerated or rebaselined.
+
+## General CI worker receipts and budget policy
+
+The reviewed source graph partitions the existing command inventory into
+`cpu-native`, `cpu-compat` and `cpu-transfer-paper` X64 workers, with
+the existing ARM64 general pool running the portable frozen/receipt proof.
+The stable `cpu` gate requires all four worker successes and complete
+current-run/current-attempt receipts. Every declared test command requires
+nonzero framework counts and no framework failure, even if a wrapper exits
+zero. Re-run **all jobs** when recovering an attempt; old-attempt receipts do
+not qualify a new attempt. Dependency source caches do not transfer binaries,
+targets or virtual environments between guests.
+
+`bash ops/ci/check-budgets.sh` now invokes the existing native
+`ci-shard budgets` command. The version1 scalar policy keeps all original
+bounds and declares the seven actual CI-role timeouts: 90/120/120/30/20/60/60
+minutes. The five CPU roles have a finite maximum of 380 job minutes; paper/security,
+audit and explicitly manual GPU remain separately bounded. This is a policy
+ceiling, not a speedup measurement or host-capacity reservation. Invalid,
+duplicate, missing, dynamic or unsupported configuration fails closed. The
+old manual-only GPU, neural 600 seconds, 16 GiB and fitness 128x32 guards remain.
+
+Local native-guard Clippy/tests include `ci-shard`. Native compilation,
+actual worker lifecycle/receipts and source-bound full CI must execute before
+qualification. These source changes do not bypass local capacity/runner
+controls or establish full Rust-language compliance. The shared next-version
+Torch reference/training suite still needs its ordinary-PR route; this worker
+split alone does not silently count that missing route as passed.
+
+
+## Per-command native process supervisor
+
+Before direct existing transfer compatibility tests, explicitly build the Rust helper with `cargo build --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1`. Set `DOPE_NATIVE_PROCESS` to its absolute path, or use the documented repository `target/debug/native-process` default. The adapter refuses a missing helper; it never builds inside measured work. Linux procfs, pidfd and close_range/CLOEXEC support are required; unsupported hosts fail closed. Native correctness proof is `cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1`. This dedicated supervisor owns only its new command session and adopted descendants; parent campaign RUSAGE_SELF accounting is unchanged.
+
+Rust tests use public synthetic subprocesses and separate isolated test entrypoints. Preserve the13 ordinary scenario assertions separately from12 ignored helper/payload entrypoints; no ignored entrypoint is a passing qualification. Captures retain32MiB per-file FSIZE and the historical8MiB hash admission. No GPU, science or private inputs are involved. Existing Python compatibility tests remain migration debt under the latest Rust-only end state, not a new Python waiver. Newly authored supervisor tests require actual normal-CI execution before qualification.
+
+The process supervisor validates the current root and capture basenames against held directory/file device+inode identities before and after hashing; replacement is a fixed safe refusal. Cleanup drains owned wait4 even if observation persistently fails and retains the error. Polling retains a50ms target cadence, not an invented observer-latency rejection; helper wall durations remain positive while existing campaign/pilot callers retain their own reservation limits. The120001ms fixture exits immediately and does not run a long campaign. These focused correction tests are authored, not executed locally.

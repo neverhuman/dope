@@ -18,85 +18,212 @@ defaults:
     working-directory: ci-source
 
 jobs:
-  cpu:
+  cpu-native:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on:
-      group: neverhuman-lan
-      labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
-    # Job119248919772 exhausted60min near its final test groups; keep a finite cold-run allowance.
+    runs-on: {group: neverhuman-lan, labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {path: ci-source, persist-credentials: false}
+      - name: Install Rust and native-check tools in the disposable guest
+        run: |
+          sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
+          sudo apt-get update
+          sudo apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup python3 ripgrep
+      - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
+        with:
+          version: v0.16.0
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-cpu-native-${{ hashFiles('ci-source/Cargo.lock', 'ci-source/engine/Cargo.lock', 'ci-source/ops/merge_guard/Cargo.lock') }}
+          restore-keys: rust-cpu-native-
+      - name: Native Rust checks
+        env:
+          CARGO_INCREMENTAL: '0'
+          CARGO_PROFILE_DEV_DEBUG: line-tables-only
+          RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
+        run: bash ops/ci/cpu-native.sh
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cpu-shard-cpu-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-source/target/ci-shards/cpu-native.json
+            ci-source/target/ci-shards/cpu-native.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  cpu-compat:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: {group: neverhuman-lan, labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]}
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {path: ci-source, persist-credentials: false}
+      - name: Install Rust in the disposable guest
+        run: |
+          sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
+          sudo apt-get update
+          sudo apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
         with:
-          path: ci-source
-          persist-credentials: false
-      - name: Provision CPU tools before tests in the disposable guest
+          version: v0.16.0
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-cpu-compat-${{ hashFiles('ci-source/Cargo.lock', 'ci-source/engine/Cargo.lock', 'ci-source/ops/merge_guard/Cargo.lock') }}
+          restore-keys: rust-cpu-compat-
+      - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41
+        with: {version: 0.11.28}
+      - name: Python compatibility and CLI journey
+        env:
+          CARGO_INCREMENTAL: '0'
+          CARGO_PROFILE_DEV_DEBUG: line-tables-only
+          RUSTFLAGS: '-C target-cpu=x86-64'
+          SCCACHE_GHA_ENABLED: 'true'
+          RUSTC_WRAPPER: sccache
+        run: bash ops/ci/cpu-compat.sh
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cpu-shard-cpu-compat-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-source/target/ci-shards/cpu-compat.json
+            ci-source/target/ci-shards/cpu-compat.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  cpu-transfer-paper:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: {group: neverhuman-lan, labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {path: ci-source, persist-credentials: false}
+      - name: Install Rust, TeX and paper tools
         run: |
           sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
           sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep strace
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
         with:
-          python-version: '3.12'
-      - name: Pin Rust toolchain
-        run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
-      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+          version: v0.16.0
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          # sccache owns compiled objects. Full target trees include Python environments
-          # and generated evidence; their post-job tar exceeded the CPU job quota.
-          key: rust-cpu-dependencies-ubuntu24-x86-64-v2-${{ hashFiles('ci-source/rust-toolchain.toml', 'ci-source/Cargo.lock', 'ci-source/engine/Cargo.lock') }}
-      - uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
-        with:
-          version: v0.16.0
-      - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-        with:
-          version: 0.11.28
-      - name: CPU tests and external learner smoke
+          key: rust-cpu-transfer-paper-${{ hashFiles('ci-source/Cargo.lock', 'ci-source/ops/merge_guard/Cargo.lock') }}
+          restore-keys: rust-cpu-transfer-paper-
+      - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41
+        with: {version: 0.11.28}
+      - name: Transfer and paper evidence
         env:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
           RUSTFLAGS: '-C target-cpu=x86-64'
           SCCACHE_GHA_ENABLED: 'true'
           RUSTC_WRAPPER: sccache
-        run: bash ops/ci/cpu.sh
+        run: bash ops/ci/cpu-transfer-paper.sh
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cpu-shard-cpu-transfer-paper-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-source/target/ci-shards/cpu-transfer-paper.json
+            ci-source/target/ci-shards/cpu-transfer-paper.log
+          if-no-files-found: warn
+          retention-days: 14
 
-      - name: R10 privacy summary study fixtures
-        run: target/ci-python/bin/python -B -m unittest research.transfer.privacy.test_summary_study -v
-
-      - name: U04 observational admissions fixtures
-        run: target/ci-python/bin/python -B examples/public-regression/bikeshare-observational/test_runner.py
-
-      - name: U03 simulated healthcare CLI journey
+  ci-shard-portable-arm64:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: {group: neverhuman-lan, labels: [self-hosted, Linux, ARM64, lan-ci, ubuntu24]}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {path: ci-source, persist-credentials: false}
+      - name: Prepare pinned user-space Rust in the disposable guest
+        working-directory: ci-source
+        run: bash ops/ci/shared-levels.sh prepare-native
+      - name: Check frozen evidence and run portable Rust receipt fixtures
+        working-directory: ci-source
         env:
           CARGO_INCREMENTAL: '0'
           CARGO_PROFILE_DEV_DEBUG: line-tables-only
-          RUSTFLAGS: '-C target-cpu=x86-64'
-          SCCACHE_GHA_ENABLED: 'true'
-          RUSTC_WRAPPER: sccache
+          CARGO_BUILD_JOBS: '2'
+          RUST_TEST_THREADS: '2'
+          RUSTUP_TOOLCHAIN: '1.88.0'
         run: |
-          out=target/healthcare-sim
-          target/ci-python/bin/python -B examples/healthcare-sim/demo.py prepare --out "$out"
-          target/ci-python/bin/python -B examples/healthcare-sim/demo.py verify --out "$out"
-          cargo build --locked --bin dope-kernel
-          target/debug/dope-kernel compile-csv --csv "$out/fit.csv" \
-            --target event_30d --candidate chow_liu --seed 1729 \
-            --deadline-seconds 60 --out "$out/model.dpk"
-          target/debug/dope-kernel sample-mixed --artifact "$out/model.dpk" \
-            --rows 640 --seed 1729 --out "$out/sampled.json"
-          target/ci-python/bin/python -B examples/healthcare-sim/demo.py evaluate \
-            --out "$out" --sampled "$out/sampled.json"
-          rm -rf "$out"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root "$PWD"
+          cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence --bin ci-shard
 
-      - name: Verify public claims and golden parity
+  cpu:
+    if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: [cpu-native, cpu-compat, cpu-transfer-paper, ci-shard-portable-arm64]
+    runs-on: {group: neverhuman-lan, labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {path: ci-source, persist-credentials: false}
+      - name: Install Rust in the disposable guest
         run: |
-          target/ci-python/bin/python tools/claims/check.py
-          target/ci-python/bin/python tools/claims/render.py --check
-          target/ci-python/bin/python -m research.transfer.tdl.golden --check
-
+          sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
+          sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
+          sudo apt-get update
+          sudo apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends rustup
+      - run: rustup toolchain install 1.88.0 --profile minimal
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-cpu-aggregate-${{ hashFiles('ci-source/ops/merge_guard/Cargo.lock') }}
+          restore-keys: rust-cpu-aggregate-
+      - name: Write exact worker outcomes
+        run: |
+          mkdir -p target/ci-receipts
+          cat > target/ci-needs.json <<'JSON'
+          {"cpu-native":"${{ needs.cpu-native.result }}","cpu-compat":"${{ needs.cpu-compat.result }}","cpu-transfer-paper":"${{ needs.cpu-transfer-paper.result }}"}
+          JSON
+      - if: always()
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        continue-on-error: true
+        with: {pattern: "cpu-shard-*-${{ github.run_id }}-${{ github.run_attempt }}", path: ci-source/target/ci-receipt-downloads, merge-multiple: false}
+      - name: Aggregate exact run receipts (cpu remains the required check)
+        env:
+          PORTABLE_RESULT: ${{ needs.ci-shard-portable-arm64.result }}
+        run: |
+          [[ "$PORTABLE_RESULT" == success ]] || { echo "portable Rust proof did not pass" >&2; exit 1; }
+          for dir in target/ci-receipt-downloads/cpu-shard-*-"$GITHUB_RUN_ID"-"$GITHUB_RUN_ATTEMPT"; do
+            [[ -d "$dir" ]] || continue
+            for file in "$dir"/*.json "$dir"/*.log; do
+              [[ -f "$file" ]] || continue
+              dest="target/ci-receipts/$(basename "$file")"
+              if [[ -e "$dest" ]]; then echo "duplicate shard receipt/log: $dest" >&2; exit 1; fi
+              cp -- "$file" "$dest"
+            done
+          done
+          cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin ci-shard -- aggregate target/ci-needs.json target/ci-receipts "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
   paper-clean:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on:
@@ -119,9 +246,13 @@ jobs:
           sudo systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
           sudo systemd-run --quiet --wait --property=After=apt-daily.service --property=After=apt-daily-upgrade.service /bin/true || true
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 -o DPkg::Options::="--force-unsafe-io" -o Acquire::Queue-Mode=access install -y --no-install-recommends latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern just ripgrep rustup
           uv venv target/paper-python
           uv pip install --python target/paper-python/bin/python --constraint validation/requirements-v1.txt numpy scipy pandas 'matplotlib==3.10.8' 'jsonschema==4.26.0'
+      - name: Pin Rust checker toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Verify frozen evidence before clean paper producers
+        run: cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence -- --root "$PWD"
       - name: Authenticate, clean rebuild, and require zero output drift
         run: |
           export PATH="$PWD/target/paper-python/bin:$PATH"

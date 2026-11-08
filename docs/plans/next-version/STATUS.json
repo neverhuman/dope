@@ -1,0 +1,1115 @@
+{
+  "schema": "dope-jope.next-version-status/v1",
+  "delivery": "one PR per repository; JopeDime existing #2071; full CI at end",
+  "tasks": {
+    "D00": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "ADRs and frozen machine-readable decisions; no campaign authorization",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D01": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Prospective common REAL-FIT route opt-in; historical replay retained; applied Python fixture PASS",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D02": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "ALL5_CRITERIA_SCOPED_SOURCE_BOUND_PASS",
+      "full_ci": "CURRENT_REQUIRED_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "S2/S3 accepted from completed root Rust/Python subtargets despite later job cancellation. S1/S4 remain pending; current full CI separate.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "engineering_criteria": "COMPLETE_SCOPED_PASS"
+    },
+    "D03": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "SCOPED_SAFE_ERROR_MATRIX_PASS_D03_S4_OPEN",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "CPU SDK build/surface and Rust-only dependency criterion S1 accepted at451-equivalent tree; vector/error/legacy remainder pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D04": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "SCOPED_S1_S2_S3_S4_NATIVE_PASS_S5_NOT_RUN",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Full-reservation spectrum/FINE-not-fabricated criterion S3 accepted; other landmark criteria remain pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D05": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "SCOPED_ROW_ROLE_TARGETLAST_CONVERSION_PASS_D05_S6_OPEN",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "FIT-card poisoning/order and edge/refusal criteria S1/S3 accepted; other NC1/native CLI criteria remain pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_SCOPED_HOSTED_CRITERION_RECEIPT_REMAINING_CRITERIA_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
+    },
+    "D06": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "ALL6_CRITERIA_SCOPED_ENGINEERING_PASS",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Actual f440 global and per-cell four-identity/policy assertions and163 goldens accepted; no custody/science/whole-CI claim. Native resource-accounting repair is separate pending-source qualification.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN",
+      "local_candidate_source": "b3427f89a0cd87bc2e558543d6262d571f2982fc",
+      "publication": "HOLD_REMOTE128a"
+    },
+    "D07": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "SCOPED_1811_NATIVE_CRITERIA_PASS_REMAINING_VALIDATION_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Nondefault gate definition and source-free sampling criteria S1/S5 accepted; remaining wire/CLI/compatibility criteria pending.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "Individual1811receipt; newSDK/fullrequiredCIpending",
+      "criterion_verdicts": "dope/tasks/inventory.json",
+      "new_contract_fixtures": "AUTHORED_AT_4054_NATIVE_NOT_RUN"
+    },
+    "D08": {
+      "source": "IMPLEMENTED_CPU_ONLY",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "CPU bounded batching, native23 masks, actual batch2 gradient/padding proof, transactional updates, counters and content-bound checkpointv2. CUDA optimizer training unsupported; no GPU or speed claim.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D09": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "CPU_FIXTURE_PASS_NATIVE_EXECUTION_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Group-aware autograd producer, all served gates, actual classification update, native aux and all intended module gradients, strict NC1/DML4 interop and FP32 AMP Gram/solve; no campaign or model qualification.",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D10": {
+      "source": "IMPLEMENTED",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Local combined check-all target; existing hosted engine coverage retained; full local gate pending",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    },
+    "D11": {
+      "source": "READINESS_HOLD",
+      "focused_checks": "SEE_EXTERNAL_RECEIPTS_NATIVE_PENDING",
+      "full_ci": "NEW_BATCH_PR_CI_PENDING",
+      "efficacy": "NOT_RUN",
+      "notes": "Readiness dossier created; no qualification campaign launched; prerequisites and owner admission remain HOLD",
+      "release": "USER_AUTHORIZED_AFTER_REQUIRED_CI_AND_REVIEW_NOT_PERFORMED",
+      "native_check": "SEE_GLOBAL_ENGINE_COMPILE_SCOPE_REQUIRED_TASK_EXECUTION_PENDING",
+      "criterion_verdicts": "dope/tasks/inventory.json"
+    }
+  },
+  "branch": "fast/next-version-dope-20261103",
+  "base_sha": "59b1e0513683fa4c5c347e4db6465eff84f496ef",
+  "receipt_root": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103",
+  "success_criteria": {
+    "PASS": 55,
+    "NOT_RUN": 6,
+    "BLOCKED": 4,
+    "note": "D06-S4 accepted from actual f440 engine/global-cell binding and163 legacy goldens; original5engineeringtasks+7Ruststreams remain, four campaign criteria deferred neverPASS. New native-process repair authored, no runtime qualification."
+  },
+  "capacity_gate": "Local native/manualCI requires fresh capacity admission; ordinary PR356 CI is admitted. Latest user authorizes merge/release after real required CI and review; no extra human merge approval gate.",
+  "native_compile": {
+    "source_sha": "84a55cf95c33b22964e976c49b41cde7144671f1",
+    "status": "PASS",
+    "toolchain": "Rust1.88",
+    "scope": "engine workspace all-targets offline locked check",
+    "receipt": "node2/engine-check-84a55cf9/RECEIPT.json"
+  },
+  "native_execution": {
+    "status": "HOSTED_PARTIAL_FIXTURE_PASS_AT_PINNED_TREE_CURRENT_ACTIVATION_NOT_RUN",
+    "tested_commit": "2b50c78d5ed47bcb02449ec970ab3be44dfa1889",
+    "tested_tree": "c2f59ae4165fad5234b2c8621b8974f2342c0ba9",
+    "equivalent_pr_head": "451ad47423a98db9de104269174dfe26eebf5e9f",
+    "passed": 252,
+    "failed": 0,
+    "ignored": 1,
+    "overall_job": "FAILURE_LICENSE_COLLECTION",
+    "release_job": "SKIPPED",
+    "receipt": "dope/receipts/hosted-native-451-criteria.json"
+  },
+  "python_legacy_goldens": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "cases": 129,
+    "tolerance": 1e-12,
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "python_next_version": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "tests": 50,
+    "skips": 0,
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "source_checkpoint": "409c84e3486fe820776aa781a37b373954653c94",
+  "dope_status_page": "dope/STATUS.md",
+  "python_v3_summary_fixture": {
+    "status": "PASS",
+    "source_sha": "409c84e3486fe820776aa781a37b373954653c94",
+    "tests": 1,
+    "scope": "selected existing synthetic canonical-summary case; no Rustparity/modelcheckpoint case executed",
+    "receipt": "ci-assist/cpu-after-caps-409c84e3/RECEIPT.json"
+  },
+  "source_cap_inventory": {
+    "governed": 1300,
+    "violations": 0,
+    "scope": "Static tracked-source inventory only; current native guard/CI pending"
+  },
+  "historical_native_execution": {
+    "status": "STOPPED_CAPACITY_HOLD",
+    "executed_tests": 0,
+    "receipt": "node2/core-fixtures-84a55cf9/CAPACITY_HOLD.json",
+    "note": "Compilation only before termination; never count as a test pass."
+  },
+  "rust_frozen_checker_activation": {
+    "source": "ACTIVATED_PENDING_HOSTED_BUILD_TESTS",
+    "binary": "check-frozen-evidence",
+    "ci_route": "first executing guard in ops/ci/cpu.sh; Justfile native-guard-check",
+    "compile_tests_parity": "NOT_RUN_LOCALLY",
+    "python_originals": "PRESERVED",
+    "scope": "C0-reason parity plus minimal root CLI forms; not universal argparse parity"
+  },
+  "engineering_release_scope": {
+    "decision": "ENGINEERING_RELEASE",
+    "deferred_campaign_criteria": [
+      "D00-S4",
+      "D11-S2",
+      "D11-S3",
+      "D11-S4"
+    ],
+    "verdict": "DEFERRED_CAMPAIGN_QUALIFICATION",
+    "historical_verdicts_preserved": true,
+    "receipt": "../receipts/engineering-release-scope-owner-decision.json",
+    "pending_user_question": false
+  },
+  "engineering_source_batch": {
+    "source_commit": "4054cef554ff631a47852b9229469fb6f24a8923",
+    "base": "a23ee0541b955061e17cf462dc1f926e55d6dee9",
+    "engine_version_candidate": "1.2.0",
+    "D06": "Required declared roles + production grouping/CLI fixtures authored",
+    "D05": "Actual private SDK target-last extension + role/privacy tests authored",
+    "D07": "2/16/64KiB caps/malformed tests authored",
+    "rustfmt_1_88": "PASS",
+    "static_caps": {
+      "governed": 1291,
+      "violations": 0
+    },
+    "new_native_tests_executed": 0,
+    "native_execution": "NOT_RUN",
+    "current_full_ci": "PENDING"
+  },
+  "rust_golden_caller_activation": {
+    "schema": "dope.native-caller-source-activation/v1",
+    "status": "SOURCE_IMPLEMENTED_NATIVE_NOT_RUN",
+    "source_commit": "53c2b0088744b77d6516617b514697dd357df374",
+    "base": "664ab442f7083e908bd6bc23dd303aa1e0841e5b",
+    "owner": "/root/dope_audit",
+    "independent_reviewer": "/root/ci_shard_review",
+    "scope": [
+      "rust/metrics/golden.rs",
+      "rust/metrics/golden/discovery.rs",
+      "rust/metrics/golden/discovery_tests.rs",
+      "Justfile:golden-parity",
+      "ops/ci/public-smoke.sh:golden_step"
+    ],
+    "corpus_static_inventory": {
+      "top_level": 129,
+      "drivers_v2": 34,
+      "standard_total": 163,
+      "separate_analytic_rank": 7,
+      "standard_ids_unique": true
+    },
+    "guarantees_authored": [
+      "Required component/v2/rank directories; recursive IO/entry/symlink/special-node refusal",
+      "Exact163andper-componentassertions; seven rank fixture objects separately evaluated",
+      "Explicit outer-schema2 legacy v2 driver dispatch; historical run_case still rejects schema2",
+      "Existing native audit-proof focus refuses zero discovered tests",
+      "Original Python sources and all expected fixture bytes preserved"
+    ],
+    "source_api_note": "discover_cases now returns MetricResult<Vec<PathBuf>> to propagate IO refusal. The sole existing repository caller and new tests handle the result; engineSDK ABI/wires unchanged.",
+    "new_rust_test_functions": 4,
+    "checks": {
+      "rustfmt_1_88_edition2024": "PASS",
+      "bash_syntax": "PASS",
+      "diff_check": "PASS",
+      "static_source_caps": {
+        "governed": 1292,
+        "violations": 0
+      },
+      "new_native_tests_executed": 0,
+      "compile": "NOT_RUN",
+      "checker": "NOT_RUN",
+      "full_current_ci": "PENDING"
+    },
+    "criterion_effect": {
+      "D02-S1": "NOT_RUN until full strict native corpus assertions execute",
+      "D02-S4": "NOT_RUN until separate actual production grouped-member fixture executes"
+    },
+    "policy": "NOT_COMPLIANT; this closes one caller source slice only. Remaining claim checks/nontrainingPython migration remain visible.",
+    "limits": "No science, model, performance, privacy or release qualification; no local native admission inferred."
+  },
+  "current_local_source_commit": "5cb20de52868b11cf71d544e62579271bd06b35a",
+  "ci_worker_activation": {
+    "schema": "dope.current-ci-repair-and-required-reference-route/v1",
+    "status": "SOURCE_IMPLEMENTED_RUNTIME_NOT_RUN",
+    "source_commit": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+    "base": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+    "scope": {
+      "R6_paths": 6,
+      "owned_CI_runtime_fixes": [
+        "emit receipt error has ownedString with unchanged safe code",
+        "ARM bootstrap existing prepare-native in checkout; stepPATH/RUSTUP_TOOLCHAIN1.88.0, no sudo or globaldefaults",
+        "NC1 privatecard assertion uses required nested state.numeric.hi f64=4.0; productionserde unchanged"
+      ]
+    },
+    "actual_failing_source_evidence": {
+      "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+      "native_compile_jobs": [
+        126081956713,
+        126081956590
+      ],
+      "portable_job": 126081956650,
+      "signed_job": 126081956450,
+      "signed_run": 41683191770,
+      "disposition": "FAIL retained; no new tests claimed PASS"
+    },
+    "required_reference_route": {
+      "stage": "cpu-compat",
+      "prepare": "bash ops/ci/shared-levels.sh prepare-torch",
+      "test": "env SHARED_PYTHON=target/shared-python/bin/python bash ops/ci/shared-levels.sh torch test_next_version",
+      "separate_environment": true,
+      "actual_test_count": "NOT_RUN; do not substitute source method count",
+      "nonzero_required": true,
+      "skips_allowed": 0,
+      "expected_failures_allowed": 0,
+      "failure_with_exit0_refuses": true,
+      "fixture_and_source_bindings": "existing required tracked fixtures/source hashes unchanged"
+    },
+    "inventory": {
+      "legacy_source_origins": 70,
+      "runtime_ids": 82,
+      "stage_markers": 73,
+      "test_kind_commands": 22
+    },
+    "preserved": [
+      "existing worker/job inventory, fork restriction and ARM30minute quota",
+      "portable twoRustbin commands and requiredall-worker cpu gate",
+      "nativebudget allhistoricalconstraints and unchanged sevenjob quotas",
+      "unchanged oldPython/fixturebytes/producer sources/dependencies/locks"
+    ],
+    "checks": {
+      "Rust1.88_format": "PASS5files",
+      "Bash_syntax": "PASScpu-compat",
+      "Actionlint": {
+        "verdict": "PASS_EXIT0",
+        "ignore_flags": [],
+        "config_git_blob": "de587ea88e7293c83b17cee9f241caad917ce8f5",
+        "workflow_sha256": "3f7c7290781c00edd31ae330e4b2ea4dae9796a65a161a55174dd148267782fd",
+        "scope": "Exactnewworkflow with authentic repo config"
+      },
+      "diff_check": "PASS",
+      "static_source_caps": {
+        "governed": 1300,
+        "violations": 0
+      },
+      "local_native_compile_verifier_tests_executed": 0,
+      "current_full_CI": "PENDING"
+    },
+    "acceptance": "No criterion promoted from source changes. Counts38PASS23NOTRUN4historicalBLOCKED; campaign deferral neverPASS. R0 source route now implemented, actual qualification pending.",
+    "remaining": [
+      "Real current-head required CI/review and actualworker/reference/CLI execution",
+      "M0 SDK/High +actualrecipe-bound forward candidate review/adoption",
+      "Seven Rust migration streams and23engineering acceptance criteria",
+      "Merge/release only after real checks; no science/modelpromotion"
+    ]
+  },
+  "current_ci_known_failure": {
+    "CI_run": 41706702071,
+    "native_job": 126163801333,
+    "native": "Two test-onlyworkflow_events mainprofile conversions failed; productionactualworkflowtestpassed",
+    "compat_job": 126163801292,
+    "compat": "Public-numberfirewall3literalversion/historicallabeltokens; notparser/dependency/test-summaryfix",
+    "disposition": "Failuresretained; no guard/regex/fixtureweakening"
+  },
+  "historical_ci_worker_activation": [
+    {
+      "schema": "dope.native-ci-source-activation/v1",
+      "status": "SOURCE_IMPLEMENTED_NORMAL_CI_REQUIRED",
+      "source_commit": "9a5880c8ed4a28c41b11991c0b7991ecd04981a7",
+      "base_before_ci": "ecce42a0e660922d65bfd0db7270285d64e419e0",
+      "reviewed_composition": "CI R4 then native budget R5",
+      "source_writer": "/root/dope_audit",
+      "source_reviewers": [
+        "/root",
+        "/root/ci_shard_review"
+      ],
+      "topology": {
+        "x64_heavy_workers": [
+          "cpu-native",
+          "cpu-compat",
+          "cpu-transfer-paper"
+        ],
+        "portable_worker": "ci-shard-portable-arm64",
+        "required_aggregate": "cpu",
+        "required_workers": 4
+      },
+      "completeness": {
+        "legacy_source_commands": 70,
+        "runtime_command_ids": 80,
+        "test_kind_commands": 21,
+        "current_run_and_attempt_only": true,
+        "test_commands_require_nonzero_framework_counts": true,
+        "framework_failures_refuse_even_wrapper_exit_zero": true,
+        "rerun_policy": "Re-run all jobs; no successful receipts reused across attempts"
+      },
+      "budgets": {
+        "cpu_native": 90,
+        "cpu_compat": 120,
+        "cpu_transfer_paper": 120,
+        "portable_arm64": 30,
+        "cpu_aggregate": 20,
+        "paper": 60,
+        "security": 60,
+        "cpu_role_job_minute_max": 380,
+        "audit": 60,
+        "manual_gpu": 120,
+        "neural_fit_seconds": 600,
+        "gpu_memory_bytes": 17179869184,
+        "fitness_rows": 128,
+        "fitness_dimensions": 32,
+        "capacity_claim": "Finite policy quotas only; no speedup, host placement or resource-admission guarantee"
+      },
+      "old_guards_preserved": [
+        "manual-only GPU dispatch",
+        "sealed corpus and artifact input presence",
+        "complete bounded Rust split source closure",
+        "neural600seconds/16GiB/fitness128x32 config and source bounds",
+        "original sequential cpu.sh retained unchanged as source baseline"
+      ],
+      "native_budget_profile": "version1 strict supported scalar TOML, unknown/duplicate/missing/unsupported config refuses",
+      "registration": {
+        "existing_ci_shard_binary": true,
+        "new_bins": 0,
+        "new_dependencies": 0,
+        "lock_changes": 0,
+        "new_Python": 0,
+        "Justfile_native_guard": "ci-shard included in existing Clippy/test commands"
+      },
+      "checks": {
+        "rustfmt_1_88_edition2024": "PASS13files",
+        "bash_syntax": "PASS5scripts",
+        "actionlint": "Root PASS on byte-identical reviewed workflow using authentic unchanged repo config",
+        "diff_check": "PASS after removing only two trailing blank lines",
+        "static_source_caps": {
+          "governed": 1300,
+          "violations": 0
+        },
+        "local_native_compile_tests_executed": 0,
+        "native_compile": "NOT_RUN",
+        "worker_runtime": "NOT_RUN",
+        "current_full_ci": "PENDING"
+      },
+      "nc1_fixture_repair": {
+        "source_commit": "ecce42a0e660922d65bfd0db7270285d64e419e0",
+        "published_failing_head": "d9540a6f7de559129b9bad79f87ace040dcd2912",
+        "run_id": 41678411412,
+        "job_id": 126065167647,
+        "reason": "Fixture flattened internally tagged FeatureKind and Task JSON incorrectly",
+        "fix": "Valid requests now serialize actual public InputTable/Cell and DeclaredSchema/FeatureSpec/FeatureKind/TargetSpec/Task values. Production parser and all unknown-field/semantic refusal assertions unchanged.",
+        "current_execution": "NOT_RUN"
+      },
+      "limits": [
+        "Shared next-version Torch/reference/training ordinary-PR route remains open; no implicit coverage from splitting old commands",
+        "M0 SDK/High matrix packet not yet adopted",
+        "Seven Rust migration streams and23engineering criteria remain open",
+        "Four campaign criteria deferred, never PASS",
+        "No local native/host control changes, manual CI dispatch, scientific campaign or model promotion"
+      ]
+    }
+  ],
+  "required_next_version_PR_route": {
+    "source": "IMPLEMENTED_R6",
+    "actual_runtime": "NOT_RUN",
+    "receipt": "dope/receipts/ci-r6-required-reference-route.json"
+  },
+  "current_stage_pin_and_sdk_surface": {
+    "schema": "dope.stage-pin-and-sdk-prepared-surface/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "6116c2db346a037cbc3bff05bad605fb35949164",
+    "base": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+    "actual_1811_findings": {
+      "coverage": "FAIL coverage_stage_changed before stages; ARM34passed1failed strict packaged coverage test",
+      "root_cause": "R6 candidate pin hashed an extra trailing blank line absent in actual script",
+      "script": "ops/ci/shared-levels.sh",
+      "raw_git_bytes": 5132,
+      "actual_sha256": "db919c20f23e729686a800d5bcdca22abd54b1258bd337f04471f083a1ba9453",
+      "unchanged_between": "664 and1811 raw Git bytes identical",
+      "repair": "Only new inventory pin changes; script and strict verifier unchanged"
+    },
+    "m0": {
+      "new_tests": [
+        "engine/dope-sdk/tests/legacy_surface_parity.rs",
+        "engine/dope-core/tests/landmark_high_matrix.rs"
+      ],
+      "actual_forward_boundary": "dope_sdk::v0::encode_prepared",
+      "validates": [
+        "known expected existing recipe",
+        "known conditioning recipe and exact match",
+        "known conditioning level before tensor conversion/forward"
+      ],
+      "actual_encoder": "unchanged MlcV3Model::encode_features_629",
+      "authenticity_limit": "caller-declared structural consistency, not model/training/custody authentication",
+      "legacy_readers_and_ids": "unchanged",
+      "source_review_fixes": [
+        "remove unused sdk_columns",
+        "assert original delegated Artifact shape error rather than Input"
+      ],
+      "existing_graph_test_dependencies": [
+        "safetensors",
+        "serde_json"
+      ],
+      "native_tests": "NOT_RUN current source; no criterion credit"
+    },
+    "engine_failure_collection": {
+      "scripts": [
+        "ops/ci/engine.sh",
+        "ops/ci/engine-release.sh"
+      ],
+      "change": "append --no-fail-fast only to existing all-engine cargo test commands",
+      "preserved": "targets/flags/set-e/final nonzero gate; later release/build/smoke remain blocked on any test failure"
+    },
+    "checks": {
+      "Rust1.88_format": "PASS5files",
+      "Bash_syntax": "PASS2scripts",
+      "all5_stage_pins_against_rawGit": "PASS",
+      "diff_check": "PASS",
+      "static_governed_source_count": 1301,
+      "static_source_cap_violations": 0,
+      "new_native_test_execution": "NOT_RUN",
+      "full_current_CI": "PENDING"
+    },
+    "historical_hosted_signed": {
+      "head": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+      "run_id": 41687886049,
+      "job_id": 126098368662,
+      "conclusion": "SUCCESS",
+      "tested_merge": "8efd1a1e5aa8cc3de38ec2faffefcb1bafe0f73d",
+      "tested_tree": "f3b5f5ebe4541bdf17f2110661f7f91ee0c4f362",
+      "same_as_head_tree": true,
+      "Rust_passed": 273,
+      "failed": 0,
+      "ignored": 1,
+      "result_rows": 45,
+      "zero_result_rows": 6,
+      "scope": "Signed-engine named job; not all CI, new-source M0 or automatic criterion promotion",
+      "primary_log_sha256": "2f901ec01bb95d9c0620e5a080d92c3ed7fcae10758e05506e7ac5493a488a5d"
+    },
+    "criteria": "38PASS/23NOT_RUN/4historicalBLOCKED unchanged; four campaign criteria separately deferred neverPASS",
+    "language_policy": "NOT_COMPLIANT; seven Rust streams remain required",
+    "remaining": [
+      "Actual current-source required CI/review and per-criterion evidence mapping",
+      "Authentic current audit/badge snapshot reconciliation;1811 score87 report passed floor but88 snapshot mismatch failed job",
+      "Seven Rust streams/23 engineering criteria; no campaign or model promotion"
+    ]
+  },
+  "historical_ci_known_failures": [
+    {
+      "head": "4b2bbde997675d708793c7d00cdb6d792de4c219",
+      "receipt_emit_compile": "FAIL",
+      "ARM_privileged_setup": "FAIL",
+      "NC1_private_card_assertion": "FAIL",
+      "fix_source": "9484dd2e3c6c68ab390ee7f1b6c4231918f34df8",
+      "current_qualification": "NOT_RUN"
+    },
+    {
+      "head": "181116c7aa8f91ce74ab3ff9e5838ebdcde5037b",
+      "coverage_stage_pin": "FAIL; source6116c2db fixes one new pin",
+      "audit_badge": "FAIL after report87passed floor; committed88 snapshot mismatch",
+      "cpu_compat_provision": "runner communication lost before stages; no executed test count",
+      "current_qualification": "PENDING_CURRENT_HEAD"
+    },
+    {
+      "CPU_run": 41691847183,
+      "native_job": 126112158608,
+      "compat_job": 126112158688,
+      "portable_job": 126112158768,
+      "coverage": "command_semantics_mismatch before stage execution; portable34PASS1FAIL packaged proof",
+      "Signed_run": 41691846863,
+      "Signed_check": 126112158285,
+      "Signed": "FAIL --locked lock update required before tests; no test success claimed"
+    },
+    {
+      "head": "94d870f0915d3c18591f553803dc38e26be932e2",
+      "run": 41696444169,
+      "job": 126128142260,
+      "reason": "HighmatrixFINE_SLOTS wrongtestimport",
+      "fix_source": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+      "new_native_execution": "NOT_RUN"
+    }
+  ],
+  "current_command_and_lock_repair": {
+    "schema": "dope.ci-command-and-lock-compatibility-repair/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "5378f87c67d20b511022fb986a2ecb2bd4220893",
+    "base": "bedf17b49ab00079bbee27cca7f55dd7e4f6556c",
+    "actual_bedf_failures": {
+      "CPU_run": 41691847183,
+      "native_job": 126112158608,
+      "compat_job": 126112158688,
+      "portable_job": 126112158768,
+      "coverage": "command_semantics_mismatch before stage execution; portable34PASS1FAIL packaged proof",
+      "Signed_run": 41691846863,
+      "Signed_check": 126112158285,
+      "Signed": "FAIL --locked lock update required before tests; no test success claimed"
+    },
+    "corrections": {
+      "YAML": "Strip one literal run: prefix only for exact frozen workflow path semantic comparison, after unchanged full frozen-block hash verification",
+      "environment": "Restore explicit env PYTHONPATH=. in live paper-number-tests; no dropped assignment/inherited-env assumption",
+      "hashes": "Only live paper-number command body marker/map and transfer-stage pin recomputed; frozen70origins, preimages, source hashes and test IDs unchanged",
+      "SDK_lock": "Qualify existing SDK safetensors dependency as safetensors0.7.0 because three versions already exist in lock. No package version/source/checksum/dependency graph update."
+    },
+    "cache_restoration": {
+      "scope": "Only three X64 workers",
+      "action": "mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba",
+      "action_version": "v0.0.11",
+      "cache_binary_version": "v0.16.0",
+      "environment": [
+        "SCCACHE_GHA_ENABLED=true",
+        "RUSTC_WRAPPER=sccache"
+      ],
+      "reference": "Exact original main59b pin/inputs",
+      "workflow_sha256": "410e1c4f555cdb6a2f4d553c86d53ed264a4c50987c9a2cf24cafae31058c09a",
+      "unchanged": "roles, permissions, runner labels, budgets, build/test commands, ARM/aggregate gates and source preimage identity",
+      "measurement": "No hit-rate, elapsed-time or score recovery asserted; fresh audit must measure actual source"
+    },
+    "checks": {
+      "Rust1.88_format": "PASS3files",
+      "Bash_syntax": "PASS3worker scripts",
+      "Actionlint": "EXIT0 authentic repo config, no ignore flags",
+      "Actionlint_config_blob": "de587ea88e7293c83b17cee9f241caad917ce8f5",
+      "full_Cargo_metadata_offline_locked": {
+        "argv": [
+          "/home/ubuntu/.cargo/bin/rustup",
+          "run",
+          "1.88.0",
+          "cargo",
+          "metadata",
+          "--offline",
+          "--locked",
+          "--manifest-path",
+          "engine/Cargo.toml",
+          "--format-version",
+          "1"
+        ],
+        "exit": 0,
+        "seconds": 0.9627866350056138,
+        "builds": 0,
+        "tests": 0,
+        "locked_bytes_unchanged": true
+      },
+      "lock_semantic_diff": "Exactly one SDK dependency qualifier, all locked versions/sources/checksums unchanged",
+      "map_semantic_diff": "Exactly one body_sha256; full frozen hashes and70row inventory unchanged",
+      "independent_static_comparison": "70of70invocations/73markers/all5stagepins match",
+      "diff_check": "PASS",
+      "static_source_caps": {
+        "governed": 1301,
+        "violations": 0
+      },
+      "native_build_tests_executed": 0,
+      "current_native_runtime": "NOT_RUN",
+      "current_required_CI": "PENDING_NEW_PUSH"
+    },
+    "acceptance": "No criteria promoted.38PASS23NOT_RUN4historicalBLOCKED; only4campaigncriteria deferred neverPASS. Rustlanguagepolicy NOT_COMPLIANT/sevenstreams unfinished.",
+    "audit": "Current source requires fresh audit/badge; historical1811authentic87snapshot/witness preserved, no score guessed."
+  },
+  "historical_success_criteria": [
+    {
+      "PASS": 38,
+      "NOT_RUN": 23,
+      "BLOCKED": 4,
+      "note": "Historical30/31/4 baseline, six451-tree promotions and two completed ccd metric subtargets. Four campaign criteria separately DEFERRED_CAMPAIGN_QUALIFICATION, never PASS. Current source/new tests need exact-head qualification."
+    },
+    {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "BLOCKED": 4,
+      "note": "Original65 criteria retained. Nine individually reviewed1811 source/test closures promoted; no generic273/currentSDK/allCI inference. Four campaign criteria separately deferred, neverPASS."
+    },
+    {
+      "PASS": 50,
+      "NOT_RUN": 11,
+      "BLOCKED": 4,
+      "note": "Original65criteria preserved. Three individually reviewedactualbbSDK/High/M1targets promoted, wholeengine/fileidentitiesmatch; no generic280/fullCI/science/Pythoncompliance inference. Fourcampaigncriteria deferredneverPASS."
+    },
+    {
+      "PASS": 51,
+      "NOT_RUN": 10,
+      "BLOCKED": 4,
+      "note": "D02S1 completed302/0/0 library and strict163corpus accepted with unchangedmetric/fixture objects. WholefailedjobnotPASS. Original65criteria retained; fourcampaigncriteria deferredneverPASS."
+    },
+    {
+      "PASS": 52,
+      "NOT_RUN": 9,
+      "BLOCKED": 4,
+      "note": "D04S1 scopedimmutablefixture/coordinates accepted; D03S3M2authoredNOTRUN; sixengineeringtasks/sevenRuststreams. Fourcampaigncriteria deferredneverPASS."
+    }
+  ],
+  "hosted_native_1811_acceptance": {
+    "receipt": "dope/receipts/hosted-native-1811-criteria.json",
+    "sha256": "8bf2356e548c08fef7ededa18335e931b4729e0a30ffd1eaf672f649fe6b675e",
+    "accepted": [
+      "D02-S4",
+      "D04-S4",
+      "D06-S1",
+      "D06-S2",
+      "D06-S3",
+      "D06-S5",
+      "D06-S6",
+      "D07-S2",
+      "D07-S4"
+    ],
+    "source_closure_current_verified": true
+  },
+  "current_sdk_parity_repair": {
+    "source": "e3eaadd803c5a556f2d729dd9b8f95af85868704",
+    "actual_failing_run": 41694404601,
+    "job": 126121036461,
+    "reason": "Clippy unused sdk_vec",
+    "fix": "Explicit independent SDK/CoreHigh floatbit equality;497LOC; no test/assertion removed",
+    "new_native_execution": "NOT_RUN"
+  },
+  "current_m1_and_high_import_source": {
+    "schema": "dope.m1-and-high-import-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "0dfe96a0d1a90aec5f2100bd6177b57c80f436f4",
+    "base": "94d870f0915d3c18591f553803dc38e26be932e2",
+    "actual_failure": {
+      "run": 41696444169,
+      "job": 126128142260,
+      "conclusion": "FAIL unresolveddope_core::landmark::FINE_SLOTS import",
+      "disposition": "Retained; no newruntimePASS"
+    },
+    "repair": "Test imports existing landmark::bundle::FINE_SLOTS; no productreexport/constant/math change",
+    "Clippy": {
+      "script": "ops/ci/engine.sh",
+      "change": "Append only --keep-going before -- -D warnings on existing Clippy invocation",
+      "preserved": [
+        "--all-targets",
+        "--locked",
+        "set-e",
+        "nonzero final warning/failure exit",
+        "existing cargo test --no-fail-fast",
+        "alltargets and alltest assertions"
+      ],
+      "version_support": "Cargo stabilized1.74; pinned1.88. Root verified official CargoBook unstable#keep-going and officialCI guide example. Help-only Clippy exit0 does not list every Cargo flag; no build/test was used for support check."
+    },
+    "M1": {
+      "path": "engine/dope-cli/tests/nc1_refusal_privacy.rs",
+      "author_sha256": "c9a63328d9892a8b2bd4caf96c3462cf6bc322a8e31b04e8145af0903486b517",
+      "integrated_sha256": "19f76d87660ef8e51686acbd8d3139ee9c9d77c482b72518a65880cde55a8dfa",
+      "adaptation": "Rust1.88 workspaceedition2021 format/importordering only; authorpacket preserved",
+      "source_preimages_match": 13,
+      "author_checksums_match": 16,
+      "lines": 357,
+      "ordinary_test_functions_authored": 3,
+      "native_CLI_calls_authored": 7,
+      "actual_executed": 0,
+      "assertions": [
+        "Privateheaders/vocabulary/classes/inFIT1e300 actuallyplanted; publicschema/stdoutredacted",
+        "MalformedJSON andunknownfields fixedsafecode/nooutput",
+        "Rolecollision andtamperedactualprivatecard fixedsafecode/nooutput",
+        "Absolute actualCLI with emptyPATH/removedPythonvars"
+      ],
+      "criterion": "D05-S4",
+      "criterion_verdict": "PASS scopedactualbbnativeexecution; seehosted-native-bb-criteria receipt",
+      "independent_review": "nc1-cli-canary-m1/REVIEW-STRONG.md: no concrete static blocker; no runtime qualification"
+    },
+    "scope_preserved": "No dependencies/locks/productionparsers/CLIregistration/Python/guardthreshold/exclusions/frozenfixtures changed",
+    "checks": {
+      "Rust1.88_format": "PASS2files",
+      "Bash_syntax": "PASSengine.sh",
+      "diff_check": "PASS",
+      "new_native_build_tests_executed": 0,
+      "full_current_CI": "PENDING_NEW_PUSH"
+    },
+    "criterion_counts": {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "historical_BLOCKED": 4
+    },
+    "remaining": "ActualcurrentCI/review/M1/nativeM0qualifications, sevenRuststreams,14engineeringcriteria;4campaigncriteria deferredneverPASS; no newscore/audit claim"
+  },
+  "current_bb_ci_repair": {
+    "schema": "dope.bb-ci-repair-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "492fae914f6151cf32e14dad16699b40019d999a",
+    "base": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+    "actual_bb_failures": {
+      "CI_run": 41699461094,
+      "native_job": 126140855993,
+      "native": "FAIL Clippytype_complexity before subsequenttargetcompletion",
+      "compat_job": 126140855691,
+      "compat": "FAIL public-claims tools/claims/check.py→figure_drawing.py missingmatplotlib onitsguest; failedreceiptretained",
+      "audit_job": 126138603944,
+      "audit": "FAIL finalbadge mismatch; actualfullreport88PASS"
+    },
+    "repairs": {
+      "coverage": "SemanticMarkerFields4Stringtuple andMarkedCommandsmapaliases; exactfieldorder/bodiesunchanged, no lintallow",
+      "compat": "ONE claims-plot-dependencies check installs existingmatplotlib==3.10.8 withunchanged validation/requirements-v1.txt intoownci-python beforepublic-claims. Originalmonolith provisioned it in sameenv beforeclaims; splitotherguest cannot supply it. No localinstall/newversion/lock.",
+      "inventory": "83runtimeIDs/74markers/22testcommands; original70origins/testIDs/frozenpreimages/sourcehashes unchanged. Newcheckhasactualreceipt/fatalfailure, no fakeframeworkcounts.",
+      "badge": "Copyexactauthenticbb88SVG withhashonlysourcewitness; preserveoldjobFAIL andolder87/451witnesses"
+    },
+    "checks": {
+      "Rust1.88_format": "PASS2files",
+      "Bash_syntax": "PASScompatstage",
+      "independent_source_review": "APPROVED exact3CIpathdiff;74marker/order/kind/bodyhashes+all5stagepinsmatch",
+      "diff_check": "PASS",
+      "static_governed_sources": 1301,
+      "source_cap_violations": 0,
+      "new_build_tests_executed_locally": 0,
+      "new_required_CI": "PENDING_NEW_PUSH"
+    },
+    "bb_Signed_evidence": {
+      "run": 41699460902,
+      "job": 126138608036,
+      "conclusion": "SUCCESS",
+      "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+      "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+      "same_as_bb": true,
+      "passed": 280,
+      "failed": 0,
+      "ignored": 1,
+      "result_rows": 48,
+      "includes": "M0actualSDK/Highmatrix andM1CLI3tests executed; rootcriterionreview separate",
+      "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+    },
+    "criterion_counts": {
+      "PASS": 47,
+      "NOT_RUN": 14,
+      "historical_BLOCKED": 4
+    },
+    "qualification": "No automaticcriterionpromotion from280total orsourcechanges; actualper-criterionreviewrequired. NewheadfullCIpending.",
+    "remaining": "Sevenengineeringtasks/sevenRuststreams/14engineeringcriteria; only4campaigncriteria deferredneverPASS; no model/sciencepromotion"
+  },
+  "source_bound_bb_signed": {
+    "run": 41699460902,
+    "job": 126138608036,
+    "conclusion": "SUCCESS",
+    "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+    "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+    "same_as_bb": true,
+    "passed": 280,
+    "failed": 0,
+    "ignored": 1,
+    "result_rows": 48,
+    "includes": "M0actualSDK/Highmatrix andM1CLI3tests executed; rootcriterionreview separate",
+    "log_sha256": "c92290fed1d61a56805b4c1dcfd36b03e1c4fde45cb4f6fa986b51a3babfc2a4"
+  },
+  "latest_recorded_audit_snapshot": {
+    "schema": "dope.hosted-audit-snapshot/v1",
+    "source_head": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+    "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+    "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+    "tree_matches_source": true,
+    "source_binding": "RootindependentGitAPI: parentsmain59b+bb; exactsamecheckedout/source tree",
+    "audit_run": 41699460421,
+    "audit_job": 126138603944,
+    "artifact_id": 13263332952,
+    "report": {
+      "sha256": "587becb08546e6e89cd1934e635614e89e751bf361e2ca762c5d4a6b4606274e",
+      "bytes": 154690,
+      "version": "1.7.1",
+      "scope": "full",
+      "dirty_worktree": false,
+      "score": 88,
+      "raw_score": 88,
+      "minimum_score": 85,
+      "report_decision": "pass",
+      "caps": 0,
+      "high": 0,
+      "critical": 0,
+      "medium": 11
+    },
+    "generated_svg": {
+      "sha256": "6074b4b29a628bd4645cbf1008a110592b14b25944eb7c97c92f7d8189cae86b",
+      "bytes": 437,
+      "generator": "Unchangedaudit-proof in authenticGHAjob",
+      "adoption": "Exactartifactbytes; no manualscore edit"
+    },
+    "score_receipt": {
+      "sha256": "d5f90bf96701fce3af4d92a40d8b77a6819abcca9bcd86872b06dba16c4c4e04",
+      "report_status": "pass",
+      "committed_badge_matches": false
+    },
+    "proof_tests": 9,
+    "job_conclusion": "FAIL finalbadgecheck againstformer87snapshot; reportPASSisnotwholejobPASS",
+    "later_source_qualification": "PENDING; no inheritednewhead exactauditpass",
+    "historical_witnesses_preserved": [
+      "hosted-audit-1811-snapshot.json",
+      "jankurai-451-snapshot.json"
+    ]
+  },
+  "hosted_native_bb_acceptance": {
+    "receipt": "dope/receipts/hosted-native-bb-criteria.json",
+    "sha256": "63a99552bb8797726bb2e65e05bab20b3ec47c6865a538f9bf9c515e3d2bf90d",
+    "accepted": [
+      "D03-S2",
+      "D04-S2",
+      "D05-S4"
+    ],
+    "whole_engine_closure_current_verified": "bd87d75d65f76606fd8c9a520412c07c7191ed94"
+  },
+  "engineering_tasks_open": 5,
+  "historical_tasks_open": 7,
+  "completed_root_goldens_bb": {
+    "receipt": "dope/receipts/completed-root-goldens-bb.json",
+    "sha256": "5b6b83d14dbd80f3c846595f17366442b4795bea4874541409fcd1461e2ae0db",
+    "criterion": "D02-S1",
+    "source_objects_verified": true
+  },
+  "current_e5_ci_profile_readme_repair": {
+    "schema": "dope.e5-reviewed-ci-repair-source/v1",
+    "status": "SOURCE_REVIEWED_NORMAL_CI_REQUIRED",
+    "source_commit": "5e4f27b457c8351f3d031d973add1d4536788d75",
+    "base": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+    "source_scope": [
+      "README approvedauditparagraphlabels only: pinned auditor/earlierhosted/earlierlocal;88score/source/job/witness/historypreserved; no claimschecker change",
+      "Test-onlyworkflow_eventshelper expands main-filtered synthetic profile to exactcurrent7CI+auditjobs/uniqueIDs; all6testbodies/negativeconditions/oldJSON/prodguard unchanged"
+    ],
+    "reviewed_packets": {
+      "guard_candidate_sha256": "412ed4e59c33db10f91b6d6a16760275b305ff512c947a6cf8efc9caa450417d",
+      "guard_preimage_sha256": "34a073831b68da026de678cfd7ac889a442275cb7f450f616a262fe39fc27d4c",
+      "guard_manifest_sha256": "aa3caf8eaf2a65fc299067a174d1963e84dcd2e523eec34b02ae8f47e30eb988",
+      "README_mechanical_correction": "Authorzero-contexthunkheaderline9; exactprimaryoldparagraphline10. Preflights refusedbeforewrites; appliedonlyexact singleapprovedold→newtext, allURLsunchanged.",
+      "compat_receipt_metadata_correction": "Authorworkflow_run_idwasjobnumber. Actualworkflowrun41706702071/job126163801292; authorreceiptpreserved/rootreviewrecords correction."
+    },
+    "actual_e5_failures": {
+      "CI_run": 41706702071,
+      "native_job": 126163801333,
+      "native": "Two test-onlyworkflow_events mainprofile conversions failed; productionactualworkflowtestpassed",
+      "compat_job": 126163801292,
+      "compat": "Public-numberfirewall3literalversion/historicallabeltokens; notparser/dependency/test-summaryfix",
+      "disposition": "Failuresretained; no guard/regex/fixtureweakening"
+    },
+    "actual_e5_qualified_components": {
+      "source": "e5ec1f15ec90099e4aba1a9df789c5c482425335",
+      "tested_merge": "ace859a8fc2546fba12feeec989bc5004f072741",
+      "tested_tree": "f58b7e60c264fc52e39344261cdbd3b8e9cca031",
+      "matches_source_tree": true,
+      "audit": {
+        "run": 41706702169,
+        "job": 126163801917,
+        "job_conclusion": "SUCCESS",
+        "version": "1.7.1",
+        "scope": "full",
+        "dirty": false,
+        "score": 88,
+        "raw": 88,
+        "caps": 0,
+        "high": 0,
+        "critical": 0,
+        "medium": 11,
+        "strict_security": "5ran0skip0fail",
+        "proof_tests": 9,
+        "committed_badge_matches": true,
+        "artifact": 13268015978,
+        "report_sha256": "c894c281a08a36b4cb02945bbb3571bb77b21384bce3fc26b6fce5b97d6ab943"
+      },
+      "Signed": {
+        "run": 41706702083,
+        "job": 126163801942,
+        "conclusion": "SUCCESS",
+        "passed": 280,
+        "failed": 0,
+        "ignored": 1
+      },
+      "other_jobs_at_root_finalreadback": "ARM/paper/securitySUCCESS;transfer-paperstillRUNNING at20:08, no terminalPASS inferred"
+    },
+    "D02_acceptance": {
+      "receipt": "dope/receipts/completed-root-goldens-bb.json",
+      "each_source_object_rechecked": true,
+      "prior_S1": "NOT_RUN",
+      "other4": "PASS already",
+      "new_scoped_D02_status": "COMPLETE_CURRENT_FULL_CI_PENDING",
+      "counts": {
+        "PASS": 51,
+        "NOT_RUN": 10,
+        "historical_BLOCKED": 4
+      },
+      "engineering_tasks_open": 6,
+      "historical_tasks_open": 8
+    },
+    "checks": {
+      "Rust1.88_format": "PASSexact286LOCtestcandidate",
+      "diff_check": "PASS",
+      "source_hash_scope": "Exactcandidate/rootreview/preimages verified; no productionguard/workflow/JSONfixture/dependency/lock/scoreSVG changes",
+      "new_native_tests_executed_locally": 0,
+      "current_requiredCI": "PENDING_NEW_PUSH"
+    },
+    "remaining": "10engineeringcriteria/6tasks+7Ruststreams/NOT_COMPLIANT/currentfullCI. Fourcampaigncriteria deferredneverPASS; no science/releaseclaim."
+  },
+  "current_pytest_reporting_sdk_source": {
+    "schema": "dope.pytest-reporting-sdk-error-source/v1",
+    "status": "SOURCE_REVIEWED_SELECTED_REPORTING_PROOF_PASS_NORMAL_CI_REQUIRED",
+    "source_commit": "9d407a5f569d7436d6d6beb5f1564584fc6b191c",
+    "base": "6191ba2c5dd96db61dd632ad1af8265932f692d1",
+    "actual6191_failure": {
+      "job": 126181232577,
+      "artifact": 13268932067,
+      "reason": "project-pytest emits onlydots/END0 underini-q plusCLI-q; genuine terminalsummaryabsent, strictfinishrefuses",
+      "new_claims_commands": "public-claims/claims-render/golden-parity actualPASS; no newcheckerbugclaimed"
+    },
+    "reporting_fix": {
+      "files": [
+        "ops/ci/cpu-compat.sh",
+        "ops/merge_guard/ci_shard_inventory.rs"
+      ],
+      "setup": "export PYTEST_ADDOPTS=\"${PYTEST_ADDOPTS:-} -v\" before originalproject-pytest marker",
+      "existing_options": "Preserved; addsreportverbosity only, no filters/warning/mark/configclear",
+      "role_effect": "Any laterpytestsubprocess gets reportverbosity; no laterdirectpytest/selectedsuitepytest.main orverbosityhooks found. Currentotherroles useunittest/Torch/CLI. Extrasuppressioncanstillfailclosed.",
+      "compat_stage_sha256": "ff7ec06cbcf7745f16c15600e1572050adecc22cbdf1a1f894112bdf398b8033",
+      "unchanged": "Originalargv/body/marker/map/verifier/parser/all70origins/83runtime74markers22testkind; no exceptionadapter"
+    },
+    "selected_existing_CPU_proof": {
+      "receipt_external": "/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-proof-packets/pytest-summary-env-proposal/selected-proof/RECEIPT.json",
+      "receipt_sha256": "bf4a909275bec8afe59141143e7275d995ebab780e4e6a370a415d7b969d12cd",
+      "argv": [
+        "nice",
+        "-n",
+        "19",
+        "/usr/bin/python3",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_dsl.py",
+        "-o",
+        "cache_dir=/home/ubuntu/jope_plan/evidence/next-version-implementation-20261103/dope-proof-packets/pytest-summary-env-proposal/selected-proof/pytest-cache"
+      ],
+      "actual_terminal_summary": "7 passed in 1.50s",
+      "actual_passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "exit": 0,
+      "seconds": 2.712317682991852,
+      "preflight_MemAvailable_kib": 85272784,
+      "limits": "Onlyexisting7-casepureDSLfixture, notfullproject/env/nativequalification. Nice19/math1/offline/noinstall/CUDAempty/cacheoutside/bytecodeoff; reporemainedclean. Prior39case/dotproofnotreconstructed."
+    },
+    "M2": {
+      "path": "engine/dope-sdk/tests/safe_errors.rs",
+      "sha256": "5feafd2fdf235afb19e9bf318718b75df8edb73b0c1191dc706999de710d0bf7",
+      "lines": 43,
+      "authored_tests": 2,
+      "native_executed": 0,
+      "criterion": "D03-S3",
+      "verdict": "NOT_RUN",
+      "scope": "ActualSDK malformedweights/schema errorvariant/fixedmessage/canary assertions; no prodAPI/math/deps/locks change"
+    },
+    "D04_S1_acceptance": {
+      "receipt": "dope/receipts/hosted-native-e5-d04-constants.json",
+      "current_NOTRUN_verified": true,
+      "59b_and_current_fixture_tree": "2ec9ce02bbc0e3aaa57351a1da982fc998a76074",
+      "59b_and_current_bundle_blob": "78c8d23d2a742b066ebbe7c7ccabf2333a2f5e17",
+      "current_core_and_goldens_vs_e5": "UNCHANGED",
+      "limits": "Fixture-specificcoordinate/immutable replay only; D04-S5historicalreportbyteoracle remainsNOTRUN"
+    },
+    "checks": {
+      "Rust1.88_fmt": "PASSSDKedition2021/inventoryedition2024",
+      "Bash_syntax": "PASScompat",
+      "diff_check": "PASS",
+      "native_build_tests_executed": 0,
+      "full_currentCI": "PENDING"
+    },
+    "criterion_counts": {
+      "PASS": 52,
+      "NOT_RUN": 9,
+      "historical_BLOCKED": 4
+    },
+    "remaining": "6engineeringtasks/7Ruststreams/9engineeringcriteria/currentfullCI; fourcampaigncriteria deferredneverPASS. NoD03-S4/D04-S5promotion/no newbadge or science claim."
+  },
+  "hosted_e5_D04_S1": {
+    "receipt": "dope/receipts/hosted-native-e5-d04-constants.json",
+    "sha256": "73090cf76b6c7b6f72688127b0c0fea1d730f5425531568a851ec4d745164e33",
+    "source_closure_verified": true
+  },
+  "current_D06_required_policy_source": {
+    "schema": "Strictlyadditive optionalhistoricalproperty; newissuance always includes requirement. Fullschemaengine NOT_RUN; staticJSONparse only.",
+    "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+    "source_commit": "5cb20de52868b11cf71d544e62579271bd06b35a",
+    "base": "bdea9e7f7198ce3858ae383375341509ab3133f1",
+    "frozen_patch_sha256": "129f60ad1f8867c1d0bf0b85e5a34108909f1aba2e2c6571c82c0c2c5a4f3490",
+    "scope": "Exact4R2files; typed requiredpolicy only, not verifiedinference/custody/per-cellprovenance; oldnumericaldrivers/legacy/deps/locks/CLI unchanged",
+    "requirement": {
+      "state": "required_for_complete_driver_evidence",
+      "driver_protocol": "driver-rank-informative-v1",
+      "bound_method": "full_family_max_t",
+      "pins": "Validatedexisting5DataPins copied; complete identity coverage remains acceptance review"
+    },
+    "new_native_tests": "NOT_RUN",
+    "D06_S4": "NOT_RUN even if newtest laterpasses until full identity/multiplicitycoverage reviewed",
+    "promotions": {
+      "D03_S3": "Actualbdeasafeerror/nativefixture accepted with unchangedrelevant sources",
+      "D05_S2": "Actualbdea target-role/rowID/SDKtargetlast conversions accepted with unchangedrelevant sources"
+    },
+    "counts": {
+      "PASS": 54,
+      "NOT_RUN": 7,
+      "historical_BLOCKED": 4
+    },
+    "checks": {
+      "Rust1_88_fmt": "PASSexactR2files",
+      "JSON": "parsePASS",
+      "preimages": "all4MATCH",
+      "candidate": "all4MATCH",
+      "native_compiler_tests": 0,
+      "Python_tests": 0,
+      "schema_engine": "NOT_RUN",
+      "current_full_CI": "PENDING_NEW_PUSH"
+    },
+    "remaining": "6engineeringtasks/7Ruststreams/currentrequiredCI,4campaigncriteria deferredneverPASS; no efficacy/release claim"
+  },
+  "hosted_f440_D06_S4": {
+    "receipt": "dope/receipts/hosted-native-f440-driver-bindings.json",
+    "source": "f44073230ecffed14b8d1832e0dae8db00066678",
+    "same_relevant_closure_verified": true,
+    "verdict": "PASS_SCOPED_ONLY"
+  },
+  "current_native_process_repair": {
+    "status": "SOURCE_AUTHORED_RUNTIME_NOT_RUN",
+    "base": "f44073230ecffed14b8d1832e0dae8db00066678",
+    "cause": "Python RUSAGE_CHILDREN lifetime peak contaminated subsequent native calls; budgets unchanged",
+    "source": "Rust per-command wait4 +owned tree supervisor; existing Python invoke is transport only; explicit CI build outside measured invocation",
+    "local_build_tests_native_Python": 0
+  }
+}

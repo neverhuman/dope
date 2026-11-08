@@ -1,0 +1,311 @@
+{
+  "schema": "dope-jope.planning-package/v1",
+  "status": "IMPLEMENTATION_IN_PROGRESS",
+  "files": {
+    "EXECUTION_RULES.md": {
+      "bytes": 5047,
+      "sha256": "8fc1634224b984e57093dbe7d54d3300e2943d52344d87a07eacb1e5612fa6a8"
+    },
+    "MASTER_PLAN.md": {
+      "bytes": 43875,
+      "sha256": "1bae58c368a3fcf7962ff121dafe4643525c7cf87007b5620b6d2175924f34e5"
+    },
+    "PLAN_VERIFICATION.json": {
+      "bytes": 363,
+      "sha256": "630a316cca18deba8b62354ae1e866814ca9eb409bf438ef11103c276e6f6655"
+    },
+    "README.md": {
+      "bytes": 4665,
+      "sha256": "8b8add7498161aec7788a233fc53d8502f08ddb71de11131fb5b987943ba4a71"
+    },
+    "SOURCE_PINS.json": {
+      "bytes": 795,
+      "sha256": "72fb4bf6e2c0e68c28cf0a473949e9a693ae2f29720d114005dd62d340444107"
+    },
+    "dependencies.json": {
+      "bytes": 18232,
+      "sha256": "9952fe609fc0a4332092b133c2eb073855d0d6f2a8a2e3b153087718d42bec5e"
+    },
+    "dope/README.md": {
+      "bytes": 5055,
+      "sha256": "fdd6d7bd2d6fad5f4f2d014e062eedb2445f7fafcc1f1187ccab41141a552582"
+    },
+    "dope/tasks/d00-contracts-lineage-and-decision-record.md": {
+      "bytes": 8714,
+      "sha256": "d1a3baaab7ac5b6ea562b609a00ed1dca458fb1e4cab69ba5d36f99dec67daa3"
+    },
+    "dope/tasks/d01-prospective-evaluation-coordinate-repair.md": {
+      "bytes": 9096,
+      "sha256": "73953978226c862e3a87029089a8646673583e7ad9f946e9b885ff882b65a349"
+    },
+    "dope/tasks/d02-versioned-driver-rank-successor.md": {
+      "bytes": 11036,
+      "sha256": "20a1dbf728c263ea0d1f0e2605492bf3f63500e4d9662f55b2a535050445cd26"
+    },
+    "dope/tasks/d03-minimal-sdk-facade.md": {
+      "bytes": 9360,
+      "sha256": "4c668747f858aa0a9dd971e11ce1faae279185084013aa1a6e979e1840366d9e"
+    },
+    "dope/tasks/d04-high-landmark-dependency-plan.md": {
+      "bytes": 9957,
+      "sha256": "0ddc60796d7d73c278635cdf1e09992b220ba7db3e7b1358b1e510ef83a8c410"
+    },
+    "dope/tasks/d05-nc1-private-normalization-contract.md": {
+      "bytes": 10327,
+      "sha256": "407ac28f2c1904e4fe245d74deb5fe7fc5502fc3003d2c420113d2fb163d29e4"
+    },
+    "dope/tasks/d06-dvs-and-audit-card.md": {
+      "bytes": 11795,
+      "sha256": "0069f7656d5ff9b46e5af1a774aad1c8cfc5f85a224704ed5bc73e6160b5992f"
+    },
+    "dope/tasks/d07-dml4-wire-reference-sampler-and-hard-caps.md": {
+      "bytes": 10256,
+      "sha256": "da895ca6ea5439b629702b709aad82f5f41ae4219ea94f0a2e5401934b3f54d1"
+    },
+    "dope/tasks/d08-batched-resumable-trainer.md": {
+      "bytes": 9663,
+      "sha256": "d4120ca21d383eec71415d6542ac4403a3d678ddae1e40383f67bc2383da707f"
+    },
+    "dope/tasks/d09-v4-train-what-ships-objective.md": {
+      "bytes": 9846,
+      "sha256": "3a5d53dc875b6d0b107d07892c6a01864e301bf30323cb18b8198e98279c2fad"
+    },
+    "dope/tasks/d10-local-product-gate-routing.md": {
+      "bytes": 8448,
+      "sha256": "130fb57c84861973641b64e01d9a0679c0f02155a02ccdd80526d396c2150364"
+    },
+    "dope/tasks/d11-qualification-campaign-readiness.md": {
+      "bytes": 9506,
+      "sha256": "e48c585992cb70a95e63adf88cc2e4975de48047d68fe2e0a785ffc34ba27c0e"
+    },
+    "dope/tasks/inventory.json": {
+      "bytes": 38571,
+      "sha256": "8f9fd1ddd5c49b72ce9f2f7b3024b7a1b9cc85571d23cca81f1a491483b831bc"
+    },
+    "jopedime/README.md": {
+      "bytes": 4608,
+      "sha256": "cf0f0cae6fa22e9977140225db81e16d06dc844584d6027eab8aa9f6902a9298"
+    },
+    "jopedime/tasks/J00-baseline-identities.md": {
+      "bytes": 6798,
+      "sha256": "563f3bd1af190edf1c5b6843d6799a29b9c3634ac032edf860b7ae41a80b3db2"
+    },
+    "jopedime/tasks/J01-v2-seed-transport.md": {
+      "bytes": 7903,
+      "sha256": "2688dd863dee6f62447e8e2e5858677374f482df121484937908e2c5711255e7"
+    },
+    "jopedime/tasks/J02-controlled-retrieval.md": {
+      "bytes": 7934,
+      "sha256": "3ffa390e091613a23fcdfad13032e84260420c046173ba2db329c2129019387c"
+    },
+    "jopedime/tasks/J03-retrieval-study-protocol.md": {
+      "bytes": 7600,
+      "sha256": "0b27b01bc83921e4cf89c9387fde6c9be59a633f39405a43f0fca83cdece42aa"
+    },
+    "jopedime/tasks/J04-cpu-packaging-defaults.md": {
+      "bytes": 7294,
+      "sha256": "8b1ccac7006f755121712d82172f1c083016fe2f72c5a7cf1b7616ed94fb8280"
+    },
+    "jopedime/tasks/J05-nc1-additive-intake.md": {
+      "bytes": 7212,
+      "sha256": "e3a180f29357c543d1335723245df6843d7eb40e796af104614e39a09e57ac61"
+    },
+    "jopedime/tasks/J06-private-scalecard-emission.md": {
+      "bytes": 7096,
+      "sha256": "c9adc90e55650a5b4f4b9b9c97c77d8b9db47ab708b738c4c738cad4ab991263"
+    },
+    "jopedime/tasks/J07-facade-migration.md": {
+      "bytes": 7474,
+      "sha256": "6274ba44b6b8dc9c2cf72a4edc4c2ad7d346e99af70341510577f3a15393a48b"
+    },
+    "jopedime/tasks/J08-dope-auditor.md": {
+      "bytes": 7219,
+      "sha256": "24f983d70e0fe6d4fcf37722c85c3e26a61b0a6c0981e0572b908965348c6e64"
+    },
+    "jopedime/tasks/J09-growth-readiness-routing.md": {
+      "bytes": 7216,
+      "sha256": "7b6b7749048d9c5d6bc73667a1d144951eccdee6b73b8c4d122c559f92c0d36e"
+    },
+    "jopedime/tasks/inventory.json": {
+      "bytes": 6441,
+      "sha256": "802d859d8c9c74efef580223ee5514a42947332545b7d744f9eeed2317ec7c2c"
+    },
+    "review.md": {
+      "bytes": 4024,
+      "sha256": "6f950671f9480b6945d558e984d8c29b01f9549b9af9067ebab5da3c9890b518"
+    },
+    "dope/STATUS.md": {
+      "bytes": 33656,
+      "sha256": "1e250f3665970993dcc2926cf21ddcfcef91e291393b68eb3382b2db7003ea50"
+    },
+    "STATUS.json": {
+      "bytes": 51969,
+      "sha256": "99e9facd2b785a6b9eee2f7f64e6df4410c472ac8e9d9a5e87f60b31e317a570"
+    },
+    "dope/language-policy/README.md": {
+      "bytes": 10323,
+      "sha256": "82465a8e6febc9776e8fa846e47793fce4094c40467521be857c8b4b28c0c8b6"
+    },
+    "dope/language-policy/inventory-coverage.json": {
+      "bytes": 638,
+      "sha256": "36c4ec4165ea6ac395cb5a62fb1f6ea174419114c18affe7409017fb631b1c4f"
+    },
+    "dope/language-policy/migration-manifest.json": {
+      "bytes": 17881,
+      "sha256": "620a0f2e3e452630b9e42850ffcaa45029af99679b6441439127c9b3e19ef02a"
+    },
+    "dope/language-policy/policy.json": {
+      "bytes": 2746,
+      "sha256": "346ef346be435b4e9a0eb483087eebaa6df541c4e2dfa73000d768d410c1df0f"
+    },
+    "dope/language-policy/remote-lanes/rs01.md": {
+      "bytes": 5957,
+      "sha256": "3fa0397e1f923a2aa7518b9f43069d1a81640bcee4617b44265810d2427e6f5c"
+    },
+    "dope/language-policy/remote-lanes/rs02.md": {
+      "bytes": 5814,
+      "sha256": "fd56de4bb6410fb58485e5442b63374da7ab61ee75b549f9048781811e66a8e2"
+    },
+    "dope/language-policy/remote-lanes/rs03.md": {
+      "bytes": 5878,
+      "sha256": "7fd131737b6c6fdb26be82d01f6af54e6f771fcd8884e7fce4e7e49efd270433"
+    },
+    "dope/language-policy/remote-lanes/rs04.md": {
+      "bytes": 5774,
+      "sha256": "6a9149a2122d53fe2d62ea1c305038f8dc705b1e7872e9d5e3f82ab8b2c66638"
+    },
+    "dope/language-policy/remote-lanes/rs05.md": {
+      "bytes": 5816,
+      "sha256": "f44e428562f1b8416dec1a2a6b4937d70643f954677aee3a48e8b61100f5a4d2"
+    },
+    "dope/language-policy/remote-lanes/rs06.md": {
+      "bytes": 5816,
+      "sha256": "c299a0fb852c40b6d5a6c047dcceeb2b6aae4f9697b42daad216f6cc21156611"
+    },
+    "dope/language-policy/remote-lanes/rs07.md": {
+      "bytes": 5865,
+      "sha256": "5b52af9a703ac77e65f93547cc3a28836068d406928bb328c59b96608504de4d"
+    },
+    "dope/language-policy/tasks/RS00-v3-summary-rust-port.md": {
+      "bytes": 5376,
+      "sha256": "4a710b02942b4a55f8775213435bd1c2ef669198ed35f2738c351f9af6c27bde"
+    },
+    "dope/language-policy/tasks/RS01-v3-runner-orchestration-rust-port.md": {
+      "bytes": 6364,
+      "sha256": "0cfdf68c4656a6ca7cd99534624c709948ee442d44f017edebe9b334df650d5f"
+    },
+    "dope/language-policy/tasks/RS02-python-dl-training-boundary.md": {
+      "bytes": 6044,
+      "sha256": "1211bd199c7f17d1b06d97ce471990ac8f0154da5775c972dcca71359e1f4e85"
+    },
+    "dope/language-policy/tasks/V3-RUST-MIGRATION-TASKS.md": {
+      "bytes": 14815,
+      "sha256": "b63a8c5fa5a013ef58b63ee56b86c58822fdf482b9e6d3e8b45017dddaef6c59"
+    },
+    "dope/language-policy/training-boundary-audit.md": {
+      "bytes": 9219,
+      "sha256": "30d085aafed161a46d15aa8ed57d8e40620befdb2bc6aa2a73b0c188b7d15d8a"
+    },
+    "dope/receipts/hosted-native-451-criteria.json": {
+      "bytes": 8089,
+      "sha256": "e4b02670e2c63ad9012c5a7c84ccd5e21ad73ef41c38f51ae7cde61668eb597e"
+    },
+    "dope/receipts/jankurai-451-snapshot.json": {
+      "bytes": 1398,
+      "sha256": "f95e76af2c0330ef1e43f62ad5d233e68469863e4dc4b5b196838b8f7b76d39f"
+    },
+    "dope/receipts/completed-root-metrics-ccd.json": {
+      "bytes": 2671,
+      "sha256": "8917bca44e4d7e40440e469ade5133ce297b673b3660fb08c5ce9da7de4b7c27"
+    },
+    "dope/receipts/engineering-release-scope-owner-decision.json": {
+      "bytes": 1275,
+      "sha256": "3bf01d2331dfc0aca1d22b9733cff9caf202e6b0be250d4e7f4d67c9567a4765"
+    },
+    "dope/receipts/strict-golden-caller.json": {
+      "bytes": 2141,
+      "sha256": "f0deb3830b1ebc1762411becc30a3e00e7c2646070549bf5a935b6c11a3d4890"
+    },
+    "dope/receipts/ci-worker-source-activation.json": {
+      "bytes": 3656,
+      "sha256": "69cdfb6f4af274954d7724a37c0b3090604b0b3509ed6d103378d239dcb0db20"
+    },
+    "dope/receipts/ci-r6-required-reference-route.json": {
+      "bytes": 3082,
+      "sha256": "0331fd3c5818adfb884f75f5e7ef40a4b6c06d96cf62a75134b5d569a638aba5"
+    },
+    "dope/receipts/stage-pin-and-sdk-prepared-surface.json": {
+      "bytes": 3487,
+      "sha256": "050064230501211893682e8b7edbafcbbb1f4dac7738ee8db7c5ffee85348477"
+    },
+    "dope/receipts/hosted-audit-1811-snapshot.json": {
+      "bytes": 1363,
+      "sha256": "c53b1d522af139e07dd985285ddbc83ce83a0bfa12f015b8c860807c8a7ec1b5"
+    },
+    "dope/receipts/bedf-command-and-lock-repair.json": {
+      "bytes": 3558,
+      "sha256": "3f864a7d74007f2ae3badd0cafa287feb667160461461a7f86492b6403c09c52"
+    },
+    "dope/receipts/hosted-native-1811-criteria.json": {
+      "bytes": 6909,
+      "sha256": "8bf2356e548c08fef7ededa18335e931b4729e0a30ffd1eaf672f649fe6b675e"
+    },
+    "dope/receipts/m1-and-high-import-source.json": {
+      "bytes": 2819,
+      "sha256": "5d7811da0d7db42a7de7393127fa65f735558e94b0b25c0625e63bed7a3e5f88"
+    },
+    "dope/receipts/hosted-audit-bb-snapshot.json": {
+      "bytes": 1532,
+      "sha256": "0bee2aee0cef41793b409ad343f341066403fafa80184c1a2f6cbf82bb1123e8"
+    },
+    "dope/receipts/bb-ci-repair-source.json": {
+      "bytes": 2665,
+      "sha256": "21dd222a47a2b912d65fa2419d5e948373cb3fa4bc13ac6d36ff6b2534d6c383"
+    },
+    "dope/receipts/hosted-native-bb-criteria.json": {
+      "bytes": 4399,
+      "sha256": "63a99552bb8797726bb2e65e05bab20b3ec47c6865a538f9bf9c515e3d2bf90d"
+    },
+    "dope/receipts/completed-root-goldens-bb.json": {
+      "bytes": 2825,
+      "sha256": "5b6b83d14dbd80f3c846595f17366442b4795bea4874541409fcd1461e2ae0db"
+    },
+    "dope/receipts/e5-ci-profile-readme-source.json": {
+      "bytes": 3685,
+      "sha256": "90c7c7587a46604ddab0c63521ecd375e7e86dde27a13d4a1897cf819a7a38a5"
+    },
+    "dope/receipts/hosted-native-e5-d04-constants.json": {
+      "bytes": 2176,
+      "sha256": "73090cf76b6c7b6f72688127b0c0fea1d730f5425531568a851ec4d745164e33"
+    },
+    "dope/receipts/pytest-reporting-and-sdk-errors-source.json": {
+      "bytes": 3734,
+      "sha256": "ba8476b3da8de41d5d160572662091e41c510ff34630c65c0efe28f56294336a"
+    },
+    "dope/receipts/hosted-native-bdea-sdk-errors.json": {
+      "bytes": 2243,
+      "sha256": "8a7db5505250d6305080a193223375fc1c2d4dc1a4b0e02049b71f8f62a05c61"
+    },
+    "dope/receipts/hosted-native-bdea-normalization-views.json": {
+      "bytes": 2576,
+      "sha256": "64adb117f9288ce444323ec444d78c5dba6464b8ab26045ac380f5d32ced4892"
+    },
+    "dope/receipts/d06-policy-requirement-source.json": {
+      "bytes": 1684,
+      "sha256": "40ba6c6ac315a5be1d578c38fc5525c434f497d16b741362a61e159818618169"
+    },
+    "dope/receipts/d06-per-cell-identities-source.json": {
+      "bytes": 1344,
+      "sha256": "a6a1fbd3ff8c3000327dff0d317cc5c119f68c770bfa6260e59917757f4b9d06"
+    },
+    "dope/receipts/native-child-accounting-source.json": {
+      "bytes": 4177,
+      "sha256": "75cfd2b9e50d5369dab68a554de5ab44b7dd7b09fee3b2568421bb9b6f3ed929"
+    },
+    "dope/receipts/hosted-native-f440-driver-bindings.json": {
+      "bytes": 4075,
+      "sha256": "415619e51cabd3c3dac20d7e493fb63e8c20d4620b28259792493b88a55dcb1b"
+    }
+  },
+  "historical_status": "PLANNED"
+}

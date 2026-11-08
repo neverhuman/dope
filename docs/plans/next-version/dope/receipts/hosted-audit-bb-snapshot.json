@@ -1,0 +1,44 @@
+{
+  "schema": "dope.hosted-audit-snapshot/v1",
+  "source_head": "bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93",
+  "tested_merge": "fee51ff5d8296af5027414920dce3444d59ed926",
+  "tested_tree": "08b9fecfaa3f5cce0527f8b56db75fa8a105f18c",
+  "tree_matches_source": true,
+  "source_binding": "RootindependentGitAPI: parentsmain59b+bb; exactsamecheckedout/source tree",
+  "audit_run": 41699460421,
+  "audit_job": 126138603944,
+  "artifact_id": 13263332952,
+  "report": {
+    "sha256": "587becb08546e6e89cd1934e635614e89e751bf361e2ca762c5d4a6b4606274e",
+    "bytes": 154690,
+    "version": "1.7.1",
+    "scope": "full",
+    "dirty_worktree": false,
+    "score": 88,
+    "raw_score": 88,
+    "minimum_score": 85,
+    "report_decision": "pass",
+    "caps": 0,
+    "high": 0,
+    "critical": 0,
+    "medium": 11
+  },
+  "generated_svg": {
+    "sha256": "6074b4b29a628bd4645cbf1008a110592b14b25944eb7c97c92f7d8189cae86b",
+    "bytes": 437,
+    "generator": "Unchangedaudit-proof in authenticGHAjob",
+    "adoption": "Exactartifactbytes; no manualscore edit"
+  },
+  "score_receipt": {
+    "sha256": "d5f90bf96701fce3af4d92a40d8b77a6819abcca9bcd86872b06dba16c4c4e04",
+    "report_status": "pass",
+    "committed_badge_matches": false
+  },
+  "proof_tests": 9,
+  "job_conclusion": "FAIL finalbadgecheck againstformer87snapshot; reportPASSisnotwholejobPASS",
+  "later_source_qualification": "PENDING; no inheritednewhead exactauditpass",
+  "historical_witnesses_preserved": [
+    "hosted-audit-1811-snapshot.json",
+    "jankurai-451-snapshot.json"
+  ]
+}
