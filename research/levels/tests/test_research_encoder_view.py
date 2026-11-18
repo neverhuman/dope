@@ -136,24 +136,24 @@ class ResearchEncoderViewTests(unittest.TestCase):
         self.assertEqual(ultra[:-1], expected[:-1])
 
     def test_packet_refusals_do_not_echo_values(self):
-        secret = "123456.789"
+        marker = "7.25"
         missing = _encoding()
         del missing["target_bundle"]["residual_std"]
         with self.assertRaises(ValueError) as missing_gate:
             packet_global_v0(missing)
-        self.assertNotIn(secret, str(missing_gate.exception))
+        self.assertNotIn(marker, str(missing_gate.exception))
         self.assertIn("target_bundle.residual_std", str(missing_gate.exception))
         poisoned = _encoding()
-        poisoned["target_bundle"]["y_max"] = float(secret)
+        poisoned["target_bundle"]["y_max"] = float(marker)
         poisoned["target_bundle"]["residual_std"] = float("nan")
         with self.assertRaises(ValueError) as nonfinite:
             packet_global_v0(poisoned)
-        self.assertNotIn(secret, str(nonfinite.exception))
+        self.assertNotIn(marker, str(nonfinite.exception))
         for key in ("X_query", "y_query", "query_rows", "query_features"):
             with self.assertRaises(ValueError) as query:
-                packet_global_v0(_encoding(**{key: secret}))
+                packet_global_v0(_encoding(**{key: marker}))
             self.assertIn(key, str(query.exception))
-            self.assertNotIn(secret, str(query.exception))
+            self.assertNotIn(marker, str(query.exception))
         with self.assertRaises(ValueError):
             packet_global_v0(_encoding(level="low"))
         with self.assertRaises(ValueError):
