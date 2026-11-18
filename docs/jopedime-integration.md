@@ -11,8 +11,8 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Compatible encoder source commit | `15e12aa3dc33851655580f6aa7c9c66353143f23` (signed `dope-engine-v1.1.0`, pinned by JopeDime `#435` and `#437`; initial `1.1.0` source pin `22dad4ed080653d31b8acf02a507a7b35ce1cdb6`; `29ba3db72df79b2a799cbfb13d55485eb46bb2d5` (`#349`) and `bbba9863faaad35f0c66d1ba5ed42ee2b138ff52` (`#351`, standalone `resident_release_check` example) are later `main` commits where encode outputs are byte-identical on the 285-table and 27-synthetic checks, **not JopeDime-tested pins**; JopeDime pins `15e12aa3dc33851655580f6aa7c9c66353143f23`) |
-| Source engine workspace version | `1.1.0` ([`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0), tag commit `15e12aa3dc33851655580f6aa7c9c66353143f23`) |
+| Compatible encoder source commit | `5fc96f2819a97ed313658c336a9a46e637299352` (signed `dope-engine-v1.2.0`; includes `encode_research_view_629`, `PacketFeaturesV1`, `sanitize_public_landmark_bundle`, and `dope-norm`; earlier signed `dope-engine-v1.1.0` pin `15e12aa3dc33851655580f6aa7c9c66353143f23` remains valid for `1.1.0` consumers) |
+| Source engine workspace version | `1.2.0` ([`dope-engine-v1.2.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.2.0), tag commit `5fc96f2819a97ed313658c336a9a46e637299352`) |
 | Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) |
 | Canonical file | `dope_mlc_v3_multitask_best.safetensors` |
 | Exact bytes | `1,781,800` |
@@ -22,7 +22,8 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Rust dependency graph | [engine/Cargo.lock](../engine/Cargo.lock) at the source pin |
 
 The model release `v1.0.0` and the signed engine releases
-([`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0) and
+([`dope-engine-v1.2.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.2.0),
+[`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0), and
 [`dope-engine-v1.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.0.0))
 are distinct. The engine releases carry binaries, not these model weights.
 The `v1.0.0` source tag predates `research/levels/multilevel_model.py`, the Python
@@ -51,10 +52,10 @@ submodule gitlink; do not follow a moving branch automatically.
 ```bash
 set -euo pipefail
 git clone https://github.com/neverhuman/dope.git vendor/dope
-git -C vendor/dope checkout --detach 15e12aa3dc33851655580f6aa7c9c66353143f23
+git -C vendor/dope checkout --detach 5fc96f2819a97ed313658c336a9a46e637299352
 # Alternatively, instead of the clone above:
 # git submodule add https://github.com/neverhuman/dope.git vendor/dope
-# git -C vendor/dope checkout --detach 15e12aa3dc33851655580f6aa7c9c66353143f23
+# git -C vendor/dope checkout --detach 5fc96f2819a97ed313658c336a9a46e637299352
 # git add .gitmodules vendor/dope
 
 python3.12 -m venv .venv
