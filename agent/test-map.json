@@ -3564,6 +3564,10 @@
       "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
       "purpose": "verify 40-tensor DopeEncoder629 pruning, SHA-256 pre-parse verification, alphabetical 14-gate ordering and [B, 256] + [B, 64, 17] -> [B, 629] parity"
     },
+    "research/levels/research_encoder_view.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_research_encoder_view -v",
+      "purpose": "verify the research high view calls DopeEncoder629.forward, ultra stays a separate wrapper, and the 24-value fit-row packet refuses query rows"
+    },
     "research/levels/s3_multilevel_trainer.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
       "purpose": "verify multi-level conditioning objective and gradient flow"
@@ -3623,6 +3627,10 @@
     "research/levels/tests/test_encoder_629.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
       "purpose": "verify DopeEncoder629 40-tensor pruning, SHA-256 pre-parse check, and 629D composite encoder parity"
+    },
+    "research/levels/tests/test_research_encoder_view.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_research_encoder_view -v",
+      "purpose": "verify the research high view matches DopeEncoder629.forward, ultra does not take a product level argument, and packet-global/v0 is column-invariant"
     },
     "research/levels/optional_landmarks.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",

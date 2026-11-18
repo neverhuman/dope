@@ -14,7 +14,7 @@ case "${1:-all}" in
     target/shared-python/bin/pip install --requirement research/levels/requirements.txt
     ;;
   torch)
-    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629|test_optional_landmarks|test_next_version) ;; *) exit 2;; esac
+    case "${2:?test shard required}" in test_models|test_training|test_comparison|test_validation|test_v2|test_landmark_inputs|test_precalc|test_observed_landmarks|test_landmark_views|test_encoder_629|test_research_encoder_view|test_optional_landmarks|test_next_version) ;; *) exit 2;; esac
     if [[ "$2" == test_next_version ]]; then
       "${SHARED_PYTHON:-target/shared-python/bin/python}" -B -m unittest research.levels.tests.test_transfer_evaluation research.transfer.tests.test_driver_rank_successor research.levels.tests.test_nc1 research.levels.tests.test_v4_wire research.levels.tests.test_v4_objectives research.levels.tests.test_v4_training research.levels.tests.test_v4_training_model -v
       exit $?
@@ -70,6 +70,7 @@ case "${1:-all}" in
     bash ops/ci/shared-levels.sh torch test_observed_landmarks
     bash ops/ci/shared-levels.sh torch test_landmark_views
     bash ops/ci/shared-levels.sh torch test_encoder_629
+    bash ops/ci/shared-levels.sh torch test_research_encoder_view
     bash ops/ci/shared-levels.sh torch test_optional_landmarks
     bash ops/ci/shared-levels.sh torch test_next_version
     bash ops/ci/shared-levels.sh native
