@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## Engine 1.2.0 - 2026-11-18
 
 - Upgrade research-only `research-encoder-view/v1` across Rust (`dope_core::mlc_v3`)
   and Python (`research/levels/research_encoder_view.py`): enforce explicit
@@ -8,30 +8,36 @@
   inputs), deduplicate `noise_scale`, remove raw `y_min`/`y_max` target extrema,
   and add the 196-D scale-invariant, column-permutation-invariant fitted packet
   extractor (`dope.packet-features/v1` and `dope.packet-global/v1`). `DopeEncoder629`,
-  v3 goldens, and the weight digest remain unchanged.
+  v3 goldens, and the weight digest remain unchanged (#357, #358).
 - Drop unused `rusqlite`/`libsqlite3-sys` from `deploy/native` (`deploy/Cargo.lock`
   is now SQLite-free), verify sibling `-wal` header magic and page size in
   `CampaignLedger::connection` before SQLite open (`CVE-2026-119375` /
   `RUSTSEC-2026-0459` mitigation), and keep `TMPDIR` isolated inside `target/tmp`
-  when `cargo` is already installed.
-
-### Engine 1.2.0 engineering release candidate
-
-- Add the native SDK facade and private NC1 FIT-only normalization, explicit
-  physical-row/target roles, and a bounded private target-last consumer view.
+  when `cargo` is already installed (#358).
+- Fix `dope mlc-v3 inspect-wire` printing `regression (continuous target)` instead
+  of `regression (k_classes = 2)` on regression `.dml3` wire packets, split the
+  multi-level vs mechanism/sampling README benchmark tables (`bench/real-world/render_tex.py`),
+  clarify `D80` and progressive `High` vs `Ultra` landmarks, and raise the local
+  checkpoint fixture worker spawn budget to `30.0s` (#359, #360).
+- Add the native SDK facade (`dope-sdk`) and private NC1 FIT-only normalization
+  (`dope-norm`), explicit physical-row/target roles, and a bounded private
+  target-last consumer view (#356).
 - Add opt-in High-required landmark execution, the explicit six-gate DML4
   graph/sampler, and DVS evidence receipts with required caller-declared view
   roles, stable refusals, actual byte accounting and Audit Cards. Historical
-  model, preparation, metric v1/v2 and wire readers retain their own identities.
+  model, preparation, metric v1/v2 and wire readers retain their own identities (#356).
+- Sanitize public `LandmarkBundle` coordinates (`[-1, 1]` clamp and unobserved or
+  non-finite zeroing) before conditioning (`sanitize_public_landmark_bundle`), and
+  validate RFC 3339 timestamps in transfer schema checks using the standard library (#354, #355).
 - Add prospective evaluation repair and additive informative rank semantics,
   bounded deep-learning training/resume fixtures, and native frozen-evidence CI
-  routing. Preserve legacy compatibility sources and fixture values.
-- This is an engineering candidate pending required CI/review. It makes no new
-  scientific accuracy, performance, formal privacy or model qualification
+  routing. Preserve legacy compatibility sources and fixture values (#356).
+- This is an uncertified engine release (`dope-engine-v1.2.0`; published model
+  weights remain `v1.0.0`, SHA-256
+  `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`). It makes
+  no new scientific accuracy, performance, formal privacy or model qualification
   claim. Four campaign criteria are explicitly deferred; the Rust-only
   nontraining migration remains incomplete.
-
-
 - Add opt-in `dope mlc-v3 encode --encoding-receipt FILE` JSONL snapshot
   companions with a named High629 schema, actual loaded checkpoint identity,
   sanitized landmark coverage, complete FIT-source identity, and effective
