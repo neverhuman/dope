@@ -12,14 +12,23 @@
 
 *Byte, cohort & coverage qualification (`v8` canonical index):* The `1,000`-dataset `DOPE-MLC-v2` pooled panel (`dope_mlc_v2_s3_best.pt`) comprises **`242` strictly dataset-disjoint datasets** (`0` train overlap, `Ultra` $R = 0.8493$, `#1` Elo `1671.6 [1655.2, 1688.0]`) and **`758` in-corpus unseen-fold datasets** (row-disjoint, `Ultra` $R = 0.9129$, `#1` Elo `1645.4 [1637.8, 1653.6]`), while the strictly dataset-disjoint checkpoint (`dope_mlc_v2_disjoint1000_best.pt`, `0` train overlap across all `1,000` eval DS) reaches `Ultra` $R = 0.8998$ and **`#1` Elo `1650.7 [1643.4, 1657.5]`**. `DOPE-MLC-v2` median wire bytes (`1,502 / 2,836 / 5,872 B` = `1.5 / 2.8 / 5.7 KiB`; zlib `1,238 / 2,351 / 4,616 B`) are bit-exact `version=2` latent payloads (`6,000/6,000` cells `max_abs_diff = 0.0`), excluding the `.dope` scaler sidecar (`+545 B` median; full raw `2,031 / 3,376 / 6,398 B`) and shared frozen decoder (`292,707 B` / `285.8 KiB`, amortized `0 B/dataset`), whereas `DOPE-MLC-v3` (`DML3+CSC1`) is self-contained inside `2 / 4 / 16 / 64 KiB` caps (`960.6 / 1,550.2 / 3,429.2 / 6,144.6 B` mean on `1,000` `v2`-panel tables; `1,418.0 / 2,510.7 / 6,435.3 / 9,877.5 B` mean on `69` multiclass tables; `1,781,800 B` shared SafeTensors hypernetwork). Baseline byte tiers (`4 / 16 / 64 KiB`) reflect nominal caps and historical `fp16` byte estimates paired with `float64` in-memory scores (`baseline_wire_1000ds_qualified = false`; `rows` `medium|catboost` observed on `999/1,000` DS with `17cd766e7ec82f1e` omitted; `65,874` evaluated `v2` auditor fits alongside `1,303` `real_gain < 0.01` skips and `500` `arf` multiclass exclusions).
 
-| Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` | Nonlinearity Regime / Mechanism Audit | `Medium` (`1.5 KiB`) $R$ | `High` (`2.8 KiB`) $R$ | `Ultra` (`5.7 KiB`) $R$ |
-|---|---:|---:|---|---:|---:|---:|
-| **Linear / Logistic** (`n=969`) | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` | **Mostly Linear** (`<= 0.04`, `581` DS) | `0.9401` | **`0.9579`** | `0.9459` (`D = 0.7836`) |
-| **Local Gated Attention Net** (`kumo_tabpfn` key, `n=962`) | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** | **Moderate Nonlinear** (`0.04–0.14`, `198` DS) | `0.8637` | `0.8953` | **`0.8990`** (`+3.53` pts) |
-| **MLP** (`n=965`) | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** | **Strongly Nonlinear** (`> 0.14`, `221` DS) | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
-| **LightGBM** (`n=989`) | **`0.8978 [0.8852, 0.9085]`** | `0.7703 [0.7615, 0.7793]` | **Stage-0 Signal Ceiling $R^2$** (`19,190` splits) | `0.9417` | `0.9654` | **`0.9863`** |
-| **CatBoost** (`n=1,000`) | **`0.8810 [0.8692, 0.8915]`** | **`0.8130 [0.8055, 0.8213]` (`D80` pass)** | **Stage-0 Nonlinear Uplift $R^2$** (`19,190` splits) | `0.7912` | `0.8727` | **`0.9383`** |
-| **XGBoost** (`n=989`) | **`0.8121 [0.7915, 0.8285]`** | `0.7221 [0.7131, 0.7310]` | **Sampling Expansion** (`1× -> 2× -> 5× N_train`, `n=150` DS subset, `ds_rank<150`) | `0.8808` (`1×`) | `0.9010` (`2×`) | **`0.9070` (`5×`, `+2.62` pts)** |
+| Downstream Learner Family (`DOPE-MLC-v2 Ultra`, `1,000` DS) | Evaluated Datasets | Holdout Retention $R$ `[95% CI]` | Driver Fidelity $D$ `[95% CI]` |
+|---|---:|---:|---:|
+| **Linear / Logistic** | `n=969` | **`0.9297 [0.9182, 0.9398]`** | `0.7853 [0.7745, 0.7950]` |
+| **Local Gated Attention Net** (`kumo_tabpfn` key) | `n=962` | **`0.9211 [0.9094, 0.9333]`** | **`0.8781 [0.8743, 0.8824]` (`D80` pass)** |
+| **MLP** | `n=965` | **`0.9143 [0.9021, 0.9245]`** | **`0.8915 [0.8872, 0.8960]` (`D80` pass)** |
+| **LightGBM** | `n=989` | **`0.8978 [0.8852, 0.9085]`** | `0.7703 [0.7615, 0.7793]` |
+| **CatBoost** | `n=1,000` | **`0.8810 [0.8692, 0.8915]`** | **`0.8130 [0.8055, 0.8213]` (`D80` pass)** |
+| **XGBoost** | `n=989` | **`0.8121 [0.7915, 0.8285]`** | `0.7221 [0.7131, 0.7310]` |
+
+| Mechanism, Nonlinearity Regime & Sampling-Expansion Audit | Scope | `Medium` (`1.5 KiB`) / `1×` | `High` (`2.8 KiB`) / `2×` | `Ultra` (`5.7 KiB`) / `5×` |
+|---|---|---:|---:|---:|
+| **Mostly Linear Regime** (`<= 0.04` uplift) | `581` DS | `0.9401` | **`0.9579`** | `0.9459` (`D = 0.7836`) |
+| **Moderate Nonlinear Regime** (`0.04–0.14` uplift) | `198` DS | `0.8637` | `0.8953` | **`0.8990`** (`+3.53` pts) |
+| **Strongly Nonlinear Regime** (`> 0.14` uplift) | `221` DS | `0.6552` | `0.7390` | **`0.7689` (`+11.37` pts)** |
+| **Stage-0 Signal Ceiling $R^2$** | `19,190` splits | `0.9417` | `0.9654` | **`0.9863`** |
+| **Stage-0 Nonlinear Uplift $R^2$** | `19,190` splits | `0.7912` | `0.8727` | **`0.9383`** |
+| **CatBoost Sampling Expansion** (`1× -> 2× -> 5× N_train`) | `n=150` DS (`ds_rank<150`) | `0.8808` (`1×`) | `0.9010` (`2×`) | **`0.9070` (`5×`, `+2.62` pts)** |
 
 ![DOPE-MLC-v2 and DOPE-MLC-v3 deep learning training monitor vs. <5% full-population validation loss curves across Training Rounds R0..R8, holdout retention value vs. wire bytes across 1,000 and 1,069 datasets, and distinct non-summed testing campaign scale](bench/real-world/figures/convergence.png)
 
