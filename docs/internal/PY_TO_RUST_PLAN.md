@@ -861,7 +861,9 @@ The optional `examples/quickstart/` Python boundary uses pandas and external ML 
 | `research/levels/disjoint_reconcile.py` | `keep-with-reason` | Strictly dataset-disjoint 1,000-dataset training/re-scoring reconciliation and dev_val selection audit. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/landmark_features.py` | `keep-with-reason` | Versioned finite CV landmark input feature and mask tensor construction. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/encoder.py` | `keep-with-reason` | Pinned FP32/High tensor composition and PyTorch export reference; native DOPE feature methods remain Rust. |
+| `research/levels/research_encoder_view.py` | `keep-with-reason` | Research high/ultra view and 24-value fit-row packet. `DopeEncoder629.forward` stays level high; native inference remains Rust. |
 | `research/levels/tests/test_encoder_629.py` | `keep-with-reason` | Verify the Python export reference against Micro, checkpoint schemas, CPU export and CUDA replay. |
+| `research/levels/tests/test_research_encoder_view.py` | `keep-with-reason` | Verify the research view calls the pinned forward for high and refuses query rows in the fit-row packet. |
 | `research/levels/budget_planner.py` | `keep-with-reason` | Tier envelope and compact scaler contracts imported by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |
 | `research/levels/building_block_landmarks.py` | `keep-with-reason` | Train-only mathematical probes and conditioning statistics used by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |
 | `research/levels/multiclass_head.py` | `keep-with-reason` | Shared inter-landmark attention and multiclass research heads used by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |

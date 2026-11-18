@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add research-only `research-encoder-view/v0`: the high view calls
+  `DopeEncoder629.forward` unchanged, ultra is a separate wrapper, and
+  `dope.packet-global/v0` exports 24 fit-row globals. This is not a product
+  recipe, a weight release, or a scientific accuracy claim. The pinned high
+  path, goldens, and weight digest stay as they are.
+
 ### Engine 1.2.0 engineering release candidate
 
 - Add the native SDK facade and private NC1 FIT-only normalization, explicit

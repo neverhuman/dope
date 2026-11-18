@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 888
-- **`keep-with-reason`**: 862 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 892
+- **`keep-with-reason`**: 866 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -847,7 +847,9 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/disjoint_reconcile.py` | `research/levels` | `keep-with-reason` | Strictly dataset-disjoint 1,000-dataset training/re-scoring reconciliation and dev_val selection audit. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/landmark_features.py` | `research/levels` | `keep-with-reason` | Versioned finite CV landmark input feature and mask tensor construction. | Offline shared-model research/evidence boundary; no native product dependency or certification authority. |
 | `research/levels/encoder.py` | `research/levels` | `keep-with-reason` | Verified FP32/High router and column-gate tensor export for downstream composition. | Isolated PyTorch reference/export boundary; native DOPE product and certification remain Rust. |
+| `research/levels/research_encoder_view.py` | `research/levels` | `keep-with-reason` | Research high/ultra view and 24-value fit-row packet beside the pinned encoder. | Does not change `DopeEncoder629.forward`, weights, or the native product. |
 | `research/levels/tests/test_encoder_629.py` | `research/levels` | `keep-with-reason` | Released-weight Micro parity, schema refusals, CPU export and CUDA replay. | Tests the Python reference/export boundary directly; no product authority. |
+| `research/levels/tests/test_research_encoder_view.py` | `research/levels` | `keep-with-reason` | Contract tests for the research view and fit-row packet. | Tests the research wrapper only; no checkpoint download and no product authority. |
 | `research/levels/budget_planner.py` | `research/levels` | `keep-with-reason` | Tier envelope and compact scaler contracts imported by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
 | `research/levels/building_block_landmarks.py` | `research/levels` | `keep-with-reason` | Train-only mathematical probes and conditioning statistics used by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
 | `research/levels/multiclass_head.py` | `research/levels` | `keep-with-reason` | Shared inter-landmark attention and multiclass research heads used by the pinned model. | Offline reference, research and export evidence; no native product or certification authority. |
