@@ -394,14 +394,19 @@ pub(crate) fn print_mlc_v3_wire_report(
         "{} {p}  {wb} / {cb} bytes ({wf} · tier `{lv}`) {bar}",
         style.cyan_bold("●")
     );
-    let (tk, kc) = (style.bold(&enc.task), enc.target_bundle.k_classes);
+    let tk = style.bold(&enc.task);
+    let kind_detail = if enc.task == "regression" {
+        "continuous target".to_string()
+    } else {
+        format!("k_classes = {}", enc.target_bundle.k_classes)
+    };
     let (nt, pu, zr) = (
         group(enc.n_train),
         enc.p_use,
         style.green("0 source rows stored"),
     );
     println!(
-        "  {}         {tk} (k_classes = {kc}) · {nt} train rows × {pu} features · {zr}",
+        "  {}         {tk} ({kind_detail}) · {nt} train rows × {pu} features · {zr}",
         style.dim("task")
     );
     let (cw, v3p, csc) = (
