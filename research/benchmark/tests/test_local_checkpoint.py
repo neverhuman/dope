@@ -43,7 +43,10 @@ class PrivateFailureFixture(QueryBoundaryFixture):
 def hook(cls=QueryBoundaryFixture, **changes):
     model = identity(name="local_checkpoint_fixture", mode="frozen_context", weights_sha256=pin("synthetic weights"),
                      licenses=identity().licenses + (("weights", "fixture_license", pin("synthetic license")),),
-                     resources=ResourceLimits(2., 4 * 1024**3, 0), **changes)
+                     # Spawn of the fresh interpreter is inside this budget. 2s
+                     # expired on cpu-compat run 44343700812 before the child
+                     # answered. The timeout test keeps its own 0.05s cap.
+                     resources=ResourceLimits(30., 4 * 1024**3, 0), **changes)
     admission = AdapterAdmission.from_registry(registry(model), model, "learner")
     adapter = cls(model, admission)
     return LocalCheckpointHook(adapter, admission, model.sha256, admission.eligibility_sha256,
