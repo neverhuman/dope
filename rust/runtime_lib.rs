@@ -9,4 +9,9 @@ pub mod model;
 pub mod neural;
 pub mod sample;
 
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+pub struct NoSqlBackendError(std::convert::Infallible);
+pub(crate) type SqlBackendError = NoSqlBackendError;
+
 pub use codec::{decode_kernel, encode_kernel};

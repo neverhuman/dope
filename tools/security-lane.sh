@@ -3,10 +3,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 source ops/ci/lib.sh
 mkdir -p target/security
-# lib.sh points TMPDIR at the workspace. Cold security and audit guests exit 1
-# while the apt rustup unpacks rustc there, so install the pinned toolchain
-# on the default temp dir before cargo-audit runs.
-env -u TMPDIR rustup toolchain install "$RUST_VERSION" --profile minimal
+# Workflow guests install the pinned toolchain before sourcing lib.sh; only fall back
+# when cargo is absent altogether so local runs keep TMPDIR inside target/tmp.
+if ! command -v cargo >/dev/null 2>&1 && command -v rustup >/dev/null 2>&1; then
+  env -u TMPDIR rustup toolchain install "$RUST_VERSION" --profile minimal
+fi
 if ! command -v cargo-audit >/dev/null 2>&1; then
   if [[ "$(uname -s):$(uname -m)" == "Linux:x86_64" ]] && command -v curl >/dev/null 2>&1 && command -v tar >/dev/null 2>&1; then
     mkdir -p target/tools/cargo-audit

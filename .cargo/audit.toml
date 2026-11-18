@@ -1,11 +1,13 @@
-# RUSTSEC-2026-0459 affects libsqlite3-sys 0.30.1 through rusqlite 0.32.1.
-# The patched line is rusqlite 0.41, and that crate requires Rust 1.89.
-# This repository pins rustc 1.88.0 in rust-toolchain.toml and the CI scripts.
-# The advisory is already in origin/main's lockfile. It was issued on
-# 2026-11-09, after the last green security run on main. The ledger opens a
-# caller-supplied database and then sets WAL, so this ignore is the MSRV hold.
-# It is not a claim that the bug is unreachable. Remove this entry when the
-# toolchain can move to 1.89 and rusqlite can move to 0.41.
+# RUSTSEC-2026-0459 (CVE-2026-119375, published 2026-10-30) affects bundled C SQLite
+# < 3.54.0 in libsqlite3-sys 0.30.1 (pulled by rusqlite 0.32.1 in the root dope-kernel
+# lockfile). Upgrading rusqlite to 0.41 (libsqlite3-sys 0.39.1) requires Rust 1.89, while
+# this repository pins rustc 1.88.0 across rust-toolchain.toml and CI scripts.
+#
+# Mitigations enforced in source:
+# 1. deploy/native (dope-inference-core) removed rusqlite/libsqlite3-sys completely.
+# 2. CampaignLedger::connection verifies any sibling -wal file header magic and page size
+#    against the main SQLite database header before rusqlite::Connection::open runs.
+# Remove this MSRV hold once rust-toolchain.toml moves to >= 1.89 and rusqlite to >= 0.41.
 
 [advisories]
 ignore = ["RUSTSEC-2026-0459"]

@@ -14,7 +14,7 @@ pub enum DopeError {
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
     #[error("SQLite error: {0}")]
-    Sql(#[from] rusqlite::Error),
+    Sql(#[from] crate::SqlBackendError),
     #[error("invalid data: {0}")]
     Data(String),
     #[error("invalid or unsupported artifact: {0}")]

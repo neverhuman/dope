@@ -3565,8 +3565,8 @@
       "purpose": "verify 40-tensor DopeEncoder629 pruning, SHA-256 pre-parse verification, alphabetical 14-gate ordering and [B, 256] + [B, 64, 17] -> [B, 629] parity"
     },
     "research/levels/research_encoder_view.py": {
-      "command": "python3 -B -m unittest research.levels.tests.test_research_encoder_view -v",
-      "purpose": "verify the research high view calls DopeEncoder629.forward, ultra stays a separate wrapper, and the 24-value fit-row packet refuses query rows"
+      "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
+      "purpose": "verify level-bound High/Ultra research 629D view and extrema-free 196D fitted packet features"
     },
     "research/levels/s3_multilevel_trainer.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_multilevel_model -v",
@@ -3629,8 +3629,16 @@
       "purpose": "verify DopeEncoder629 40-tensor pruning, SHA-256 pre-parse check, and 629D composite encoder parity"
     },
     "research/levels/tests/test_research_encoder_view.py": {
-      "command": "python3 -B -m unittest research.levels.tests.test_research_encoder_view -v",
-      "purpose": "verify the research high view matches DopeEncoder629.forward, ultra does not take a product level argument, and packet-global/v0 is column-invariant"
+      "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
+      "purpose": "verify research-encoder-view/v1 conditioning-level enforcement, real encode_table 196D packet parity, and extrema/query refusals"
+    },
+    ".cargo/audit.toml": {
+      "command": "bash tools/security-lane.sh && bash ops/ci/deployment.sh audit",
+      "purpose": "verify workspace, merge-guard, engine, and SQLite-free deployment lockfile advisory scans"
+    },
+    "ops/ci/shared-levels.sh": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --locked",
+      "purpose": "verify shared-levels stage inventory pin and shard coverage contract"
     },
     "research/levels/optional_landmarks.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_optional_landmarks -v",

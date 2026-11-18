@@ -178,4 +178,27 @@ mod tests {
         drop(ledger);
         let _ = fs::remove_file(path);
     }
+
+    #[test]
+    fn rejects_mismatched_wal_page_size_before_sqlite_open() {
+        let (ledger, path) = ledger();
+        ledger.insert_specs(&[spec()]).unwrap();
+        drop(ledger);
+
+        let mut wal_os = path.as_os_str().to_os_string();
+        wal_os.push("-wal");
+        let wal_path = PathBuf::from(wal_os);
+        let mut fake_wal = [0u8; 32];
+        fake_wal[..4].copy_from_slice(&0x377f_0682u32.to_be_bytes());
+        fake_wal[4..8].copy_from_slice(&3_007_000u32.to_be_bytes());
+        // Main DB uses default 4096-byte pages; forge a 1024-byte WAL header (CVE-2026-119375).
+        fake_wal[8..12].copy_from_slice(&1024u32.to_be_bytes());
+        fs::write(&wal_path, fake_wal).unwrap();
+
+        let err = CampaignLedger::open(&path).unwrap_err().to_string();
+        assert!(err.contains("WAL page size mismatch"), "unexpected error: {err}");
+        let _ = fs::remove_file(&wal_path);
+        let _ = fs::remove_file(path.with_extension("sqlite-shm"));
+        let _ = fs::remove_file(&path);
+    }
 }

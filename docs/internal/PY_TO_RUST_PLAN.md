@@ -861,9 +861,9 @@ The optional `examples/quickstart/` Python boundary uses pandas and external ML 
 | `research/levels/disjoint_reconcile.py` | `keep-with-reason` | Strictly dataset-disjoint 1,000-dataset training/re-scoring reconciliation and dev_val selection audit. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/landmark_features.py` | `keep-with-reason` | Versioned finite CV landmark input feature and mask tensor construction. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/encoder.py` | `keep-with-reason` | Pinned FP32/High tensor composition and PyTorch export reference; native DOPE feature methods remain Rust. |
-| `research/levels/research_encoder_view.py` | `keep-with-reason` | Research high/ultra view and 24-value fit-row packet. `DopeEncoder629.forward` stays level high; native inference remains Rust. |
+| `research/levels/research_encoder_view.py` | `keep-with-reason` | Level-verified High/Ultra research view and extrema-free 196D fitted packet reference matching Rust `dope_core::mlc_v3`. |
 | `research/levels/tests/test_encoder_629.py` | `keep-with-reason` | Verify the Python export reference against Micro, checkpoint schemas, CPU export and CUDA replay. |
-| `research/levels/tests/test_research_encoder_view.py` | `keep-with-reason` | Verify the research view calls the pinned forward for high and refuses query rows in the fit-row packet. |
+| `research/levels/tests/test_research_encoder_view.py` | `keep-with-reason` | Verify `research-encoder-view/v1` conditioning-level guards, real `encode_table` 196D packet parity, and extrema/query refusals. |
 | `research/levels/budget_planner.py` | `keep-with-reason` | Tier envelope and compact scaler contracts imported by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |
 | `research/levels/building_block_landmarks.py` | `keep-with-reason` | Train-only mathematical probes and conditioning statistics used by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |
 | `research/levels/multiclass_head.py` | `keep-with-reason` | Shared inter-landmark attention and multiclass research heads used by the pinned model. Retain in the isolated reference/research boundary; native inference remains Rust. |
@@ -899,3 +899,42 @@ The optional `examples/quickstart/` Python boundary uses pandas and external ML 
 | `research/levels/world_class_eval.py` | `keep-with-reason` | 1,000-dataset 6-auditor synthetic-to-real transfer and Bradley-Terry Elo evaluation harness. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/optional_landmarks.py` | `keep-with-reason` | Optional and progressive LandmarkBundle v1 reference implementation and observed-only MLC-v3 conditioning. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
 | `research/levels/tests/test_optional_landmarks.py` | `keep-with-reason` | Unit tests for LandmarkBundle v1 sanitation, merge laws, golden digests, stratified subsampling and optional conditioning. Offline shared-model research/evidence boundary; only tensor exports enter Rust. |
+| `research/levels/nc1_reference.py` | `keep-with-reason` | Source-independent NC1 normalization oracle and strict private/public card validation. |
+| `research/levels/observed_conditioning.py` | `keep-with-reason` | Observed-only MLC-v3 conditioning descriptors, progressive step iterator and stratified subsample reference. |
+| `research/levels/tests/test_multiclass_and_dropout.py` | `keep-with-reason` | Unit tests for unbounded K>=33 multiclass labels, absent query classes, and full-partition landmark-dropout conditioning parity. |
+| `research/levels/tests/test_nc1.py` | `keep-with-reason` | Actual Rust NC1 fixture replay, source binding and malformed-card regressions. |
+| `research/levels/tests/test_transfer_evaluation.py` | `keep-with-reason` | Prospective common-REAL-FIT coordinate, mutation and historical replay regressions. |
+| `research/levels/tests/test_v4_objectives.py` | `keep-with-reason` | Actual producer gradients, categorical hard-forward parity and stale export refusals. |
+| `research/levels/tests/test_v4_training.py` | `keep-with-reason` | Padding, optimizer, RNG, role and deterministic checkpoint regressions. |
+| `research/levels/tests/test_v4_training_model.py` | `keep-with-reason` | Actual model two-step resume, native23 masks and data/schema/role mutation refusals. |
+| `research/levels/tests/test_v4_wire.py` | `keep-with-reason` | Tracked actual Rust DML4 packet/draw parity without optional fixture skips. |
+| `research/levels/tools/export_prepare_goldens.py` | `keep-with-reason` | Exports lane-A deterministic scaler and descriptor golden fixtures for `dope_core::prepare`. |
+| `research/levels/tools/export_prepare_goldens_b.py` | `keep-with-reason` | Exports lane-B deterministic V3 and observed-only conditioning golden fixtures for `dope_core::prepare`. |
+| `research/levels/tools/export_v4_conformance.py` | `keep-with-reason` | Deterministic synthetic producer conformance export to an exclusive new directory. |
+| `research/levels/tools/optional_landmarks_qa/ab_timing.py` | `keep-with-reason` | Interleaved A/B wall time of native landmark reports between two binaries. |
+| `research/levels/tools/optional_landmarks_qa/build_reports.py` | `keep-with-reason` | Collects qualification runs into docs/evidence/optional-landmarks JSON. |
+| `research/levels/tools/optional_landmarks_qa/compare.py` | `keep-with-reason` | Compares native report sha256 across binaries and thread counts. |
+| `research/levels/tools/optional_landmarks_qa/evidence_manifest.py` | `keep-with-reason` | Authenticated manifest binding native training evidence to verified inputs, report/bundle hashes and scope digests. |
+| `research/levels/tools/optional_landmarks_qa/h7_dependency.py` | `keep-with-reason` | Measures which landmark slots influence MLC-v3 High conditioning. |
+| `research/levels/tools/optional_landmarks_qa/make_ablation_corpus.py` | `keep-with-reason` | Builds the subsample-ablation table manifest from local catalog splits. |
+| `research/levels/tools/optional_landmarks_qa/make_corpus.py` | `keep-with-reason` | Builds the identity/benchmark table manifest (precalc, JopeDime fixtures, synthetic). |
+| `research/levels/tools/optional_landmarks_qa/probe_costs.py` | `keep-with-reason` | Per-probe native landmark wall time via --ids. |
+| `research/levels/tools/optional_landmarks_qa/q2_public_matrix.py` | `keep-with-reason` | Cold public-call latency of mlc-v3 encode per landmark mode and device under the qualification lock. |
+| `research/levels/tools/optional_landmarks_qa/q3_retention.py` | `keep-with-reason` | Genuine native retention arms (zero/partial/full/sub-N) on the 112-table dev roster. |
+| `research/levels/tools/optional_landmarks_qa/run_ablation.py` | `keep-with-reason` | Native landmark bundles at subsample sizes N versus full rows. |
+| `research/levels/tools/optional_landmarks_qa/run_sweep.py` | `keep-with-reason` | Runs native landmark reports over a manifest for identity sweeps and timing. |
+| `research/levels/tools/optional_landmarks_qa/summarize_ablation.py` | `keep-with-reason` | Summarizes subsample-ablation bundle similarity. |
+| `research/levels/tools/optional_landmarks_qa/summarize_q1.py` | `keep-with-reason` | Aggregates retention arms per the shared qualification protocol. |
+| `research/levels/tools/optional_landmarks_qa/summarize_q2.py` | `keep-with-reason` | Summarizes the cold public-call matrix into the per-cell fast-versus-full gate table. |
+| `research/levels/train_landmark_dropout.py` | `keep-with-reason` | Offline landmark-dropout and partial-mask warm-start trainer for DOPE-MLC-v3 SafeTensors weights. |
+| `research/levels/transfer_evaluation.py` | `keep-with-reason` | Frozen REAL-FIT prepared-coordinate research evaluation without synthetic refitting. |
+| `research/levels/v3_canonical_summary.py` | `keep-with-reason` | Pure historical canonical summary/Elo reducer extracted without arithmetic changes; its source enters future producer receipt hashes. |
+| `research/levels/v4_encode.py` | `keep-with-reason` | Strict closed DML4 public producer export and stale-state refusal. |
+| `research/levels/v4_model.py` | `keep-with-reason` | Bounded semantic-group autograd encoder, explicit native conditioning and served-basis heads. |
+| `research/levels/v4_objectives.py` | `keep-with-reason` | Differentiable synthesize-learn-query loss and grouped driver objective. |
+| `research/levels/v4_trainer.py` | `keep-with-reason` | CPU bounded shape batches, explicit roles, actual updates and content-bound atomic resume. |
+| `research/levels/v4_training_adapter.py` | `keep-with-reason` | Explicit frozen callback connecting actual v4 objective to bounded CPU trainer. |
+| `research/levels/v4_training_helpers.py` | `keep-with-reason` | Pure bounded scheduling, padding, typed identity and checkpoint-state helpers; original public classes/exceptions remain in v4_trainer. |
+| `research/levels/v4_wire_reference.py` | `keep-with-reason` | Independent bounded DML4 decoder and fixed-draw recipient reference. |
+| `research/transfer/tests/test_driver_rank_successor.py` | `keep-with-reason` | Additive informative-rank and preserved C02 inference regressions. |
+| `research/transfer/tests/test_landmark_encoding_schema.py` | `keep-with-reason` | Native landmark companion schema and private/public receipt regressions. |
