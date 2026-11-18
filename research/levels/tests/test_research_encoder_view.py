@@ -1,20 +1,26 @@
-"""Research-view contract. Does not download or require the released checkpoint."""
+"""Research-view contract (`WP1` Ultra + `WP2` 196D Packet). Offline; no weight download."""
 import inspect
-import math
 import unittest
 from pathlib import Path
 
+import numpy as np
 import torch
 
 from research.levels.encoder import CANONICAL_GATE_KEYS_14, DopeEncoder629
+from research.levels.multilevel_model import MultiLevelLandmarkModel
 from research.levels.research_encoder_view import (
+    FORBIDDEN_QUERY_KEYS,
     LEVEL_CODE,
+    PACKET_FEATURES_SCHEMA,
+    PACKET_FEATURES_WIDTH,
     PACKET_GLOBAL_FIELDS,
     PACKET_GLOBAL_SCHEMA,
     PACKET_GLOBAL_WIDTH,
     RESEARCH_ENCODER_VIEW_RECIPE,
     encode_research_view,
+    packet_features_v1,
     packet_global_v0,
+    packet_global_v1,
 )
 
 
@@ -28,39 +34,38 @@ def _inputs(batch=2):
     return torch.randn(batch, 256), torch.randn(batch, 64, 17)
 
 
-def _encoding(**overrides):
-    gates = {key: float(index + 1) for index, key in enumerate(CANONICAL_GATE_KEYS_14)}
-    encoding = {
-        "level": "high",
-        "n_train": 8,
-        "p_use": 4,
-        "gates": gates,
-        "target_bundle": {
-            "residual_std": 1.5,
-            "noise_scale": 0.25,
-            "class_prior": 0.5,
-            "y_min": -2.0,
-            "y_max": 3.0,
-            "trees": [{"leaf": 0.0}, {"leaf": 1.0}],
-            "pairs": [(0, 1)],
-        },
-        "col_knots": [[0.1, 0.2], [0.3, 0.4]],
-        "col_means": [9.0, 8.0],
-    }
-    encoding.update(overrides)
-    return encoding
+def _real_encoding(task="regression", level="high", seed=11):
+    rng = np.random.default_rng(seed)
+    X = rng.standard_normal((64, 5)).astype(np.float64)
+    X[:, 3] = (X[:, 3] > 0.0).astype(np.float64)
+    X[:, 4] = rng.integers(0, 4, size=64).astype(np.float64)
+    if task == "regression":
+        y = (0.7 * X[:, 0] - 0.4 * (X[:, 1] ** 2) + 0.2 * rng.standard_normal(64)).astype(np.float64)
+    elif task == "classification":
+        y = (X[:, 0] - 0.5 * X[:, 1] > 0.0).astype(np.float64)
+    else:
+        y = rng.integers(0, 3, size=64).astype(np.float64)
+    torch.manual_seed(42)
+    model = MultiLevelLandmarkModel().eval()
+    return model.encode_table(X, y, task=task, level=level, landmark_mode="none")
 
 
 class ResearchEncoderViewTests(unittest.TestCase):
-    def test_recipe_is_not_a_product_identity(self):
-        self.assertEqual(RESEARCH_ENCODER_VIEW_RECIPE, "research-encoder-view/v0")
-        self.assertEqual(PACKET_GLOBAL_SCHEMA, "dope.packet-global/v0")
+    def test_schema_deduplicates_noise_scale_and_excludes_extrema(self):
+        self.assertEqual(RESEARCH_ENCODER_VIEW_RECIPE, "research-encoder-view/v1")
+        self.assertEqual(PACKET_GLOBAL_SCHEMA, "dope.packet-global/v1")
+        self.assertEqual(PACKET_FEATURES_SCHEMA, "dope.packet-features/v1")
+        self.assertEqual(len(PACKET_GLOBAL_FIELDS), PACKET_GLOBAL_WIDTH)
+        self.assertEqual(len(set(PACKET_GLOBAL_FIELDS)), PACKET_GLOBAL_WIDTH)
+        self.assertEqual(PACKET_GLOBAL_FIELDS.count("noise_scale"), 1)
+        self.assertNotIn("y_min", PACKET_GLOBAL_FIELDS)
+        self.assertNotIn("y_max", PACKET_GLOBAL_FIELDS)
         source = Path(__import__("research.levels.research_encoder_view", fromlist=["x"]).__file__).read_text()
         self.assertNotIn("dope629-ultra/v1", source)
         forward = inspect.signature(DopeEncoder629.forward)
         self.assertEqual(list(forward.parameters), ["self", "dataset_features", "col_landmarks"])
 
-    def test_high_calls_forward_and_matches_it(self):
+    def test_high_delegates_to_forward_and_refuses_ultra_conditioning(self):
         encoder = _encoder()
         features, columns = _inputs()
         seen = {}
@@ -75,91 +80,90 @@ class ResearchEncoderViewTests(unittest.TestCase):
         direct = real(features, columns)
         self.assertTrue(seen.get("called"))
         self.assertTrue(torch.equal(view, direct))
-        self.assertEqual(tuple(view.shape), (2, 629))
-        self.assertTrue(torch.equal(view[:, :256], features))
+        with self.assertRaisesRegex(ValueError, "conditioning_level"):
+            encode_research_view(encoder, features, columns, level="high", conditioning_level="ultra")
 
-    def test_ultra_is_separate_finite_and_not_high(self):
+    def test_ultra_requires_explicit_ultra_conditioning_eval_and_finite_inputs(self):
         encoder = _encoder()
         features, columns = _inputs()
-        called = {}
-        real = encoder.forward
+        for bad_cond in (None, "high", "low"):
+            with self.assertRaisesRegex(ValueError, "conditioning_level"):
+                encode_research_view(encoder, features, columns, level="ultra", conditioning_level=bad_cond)
 
-        def wrapped(dataset_features, col_landmarks):
-            called["forward"] = True
-            return real(dataset_features, col_landmarks)
-
-        encoder.forward = wrapped
-        router = encoder.router.forward
-        levels = []
-
-        def routed(desc_vec, level):
-            levels.append(level)
-            return router(desc_vec, level)
-
-        encoder.router.forward = routed
-        ultra = encode_research_view(encoder, features, columns, level="ultra")
-        self.assertNotIn("forward", called)
-        self.assertEqual(levels, ["ultra"])
-        high = real(features, columns)
+        ultra = encode_research_view(
+            encoder, features, columns, level="ultra", conditioning_level="ultra",
+        )
+        high = encoder(features, columns)
+        self.assertFalse(ultra.requires_grad)
         self.assertEqual(tuple(ultra.shape), (2, 629))
         self.assertTrue(torch.isfinite(ultra).all())
         self.assertTrue(torch.equal(ultra[:, :256], features))
         self.assertFalse(torch.equal(ultra[:, 512:526], high[:, 512:526]))
 
-    def test_bad_level_and_nan_inputs(self):
-        encoder = _encoder()
-        features, columns = _inputs()
-        for level in ("low", "medium", "small", "", None):
-            with self.assertRaises(ValueError):
-                encode_research_view(encoder, features, columns, level=level)
-        features = features.clone()
-        features[0, 0] = float("nan")
-        columns = columns.clone()
-        columns[0, 0, 0] = float("inf")
-        high = encode_research_view(encoder, features, columns, level="high")
-        ultra = encode_research_view(encoder, features, columns, level="ultra")
-        self.assertTrue(torch.isfinite(high).all())
-        self.assertTrue(torch.isfinite(ultra).all())
+        # Non-finite input must fail cleanly on ultra rather than collapsing 373 router coords to 0.
+        bad_feat = features.clone()
+        bad_feat[0, 0] = float("nan")
+        with self.assertRaisesRegex(ValueError, "non-finite"):
+            encode_research_view(encoder, bad_feat, columns, level="ultra", conditioning_level="ultra")
 
-    def test_packet_fixture_ignores_columns_and_refuses_queries(self):
-        expected = tuple(float(index + 1) for index in range(14)) + (
-            1.5, 0.25, 0.5, -2.0, 3.0, math.log(8), 4.0, 2.0, 1.0, LEVEL_CODE["high"],
-        )
-        self.assertEqual(len(expected), PACKET_GLOBAL_WIDTH)
-        self.assertEqual(len(PACKET_GLOBAL_FIELDS), PACKET_GLOBAL_WIDTH)
-        left = packet_global_v0(_encoding())
-        right = packet_global_v0(_encoding(col_knots=[[4.0, 5.0]], col_means=[0.0, 1.0]))
-        self.assertEqual(left, expected)
-        self.assertEqual(left, right)
-        ultra = packet_global_v0(_encoding(level="ultra"))
-        self.assertEqual(ultra[-1], LEVEL_CODE["ultra"])
-        self.assertEqual(ultra[:-1], expected[:-1])
+        train_enc = DopeEncoder629().train()
+        with self.assertRaisesRegex(ValueError, "eval"):
+            encode_research_view(train_enc, features, columns, level="ultra", conditioning_level="ultra")
 
-    def test_packet_refusals_do_not_echo_values(self):
+    def test_real_encode_table_across_regression_binary_and_multiclass(self):
+        for task in ("regression", "classification", "multiclass"):
+            for level in ("high", "ultra"):
+                enc = _real_encoding(task=task, level=level)
+                feat = packet_features_v1(enc)
+                glob = packet_global_v1(enc)
+                self.assertEqual(len(feat), PACKET_FEATURES_WIDTH)
+                self.assertEqual(len(glob), PACKET_GLOBAL_WIDTH)
+                self.assertEqual(glob, feat[:PACKET_GLOBAL_WIDTH])
+                self.assertEqual(packet_global_v0(enc), glob)
+                self.assertTrue(all(np.isfinite(v) for v in feat))
+                self.assertEqual(glob[-1], LEVEL_CODE[level])
+
+                # Changing y_min / y_max extrema by 6 orders of magnitude leaves packet unchanged.
+                enc_ext = dict(enc)
+                enc_ext["target_bundle"] = dict(enc["target_bundle"], y_min=-765432.0, y_max=987654.0)
+                self.assertEqual(packet_features_v1(enc_ext), feat)
+
+                # P-S2 covariate-only ablation zeros target-bundle slots while keeping covariates.
+                no_tgt = packet_features_v1(enc, include_target_bundle=False)
+                self.assertEqual(len(no_tgt), PACKET_FEATURES_WIDTH)
+                self.assertEqual(no_tgt[14:17], (0.0, 0.0, 0.0))
+                self.assertEqual(no_tgt[40:44], (0.0, 0.0, 0.0, 0.0))
+                self.assertEqual(no_tgt[172:188], (0.0,) * 16)
+                self.assertEqual(no_tgt[188:196], feat[188:196])
+
+    def test_multiclass_label_and_column_permutation_invariance(self):
+        enc = _real_encoding(task="multiclass", level="high")
+        base = packet_global_v1(enc)
+        perm_enc = dict(enc)
+        priors = list(enc["target_bundle"]["class_priors"])
+        perm_enc["target_bundle"] = dict(enc["target_bundle"], class_priors=priors[::-1])
+        perm_glob = packet_global_v1(perm_enc)
+        for a, b in zip(base, perm_glob):
+            self.assertAlmostEqual(a, b, places=6)
+
+    def test_packet_refusals_block_query_keys_and_redact_values(self):
+        enc = _real_encoding(task="regression", level="high")
         marker = "7.25"
-        missing = _encoding()
-        del missing["target_bundle"]["residual_std"]
-        with self.assertRaises(ValueError) as missing_gate:
-            packet_global_v0(missing)
-        self.assertNotIn(marker, str(missing_gate.exception))
-        self.assertIn("target_bundle.residual_std", str(missing_gate.exception))
-        poisoned = _encoding()
-        poisoned["target_bundle"]["y_max"] = float(marker)
-        poisoned["target_bundle"]["residual_std"] = float("nan")
-        with self.assertRaises(ValueError) as nonfinite:
-            packet_global_v0(poisoned)
-        self.assertNotIn(marker, str(nonfinite.exception))
-        for key in ("X_query", "y_query", "query_rows", "query_features"):
-            with self.assertRaises(ValueError) as query:
-                packet_global_v0(_encoding(**{key: marker}))
-            self.assertIn(key, str(query.exception))
-            self.assertNotIn(marker, str(query.exception))
+        for key in FORBIDDEN_QUERY_KEYS:
+            with self.assertRaises(ValueError) as query_err:
+                packet_features_v1(dict(enc, **{key: marker}))
+            self.assertIn(key, str(query_err.exception))
+            self.assertNotIn(marker, str(query_err.exception))
+        with self.assertRaisesRegex(ValueError, "fit role"):
+            packet_features_v1(dict(enc, role="query"))
+        poisoned = dict(enc)
+        poisoned["target_bundle"] = dict(enc["target_bundle"], y_max=float(marker), residual_std=float("nan"))
+        with self.assertRaises(ValueError) as nan_err:
+            packet_features_v1(poisoned)
+        self.assertNotIn(marker, str(nan_err.exception))
+        bad_gates = dict(enc, gates={k: 0.1 for k in CANONICAL_GATE_KEYS_14[:-1]})
         with self.assertRaises(ValueError):
-            packet_global_v0(_encoding(level="low"))
-        with self.assertRaises(ValueError):
-            packet_global_v0(_encoding(n_train=0))
-        with self.assertRaises(ValueError):
-            packet_global_v0(_encoding(p_use=0))
+            packet_features_v1(bad_gates)
 
 
 if __name__ == "__main__":

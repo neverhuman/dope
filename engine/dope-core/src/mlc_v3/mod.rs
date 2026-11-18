@@ -8,8 +8,10 @@
 
 pub mod inflate;
 pub mod nets;
+pub mod packet_features;
 mod resident;
 pub use resident::MlcV3RoutedTensors;
+pub mod research_view;
 pub mod sample;
 pub mod scaler;
 pub mod wire;
@@ -18,6 +20,12 @@ pub use nets::{
     ConditionalHyperTargetNet, CovariateRefinementNet, MlcV3ForwardCheckInput,
     MlcV3ForwardCheckOutput, MLC_V3_FEATURES_512_DIM, MLC_V3_FEATURES_629_DIM, MLC_V3_GATE_KEYS_14,
 };
+pub use packet_features::{
+    packet_features_v1_from_encoding, packet_global_v1_from_encoding, PACKET_FEATURES_V1_DIM,
+    PACKET_FEATURES_V1_SCHEMA, PACKET_GLOBAL_V1_DIM, PACKET_GLOBAL_V1_FIELDS,
+    PACKET_GLOBAL_V1_SCHEMA,
+};
+pub use research_view::{ResearchConditioningLevel, RESEARCH_ENCODER_VIEW_V1_RECIPE};
 pub use sample::{
     build_enriched_basis, sample_synthetic_table, sample_synthetic_table_with_draws,
     FixedSampleDraws, MlcV3SampledTable,

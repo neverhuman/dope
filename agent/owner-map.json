@@ -14,6 +14,8 @@
     "schemas/landmark-encoding-receipt-v1.schema.json": "rust-core",
     "research/transfer/tests/test_landmark_encoding_schema.py": "external-evidence",
     "docs/landmark-encoding-receipts.md": "governance",
+    ".cargo/audit.toml": "governance",
+    "ops/ci/shared-levels.sh": "governance",
     ".cargo/": "rust-core",
     ".gitattributes": "governance",
     ".github/": "governance",

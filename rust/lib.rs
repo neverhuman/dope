@@ -15,6 +15,7 @@ pub mod data;
 pub mod deep_campaign;
 pub mod embedding;
 pub mod error;
+pub(crate) type SqlBackendError = rusqlite::Error;
 pub mod evaluation;
 pub mod evidence;
 pub mod fitness;

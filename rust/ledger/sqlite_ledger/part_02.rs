@@ -67,6 +67,7 @@ impl CampaignLedger {
     }
 
     fn connection(&self) -> Result<Connection> {
+        verify_wal_sibling(&self.path)?;
         let connection = Connection::open(&self.path)?;
         // Multiple short-lived handles are intentionally used by the scheduler
         // and by recovery tooling.  WAL removes reader/writer contention, but
