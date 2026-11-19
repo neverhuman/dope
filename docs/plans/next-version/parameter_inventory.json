@@ -1,0 +1,16 @@
+{
+  "schema": "dope.parameter-inventory/v1",
+  "released_checkpoint": "dope_mlc_v3_multitask_best.safetensors",
+  "released_tensors": 56,
+  "released_parameters": 444168,
+  "released_safetensors_bytes": 1781800,
+  "released_safetensors_sha256": "d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c",
+  "active_encoder_tensors": 40,
+  "active_encoder_parameters": 353095,
+  "active_encoder_is_subset_of_released": true,
+  "sources": {
+    "released_counts": "engine/dope-core/src/mlc_v3/mod.rs MLC_V3_EXPECTED_TENSORS and MLC_V3_EXPECTED_PARAMETERS",
+    "active_encoder": "research/levels/encoder.py DOPE_ACTIVE_ENCODER_TENSORS and DOPE_ACTIVE_ENCODER_PARAMETERS",
+    "digest": "research/levels/encoder.py PINNED_MULTITASK_SAFETENSORS_SHA256"
+  }
+}

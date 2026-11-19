@@ -250,5 +250,65 @@ class DopeEncoder629Tests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr.decode())
 
 
+class BaselineInventoryTests(unittest.TestCase):
+    """WP00 inventories stay tied to the released constants. They are not a new checkpoint."""
+
+    @staticmethod
+    def _load(name):
+        root = Path(__file__).resolve().parents[3]
+        return root, json.loads((root / "docs/plans/next-version" / name).read_text())
+
+    def test_parameter_inventory_matches_released_constants(self):
+        root, inv = self._load("parameter_inventory.json")
+        rust = (root / "engine/dope-core/src/mlc_v3/mod.rs").read_text()
+        self.assertIn("pub const MLC_V3_EXPECTED_TENSORS: usize = 56;", rust)
+        self.assertIn("pub const MLC_V3_EXPECTED_PARAMETERS: usize = 444_168;", rust)
+        self.assertEqual(inv["released_tensors"], 56)
+        self.assertEqual(inv["released_parameters"], 444_168)
+        self.assertEqual(inv["released_safetensors_bytes"], 1_781_800)
+        self.assertEqual(inv["released_safetensors_sha256"], PINNED_MULTITASK_SAFETENSORS_SHA256)
+        self.assertEqual(inv["active_encoder_tensors"], DOPE_ACTIVE_ENCODER_TENSORS)
+        self.assertEqual(inv["active_encoder_parameters"], DOPE_ACTIVE_ENCODER_PARAMETERS)
+        self.assertLess(inv["active_encoder_tensors"], inv["released_tensors"])
+        self.assertLess(inv["active_encoder_parameters"], inv["released_parameters"])
+        self.assertTrue(inv["active_encoder_is_subset_of_released"])
+        decisions = json.loads((root / "docs/plans/dope-jope-contract-decisions.json").read_text())
+        self.assertEqual(inv["released_safetensors_sha256"], decisions["identities"]["standalone_model_sha256"])
+
+    def test_baseline_manifest_pins_known_heads(self):
+        root, base = self._load("baseline_manifest.json")
+        sha_keys = (
+            "inspected_dope_main",
+            "inspected_jopedime_main",
+            "released_engine_tag_commit",
+            "compatible_encoder_source",
+            "earlier_signed_engine_source",
+        )
+        for key in sha_keys:
+            self.assertRegex(base[key], r"^[0-9a-f]{40}$")
+        self.assertEqual(base["released_engine_tag"], "dope-engine-v1.2.0")
+        self.assertEqual(base["released_engine_tag_commit"], base["compatible_encoder_source"])
+        readme = (root / "README.md").read_text()
+        integration = (root / "docs/jopedime-integration.md").read_text()
+        self.assertIn(base["released_engine_tag_commit"], readme)
+        self.assertIn(base["compatible_encoder_source"], integration)
+        ancestor = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", base["inspected_dope_main"], "HEAD"],
+            cwd=root, check=False,
+        )
+        self.assertEqual(ancestor.returncode, 0)
+        self.assertTrue(base["weight_identity_unchanged"])
+
+    def test_exposure_inventory_keeps_identities_apart(self):
+        root, exp = self._load("exposure_inventory.json")
+        decisions = json.loads((root / "docs/plans/dope-jope-contract-decisions.json").read_text())
+        self.assertEqual(exp["released_safetensors_sha256"], PINNED_MULTITASK_SAFETENSORS_SHA256)
+        self.assertEqual(exp["fused_research_composite_sha256"], decisions["identities"]["jopedime_fused_composite_sha256"])
+        self.assertNotEqual(exp["released_safetensors_sha256"], exp["fused_research_composite_sha256"])
+        self.assertFalse(exp["icl_models_load_this_checkpoint"])
+        self.assertEqual(exp["training_corpus_overlap_with_dl_val91"], "NOT_RUN")
+        self.assertFalse(exp["historical_h_runs_replayed"])
+
+
 if __name__ == "__main__":
     unittest.main()

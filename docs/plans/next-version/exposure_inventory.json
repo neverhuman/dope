@@ -1,0 +1,15 @@
+{
+  "schema": "dope.exposure-inventory/v1",
+  "released_safetensors_sha256": "d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c",
+  "fused_research_composite_sha256": "c51a56d031a4af40cb2b2661e6230109db684fc5cf80743dcad5c2fc770ba814",
+  "identities_not_interchangeable": [
+    "released_safetensors",
+    "fused_research_composite",
+    "icl_size_m",
+    "icl_size_l"
+  ],
+  "icl_models_load_this_checkpoint": false,
+  "training_corpus_overlap_with_dl_val91": "NOT_RUN",
+  "historical_h_runs_replayed": false,
+  "note": "The released SafeTensors digest and the fused research composite are different objects, copied from docs/plans/dope-jope-contract-decisions.json. Whether the released training corpus overlaps DL-Val91 families was not measured here."
+}
