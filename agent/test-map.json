@@ -2836,6 +2836,10 @@
       "command": "cargo test --locked --lib token_cache::",
       "purpose": "verify the identity-bound token cache misses when weights, target, support rows, normalizer, masks, or projector change, refuses forbidden source roles, and returns the same payload on a warm read"
     },
+    "rust/corpus/training_manifest.rs": {
+      "command": "cargo test --locked --lib corpus::training_manifest::",
+      "purpose": "verify the training manifest refuses protected legacy reads, derived-family TRAIN admission, reorder base-count inflation, and generator seed collisions with the same realized content"
+    },
     "rust/transfer_metrics.rs": {
       "command": "just focus transfer_metrics::tests",
       "purpose": "run original-unit metric golden tests through the registered Rust library"

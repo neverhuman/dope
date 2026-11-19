@@ -46,6 +46,17 @@ pub fn inventory_corpus(roots: &[PathBuf]) -> Result<CorpusInventory> {
                 ));
                 continue;
             }
+            match training_manifest::legacy_blocks_read(&path) {
+                Ok(true) => {
+                    exclusions.push(exclude(
+                        "protected",
+                        "training_manifest_protected".into(),
+                    ));
+                    continue;
+                }
+                Ok(false) => {}
+                Err(error) => return Err(error),
+            }
             let train_path = path.join("train.csv");
             if !train_path.is_file() {
                 exclusions.push(exclude("incomplete", "missing train.csv".into()));
