@@ -2844,6 +2844,10 @@
       "command": "cargo test --locked --lib corpus::training_manifest::",
       "purpose": "verify the training manifest refuses protected legacy reads, marker symlinks, DEV content, non-TRAIN ancestors, reorder base-count inflation, and generator seed collisions with the same realized content"
     },
+    "rust/corpus/response_panel.rs": {
+      "command": "cargo test --locked --lib corpus::response_panel::",
+      "purpose": "verify response records trace measured values to admitted rows, mask unknown outcomes, pair fidelities on one task, and keep scores out of a first-shot panel"
+    },
     "rust/transfer_metrics.rs": {
       "command": "just focus transfer_metrics::tests",
       "purpose": "run original-unit metric golden tests through the registered Rust library"
