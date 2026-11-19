@@ -11,7 +11,7 @@ use std::path::Path;
 
 use sha2::{Digest, Sha256};
 
-use crate::error::{io_error, DopeError, Result};
+use crate::error::{DopeError, Result, io_error};
 
 pub const SCHEMA: &str = "dope-training-base/v1";
 pub const MARKER_FILE: &str = "dope-training-base.json";
@@ -422,10 +422,12 @@ mod tests {
         let admission = admit(&[protected, renamed, derived, copied]).unwrap();
         assert_eq!(admission.accepted_base_count, 0);
         assert_eq!(admission.rejected.len(), 3);
-        assert!(admission
-            .rejected
-            .iter()
-            .all(|rejection| rejection.code == "training_manifest_ancestry"));
+        assert!(
+            admission
+                .rejected
+                .iter()
+                .all(|rejection| rejection.code == "training_manifest_ancestry")
+        );
     }
 
     #[test]
