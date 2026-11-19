@@ -3568,6 +3568,10 @@
       "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
       "purpose": "verify 40-tensor DopeEncoder629 pruning, SHA-256 pre-parse verification, alphabetical 14-gate ordering and [B, 256] + [B, 64, 17] -> [B, 629] parity"
     },
+    "research/levels/transfer_projection.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_projection -v",
+      "purpose": "verify the frozen full629 affine init reproduces Stage-1B slots 2/4/5 inside the linear region and leaves landmark, mask, and mixed slots unchanged"
+    },
     "research/levels/research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
       "purpose": "verify level-bound High/Ultra research 629D view and extrema-free 196D fitted packet features"
@@ -3631,6 +3635,10 @@
     "research/levels/tests/test_encoder_629.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
       "purpose": "verify DopeEncoder629 40-tensor pruning, SHA-256 pre-parse check, and 629D composite encoder parity"
+    },
+    "research/levels/tests/test_transfer_projection.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_projection -v",
+      "purpose": "verify the frozen full629 affine init reproduces Stage-1B slots 2/4/5 inside the linear region and leaves landmark, mask, and mixed slots unchanged"
     },
     "research/levels/tests/test_research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
