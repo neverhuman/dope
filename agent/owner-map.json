@@ -685,6 +685,7 @@
     "rust/schema.rs": "rust-core",
     "rust/table.rs": "rust-core",
     "rust/table/": "rust-core",
+    "rust/token_cache.rs": "rust-core",
     "rust/transfer_metrics.rs": "rust-core",
     "rust/transfer_metrics/mfs_v4.rs": "rust-core",
     "rust/transfer_metrics/tdl.rs": "rust-core",
