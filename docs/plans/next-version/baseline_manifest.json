@@ -1,0 +1,11 @@
+{
+  "schema": "dope.baseline-manifest/v1",
+  "inspected_dope_main": "c784fe4bc8b54c448ccc553f2d9d3ab651c47921",
+  "inspected_jopedime_main": "13666db9e35b6ff3f904638a9b1e9c2b7d53df66",
+  "released_engine_tag": "dope-engine-v1.2.0",
+  "released_engine_tag_commit": "5fc96f2819a97ed313658c336a9a46e637299352",
+  "compatible_encoder_source": "5fc96f2819a97ed313658c336a9a46e637299352",
+  "earlier_signed_engine_source": "15e12aa3dc33851655580f6aa7c9c66353143f23",
+  "weight_identity_unchanged": true,
+  "note": "Inspected heads at the time this manifest was written. Later commits can descend from inspected_dope_main without editing this snapshot. This file is not a new model card and not a training result."
+}
