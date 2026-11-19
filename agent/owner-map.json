@@ -658,6 +658,7 @@
     "rust/control_isolation_ffi.rs": "rust-core",
     "rust/corpus/source_pilot.rs": "rust-core",
     "rust/corpus/source_pilot_tests.rs": "rust-core",
+    "rust/corpus/response_panel.rs": "rust-core",
     "rust/corpus/training_manifest.rs": "rust-core",
     "rust/corpus/training_manifest_tests.rs": "rust-core",
     "rust/deep_campaign/part_02.rs": "rust-core",
