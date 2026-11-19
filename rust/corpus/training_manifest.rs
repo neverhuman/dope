@@ -2,11 +2,13 @@
 //!
 //! Historical inventory readers stay in place. A directory that carries this
 //! schema with a protected role is not opened as `train.csv` / `test.csv`.
-//! Accepted TRAIN bases are distinct realized tables: row order, a new target,
-//! and a new generator seed do not create another base.
+//! A marker that is not a regular file is refused. Accepted TRAIN bases are
+//! distinct realized tables. DEV content and any non-TRAIN ancestor stay out
+//! of that count. Row order and a new generator seed do not create another base.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+use std::io::ErrorKind;
 use std::path::Path;
 
 use sha2::{Digest, Sha256};
@@ -46,6 +48,10 @@ impl SourceRole {
             self,
             Self::Confirm | Self::Test | Self::Query | Self::Holdout
         )
+    }
+
+    fn seals_train_content(self) -> bool {
+        self.protected() || matches!(self, Self::Dev)
     }
 }
 
@@ -112,8 +118,11 @@ struct Prepared {
 /// True when the legacy inventory must not open table bytes in `dir`.
 pub fn legacy_blocks_read(dir: &Path) -> Result<bool> {
     let path = dir.join(MARKER_FILE);
-    if !path.is_file() {
-        return Ok(false);
+    match fs::symlink_metadata(&path) {
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(false),
+        Ok(meta) if meta.file_type().is_file() => {}
+        Ok(_) => return Err(DopeError::Data("training_manifest_schema".into())),
+        Err(error) => return Err(io_error(&path, error)),
     }
     let bytes = fs::read(&path).map_err(|error| io_error(&path, error))?;
     let marker: Marker = serde_json::from_slice(&bytes)
@@ -175,19 +184,14 @@ pub fn admit(items: &[TrainingBase]) -> Result<Admission> {
         .iter()
         .map(|item| (item.item.base_dataset_id.as_str(), item))
         .collect();
-    let protected_ids: BTreeSet<&str> = prepared
-        .iter()
-        .filter(|item| item.item.role.protected())
-        .map(|item| item.item.base_dataset_id.as_str())
-        .collect();
     let protected_families: BTreeSet<&str> = prepared
         .iter()
-        .filter(|item| item.item.role.protected())
+        .filter(|item| item.item.role.seals_train_content())
         .flat_map(|item| item.item.source_family_ids.iter().map(String::as_str))
         .collect();
     let protected_identities: BTreeSet<&str> = prepared
         .iter()
-        .filter(|item| item.item.role.protected())
+        .filter(|item| item.item.role.seals_train_content())
         .map(|item| item.identity.as_str())
         .collect();
 
@@ -195,13 +199,8 @@ pub fn admit(items: &[TrainingBase]) -> Result<Admission> {
     let mut accepted_identity: BTreeMap<&str, Option<u64>> = BTreeMap::new();
     let mut rejected = Vec::new();
     for item in prepared.iter().filter(|item| item.item.view_of.is_none()) {
-        if let Some(code) = base_rejection(
-            item,
-            &by_id,
-            &protected_ids,
-            &protected_families,
-            &protected_identities,
-        ) {
+        if let Some(code) = base_rejection(item, &by_id, &protected_families, &protected_identities)
+        {
             rejected.push(Rejection {
                 base_dataset_id: item.item.base_dataset_id.clone(),
                 code,
@@ -262,7 +261,6 @@ pub fn admit(items: &[TrainingBase]) -> Result<Admission> {
 fn base_rejection<'a>(
     item: &'a Prepared,
     by_id: &BTreeMap<&str, &'a Prepared>,
-    protected_ids: &BTreeSet<&str>,
     protected_families: &BTreeSet<&str>,
     protected_identities: &BTreeSet<&str>,
 ) -> Option<&'static str> {
@@ -279,12 +277,7 @@ fn base_rejection<'a>(
         return Some("training_manifest_ancestry");
     }
     let mut stack = BTreeSet::new();
-    if ancestry_blocked(
-        item.item.base_dataset_id.as_str(),
-        by_id,
-        protected_ids,
-        &mut stack,
-    ) {
+    if ancestry_blocked(item.item.base_dataset_id.as_str(), by_id, &mut stack) {
         return Some("training_manifest_ancestry");
     }
     None
@@ -293,21 +286,19 @@ fn base_rejection<'a>(
 fn ancestry_blocked<'a>(
     id: &'a str,
     by_id: &BTreeMap<&str, &'a Prepared>,
-    protected_ids: &BTreeSet<&str>,
     stack: &mut BTreeSet<&'a str>,
 ) -> bool {
     let Some(item) = by_id.get(id) else {
         return true;
     };
-    if item.item.role.protected() || protected_ids.contains(id) {
+    if item.item.role != SourceRole::Train {
         return true;
     }
     if !stack.insert(id) {
         return true;
     }
     let blocked = item.item.ancestor_base_ids.iter().any(|ancestor| {
-        !by_id.contains_key(ancestor.as_str())
-            || ancestry_blocked(ancestor.as_str(), by_id, protected_ids, stack)
+        !by_id.contains_key(ancestor.as_str()) || ancestry_blocked(ancestor.as_str(), by_id, stack)
     });
     stack.remove(id);
     blocked
@@ -334,149 +325,5 @@ fn sha256_hex(bytes: &[u8]) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use std::io::Write;
-
-    fn hex(fill: u8) -> String {
-        format!("{fill:02x}").repeat(32)
-    }
-
-    fn train(id: &str, rows: Vec<String>, families: &[&str]) -> TrainingBase {
-        TrainingBase {
-            base_dataset_id: id.into(),
-            physical_rows_sha256: rows,
-            source_family_ids: families
-                .iter()
-                .map(|family| (*family).to_string())
-                .collect(),
-            ancestor_base_ids: Vec::new(),
-            origin: Origin::Real,
-            generator: None,
-            role: SourceRole::Train,
-            task: TaskKind::Regression,
-            target_declaration_sha256: hex(0x11),
-            view_of: None,
-        }
-    }
-
-    #[test]
-    fn legacy_inventory_does_not_read_protected_bytes() {
-        let root = Path::new("target/training-manifest").join(format!("{}", std::process::id()));
-        let public = root.join("public");
-        let sealed = root.join("sealed");
-        fs::create_dir_all(&public).unwrap();
-        fs::create_dir_all(&sealed).unwrap();
-        for (path, body) in [
-            (public.join("train.csv"), "0,1,0\n"),
-            (public.join("test.csv"), "1,0,1\n"),
-            (sealed.join("train.csv"), "SECRET_LABEL,1\n"),
-            (sealed.join("test.csv"), "SECRET_LABEL,0\n"),
-        ] {
-            let mut file = fs::File::create(path).unwrap();
-            write!(file, "{body}").unwrap();
-        }
-        fs::write(
-            sealed.join(MARKER_FILE),
-            r#"{"schema":"dope-training-base/v1","role":"CONFIRM"}"#,
-        )
-        .unwrap();
-        let inventory = super::super::inventory_corpus(&[root.clone()]).unwrap();
-        assert_eq!(inventory.datasets.len(), 1);
-        assert_eq!(inventory.exclusions.len(), 1);
-        assert_eq!(inventory.exclusions[0].reason, "protected");
-        assert_eq!(
-            inventory.exclusions[0].detail,
-            "training_manifest_protected"
-        );
-        let rendered = format!("{inventory:?}");
-        assert!(!rendered.contains("SECRET_LABEL"));
-        fs::remove_dir_all(&root).unwrap();
-    }
-
-    #[test]
-    fn malformed_marker_refuses_before_table_bytes() {
-        let root =
-            Path::new("target/training-manifest-bad").join(format!("{}", std::process::id()));
-        let sealed = root.join("sealed");
-        fs::create_dir_all(&sealed).unwrap();
-        fs::write(sealed.join("train.csv"), "SECRET_LABEL,1\n").unwrap();
-        fs::write(sealed.join("test.csv"), "SECRET_LABEL,0\n").unwrap();
-        fs::write(sealed.join(MARKER_FILE), "{").unwrap();
-        let error = super::super::inventory_corpus(&[root.clone()]).unwrap_err();
-        let rendered = error.to_string();
-        assert!(rendered.contains("training_manifest_schema"));
-        assert!(!rendered.contains("SECRET_LABEL"));
-        fs::remove_dir_all(&root).unwrap();
-    }
-
-    #[test]
-    fn derived_family_alias_is_refused() {
-        let mut protected = train("secret-source", vec![hex(1)], &["family-secret"]);
-        protected.role = SourceRole::Confirm;
-        let mut renamed = train("public-name", vec![hex(2)], &["family-secret"]);
-        renamed.ancestor_base_ids = vec!["secret-source".into()];
-        let mut derived = train("derived", vec![hex(3)], &["other-family"]);
-        derived.ancestor_base_ids = vec!["secret-source".into()];
-        let copied = train("copied-bytes", vec![hex(1)], &["unrelated"]);
-        let admission = admit(&[protected, renamed, derived, copied]).unwrap();
-        assert_eq!(admission.accepted_base_count, 0);
-        assert_eq!(admission.rejected.len(), 3);
-        assert!(
-            admission
-                .rejected
-                .iter()
-                .all(|rejection| rejection.code == "training_manifest_ancestry")
-        );
-    }
-
-    #[test]
-    fn reordering_does_not_increment_base_count() {
-        let first = train("base", vec![hex(1), hex(2)], &["family-a"]);
-        let mut reordered = train("reordered", vec![hex(2), hex(1)], &["family-a"]);
-        reordered.target_declaration_sha256 = hex(0x22);
-        let mut view = train("view", vec![hex(2), hex(1)], &["family-a"]);
-        view.view_of = Some("base".into());
-        view.target_declaration_sha256 = hex(0x33);
-        let admission = admit(&[first, reordered, view]).unwrap();
-        assert_eq!(admission.accepted_base_count, 1);
-        assert_eq!(admission.accepted_base_ids, vec!["base".to_string()]);
-        assert_eq!(admission.rejected.len(), 1);
-        assert_eq!(admission.rejected[0].code, "training_manifest_duplicate");
-        assert_eq!(
-            physical_base_identity(&[hex(1), hex(2)]).unwrap(),
-            physical_base_identity(&[hex(2), hex(1)]).unwrap()
-        );
-    }
-
-    #[test]
-    fn seed_collision_is_rejected_by_realized_content() {
-        let mut first = train("draw-a", vec![hex(4), hex(5)], &["mech"]);
-        first.origin = Origin::StructuralSynthetic;
-        first.generator = Some(Generator {
-            mechanism_id: "generator-a".into(),
-            seed: 1,
-        });
-        let mut second = train("draw-b", vec![hex(5), hex(4)], &["mech"]);
-        second.origin = Origin::StructuralSynthetic;
-        second.generator = Some(Generator {
-            mechanism_id: "generator-a".into(),
-            seed: 2,
-        });
-        let mut distinct = train("draw-c", vec![hex(6)], &["mech"]);
-        distinct.origin = Origin::StructuralSynthetic;
-        distinct.generator = Some(Generator {
-            mechanism_id: "generator-a".into(),
-            seed: 2,
-        });
-        let admission = admit(&[first, second, distinct]).unwrap();
-        assert_eq!(admission.accepted_base_count, 2);
-        assert_eq!(
-            admission.rejected,
-            vec![Rejection {
-                base_dataset_id: "draw-b".into(),
-                code: "training_manifest_seed",
-            }]
-        );
-    }
-}
+#[path = "training_manifest_tests.rs"]
+mod tests;
