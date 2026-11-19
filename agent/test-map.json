@@ -2832,6 +2832,10 @@
       "command": "cargo test --locked --lib table::",
       "purpose": "plan inference, invertible encodings, the DOPETAB1 container, and fit/sample round trips to the source schema"
     },
+    "rust/token_cache.rs": {
+      "command": "cargo test --locked --lib token_cache::",
+      "purpose": "verify the identity-bound token cache misses when weights, target, support rows, normalizer, masks, or projector change, refuses forbidden source roles, and returns the same payload on a warm read"
+    },
     "rust/transfer_metrics.rs": {
       "command": "just focus transfer_metrics::tests",
       "purpose": "run original-unit metric golden tests through the registered Rust library"
