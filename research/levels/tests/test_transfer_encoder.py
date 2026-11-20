@@ -7,11 +7,15 @@ import torch
 from research.levels.contracts import ModelConfig
 from research.levels.encoder import DOPE_FEATURES_629_DIM, DopeEncoder629
 from research.levels.transfer_encoder import (
+    ATTENTION_ELEMENT_CAP,
+    COLUMN_WIDTH,
     GLOBAL_WIDTH,
     RESIDUAL_ALPHA,
     SCHEMA,
+    FrozenBackboneConsumer,
     ResidualControl,
     TransferEncoderError,
+    attention_budget,
     candidate,
     encode,
     inventory,
@@ -34,6 +38,10 @@ class TransferEncoderTests(unittest.TestCase):
         self.assertEqual(recorded["target_blocks"], config.target_blocks)
         self.assertEqual(recorded["max_features"], config.max_features)
         self.assertEqual(recorded["cell_cap"], config.cell_cap)
+        self.assertEqual(recorded["attention_element_cap"], ATTENTION_ELEMENT_CAP)
+        self.assertTrue(candidate("A").frozen_backbone)
+        self.assertFalse(candidate("B").frozen_backbone)
+        self.assertFalse(candidate("C").frozen_backbone)
         self.assertEqual(recorded["full629_width"], DOPE_FEATURES_629_DIM)
         self.assertFalse(recorded["released_weights_loaded"])
         self.assertEqual(candidate("C").input_width, config.width)
@@ -121,11 +129,14 @@ class TransferEncoderTests(unittest.TestCase):
             column_ids=ids,
             column_tokens=tokens,
             observed=observed,
+            table_rows=1,
         )
         self.assertEqual(encoded["column_ids"], ("age", "zip"))
         self.assertEqual(encoded["task_id"], "rank")
         self.assertEqual(encoded["schema"], SCHEMA)
-        self.assertTrue(torch.equal(encoded["column_tokens"], tokens))
+        accepted = tokens.clone()
+        accepted[0, 1].zero_()
+        self.assertTrue(torch.equal(encoded["column_tokens"], accepted))
         self.assertTrue(torch.equal(encoded["observed"], observed))
         swapped_tokens = tokens[:, [1, 0], :]
         swapped = encode(
@@ -137,9 +148,12 @@ class TransferEncoderTests(unittest.TestCase):
             column_ids=("zip", "age"),
             column_tokens=swapped_tokens,
             observed=torch.tensor([[False, True]]),
+            table_rows=1,
         )
         self.assertEqual(swapped["column_ids"], ("zip", "age"))
-        self.assertTrue(torch.equal(swapped["column_tokens"], swapped_tokens))
+        accepted_swap = swapped_tokens.clone()
+        accepted_swap[0, 0].zero_()
+        self.assertTrue(torch.equal(swapped["column_tokens"], accepted_swap))
         with self.assertRaises(TransferEncoderError) as caught:
             encode(
                 readout,
@@ -181,6 +195,7 @@ class TransferEncoderTests(unittest.TestCase):
             column_ids=("age",),
             column_tokens=zeros,
             observed=mask,
+            table_rows=1,
         )
         loud = encode(
             with_columns,
@@ -191,6 +206,7 @@ class TransferEncoderTests(unittest.TestCase):
             column_ids=("age",),
             column_tokens=ones,
             observed=mask,
+            table_rows=1,
         )
         self.assertFalse(torch.equal(quiet["global"], loud["global"]))
         pooled = realize("C", column_tokens=False)
@@ -240,6 +256,180 @@ class TransferEncoderTests(unittest.TestCase):
             self.assertTrue(torch.equal(parameter, saved))
         self.assertNotIn("transfer_encoder", source)
         self.assertEqual(inspect.getsource(DopeEncoder629.forward), source)
+
+    def test_continued_candidates_keep_observed_gradients(self):
+        observed = torch.tensor([[True, False]])
+        ids = ("age", "zip")
+        for name in ("B", "C"):
+            readout = realize(name, column_tokens=True)
+            with torch.no_grad():
+                readout.hidden.weight.fill_(0.01)
+                readout.hidden.bias.zero_()
+                readout.column.weight.fill_(0.01)
+                readout.column.bias.zero_()
+            features = torch.zeros(1, candidate(name).input_width, requires_grad=True)
+            tokens = torch.zeros(1, 2, COLUMN_WIDTH)
+            tokens[0, 0, 0] = 0.5
+            tokens.requires_grad_(True)
+            encoded = encode(
+                readout,
+                name,
+                features,
+                task_id="rank",
+                claimed_identity=candidate(name).identity,
+                column_ids=ids,
+                column_tokens=tokens,
+                observed=observed,
+                table_rows=4,
+            )
+            encoded["global"].sum().backward()
+            self.assertIsNotNone(features.grad)
+            self.assertGreater(float(features.grad.abs().sum()), 0.0)
+            self.assertIsNotNone(tokens.grad)
+            self.assertGreater(float(tokens.grad[0, 0].abs().sum()), 0.0)
+            self.assertTrue(torch.equal(tokens.grad[0, 1], torch.zeros(COLUMN_WIDTH)))
+        frozen = realize("A")
+        teacher = torch.zeros(1, DOPE_FEATURES_629_DIM, requires_grad=True)
+        encode(
+            frozen,
+            "A",
+            teacher,
+            task_id="rank",
+            claimed_identity=candidate("A").identity,
+        )["global"].sum().backward()
+        self.assertIsNone(teacher.grad)
+
+    def test_unobserved_padding_leaves_the_readout_unchanged(self):
+        readout = realize("C", column_tokens=True)
+        with torch.no_grad():
+            readout.hidden.weight.fill_(0.01)
+            readout.hidden.bias.zero_()
+            readout.column.weight.fill_(0.01)
+            readout.column.bias.zero_()
+        observed = torch.tensor([[True, False]])
+        base = torch.zeros(1, 2, COLUMN_WIDTH)
+        base[0, 0, 0] = 0.5
+        hidden = torch.zeros(1, candidate("C").input_width)
+        hidden[0, 0] = 0.25
+        identity = candidate("C").identity
+
+        def run(padding):
+            tokens = base.clone()
+            tokens[0, 1].fill_(padding)
+            features = hidden.detach().clone().requires_grad_(True)
+            leaf = tokens.detach().clone().requires_grad_(True)
+            encoded = encode(
+                readout,
+                "C",
+                features,
+                task_id="generate",
+                claimed_identity=identity,
+                column_ids=("age", "zip"),
+                column_tokens=leaf,
+                observed=observed,
+                table_rows=4,
+            )
+            encoded["global"].sum().backward()
+            return encoded["global"].detach(), features.grad.detach(), leaf.grad.detach(), encoded["column_tokens"]
+
+        clean_global, clean_features, clean_tokens, clean_stored = run(0.0)
+        dirty_global, dirty_features, dirty_tokens, dirty_stored = run(999.0)
+        nan_global, nan_features, nan_tokens, nan_stored = run(float("nan"))
+        self.assertTrue(torch.equal(clean_global, dirty_global))
+        self.assertTrue(torch.equal(clean_global, nan_global))
+        self.assertTrue(torch.equal(clean_features, dirty_features))
+        self.assertTrue(torch.equal(clean_features, nan_features))
+        self.assertTrue(torch.equal(clean_tokens[0, 0], dirty_tokens[0, 0]))
+        self.assertTrue(torch.equal(clean_tokens[0, 0], nan_tokens[0, 0]))
+        self.assertTrue(torch.equal(dirty_tokens[0, 1], torch.zeros(COLUMN_WIDTH)))
+        self.assertTrue(torch.equal(nan_tokens[0, 1], torch.zeros(COLUMN_WIDTH)))
+        self.assertTrue(torch.equal(clean_stored, dirty_stored))
+        self.assertTrue(torch.equal(clean_stored, nan_stored))
+        self.assertTrue(torch.equal(clean_stored[0, 1], torch.zeros(COLUMN_WIDTH)))
+        self.assertTrue(bool(torch.isfinite(nan_global).all()))
+
+    def test_outer_train_leaves_the_released_encoder_frozen(self):
+        torch.manual_seed(7)
+        encoder = DopeEncoder629()
+        with self.assertRaises(TransferEncoderError) as refused:
+            FrozenBackboneConsumer(DopeEncoder629(), realize("B"))
+        self.assertEqual(str(refused.exception), "transfer_encoder_candidate")
+        consumer = FrozenBackboneConsumer(encoder, realize("A"))
+        saved_parameters = [parameter.detach().clone() for parameter in encoder.parameters()]
+        saved_buffers = [buffer.detach().clone() for _, buffer in encoder.named_buffers()]
+        encoder.train()
+        consumer.train()
+        self.assertFalse(encoder.training)
+        self.assertTrue(consumer.readout.training)
+        self.assertTrue(all(not parameter.requires_grad for parameter in encoder.parameters()))
+        readout_before = consumer.readout.hidden.weight.detach().clone()
+        trainable = [parameter for parameter in consumer.parameters() if parameter.requires_grad]
+        optimizer = torch.optim.SGD(trainable, lr=0.1)
+        score = consumer(torch.zeros(1, 256), torch.zeros(1, 64, 17), task_id="rank").sum()
+        score.backward()
+        optimizer.step()
+        self.assertFalse(encoder.training)
+        self.assertFalse(torch.equal(consumer.readout.hidden.weight, readout_before))
+        for parameter, saved in zip(encoder.parameters(), saved_parameters):
+            self.assertTrue(torch.equal(parameter, saved))
+        for buffer, saved in zip((buffer for _, buffer in encoder.named_buffers()), saved_buffers):
+            self.assertTrue(torch.equal(buffer, saved))
+
+    def test_task_vocabulary_and_table_budget_refuse_without_echo(self):
+        self.assertNotEqual(task_slot("rank"), task_slot("generate"))
+        for collided in ("ab", "ba"):
+            with self.assertRaises(TransferEncoderError) as caught:
+                task_slot(collided)
+            self.assertEqual(str(caught.exception), "transfer_encoder_identity")
+            self.assertNotIn(collided, str(caught.exception))
+        config = ModelConfig().validate()
+        self.assertEqual(
+            config.max_context * config.max_features * config.max_features * config.heads,
+            ATTENTION_ELEMENT_CAP,
+        )
+        attention_budget(config.max_context, config.max_features)
+        with self.assertRaises(TransferEncoderError) as wide:
+            attention_budget(1, config.max_features + 1)
+        self.assertEqual(str(wide.exception), "transfer_encoder_limit")
+        self.assertNotIn(str(config.max_features + 1), str(wide.exception))
+        with self.assertRaises(TransferEncoderError) as tall:
+            attention_budget(config.max_context + 1, config.max_features)
+        self.assertEqual(str(tall.exception), "transfer_encoder_limit")
+        self.assertNotIn(str(config.max_context + 1), str(tall.exception))
+        readout = realize("C", column_tokens=True)
+        hidden = torch.zeros(1, candidate("C").input_width)
+        wide_count = config.max_features + 1
+        tokens = torch.zeros(1, wide_count, COLUMN_WIDTH)
+        observed = torch.ones(1, wide_count, dtype=torch.bool)
+        with self.assertRaises(TransferEncoderError) as refused:
+            encode(
+                readout,
+                "C",
+                hidden,
+                task_id="rank",
+                claimed_identity=candidate("C").identity,
+                column_ids=tuple(f"c{index}" for index in range(wide_count)),
+                column_tokens=tokens,
+                observed=observed,
+                table_rows=1,
+            )
+        self.assertEqual(str(refused.exception), "transfer_encoder_limit")
+        self.assertNotIn(str(wide_count), str(refused.exception))
+        blank = torch.zeros(1, 1, COLUMN_WIDTH)
+        blank_mask = torch.zeros(1, 1, dtype=torch.bool)
+        empty = encode(
+            readout,
+            "C",
+            hidden,
+            task_id="validate",
+            claimed_identity=candidate("C").identity,
+            column_ids=("age",),
+            column_tokens=blank,
+            observed=blank_mask,
+            table_rows=1,
+        )
+        self.assertTrue(bool(torch.isfinite(empty["global"]).all()))
+        empty["global"].sum().backward()
 
 
 if __name__ == "__main__":

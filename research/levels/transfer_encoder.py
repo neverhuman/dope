@@ -19,7 +19,19 @@ GLOBAL_WIDTH = 512
 COLUMN_WIDTH = 128
 TASK_SLOTS = 8
 RESIDUAL_ALPHA = 0.1
+# TableEncoder feature-attention element cap: rows * features^2 * heads.
+ATTENTION_ELEMENT_CAP = 33_554_432
 _DENIED_IDENTITIES = ("Dope512", "DopeEncoder629", "dope-encoder-629", "released-v1")
+TASK_VOCABULARY = (
+    "rank",
+    "generate",
+    "fit",
+    "select",
+    "calibrate",
+    "distill",
+    "retrieve",
+    "validate",
+)
 
 
 class TransferEncoderError(ValueError):
@@ -37,6 +49,7 @@ class Candidate:
     readout_width: int
     continues_released_graph: bool
     loads_released_weights: bool
+    frozen_backbone: bool
 
 
 def _candidates() -> dict[str, Candidate]:
@@ -52,6 +65,7 @@ def _candidates() -> dict[str, Candidate]:
             GLOBAL_WIDTH,
             False,
             False,
+            True,
         ),
         "B": Candidate(
             "B",
@@ -63,6 +77,7 @@ def _candidates() -> dict[str, Candidate]:
             GLOBAL_WIDTH,
             True,
             False,
+            False,
         ),
         "C": Candidate(
             "C",
@@ -72,6 +87,7 @@ def _candidates() -> dict[str, Candidate]:
             raw_width,
             "transfer512",
             GLOBAL_WIDTH,
+            False,
             False,
             False,
         ),
@@ -93,12 +109,30 @@ def same_abi(left_identity: str, right_identity: str, left_width: int, right_wid
 
 
 def task_slot(task_id: str) -> int:
-    if not isinstance(task_id, str) or not task_id or len(task_id) > 64:
+    if len(TASK_VOCABULARY) != TASK_SLOTS or type(task_id) is not str:
         raise TransferEncoderError("transfer_encoder_identity")
-    total = 0
-    for character in task_id:
-        total = (total * 33 + ord(character)) % TASK_SLOTS
-    return total
+    try:
+        return TASK_VOCABULARY.index(task_id)
+    except ValueError:
+        raise TransferEncoderError("transfer_encoder_identity") from None
+
+
+def attention_budget(rows: int, features: int) -> None:
+    """Refuse a table outside the live raw-table encoder envelope."""
+    if type(rows) is not int or type(features) is not int or rows < 1 or features < 1:
+        raise TransferEncoderError("transfer_encoder_shape")
+    config = ModelConfig().validate()
+    cells = rows * features
+    quadratic = cells * features * config.heads
+    width_term = cells * config.width
+    if (
+        features > config.max_features
+        or rows > config.max_context
+        or cells > config.cell_cap
+        or quadratic > ATTENTION_ELEMENT_CAP
+        or width_term > ATTENTION_ELEMENT_CAP
+    ):
+        raise TransferEncoderError("transfer_encoder_limit")
 
 
 def limits() -> dict[str, int | str | bool]:
@@ -119,6 +153,7 @@ def limits() -> dict[str, int | str | bool]:
         "max_features": config.max_features,
         "max_context": config.max_context,
         "cell_cap": config.cell_cap,
+        "attention_element_cap": ATTENTION_ELEMENT_CAP,
         "global_width": GLOBAL_WIDTH,
         "column_token_width": COLUMN_WIDTH,
         "full629_width": DOPE_FEATURES_629_DIM,
@@ -131,11 +166,12 @@ def limits() -> dict[str, int | str | bool]:
 class TransferReadout(nn.Module):
     """transfer512 head. Column tokens are an optional ablation."""
 
-    def __init__(self, input_width: int, *, column_tokens: bool) -> None:
+    def __init__(self, input_width: int, *, column_tokens: bool, frozen_backbone: bool) -> None:
         super().__init__()
-        if type(input_width) is not int or input_width < 1:
+        if type(input_width) is not int or input_width < 1 or type(frozen_backbone) is not bool:
             raise TransferEncoderError("transfer_encoder_shape")
         self.input_width = input_width
+        self.frozen_backbone = frozen_backbone
         self.hidden = nn.Linear(input_width, GLOBAL_WIDTH)
         self.task = nn.Embedding(TASK_SLOTS, GLOBAL_WIDTH)
         self.column = nn.Linear(COLUMN_WIDTH, GLOBAL_WIDTH) if column_tokens else None
@@ -148,16 +184,31 @@ class TransferReadout(nn.Module):
         features: torch.Tensor,
         task_index: torch.Tensor,
         column_tokens: torch.Tensor | None,
+        observed: torch.Tensor | None,
     ) -> torch.Tensor:
-        # Detach the incoming representation so a released encoder cannot receive this gradient.
-        projected = self.hidden(features.detach()) + self.task(task_index)
+        incoming = features.detach() if self.frozen_backbone else features
+        projected = self.hidden(incoming) + self.task(task_index)
         if self.column is None:
-            if column_tokens is not None:
+            if column_tokens is not None or observed is not None:
                 raise TransferEncoderError("transfer_encoder_shape")
             return projected
-        if column_tokens is None:
+        if column_tokens is None or observed is None:
             raise TransferEncoderError("transfer_encoder_shape")
-        return projected + self.column(column_tokens.detach()).mean(dim=1)
+        tokens = column_tokens.detach() if self.frozen_backbone else column_tokens
+        return projected + self._pooled_columns(tokens, observed)
+
+    def _pooled_columns(self, column_tokens: torch.Tensor, observed: torch.Tensor) -> torch.Tensor:
+        mask = observed.unsqueeze(-1)
+        safe = torch.where(mask, column_tokens, torch.zeros_like(column_tokens))
+        projected = self.column(safe)
+        masked = torch.where(mask, projected, torch.zeros_like(projected))
+        count = observed.sum(dim=1, keepdim=True).to(dtype=masked.dtype)
+        numerator = masked.sum(dim=1)
+        alive = count > 0
+        divided = numerator / torch.where(alive, count, torch.ones_like(count))
+        connected = torch.where(torch.isfinite(numerator), numerator, torch.zeros_like(numerator))
+        zero = connected.sum(dim=1, keepdim=True) * 0
+        return torch.where(alive, divided, zero)
 
 
 class ResidualControl(nn.Module):
@@ -189,7 +240,48 @@ def realize(candidate_id: str, *, column_tokens: bool = False) -> TransferReadou
     record = candidate(candidate_id)
     if type(column_tokens) is not bool:
         raise TransferEncoderError("transfer_encoder_shape")
-    return TransferReadout(record.input_width, column_tokens=column_tokens)
+    return TransferReadout(
+        record.input_width,
+        column_tokens=column_tokens,
+        frozen_backbone=record.frozen_backbone,
+    )
+
+
+class FrozenBackboneConsumer(nn.Module):
+    """Candidate A wrapper. Outer train() cannot reopen the released encoder."""
+
+    def __init__(self, encoder: DopeEncoder629, readout: TransferReadout) -> None:
+        super().__init__()
+        if not isinstance(encoder, DopeEncoder629) or not isinstance(readout, TransferReadout):
+            raise TransferEncoderError("transfer_encoder_shape")
+        if not readout.frozen_backbone:
+            raise TransferEncoderError("transfer_encoder_candidate")
+        self.encoder = encoder
+        self.readout = readout
+        self._freeze_encoder()
+
+    def _freeze_encoder(self) -> None:
+        self.encoder.requires_grad_(False)
+        self.encoder.eval()
+
+    def train(self, mode: bool = True):
+        super().train(mode)
+        self._freeze_encoder()
+        return self
+
+    def forward(
+        self,
+        dataset_features: torch.Tensor,
+        col_landmarks: torch.Tensor,
+        *,
+        task_id: str,
+    ) -> torch.Tensor:
+        self._freeze_encoder()
+        with torch.no_grad():
+            released = self.encoder(dataset_features, col_landmarks)
+        slot = task_slot(task_id)
+        index = torch.full((released.shape[0],), slot, dtype=torch.long, device=released.device)
+        return self.readout(released.detach(), index, None, None)
 
 
 def inventory(module: nn.Module) -> dict[str, object]:
@@ -237,19 +329,28 @@ def encode(
     column_ids: tuple[str, ...] = (),
     column_tokens: torch.Tensor | None = None,
     observed: torch.Tensor | None = None,
+    table_rows: int | None = None,
 ) -> dict[str, object]:
     record = candidate(candidate_id)
     _bind_identity(record, claimed_identity)
     _check_features(readout, features)
     ids = _check_columns(readout, features.shape[0], column_ids, column_tokens)
     observed_mask = _check_observed(features.shape[0], ids, observed)
+    _check_observed_finite(column_tokens, observed_mask)
+    if ids:
+        if table_rows is None:
+            raise TransferEncoderError("transfer_encoder_shape")
+        attention_budget(table_rows, len(ids))
     slot = task_slot(task_id)
     task_index = torch.full((features.shape[0],), slot, dtype=torch.long, device=features.device)
-    global_features = readout(features, task_index, column_tokens)
+    global_features = readout(features, task_index, column_tokens, observed_mask)
     if global_features.shape != (features.shape[0], GLOBAL_WIDTH):
         raise TransferEncoderError("transfer_encoder_shape")
     if not bool(torch.isfinite(global_features).all()):
         raise TransferEncoderError("transfer_encoder_nonfinite")
+    stored_tokens = None
+    if column_tokens is not None:
+        stored_tokens = column_tokens.masked_fill(~observed_mask.unsqueeze(-1), 0).detach()
     return {
         "schema": SCHEMA,
         "recipe": SCHEMA,
@@ -257,7 +358,7 @@ def encode(
         "graph": record.graph,
         "readout": record.readout_name,
         "global": global_features,
-        "column_tokens": None if column_tokens is None else column_tokens.detach(),
+        "column_tokens": stored_tokens,
         "column_ids": ids,
         "observed": observed_mask,
         "task_id": task_id,
@@ -305,6 +406,8 @@ def _check_columns(
         return ()
     if len(column_ids) < 1:
         raise TransferEncoderError("transfer_encoder_identity")
+    if len(column_ids) > ModelConfig().validate().max_features:
+        raise TransferEncoderError("transfer_encoder_limit")
     if (
         column_tokens is None
         or not torch.is_tensor(column_tokens)
@@ -316,9 +419,18 @@ def _check_columns(
         raise TransferEncoderError("transfer_encoder_shape")
     if column_tokens.shape[1] != len(column_ids):
         raise TransferEncoderError("transfer_encoder_identity")
-    if bool((~torch.isfinite(column_tokens)).any()):
-        raise TransferEncoderError("transfer_encoder_nonfinite")
     return column_ids
+
+
+def _check_observed_finite(
+    column_tokens: torch.Tensor | None,
+    observed: torch.Tensor | None,
+) -> None:
+    if column_tokens is None:
+        return
+    active = column_tokens[observed]
+    if active.numel() > 0 and bool((~torch.isfinite(active)).any()):
+        raise TransferEncoderError("transfer_encoder_nonfinite")
 
 
 def _check_observed(
