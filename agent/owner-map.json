@@ -662,6 +662,8 @@
     "rust/corpus/response_panel_tests.rs": "rust-core",
     "rust/corpus/training_manifest.rs": "rust-core",
     "rust/corpus/training_manifest_tests.rs": "rust-core",
+    "rust/corpus/generator_pilot.rs": "rust-core",
+    "rust/corpus/generator_pilot_tests.rs": "rust-core",
     "rust/deep_campaign/part_02.rs": "rust-core",
     "rust/dope.rs": "rust-core",
     "rust/embedding/encoder_capability.rs": "rust-core",

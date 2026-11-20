@@ -2844,6 +2844,14 @@
       "command": "cargo test --locked --lib corpus::training_manifest::",
       "purpose": "verify the training manifest refuses protected legacy reads, marker symlinks, DEV content, non-TRAIN ancestors, reorder base-count inflation, and generator seed collisions with the same realized content"
     },
+    "rust/corpus/generator_pilot.rs": {
+      "command": "cargo test --locked --lib corpus::generator_pilot::",
+      "purpose": "verify the generator pilot counts admitted TRAIN bases exactly, keeps views and the conditioning ancestor out of that count, reproduces a shard, and ledgers an unsupported task"
+    },
+    "rust/corpus/generator_pilot_tests.rs": {
+      "command": "cargo test --locked --lib corpus::generator_pilot::",
+      "purpose": "verify the generator pilot counts admitted TRAIN bases exactly, keeps views and the conditioning ancestor out of that count, reproduces a shard, and ledgers an unsupported task"
+    },
     "rust/corpus/response_panel.rs": {
       "command": "cargo test --locked --lib corpus::response_panel::",
       "purpose": "verify one response panel binds one task, refuses confirmation fits and fit-row inner queries, masks unknown outcomes, and reports search-versus-full order disagreement separately from the empirical full-fit oracle"
