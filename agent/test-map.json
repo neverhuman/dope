@@ -3596,6 +3596,14 @@
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_losses -v",
       "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, and a labeled nondifferentiable top choice without query values or a baseline objective change"
     },
+    "research/levels/transfer_encoder.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_encoder -v",
+      "purpose": "verify transfer-candidate identities, counted shape limits, transfer512 readout, and an unchanged released encoder"
+    },
+    "research/levels/tests/test_transfer_encoder.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_encoder -v",
+      "purpose": "verify transfer-candidate identities, counted shape limits, transfer512 readout, and an unchanged released encoder"
+    },
     "research/levels/research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
       "purpose": "verify level-bound High/Ultra research 629D view and extrema-free 196D fitted packet features"
