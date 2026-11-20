@@ -291,7 +291,7 @@ pub(super) const PINNED_STAGE_SHA256: &[(&str, &str)] = &[
     ),
     (
         "shared-levels.sh",
-        "417905009320f5320e817913b35c5c5651134876f950c2cd4d70317b7fb5f03b",
+        "835426f2557bdf241c0336f07210de3ab5a71d023d3276942076d64f0890ec19",
     ),
     (
         "cpu-transfer-paper.sh",
