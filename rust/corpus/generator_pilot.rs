@@ -43,8 +43,21 @@ pub struct PilotReport {
     pub view_count: usize,
     pub rejected: Vec<Rejection>,
     pub mechanism_counts: BTreeMap<String, usize>,
-    pub content_sha256: String,
+    pub content_sha256: Option<String>,
     pub sample_row_sha256: Option<String>,
+}
+
+struct BaseDraft {
+    id: String,
+    rows: Vec<String>,
+    family: String,
+    origin: Origin,
+    generator: Option<Generator>,
+    role: SourceRole,
+    task: TaskKind,
+    target: String,
+    ancestors: Vec<String>,
+    view_of: Option<String>,
 }
 
 struct Mechanism {
@@ -68,12 +81,12 @@ pub fn run(plan: &Plan) -> Result<PilotReport> {
             view_count: 0,
             rejected: (0..plan.bases)
                 .map(|index| Rejection {
-                    base_dataset_id: base_id(index),
+                    base_dataset_id: base_id(plan.shard_id, index),
                     code: "generator_pilot_task",
                 })
                 .collect(),
             mechanism_counts: BTreeMap::new(),
-            content_sha256: sha256_hex(b""),
+            content_sha256: None,
             sample_row_sha256: None,
         });
     }
@@ -88,59 +101,67 @@ pub fn run(plan: &Plan) -> Result<PilotReport> {
         .arms
         .iter()
         .any(|arm| registry(&arm.mechanism_id).is_some_and(|mechanism| mechanism.conditioned));
+    let ancestor = ancestor_id(plan.shard_id);
     if needs_ancestor {
         let digest = row_digest("ancestor", plan, 0);
-        items.push(record(
-            "ancestor",
-            vec![digest],
-            "pilot-ancestor",
-            Origin::Real,
-            None,
-            plan.ancestor_role,
+        items.push(record(BaseDraft {
+            id: ancestor.clone(),
+            rows: vec![digest],
+            family: "pilot-ancestor".to_string(),
+            origin: Origin::Real,
+            generator: None,
+            role: plan.ancestor_role,
             task,
-            &target,
-            None,
-        ));
+            target: target.clone(),
+            ancestors: Vec::new(),
+            view_of: None,
+        }));
     }
     for index in 0..plan.bases {
         let arm = pick(plan, index)?;
         let mechanism = registry(&arm.mechanism_id).expect("validated arm");
         let digest = row_digest(&arm.mechanism_id, plan, index);
-        let id = base_id(index);
+        let id = base_id(plan.shard_id, index);
+        let ancestors = if mechanism.conditioned {
+            vec![ancestor.clone()]
+        } else {
+            Vec::new()
+        };
         rows.push(digest.clone());
         mechanisms.push(arm.mechanism_id.clone());
         requested.insert(id.clone());
-        items.push(record(
-            &id,
-            vec![digest.clone()],
-            &format!("pilot-{}", arm.mechanism_id),
-            mechanism.origin,
-            Some(Generator {
-                mechanism_id: arm.mechanism_id.clone(),
-                seed: plan.seed,
-            }),
-            SourceRole::Train,
+        let family = format!("pilot-{}", arm.mechanism_id);
+        let generator = Some(Generator {
+            mechanism_id: arm.mechanism_id.clone(),
+            seed: plan.seed,
+        });
+        items.push(record(BaseDraft {
+            id: id.clone(),
+            rows: vec![digest.clone()],
+            family: family.clone(),
+            origin: mechanism.origin,
+            generator: generator.clone(),
+            role: SourceRole::Train,
             task,
-            &target,
-            None,
-        ));
+            target: target.clone(),
+            ancestors: ancestors.clone(),
+            view_of: None,
+        }));
         for view in 0..plan.views_per_base {
-            let view_id = format!("v{index:06}-{view}");
-            view_ids.insert(view_id.clone());
-            items.push(record(
-                &view_id,
-                vec![digest.clone()],
-                &format!("pilot-{}", arm.mechanism_id),
-                mechanism.origin,
-                Some(Generator {
-                    mechanism_id: arm.mechanism_id.clone(),
-                    seed: plan.seed,
-                }),
-                SourceRole::Train,
+            let view_name = view_id(plan.shard_id, index, view);
+            view_ids.insert(view_name.clone());
+            items.push(record(BaseDraft {
+                id: view_name,
+                rows: vec![digest.clone()],
+                family: family.clone(),
+                origin: mechanism.origin,
+                generator: generator.clone(),
+                role: SourceRole::Train,
                 task,
-                &target,
-                Some(id.clone()),
-            ));
+                target: target.clone(),
+                ancestors: ancestors.clone(),
+                view_of: Some(id.clone()),
+            }));
         }
     }
     let admission = admit(&items)?;
@@ -169,9 +190,11 @@ pub fn run(plan: &Plan) -> Result<PilotReport> {
         .map(String::as_str)
         .collect();
     let mut mechanism_counts = BTreeMap::new();
+    let mut accepted_rows = Vec::new();
     for (index, mechanism_id) in mechanisms.iter().enumerate() {
-        if accepted_ids.contains(base_id(index).as_str()) {
+        if accepted_ids.contains(base_id(plan.shard_id, index).as_str()) {
             *mechanism_counts.entry(mechanism_id.clone()).or_insert(0) += 1;
+            accepted_rows.push(rows[index].as_str());
         }
     }
     let accepted_base_count = mechanism_counts.values().sum();
@@ -179,13 +202,13 @@ pub fn run(plan: &Plan) -> Result<PilotReport> {
         schema: SCHEMA,
         requested_bases: plan.bases,
         accepted_base_count,
-        conditioning_base_count: usize::from(accepted_ids.contains("ancestor")),
+        conditioning_base_count: usize::from(accepted_ids.contains(ancestor.as_str())),
         requested_views,
         view_count: admitted_views,
         rejected,
         mechanism_counts,
-        content_sha256: content_digest(&rows),
-        sample_row_sha256: rows.first().cloned(),
+        content_sha256: (!accepted_rows.is_empty()).then(|| content_digest(&accepted_rows)),
+        sample_row_sha256: accepted_rows.first().map(|row| (*row).to_string()),
     })
 }
 
@@ -254,38 +277,31 @@ fn pick(plan: &Plan, index: usize) -> Result<&Arm> {
     Err(DopeError::Data("generator_pilot_mechanism".into()))
 }
 
-fn record(
-    id: &str,
-    rows: Vec<String>,
-    family: &str,
-    origin: Origin,
-    generator: Option<Generator>,
-    role: SourceRole,
-    task: TaskKind,
-    target: &str,
-    view_of: Option<String>,
-) -> TrainingBase {
+fn record(draft: BaseDraft) -> TrainingBase {
     TrainingBase {
-        base_dataset_id: id.to_string(),
-        physical_rows_sha256: rows,
-        source_family_ids: vec![family.to_string()],
-        ancestor_base_ids: if origin == Origin::RealConditioned || origin == Origin::Counterfactual
-        {
-            vec!["ancestor".to_string()]
-        } else {
-            Vec::new()
-        },
-        origin,
-        generator,
-        role,
-        task,
-        target_declaration_sha256: target.to_string(),
-        view_of,
+        base_dataset_id: draft.id,
+        physical_rows_sha256: draft.rows,
+        source_family_ids: vec![draft.family],
+        ancestor_base_ids: draft.ancestors,
+        origin: draft.origin,
+        generator: draft.generator,
+        role: draft.role,
+        task: draft.task,
+        target_declaration_sha256: draft.target,
+        view_of: draft.view_of,
     }
 }
 
-fn base_id(index: usize) -> String {
-    format!("b{index:06}")
+fn ancestor_id(shard: u32) -> String {
+    format!("a{shard:010}")
+}
+
+fn base_id(shard: u32, index: usize) -> String {
+    format!("b{shard:010}-{index:06}")
+}
+
+fn view_id(shard: u32, index: usize, view: usize) -> String {
+    format!("v{shard:010}-{index:06}-{view}")
 }
 
 fn row_digest(mechanism: &str, plan: &Plan, index: usize) -> String {
@@ -298,7 +314,7 @@ fn row_digest(mechanism: &str, plan: &Plan, index: usize) -> String {
     )
 }
 
-fn content_digest(rows: &[String]) -> String {
+fn content_digest(rows: &[&str]) -> String {
     let mut payload = Vec::new();
     for row in rows {
         payload.extend(row.as_bytes());

@@ -51,6 +51,8 @@ fn pilot_counts_one_hundred_thousand_bases_exactly() {
         SourceRole::Train,
     ))
     .unwrap();
+    assert!(report.content_sha256.is_some());
+    assert!(report.sample_row_sha256.is_some());
     assert_eq!(report.content_sha256, again.content_sha256);
     assert_eq!(report.sample_row_sha256, again.sample_row_sha256);
 }
@@ -97,6 +99,8 @@ fn non_train_ancestor_is_rejected_and_counted() {
         report.requested_bases,
         report.accepted_base_count + report.rejected.len()
     );
+    assert!(report.content_sha256.is_none());
+    assert!(report.sample_row_sha256.is_none());
     let rendered = format!("{report:?}");
     assert!(!rendered.contains("DEV"));
 }
@@ -172,6 +176,7 @@ fn unsupported_task_is_ledgered_without_echo() {
     assert_eq!(report.requested_views, 3);
     assert_eq!(report.view_count, 0);
     assert!(report.mechanism_counts.is_empty());
+    assert!(report.content_sha256.is_none());
     assert!(report.sample_row_sha256.is_none());
     assert!(
         report
@@ -206,6 +211,41 @@ fn unknown_mechanism_and_over_limit_refuse_without_echo() {
     .unwrap_err();
     assert!(limit.to_string().contains("generator_pilot_limit"));
     assert!(!limit.to_string().contains("100001"));
+}
+
+#[test]
+fn shard_id_is_bound_into_base_and_view_ids() {
+    assert_ne!(base_id(3, 0), base_id(9, 0));
+    assert_ne!(view_id(3, 0, 1), view_id(9, 0, 1));
+    assert_ne!(base_id(3, 0), "b000000");
+    let mut other = plan(
+        3,
+        &[("independent", 1)],
+        "secret-task-value",
+        0,
+        SourceRole::Train,
+    );
+    other.shard_id = 9;
+    let left = run(&plan(
+        3,
+        &[("independent", 1)],
+        "secret-task-value",
+        0,
+        SourceRole::Train,
+    ))
+    .unwrap();
+    let right = run(&other).unwrap();
+    let left_ids: std::collections::BTreeSet<_> = left
+        .rejected
+        .iter()
+        .map(|rejection| rejection.base_dataset_id.as_str())
+        .collect();
+    let right_ids: std::collections::BTreeSet<_> = right
+        .rejected
+        .iter()
+        .map(|rejection| rejection.base_dataset_id.as_str())
+        .collect();
+    assert!(left_ids.is_disjoint(&right_ids));
 }
 
 #[test]
