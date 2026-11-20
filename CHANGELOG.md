@@ -1,5 +1,27 @@
 # Changelog
 
+## Engine 1.3.0 - 2026-11-20
+
+- Bind the WP00–WP09 research contracts to this source line: baseline inventories,
+  an identity-bound token cache, the frozen full629 projection instrument, a
+  role-aware training manifest, an admitted response panel, analytic decision
+  losses, versioned transfer-encoder candidates, a deterministic generator pilot,
+  a single-device transfer stream, and landmark-student report separation
+  (#363–#379).
+- A predicted landmark slot stays predicted when its number matches a measured
+  slot, and prediction does not grow measured support. None, partial, and full
+  report modes share one table and target. Synthetic retention, embedding cosine,
+  and forward-only timing are not a decision. The dropout checkpoint `ecded022…`
+  stays unregistered and is not loaded (#379).
+- Published model weights remain `v1.0.0`, SHA-256
+  `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`.
+  `scripts/install.sh` keeps the published `dope-engine-v1.2.0` default until
+  `dope-engine-v1.3.0` is signed.
+- This is an uncertified engine release (`dope-engine-v1.3.0`). It makes no new
+  scientific accuracy, performance, formal privacy, or model qualification claim.
+  The 1M/10M campaign was not run. The certified holdout gates in
+  `docs/release.md` were not run for this tag.
+
 ## Engine 1.2.0 - 2026-11-18
 
 - Upgrade research-only `research-encoder-view/v1` across Rust (`dope_core::mlc_v3`)
