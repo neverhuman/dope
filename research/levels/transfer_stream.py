@@ -220,6 +220,11 @@ def apply_update(
     owned = [parameter for group in optimizer.param_groups for parameter in group["params"]]
     if [id(parameter) for parameter in owned] != [id(parameter) for parameter in model.parameters()]:
         raise StreamError("stream_state")
+    for state in optimizer.state.values():
+        if isinstance(state, dict):
+            for key, value in list(state.items()):
+                if torch.is_tensor(value) and value.device != device:
+                    state[key] = value.to(device)
     accumulated_gradient(
         model,
         features.to(device),
@@ -235,7 +240,14 @@ def capture(
     step: int,
     optimizer: torch.optim.Optimizer,
 ) -> dict[str, object]:
-    if type(step) is not int or step != len(ledger.committed()):
+    committed_items = ledger.committed()
+    committed_count = len(committed_items)
+    if (
+        type(step) is not int
+        or step < 0
+        or (step == 0) != (committed_count == 0)
+        or committed_count < step
+    ):
         raise StreamError("stream_state")
     if not isinstance(optimizer, torch.optim.Optimizer):
         raise StreamError("stream_state")
@@ -247,15 +259,22 @@ def capture(
             raise StreamError("stream_nonfinite")
         parameters[name] = values.tolist()
         shapes[name] = list(values.shape)
+    cuda_rng = (
+        [_export_tree(state) for state in torch.cuda.get_rng_state_all()]
+        if torch.cuda.is_available() and torch.cuda.is_initialized()
+        else []
+    )
     return {
         "schema": SCHEMA,
         "count": ledger.count,
         "step": step,
-        "committed": list(ledger.committed()),
+        "committed_count": committed_count,
+        "committed": list(committed_items),
         "parameters": parameters,
         "shapes": shapes,
         "optimizer": _export_tree(optimizer.state_dict()),
         "rng": _export_tree(torch.get_rng_state()),
+        "cuda_rng": cuda_rng,
     }
 
 
@@ -269,6 +288,10 @@ def restore(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -
     committed = payload.get("committed")
     count = payload.get("count")
     step = payload.get("step")
+    committed_count = payload.get(
+        "committed_count", len(committed) if isinstance(committed, list) else -1
+    )
+    cuda_rng_raw = payload.get("cuda_rng", [])
     names = {name for name, _ in model.named_parameters()}
     if (
         not isinstance(parameters, dict)
@@ -277,9 +300,14 @@ def restore(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -
         or set(parameters) != names
         or set(shapes) != names
         or type(step) is not int
-        or step != len(committed)
+        or type(committed_count) is not int
+        or step < 0
+        or committed_count != len(committed)
+        or (step == 0) != (committed_count == 0)
+        or committed_count < step
         or "optimizer" not in payload
         or "rng" not in payload
+        or not isinstance(cuda_rng_raw, list)
     ):
         raise StreamError("stream_state")
     with torch.no_grad():
@@ -300,6 +328,14 @@ def restore(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -
         if not torch.is_tensor(rng) or rng.dtype != torch.uint8:
             raise StreamError("stream_state")
         torch.set_rng_state(rng)
+        if cuda_rng_raw:
+            cuda_states = [_import_tree(item) for item in cuda_rng_raw]
+            if any(not torch.is_tensor(s) or s.dtype != torch.uint8 for s in cuda_states):
+                raise StreamError("stream_state")
+            if torch.cuda.is_available() and torch.cuda.is_initialized():
+                if len(cuda_states) != len(torch.cuda.get_rng_state_all()):
+                    raise StreamError("stream_state")
+                torch.cuda.set_rng_state_all(cuda_states)
     except (RuntimeError, ValueError, TypeError):
         raise StreamError("stream_state") from None
     return ExposureLedger(count, tuple(committed))

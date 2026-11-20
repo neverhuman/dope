@@ -126,6 +126,19 @@ class TransferLossTests(unittest.TestCase):
         )
         self.assertEqual(balanced_record["denominator"], 2)
         self.assertAlmostEqual(float(balanced), 5.5, places=12)
+        frac_small, frac_small_rec = reduce_tasks(losses, [0.4, 0.4], mode="pair_weighted")
+        self.assertAlmostEqual(float(frac_small), 2.0, places=12)
+        self.assertAlmostEqual(float(frac_small_rec["denominator"]), 0.8, places=12)
+        frac_over, frac_over_rec = reduce_tasks(losses, [0.6, 0.6], mode="pair_weighted")
+        self.assertAlmostEqual(float(frac_over), 2.0, places=12)
+        self.assertAlmostEqual(float(frac_over_rec["denominator"]), 1.2, places=12)
+        for bad_counts in ([float("nan"), 1.0], [float("inf"), 1.0]):
+            with self.assertRaises(DecisionLossError) as nf_err:
+                reduce_tasks(losses, bad_counts, mode="pair_weighted")
+            self.assertEqual(str(nf_err.exception), "decision_loss_nonfinite")
+        with self.assertRaises(DecisionLossError) as neg_err:
+            reduce_tasks(losses, [-0.5, 1.0], mode="pair_weighted")
+        self.assertEqual(str(neg_err.exception), "decision_loss_weights")
 
     def test_masked_nonfinite_stays_out_of_the_graph(self):
         scores = torch.tensor([0.0, 0.0, float("nan")], dtype=torch.float64, requires_grad=True)
@@ -212,6 +225,35 @@ class TransferLossTests(unittest.TestCase):
         self.assertEqual(str(nan_err.exception), "decision_loss_nonfinite")
         with self.assertRaises(DecisionLossError):
             coupled_tstr_loss(fit_x, fit_y, query_x, query_y, synth_x, synth_y, ridge_lambda=0.0)
+
+        with torch.autocast("cpu", dtype=torch.bfloat16):
+            bf_sx = fit_x.detach().to(torch.bfloat16).requires_grad_(True)
+            bf_sy = (0.25 * fit_y).detach().to(torch.bfloat16).requires_grad_(True)
+            bf_loss, _ = coupled_tstr_loss(
+                fit_x.to(torch.bfloat16),
+                fit_y.to(torch.bfloat16),
+                query_x.to(torch.bfloat16),
+                query_y.detach().to(torch.bfloat16),
+                bf_sx,
+                bf_sy,
+            )
+        self.assertEqual(bf_loss.dtype, torch.float32)
+        bf_loss.backward()
+        self.assertIsNotNone(bf_sx.grad)
+        self.assertTrue(torch.isfinite(bf_sx.grad).all())
+
+        collinear_s = torch.tensor([[1.0, 2.0, 2.0], [1.0, 2.0, 2.0]], dtype=torch.float32)
+        with self.assertRaises(DecisionLossError) as sing_err:
+            coupled_tstr_loss(
+                fit_x,
+                fit_y,
+                query_x,
+                query_y.detach(),
+                collinear_s,
+                torch.tensor([0.5, 0.5], dtype=torch.float32),
+                ridge_lambda=1e-46,
+            )
+        self.assertEqual(str(sing_err.exception), "decision_loss_singular")
 
     def test_baseline_objective_is_unchanged(self):
         source = inspect.getsource(baseline.objective)

@@ -105,6 +105,7 @@ pub struct Admission {
 }
 
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Marker {
     schema: String,
     role: String,
@@ -130,7 +131,7 @@ pub fn legacy_blocks_read(dir: &Path) -> Result<bool> {
     if marker.schema != SCHEMA {
         return Err(DopeError::Data("training_manifest_schema".into()));
     }
-    Ok(SourceRole::parse(&marker.role)?.protected())
+    Ok(SourceRole::parse(&marker.role)?.seals_train_content())
 }
 
 pub fn physical_base_identity(rows: &[String]) -> Result<String> {
@@ -228,6 +229,7 @@ pub fn admit(items: &[TrainingBase]) -> Result<Admission> {
         accepted_identity.insert(item.identity.as_str(), seed_of(item));
         accepted_ids.push(item.item.base_dataset_id.clone());
     }
+    let accepted_set: BTreeSet<&str> = accepted_ids.iter().map(String::as_str).collect();
     for item in prepared.iter().filter(|item| item.item.view_of.is_some()) {
         let parent_id = item.item.view_of.as_deref().unwrap_or("");
         let Some(parent) = by_id.get(parent_id) else {
@@ -248,6 +250,21 @@ pub fn admit(items: &[TrainingBase]) -> Result<Admission> {
             rejected.push(Rejection {
                 base_dataset_id: item.item.base_dataset_id.clone(),
                 code: "training_manifest_ancestry",
+            });
+            continue;
+        }
+        if item.item.role == SourceRole::Train && !accepted_set.contains(parent_id) {
+            rejected.push(Rejection {
+                base_dataset_id: item.item.base_dataset_id.clone(),
+                code: "parent_rejected",
+            });
+            continue;
+        }
+        if let Some(code) = base_rejection(item, &by_id, &protected_families, &protected_identities)
+        {
+            rejected.push(Rejection {
+                base_dataset_id: item.item.base_dataset_id.clone(),
+                code,
             });
         }
     }

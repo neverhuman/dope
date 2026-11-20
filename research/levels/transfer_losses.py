@@ -89,6 +89,10 @@ def reduce_tasks(losses, pair_counts, *, mode, family_ids=None):
     counts = torch.as_tensor(pair_counts, dtype=losses.dtype, device=losses.device)
     if counts.shape != losses.shape or counts.ndim != 1:
         raise DecisionLossError("decision_loss_shape")
+    if not bool(torch.isfinite(counts).all()):
+        raise DecisionLossError("decision_loss_nonfinite")
+    if bool((counts < 0).any()):
+        raise DecisionLossError("decision_loss_weights")
     eligible = counts > 0
     if bool((~torch.isfinite(losses) & eligible).any()):
         raise DecisionLossError("decision_loss_nonfinite")
@@ -100,10 +104,12 @@ def reduce_tasks(losses, pair_counts, *, mode, family_ids=None):
     safe = torch.where(eligible, losses, torch.zeros((), dtype=losses.dtype, device=losses.device))
     if mode == "pair_weighted":
         weights = torch.where(eligible, counts, torch.zeros((), dtype=losses.dtype, device=losses.device))
-        total = int(weights.sum().item())
-        if total == 0:
+        weight_total = weights.sum()
+        weight_value = float(weight_total.detach().item())
+        if weight_value <= 0.0:
             return _zero(losses), _record(0, "pair_weighted")
-        return _finite((safe * weights).sum() / total), _record(total, "pair_weighted")
+        denom = int(round(weight_value)) if bool((weights == weights.round()).all()) else weight_value
+        return _finite((safe * weights).sum() / weight_total), _record(denom, "pair_weighted")
     if family_ids is None or len(family_ids) != int(losses.shape[0]):
         raise DecisionLossError("decision_loss_reduction")
     groups = {}
@@ -153,25 +159,29 @@ def coupled_tstr_loss(fit_x, fit_y, query_x, query_y, synth_x, synth_y, *, ridge
         raise DecisionLossError("decision_loss_nonfinite")
     if fit_x.data_ptr() == query_x.data_ptr() or fit_y.data_ptr() == query_y.data_ptr():
         raise DecisionLossError("decision_loss_query")
-    fx = fit_x.detach().to(torch.float32)
-    qx = query_x.detach().to(torch.float32)
-    qy = query_y.detach().to(torch.float32)
-    sx = synth_x.to(torch.float32)
-    sy = synth_y.to(torch.float32)
-    mu = fx.mean(dim=0, keepdim=True)
-    scale = fx.std(dim=0, correction=0, keepdim=True).clamp_min(1e-6)
-    n_synth, width = sx.shape
-    ones_s = torch.ones((n_synth, 1), dtype=torch.float32, device=sx.device)
-    ones_q = torch.ones((qx.shape[0], 1), dtype=torch.float32, device=sx.device)
-    design_s = torch.cat([ones_s, (sx - mu) / scale], dim=1)
-    design_q = torch.cat([ones_q, (qx - mu) / scale], dim=1)
-    reg = torch.full((width + 1,), float(ridge_lambda), dtype=torch.float32, device=sx.device)
-    reg[0] = 1e-6
-    gram = (design_s.T @ design_s) / float(n_synth) + torch.diag(reg)
-    rhs = (design_s.T @ sy.unsqueeze(1)) / float(n_synth)
-    weights = torch.linalg.solve(gram, rhs).squeeze(1)
-    pred_q = design_q @ weights
-    loss = F.huber_loss(pred_q, qy)
+    with torch.autocast(device_type=fit_x.device.type, enabled=False):
+        fx = fit_x.detach().to(torch.float32)
+        qx = query_x.detach().to(torch.float32)
+        qy = query_y.detach().to(torch.float32)
+        sx = synth_x.to(torch.float32)
+        sy = synth_y.to(torch.float32)
+        mu = fx.mean(dim=0, keepdim=True)
+        scale = fx.std(dim=0, correction=0, keepdim=True).clamp_min(1e-6)
+        n_synth, width = sx.shape
+        ones_s = torch.ones((n_synth, 1), dtype=torch.float32, device=sx.device)
+        ones_q = torch.ones((qx.shape[0], 1), dtype=torch.float32, device=sx.device)
+        design_s = torch.cat([ones_s, (sx - mu) / scale], dim=1)
+        design_q = torch.cat([ones_q, (qx - mu) / scale], dim=1)
+        reg = torch.full((width + 1,), float(ridge_lambda), dtype=torch.float32, device=sx.device)
+        reg[0] = 1e-6
+        gram = (design_s.T @ design_s) / float(n_synth) + torch.diag(reg)
+        rhs = (design_s.T @ sy.unsqueeze(1)) / float(n_synth)
+        try:
+            weights = torch.linalg.solve(gram, rhs).squeeze(1)
+        except RuntimeError:
+            raise DecisionLossError("decision_loss_singular") from None
+        pred_q = design_q @ weights
+        loss = F.huber_loss(pred_q, qy)
     return _finite(loss), _record(int(qy.shape[0]), "coupled_tstr")
 
 

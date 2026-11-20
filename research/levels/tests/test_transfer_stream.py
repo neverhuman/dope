@@ -261,6 +261,67 @@ class TransferStreamTests(unittest.TestCase):
             self.assertEqual(ledger.committed(), (0,))
             self.assertEqual(path.read_bytes(), saved)
 
+    def test_batched_capture_restore_and_optimizer_device_alignment(self):
+        features = torch.randn(8, 2, generator=torch.Generator().manual_seed(31))
+        target = torch.randn(8, 1, generator=torch.Generator().manual_seed(32))
+
+        def run_batches(stop_steps, payload=None):
+            model = nn.Linear(2, 1)
+            with torch.no_grad():
+                model.weight.zero_()
+                model.bias.zero_()
+            opt = torch.optim.AdamW(model.parameters(), lr=0.05)
+            if payload is None:
+                torch.manual_seed(19)
+                ledger = ExposureLedger(8)
+                step_idx = 0
+                start_rec = 0
+            else:
+                ledger = restore(model, opt, payload)
+                step_idx = payload["step"]
+                start_rec = payload["committed_count"]
+            stream = IndexedStream(
+                8, lambda idx: StreamRecord(idx, (2,), idx), prefetch=2, batch=4, start=start_rec
+            )
+            for batch in stream:
+                if step_idx >= stop_steps:
+                    break
+                idxs = [rec.index for rec in batch]
+                apply_update(model, features[idxs], target[idxs], opt, device=torch.device("cpu"))
+                for idx in idxs:
+                    ledger.commit(idx)
+                step_idx += 1
+            return model, opt, capture(model, ledger, step_idx, opt)
+
+        full_m, _, full_state = run_batches(2)
+        _, _, half_state = run_batches(1)
+        self.assertEqual(half_state["step"], 1)
+        self.assertEqual(half_state["committed_count"], 4)
+        self.assertIn("cuda_rng", half_state)
+        resumed_m, _, replay_state = run_batches(2, half_state)
+        self.assertEqual(replay_state["step"], 2)
+        self.assertEqual(replay_state["committed_count"], 8)
+        self.assertEqual(replay_state["committed"], full_state["committed"])
+        self.assertTrue(torch.equal(resumed_m.weight, full_m.weight))
+        self.assertTrue(torch.equal(resumed_m.bias, full_m.bias))
+
+        mig_model = nn.Linear(2, 1)
+        mig_opt = torch.optim.AdamW(mig_model.parameters(), lr=0.05)
+        apply_update(mig_model, features[:2], target[:2], mig_opt, device=torch.device("cpu"))
+        if torch.cuda.is_available():
+            apply_update(mig_model, features[2:4], target[2:4], mig_opt, device=torch.device("cuda"))
+            for st in mig_opt.state.values():
+                for val in st.values():
+                    if torch.is_tensor(val):
+                        self.assertEqual(val.device.type, "cuda")
+            cuda_snap = capture(mig_model, ExposureLedger(2, (0, 1)), 2, mig_opt)
+            self.assertGreaterEqual(len(cuda_snap["cuda_rng"]), 1)
+            apply_update(mig_model, features[4:6], target[4:6], mig_opt, device=torch.device("cpu"))
+            for st in mig_opt.state.values():
+                for val in st.values():
+                    if torch.is_tensor(val):
+                        self.assertEqual(val.device.type, "cpu")
+
 
 def _rng_from(payload):
     values = payload["rng"]["values"]

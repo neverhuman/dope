@@ -269,3 +269,29 @@ fn mixture_counts_cover_every_arm() {
     assert!(report.mechanism_counts.values().all(|count| *count > 0));
     assert!(report.rejected.is_empty());
 }
+
+#[test]
+fn non_train_ancestors_reject_all_views_and_bases() {
+    for role in [SourceRole::Dev, SourceRole::Confirm] {
+        let report = run(&plan(
+            5,
+            &[("real-conditioned", 1), ("counterfactual", 1)],
+            "multiclass",
+            2,
+            role,
+        ))
+        .unwrap();
+        assert_eq!(report.requested_bases, 5);
+        assert_eq!(report.accepted_base_count, 0);
+        assert_eq!(report.conditioning_base_count, 0);
+        assert_eq!(report.requested_views, 10);
+        assert_eq!(report.view_count, 0);
+        assert_eq!(report.rejected.len(), 5);
+        assert!(
+            report
+                .rejected
+                .iter()
+                .all(|rejection| rejection.code == "training_manifest_ancestry")
+        );
+    }
+}
