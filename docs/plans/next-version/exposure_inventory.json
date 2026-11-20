@@ -9,7 +9,36 @@
     "icl_size_l"
   ],
   "icl_models_load_this_checkpoint": false,
-  "training_corpus_overlap_with_dl_val91": "NOT_RUN",
+  "training_corpus_overlap_with_dl_val91": {
+    "status": "MEASURED",
+    "catalog_sha256": "ab9fda8d2dea46067b70a42812e9d3c1d9dc6ba025780100df34377e81aa1120",
+    "catalog_dataset_count": 3859,
+    "s3_precalc_reports_sha256": "7bfa929ceae854f4876c05c4f6e8afa79d2a635b3e2b9386702082199571a96c",
+    "s3_precalc_report_count": 19190,
+    "s3_precalc_unique_dataset_count": 3201,
+    "downstream_selected_sha256": "981960ad628f5029f8c54552c7b1cb1d440072e7e9dcffecdea52c6a3493a0f1",
+    "downstream_task_metadata_sha256": "510fb1a0536766246564002b6d8186c260426f88a0f1ae9d16661b53dcda13f0",
+    "downstream_verified_table_count": 1310,
+    "dl_train1219": {
+      "view_count": 1219,
+      "unique_dataset_count": 257,
+      "family_count": 205,
+      "catalog_exact_content_hash_dataset_overlap": 128,
+      "s3_precalc_exact_content_hash_dataset_overlap": 128,
+      "exact_content_hash_view_overlap": 616,
+      "normalized_stem_and_family_overlap": 94
+    },
+    "dl_val91": {
+      "view_count": 91,
+      "unique_dataset_count": 19,
+      "family_count": 19,
+      "catalog_exact_content_hash_dataset_overlap": 10,
+      "s3_precalc_exact_content_hash_dataset_overlap": 10,
+      "exact_content_hash_view_overlap": 50,
+      "normalized_stem_and_family_overlap": 10
+    },
+    "dl_val91_exposure_class": "in_corpus"
+  },
   "historical_h_runs_replayed": false,
-  "note": "The released SafeTensors digest and the fused research composite are different objects, copied from docs/plans/dope-jope-contract-decisions.json. Whether the released training corpus overlaps DL-Val91 families was not measured here."
+  "note": "The released SafeTensors digest and the fused research composite are different objects, copied from docs/plans/dope-jope-contract-decisions.json. Exact canonical_sha256 and normalized stem/family crosswalk confirms 10 of 19 DL-Val91 families (50 of 91 views) and 94 of 205 DL-Train1219 families (128 of 257 datasets, 616 of 1219 views) appear in the 3,859-dataset precalc catalog and 19,190-report S3 corpus; DL-Val91 is therefore in_corpus rather than unseen_source_family."
 }

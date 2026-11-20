@@ -4,3 +4,4 @@ pub mod generator_pilot;
 pub mod response_panel;
 pub mod source_pilot;
 pub mod training_manifest;
+pub mod transfer_schemas;

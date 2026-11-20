@@ -938,3 +938,17 @@ The optional `examples/quickstart/` Python boundary uses pandas and external ML 
 | `research/levels/v4_wire_reference.py` | `keep-with-reason` | Independent bounded DML4 decoder and fixed-draw recipient reference. |
 | `research/transfer/tests/test_driver_rank_successor.py` | `keep-with-reason` | Additive informative-rank and preserved C02 inference regressions. |
 | `research/transfer/tests/test_landmark_encoding_schema.py` | `keep-with-reason` | Native landmark companion schema and private/public receipt regressions. |
+| `research/levels/counterfactual_suite.py` | `keep-with-reason` | Deterministic seven-case Spec 3 section 6.4 counterfactual sensitivity and wide-column permutation suite; retain in PyTorch/NumPy research boundary. |
+| `research/levels/landmark_student.py` | `keep-with-reason` | Predicted landmark student conditioning path preserving provenance separation from measured landmarks; retain in PyTorch research boundary. |
+| `research/levels/tests/test_counterfactual_suite.py` | `keep-with-reason` | Unit tests for all seven Spec 3 section 6.4 counterfactual sensitivity and wide-column permutation invariants. |
+| `research/levels/tests/test_landmark_student.py` | `keep-with-reason` | Unit tests verifying predicted landmark reports remain distinct from measured support under one budget. |
+| `research/levels/tests/test_transfer_encoder.py` | `keep-with-reason` | Unit tests for versioned transfer-encoder candidates, counted caps, and frozen-backbone isolation. |
+| `research/levels/tests/test_transfer_jx_heads.py` | `keep-with-reason` | Unit tests for nested 32/64/96/128 prefix heads, preference-reversal additive-offset control, sibling-masked InfoNCE, and target-swap disentanglement. |
+| `research/levels/tests/test_transfer_losses.py` | `keep-with-reason` | Unit tests for pairwise, calibration, validity, distillation, and coupled FP32 ridge TSTR decision losses. |
+| `research/levels/tests/test_transfer_projection.py` | `keep-with-reason` | Unit tests for frozen full629 affine initialization and Stage-1B linear-region parity. |
+| `research/levels/tests/test_transfer_stream.py` | `keep-with-reason` | Unit tests for indexed single-device stream windows, microbatch gradient parity, and exact interrupted replay. |
+| `research/levels/transfer_encoder.py` | `keep-with-reason` | Versioned transfer-encoder candidates, `TransferReadout`, `ResidualControl`, and frozen-backbone consumer wrapper; retain in PyTorch research boundary. |
+| `research/levels/transfer_jx_heads.py` | `keep-with-reason` | Latent-only Matryoshka 32/64/96/128 prefix heads, preference-reversal supervision, sibling-masked InfoNCE, and target-swap disentanglement; retain in PyTorch autograd boundary. |
+| `research/levels/transfer_losses.py` | `keep-with-reason` | Decision-supervised response losses, task reductions, and opt-in coupled FP32 ridge TSTR loss; retain in PyTorch autograd boundary. |
+| `research/levels/transfer_projection.py` | `keep-with-reason` | Frozen full629 affine projection initialization preserving Stage-1B linear coordinates; retain in PyTorch research boundary. |
+| `research/levels/transfer_stream.py` | `keep-with-reason` | Bounded single-device indexed stream trainer with microbatch parity and atomic checkpoint resume; retain in PyTorch training boundary. |

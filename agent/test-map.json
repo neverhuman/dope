@@ -2860,6 +2860,14 @@
       "command": "cargo test --locked --lib corpus::response_panel::",
       "purpose": "verify one response panel binds one task, refuses confirmation fits and fit-row inner queries, masks unknown outcomes, and reports search-versus-full order disagreement separately from the empirical full-fit oracle"
     },
+    "rust/corpus/transfer_schemas.rs": {
+      "command": "cargo test --locked --lib corpus::transfer_schemas::",
+      "purpose": "verify TrainingViewV1 and TransferExperimentReceiptV1 enforce physical FIT/query disjointness, non-dataset partition seeding, 23-slot landmark bitsets, and unseen-family PROMOTE gates"
+    },
+    "rust/corpus/transfer_schemas_tests.rs": {
+      "command": "cargo test --locked --lib corpus::transfer_schemas::",
+      "purpose": "verify TrainingViewV1 and TransferExperimentReceiptV1 enforce physical FIT/query disjointness, non-dataset partition seeding, 23-slot landmark bitsets, and unseen-family PROMOTE gates"
+    },
     "rust/transfer_metrics.rs": {
       "command": "just focus transfer_metrics::tests",
       "purpose": "run original-unit metric golden tests through the registered Rust library"
@@ -3598,11 +3606,11 @@
     },
     "research/levels/transfer_losses.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_losses -v",
-      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, and a labeled nondifferentiable top choice without query values or a baseline objective change"
+      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, labeled nondifferentiable top choice, and coupled FP32 ridge TSTR query isolation"
     },
     "research/levels/tests/test_transfer_losses.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_losses -v",
-      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, and a labeled nondifferentiable top choice without query values or a baseline objective change"
+      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, labeled nondifferentiable top choice, and coupled FP32 ridge TSTR query isolation"
     },
     "research/levels/transfer_encoder.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_encoder -v",
@@ -3627,6 +3635,30 @@
     "research/levels/tests/test_landmark_student.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_landmark_student -v",
       "purpose": "verify predicted landmark reports stay distinct from measured reports under one support budget"
+    },
+    "research/levels/transfer_jx_heads.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_jx_heads -v",
+      "purpose": "verify nested 32/64/96/128 prefix heads, preference-reversal additive-offset cancellation, sibling-masked InfoNCE, and target-swap disentanglement"
+    },
+    "research/levels/tests/test_transfer_jx_heads.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_jx_heads -v",
+      "purpose": "verify nested 32/64/96/128 prefix heads, preference-reversal additive-offset cancellation, sibling-masked InfoNCE, and target-swap disentanglement"
+    },
+    "research/levels/counterfactual_suite.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_counterfactual_suite -v",
+      "purpose": "verify all seven Spec 3 section 6.4 counterfactual sensitivity and wide-column permutation invariants"
+    },
+    "research/levels/tests/test_counterfactual_suite.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_counterfactual_suite -v",
+      "purpose": "verify all seven Spec 3 section 6.4 counterfactual sensitivity and wide-column permutation invariants"
+    },
+    "docs/plans/next-version/exposure_inventory.json": {
+      "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
+      "purpose": "verify measured precalc/S3 overlap counts and in_corpus classification without dataset or path echo"
+    },
+    "docs/plans/next-version/wp10_readiness_manifest.json": {
+      "command": "python3 -B -m unittest research.levels.tests.test_encoder_629 -v",
+      "purpose": "verify WP10 storage arithmetic and dedicated-cluster launch gates"
     },
     "research/levels/research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",

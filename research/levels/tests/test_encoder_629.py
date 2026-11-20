@@ -289,21 +289,74 @@ class BaselineInventoryTests(unittest.TestCase):
         self.assertEqual(base["released_engine_tag"], "dope-engine-v1.2.0")
         self.assertEqual(base["released_engine_tag_commit"], base["compatible_encoder_source"])
         readme = (root / "README.md").read_text()
+        docs_readme = (root / "docs/README.md").read_text()
         integration = (root / "docs/jopedime-integration.md").read_text()
         self.assertIn(base["released_engine_tag_commit"], readme)
         self.assertIn(base["compatible_encoder_source"], integration)
+        v130_commit = "cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b"
+        self.assertIn("dope-engine-v1.3.0", readme)
+        self.assertIn(v130_commit, readme)
+        self.assertIn("dope-engine-v1.3.0", docs_readme)
+        self.assertIn("dope-engine-v1.3.0", integration)
+        self.assertIn(v130_commit, integration)
         # Shared-levels checks out depth 1, so inspected_dope_main is not in that clone.
         self.assertTrue(base["weight_identity_unchanged"])
 
     def test_exposure_inventory_keeps_identities_apart(self):
         root, exp = self._load("exposure_inventory.json")
+        raw_text = (root / "docs/plans/next-version/exposure_inventory.json").read_text()
+        self.assertNotIn("/home/", raw_text)
         decisions = json.loads((root / "docs/plans/dope-jope-contract-decisions.json").read_text())
         self.assertEqual(exp["released_safetensors_sha256"], PINNED_MULTITASK_SAFETENSORS_SHA256)
         self.assertEqual(exp["fused_research_composite_sha256"], decisions["identities"]["jopedime_fused_composite_sha256"])
         self.assertNotEqual(exp["released_safetensors_sha256"], exp["fused_research_composite_sha256"])
         self.assertFalse(exp["icl_models_load_this_checkpoint"])
-        self.assertEqual(exp["training_corpus_overlap_with_dl_val91"], "NOT_RUN")
+        overlap = exp["training_corpus_overlap_with_dl_val91"]
+        self.assertIsInstance(overlap, dict)
+        self.assertEqual(overlap["status"], "MEASURED")
+        for key in (
+            "catalog_sha256",
+            "s3_precalc_reports_sha256",
+            "downstream_selected_sha256",
+            "downstream_task_metadata_sha256",
+        ):
+            self.assertRegex(overlap[key], r"^[0-9a-f]{64}$")
+        self.assertEqual(overlap["catalog_dataset_count"], 3859)
+        self.assertEqual(overlap["s3_precalc_report_count"], 19190)
+        self.assertEqual(overlap["s3_precalc_unique_dataset_count"], 3201)
+        self.assertEqual(overlap["downstream_verified_table_count"], 1310)
+        self.assertEqual(overlap["dl_train1219"]["view_count"], 1219)
+        self.assertEqual(overlap["dl_train1219"]["family_count"], 205)
+        self.assertEqual(overlap["dl_train1219"]["catalog_exact_content_hash_dataset_overlap"], 128)
+        self.assertEqual(overlap["dl_train1219"]["normalized_stem_and_family_overlap"], 94)
+        self.assertEqual(overlap["dl_val91"]["view_count"], 91)
+        self.assertEqual(overlap["dl_val91"]["family_count"], 19)
+        self.assertEqual(overlap["dl_val91"]["catalog_exact_content_hash_dataset_overlap"], 10)
+        self.assertEqual(overlap["dl_val91"]["normalized_stem_and_family_overlap"], 10)
+        self.assertEqual(overlap["dl_val91_exposure_class"], "in_corpus")
         self.assertFalse(exp["historical_h_runs_replayed"])
+
+    def test_wp10_readiness_manifest_gates_full_scale_launch(self):
+        _root, wp10 = self._load("wp10_readiness_manifest.json")
+        self.assertEqual(wp10["schema"], "dope.wp10-readiness/v1")
+        self.assertEqual(wp10["status"], "gated_awaiting_dedicated_cluster")
+        expected_prereqs = {
+            *(f"WP0{i}" for i in range(10)),
+            "transfer_schemas",
+            "transfer_jx_heads",
+            "counterfactual_suite",
+        }
+        self.assertTrue(expected_prereqs.issubset(set(wp10["completed_prerequisites"])))
+        storage = wp10["storage_arithmetic_bytes"]
+        self.assertEqual(storage["fp32_10m_512x65"], 10_000_000 * 512 * 65 * 4)
+        self.assertEqual(storage["fp32_10m_512x65"], 1_331_200_000_000)
+        self.assertEqual(storage["fp32_global512_10m"], 10_000_000 * 512 * 4)
+        self.assertEqual(storage["fp32_global512_10m"], 20_480_000_000)
+        gates = wp10["required_launch_gates"]
+        self.assertEqual(gates["min_free_scratch_bytes"], 2_000_000_000_000)
+        self.assertTrue(gates["dedicated_uncontested_gpu"])
+        self.assertEqual(gates["downstream_panel_mde_max"], 0.01)
+        self.assertTrue(gates["s2_100k_and_s3_1m_positive_scaling"])
 
 
 if __name__ == "__main__":

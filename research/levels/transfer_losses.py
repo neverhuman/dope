@@ -1,19 +1,26 @@
 """Decision losses for measured response scores.
 
 The baseline objective in ``losses.py`` is not called. Query values are
-refused. ``top_choice_indicator`` is nondifferentiable and is not on the
-gradient path. Optional TSTR is not connected to ``v4_objectives``.
+refused on score-panel losses. ``top_choice_indicator`` is nondifferentiable
+and is not on the gradient path. Coupled TSTR is opt-in for ``v4_objectives``.
 """
 
+import math
 import torch
 from torch.nn import functional as F
 
-TSTR_INTEGRATION = "not_connected"
+TSTR_INTEGRATION = "opt_in_v4_objectives"
 NONDIFFERENTIABLE = ("top_choice_indicator",)
 
 
 class DecisionLossError(ValueError):
     """Static refusal. The message is a code, not a source value."""
+
+    purpose = "compute decision-supervised and coupled TSTR losses over measured panels"
+    reason = "an input tensor shape, mask, finiteness invariant, or query boundary was violated"
+    common_fixes = "pass finite matching tensors, boolean masks, and disjoint FIT and query arrays"
+    docs_url = "docs/testing.md#local-repair"
+    repair_hint = "fix the offending caller tensor shapes or masks and rerun test_transfer_losses"
 
 
 def pairwise_logistic(scores, outcomes, mask, *, higher_is_better, query_values=None):
@@ -112,6 +119,60 @@ def reduce_tasks(losses, pair_counts, *, mode, family_ids=None):
         for index in members:
             weight[index] = piece
     return _finite((safe * weight).sum()), _record(len(groups), "family_balanced")
+
+
+def coupled_tstr_loss(fit_x, fit_y, query_x, query_y, synth_x, synth_y, *, ridge_lambda=1e-2):
+    """Differentiable FP32 ridge learner on synthetic rows scored by Huber loss on disjoint query rows."""
+    if isinstance(ridge_lambda, bool) or not isinstance(ridge_lambda, (int, float)):
+        raise DecisionLossError("decision_loss_ridge")
+    if not math.isfinite(ridge_lambda) or ridge_lambda <= 0.0:
+        raise DecisionLossError("decision_loss_ridge")
+    tensors = (fit_x, fit_y, query_x, query_y, synth_x, synth_y)
+    if any(not torch.is_tensor(t) or not t.is_floating_point() for t in tensors):
+        raise DecisionLossError("decision_loss_shape")
+    if (
+        fit_x.ndim != 2
+        or query_x.ndim != 2
+        or synth_x.ndim != 2
+        or fit_y.ndim != 1
+        or query_y.ndim != 1
+        or synth_y.ndim != 1
+        or fit_x.shape[0] < 1
+        or query_x.shape[0] < 1
+        or synth_x.shape[0] < 1
+        or fit_x.shape[1] < 1
+        or fit_x.shape[1] != query_x.shape[1]
+        or fit_x.shape[1] != synth_x.shape[1]
+        or fit_y.shape != (fit_x.shape[0],)
+        or query_y.shape != (query_x.shape[0],)
+        or synth_y.shape != (synth_x.shape[0],)
+        or any(t.device != fit_x.device for t in tensors[1:])
+    ):
+        raise DecisionLossError("decision_loss_shape")
+    if any(bool((~torch.isfinite(t)).any()) for t in tensors):
+        raise DecisionLossError("decision_loss_nonfinite")
+    if fit_x.data_ptr() == query_x.data_ptr() or fit_y.data_ptr() == query_y.data_ptr():
+        raise DecisionLossError("decision_loss_query")
+    fx = fit_x.detach().to(torch.float32)
+    qx = query_x.detach().to(torch.float32)
+    qy = query_y.detach().to(torch.float32)
+    sx = synth_x.to(torch.float32)
+    sy = synth_y.to(torch.float32)
+    mu = fx.mean(dim=0, keepdim=True)
+    scale = fx.std(dim=0, correction=0, keepdim=True).clamp_min(1e-6)
+    n_synth, width = sx.shape
+    ones_s = torch.ones((n_synth, 1), dtype=torch.float32, device=sx.device)
+    ones_q = torch.ones((qx.shape[0], 1), dtype=torch.float32, device=sx.device)
+    design_s = torch.cat([ones_s, (sx - mu) / scale], dim=1)
+    design_q = torch.cat([ones_q, (qx - mu) / scale], dim=1)
+    reg = torch.full((width + 1,), float(ridge_lambda), dtype=torch.float32, device=sx.device)
+    reg[0] = 1e-6
+    gram = (design_s.T @ design_s) / float(n_synth) + torch.diag(reg)
+    rhs = (design_s.T @ sy.unsqueeze(1)) / float(n_synth)
+    weights = torch.linalg.solve(gram, rhs).squeeze(1)
+    pred_q = design_q @ weights
+    loss = F.huber_loss(pred_q, qy)
+    return _finite(loss), _record(int(qy.shape[0]), "coupled_tstr")
 
 
 def top_choice_indicator(scores, mask):
