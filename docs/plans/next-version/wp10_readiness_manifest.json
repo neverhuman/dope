@@ -1,0 +1,30 @@
+{
+  "schema": "dope.wp10-readiness/v1",
+  "status": "gated_awaiting_dedicated_cluster",
+  "completed_prerequisites": [
+    "WP00",
+    "WP01",
+    "WP02",
+    "WP03",
+    "WP04",
+    "WP05",
+    "WP06",
+    "WP07",
+    "WP08",
+    "WP09",
+    "transfer_schemas",
+    "transfer_jx_heads",
+    "counterfactual_suite"
+  ],
+  "storage_arithmetic_bytes": {
+    "fp32_10m_512x65": 1331200000000,
+    "fp32_global512_10m": 20480000000
+  },
+  "required_launch_gates": {
+    "min_free_scratch_bytes": 2000000000000,
+    "dedicated_uncontested_gpu": true,
+    "downstream_panel_mde_max": 0.01,
+    "s2_100k_and_s3_1m_positive_scaling": true
+  },
+  "note": "WP10 full-scale training remains gated until dedicated cluster storage, uncontested GPU capacity, panel MDE <= 0.01, and positive S2-100k / S3-1M scaling receipts are verified."
+}

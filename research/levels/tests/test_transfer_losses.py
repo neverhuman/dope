@@ -11,6 +11,7 @@ from research.levels.transfer_losses import (
     NONDIFFERENTIABLE,
     TSTR_INTEGRATION,
     DecisionLossError,
+    coupled_tstr_loss,
     masked_calibration,
     pairwise_logistic,
     reduce_tasks,
@@ -91,7 +92,7 @@ class TransferLossTests(unittest.TestCase):
         student = _scores(0.0, 0.0)
         teacher = torch.tensor([1.0, 3.0], dtype=torch.float64, requires_grad=True)
         loss, record = teacher_distillation(student, teacher, torch.tensor([True, True]))
-        self.assertEqual(record["tstr_integration"], "not_connected")
+        self.assertEqual(record["tstr_integration"], "opt_in_v4_objectives")
         self.assertEqual(record["nondifferentiable"], NONDIFFERENTIABLE)
         loss.backward()
         self.assertIsNone(teacher.grad)
@@ -157,9 +158,64 @@ class TransferLossTests(unittest.TestCase):
         self.assertGreater(float(class_bias.grad.abs().sum()), 1e-8)
         self.assertGreater(float(class_bias.grad.max() - class_bias.grad.min()), 1e-8)
 
+    def test_coupled_tstr_gradients_and_query_isolation(self):
+        gen = torch.Generator().manual_seed(17)
+        fit_x = torch.randn((24, 3), generator=gen, dtype=torch.float32)
+        true_w = torch.tensor([1.5, -0.8, 0.4], dtype=torch.float32)
+        fit_y = fit_x @ true_w + 0.2
+        query_x = torch.randn((16, 3), generator=gen, dtype=torch.float32)
+        query_y = (query_x @ true_w + 0.2).requires_grad_(True)
+
+        def encode_fit(fx, fy):
+            return torch.cat([fx.mean(dim=0), fx.std(dim=0, correction=0), fy.mean().unsqueeze(0)])
+
+        fit_summary_before = encode_fit(fit_x, fit_y)
+        perturbed_query_y = (query_y.detach() * -9.0 + 42.0).requires_grad_(True)
+        fit_summary_after = encode_fit(fit_x, fit_y)
+        self.assertTrue(torch.equal(fit_summary_before, fit_summary_after))
+
+        synth_x = fit_x.clone().detach().requires_grad_(True)
+        synth_y = (0.25 * fit_y).clone().detach().requires_grad_(True)
+        loss, record = coupled_tstr_loss(
+            fit_x, fit_y, query_x, query_y, synth_x, synth_y, ridge_lambda=1e-2
+        )
+        self.assertEqual(loss.dtype, torch.float32)
+        self.assertEqual(record["denominator"], 16)
+        self.assertEqual(record["kind"], "coupled_tstr")
+        self.assertEqual(record["tstr_integration"], "opt_in_v4_objectives")
+        loss.backward()
+        self.assertIsNone(query_y.grad)
+        self.assertIsNotNone(synth_x.grad)
+        self.assertIsNotNone(synth_y.grad)
+        self.assertGreater(float(synth_x.grad.abs().sum()), 1e-5)
+        self.assertGreater(float(synth_y.grad.abs().sum()), 1e-5)
+
+        updated_y = (synth_y.detach() - 0.8 * synth_y.grad.detach()).requires_grad_(True)
+        loss_after, _ = coupled_tstr_loss(
+            fit_x, fit_y, query_x, perturbed_query_y.detach(), synth_x.detach(), updated_y
+        )
+        loss_aligned, _ = coupled_tstr_loss(
+            fit_x, fit_y, query_x, query_y.detach(), synth_x.detach(), updated_y
+        )
+        self.assertLess(float(loss_aligned), float(loss))
+        self.assertTrue(torch.isfinite(loss_after))
+
+        with self.assertRaises(DecisionLossError) as alias_err:
+            coupled_tstr_loss(fit_x, fit_y, fit_x, query_y[:24] if len(query_y) >= 24 else fit_y, synth_x, synth_y)
+        self.assertIn("decision_loss_", str(alias_err.exception))
+        with self.assertRaises(DecisionLossError):
+            coupled_tstr_loss(fit_x[:0], fit_y[:0], query_x, query_y, synth_x, synth_y)
+        bad_synth = synth_x.detach().clone()
+        bad_synth[0, 0] = float("nan")
+        with self.assertRaises(DecisionLossError) as nan_err:
+            coupled_tstr_loss(fit_x, fit_y, query_x, query_y, bad_synth, synth_y)
+        self.assertEqual(str(nan_err.exception), "decision_loss_nonfinite")
+        with self.assertRaises(DecisionLossError):
+            coupled_tstr_loss(fit_x, fit_y, query_x, query_y, synth_x, synth_y, ridge_lambda=0.0)
+
     def test_baseline_objective_is_unchanged(self):
         source = inspect.getsource(baseline.objective)
         self.assertIn("def objective", source)
-        self.assertEqual(TSTR_INTEGRATION, "not_connected")
+        self.assertEqual(TSTR_INTEGRATION, "opt_in_v4_objectives")
         self.assertNotIn("transfer_losses", source)
         self.assertEqual(inspect.getsource(baseline.objective), source)
