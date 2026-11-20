@@ -3620,6 +3620,14 @@
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_stream -v",
       "purpose": "verify an indexed training window, agreeing microbatch gradients, a single-device update, and exact interrupted replay"
     },
+    "research/levels/landmark_student.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_landmark_student -v",
+      "purpose": "verify predicted landmark reports stay distinct from measured reports under one support budget"
+    },
+    "research/levels/tests/test_landmark_student.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_landmark_student -v",
+      "purpose": "verify predicted landmark reports stay distinct from measured reports under one support budget"
+    },
     "research/levels/research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
       "purpose": "verify level-bound High/Ultra research 629D view and extrema-free 196D fitted packet features"

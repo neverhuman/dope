@@ -886,6 +886,8 @@
     "research/levels/tests/test_transfer_encoder.py": "external-evidence",
     "research/levels/transfer_stream.py": "external-evidence",
     "research/levels/tests/test_transfer_stream.py": "external-evidence",
+    "research/levels/landmark_student.py": "external-evidence",
+    "research/levels/tests/test_landmark_student.py": "external-evidence",
     "research/levels/research_encoder_view.py": "external-evidence",
     "research/levels/s3_multilevel_trainer.py": "external-evidence",
     "research/levels/world_class_eval.py": "external-evidence",
