@@ -219,7 +219,7 @@ class TransferStreamTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "stream.json"
             write_state(path, midway)
-            self.assertFalse(Path(str(path) + ".tmp").exists())
+            self.assertFalse(Path(str(path) + ".part").exists())
             loaded = read_state(path)
             resumed, resumed_optimizer, replay = train(4, loaded)
             self.assertTrue(torch.equal(resumed.weight, finished.weight))

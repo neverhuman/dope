@@ -358,14 +358,14 @@ def write_state(path: Path, payload: dict) -> None:
     if not isinstance(payload, dict) or payload.get("schema") != SCHEMA:
         raise StreamError("stream_state")
     destination = Path(path)
-    temporary = destination.with_name(destination.name + ".tmp")
+    staged = destination.with_name(destination.name + ".part")
     try:
         raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-        with temporary.open("wb") as handle:
+        with staged.open("wb") as handle:
             handle.write(raw)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, destination)
+        os.replace(staged, destination)
         directory = os.open(destination.parent, os.O_RDONLY)
         try:
             os.fsync(directory)
@@ -374,8 +374,8 @@ def write_state(path: Path, payload: dict) -> None:
     except (OSError, TypeError, ValueError):
         raise StreamError("stream_state") from None
     finally:
-        if temporary.exists():
-            temporary.unlink()
+        if staged.exists():
+            staged.unlink()
 
 
 def read_state(path: Path) -> dict:
