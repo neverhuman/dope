@@ -109,14 +109,30 @@ class TransferStreamTests(unittest.TestCase):
             model.weight.zero_()
             model.bias.zero_()
         before = model.weight.detach().clone()
-        apply_update(model, features, target, device=resolve_device("cpu"), lr=0.1)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=0.1)
+        apply_update(model, features, target, optimizer, device=resolve_device("cpu"))
         self.assertFalse(torch.equal(model.weight.detach().cpu(), before))
+        quiet = nn.Linear(2, 1)
+        with torch.no_grad():
+            quiet.weight.zero_()
+            quiet.bias.zero_()
+        quiet_optimizer = torch.optim.AdamW(quiet.parameters(), lr=0.1)
+        apply_update(
+            quiet,
+            torch.zeros(1, 2),
+            torch.zeros(1, 1),
+            quiet_optimizer,
+            device=torch.device("cpu"),
+        )
+        self.assertIsNotNone(quiet.weight.grad)
+        self.assertEqual(int(torch.count_nonzero(quiet.weight.grad)), 0)
         if torch.cuda.is_available():
             gpu = nn.Linear(2, 1)
             with torch.no_grad():
                 gpu.weight.zero_()
                 gpu.bias.zero_()
-            apply_update(gpu, features, target, device=resolve_device("cuda"), lr=0.1)
+            gpu_optimizer = torch.optim.AdamW(gpu.parameters(), lr=0.1)
+            apply_update(gpu, features, target, gpu_optimizer, device=resolve_device("cuda"))
             self.assertEqual(gpu.weight.device.type, "cuda")
             self.assertFalse(torch.equal(gpu.weight.detach().cpu(), before))
 
@@ -135,7 +151,40 @@ class TransferStreamTests(unittest.TestCase):
         self.assertEqual(str(wide.exception), "stream_limit")
         self.assertNotIn("9", str(wide.exception))
 
-    def test_interrupted_replay_finishes_the_same_update(self):
+    def test_prefetched_uncommitted_records_replay_from_start(self):
+        count = 6
+        reads = []
+
+        def read(index):
+            reads.append(index)
+            return StreamRecord(index, (1,), None)
+
+        stream = IndexedStream(count, read, prefetch=2, batch=1, start=0)
+        first = next(iter(stream))
+        self.assertEqual(first[0].index, 0)
+        self.assertEqual(stream.resident(), 2)
+        self.assertEqual(reads, [0, 1, 2])
+        resumed_reads = []
+
+        def read_again(index):
+            resumed_reads.append(index)
+            return StreamRecord(index, (1,), None)
+
+        resumed = IndexedStream(count, read_again, prefetch=2, batch=1, start=1)
+        indexes = [record.index for batch in resumed for record in batch]
+        self.assertEqual(indexes, [1, 2, 3, 4, 5])
+        self.assertEqual(resumed_reads[:2], [1, 2])
+        ledger = ExposureLedger(count)
+        ledger.commit(0)
+        for index in indexes:
+            ledger.commit(index)
+        self.assertTrue(ledger.complete())
+        with self.assertRaises(StreamError) as caught:
+            IndexedStream(count, read, prefetch=2, batch=1, start=9)
+        self.assertEqual(str(caught.exception), "stream_limit")
+        self.assertNotIn("9", str(caught.exception))
+
+    def test_adamw_replay_matches_and_a_failed_microbatch_keeps_the_checkpoint(self):
         features, target = _rows()
 
         def train(stop, payload=None):
@@ -143,41 +192,79 @@ class TransferStreamTests(unittest.TestCase):
             with torch.no_grad():
                 model.weight.zero_()
                 model.bias.zero_()
+            optimizer = torch.optim.AdamW(model.parameters(), lr=0.1)
             if payload is None:
+                torch.manual_seed(7)
                 ledger = ExposureLedger(4)
                 start = 0
             else:
-                ledger = restore(model, payload)
+                ledger = restore(model, optimizer, payload)
                 start = payload["step"]
             for index in range(start, stop):
+                noise = torch.randn(1, 2)
                 apply_update(
                     model,
-                    features[index:index + 1],
+                    features[index:index + 1] + noise,
                     target[index:index + 1],
+                    optimizer,
                     device=torch.device("cpu"),
-                    lr=0.1,
                 )
                 ledger.commit(index)
-            return model, capture(model, ledger, stop)
+            return model, optimizer, capture(model, ledger, stop, optimizer)
 
-        finished, full = train(4)
-        _, midway = train(2)
-        self.assertEqual(midway["step"], 2)
-        self.assertEqual(len(midway["committed"]), 2)
+        finished, finished_optimizer, full = train(4)
+        _, _, midway = train(2)
+        self.assertIn("optimizer", midway)
+        self.assertIn("rng", midway)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "stream.json"
             write_state(path, midway)
-            self.assertFalse(Path(str(path) + ".tmp").exists())
+            self.assertFalse(Path(str(path) + ".part").exists())
             loaded = read_state(path)
-        resumed, replay = train(4, loaded)
-        self.assertTrue(torch.equal(resumed.weight, finished.weight))
-        self.assertTrue(torch.equal(resumed.bias, finished.bias))
-        self.assertEqual(replay["committed"], full["committed"])
-        self.assertTrue(restore(nn.Linear(2, 1), replay).complete())
-        with self.assertRaises(StreamError) as caught:
-            restore(nn.Linear(2, 1), replay).commit(1)
-        self.assertEqual(str(caught.exception), "stream_coverage")
-        self.assertNotIn("1", str(caught.exception))
+            resumed, resumed_optimizer, replay = train(4, loaded)
+            self.assertTrue(torch.equal(resumed.weight, finished.weight))
+            self.assertTrue(torch.equal(resumed.bias, finished.bias))
+            self.assertTrue(torch.equal(torch.get_rng_state(), _rng_from(full)))
+            left_state = finished_optimizer.state_dict()["state"]
+            right_state = resumed_optimizer.state_dict()["state"]
+            self.assertEqual(set(left_state), set(right_state))
+            for key, group in left_state.items():
+                self.assertEqual(set(group), set(right_state[key]))
+                for name, value in group.items():
+                    self.assertTrue(torch.equal(value, right_state[key][name]))
+            self.assertEqual(replay["committed"], full["committed"])
+            checked = nn.Linear(2, 1)
+            held = restore(checked, torch.optim.AdamW(checked.parameters(), lr=0.1), replay)
+            self.assertTrue(held.complete())
+            saved = path.read_bytes()
+            failed = nn.Linear(1, 1)
+            with torch.no_grad():
+                failed.weight.fill_(1e20)
+                failed.bias.zero_()
+            failed_optimizer = torch.optim.AdamW(failed.parameters(), lr=0.1)
+            kept = failed.weight.detach().clone()
+            ledger = ExposureLedger(2, (0,))
+            with self.assertRaises(StreamError) as caught:
+                apply_update(
+                    failed,
+                    torch.tensor([[1e-20], [1.0]]),
+                    torch.zeros(2, 1),
+                    failed_optimizer,
+                    device=torch.device("cpu"),
+                    microbatches=2,
+                )
+            self.assertEqual(str(caught.exception), "stream_nonfinite")
+            self.assertNotIn("inf", str(caught.exception))
+            self.assertIsNone(failed.weight.grad)
+            self.assertIsNone(failed.bias.grad)
+            self.assertTrue(torch.equal(failed.weight, kept))
+            self.assertEqual(ledger.committed(), (0,))
+            self.assertEqual(path.read_bytes(), saved)
+
+
+def _rng_from(payload):
+    values = payload["rng"]["values"]
+    return torch.tensor(values, dtype=torch.uint8)
 
 
 if __name__ == "__main__":
