@@ -2846,7 +2846,11 @@
     },
     "rust/corpus/response_panel.rs": {
       "command": "cargo test --locked --lib corpus::response_panel::",
-      "purpose": "verify response records trace measured values to admitted rows, mask unknown outcomes, pair fidelities on one task, and keep scores out of a first-shot panel"
+      "purpose": "verify one response panel binds one task, refuses confirmation fits and fit-row inner queries, masks unknown outcomes, and reports search-versus-full order disagreement separately from the empirical full-fit oracle"
+    },
+    "rust/corpus/response_panel_tests.rs": {
+      "command": "cargo test --locked --lib corpus::response_panel::",
+      "purpose": "verify one response panel binds one task, refuses confirmation fits and fit-row inner queries, masks unknown outcomes, and reports search-versus-full order disagreement separately from the empirical full-fit oracle"
     },
     "rust/transfer_metrics.rs": {
       "command": "just focus transfer_metrics::tests",

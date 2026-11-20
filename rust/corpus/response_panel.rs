@@ -1,10 +1,12 @@
 //! Algorithm response panel.
 //!
-//! The evaluator still owns execution. A measured value is admitted only when
-//! its fit scope names admitted rows. Unmeasured statuses stay masked, a
-//! search/full pair must share one task, and a first-shot panel carries no score.
+//! The evaluator still owns execution. One panel binds one task. A measured
+//! value is admitted only for a non-confirmation fit scope with a disjoint
+//! inner-query scope. Unknown statuses stay masked. Search and full records
+//! of the same ranked program can be compared without treating that count as
+//! a rank correlation.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use crate::error::{DopeError, Result};
 
@@ -39,10 +41,37 @@ pub enum PanelMode {
     Revealed,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FitRole {
+    Train,
+    Dev,
+    Recall,
+    Confirm,
+    Test,
+    Query,
+    Holdout,
+}
+
+impl FitRole {
+    fn blocks_panel(self) -> bool {
+        matches!(
+            self,
+            Self::Confirm | Self::Test | Self::Query | Self::Holdout
+        )
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MetricDirection {
+    LowerIsBetter,
+    HigherIsBetter,
+}
+
 #[derive(Clone, Debug)]
 pub struct AdmittedFit {
     pub fit_scope_sha256: String,
     pub row_count: u64,
+    pub role: FitRole,
 }
 
 #[derive(Clone, Debug)]
@@ -51,11 +80,13 @@ pub struct OutcomeDraft {
     pub program_sha256: String,
     pub evaluator_sha256: String,
     pub fit_scope_sha256: String,
+    pub inner_query_scope_sha256: String,
     pub budget_sha256: String,
     pub seed: u64,
     pub fidelity: Fidelity,
     pub acquisition: Acquisition,
     pub status: OutcomeStatus,
+    pub direction: MetricDirection,
     pub raw_value: Option<f64>,
 }
 
@@ -65,18 +96,43 @@ pub struct OutcomeRecord {
     pub program_sha256: String,
     pub evaluator_sha256: String,
     pub fit_scope_sha256: String,
+    pub inner_query_scope_sha256: String,
     pub budget_sha256: String,
     pub seed: u64,
     pub fidelity: Fidelity,
     pub acquisition: Acquisition,
     pub status: OutcomeStatus,
+    pub direction: MetricDirection,
     pub raw_value: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
 pub struct Panel {
     pub mode: PanelMode,
+    pub task_context_sha256: String,
+    pub direction: MetricDirection,
     pub records: Vec<OutcomeRecord>,
+}
+
+/// Empirical pool summary for one task. Regret is `u(oracle) - u(selected)`
+/// on full-fit values. It is not regret against an unmeasured program.
+#[derive(Clone, Debug, PartialEq)]
+pub struct FidelityDiscrepancy {
+    pub task_context_sha256: String,
+    pub direction: MetricDirection,
+    pub paired_program_count: u64,
+    pub unpaired_program_count: u64,
+    pub pairwise_comparisons: u64,
+    pub pairwise_order_disagreements: u64,
+    pub top_choice_disagrees: bool,
+    pub oracle_program_sha256: String,
+    pub selected_program_sha256: String,
+    pub oracle_count: u64,
+    pub selected_count: u64,
+    pub oracle_full_value: f64,
+    pub selected_full_value: f64,
+    pub regret: f64,
+    pub normalized_regret: f64,
 }
 
 pub fn build_panel(
@@ -90,6 +146,9 @@ pub fn build_panel(
     let mut scopes = BTreeMap::<String, u64>::new();
     for fit in admitted {
         digest_text(&fit.fit_scope_sha256)?;
+        if fit.role.blocks_panel() {
+            return Err(DopeError::Data("response_panel_role".into()));
+        }
         if fit.row_count == 0 {
             return Err(DopeError::Data("response_panel_scope".into()));
         }
@@ -106,12 +165,16 @@ pub fn build_panel(
             &draft.program_sha256,
             &draft.evaluator_sha256,
             &draft.fit_scope_sha256,
+            &draft.inner_query_scope_sha256,
             &draft.budget_sha256,
         ] {
             digest_text(digest)?;
         }
         if !scopes.contains_key(&draft.fit_scope_sha256) {
             return Err(DopeError::Data("response_panel_untraced".into()));
+        }
+        if draft.inner_query_scope_sha256 == draft.fit_scope_sha256 {
+            return Err(DopeError::Data("response_panel_query".into()));
         }
         match (mode, draft.status, draft.raw_value) {
             (PanelMode::FirstShot, _, Some(_))
@@ -127,31 +190,176 @@ pub fn build_panel(
             }
             _ => {}
         }
-        records.push(OutcomeRecord {
-            task_context_sha256: draft.task_context_sha256.clone(),
-            program_sha256: draft.program_sha256.clone(),
-            evaluator_sha256: draft.evaluator_sha256.clone(),
-            fit_scope_sha256: draft.fit_scope_sha256.clone(),
-            budget_sha256: draft.budget_sha256.clone(),
-            seed: draft.seed,
-            fidelity: draft.fidelity,
-            acquisition: draft.acquisition,
-            status: draft.status,
-            raw_value: draft.raw_value,
-        });
+        records.push(record_from(draft));
     }
-    let mut tasks_by_program: BTreeMap<&str, &str> = BTreeMap::new();
-    for record in &records {
-        if let Some(prior) = tasks_by_program.insert(
-            record.program_sha256.as_str(),
-            record.task_context_sha256.as_str(),
-        ) {
-            if prior != record.task_context_sha256 {
-                return Err(DopeError::Data("response_panel_task".into()));
+    let task = records[0].task_context_sha256.clone();
+    let direction = records[0].direction;
+    if records
+        .iter()
+        .any(|record| record.task_context_sha256 != task)
+    {
+        return Err(DopeError::Data("response_panel_task".into()));
+    }
+    if records.iter().any(|record| record.direction != direction) {
+        return Err(DopeError::Data("response_panel_metric".into()));
+    }
+    Ok(Panel {
+        mode,
+        task_context_sha256: task,
+        direction,
+        records,
+    })
+}
+
+pub fn fidelity_discrepancy(panel: &Panel) -> Result<FidelityDiscrepancy> {
+    if panel.mode != PanelMode::Revealed {
+        return Err(DopeError::Data("response_panel_leak".into()));
+    }
+    let mut search = BTreeMap::<&str, f64>::new();
+    let mut full = BTreeMap::<&str, f64>::new();
+    for record in &panel.records {
+        if record.acquisition != Acquisition::Ranked || record.status != OutcomeStatus::Measured {
+            continue;
+        }
+        let Some(value) = record.raw_value else {
+            return Err(DopeError::Data("response_panel_value".into()));
+        };
+        let slot = match record.fidelity {
+            Fidelity::Search => &mut search,
+            Fidelity::Full => &mut full,
+        };
+        if slot.insert(record.program_sha256.as_str(), value).is_some() {
+            return Err(DopeError::Data("response_panel_pair".into()));
+        }
+    }
+    let mut names = BTreeSet::new();
+    names.extend(search.keys().copied());
+    names.extend(full.keys().copied());
+    let mut paired = Vec::new();
+    let mut unpaired_program_count = 0u64;
+    for program in names {
+        match (search.get(program), full.get(program)) {
+            (Some(search_value), Some(full_value)) => {
+                paired.push((program, *search_value, *full_value));
+            }
+            _ => unpaired_program_count += 1,
+        }
+    }
+    if paired.is_empty() {
+        return Err(DopeError::Data("response_panel_pair".into()));
+    }
+    let mut pairwise_comparisons = 0u64;
+    let mut pairwise_order_disagreements = 0u64;
+    for left in 0..paired.len() {
+        for right in (left + 1)..paired.len() {
+            pairwise_comparisons += 1;
+            let search_order = utility(panel.direction, paired[left].1)
+                .total_cmp(&utility(panel.direction, paired[right].1));
+            let full_order = utility(panel.direction, paired[left].2)
+                .total_cmp(&utility(panel.direction, paired[right].2));
+            if search_order != full_order {
+                pairwise_order_disagreements += 1;
             }
         }
     }
-    Ok(Panel { mode, records })
+    let search_winners = winner_set(panel.direction, &paired, |row| row.1);
+    let full_winners = winner_set(panel.direction, &paired, |row| row.2);
+    let selected = search_winners
+        .iter()
+        .copied()
+        .min()
+        .ok_or_else(|| DopeError::Data("response_panel_pair".into()))?;
+    let oracle = full_winners
+        .iter()
+        .copied()
+        .min()
+        .ok_or_else(|| DopeError::Data("response_panel_pair".into()))?;
+    let selected_full = full_value(&paired, selected)?;
+    let oracle_full = full_value(&paired, oracle)?;
+    let regret = utility(panel.direction, oracle_full) - utility(panel.direction, selected_full);
+    let mut lo = utility(panel.direction, paired[0].2);
+    let mut hi = lo;
+    for row in &paired {
+        let score = utility(panel.direction, row.2);
+        if score.total_cmp(&lo).is_lt() {
+            lo = score;
+        }
+        if score.total_cmp(&hi).is_gt() {
+            hi = score;
+        }
+    }
+    let span = hi - lo;
+    let normalized_regret = if span.total_cmp(&0.0).is_eq() {
+        0.0
+    } else {
+        regret / span
+    };
+    Ok(FidelityDiscrepancy {
+        task_context_sha256: panel.task_context_sha256.clone(),
+        direction: panel.direction,
+        paired_program_count: paired.len() as u64,
+        unpaired_program_count,
+        pairwise_comparisons,
+        pairwise_order_disagreements,
+        top_choice_disagrees: search_winners != full_winners,
+        oracle_program_sha256: oracle.to_string(),
+        selected_program_sha256: selected.to_string(),
+        oracle_count: full_winners.len() as u64,
+        selected_count: search_winners.len() as u64,
+        oracle_full_value: oracle_full,
+        selected_full_value: selected_full,
+        regret,
+        normalized_regret,
+    })
+}
+
+fn record_from(draft: &OutcomeDraft) -> OutcomeRecord {
+    OutcomeRecord {
+        task_context_sha256: draft.task_context_sha256.clone(),
+        program_sha256: draft.program_sha256.clone(),
+        evaluator_sha256: draft.evaluator_sha256.clone(),
+        fit_scope_sha256: draft.fit_scope_sha256.clone(),
+        inner_query_scope_sha256: draft.inner_query_scope_sha256.clone(),
+        budget_sha256: draft.budget_sha256.clone(),
+        seed: draft.seed,
+        fidelity: draft.fidelity,
+        acquisition: draft.acquisition,
+        status: draft.status,
+        direction: draft.direction,
+        raw_value: draft.raw_value,
+    }
+}
+
+fn utility(direction: MetricDirection, value: f64) -> f64 {
+    match direction {
+        MetricDirection::HigherIsBetter => value,
+        MetricDirection::LowerIsBetter => -value,
+    }
+}
+
+fn winner_set<'a>(
+    direction: MetricDirection,
+    rows: &[(&'a str, f64, f64)],
+    value: impl Fn(&(&'a str, f64, f64)) -> f64,
+) -> BTreeSet<&'a str> {
+    let mut best = utility(direction, value(&rows[0]));
+    for row in rows.iter().skip(1) {
+        let score = utility(direction, value(row));
+        if score.total_cmp(&best).is_gt() {
+            best = score;
+        }
+    }
+    rows.iter()
+        .filter(|row| utility(direction, value(row)).total_cmp(&best).is_eq())
+        .map(|row| row.0)
+        .collect()
+}
+
+fn full_value(rows: &[(&str, f64, f64)], program: &str) -> Result<f64> {
+    rows.iter()
+        .find(|row| row.0 == program)
+        .map(|row| row.2)
+        .ok_or_else(|| DopeError::Data("response_panel_pair".into()))
 }
 
 fn digest_text(value: &str) -> Result<()> {
@@ -167,110 +375,5 @@ fn digest_text(value: &str) -> Result<()> {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn hex(fill: u8) -> String {
-        format!("{fill:02x}").repeat(32)
-    }
-
-    fn admitted() -> Vec<AdmittedFit> {
-        vec![AdmittedFit {
-            fit_scope_sha256: hex(1),
-            row_count: 32,
-        }]
-    }
-
-    fn draft(status: OutcomeStatus, value: Option<f64>) -> OutcomeDraft {
-        OutcomeDraft {
-            task_context_sha256: hex(2),
-            program_sha256: hex(3),
-            evaluator_sha256: hex(4),
-            fit_scope_sha256: hex(1),
-            budget_sha256: hex(5),
-            seed: 7,
-            fidelity: Fidelity::Full,
-            acquisition: Acquisition::Ranked,
-            status,
-            raw_value: value,
-        }
-    }
-
-    #[test]
-    fn measured_value_must_name_admitted_rows() {
-        let panel = build_panel(
-            PanelMode::Revealed,
-            &admitted(),
-            &[draft(OutcomeStatus::Measured, Some(0.25))],
-        )
-        .unwrap();
-        assert_eq!(panel.records.len(), 1);
-        assert_eq!(panel.records[0].raw_value, Some(0.25));
-        let mut missing = draft(OutcomeStatus::Measured, Some(12_345.6));
-        missing.fit_scope_sha256 = hex(9);
-        let error = build_panel(PanelMode::Revealed, &admitted(), &[missing]).unwrap_err();
-        let rendered = error.to_string();
-        assert!(rendered.contains("response_panel_untraced"));
-        assert!(!rendered.contains("12345"));
-    }
-
-    #[test]
-    fn unknown_outcomes_are_masked() {
-        let error = build_panel(
-            PanelMode::Revealed,
-            &admitted(),
-            &[draft(OutcomeStatus::RequestedNotObserved, Some(0.0))],
-        )
-        .unwrap_err();
-        assert!(error.to_string().contains("response_panel_mask"));
-        let panel = build_panel(
-            PanelMode::Revealed,
-            &admitted(),
-            &[draft(OutcomeStatus::RequestedNotObserved, None)],
-        )
-        .unwrap();
-        assert_eq!(panel.records[0].raw_value, None);
-        assert_eq!(panel.records[0].status, OutcomeStatus::RequestedNotObserved);
-    }
-
-    #[test]
-    fn fidelity_pair_uses_one_task_and_keeps_nonwinners() {
-        let mut search = draft(OutcomeStatus::Measured, Some(0.5));
-        search.fidelity = Fidelity::Search;
-        search.acquisition = Acquisition::Random;
-        let mut full = draft(OutcomeStatus::Failed, None);
-        full.fidelity = Fidelity::Full;
-        let panel = build_panel(PanelMode::Revealed, &admitted(), &[search, full]).unwrap();
-        assert_eq!(panel.records.len(), 2);
-        assert_eq!(panel.records[0].acquisition, Acquisition::Random);
-        assert_eq!(panel.records[1].status, OutcomeStatus::Failed);
-        let mut other_task = draft(OutcomeStatus::Measured, Some(0.5));
-        other_task.fidelity = Fidelity::Search;
-        other_task.task_context_sha256 = hex(8);
-        let mut full_ok = draft(OutcomeStatus::Measured, Some(0.25));
-        full_ok.fidelity = Fidelity::Full;
-        let error =
-            build_panel(PanelMode::Revealed, &admitted(), &[other_task, full_ok]).unwrap_err();
-        assert!(error.to_string().contains("response_panel_task"));
-    }
-
-    #[test]
-    fn first_shot_panel_has_no_score() {
-        let error = build_panel(
-            PanelMode::FirstShot,
-            &admitted(),
-            &[draft(OutcomeStatus::Measured, Some(0.25))],
-        )
-        .unwrap_err();
-        assert!(error.to_string().contains("response_panel_leak"));
-        let panel = build_panel(
-            PanelMode::FirstShot,
-            &admitted(),
-            &[draft(OutcomeStatus::NotRequested, None)],
-        )
-        .unwrap();
-        assert_eq!(panel.mode, PanelMode::FirstShot);
-        assert_eq!(panel.records[0].raw_value, None);
-        assert_ne!(panel.records[0].status, OutcomeStatus::Measured);
-    }
-}
+#[path = "response_panel_tests.rs"]
+mod tests;
