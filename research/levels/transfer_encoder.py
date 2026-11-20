@@ -121,7 +121,7 @@ def attention_budget(rows: int, features: int) -> None:
     """Refuse a table outside the live raw-table encoder envelope."""
     if type(rows) is not int or type(features) is not int or rows < 1 or features < 1:
         raise TransferEncoderError("transfer_encoder_shape")
-    config = ModelConfig().validate()
+    config = ModelConfig(max_features=256).validate()
     cells = rows * features
     quadratic = cells * features * config.heads
     width_term = cells * config.width
@@ -230,6 +230,19 @@ class ResidualControl(nn.Module):
             or incumbent.shape[0] != hidden.shape[0]
         ):
             raise TransferEncoderError("transfer_encoder_shape")
+        if (
+            not incumbent.is_floating_point()
+            or not hidden.is_floating_point()
+            or incumbent.dtype != hidden.dtype
+            or hidden.dtype != self.correction.weight.dtype
+        ):
+            raise TransferEncoderError("transfer_encoder_dtype")
+        if (
+            incumbent.device != hidden.device
+            or hidden.device.type not in ("cpu", "cuda")
+            or any(param.device != hidden.device for param in self.parameters())
+        ):
+            raise TransferEncoderError("transfer_encoder_device")
         if bool((~torch.isfinite(incumbent)).any()) or bool((~torch.isfinite(hidden)).any()):
             raise TransferEncoderError("transfer_encoder_nonfinite")
         correction = self.correction(hidden).squeeze(-1)
@@ -287,9 +300,12 @@ class FrozenBackboneConsumer(nn.Module):
 def inventory(module: nn.Module) -> dict[str, object]:
     if not isinstance(module, nn.Module):
         raise TransferEncoderError("transfer_encoder_shape")
+    is_consumer = isinstance(module, FrozenBackboneConsumer)
     tensors = []
     for name, parameter in module.named_parameters():
-        if "correction" in name:
+        if is_consumer and name.startswith("encoder."):
+            origin = "released-frozen"
+        elif "correction" in name:
             origin = "residual-zero"
         elif "task" in name:
             origin = "task-conditioning"
@@ -307,11 +323,14 @@ def inventory(module: nn.Module) -> dict[str, object]:
             }
         )
     parameter_count = sum(row["count"] for row in tensors)
+    transferred_params = sum(p.numel() for p in module.encoder.parameters()) if is_consumer else 0
+    transferred_tensors = sum(1 for _ in module.encoder.state_dict()) if is_consumer else 0
     return {
         "schema": SCHEMA,
         "parameter_count": parameter_count,
         "trainable_count": sum(row["count"] for row in tensors if row["trainable"]),
-        "transferred_from_released": 0,
+        "transferred_from_released": transferred_params,
+        "transferred_tensors": transferred_tensors,
         "residual_alpha": RESIDUAL_ALPHA if isinstance(module, ResidualControl) else None,
         "residual_alpha_trainable": False,
         "tensors": tensors,
@@ -334,8 +353,8 @@ def encode(
     record = candidate(candidate_id)
     _bind_identity(record, claimed_identity)
     _check_features(readout, features)
-    ids = _check_columns(readout, features.shape[0], column_ids, column_tokens)
-    observed_mask = _check_observed(features.shape[0], ids, observed)
+    ids = _check_columns(readout, features, column_ids, column_tokens)
+    observed_mask = _check_observed(features, ids, observed)
     _check_observed_finite(column_tokens, observed_mask)
     if ids:
         if table_rows is None:
@@ -378,20 +397,23 @@ def _check_features(readout: TransferReadout, features: torch.Tensor) -> None:
     if (
         not torch.is_tensor(features)
         or features.ndim != 2
-        or features.dtype != torch.float32
         or features.shape[0] < 1
         or features.shape[1] != readout.input_width
-        or features.device.type not in ("cpu", "cuda")
-        or any(parameter.device != features.device for parameter in readout.parameters())
     ):
         raise TransferEncoderError("transfer_encoder_shape")
+    if features.dtype != torch.float32:
+        raise TransferEncoderError("transfer_encoder_dtype")
+    if features.device.type not in ("cpu", "cuda") or any(
+        parameter.device != features.device for parameter in readout.parameters()
+    ):
+        raise TransferEncoderError("transfer_encoder_device")
     if bool((~torch.isfinite(features)).any()):
         raise TransferEncoderError("transfer_encoder_nonfinite")
 
 
 def _check_columns(
     readout: TransferReadout,
-    batch: int,
+    features: torch.Tensor,
     column_ids: tuple[str, ...],
     column_tokens: torch.Tensor | None,
 ) -> tuple[str, ...]:
@@ -399,24 +421,26 @@ def _check_columns(
         raise TransferEncoderError("transfer_encoder_identity")
     if len(set(column_ids)) != len(column_ids):
         raise TransferEncoderError("transfer_encoder_identity")
-    enabled = readout.column is not None
-    if not enabled:
+    if readout.column is None:
         if column_ids or column_tokens is not None:
             raise TransferEncoderError("transfer_encoder_shape")
         return ()
     if len(column_ids) < 1:
         raise TransferEncoderError("transfer_encoder_identity")
-    if len(column_ids) > ModelConfig().validate().max_features:
+    if len(column_ids) > ModelConfig(max_features=256).validate().max_features:
         raise TransferEncoderError("transfer_encoder_limit")
     if (
         column_tokens is None
         or not torch.is_tensor(column_tokens)
         or column_tokens.ndim != 3
-        or column_tokens.dtype != torch.float32
-        or column_tokens.shape[0] != batch
+        or column_tokens.shape[0] != features.shape[0]
         or column_tokens.shape[2] != COLUMN_WIDTH
     ):
         raise TransferEncoderError("transfer_encoder_shape")
+    if not column_tokens.is_floating_point() or column_tokens.dtype != features.dtype:
+        raise TransferEncoderError("transfer_encoder_dtype")
+    if column_tokens.device != features.device:
+        raise TransferEncoderError("transfer_encoder_device")
     if column_tokens.shape[1] != len(column_ids):
         raise TransferEncoderError("transfer_encoder_identity")
     return column_ids
@@ -434,7 +458,7 @@ def _check_observed_finite(
 
 
 def _check_observed(
-    batch: int,
+    features: torch.Tensor,
     column_ids: tuple[str, ...],
     observed: torch.Tensor | None,
 ) -> torch.Tensor | None:
@@ -443,11 +467,10 @@ def _check_observed(
             raise TransferEncoderError("transfer_encoder_shape")
         return None
     groups = len(column_ids)
-    if (
-        not torch.is_tensor(observed)
-        or observed.dtype != torch.bool
-        or observed.shape != (batch, groups)
-        or groups < 1
-    ):
+    if not torch.is_tensor(observed) or observed.shape != (features.shape[0], groups) or groups < 1:
         raise TransferEncoderError("transfer_encoder_shape")
+    if observed.dtype != torch.bool:
+        raise TransferEncoderError("transfer_encoder_dtype")
+    if observed.device != features.device:
+        raise TransferEncoderError("transfer_encoder_device")
     return observed.detach()

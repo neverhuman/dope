@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- Switch the default signed binary tag in `scripts/install.sh` and README quickstart
+  snippets to `dope-engine-v1.3.0` (`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`) while
+  keeping independent `v1.0.0` model weights (`d0b69603…`) (#381).
+- Add pure-Rust transfer training view and counterfactual audit schemas
+  (`rust/corpus/transfer_schemas.rs`), coupled FP32 TSTR ridge loss
+  (`coupled_tstr_loss`), DOPE-JX nested prefix heads and invariance losses
+  (`research/levels/transfer_jx_heads.py`), the 7-case counterfactual sensitivity
+  suite (`research/levels/counterfactual_suite.py`), aggregate catalog provenance
+  overlap counts in `docs/plans/next-version/exposure_inventory.json`, and
+  `docs/plans/next-version/wp10_readiness_manifest.json` (#382).
+- Tighten `dope-training-base.json` `DEV` legacy exclusion and rejected-parent view
+  admission, `coupled_tstr_loss` autocast/singularity guards and fractional
+  `pair_weighted` reductions, frozen-backbone `matryoshka_prefix_loss` and
+  single-family `split_invariance_infonce` gradients, batched `transfer_stream`
+  checkpoint/CUDA RNG/optimizer-device alignment, `FrozenBackboneConsumer`
+  `inventory()` and 256-column `encode()` support, and documentation links.
+
 ## Engine 1.3.0 - 2026-11-20
 
 - Bind the WP00–WP09 research contracts to this source line: baseline inventories,
@@ -15,8 +34,9 @@
   stays unregistered and is not loaded (#379).
 - Published model weights remain `v1.0.0`, SHA-256
   `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c`.
-  `scripts/install.sh` keeps the published `dope-engine-v1.2.0` default until
-  `dope-engine-v1.3.0` is signed.
+  At tag creation time, `scripts/install.sh` kept the published
+  `dope-engine-v1.2.0` default until `dope-engine-v1.3.0` was signed and promoted
+  in #381.
 - This is an uncertified engine release (`dope-engine-v1.3.0`). It makes no new
   scientific accuracy, performance, formal privacy, or model qualification claim.
   The 1M/10M campaign was not run. The certified holdout gates in

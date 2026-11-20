@@ -146,6 +146,45 @@ class ResearchEncoderViewTests(unittest.TestCase):
         for a, b in zip(base, perm_glob):
             self.assertAlmostEqual(a, b, places=6)
 
+        reg_enc = _real_encoding(task="regression", level="high")
+        p = int(reg_enc["p_use"])
+        order = [3, 0, 4, 1, 2]
+        inv = [order.index(j) for j in range(p)]
+        col_perm = dict(
+            reg_enc,
+            col_knots=[reg_enc["col_knots"][j] for j in order],
+            chol_factor=np.asarray(reg_enc["chol_factor"])[order],
+            diag_res_std=[reg_enc["diag_res_std"][j] for j in order],
+            is_binary_col=[reg_enc["is_binary_col"][j] for j in order],
+            binary_probs=[reg_enc["binary_probs"][j] for j in order],
+        )
+        if isinstance(reg_enc.get("discrete_support"), dict):
+            col_perm["discrete_support"] = {
+                inv[int(k)]: v for k, v in reg_enc["discrete_support"].items() if int(k) < p
+            }
+        for key in ("regime_means", "regime_scales"):
+            arr = np.asarray(reg_enc.get(key, np.zeros((0, p))))
+            if arr.ndim == 2 and arr.shape[1] >= p:
+                col_perm[key] = arr[:, order]
+        tb = dict(reg_enc["target_bundle"])
+        tb["pairs"] = [(inv[int(a)], inv[int(c)]) for a, c in tb.get("pairs", ())]
+        tb["trees"] = [
+            dict(t, features=[inv[int(f)] if 0 <= int(f) < p else int(f) for f in t["features"]])
+            for t in tb.get("trees", ())
+        ]
+        w = list(np.asarray(tb.get("w_basis", ())).reshape(-1))
+        if len(w) >= 1 + 3 * p:
+            tb["w_basis"] = (
+                [w[0]]
+                + [w[1 + j] for j in order]
+                + [w[1 + p + j] for j in order]
+                + [w[1 + 2 * p + j] for j in order]
+                + w[1 + 3 * p :]
+            )
+        col_perm["target_bundle"] = tb
+        for a, b in zip(packet_features_v1(reg_enc), packet_features_v1(col_perm)):
+            self.assertAlmostEqual(a, b, places=6)
+
     def test_packet_refusals_block_query_keys_and_redact_values(self):
         enc = _real_encoding(task="regression", level="high")
         marker = "7.25"

@@ -92,11 +92,15 @@ def matryoshka_prefix_loss(
     if set(targets.keys()) != set(masks.keys()) or not set(targets.keys()).issubset(HEAD_KINDS):
         raise JXHeadError("jx_head_shape")
     prefix_weights = _normalize_prefix_weights(weights)
+    all_preds = {prefix: heads(task_latent, dist_latent, prefix=prefix) for prefix in PREFIXES}
     total = _zero(task_latent) + _zero(dist_latent)
+    for preds in all_preds.values():
+        for pred_tensor in preds.values():
+            total = total + _zero(pred_tensor)
     per_prefix: dict[int, float] = {}
     active_total = 0
     for prefix in PREFIXES:
-        preds = heads(task_latent, dist_latent, prefix=prefix)
+        preds = all_preds[prefix]
         prefix_loss, prefix_terms = _zero(task_latent), 0
         for name, target in targets.items():
             aligned_pred, aligned_target, valid = _align_head_tensors(preds[name], target, masks[name])
@@ -250,16 +254,24 @@ def split_invariance_infonce(
         device=z_a.device,
     )
     sibling_mask = same_family & ~torch.eye(batch, dtype=torch.bool, device=z_a.device)
+    valid_neg = ~same_family
+    row_ok = valid_neg.any(dim=1)
+    if not bool(row_ok.any()):
+        return _zero(z_a) + _zero(z_b), {
+            "schema": SCHEMA,
+            "batch": batch,
+            "masked_sibling_pairs": int(sibling_mask.sum().item()),
+            "eligible_negative_pairs": 0,
+        }
     targets = torch.arange(batch, dtype=torch.long, device=z_a.device)
-    loss = 0.5 * (
-        F.cross_entropy(logits_ab.masked_fill(sibling_mask, float("-inf")), targets)
-        + F.cross_entropy(logits_ab.T.masked_fill(sibling_mask.T, float("-inf")), targets)
-    )
+    ce_ab = F.cross_entropy(logits_ab.masked_fill(sibling_mask, float("-inf")), targets, reduction="none")
+    ce_ba = F.cross_entropy(logits_ab.T.masked_fill(sibling_mask.T, float("-inf")), targets, reduction="none")
+    loss = 0.5 * (ce_ab[row_ok].mean() + ce_ba[row_ok].mean())
     return _finite(loss), {
         "schema": SCHEMA,
         "batch": batch,
         "masked_sibling_pairs": int(sibling_mask.sum().item()),
-        "eligible_negative_pairs": int((~same_family).sum().item()),
+        "eligible_negative_pairs": int(valid_neg.sum().item()),
     }
 
 

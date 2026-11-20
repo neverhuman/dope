@@ -15,7 +15,7 @@ from .encoder import DOPE_FEATURES_629_DIM, DopeEncoder629
 from .multilevel_model import MAX_COLS
 from .observed_conditioning import bundle_to_report
 from .optional_landmarks import LandmarkBundle
-from .transfer_encoder import COLUMN_WIDTH, candidate, encode, realize, task_slot
+from .transfer_encoder import COLUMN_WIDTH, candidate, encode, realize
 
 SCHEMA = "dope-counterfactual-suite/v1"
 CASE_NAMES = (
@@ -230,10 +230,20 @@ class _SuiteHarness:
         obs_tokens = tokens[0, :p]
         global_in[0, :COLUMN_WIDTH] = obs_tokens.mean(dim=0)
         global_in[0, COLUMN_WIDTH : 2 * COLUMN_WIDTH] = 4.0 * obs_tokens.max(dim=0).values
-        slot = torch.tensor([task_slot("rank")], dtype=torch.long)
+        col_ids = tuple(f"col_{idx}" for idx in range(tokens.shape[1]))
         with torch.no_grad():
-            wide_global = self.readout_wide(global_in, slot, tokens, observed)
-        return truncated64, wide_global
+            pkt = encode(
+                self.readout_wide,
+                "A",
+                global_in,
+                task_id="rank",
+                claimed_identity=candidate("A").identity,
+                column_ids=col_ids,
+                column_tokens=tokens,
+                observed=observed,
+                table_rows=int(x_raw.shape[0]),
+            )
+        return truncated64, pkt["global"]
 
 
 def evaluate_counterfactual_case(case_name: str, *, seed: int = 20261120, rows: int = 384) -> dict[str, object]:

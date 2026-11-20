@@ -102,6 +102,18 @@ class TransferJXHeadsTests(unittest.TestCase):
         self.assertEqual(str(lbl_err.exception), "jx_head_label")
         self.assertNotIn("99", str(lbl_err.exception))
 
+        frozen_heads = JXPrefixHeads(program_slots=2, pair_noise_dim=1)
+        empty_masks = {key: torch.zeros_like(val) for key, val in masks.items()}
+        zero_loss, zero_rec = matryoshka_prefix_loss(
+            frozen_heads, task.detach(), dist.detach(), targets, empty_masks
+        )
+        self.assertTrue(zero_loss.requires_grad)
+        self.assertEqual(zero_rec["active_entries"], 0)
+        zero_loss.backward()
+        for param in frozen_heads.parameters():
+            self.assertIsNotNone(param.grad)
+            self.assertEqual(float(param.grad.abs().max()), 0.0)
+
     def test_preference_reversal_loss_and_additive_offset_control(self):
         outcomes_a = torch.tensor([0.90, 0.20, 0.50], dtype=torch.float64)
         outcomes_b = torch.tensor([0.15, 0.85, 0.50], dtype=torch.float64)
@@ -185,6 +197,19 @@ class TransferJXHeadsTests(unittest.TestCase):
 
         with self.assertRaises(JXHeadError):
             split_invariance_infonce(torch.zeros((2, 4)), z_b[:2].float(), ("a", "b"))
+
+        za_single = z_a.detach().clone().requires_grad_(True)
+        zb_single = z_b.detach().clone().requires_grad_(True)
+        single_loss, single_rec = split_invariance_infonce(
+            za_single, zb_single, ("fam-same", "fam-same", "fam-same"), temperature=0.2
+        )
+        self.assertEqual(single_rec["eligible_negative_pairs"], 0)
+        self.assertEqual(single_rec["masked_sibling_pairs"], 6)
+        self.assertTrue(single_loss.requires_grad)
+        self.assertEqual(float(single_loss), 0.0)
+        single_loss.backward()
+        self.assertEqual(float(za_single.grad.abs().max()), 0.0)
+        self.assertEqual(float(zb_single.grad.abs().max()), 0.0)
 
     def test_target_swap_disentangle_pulls_dist_and_pushes_task(self):
         task_a = torch.tensor([[1.0, 0.1, 0.0], [0.2, 1.0, 0.0]], dtype=torch.float32, requires_grad=True)

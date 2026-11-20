@@ -29,7 +29,12 @@ The model release `v1.0.0` and the signed engine releases
 are distinct. The engine releases carry binaries, not these model weights.
 The `v1.0.0` source tag predates `research/levels/multilevel_model.py`, the Python
 model source used by Micro. Checking out that tag does not provide the encoder.
-Use the exact source commit above, separately from the weight asset URL.
+Use the exact source commit above, separately from the weight asset URL. Commit
+`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`) pins the signed
+Rust engine (`dope-core` `1.3.0`); `main` (`b674c3d6` and later) adds post-`1.3.0`
+research/transfer schemas and the measured provenance summary in
+[exposure_inventory.json](plans/next-version/exposure_inventory.json) without
+modifying `engine/`.
 
 The 1.70 MiB checkpoint fits comfortably within GitHub's per-asset limit of under
 2 GiB ([GitHub release documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)).

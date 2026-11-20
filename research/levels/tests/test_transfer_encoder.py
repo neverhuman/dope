@@ -355,6 +355,11 @@ class TransferEncoderTests(unittest.TestCase):
             FrozenBackboneConsumer(DopeEncoder629(), realize("B"))
         self.assertEqual(str(refused.exception), "transfer_encoder_candidate")
         consumer = FrozenBackboneConsumer(encoder, realize("A"))
+        consumer_inv = inventory(consumer)
+        self.assertEqual(consumer_inv["transferred_from_released"], 353095)
+        self.assertEqual(consumer_inv["transferred_tensors"], 40)
+        enc_rows = [r for r in consumer_inv["tensors"] if r["name"].startswith("encoder.")]
+        self.assertTrue(enc_rows and all(r["origin"] == "released-frozen" and not r["trainable"] for r in enc_rows))
         saved_parameters = [parameter.detach().clone() for parameter in encoder.parameters()]
         saved_buffers = [buffer.detach().clone() for _, buffer in encoder.named_buffers()]
         encoder.train()
@@ -383,22 +388,35 @@ class TransferEncoderTests(unittest.TestCase):
             self.assertEqual(str(caught.exception), "transfer_encoder_identity")
             self.assertNotIn(collided, str(caught.exception))
         config = ModelConfig().validate()
+        wide_config = ModelConfig(max_features=256).validate()
         self.assertEqual(
             config.max_context * config.max_features * config.max_features * config.heads,
             ATTENTION_ELEMENT_CAP,
         )
         attention_budget(config.max_context, config.max_features)
         with self.assertRaises(TransferEncoderError) as wide:
-            attention_budget(1, config.max_features + 1)
+            attention_budget(1, wide_config.max_features + 1)
         self.assertEqual(str(wide.exception), "transfer_encoder_limit")
-        self.assertNotIn(str(config.max_features + 1), str(wide.exception))
+        self.assertNotIn(str(wide_config.max_features + 1), str(wide.exception))
         with self.assertRaises(TransferEncoderError) as tall:
             attention_budget(config.max_context + 1, config.max_features)
         self.assertEqual(str(tall.exception), "transfer_encoder_limit")
         self.assertNotIn(str(config.max_context + 1), str(tall.exception))
         readout = realize("C", column_tokens=True)
         hidden = torch.zeros(1, candidate("C").input_width)
-        wide_count = config.max_features + 1
+        wide72 = encode(
+            readout,
+            "C",
+            hidden,
+            task_id="rank",
+            claimed_identity=candidate("C").identity,
+            column_ids=tuple(f"c{index}" for index in range(72)),
+            column_tokens=torch.zeros(1, 72, COLUMN_WIDTH),
+            observed=torch.ones(1, 72, dtype=torch.bool),
+            table_rows=4,
+        )
+        self.assertEqual(wide72["global"].shape, (1, GLOBAL_WIDTH))
+        wide_count = wide_config.max_features + 1
         tokens = torch.zeros(1, wide_count, COLUMN_WIDTH)
         observed = torch.ones(1, wide_count, dtype=torch.bool)
         with self.assertRaises(TransferEncoderError) as refused:
@@ -415,6 +433,34 @@ class TransferEncoderTests(unittest.TestCase):
             )
         self.assertEqual(str(refused.exception), "transfer_encoder_limit")
         self.assertNotIn(str(wide_count), str(refused.exception))
+        with self.assertRaises(TransferEncoderError) as dt_err:
+            encode(
+                readout, "C", hidden, task_id="rank", claimed_identity=candidate("C").identity,
+                column_ids=("age",), column_tokens=torch.zeros(1, 1, COLUMN_WIDTH, dtype=torch.float64),
+                observed=torch.ones(1, 1, dtype=torch.bool), table_rows=1,
+            )
+        self.assertEqual(str(dt_err.exception), "transfer_encoder_dtype")
+        with self.assertRaises(TransferEncoderError) as obs_dt:
+            encode(
+                readout, "C", hidden, task_id="rank", claimed_identity=candidate("C").identity,
+                column_ids=("age",), column_tokens=torch.zeros(1, 1, COLUMN_WIDTH),
+                observed=torch.ones(1, 1, dtype=torch.int64), table_rows=1,
+            )
+        self.assertEqual(str(obs_dt.exception), "transfer_encoder_dtype")
+        ctrl = ResidualControl()
+        with self.assertRaises(TransferEncoderError) as rc_dt:
+            ctrl(torch.zeros(1, dtype=torch.float64), torch.zeros(1, GLOBAL_WIDTH))
+        self.assertEqual(str(rc_dt.exception), "transfer_encoder_dtype")
+        with self.assertRaises(TransferEncoderError) as rc_dev:
+            ctrl(torch.zeros(1), torch.zeros(1, GLOBAL_WIDTH, device="meta"))
+        self.assertEqual(str(rc_dev.exception), "transfer_encoder_device")
+        with self.assertRaises(TransferEncoderError) as col_dev:
+            encode(
+                readout, "C", hidden, task_id="rank", claimed_identity=candidate("C").identity,
+                column_ids=("age",), column_tokens=torch.zeros(1, 1, COLUMN_WIDTH, device="meta"),
+                observed=torch.ones(1, 1, dtype=torch.bool), table_rows=1,
+            )
+        self.assertEqual(str(col_dev.exception), "transfer_encoder_device")
         blank = torch.zeros(1, 1, COLUMN_WIDTH)
         blank_mask = torch.zeros(1, 1, dtype=torch.bool)
         empty = encode(

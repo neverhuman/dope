@@ -195,3 +195,87 @@ fn dev_examples_and_marker_symlinks_stay_out_of_train() {
     assert!(!followed_text.contains("SECRET_LABEL"));
     fs::remove_dir_all(&root).unwrap();
 }
+
+#[test]
+fn dev_marker_blocks_legacy_read_and_unknown_marker_fields_refuse() {
+    let root = Path::new("target/training-manifest-dev").join(format!("{}", std::process::id()));
+    let public = root.join("public");
+    let dev_dir = root.join("dev-sealed");
+    fs::create_dir_all(&public).unwrap();
+    fs::create_dir_all(&dev_dir).unwrap();
+    fs::write(public.join("train.csv"), "0,1,0\n").unwrap();
+    fs::write(public.join("test.csv"), "1,0,1\n").unwrap();
+    fs::write(dev_dir.join("train.csv"), "SECRET_DEV_LABEL,1\n").unwrap();
+    fs::write(dev_dir.join("test.csv"), "SECRET_DEV_LABEL,0\n").unwrap();
+    fs::write(
+        dev_dir.join(MARKER_FILE),
+        r#"{"schema":"dope-training-base/v1","role":"DEV"}"#,
+    )
+    .unwrap();
+    assert!(legacy_blocks_read(&dev_dir).unwrap());
+    let inventory = super::super::inventory_corpus(&[root.clone()]).unwrap();
+    assert_eq!(inventory.datasets.len(), 1);
+    assert_eq!(inventory.exclusions.len(), 1);
+    assert_eq!(inventory.exclusions[0].reason, "protected");
+    assert!(!format!("{inventory:?}").contains("SECRET_DEV_LABEL"));
+
+    fs::write(
+        dev_dir.join(MARKER_FILE),
+        r#"{"schema":"dope-training-base/v1","role":"TRAIN","extra":"SECRET_DEV_LABEL"}"#,
+    )
+    .unwrap();
+    let err = legacy_blocks_read(&dev_dir).unwrap_err().to_string();
+    assert!(err.contains("training_manifest_schema"));
+    assert!(!err.contains("SECRET_DEV_LABEL"));
+    fs::remove_dir_all(&root).unwrap();
+}
+
+#[test]
+fn views_of_rejected_parents_and_protected_view_metadata_are_rejected() {
+    let mut dev = train("dev-source", vec![hex(0x41)], &["family-dev"]);
+    dev.role = SourceRole::Dev;
+
+    let first = train("base-ok", vec![hex(0x42)], &["family-clean"]);
+    let dup = train("base-dup", vec![hex(0x42)], &["family-clean"]);
+    let mut dup_view = train("dup-view", vec![hex(0x42)], &["family-clean"]);
+    dup_view.view_of = Some("base-dup".into());
+
+    let mut dirty_family_view = train("dirty-family-view", vec![hex(0x42)], &["family-dev"]);
+    dirty_family_view.view_of = Some("base-ok".into());
+
+    let mut dirty_ancestor_view = train("dirty-ancestor-view", vec![hex(0x42)], &["family-clean"]);
+    dirty_ancestor_view.view_of = Some("base-ok".into());
+    dirty_ancestor_view.ancestor_base_ids = vec!["dev-source".into()];
+
+    let admission = admit(&[
+        dev,
+        first,
+        dup,
+        dup_view,
+        dirty_family_view,
+        dirty_ancestor_view,
+    ])
+    .unwrap();
+    assert_eq!(admission.accepted_base_ids, vec!["base-ok".to_string()]);
+    assert_eq!(
+        admission.rejected,
+        vec![
+            Rejection {
+                base_dataset_id: "base-dup".into(),
+                code: "training_manifest_duplicate",
+            },
+            Rejection {
+                base_dataset_id: "dup-view".into(),
+                code: "parent_rejected",
+            },
+            Rejection {
+                base_dataset_id: "dirty-family-view".into(),
+                code: "training_manifest_ancestry",
+            },
+            Rejection {
+                base_dataset_id: "dirty-ancestor-view".into(),
+                code: "training_manifest_ancestry",
+            },
+        ]
+    );
+}
