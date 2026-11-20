@@ -17,6 +17,14 @@ from torch import nn
 SCHEMA = "dope-transfer-stream/v1"
 MAX_PREFETCH = 8
 MAX_BATCH = 32
+_TENSOR_DTYPES = {
+    "float32": torch.float32,
+    "float64": torch.float64,
+    "int64": torch.int64,
+    "int32": torch.int32,
+    "uint8": torch.uint8,
+    "bool": torch.bool,
+}
 
 
 class StreamError(ValueError):
@@ -78,12 +86,15 @@ class ExposureLedger:
 class IndexedStream:
     """Pulls records by index and groups a batch by shape."""
 
-    def __init__(self, count: int, read, *, prefetch: int, batch: int) -> None:
+    def __init__(self, count: int, read, *, prefetch: int, batch: int, start: int = 0) -> None:
         if (
             type(count) is not int
             or type(prefetch) is not int
             or type(batch) is not int
+            or type(start) is not int
             or count < 1
+            or start < 0
+            or start > count
             or not 1 <= prefetch <= MAX_PREFETCH
             or not 1 <= batch <= MAX_BATCH
             or not callable(read)
@@ -93,7 +104,7 @@ class IndexedStream:
         self._read = read
         self.prefetch = prefetch
         self.batch = batch
-        self._next = 0
+        self._next = start
         self._window: list[StreamRecord] = []
 
     def resident(self) -> int:
@@ -163,47 +174,70 @@ def accumulated_gradient(
         or features.shape[0] % microbatches != 0
     ):
         raise StreamError("stream_shape")
-    if bool((~torch.isfinite(features)).any()) or bool((~torch.isfinite(target)).any()):
-        raise StreamError("stream_nonfinite")
     rows = features.shape[0]
     width = rows // microbatches
     model.zero_grad(set_to_none=True)
-    for start in range(0, rows, width):
-        stop = start + width
-        prediction = model(features[start:stop])
-        loss = torch.nn.functional.mse_loss(prediction, target[start:stop], reduction="sum") / rows
-        if not bool(torch.isfinite(loss).all()):
-            raise StreamError("stream_nonfinite")
-        loss.backward()
-    grads = []
-    for parameter in model.parameters():
-        if parameter.grad is None:
-            raise StreamError("stream_state")
-        grads.append(parameter.grad.detach().clone())
-    return tuple(grads)
+    try:
+        for start in range(0, rows, width):
+            stop = start + width
+            chunk_features = features[start:stop]
+            chunk_target = target[start:stop]
+            if bool((~torch.isfinite(chunk_features)).any()) or bool((~torch.isfinite(chunk_target)).any()):
+                raise StreamError("stream_nonfinite")
+            prediction = model(chunk_features)
+            loss = torch.nn.functional.mse_loss(prediction, chunk_target, reduction="sum") / rows
+            if not bool(torch.isfinite(prediction).all()) or not bool(torch.isfinite(loss).all()):
+                raise StreamError("stream_nonfinite")
+            loss.backward()
+        grads = []
+        for parameter in model.parameters():
+            grad = parameter.grad
+            if grad is None:
+                raise StreamError("stream_state")
+            if not bool(torch.isfinite(grad).all()):
+                raise StreamError("stream_nonfinite")
+            grads.append(grad.detach().clone())
+        return tuple(grads)
+    except StreamError:
+        model.zero_grad(set_to_none=True)
+        raise
 
 
 def apply_update(
     model: nn.Module,
     features: torch.Tensor,
     target: torch.Tensor,
+    optimizer: torch.optim.Optimizer,
     *,
     device: torch.device,
-    lr: float,
+    microbatches: int = 1,
 ) -> None:
     if not isinstance(device, torch.device) or device.type not in ("cpu", "cuda"):
         raise StreamError("stream_device")
-    if type(lr) is not float or not 0.0 < lr <= 1.0:
-        raise StreamError("stream_limit")
-    grads = accumulated_gradient(model.to(device), features.to(device), target.to(device), microbatches=1)
-    if all(bool(torch.count_nonzero(grad) == 0) for grad in grads):
+    if not isinstance(optimizer, torch.optim.Optimizer):
         raise StreamError("stream_state")
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+    model.to(device)
+    owned = [parameter for group in optimizer.param_groups for parameter in group["params"]]
+    if [id(parameter) for parameter in owned] != [id(parameter) for parameter in model.parameters()]:
+        raise StreamError("stream_state")
+    accumulated_gradient(
+        model,
+        features.to(device),
+        target.to(device),
+        microbatches=microbatches,
+    )
     optimizer.step()
 
 
-def capture(model: nn.Module, ledger: ExposureLedger, step: int) -> dict[str, object]:
+def capture(
+    model: nn.Module,
+    ledger: ExposureLedger,
+    step: int,
+    optimizer: torch.optim.Optimizer,
+) -> dict[str, object]:
     if type(step) is not int or step != len(ledger.committed()):
+        raise StreamError("stream_state")
+    if not isinstance(optimizer, torch.optim.Optimizer):
         raise StreamError("stream_state")
     parameters = {}
     shapes = {}
@@ -220,11 +254,15 @@ def capture(model: nn.Module, ledger: ExposureLedger, step: int) -> dict[str, ob
         "committed": list(ledger.committed()),
         "parameters": parameters,
         "shapes": shapes,
+        "optimizer": _export_tree(optimizer.state_dict()),
+        "rng": _export_tree(torch.get_rng_state()),
     }
 
 
-def restore(model: nn.Module, payload: dict) -> ExposureLedger:
+def restore(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -> ExposureLedger:
     if not isinstance(payload, dict) or payload.get("schema") != SCHEMA:
+        raise StreamError("stream_state")
+    if not isinstance(optimizer, torch.optim.Optimizer):
         raise StreamError("stream_state")
     parameters = payload.get("parameters")
     shapes = payload.get("shapes")
@@ -240,6 +278,8 @@ def restore(model: nn.Module, payload: dict) -> ExposureLedger:
         or set(shapes) != names
         or type(step) is not int
         or step != len(committed)
+        or "optimizer" not in payload
+        or "rng" not in payload
     ):
         raise StreamError("stream_state")
     with torch.no_grad():
@@ -254,7 +294,64 @@ def restore(model: nn.Module, payload: dict) -> ExposureLedger:
             if values.shape != parameter.shape or not bool(torch.isfinite(values).all()):
                 raise StreamError("stream_state")
             parameter.copy_(values)
+    try:
+        optimizer.load_state_dict(_import_tree(payload["optimizer"]))
+        rng = _import_tree(payload["rng"])
+        if not torch.is_tensor(rng) or rng.dtype != torch.uint8:
+            raise StreamError("stream_state")
+        torch.set_rng_state(rng)
+    except (RuntimeError, ValueError, TypeError):
+        raise StreamError("stream_state") from None
     return ExposureLedger(count, tuple(committed))
+
+
+def _export_tree(value):
+    if torch.is_tensor(value):
+        cpu = value.detach().cpu().contiguous()
+        kind = str(cpu.dtype).replace("torch.", "")
+        if kind not in _TENSOR_DTYPES:
+            raise StreamError("stream_state")
+        raw = cpu.reshape(-1).view(torch.uint8).reshape(-1)
+        return {"tensor": kind, "shape": list(cpu.shape), "values": raw.tolist()}
+    if isinstance(value, dict):
+        return {str(key): _export_tree(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return {"tuple": [_export_tree(item) for item in value]}
+    if isinstance(value, list):
+        return [_export_tree(item) for item in value]
+    if value is None or type(value) in (str, int, float, bool):
+        return value
+    raise StreamError("stream_state")
+
+
+def _import_tree(value):
+    if isinstance(value, dict) and set(value) == {"tensor", "shape", "values"}:
+        dtype = _TENSOR_DTYPES.get(value["tensor"])
+        shape = value["shape"]
+        if dtype is None or not isinstance(shape, list) or not isinstance(value["values"], list):
+            raise StreamError("stream_state")
+        try:
+            raw = torch.tensor(value["values"], dtype=torch.uint8)
+            count = 1
+            for dim in shape:
+                count *= dim
+            if raw.numel() != count * torch.empty((), dtype=dtype).element_size():
+                raise StreamError("stream_state")
+            return raw.view(dtype).reshape(shape)
+        except (TypeError, ValueError, RuntimeError):
+            raise StreamError("stream_state") from None
+    if isinstance(value, dict) and set(value) == {"tuple"} and isinstance(value["tuple"], list):
+        return tuple(_import_tree(item) for item in value["tuple"])
+    if isinstance(value, dict):
+        return {
+            int(key) if isinstance(key, str) and key.isdigit() else key: _import_tree(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_import_tree(item) for item in value]
+    if value is None or type(value) in (str, int, float, bool):
+        return value
+    raise StreamError("stream_state")
 
 
 def write_state(path: Path, payload: dict) -> None:
