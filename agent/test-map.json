@@ -3588,6 +3588,14 @@
       "command": "python3 -B -m unittest research.levels.tests.test_transfer_projection -v",
       "purpose": "verify the frozen full629 affine init reproduces Stage-1B slots 2/4/5 inside the linear region and leaves landmark, mask, and mixed slots unchanged"
     },
+    "research/levels/transfer_losses.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_losses -v",
+      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, and a labeled nondifferentiable top choice without query values or a baseline objective change"
+    },
+    "research/levels/tests/test_transfer_losses.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_transfer_losses -v",
+      "purpose": "verify decision-loss signs, masks, denominators, teacher-stopped gradients, and a labeled nondifferentiable top choice without query values or a baseline objective change"
+    },
     "research/levels/research_encoder_view.py": {
       "command": "SHARED_PYTHON=python3 bash ops/ci/shared-levels.sh torch test_research_encoder_view",
       "purpose": "verify level-bound High/Ultra research 629D view and extrema-free 196D fitted packet features"
