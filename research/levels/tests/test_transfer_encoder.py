@@ -36,7 +36,7 @@ class TransferEncoderTests(unittest.TestCase):
         self.assertEqual(recorded["feature_blocks"], config.feature_blocks)
         self.assertEqual(recorded["inducing_blocks"], config.inducing_blocks)
         self.assertEqual(recorded["target_blocks"], config.target_blocks)
-        self.assertEqual(recorded["max_features"], config.max_features)
+        self.assertEqual(recorded["max_features"], 256)
         self.assertEqual(recorded["cell_cap"], config.cell_cap)
         self.assertEqual(recorded["attention_element_cap"], ATTENTION_ELEMENT_CAP)
         self.assertTrue(candidate("A").frozen_backbone)
@@ -379,6 +379,9 @@ class TransferEncoderTests(unittest.TestCase):
             self.assertTrue(torch.equal(parameter, saved))
         for buffer, saved in zip((buffer for _, buffer in encoder.named_buffers()), saved_buffers):
             self.assertTrue(torch.equal(buffer, saved))
+        with self.assertRaises(TransferEncoderError) as col_err:
+            FrozenBackboneConsumer(encoder, realize("A", column_tokens=True))
+        self.assertEqual(str(col_err.exception), "transfer_encoder_candidate")
 
     def test_task_vocabulary_and_table_budget_refuse_without_echo(self):
         self.assertNotEqual(task_slot("rank"), task_slot("generate"))

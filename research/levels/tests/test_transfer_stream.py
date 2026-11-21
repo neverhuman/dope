@@ -322,6 +322,36 @@ class TransferStreamTests(unittest.TestCase):
                     if torch.is_tensor(val):
                         self.assertEqual(val.device.type, "cpu")
 
+    def test_custom_loss_fn_integrates_decision_losses_and_microbatches(self):
+        from research.levels.transfer_losses import pairwise_logistic
+
+        features = torch.randn(4, 2, generator=torch.Generator().manual_seed(41))
+        target = torch.tensor([[1.0], [0.5], [0.2], [0.0]], dtype=torch.float32)
+        model = nn.Linear(2, 1)
+        opt = torch.optim.AdamW(model.parameters(), lr=0.05)
+        before = model.weight.detach().clone()
+
+        def pair_loss(pred: torch.Tensor, tgt: torch.Tensor) -> torch.Tensor:
+            mask = torch.ones(pred.shape[0], dtype=torch.bool, device=pred.device)
+            loss, _ = pairwise_logistic(
+                pred.squeeze(-1), tgt.squeeze(-1), mask, higher_is_better=True
+            )
+            return loss
+
+        apply_update(
+            model,
+            features,
+            target,
+            opt,
+            device=torch.device("cpu"),
+            microbatches=1,
+            loss_fn=pair_loss,
+        )
+        self.assertFalse(torch.equal(model.weight, before))
+        with self.assertRaises(StreamError) as bad_fn:
+            accumulated_gradient(model, features, target, microbatches=1, loss_fn="not-callable")
+        self.assertEqual(str(bad_fn.exception), "stream_shape")
+
 
 def _rng_from(payload):
     values = payload["rng"]["values"]

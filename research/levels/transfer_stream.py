@@ -158,6 +158,7 @@ def accumulated_gradient(
     target: torch.Tensor,
     *,
     microbatches: int,
+    loss_fn=None,
 ) -> tuple[torch.Tensor, ...]:
     """Sum of per-row losses, divided once by the full row count."""
     if type(microbatches) is not int or microbatches < 1:
@@ -172,6 +173,7 @@ def accumulated_gradient(
         or features.dtype != torch.float32
         or target.dtype != torch.float32
         or features.shape[0] % microbatches != 0
+        or (loss_fn is not None and not callable(loss_fn))
     ):
         raise StreamError("stream_shape")
     rows = features.shape[0]
@@ -185,7 +187,13 @@ def accumulated_gradient(
             if bool((~torch.isfinite(chunk_features)).any()) or bool((~torch.isfinite(chunk_target)).any()):
                 raise StreamError("stream_nonfinite")
             prediction = model(chunk_features)
-            loss = torch.nn.functional.mse_loss(prediction, chunk_target, reduction="sum") / rows
+            if loss_fn is None:
+                loss = torch.nn.functional.mse_loss(prediction, chunk_target, reduction="sum") / rows
+            else:
+                chunk_loss = loss_fn(prediction, chunk_target)
+                if not torch.is_tensor(chunk_loss) or chunk_loss.ndim != 0:
+                    raise StreamError("stream_shape")
+                loss = chunk_loss * (chunk_features.shape[0] / rows)
             if not bool(torch.isfinite(prediction).all()) or not bool(torch.isfinite(loss).all()):
                 raise StreamError("stream_nonfinite")
             loss.backward()
@@ -211,6 +219,7 @@ def apply_update(
     *,
     device: torch.device,
     microbatches: int = 1,
+    loss_fn=None,
 ) -> None:
     if not isinstance(device, torch.device) or device.type not in ("cpu", "cuda"):
         raise StreamError("stream_device")
@@ -230,6 +239,7 @@ def apply_update(
         features.to(device),
         target.to(device),
         microbatches=microbatches,
+        loss_fn=loss_fn,
     )
     optimizer.step()
 
@@ -332,8 +342,8 @@ def restore(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -
             cuda_states = [_import_tree(item) for item in cuda_rng_raw]
             if any(not torch.is_tensor(s) or s.dtype != torch.uint8 for s in cuda_states):
                 raise StreamError("stream_state")
-            if torch.cuda.is_available() and torch.cuda.is_initialized():
-                if len(cuda_states) != len(torch.cuda.get_rng_state_all()):
+            if torch.cuda.is_available():
+                if len(cuda_states) != torch.cuda.device_count():
                     raise StreamError("stream_state")
                 torch.cuda.set_rng_state_all(cuda_states)
     except (RuntimeError, ValueError, TypeError):

@@ -38,6 +38,33 @@ class TransferLossTests(unittest.TestCase):
         self.assertGreater(float(grads[1]), 0.0)
         self.assertEqual(float(grads[2]), 0.0)
 
+        # Noise-band margin, temperature, and pair_weights support (Spec 1 §8.2)
+        scores_m = _scores(0.2, 0.0, -0.5)
+        outcomes_m = torch.tensor([1.0, 0.95, 0.0], dtype=torch.float64)
+        mask_m = torch.tensor([True, True, True])
+        loss_m, rec_m = pairwise_logistic(
+            scores_m, outcomes_m, mask_m, higher_is_better=True, margin=0.10, temperature=0.5
+        )
+        self.assertEqual(rec_m["denominator"], 2)
+        self.assertTrue(torch.isfinite(loss_m))
+        weights_m = torch.tensor(
+            [[0.0, 1.0, 3.0], [0.0, 0.0, 1.0], [0.0, 0.0, 0.0]], dtype=torch.float64
+        )
+        loss_w, rec_w = pairwise_logistic(
+            scores_m,
+            outcomes_m,
+            mask_m,
+            higher_is_better=True,
+            margin=0.10,
+            temperature=0.5,
+            pair_weights=weights_m,
+        )
+        self.assertEqual(rec_w["denominator"], 2)
+        self.assertNotAlmostEqual(float(loss_m), float(loss_w), places=6)
+        for bad_kw in ({"margin": -0.1}, {"margin": True}, {"temperature": 0.0}, {"temperature": False}):
+            with self.assertRaises(DecisionLossError):
+                pairwise_logistic(scores_m, outcomes_m, mask_m, higher_is_better=True, **bad_kw)
+
     def test_lower_is_better_flips_the_preferred_score(self):
         scores = _scores(0.0, 0.0)
         outcomes = torch.tensor([1.0, 4.0], dtype=torch.float64)

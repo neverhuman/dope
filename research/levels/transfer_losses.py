@@ -23,23 +23,65 @@ class DecisionLossError(ValueError):
     repair_hint = "fix the offending caller tensor shapes or masks and rerun test_transfer_losses"
 
 
-def pairwise_logistic(scores, outcomes, mask, *, higher_is_better, query_values=None):
-    """Logistic loss on strict measured utility gaps.
+def pairwise_logistic(
+    scores,
+    outcomes,
+    mask,
+    *,
+    higher_is_better,
+    query_values=None,
+    margin=0.0,
+    temperature=1.0,
+    pair_weights=None,
+):
+    """Logistic loss on strict measured utility gaps with optional margin, temperature, and pair weights.
 
-    The denominator is the number of ordered pairs with a positive utility
-    gap. Masked rows do not enter that count. A nonfinite active row is refused.
+    The denominator is the number (or total weight) of ordered pairs with
+    utility gap strictly exceeding ``margin``. Masked rows do not enter that
+    count. A nonfinite active row is refused.
     """
     _refuse_query(query_values)
+    if (
+        isinstance(margin, bool)
+        or not isinstance(margin, (int, float))
+        or not math.isfinite(margin)
+        or margin < 0.0
+    ):
+        raise DecisionLossError("decision_loss_value")
+    if (
+        isinstance(temperature, bool)
+        or not isinstance(temperature, (int, float))
+        or not math.isfinite(temperature)
+        or temperature <= 0.0
+    ):
+        raise DecisionLossError("decision_loss_value")
     scores, outcomes, valid = _vectors(scores, outcomes, mask)
     utility = _utility(outcomes, higher_is_better)
     gap = utility[:, None] - utility[None, :]
-    pair = valid[:, None] & valid[None, :] & (gap > 0)
+    pair = valid[:, None] & valid[None, :] & (gap > float(margin))
     count = int(pair.sum().item())
     if count == 0:
         return _zero(scores), _record(0, "pairwise")
-    score_gap = scores[:, None] - scores[None, :]
+    score_gap = (scores[:, None] - scores[None, :]) / float(temperature)
     safe_gap = torch.where(pair, score_gap, torch.zeros((), device=scores.device, dtype=scores.dtype))
-    loss = (F.softplus(-safe_gap) * pair.to(scores.dtype)).sum() / count
+    if pair_weights is None:
+        loss = (F.softplus(-safe_gap) * pair.to(scores.dtype)).sum() / count
+    else:
+        if (
+            not torch.is_tensor(pair_weights)
+            or pair_weights.shape != pair.shape
+            or not pair_weights.is_floating_point()
+            or pair_weights.device != scores.device
+        ):
+            raise DecisionLossError("decision_loss_shape")
+        weights = pair_weights.detach().to(dtype=scores.dtype)
+        active_w = torch.where(pair, weights, torch.zeros((), device=scores.device, dtype=scores.dtype))
+        if bool((~torch.isfinite(active_w)).any()) or bool((active_w < 0).any()):
+            raise DecisionLossError("decision_loss_value")
+        denom = active_w.sum()
+        if float(denom.item()) <= 0.0:
+            return _zero(scores), _record(0, "pairwise")
+        loss = (F.softplus(-safe_gap) * active_w).sum() / denom
     return _finite(loss), _record(count, "pairwise")
 
 
