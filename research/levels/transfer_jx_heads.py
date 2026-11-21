@@ -66,12 +66,11 @@ class JXPrefixHeads(nn.Module):
         if any(param.device != task_latent.device for param in self.parameters()):
             raise JXHeadError("jx_head_shape")
         task_pad = self.mask_prefix(task_latent, prefix)
-        dist_pad = self.mask_prefix(dist_latent, prefix)
         return {
             "rank_utility": self.rank_utility(task_pad),
             "calibration": self.calibration(task_pad),
             "validity": self.validity(task_pad),
-            "pair_noise": self.pair_noise(torch.cat([task_pad, dist_pad], dim=-1)),
+            "pair_noise": self.pair_noise(torch.cat([task_pad, dist_latent], dim=-1)),
         }
 
 
@@ -338,11 +337,19 @@ def _normalize_prefix_weights(weights: Mapping[int, float] | Sequence[float] | N
     if weights is None:
         return {p: 0.25 for p in PREFIXES}
     if isinstance(weights, Mapping) and set(weights.keys()) == set(PREFIXES):
-        out = {p: float(weights[p]) for p in PREFIXES}
+        raw_items = [(p, weights[p]) for p in PREFIXES]
     elif isinstance(weights, Sequence) and not isinstance(weights, (str, bytes)) and len(weights) == len(PREFIXES):
-        out = {p: float(w) for p, w in zip(PREFIXES, weights)}
+        raw_items = list(zip(PREFIXES, weights))
     else:
         raise JXHeadError("jx_head_weights")
+    out: dict[int, float] = {}
+    for p, w in raw_items:
+        if isinstance(w, bool):
+            raise JXHeadError("jx_head_weights")
+        try:
+            out[p] = float(w)
+        except (TypeError, ValueError):
+            raise JXHeadError("jx_head_weights") from None
     if any(not math.isfinite(v) or v < 0.0 for v in out.values()) or sum(out.values()) <= 0.0:
         raise JXHeadError("jx_head_weights")
     return out

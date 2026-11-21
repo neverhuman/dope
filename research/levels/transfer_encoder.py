@@ -117,11 +117,18 @@ def task_slot(task_id: str) -> int:
         raise TransferEncoderError("transfer_encoder_identity") from None
 
 
+WIDE_MAX_FEATURES = 256
+
+
+def _wide_model_config() -> ModelConfig:
+    return ModelConfig(max_features=WIDE_MAX_FEATURES).validate()
+
+
 def attention_budget(rows: int, features: int) -> None:
     """Refuse a table outside the live raw-table encoder envelope."""
     if type(rows) is not int or type(features) is not int or rows < 1 or features < 1:
         raise TransferEncoderError("transfer_encoder_shape")
-    config = ModelConfig(max_features=256).validate()
+    config = _wide_model_config()
     cells = rows * features
     quadratic = cells * features * config.heads
     width_term = cells * config.width
@@ -137,7 +144,7 @@ def attention_budget(rows: int, features: int) -> None:
 
 def limits() -> dict[str, int | str | bool]:
     """Counts and caps taken from the live modules, not from a comment."""
-    config = ModelConfig().validate()
+    config = _wide_model_config()
     released = DopeEncoder629()
     parameter_count = sum(parameter.numel() for parameter in released.parameters())
     tensor_count = len(released.state_dict())
@@ -267,7 +274,7 @@ class FrozenBackboneConsumer(nn.Module):
         super().__init__()
         if not isinstance(encoder, DopeEncoder629) or not isinstance(readout, TransferReadout):
             raise TransferEncoderError("transfer_encoder_shape")
-        if not readout.frozen_backbone:
+        if not readout.frozen_backbone or readout.column is not None:
             raise TransferEncoderError("transfer_encoder_candidate")
         self.encoder = encoder
         self.readout = readout
@@ -427,7 +434,7 @@ def _check_columns(
         return ()
     if len(column_ids) < 1:
         raise TransferEncoderError("transfer_encoder_identity")
-    if len(column_ids) > ModelConfig(max_features=256).validate().max_features:
+    if len(column_ids) > _wide_model_config().max_features:
         raise TransferEncoderError("transfer_encoder_limit")
     if (
         column_tokens is None

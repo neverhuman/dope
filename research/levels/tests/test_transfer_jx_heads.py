@@ -53,9 +53,11 @@ class TransferJXHeadsTests(unittest.TestCase):
         self.assertIsNone(d_grad)
 
         pair_sum = out32["pair_noise"].sum()
-        _, d_pair_grad = torch.autograd.grad(pair_sum, (task, dist))
+        t_pair_grad, d_pair_grad = torch.autograd.grad(pair_sum, (task, dist))
+        self.assertGreater(float(t_pair_grad[:, :32].abs().sum()), 1e-5)
+        self.assertEqual(float(t_pair_grad[:, 32:].abs().max()), 0.0)
         self.assertGreater(float(d_pair_grad[:, :32].abs().sum()), 1e-5)
-        self.assertEqual(float(d_pair_grad[:, 32:].abs().max()), 0.0)
+        self.assertGreater(float(d_pair_grad[:, 32:].abs().sum()), 1e-5)
 
     def test_matryoshka_prefix_loss_masks_nonfinite_and_nests_gradients(self):
         torch.manual_seed(202)
@@ -83,7 +85,11 @@ class TransferJXHeadsTests(unittest.TestCase):
         t_grad32, d_grad32 = torch.autograd.grad(loss32_only, (task, dist))
         self.assertGreater(float(t_grad32[:, :32].abs().sum()), 1e-5)
         self.assertEqual(float(t_grad32[:, 32:].abs().max()), 0.0)
-        self.assertEqual(float(d_grad32[:, 32:].abs().max()), 0.0)
+        self.assertGreater(float(d_grad32[:, 32:].abs().sum()), 1e-5)
+        for bad_weights in ([True, 0.0, 0.0, 0.0], ["bad", 0.0, 0.0, 0.0]):
+            with self.assertRaises(JXHeadError) as w_err:
+                matryoshka_prefix_loss(heads, task, dist, targets, masks, weights=bad_weights)
+            self.assertEqual(str(w_err.exception), "jx_head_weights")
 
         full_loss, full_rec = matryoshka_prefix_loss(heads, task, dist, targets, masks)
         self.assertTrue(torch.isfinite(full_loss))
