@@ -194,10 +194,15 @@ fix), and every number I report comes from a ledger that can be re-reduced.
 New modules under `engine/dope-arena/src/`, built by a new auto-discovered
 binary `engine/dope-arena/src/bin/dope_kpi.rs` (`#[path]` includes; no new
 crates; reads tables from the flat float32 arena, so no edits to
-Antigravity's `main.rs`, `lib.rs`, `Cargo.toml` or lockfile). Hooks it is
-landing in PR #388: `pub fn fit_predict_auditor` (wrapping the private
-`eval::run_auditor`) and `reduce --kappa-file --allow-partial`. Fallback if
-they slip: a 40-line local wrapper over the public `eval` fitters.
+Antigravity's `main.rs`, `lib.rs`, `Cargo.toml` or lockfile). Hooks landed
+in PR #388: `pub fn fit_predict_auditor` (wrapping the private
+`eval::run_auditor`) and `reduce --kappa-file --allow-partial`
+(`report::reduce_cells_with_options`, which `reduce-ledger` calls). The
+auditors remain a local wrapper over the public `eval` fitters: at a row
+ratio of 1 it returns the same bits as `fit_predict_auditor` (unit-tested),
+and it also scales the count-based knobs with the training rows, which the
+hook cannot. Since #389 `gbdt::Params::default()` no longer groups duplicate
+rows, so the scoreboard sets `group_duplicates: true` itself.
 
 | Module | Does | Reuses |
 |---|---|---|
