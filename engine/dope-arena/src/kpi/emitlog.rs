@@ -15,6 +15,7 @@ pub const EMIT_LOG: &str = "emit.jsonl";
 /// `artifact_class` values written by this binary (an emitter may also log `rows_at_sampler`).
 pub const CLASS_CONTROL: &str = "control";
 pub const CLASS_SOURCE_FREE: &str = "source_free";
+pub const CLASS_ROWS_AT_SAMPLER: &str = "rows_at_sampler";
 /// Log rows a worker process hands to its parent for a native arm.
 pub const EMIT_PART: &str = "emit.part.jsonl";
 pub const EMIT_OK: &str = "ok";
@@ -55,6 +56,11 @@ pub struct EmitRow {
     /// emit, when the emitter declares it (not part of formats.md section 6).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub min_emitted_support: Option<u64>,
+}
+
+/// Whether `class` is one of the three artifact classes of formats.md section 6.
+pub fn known_class(class: &str) -> bool {
+    [CLASS_SOURCE_FREE, CLASS_ROWS_AT_SAMPLER, CLASS_CONTROL].contains(&class)
 }
 
 /// Key of one attempted file within an arm.
@@ -214,6 +220,8 @@ mod tests {
         for bad in ["", "a/b", "..", ".hidden", "a b", "a:b", &"x".repeat(97)] {
             assert!(check_arm_id(bad).is_err(), "{bad:?}");
         }
+        assert!(known_class("source_free") && known_class("rows_at_sampler"));
+        assert!(known_class("control") && !known_class("Control") && !known_class(""));
         assert_eq!(
             sanitize_reason("encode_exception:ValueError"),
             "encode_exception:ValueError"
