@@ -5,18 +5,25 @@
 //! from here is a pure function of its inputs: no clock, no process id, no
 //! unseeded randomness, and the same bytes for any `--threads` value.
 
+pub mod auditors;
+pub mod celldata;
 pub mod cellplan;
+pub mod controls;
+pub mod emitlog;
 pub mod families;
+pub mod format2;
 pub mod io;
 pub mod jsonl;
-// The `score` and control-arm stages consume this container; `build-panels`
-// and `plan` only define it, so the binary does not call it yet.
-#[allow(dead_code)]
 pub mod mat;
 pub mod panels_build;
 pub mod par;
+pub mod realref;
+pub mod reduce;
 pub mod roles;
+pub mod score;
+pub mod scorecell;
 pub mod seeds;
+pub mod shard;
 pub mod sketch;
 
 #[cfg(test)]

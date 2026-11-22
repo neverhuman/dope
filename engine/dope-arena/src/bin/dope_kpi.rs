@@ -27,16 +27,27 @@ enum Command {
     BuildPanels(kpi::panels_build::BuildPanelsArgs),
     /// Write the frozen cell schedule (row roles and column views) for a panel and tier.
     Plan(kpi::cellplan::PlanArgs),
+    /// Fit the auditors on real rows once: per-row losses, informative flags, C2ST reference.
+    RealRef(kpi::realref::RealRefArgs),
+    /// Score one arm (external files or a native control) into a ledger and compact rows.
+    Score(kpi::score::ScoreArgs),
+    /// Reduce a score ledger with `evaluate_v3` (kappa file, partial evidence, filters).
+    ReduceLedger(kpi::reduce::ReduceArgs),
 }
 
 fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
     match &cli.command {
         Command::BuildPanels(args) => kpi::panels_build::run(args),
         Command::Plan(args) => kpi::cellplan::run(args),
+        Command::RealRef(args) => kpi::realref::run(args),
+        Command::Score(args) => kpi::score::run(args),
+        Command::ReduceLedger(args) => kpi::reduce::run(args),
     }
 }
 
 fn main() -> ExitCode {
+    // Before any thread exists: auditor fits compute on their calling thread.
+    kpi::shard::single_threaded_inner_pools();
     match run(&Cli::parse()) {
         Ok(summary) => {
             println!("{summary}");
