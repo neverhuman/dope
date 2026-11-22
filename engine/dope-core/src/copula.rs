@@ -10,7 +10,92 @@
 //! * `Factor(r)` — `Σ = ΛΛᵀ + Ψ` by principal-axis factoring (d·r bytes),
 //! * `Full` — the whole latent correlation matrix (d(d−1)/2 bytes).
 
-use crate::stats::{cholesky, nearest_correlation, sym_eigen};
+use crate::marginal::v2::ColumnMarginalV2;
+use crate::stats::{cholesky, nearest_correlation, norm_cdf, norm_ppf, sym_eigen};
+
+/// Zero-byte copula moment calibration for a single pair `(m_i, m_j)`:
+/// finds latent Gaussian correlation `rho in [-0.995, 0.995]` whose pushforward through
+/// the stored marginals matches `target_corr` (undoing the `2/pi` attenuation on binary/discrete
+/// pairs without adding any bytes to the artifact!).
+pub fn calibrate_latent_pair(
+    m_i: &ColumnMarginalV2,
+    m_j: &ColumnMarginalV2,
+    target_corr: f64,
+) -> f64 {
+    if !target_corr.is_finite() || target_corr.abs() < 1e-4 {
+        return 0.0;
+    }
+    let target = target_corr.clamp(-0.995, 0.995);
+    // 11x11 deterministic quasi-normal quadrature grid on (0,1)^2.
+    const G: usize = 11;
+    let zs: [f64; G] = std::array::from_fn(|k| norm_ppf((k as f64 + 0.5) / G as f64));
+    let eval_corr = |rho: f64| -> f64 {
+        let s = (1.0 - rho * rho).max(1e-9).sqrt();
+        let (mut mx, mut my) = (0.0, 0.0);
+        let mut xs = [0.0; G * G];
+        let mut ys = [0.0; G * G];
+        let mut idx = 0;
+        for &e1 in &zs {
+            for &e2 in &zs {
+                let z1 = e1;
+                let z2 = rho * e1 + s * e2;
+                let x = m_i.sample_from_uniform(norm_cdf(z1), 0.5, 1.0);
+                let y = m_j.sample_from_uniform(norm_cdf(z2), 0.5, 1.0);
+                xs[idx] = x;
+                ys[idx] = y;
+                mx += x;
+                my += y;
+                idx += 1;
+            }
+        }
+        let inv = 1.0 / (G * G) as f64;
+        mx *= inv;
+        my *= inv;
+        let (mut cov, mut vx, mut vy) = (0.0, 0.0, 0.0);
+        for k in 0..(G * G) {
+            let dx = xs[k] - mx;
+            let dy = ys[k] - my;
+            cov += dx * dy;
+            vx += dx * dx;
+            vy += dy * dy;
+        }
+        if vx <= 1e-12 || vy <= 1e-12 {
+            0.0
+        } else {
+            (cov / (vx * vy).sqrt()).clamp(-1.0, 1.0)
+        }
+    };
+    let (mut lo, mut hi) = (-0.995_f64, 0.995_f64);
+    for _ in 0..16 {
+        let mid = 0.5 * (lo + hi);
+        if eval_corr(mid) < target {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    0.5 * (lo + hi)
+}
+
+/// Calibrate a full `d x d` empirical correlation matrix into latent Gaussian copula space
+/// via pairwise 1-D root finding on the stored marginals + nearest PD projection.
+pub fn calibrate_latent_correlation_matrix(
+    marginals: &[ColumnMarginalV2],
+    empirical_corr: &[f64],
+) -> Vec<f64> {
+    let d = marginals.len();
+    let mut latent = vec![0.0; d * d];
+    for i in 0..d {
+        latent[i * d + i] = 1.0;
+        for j in (i + 1)..d {
+            let rho =
+                calibrate_latent_pair(&marginals[i], &marginals[j], empirical_corr[i * d + j]);
+            latent[i * d + j] = rho;
+            latent[j * d + i] = rho;
+        }
+    }
+    nearest_correlation(&latent, d, 1e-3)
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Dependence {

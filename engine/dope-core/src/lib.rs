@@ -28,6 +28,7 @@
 
 pub mod artifact;
 pub mod budget;
+pub mod catf;
 pub mod compile;
 pub mod copula;
 pub mod device;
@@ -55,6 +56,7 @@ pub mod sample_cpu;
 pub mod schema;
 pub mod screen;
 pub mod stats;
+pub mod structure;
 pub mod table;
 pub mod target;
 pub mod teacher;
