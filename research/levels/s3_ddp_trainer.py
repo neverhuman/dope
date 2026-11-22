@@ -167,9 +167,9 @@ def save_atomic_checkpoint(
         except (OSError, ValueError):
             pass
     step_files = sorted(ckpt_dir.glob("step_*.safetensors"))
-    for old in step_files[:-keep_last]:
-        if old.name not in protected:
-            old.unlink(missing_ok=True)
+    for pruned_ckpt in step_files[:-keep_last]:
+        if pruned_ckpt.name not in protected:
+            pruned_ckpt.unlink(missing_ok=True)
     return info
 
 

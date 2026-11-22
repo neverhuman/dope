@@ -199,17 +199,20 @@ class DopeSingleEncV6(nn.Module):
             y_logits = self.predict_target_from_latent(X_syn, enc, task, n_classes)
             n_params = self.hyper_noise(zg)
             noise_sd = F.softplus(n_params[0]).clamp(0.03, 1.5)
-            temp = (F.softplus(n_params[1]) + 0.5).clamp(0.5, 15.0)
+            logit_scale = (F.softplus(n_params[1]) + 0.5).clamp(0.5, 15.0)
             if task == "regression":
                 y_syn = (y_logits.squeeze(-1) + torch.randn((n_syn,), generator=gen, device=dev) * noise_sd).clamp(-6.0, 6.0)
             elif task == "binary":
-                y_syn = torch.sigmoid(y_logits.squeeze(-1) * temp).clamp(1e-4, 1.0 - 1e-4)
+                p1 = priors[1].clamp(1e-4, 1.0 - 1e-4)
+                y_syn = torch.sigmoid(torch.log(p1 / (1.0 - p1)) + y_logits.squeeze(-1) * logit_scale).clamp(1e-4, 1.0 - 1e-4)
             elif task == "multilabel":
-                y_syn = torch.sigmoid(y_logits * temp).clamp(1e-4, 1.0 - 1e-4)
+                nl = y_logits.shape[1]
+                pl = priors[:nl].clamp(1e-4, 1.0 - 1e-4).unsqueeze(0)
+                y_syn = torch.sigmoid(torch.log(pl / (1.0 - pl)) + y_logits * logit_scale).clamp(1e-4, 1.0 - 1e-4)
             else:
                 k = min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
                 p_log = torch.log(priors[:k].clamp_min(1e-4)).unsqueeze(0)
-                y_syn = F.softmax(p_log + y_logits[:, :k] * temp, dim=-1).clamp(1e-4, 1.0)
+                y_syn = F.softmax(p_log + y_logits[:, :k] * logit_scale, dim=-1).clamp(1e-4, 1.0)
             return {
                 "X_syn": X_syn, "y_syn": y_syn, "y_logits": y_logits,
                 "knots": knots, "miss_prob": miss_prob, "driver_weights": driver_weights,

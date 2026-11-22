@@ -3,9 +3,10 @@
 use clap::{Args, Parser, Subcommand};
 use dope_arena::ledger::read_ledger;
 use dope_arena::panel::PanelManifest;
-use dope_arena::report::{reduce_cells, run_swap_ladder};
+use dope_arena::report::{reduce_cells_with_options, run_swap_ladder};
 use dope_arena::schedule::MethodsRegistry;
 use dope_arena::split::{split_table_disjoint, SplitRatios};
+use dope_core::dvs::v3::equiv::KappaThresholds;
 use dope_core::RawTable;
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -73,6 +74,10 @@ struct ReduceArgs {
     seed: u64,
     #[arg(long, default_value_t = 1000)]
     draws: usize,
+    #[arg(long)]
+    kappa_file: Option<PathBuf>,
+    #[arg(long, default_value_t = false)]
+    allow_partial: bool,
 }
 
 #[derive(Args)]
@@ -137,8 +142,16 @@ fn run(cli: Cli) -> Result<(), String> {
         }
         Command::Reduce(a) => {
             let (cells, sha) = read_ledger(&a.ledger).map_err(|e| e.to_string())?;
+            let kappa = match a.kappa_file {
+                Some(ref p) => {
+                    let raw = std::fs::read_to_string(p).map_err(|e| e.to_string())?;
+                    serde_json::from_str::<KappaThresholds>(&raw).map_err(|e| e.to_string())?
+                }
+                None => KappaThresholds::default(),
+            };
             let receipt =
-                reduce_cells(cells, a.mode, a.seed, a.draws).map_err(|e| e.to_string())?;
+                reduce_cells_with_options(cells, a.mode, a.seed, a.draws, kappa, a.allow_partial)
+                    .map_err(|e| e.to_string())?;
             println!(
                 "{}",
                 serde_json::to_string_pretty(&serde_json::json!({

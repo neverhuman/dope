@@ -205,6 +205,25 @@ pub fn reduce_cells(
     seed: u64,
     bootstrap_draws: usize,
 ) -> ArenaResult<FidelityV3Receipt> {
+    reduce_cells_with_options(
+        cells,
+        mode,
+        seed,
+        bootstrap_draws,
+        KappaThresholds::default(),
+        false,
+    )
+}
+
+/// Reduce Arena ledger cells with explicit calibrated `KappaThresholds` and diagnostic partial flag.
+pub fn reduce_cells_with_options(
+    cells: Vec<FidelityCellRequest>,
+    mode: String,
+    seed: u64,
+    bootstrap_draws: usize,
+    kappa_thresholds: KappaThresholds,
+    allow_partial_diagnostic: bool,
+) -> ArenaResult<FidelityV3Receipt> {
     if cells.is_empty() {
         return Err(ArenaError::Contract("cannot reduce empty cell list".into()));
     }
@@ -213,8 +232,8 @@ pub fn reduce_cells(
         mode,
         seed,
         bootstrap_draws,
-        kappa_thresholds: KappaThresholds::default(),
-        allow_partial_diagnostic: false,
+        kappa_thresholds,
+        allow_partial_diagnostic,
         cells,
     };
     Ok(evaluate_v3(&req)?)

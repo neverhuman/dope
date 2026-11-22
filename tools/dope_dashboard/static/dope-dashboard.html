@@ -414,8 +414,12 @@ function renderAll() {
 
   // Leaderboard
   const lb = f.leaderboard || [];
-  $('lb-body').innerHTML = lb.length ? lb.map(r => `<tr>
-    <td class="left"><strong>${r.run}</strong> <span class="muted">(${r.host})</span>${r.active ? ' <span class="badge best">LIVE</span>' : ''}</td>
+  $('lb-body').innerHTML = lb.length ? lb.map(r => {
+    const clsBadge = r.artifact_class === 'source_free'
+      ? ' <span class="badge best">SOURCE-FREE</span>'
+      : ' <span class="badge warn">ROWS-AT-SAMPLER</span>';
+    return `<tr>
+    <td class="left"><strong>${r.run}</strong> <span class="muted">(${r.host})</span>${clsBadge}${r.active ? ' <span class="badge ok">LIVE</span>' : ''}</td>
     <td class="numeric">${r.step}</td>
     <td class="numeric ${clsRet(r.main_kpi_retention_median)}">${f4(r.main_kpi_retention_median)}</td>
     <td class="numeric good">${f4(r.best_main_kpi)}</td>
@@ -427,7 +431,7 @@ function renderAll() {
     <td class="numeric ${clsC2(r.c2st_auc_median)}">${f2(r.c2st_auc_median)}</td>
     <td class="numeric">${f2(r.dcr_share_median)}</td>
     <td class="numeric">${bytesFmt(r.encoding_bytes_median)}</td>
-  </tr>`).join('') : '<tr><td colspan="12" style="text-align:center;color:var(--muted)">Waiting for evaluations…</td></tr>';
+  </tr>`; }).join('') : '<tr><td colspan="12" style="text-align:center;color:var(--muted)">Waiting for evaluations…</td></tr>';
 
   renderHosts();
   renderSelectedNode();
