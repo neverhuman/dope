@@ -218,11 +218,18 @@ fn fit_predict_impl(
     seeded: bool,
 ) -> Result<Vec<f64>> {
     let o = head.outputs();
-    let mut idx: Vec<usize> = (0..x.rows).collect();
-    let mut rng = Rng::new(p.seed ^ 0x3a1);
-    rng.shuffle(&mut idx);
-    let n_val = if x.rows >= 100 { x.rows / 10 } else { 0 };
-    let (val, fit) = idx.split_at(n_val);
+    let (val_owned, fit_owned) = if seeded {
+        super::duplicate_grouped_split(x, y, 10, 100, p.seed ^ 0x3a1)
+    } else {
+        let mut idx: Vec<usize> = (0..x.rows).collect();
+        let mut rng = Rng::new(p.seed ^ 0x3a1);
+        rng.shuffle(&mut idx);
+        let n_val = if x.rows >= 100 { x.rows / 10 } else { 0 };
+        let (v, f) = idx.split_at(n_val);
+        (v.to_vec(), f.to_vec())
+    };
+    let (val, fit) = (val_owned.as_slice(), fit_owned.as_slice());
+    let mut rng = Rng::new(p.seed ^ 0x3a1 ^ 0x51a7);
     let varmap = VarMap::new();
     let vb = VarBuilder::from_varmap(&varmap, DType::F32, dev);
     let mut dims = vec![x.cols];

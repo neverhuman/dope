@@ -1,0 +1,112 @@
+{
+  "schema": "dope.methods-registry/v1",
+  "purpose": "Explicitly classify native generators, authentic external published baselines, and internal stand-ins so stand-in prototypes are never reported as published methods.",
+  "methods": {
+    "dope_engine": {
+      "authenticity": "authentic_native",
+      "allowed_in_headline_claims": true,
+      "implementation": "engine/dope-core (dope fit / dope sample)",
+      "notes": "Native Rust DOPE engine (Format 1 and Format 2)."
+    },
+    "rows_wire_v2": {
+      "authenticity": "authentic_native",
+      "allowed_in_headline_claims": true,
+      "implementation": "engine/dope-probes/src/rows_wire_v2.rs (RWW2)",
+      "notes": "Overflow-free i16 per-column brotli row-subset baseline with no artificial 88% cap."
+    },
+    "dope_mlc_v2_wire": {
+      "authenticity": "authentic_native",
+      "allowed_in_headline_claims": false,
+      "implementation": "engine/dope-core/src/mlc_v3 (DML2 compatibility)",
+      "notes": "Frozen historical MLC-v2 artifact comparator."
+    },
+    "dope_mlc_v3_wire": {
+      "authenticity": "authentic_native",
+      "allowed_in_headline_claims": false,
+      "implementation": "engine/dope-core/src/mlc_v3 (DML3 compatibility)",
+      "notes": "Frozen historical MLC-v3 artifact comparator."
+    },
+    "real_twin_b": {
+      "authenticity": "authentic_reference",
+      "allowed_in_headline_claims": true,
+      "implementation": "Disjoint fresh real sample B of size n",
+      "notes": "Fresh real-data yardstick for parity harm and equivalence calibration."
+    },
+    "real_bootstrap": {
+      "authenticity": "authentic_reference",
+      "allowed_in_headline_claims": true,
+      "implementation": "Empirical bootstrap of fit sample A (evaluated under Rule A-1 duplicate grouping)",
+      "notes": "Non-private empirical upper-reference control."
+    },
+    "tabdiff": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream TabDiff (and inference-time refinement)",
+      "notes": "Requires verified upstream package installation and prediction-bundle seam."
+    },
+    "tabsyn": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream TabSyn",
+      "notes": "Requires verified upstream package installation and prediction-bundle seam."
+    },
+    "tabddpm": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream TabDDPM",
+      "notes": "Requires verified upstream package installation and prediction-bundle seam."
+    },
+    "arf_official": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream arfpy (Adversarial Random Forests)",
+      "notes": "Official upstream ARF; distinct from internal standin_arf_proj_bins."
+    },
+    "forest_flow": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream ForestDiffusion / ForestFlow",
+      "notes": "Requires verified upstream package installation."
+    },
+    "ctgan": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream SDV CTGAN",
+      "notes": "Requires verified upstream package installation."
+    },
+    "tvae": {
+      "authenticity": "authentic_external",
+      "allowed_in_headline_claims": true,
+      "implementation": "Isolated Python worker running upstream SDV TVAE",
+      "notes": "Requires verified upstream package installation."
+    },
+    "standin_arf_proj_bins": {
+      "authenticity": "internal_standin",
+      "allowed_in_headline_claims": false,
+      "legacy_alias": "arf",
+      "implementation": "research/levels/world_class_eval.py::_baseline_generator",
+      "notes": "In-house random-projection quantile-bin resampling prototype; NOT published ARF."
+    },
+    "standin_gaussian_copula": {
+      "authenticity": "internal_standin",
+      "allowed_in_headline_claims": false,
+      "legacy_alias": "copula",
+      "implementation": "research/levels/world_class_eval.py::_baseline_generator",
+      "notes": "In-house multivariate Gaussian prototype; NOT SDV GaussianCopula."
+    },
+    "standin_noisy_bootstrap_diffusion": {
+      "authenticity": "internal_standin",
+      "allowed_in_headline_claims": false,
+      "legacy_alias": "joint_diffusion_v1",
+      "implementation": "research/levels/world_class_eval.py::_baseline_generator",
+      "notes": "In-house Gaussian-jittered bootstrap prototype; NOT TabDDPM/TabDiff."
+    },
+    "standin_factor_rff_kernel": {
+      "authenticity": "internal_standin",
+      "allowed_in_headline_claims": false,
+      "legacy_alias": "kernel",
+      "implementation": "research/levels/world_class_eval.py::_baseline_generator",
+      "notes": "In-house rank-4 factor + 6-unit RFF ridge prototype."
+    }
+  }
+}

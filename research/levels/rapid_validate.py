@@ -43,6 +43,19 @@ def _dataset_is_val(dataset_id: str) -> bool:
     return (h % 10) == 0  # 10% source-dataset-disjoint validation split
 
 
+def extract_masked_ultra_probe_vector(report: Dict[str, Any]) -> np.ndarray:
+    """Build the 116-D probe input with fine landmarks masked BEFORE computing contrasts/midranks/summaries (T02).
+
+    Preserves only Macro+Larger landmark statistics (`level="high"`) plus the univariate column
+    Chatterjee-xi spectrum (`vector116[91:107]`), guaranteeing zero leakage from `FINE_ADDED_INDICES`.
+    """
+    high_desc = extract_report_descriptors(report, level="high")
+    ultra_desc = extract_report_descriptors(report, level="ultra")
+    out = high_desc["vector116"].copy()
+    out[91:107] = ultra_desc["spectrum_summary16"].astype(np.float32)
+    return out
+
+
 def _feature_names_for_descriptors() -> List[str]:
     names: List[str] = []
     names.extend([f"gain_{name}" for name in LANDMARK_NAMES])
@@ -158,18 +171,9 @@ def run_experiment_0a(bundle_path: Path = DEFAULT_BUNDLE, catalog_path: Path = D
             X_high_raw.append(np.concatenate([high_desc["gains23"], high_desc["mask23"].astype(np.float32)]))
             X_high_rich.append(high_desc["vector116"])
 
-            # For Ultra feature importance on predicting GBDT/Net ceiling from non-target descriptors + lower landmarks + Chatterjee xi
-            ultra_input = ultra_desc["vector116"].copy()
-            # Mask out direct fine gains (17..20, 22) and group_fine_max/mean in the probe input so we test genuine predictive power of descriptors + Chatterjee xi + Macro/Larger landmarks!
-            for idx in FINE_ADDED_INDICES:
-                ultra_input[idx] = 0.0
-                ultra_input[23 + idx] = 0.0
-                ultra_input[46 + idx] = 0.0
-            ultra_input[69 + 13] = 0.0  # nonadd_ex
-            ultra_input[69 + 14] = 0.0  # knn_ratio
-            ultra_input[69 + 15] = 0.0  # gbdt_lc
-            ultra_input[107 + 2] = 0.0  # group_fine_max
-            ultra_input[107 + 5] = 0.0  # group_fine_mean
+            # For Ultra feature importance on predicting GBDT/Net ceiling from non-target descriptors + lower landmarks + Chatterjee xi:
+            # Mask fine landmarks BEFORE computing derived contrasts so `contrast_signal_ceiling` and normalized contrast denominators cannot leak fine_max (T02).
+            ultra_input = extract_masked_ultra_probe_vector(report)
             X_ultra_for_target.append(ultra_input)
 
             y_fine_ceiling.append(fine_max)

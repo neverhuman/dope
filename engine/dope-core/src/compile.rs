@@ -11,7 +11,7 @@
 use crate::budget::{ModelSize, ParameterCount};
 use crate::copula::Dependence;
 use crate::error::{DopeError, Result};
-use crate::eval::SelfAudit;
+use crate::eval::{AuditOutcome, SelfAudit};
 use crate::forest::column_codes;
 use crate::program::Program;
 use crate::regimes::{Regimes, MAX_REGIMES, REGIME_LADDER};
@@ -324,7 +324,7 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         None if opts.audit => DEPENDENCE_SHARES.to_vec(),
         None => vec![DEPENDENCE_SHARES[DEPENDENCE_SHARES.len() / 2]],
     };
-    let mut best: Option<(f64, Candidate)> = None;
+    let mut best: Option<(AuditOutcome, Candidate)> = None;
     let mut audit: Option<SelfAudit> = None;
     let mut seen: Vec<Vec<u8>> = Vec::new();
     for &share in &shares {
@@ -335,7 +335,7 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
             continue;
         }
         seen.push(cand.bytes.clone());
-        let score = if shares.len() > 1 {
+        let outcome = if shares.len() > 1 {
             if audit.is_none() {
                 audit = Some(SelfAudit::new(
                     &cand.program,
@@ -347,11 +347,14 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
             }
             audit
                 .as_ref()
-                .map_or(Ok(f64::NAN), |a| a.retention(&cand.program))?
+                .map_or(Ok(AuditOutcome::Uninformative), |a| {
+                    a.retention_outcome(&cand.program)
+                })?
         } else {
-            f64::NAN
+            AuditOutcome::Uninformative
         };
         if trace {
+            let score = outcome.score().unwrap_or(f64::NAN);
             eprintln!(
                 "share {share}: {} bytes, {} x {}, net {}->{}, {} trees, self-audit {score:.4}",
                 cand.bytes.len(),
@@ -364,10 +367,19 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         }
         let better = match &best {
             None => true,
-            Some((b, _)) => score > *b + 1e-3,
+            Some((b_out, b_cand)) => match (outcome, *b_out) {
+                (AuditOutcome::Informative(s), AuditOutcome::Informative(bs)) => s > bs + 1e-3,
+                (AuditOutcome::Informative(_), AuditOutcome::Uninformative) => true,
+                (AuditOutcome::Uninformative, AuditOutcome::Informative(_)) => false,
+                (AuditOutcome::Uninformative, AuditOutcome::Uninformative) => {
+                    cand.entry.val_loss < b_cand.entry.val_loss - 1e-9
+                        || ((cand.entry.val_loss - b_cand.entry.val_loss).abs() <= 1e-9
+                            && cand.bytes.len() < b_cand.bytes.len())
+                }
+            },
         };
         if better {
-            best = Some((score, cand));
+            best = Some((outcome, cand));
         }
     }
     let Some((
@@ -430,7 +442,7 @@ pub fn fit(raw: &RawTable, target: usize, opts: &FitOptions) -> Result<Fitted> {
         } else {
             0.0
         },
-        self_audit: self_audit.is_finite().then_some(self_audit),
+        self_audit: self_audit.score(),
         seconds: start.elapsed().as_secs_f64(),
         device: format!("{:?}", opts.device.location()),
     };

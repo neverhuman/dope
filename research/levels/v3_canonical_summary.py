@@ -16,11 +16,13 @@ def _arr_mean(vals: Sequence[float]) -> Optional[float]:
 
 def _compute_elo_and_paired_block(subset_rows: Sequence[Dict[str, Any]], n_boot: int = 200) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     methods = ("dope_mlc_v3_wire", "rows_wire", "copula_wire", "dope_mlc_v2_wire")
-    cell_scores, ds_to_cells = {}, {}
+    cell_scores, cluster_to_cells = {}, {}
     paired_diffs: Dict[str, List[float]] = {m: [] for m in methods[1:]}
+    paired_by_cluster: Dict[str, Dict[str, List[float]]] = {m: {} for m in methods[1:]}
     wtl_counts: Dict[str, Dict[str, int]] = {m: {"wins": 0, "ties_001": 0, "ties_010": 0, "losses": 0, "failed_or_missing": 0} for m in methods[1:]}
     for r in subset_rows:
         ds_id, lvl = r["dataset_id"], r["level"]
+        cluster_id = str(r.get("family_id") or ds_id)
         v3_auds = r["domains"]["sender_scaled_test_domain"]["per_auditor"]
         for aud in CORE_COMPARATOR_AUDITORS:
             v3_a = v3_auds.get(aud, {})
@@ -39,6 +41,7 @@ def _compute_elo_and_paired_block(subset_rows: Sequence[Dict[str, Any]], n_boot:
                 sc_map[comp_name] = 100.0 * float(c_aud["clipped_R"])
                 diff = float(v3_a["clipped_R"]) - float(c_aud["clipped_R"])
                 paired_diffs[comp_name].append(diff)
+                paired_by_cluster[comp_name].setdefault(cluster_id, []).append(diff)
                 if abs(diff) <= 0.01:
                     wtl_counts[comp_name]["ties_001"] += 1
                 if abs(diff) <= 0.10:
@@ -48,15 +51,15 @@ def _compute_elo_and_paired_block(subset_rows: Sequence[Dict[str, Any]], n_boot:
                 else:
                     wtl_counts[comp_name]["losses"] += 1
             cell_scores[(ds_id, lvl, aud)] = sc_map
-            ds_to_cells.setdefault(ds_id, []).append((lvl, aud, sc_map))
+            cluster_to_cells.setdefault(cluster_id, []).append((ds_id, lvl, aud, sc_map))
 
     elo_base = compute_elo_ratings(cell_scores, methods)
-    ds_keys, rng = sorted(ds_to_cells.keys()), np.random.default_rng(20261024)
+    cluster_keys, rng = sorted(cluster_to_cells.keys()), np.random.default_rng(20261024)
     boot_elos: Dict[str, List[float]] = {m: [] for m in methods}
-    if ds_keys:
+    if cluster_keys:
         for _ in range(n_boot):
-            samp = rng.choice(ds_keys, size=len(ds_keys), replace=True)
-            b_cells = {(f"{d_k}_{i}", l_k, a_k): sm for i, d_k in enumerate(samp) for l_k, a_k, sm in ds_to_cells[d_k]}
+            samp = rng.choice(cluster_keys, size=len(cluster_keys), replace=True)
+            b_cells = {(f"{c_k}_{i}_{d_k}", l_k, a_k): sm for i, c_k in enumerate(samp) for d_k, l_k, a_k, sm in cluster_to_cells[c_k]}
             for er in compute_elo_ratings(b_cells, methods):
                 boot_elos[er["method"]].append(float(er["elo"]))
     for er in elo_base:
@@ -69,8 +72,19 @@ def _compute_elo_and_paired_block(subset_rows: Sequence[Dict[str, Any]], n_boot:
         if not d_list:
             continue
         arr_d = np.asarray(d_list, dtype=np.float64)
-        b_means = [float(np.mean(rng.choice(arr_d, size=arr_d.size, replace=True))) for _ in range(n_boot)]
-        paired_summary[f"dope_mlc_v3_minus_{comp_name}"] = {"paired_complete_case_cell_count": int(arr_d.size), "mean_delta_R": round(float(np.mean(arr_d)), 4), "median_delta_R": round(float(np.median(arr_d)), 4), "ci95_mean_delta_R": [round(float(np.percentile(b_means, 2.5)), 4), round(float(np.percentile(b_means, 97.5)), 4)], **wtl_counts[comp_name]}
+        c_map = paired_by_cluster[comp_name]
+        c_keys = sorted(c_map.keys())
+        c_means = np.asarray([float(np.mean(c_map[k])) for k in c_keys], dtype=np.float64)
+        b_means = [float(np.mean(rng.choice(c_means, size=c_means.size, replace=True))) for _ in range(n_boot)]
+        paired_summary[f"dope_mlc_v3_minus_{comp_name}"] = {
+            "paired_complete_case_cell_count": int(arr_d.size),
+            "paired_cluster_count": int(c_means.size),
+            "mean_delta_R": round(float(np.mean(c_means)), 4),
+            "median_delta_R": round(float(np.median(c_means)), 4),
+            "ci95_mean_delta_R": [round(float(np.percentile(b_means, 2.5)), 4), round(float(np.percentile(b_means, 97.5)), 4)],
+            "bootstrap_unit": "physical_source_family_or_dataset_cluster",
+            **wtl_counts[comp_name],
+        }
     return elo_base, paired_summary
 
 

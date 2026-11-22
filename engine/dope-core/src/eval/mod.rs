@@ -16,8 +16,8 @@ pub mod gbdt;
 pub mod linear;
 pub mod nn;
 
-pub use audit::SELF_AUDIT_ROWS;
 pub(crate) use audit::{audit_predict, SelfAudit};
+pub use audit::{AuditOutcome, SELF_AUDIT_ROWS};
 pub use frontier::{frontier, FrontierOptions, FrontierPoint, FrontierResult};
 
 use crate::artifact::decode;
@@ -51,6 +51,70 @@ impl Matrix {
     pub fn at(&self, r: usize, c: usize) -> f64 {
         self.data[r * self.cols + c]
     }
+}
+
+/// Canonical bit key for an `f64` (`-0.0 -> +0.0`, canonical NaN) so exact duplicate rows hash
+/// identically across platforms.
+#[inline]
+fn canonical_f64_bits(v: f64) -> u64 {
+    if v.is_nan() {
+        0x7ff8_0000_0000_0000
+    } else if v == 0.0 {
+        0
+    } else {
+        v.to_bits()
+    }
+}
+
+/// Rule A-1 duplicate-grouped internal validation split: exact duplicate `(x_row, y)` rows are
+/// kept together on one side of the `(val, fit)` split so early stopping cannot overfit duplicates.
+pub(crate) fn duplicate_grouped_split(
+    x: &Matrix,
+    y: &[f64],
+    val_denom: usize,
+    min_rows: usize,
+    seed: u64,
+) -> (Vec<usize>, Vec<usize>) {
+    if x.rows < min_rows || val_denom == 0 {
+        let mut all: Vec<usize> = (0..x.rows).collect();
+        crate::rng::Rng::new(seed).shuffle(&mut all);
+        return (Vec::new(), all);
+    }
+    let mut groups: std::collections::BTreeMap<Vec<u64>, Vec<usize>> =
+        std::collections::BTreeMap::new();
+    for r in 0..x.rows {
+        let mut key = Vec::with_capacity(x.cols + 1);
+        for &v in x.row(r) {
+            key.push(canonical_f64_bits(v));
+        }
+        key.push(canonical_f64_bits(y[r]));
+        groups.entry(key).or_default().push(r);
+    }
+    let mut buckets: Vec<Vec<usize>> = groups.into_values().collect();
+    if buckets.len() < 2 {
+        let mut all: Vec<usize> = (0..x.rows).collect();
+        crate::rng::Rng::new(seed).shuffle(&mut all);
+        return (Vec::new(), all);
+    }
+    let mut rng = crate::rng::Rng::new(seed);
+    rng.shuffle(&mut buckets);
+    let target_val = (x.rows / val_denom).max(1);
+    let mut val = Vec::with_capacity(target_val);
+    let mut fit = Vec::with_capacity(x.rows);
+    for (idx, group) in buckets.into_iter().enumerate() {
+        let remaining_groups = idx + 1;
+        if val.len() < target_val && (val.len() + group.len() < x.rows) && remaining_groups > 0 {
+            val.extend(group);
+        } else {
+            fit.extend(group);
+        }
+    }
+    if fit.is_empty() {
+        return (Vec::new(), val);
+    }
+    rng.shuffle(&mut val);
+    rng.shuffle(&mut fit);
+    (val, fit)
 }
 
 /// Loss of raw scores (gbdt internals): regression values, binary logits,

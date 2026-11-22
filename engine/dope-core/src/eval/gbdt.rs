@@ -5,7 +5,6 @@
 //! auditor's own training rows. Squared loss, logistic or softmax.
 
 use super::Matrix;
-use crate::rng::Rng;
 use crate::target::Head;
 use rayon::prelude::*;
 
@@ -188,13 +187,10 @@ fn softmax_row(z: &[f64]) -> Vec<f64> {
 /// P(class 1) (binary) or row-major class probabilities (multiclass).
 pub fn fit_predict(x: &Matrix, y: &[f64], head: Head, test: &Matrix, p: &Params) -> Vec<f64> {
     let o = head.outputs();
-    let mut idx: Vec<usize> = (0..x.rows).collect();
-    Rng::new(p.seed ^ 0x6bd7).shuffle(&mut idx);
-    let n_val = if x.rows >= 200 { x.rows / 10 } else { 0 };
-    let (val, fit) = idx.split_at(n_val);
-    let e = edges(x, fit, p.bins);
-    let bf = bin(x, fit, &e);
-    let bv = bin(x, val, &e);
+    let (val, fit) = super::duplicate_grouped_split(x, y, 10, 200, p.seed ^ 0x6bd7);
+    let e = edges(x, &fit, p.bins);
+    let bf = bin(x, &fit, &e);
+    let bv = bin(x, &val, &e);
     let all_test: Vec<usize> = (0..test.rows).collect();
     let bt = bin(test, &all_test, &e);
     let yf: Vec<f64> = fit.iter().map(|&r| y[r]).collect();

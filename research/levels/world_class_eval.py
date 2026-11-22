@@ -171,13 +171,23 @@ def _fit_and_eval_auditor(auditor_name: str, X_train: np.ndarray, y_train: np.nd
     return {"primary_score": r2, "null_score": 0.0, "r2": r2, "rmse": float(math.sqrt(mean_squared_error(y_test, pred))), "importance": _compute_feature_importance(m, X_test, "regression")}
 
 
+INTERNAL_STANDIN_ALIASES: Dict[str, str] = {
+    "kernel": "standin_factor_rff_kernel",
+    "arf": "standin_arf_proj_bins",
+    "copula": "standin_gaussian_copula",
+    "joint_diffusion_v1": "standin_noisy_bootstrap_diffusion",
+}
+
+
 def _baseline_generator(method: str, X_train: np.ndarray, y_train: np.ndarray, level: str, task: str, seed: int = 20261023) -> Tuple[np.ndarray, np.ndarray]:
+    """Internal development stand-in baselines (NOT published third-party methods; see bench/methods-registry.json)."""
+    canonical = INTERNAL_STANDIN_ALIASES.get(method, method)
     rng, (n, p) = np.random.default_rng(seed), X_train.shape
-    k_rows = max(min((ARTIFACT_BYTES[level] - 512) // max((p + 1) * 7, 28), int(0.88 * n) if level == "ultra" else n), 6)
-    if method == "rows":
+    k_rows = max(min((ARTIFACT_BYTES[level] - 512) // max((p + 1) * 7, 28), n), 6)
+    if canonical == "rows":
         idx, rep = rng.choice(n, size=k_rows, replace=False), rng.choice(k_rows, size=n, replace=True)
         return (np.round(X_train[idx] * 16.0) / 16.0)[rep], y_train[idx][rep]
-    if method == "kernel":
+    if canonical == "standin_factor_rff_kernel":
         corr = np.nan_to_num(np.corrcoef(X_train, rowvar=False), nan=0.0)
         if corr.ndim == 0:
             corr = np.ones((1, 1), dtype=np.float64)
@@ -195,7 +205,7 @@ def _baseline_generator(method: str, X_train: np.ndarray, y_train: np.ndarray, l
             score = pred_syn + rng.normal(0.0, 0.18, size=n)
             return X_syn, (score >= float(np.quantile(score, 1.0 - float(np.clip(np.mean(y_train), 0.02, 0.98))))).astype(np.float64)
         return X_syn, pred_syn + rng.normal(0.0, res_std * 0.35, size=n)
-    if method == "arf":
+    if canonical == "standin_arf_proj_bins":
         n_leaves, proj = min(max(n // 16, 4), 24), X_train @ rng.normal(0.0, 1.0, size=(p, 2))
         qs = np.quantile(proj[:, 0], np.linspace(0.0, 1.0, n_leaves + 1))
         X_syn, y_syn = np.zeros((n, p), dtype=np.float64), np.zeros(n, dtype=np.float64)
@@ -211,13 +221,13 @@ def _baseline_generator(method: str, X_train: np.ndarray, y_train: np.ndarray, l
                 X_syn[m_sy, j] = rng.choice(X_leaf[:, j], size=cnt, replace=True) + rng.normal(0.0, 0.08 * float(np.std(X_train[:, j]) + 1e-4), size=cnt)
             y_syn[m_sy] = rng.choice(y_leaf, size=cnt, replace=True)
         return X_syn, y_syn
-    if method == "copula":
+    if canonical == "standin_gaussian_copula":
         XY = np.column_stack([X_train, y_train])
         samp = rng.multivariate_normal(np.mean(XY, axis=0), np.nan_to_num(np.cov(XY, rowvar=False), nan=0.0) + 1e-3 * np.eye(p + 1), size=n)
         if task == "classification":
             return samp[:, :p], (samp[:, p] >= float(np.quantile(samp[:, p], 1.0 - float(np.clip(np.mean(y_train), 0.02, 0.98))))).astype(np.float64)
         return samp[:, :p], samp[:, p]
-    if method == "joint_diffusion_v1":
+    if canonical == "standin_noisy_bootstrap_diffusion":
         noise_t, idx = (0.48 if level == "medium" else 0.38 if level == "high" else 0.32), rng.choice(n, size=n, replace=True)
         X_syn = math.sqrt(1.0 - noise_t) * X_train[idx] + math.sqrt(noise_t) * rng.standard_normal((n, p))
         if task == "classification":
