@@ -1,5 +1,62 @@
 # Changelog
 
+## Engine 2.0.0 - 2026-11-22
+
+- Major DOPE Fidelity Engine 2.0, Compact Single-Encoding Neural Anonymizer, and
+  High-Speed Fleet Training / Live Dashboard upgrade:
+  - **Rust Fidelity Engine 2.0 Format-2 P0 Fixes (`BUG-R1`–`BUG-R9`)**:
+    sequential residual interaction mining (`mine_pairs`), `MainEffectSet`
+    `mean_c` residual subtraction, cyclic coordinate Newton `LinearMember` for
+    binary/multiclass, class-stratified `K`-fold splits, smooth exponential/Pareto
+    tail continuation in `marginal/tails.rs`, stratified discrete CATF latent
+    assignment (`u_i ∈ [F_lo, F_hi]`), binary-search `keep_trees` + post-truncation
+    temperature refit in `DistilledStudent`, and wired `run_privacy_backoff` in
+    `compile/v2/pipeline.rs` (`dcr_share 0.5563 -> 0.5354`, multiclass retention
+    `-0.1547 -> +0.5075`, overall Main KPI median `0.6024 -> 0.6393` on unseen S3
+    val tables).
+  - **Track A — True Zero-Raw-Row Compact Single-Encoding Architecture
+    (`DopeSingleEncV6`, `research/levels/v6_single_encoding.py` + `v6_landmarks.py`)**:
+    encodes any arbitrary tabular dataset `(X_fit, y_fit, miss_fit)` + 48-dim
+    FIT-only landmarks (quartiles, skew, discrete cardinality, pairwise Spearman
+    stats, ANOVA `eta^2`, Ridge/IRLS probe coefficients, mutual-info proxy,
+    nonlinearity gap, class priors) into a compact single-encoding latent
+    `Z = (z_global ∈ R^{64/128}, c_j ∈ R^{16/24})` (`~1.2–2.5 KiB` FP16); decoder
+    generates `(X_syn, y_syn)` strictly from `Z` with zero access to raw fit rows
+    via a 4-regime Gaussian mixture copula, 2-layer RealNVP coupling flow,
+    monotone spline marginal knots, and a hypernetwork conditional target MLP.
+  - **Track B — Upgraded `DopeFlowV6` (`research/levels/v5_fidelity_net.py`)**:
+    resolves all 4 `v1.3.1` plateau defects (`BUG-V5-1..4`) with 3-step
+    differentiable Newton-IRLS for binary/multiclass/multilabel, ANOVA `eta^2`
+    multiclass landmarks, top-6 driver-gated pairwise interactions, randomized
+    tie-stratified normal scores, RealNVP coupling flow, 64-level discrete STE,
+    and multi-bandwidth RBF-MMD realism loss.
+  - **100% Unique-Per-Batch RAM-Resident Async Pipeline & 6-Layer Gradient
+    Smoothing (`s3_fast_pipeline.py`, `s3_ddp_trainer.py`, `s3_kpi_evaluator.py`)**:
+    0 duplicate datasets per batch, fresh Rule A-1 duplicate-grouped split with
+    jittered ratio `[0.45, 0.78]`, micro-jitter, synthetic noise/derived columns,
+    MCAR/MAR missingness with preserved masks, raw heavy-tail warps, target-swap
+    real views, infinite SCM/tree/interaction priors, correlated multi-label,
+    3-stage progressive `(N_fit, N_qry, P_max)` ramp, JopeDime regret curriculum,
+    O(1)-VRAM MoCo split-invariance InfoNCE, decoupled `AdamW (0.9, 0.98)` +
+    warmup cosine LR + BF16/TF32 + adaptive grad-norm spike guard + dual Polyak
+    EMA (`0.995`/`0.9995`), dynamic co-host VRAM/CPU watchdog, permanent
+    `best_main_kpi.safetensors`, JopeDime `k=3` valley soup
+    (`best_soup_k3.safetensors`), and immutable SHA-256 `checkpoints/ledger.jsonl`.
+  - **JSR-Parity Live DOPE Dashboard (`tools/dope_dashboard/`, `127.0.0.1:8768`)**:
+    HiDPI `<canvas>` crosshair charts, Pause toggle, shared multi-node DDP
+    telemetry, and 3 top-level tabs (`Fleet Training`, `Checkpoints & Lineage`,
+    `All Metrics & Diagnostics`).
+  - **CI & Governance Repairs**: register `contracts/dope-fidelity-v3.json` in
+    `agent/generated-zones.toml`, verify bit-identical NC1/DML4 conformance
+    exports and refresh `MANIFEST.json` source hashes, and sync
+    `PYTHON_EXCEPTIONS.md` + `docs/internal/PYTHON_EXCEPTIONS.md`.
+- Preserve Format 1, `DPK3.2`/v1 receipts, `DML2`–`DML4`, `Dope512`/`DopeEncoder629`,
+  `nc1-minmax-onehot-v1`, and published `v1.0.0` weights bit-identically.
+- This is an uncertified engine release (`dope-engine-v2.0.0`). It makes no new
+  formal DP, HIPAA de-identification, or sealed-holdout certification claim;
+  `scripts/install.sh` retains `dope-engine-v1.3.0` until signed
+  `dope-engine-v2.0.0` release artifacts are built and verified.
+
 ## Engine 1.3.1 - 2026-11-22
 
 - Land the DOPE Fidelity Engine 2.0 Rust architecture and end-to-end Format 2
