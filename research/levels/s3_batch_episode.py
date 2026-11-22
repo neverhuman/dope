@@ -1,6 +1,6 @@
 """Episode batches for the batched S3 training core (plan M3, stage C2).
 
-``collate`` pads a list of episode dicts (``s3_view_builder.build_episode`` or the legacy
+``collate`` pads a list of episode dicts (``s3_view_builder.build_episode`` or the earlier
 ``build_unique_episode``) into plain numpy arrays with masks; ``uncollate`` is its exact inverse.
 There is no torch import: the training process converts with ``torch.from_numpy``.
 

@@ -1,6 +1,6 @@
 """Single-core benchmark and view audit of the S3 view builder (plan M3, stage C2).
 
-    CUDA_VISIBLE_DEVICES="" nice -n 19 python3 -B -m research.levels.s3_view_bench [--arena DIR] [--steps 40]
+    CUDA_VISIBLE_DEVICES="" nice -n 19 python3 -B -m research.levels.s3_view_bench [--arena DIR] [--steps 40] [--baseline-steps 10]
 
 Measures, on one thread and in CPU time (``time.thread_time_ns``, so a busy host does not
 count waiting as work):
@@ -14,7 +14,7 @@ count waiting as work):
 
 The real arena is used when it exists; otherwise a synthetic arena with its shape
 distribution (median 1,000 rows and 10 columns, 15 % of tables wider than 48 columns) is
-written to a temporary directory. numpy only: importing this module never imports torch.
+written to a scratch directory that is removed on exit. numpy only: importing this module never imports torch.
 """
 from __future__ import annotations
 
@@ -78,7 +78,7 @@ def _rate(micro: np.ndarray) -> dict[str, float]:
             "p95_us": round(float(np.quantile(micro, 0.95)), 1), "episodes_per_s": round(1e6 / float(micro.mean()), 1)}
 
 
-class _LegacyStore:
+class _TableStore:
     def __init__(self, corpus: Any) -> None:
         self.corpus = corpus
 
@@ -143,9 +143,9 @@ def bench_new(corpus: Any, sampler: CounterSampler, seed: int, steps: int, cfg: 
     }
 
 
-def bench_legacy(corpus: Any, sampler: CounterSampler, seed: int, steps: int, repeats: int) -> dict[str, Any]:
+def bench_existing(corpus: Any, sampler: CounterSampler, seed: int, steps: int, repeats: int) -> dict[str, Any]:
     """The existing builders on the tables of the same plan (real slots only; they know no other kind)."""
-    store, live, matched, nxt, matched_cells = _LegacyStore(corpus), [], [], [], []
+    store, live, matched, nxt, matched_cells = _TableStore(corpus), [], [], [], []
     for step in range(steps):
         for spec in sampler.plan_step(seed, step):
             if spec.kind != "real":
@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     ap.add_argument("--batch-size", type=int, default=64)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--repeats", type=int, default=3, help="best-of-N CPU time per episode")
-    ap.add_argument("--legacy-steps", type=int, default=10)
+    ap.add_argument("--baseline-steps", type=int, default=10, help="steps timed with the existing builders")
     ap.add_argument("--out", default="")
     args = ap.parse_args(argv)
     with tempfile.TemporaryDirectory(prefix="dope-view-bench-") as tmp:
@@ -212,8 +212,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "steps": args.steps, "batch_size": args.batch_size, "seed": args.seed, "numpy": np.__version__,
             "timing": "CPU time of one thread (thread_time_ns), best of %d per episode" % args.repeats,
             "new": bench_new(corpus, sampler, args.seed, args.steps, ViewConfig(), args.repeats),
-            "legacy": bench_legacy(corpus, sampler, args.seed, min(args.legacy_steps, args.steps), args.repeats),
-            "feature_twins_by_dup_key": feature_twin_rate(corpus, sampler, args.seed, min(args.legacy_steps, args.steps)),
+            "existing_builders": bench_existing(corpus, sampler, args.seed, min(args.baseline_steps, args.steps), args.repeats),
+            "feature_twins_by_dup_key": feature_twin_rate(corpus, sampler, args.seed, min(args.baseline_steps, args.steps)),
         }
         report["host_kernel_us"] = {"before": round(before, 1), "after": round(_kernel_microseconds(), 1)}
     text = json.dumps(report, indent=1, sort_keys=True)

@@ -109,7 +109,7 @@ exact bucket need no row padding; `micro_batches(row_slack=0.25)` groups collate
 
 ## 6. Measured on `s3-v250` (seed 0, batch 64, 40 steps = 2,560 slots)
 
-Reproduce with `python3 -B -m research.levels.s3_view_bench --steps 40 --legacy-steps 10`.
+Reproduce with `python3 -B -m research.levels.s3_view_bench --steps 40 --baseline-steps 10`.
 The view audit is deterministic; the timings are not. Timing is one thread, CPU time
 (`thread_time_ns`), best of 3 per episode, on a host at load 69–84 of 128 threads with the SMT
 sibling busy; three runs are given as a range (a fixed numpy kernel, a sort of 448 × 10
