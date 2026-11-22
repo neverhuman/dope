@@ -51,6 +51,8 @@ pub(crate) enum Command {
     Predict(PredictArgs),
     /// Show what an artifact contains and where its bytes go.
     Inspect(InspectArgs),
+    /// Extract deterministic source-free PacketFeaturesV2 structural embedding from a .dope packet.
+    Embed(EmbedArgs),
     /// Write an ML-ready version of a CSV (one-hot categoricals, numerics on [0,1]).
     Encode(EncodeArgs),
     /// Measure retention: train auditors on synthetic vs real rows, test on held-out real rows.
@@ -327,6 +329,13 @@ pub(crate) struct InspectArgs {
     pub(crate) model: PathBuf,
     #[arg(long)]
     pub(crate) json: bool,
+}
+
+#[derive(Args)]
+pub(crate) struct EmbedArgs {
+    pub(crate) model: PathBuf,
+    #[arg(short, long)]
+    pub(crate) out: Option<PathBuf>,
 }
 
 #[derive(Args)]

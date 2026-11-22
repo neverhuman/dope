@@ -5,6 +5,7 @@
 mod apply;
 mod card;
 mod fit;
+pub mod nc2;
 mod public_schema;
 
 pub use card::{ApplyReceipt, ScaleCard, UnitTable};

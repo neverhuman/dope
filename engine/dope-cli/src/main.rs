@@ -265,6 +265,13 @@ fn run(cli: Cli) -> Result<(), String> {
                 print_inspect_report(&a.model, &program, &report, style);
             }
         }
+        Command::Embed(a) => {
+            let bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
+            let emb = dope_core::embed::embed_packet(&bytes).map_err(e)?;
+            let json = serde_json::to_string_pretty(&emb).map_err(|x| x.to_string())?;
+            let mut w = writer(&a.out)?;
+            writeln!(w, "{json}").map_err(|x| x.to_string())?;
+        }
         Command::Encode(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
             let scaling = Scaling::parse(&a.scaling).ok_or("--scaling must be unit or quantile")?;

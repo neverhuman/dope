@@ -35,6 +35,7 @@ pub mod copula;
 pub mod device;
 pub mod distil;
 pub mod dvs;
+pub mod embed;
 pub mod encode;
 pub mod error;
 pub mod eval;
