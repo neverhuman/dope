@@ -293,7 +293,8 @@ def fleet_summary(hosts: list[dict[str, Any]], history: deque[dict[str, Any]], n
     all_checkpoints.sort(
         key=lambda c: (role_pri.get(str(c.get("role")), 9), -(c.get("main_kpi_retention_median") or -999.0), -(c.get("time") or 0.0))
     )
-    best_eval = leaderboard[0] if leaderboard else None
+    source_free_lb = [r for r in leaderboard if r.get("artifact_class") == "source_free"]
+    best_eval = source_free_lb[0] if source_free_lb else (leaderboard[0] if leaderboard else None)
     med_loss = round(float(median(losses)), 4) if losses else None
     med_tstr = round(float(median(tstr_losses)), 4) if tstr_losses else None
     med_mmd = round(float(median(mmd_losses)), 4) if mmd_losses else None

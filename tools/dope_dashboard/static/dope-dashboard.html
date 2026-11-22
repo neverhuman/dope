@@ -394,7 +394,8 @@ function renderAll() {
     : 'Awaiting first held-out unseen-family evaluation…';
   $('kpi-gates').textContent = be ? `${pct(be.parity_coverage)} · ${f2(be.c2st_auc_median)} · ${f2(be.dcr_share_median)}` : '—';
   $('kpi-gates-sub').textContent = be ? `Parity ${pct(be.parity_coverage)} · C2ST ${f2(be.c2st_auc_median)} · Marg ${f2(be.marg_auc_median)} · DCR ${f2(be.dcr_share_median)} · MIA ${f2(be.mia_auc_median)}` : 'Parity · C2ST · MargAUC · DCR · MIA';
-  $('kpi-rate').textContent = `${f2(f.tables_per_s)} tbl/s`;
+  const tps = f.tables_per_s || 0;
+  $('kpi-rate').textContent = tps > 0 ? `${f2(tps)} tbl/s` : (f.active_dope_procs > 0 ? `0.00 tbl/s (warmup)` : `0.00 tbl/s (idle)`);
   $('kpi-aug').textContent = `${(f.unique_splits_seen||0).toLocaleString()} unique splits · Enc Z ${bytesFmt(f.encoding_bytes_median)} · Grad ${f2(f.median_grad_norm)}`;
   $('kpi-nodes').textContent = `${f.live_nodes}/${f.total_nodes} live · ${f.active_dope_procs} procs`;
   $('kpi-vram').textContent = `DOPE ${f2(f.dope_vram_gib)}G · JSR ${f2(f.other_vram_gib)}G · Free ${f2(f.free_vram_gib)}G`;

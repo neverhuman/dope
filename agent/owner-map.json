@@ -1005,6 +1005,8 @@
     "research/levels/v6_landmarks.py": "external-evidence",
     "research/levels/v6_single_encoding.py": "external-evidence",
     "research/levels/tests/test_s3_v5_training.py": "external-evidence",
+    "engine/dope-core/src/single_encoding/": "rust-core",
+    "engine/dope-core/tests/single_encoding_v7.rs": "rust-core",
     "tools/dope_dashboard/": "governance"
   },
   "workspace": "dope"
