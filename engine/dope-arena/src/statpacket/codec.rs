@@ -5,6 +5,7 @@
 //! P u16 | level u8 | bit profile u8 | section count u8 | floor(log2 n_fit) u8 |
 //! flags u8 | reserved u8 | decoder sha8 [8].
 
+use super::linpred::importance_order;
 use super::packet::{
     ColumnMarginal, Level, Packet, Task, BIT_PROFILE_V1, CRC_LEN, FLAG_SPARSE_TARGET, HEADER_LEN,
     KIND_STAT, LOG2_N_MAX, LOG2_N_MIN, MAGIC, VERSION,
@@ -22,7 +23,13 @@ pub const RECIPE: &str = concat!(
     r#""interp":"probit-linear","tail":"geometric-capped-linear/clip-6","#,
     r#""atoms":"f16-unit/6bit-mass/threshold-probit","#,
     r#""dependence":"loading-over-127/mean-6over127/psi-floor-0.02/mixture-cdf","#,
-    r#""rng":"hash3(seed,purpose<<32|draw,row)/regime-1/factor-2/noise-3"}"#
+    r#""regime":"first-cumulative-prior>u/else-last-class-with-prior","#,
+    r#""target":"eta=b+w.x/w=f16scale*code-over-127/class0-reference/zero-prior-class-never-drawn","#,
+    r#""effects":"g(c)=4*sign(c)*(c-over-127)^2/bins-at-decoded-quartiles-count-t<=x/levels-D-E","#,
+    r#""pairs":"15-products-g(c)*xa*xb/entry-15-constant/level-E","#,
+    r#""noise":"regression-sd=2^((n0-240)-over-32)*2^(-d-over-5)@D*2^(-e-over-5)@E/clip-6/classes-T=2^((n1-128)-over-32)","#,
+    r#""labels":"sampled-softmax(T*eta)-first-cumulative>u*total/multilabel-u<sigmoid(T*eta)-code-0-never-255-always/never-argmax/option-regime-label","#,
+    r#""rng":"hash3(seed,purpose<<32|draw,row)/regime-1/factor-2/noise-3/target-4"}"#
 );
 
 /// First 8 bytes of SHA-256 of [`RECIPE`].
@@ -234,19 +241,6 @@ pub struct BudgetFit {
     pub fits: bool,
     pub target_cols: usize,
     pub main_effect_cols: usize,
-}
-
-/// Columns by decreasing summed absolute S3 weight code; ties keep the lower index first.
-fn importance_order(packet: &Packet) -> Vec<usize> {
-    let (p, o) = (packet.cols(), packet.outputs());
-    let weight = |j: usize| -> u32 {
-        (0..o)
-            .map(|k| packet.target_weight[k * p + j].unsigned_abs() as u32)
-            .sum()
-    };
-    let mut order: Vec<usize> = (0..p).collect();
-    order.sort_by_key(|&j| (std::cmp::Reverse(weight(j)), j));
-    order
 }
 
 fn finish(packet: Packet, level: Level, step: BudgetStep, max_bytes: usize) -> BudgetFit {

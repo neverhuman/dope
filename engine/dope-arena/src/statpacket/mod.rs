@@ -3,9 +3,11 @@
 //!
 //! The packet holds explicit, quantised sufficient statistics of the FIT rows
 //! in unit space (see [`scale`]): class priors, per-column marginals (nested
-//! smoothed knots or atom tables), a nested low-rank dependence model and, from
-//! the target stage on, target coefficients. Synthetic rows are sampled from
-//! the packet alone by a row-local analytic decoder ([`decode`]).
+//! smoothed knots or atom tables), a nested low-rank dependence model and a
+//! target model (linear weights, binned main effects, pairwise products, see
+//! [`target`]). Synthetic rows, target included, are sampled from the packet
+//! alone by a row-local analytic decoder ([`decode`]); [`embed`] maps a packet
+//! to a fixed 64- or 128-dimensional int8 embedding.
 //!
 //! Privacy by construction: no column minimum or maximum, no level carried by
 //! fewer than 10 rows and no name or string is ever written. Errors never
@@ -17,12 +19,18 @@ pub mod binary16;
 pub mod codec;
 pub mod decode;
 pub mod dependence;
+pub mod effects;
+pub mod embed;
 pub mod fit;
+pub mod glm;
+pub mod linpred;
 pub mod marginals;
 pub mod matio;
 pub mod packet;
+pub mod response;
 pub mod scale;
 pub mod sections;
+pub mod target;
 
 #[cfg(test)]
 mod testkit;
@@ -31,11 +39,19 @@ mod tests_codec;
 #[cfg(test)]
 mod tests_dependence;
 #[cfg(test)]
+mod tests_effects;
+#[cfg(test)]
+mod tests_embed;
+#[cfg(test)]
+mod tests_labels;
+#[cfg(test)]
 mod tests_marginals;
 #[cfg(test)]
 mod tests_privacy;
 #[cfg(test)]
 mod tests_scale;
+#[cfg(test)]
+mod tests_target;
 #[cfg(test)]
 mod tests_wire;
 

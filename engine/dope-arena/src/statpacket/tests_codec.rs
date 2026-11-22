@@ -342,13 +342,17 @@ fn budget_fit_stays_within_two_kib_up_to_256_columns() {
 fn budget_fallbacks_keep_the_most_important_columns() {
     let packet = synthetic_packet(Task::Multiclass, 5, 48, |_| Kind::Continuous, 21);
     let (p, o) = (packet.cols(), packet.outputs());
-    let weight = |j: usize| -> u32 {
+    // Importance: the summed absolute dequantised weight, `sum_k scale_k * |code_kj|`.
+    let weight = |j: usize| -> f64 {
         (0..o)
-            .map(|k| packet.target_weight[k * p + j].unsigned_abs() as u32)
+            .map(|k| {
+                f16_to_f64(packet.target_scale[k])
+                    * packet.target_weight[k * p + j].unsigned_abs() as f64
+            })
             .sum()
     };
     let mut order: Vec<usize> = (0..p).collect();
-    order.sort_by_key(|&j| (std::cmp::Reverse(weight(j)), j));
+    order.sort_by(|&a, &b| weight(b).total_cmp(&weight(a)).then(a.cmp(&b)));
     let partial = fit_to_budget(&packet, 2048);
     let kept: Vec<usize> = (0..p).filter(|&j| partial.packet.main_mask[j]).collect();
     let mut want = order[..41].to_vec();

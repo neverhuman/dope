@@ -170,7 +170,8 @@ impl ColumnMarginal {
     }
 }
 
-/// One S10 entry: columns `a`, `b` and one coefficient per output.
+/// One S10 entry: columns `a`, `b` and one coefficient per output. The last of
+/// the 16 entries is the constant term and has `a = b = 0`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PairTerm {
     pub a: u16,
@@ -189,7 +190,10 @@ pub struct Packet {
     pub log2_n: u8,
     /// S1: `K-1` class codes (binary, multiclass; they sum to at most 255) or `K` label codes.
     pub prior: Vec<u8>,
+    /// S1 noise byte 0: regression residual-SD code; 0 for every other task.
     pub resid_sd: u8,
+    /// S1 noise byte 1: label temperature code; for regression the two
+    /// residual ratio nibbles of levels D (high) and E (low).
     pub temperature: u8,
     /// S2 (+ S5, S7 fields of continuous columns), one entry per column.
     pub columns: Vec<ColumnMarginal>,
@@ -357,6 +361,15 @@ impl Packet {
         if !self.target_sparse && self.target_mask.iter().any(|&m| !m) {
             return bad("dense target with a cleared column");
         }
+        // A scale is a finite non-negative binary16, an intercept a finite one.
+        if self.target_scale.iter().any(|&h| h >= 0x7c00)
+            || self.target_intercept.iter().any(|&h| h & 0x7fff >= 0x7c00)
+        {
+            return bad("target scale or intercept is not finite");
+        }
+        if self.task != Task::Regression && self.resid_sd != 0 {
+            return bad("residual SD set on a task without one");
+        }
         if self.loading.len() != p * MAX_RANK
             || self.class_mean.len() != self.regime_means() * MAX_RANK
         {
@@ -377,6 +390,10 @@ impl Packet {
                 .any(|t| t.coef.len() != o || t.a as usize >= p || t.b as usize >= p)
         {
             return bad("pair section shape");
+        }
+        // The last S10 entry is the constant term: it names no columns.
+        if self.pairs.last().is_some_and(|t| t.a != 0 || t.b != 0) {
+            return bad("constant pair entry names a column");
         }
         for (j, on) in self.target_mask.iter().enumerate() {
             if !on && (0..o).any(|k| self.target_weight[k * p + j] != 0) {

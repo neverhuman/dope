@@ -1,11 +1,14 @@
-//! Stage SP1 fit: class priors, marginals and dependence from unit-space FIT
-//! rows. The target sections (S3, S8, S10 and the two S1 noise bytes) are left
-//! at zero here; the target stage fills them without changing the layout.
+//! Fit: [`fit_packet`] runs scale card -> marginals -> dependence -> target ->
+//! budget -> pack on raw FIT rows. [`fit_features`] is the feature part alone
+//! (class priors, marginals and dependence from unit-space rows; the target
+//! sections stay zero).
 
-use super::codec::fit_to_budget;
+use super::codec::{fit_to_budget, pack, packed_len, BudgetFit};
 use super::dependence::fit_dependence;
 use super::marginals::{fit_column, knot_plan, UNIT_CLIP};
-use super::packet::{Level, Packet, Task, LOG2_N_MAX};
+use super::packet::{Level, Packet, Task, LOG2_N_MAX, SUPPORT_K};
+use super::scale::ScaleCard;
+use super::target::{fit_target, refresh_noise, FitRows, Response, TargetPlan};
 use super::StatError;
 
 /// Fewest FIT rows a packet can be built from.
@@ -143,13 +146,27 @@ fn fit(input: &FitInput, max_bytes: Option<usize>) -> Result<Packet, StatError> 
         Labels::Classes(ids) => {
             let mut counts = vec![0usize; k];
             ids.iter().for_each(|&c| counts[c as usize] += 1);
+            // Support floor: a class with fewer than 10 rows gets no prior mass.
+            // If no class reaches it, all the mass falls on the last class.
+            for count in &mut counts {
+                if *count < SUPPORT_K {
+                    *count = 0;
+                }
+            }
             packet.prior = class_prior_codes(&counts)[..k - 1].to_vec();
             Some((ids, k))
         }
         Labels::Multilabel(cells) => {
             for (label, code) in packet.prior.iter_mut().enumerate() {
                 let ones = (0..n).filter(|&i| cells[i * k + label] == 1).count();
-                *code = (255.0 * ones as f64 / n as f64).round() as u8;
+                // A side with fewer than 10 rows is never emitted: code 0 or 255.
+                *code = if ones < SUPPORT_K {
+                    0
+                } else if n - ones < SUPPORT_K {
+                    255
+                } else {
+                    (255.0 * ones as f64 / n as f64).round().clamp(1.0, 254.0) as u8
+                };
             }
             None
         }
@@ -162,4 +179,117 @@ fn fit(input: &FitInput, max_bytes: Option<usize>) -> Result<Packet, StatError> 
         packet.class_mean = dependence.class_mean;
     }
     Ok(packet)
+}
+
+/// Target of the FIT rows as the caller holds it.
+#[derive(Clone, Copy, Debug)]
+pub enum Target<'a> {
+    /// Regression: one raw value per row.
+    Regression(&'a [f64]),
+    /// Binary or multiclass: one class id in `0..K` per row.
+    Classes(&'a [u16]),
+    /// Multilabel: row-major `rows x K` cells, each 0 or 1.
+    Multilabel(&'a [u8]),
+}
+
+/// Size request: the highest level to keep and an optional byte budget.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Size {
+    pub level: Level,
+    pub max_bytes: Option<usize>,
+}
+
+impl Size {
+    pub fn level(level: Level) -> Self {
+        Self {
+            level,
+            max_bytes: None,
+        }
+    }
+    pub fn budget(max_bytes: usize) -> Self {
+        Self {
+            level: Level::E,
+            max_bytes: Some(max_bytes),
+        }
+    }
+}
+
+/// A fitted packet: the wire bytes, the owner-side scale card and how the
+/// byte budget was met (`budget.fits` is false when even the smallest packet
+/// is larger than the budget).
+#[derive(Clone, Debug)]
+pub struct Fitted {
+    pub bytes: Vec<u8>,
+    pub card: ScaleCard,
+    pub budget: BudgetFit,
+}
+
+/// Fits a packet from raw FIT rows: `x` is row-major `n_fit x P` in raw units,
+/// `y` the target of the same rows. Order: scale card, marginals, dependence,
+/// target (S3, temperature, S8, S10), level cap and byte budget
+/// (`codec::fit_to_budget`), noise codes of the final shape, pack.
+pub fn fit_packet(
+    x: &[f64],
+    y: Target,
+    task: Task,
+    k: u8,
+    size: Size,
+    n_fit: usize,
+) -> Result<Fitted, StatError> {
+    if n_fit == 0 || x.is_empty() || x.len() % n_fit != 0 {
+        return Err(StatError::Invalid(
+            "feature matrix shape does not match its dimensions",
+        ));
+    }
+    let p = x.len() / n_fit;
+    let mut card = ScaleCard::fit(x, n_fit, p)?;
+    let unit = card.to_unit_rows(x)?;
+    let standardised: Vec<f64>;
+    let (labels, response) = match y {
+        Target::Regression(raw) => {
+            if raw.len() != n_fit {
+                return Err(StatError::Invalid("labels do not match the task"));
+            }
+            card = card.with_regression_target(raw)?;
+            standardised = raw.iter().map(|&v| card.target_to_unit(v)).collect();
+            (Labels::None, Response::Regression(&standardised))
+        }
+        Target::Classes(ids) => {
+            card = card.with_classes((0..k).map(f64::from).collect());
+            (Labels::Classes(ids), Response::Classes(ids))
+        }
+        Target::Multilabel(cells) => (Labels::Multilabel(cells), Response::Multilabel(cells)),
+    };
+    let input = FitInput {
+        x: &unit,
+        rows: n_fit,
+        cols: p,
+        task,
+        k,
+        labels,
+    };
+    let max_bytes = size.max_bytes.unwrap_or(usize::MAX);
+    let mut packet = fit(&input, size.max_bytes)?;
+    // A residual section is fitted only if the budget could hold it when empty.
+    let mut probe = packet.clone();
+    probe.main_mask.fill(false);
+    let room = |level: Level| size.level >= level && packed_len(&probe, level) <= max_bytes;
+    let plan = TargetPlan {
+        main_effects: room(Level::D),
+        pairs: room(Level::E),
+    };
+    let rows = FitRows {
+        x: &unit,
+        n: n_fit,
+        p,
+    };
+    fit_target(&mut packet, &rows, response, plan)?;
+    let mut budget = fit_to_budget(&packet.at_level(size.level)?, max_bytes);
+    refresh_noise(&mut budget.packet, &rows, response)?;
+    let bytes = pack(&budget.packet, budget.level)?;
+    Ok(Fitted {
+        bytes,
+        card,
+        budget,
+    })
 }

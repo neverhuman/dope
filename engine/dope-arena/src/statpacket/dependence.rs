@@ -25,6 +25,12 @@ pub const PSI_FLOOR: f64 = 0.02;
 pub const WITHIN_FLOOR: f64 = 0.1;
 /// Ridge of the per-factor class-mean projection.
 pub const MEAN_RIDGE: f64 = 1e-3;
+/// A mean carrier is sized so that the largest class factor mean it needs is this value.
+pub const CARRIER_MEAN: f64 = 5.5;
+/// A between-class direction with less variance than this gets no carrier.
+pub const CARRIER_VARIANCE_FLOOR: f64 = 1e-6;
+/// Smallest and largest length of a carrier's loading column.
+pub const CARRIER_SIZE: (f64, f64) = (0.2, 0.7);
 /// Principal-axis iteration: passes, stopping tolerance and communality cap.
 pub const AXIS_PASSES: usize = 10;
 pub const AXIS_TOLERANCE: f64 = 1e-3;
@@ -153,12 +159,12 @@ fn class_means(
 
 /// Principal axes of a correlation matrix for `rank` factors: eigenvalues
 /// (descending) and eigenvectors (columns) of the matrix whose diagonal holds
-/// the communalities. With `p <= rank` the diagonal stays 1 (principal
-/// components reproduce the matrix). Otherwise communalities start at the
+/// the communalities. With `p <= rank` the matrix is decomposed as it stands
+/// (principal components reproduce it). Otherwise communalities start at the
 /// largest absolute correlation of each column and are replaced by the
-/// `rank`-factor reproduction, capped at 0.98, until they move by less than
-/// 1e-3 or 10 passes are done.
-fn principal_axes(corr: &[f64], p: usize, rank: usize) -> (Vec<f64>, Vec<f64>) {
+/// `rank`-factor reproduction until they move by less than 1e-3 or 10 passes
+/// are done; the communality of column `j` is capped at `cap[j]`.
+fn principal_axes(corr: &[f64], p: usize, rank: usize, cap: &[f64]) -> (Vec<f64>, Vec<f64>) {
     if p <= rank {
         return sym_eigen(corr, p);
     }
@@ -174,7 +180,7 @@ fn principal_axes(corr: &[f64], p: usize, rank: usize) -> (Vec<f64>, Vec<f64>) {
     let mut axes = (Vec::new(), Vec::new());
     for _ in 0..AXIS_PASSES {
         for (j, h) in communality.iter().enumerate() {
-            reduced[j * p + j] = h.min(COMMUNALITY_MAX);
+            reduced[j * p + j] = h.min(cap[j]);
         }
         axes = sym_eigen(&reduced, p);
         let mut moved = 0.0f64;
@@ -182,7 +188,7 @@ fn principal_axes(corr: &[f64], p: usize, rank: usize) -> (Vec<f64>, Vec<f64>) {
             let fitted: f64 = (0..rank)
                 .map(|f| axes.0[f].max(0.0) * axes.1[j * p + f].powi(2))
                 .sum();
-            let fitted = fitted.min(COMMUNALITY_MAX);
+            let fitted = fitted.min(cap[j]);
             moved = moved.max((fitted - *h).abs());
             *h = fitted;
         }
@@ -191,6 +197,58 @@ fn principal_axes(corr: &[f64], p: usize, rank: usize) -> (Vec<f64>, Vec<f64>) {
         }
     }
     axes
+}
+
+/// Sign convention of a loading column: the entry of largest magnitude is
+/// positive (the lowest column on ties).
+fn oriented(mut column: Vec<f64>) -> Vec<f64> {
+    let mut top = 0;
+    for j in 1..column.len() {
+        if column[j].abs() > column[top].abs() {
+            top = j;
+        }
+    }
+    if !column.is_empty() && column[top] < 0.0 {
+        column.iter_mut().for_each(|v| *v = -*v);
+    }
+    column
+}
+
+/// Between-class directions of the class means `mu` (`count x p`, within-class
+/// SD units): the variances `sum_c share_c ((mu_c - mean) . d)^2`, descending,
+/// and the unit directions `d`, row-major. Computed through the `count x count`
+/// Gram matrix of the weighted, centred means.
+fn between_axes(mu: &[f64], share: &[f64], count: usize, p: usize) -> (Vec<f64>, Vec<f64>) {
+    let centre: Vec<f64> = (0..p)
+        .map(|j| (0..count).map(|c| share[c] * mu[c * p + j]).sum())
+        .collect();
+    let weighted: Vec<f64> = (0..count * p)
+        .map(|i| share[i / p].sqrt() * (mu[i] - centre[i % p]))
+        .collect();
+    let mut gram = vec![0.0; count * count];
+    for c in 0..count {
+        for e in c..count {
+            let v = dot(&weighted[c * p..(c + 1) * p], &weighted[e * p..(e + 1) * p]);
+            gram[c * count + e] = v;
+            gram[e * count + c] = v;
+        }
+    }
+    let (values, vectors) = sym_eigen(&gram, count);
+    let (mut variance, mut direction) = (Vec::new(), Vec::new());
+    for g in 0..count.min(MAX_RANK) {
+        if values[g] <= CARRIER_VARIANCE_FLOOR {
+            break;
+        }
+        let norm = values[g].sqrt();
+        direction.extend((0..p).map(|j| {
+            (0..count)
+                .map(|c| vectors[c * count + g] * weighted[c * p + j])
+                .sum::<f64>()
+                / norm
+        }));
+        variance.push(values[g]);
+    }
+    (variance, direction)
 }
 
 /// Fits loadings and class factor means from unit-space rows (`x` row-major
@@ -221,8 +279,10 @@ pub fn fit_dependence(
     }
     let regimes = classes.map_or(0, |(_, count)| count);
     let mut mu = vec![0.0; regimes * p];
+    let mut share = Vec::new();
     if let Some((ids, count)) = classes {
-        let (means, share) = class_means(&scores, &kappa, ids, count);
+        let (means, shares) = class_means(&scores, &kappa, ids, count);
+        share = shares;
         // Within-class share of each column's latent variance.
         let within: Vec<f64> = (0..p)
             .map(|j| {
@@ -249,38 +309,71 @@ pub fn fit_dependence(
             }
         }
     }
+    // Mean carriers: one loading column per between-class direction, sized so
+    // that the class factor means stay inside their code range; the variance
+    // a carrier adds within classes is taken out of the matrix the axes fit.
+    // When the axes alone span the column space (`p <= 12`) and the carriers
+    // would push an axis out of the 12 slots, the axes carry the class means
+    // themselves and no carrier is made.
     let rank = MAX_RANK.min(p);
-    let (values, vectors) = principal_axes(&corr, p, rank);
-    let mut loading = vec![0i8; p * MAX_RANK];
-    for f in 0..rank {
-        let sd = values[f].max(0.0).sqrt();
-        // Sign convention: the entry of largest magnitude is positive (lowest column on ties).
-        let mut top = 0;
-        for j in 1..p {
-            if vectors[j * p + f].abs() > vectors[top * p + f].abs() {
-                top = j;
+    let mut carriers: Vec<(f64, Vec<f64>, bool)> = Vec::new();
+    let mut cap = vec![COMMUNALITY_MAX; p];
+    if let Some((_, count)) = classes {
+        let (variance, direction) = between_axes(&mu, &share, count, p);
+        if p > MAX_RANK || p + variance.len() <= MAX_RANK {
+            for (g, &v) in variance.iter().enumerate() {
+                let d = &direction[g * p..(g + 1) * p];
+                let reach = mu
+                    .chunks(p)
+                    .map(|row| dot(row, d).abs())
+                    .fold(0.0, f64::max);
+                let size = (reach / CARRIER_MEAN).clamp(CARRIER_SIZE.0, CARRIER_SIZE.1);
+                let column: Vec<f64> = d.iter().map(|x| size * x).collect();
+                for j in 0..p {
+                    cap[j] = (cap[j] - column[j] * column[j]).max(0.0);
+                    for k in 0..p {
+                        if kappa[j] > 0.0 && kappa[k] > 0.0 {
+                            corr[j * p + k] -= column[j] * column[k];
+                        }
+                    }
+                }
+                carriers.push((v, oriented(column), true));
             }
-        }
-        let sign = if vectors[top * p + f] < 0.0 {
-            -1.0
-        } else {
-            1.0
-        };
-        for j in 0..p {
-            loading[j * MAX_RANK + f] = code_i8(sign * sd * vectors[j * p + f] * LOADING_SCALE);
         }
     }
-    // One ridge projection per factor against the quantised loadings keeps the ranks nested.
+    let with_carriers = !carriers.is_empty();
+    let (values, vectors) = principal_axes(&corr, p, rank, &cap);
+    // Candidate factors (variance, loading column, carries class means):
+    // within-class axes first, then the carriers.
+    let mut factors: Vec<(f64, Vec<f64>, bool)> = (0..rank)
+        .map(|f| {
+            let sd = values[f].max(0.0).sqrt();
+            let column = (0..p).map(|j| sd * vectors[j * p + f]).collect();
+            (values[f].max(0.0), oriented(column), !with_carriers)
+        })
+        .collect();
+    factors.extend(carriers);
+    // Stable: on equal variance a within-class axis stays ahead of a carrier.
+    factors.sort_by(|a, b| b.0.total_cmp(&a.0));
+    factors.truncate(MAX_RANK);
+    let mut loading = vec![0i8; p * MAX_RANK];
     let mut class_mean = vec![0i8; regimes * MAX_RANK];
-    for c in 0..regimes {
-        for f in 0..rank {
-            let (mut num, mut den) = (0.0, MEAN_RIDGE);
-            for j in 0..p {
-                let l = loading[j * MAX_RANK + f] as f64 / LOADING_SCALE;
-                num += l * mu[c * p + j];
-                den += l * l;
-            }
-            class_mean[c * MAX_RANK + f] = code_i8(num / den / MEAN_STEP);
+    for (f, (_, column, carries)) in factors.iter().enumerate() {
+        for j in 0..p {
+            loading[j * MAX_RANK + f] = code_i8(column[j] * LOADING_SCALE);
+        }
+        if !carries {
+            continue;
+        }
+        // The mean-carrying columns are mutually orthogonal, so one projection
+        // per factor against its quantised loadings keeps the ranks nested.
+        let l: Vec<f64> = (0..p)
+            .map(|j| loading[j * MAX_RANK + f] as f64 / LOADING_SCALE)
+            .collect();
+        let den = dot(&l, &l) + MEAN_RIDGE;
+        for c in 0..regimes {
+            let m = dot(&l, &mu[c * p..(c + 1) * p]) / den;
+            class_mean[c * MAX_RANK + f] = code_i8(m / MEAN_STEP);
         }
     }
     Dependence {
