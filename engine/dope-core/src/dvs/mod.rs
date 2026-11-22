@@ -7,6 +7,7 @@ pub mod permutation;
 pub mod receipt;
 pub mod roles;
 pub mod selection;
+pub mod v3;
 
 use receipt::{
     CellDriverIdentityBinding, CellReceipt, DriverPolicyBinding, DvsReceipt, FamilyReceipt,

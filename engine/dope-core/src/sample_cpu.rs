@@ -231,3 +231,31 @@ pub fn sample_cpu(program: &Program, rows: usize, seed: u64) -> Samples {
         .collect();
     Samples { x: out_x, y: out_y }
 }
+
+/// Draw synthetic targets `y ~ Q(Y | X = given_x)` at caller-supplied model-space feature rows.
+///
+/// Used by diagnostic swap-ladder controls (`real-X + synth-Y`) to isolate conditional
+/// target fidelity from covariate distribution error.
+pub fn sample_cpu_given(program: &Program, given_x: &[Vec<f64>], seed: u64) -> Samples {
+    let plan = Plan::new(program);
+    let d = program.features();
+    let rows = given_x.first().map_or(0, Vec::len);
+    let mut out_y = vec![0.0; rows];
+    out_y
+        .par_iter_mut()
+        .enumerate()
+        .with_min_len(1024)
+        .for_each_init(
+            || (plan.scratch(), vec![0.0; d]),
+            |(scratch, x_row), (r, y)| {
+                for j in 0..d {
+                    x_row[j] = given_x[j][r];
+                }
+                *y = plan.target(seed, r as u64, x_row, scratch);
+            },
+        );
+    Samples {
+        x: given_x.to_vec(),
+        y: out_y,
+    }
+}

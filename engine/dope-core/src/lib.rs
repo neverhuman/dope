@@ -65,7 +65,7 @@ pub use compile::{fit, FitOptions, FitReport, Fitted, DEFAULT_BUDGET};
 pub use encode::{MlEncoder, Scaling};
 pub use error::{DopeError, Result};
 pub use program::Program;
-pub use sample::{sample, SampleOptions, Samples};
+pub use sample::{sample, sample_given, SampleOptions, Samples};
 pub use schema::Task;
 pub use table::RawTable;
 

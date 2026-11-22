@@ -1,0 +1,17 @@
+[package]
+name = "dope-arena"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Unified Rust benchmark Arena for dope-fidelity/v3: splits, swap ladder, and complete failure accounting."
+
+[dependencies]
+dope-core = { path = "../dope-core" }
+clap = { workspace = true }
+csv = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }

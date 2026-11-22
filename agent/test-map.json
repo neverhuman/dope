@@ -44,9 +44,13 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test next_version_cli",
       "purpose": "exercise normalize, DML4 and DVS public journeys with private-error redaction"
     },
+    "engine/dope-arena/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
+      "purpose": "verify unified Rust Arena splits, sealed panel checks, methods registry, swap ladder (--given), and dope-fidelity/v3 reduction"
+    },
     "engine/dope-core/src/dvs/": {
-      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs",
-      "purpose": "verify C02 simultaneous reducer, informative ranks, scheduled denominator and honest AuditCard"
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_v3",
+      "purpose": "verify C02 simultaneous reducer, dope-fidelity/v3 hard-gate coverage, donor-aware/family-clustered Holm inference, and honest AuditCard"
     },
     "engine/dope-core/src/mlc_v4/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test mlc_v4_wire --test mlc_v4_sampling --test mlc_v4_producer_parity",
@@ -215,6 +219,10 @@
     "contracts/": {
       "command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound",
       "purpose": "verify generated tier constants and embedded digest"
+    },
+    "contracts/dope-fidelity-v3.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_v3 && cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
+      "purpose": "verify dope-fidelity/v3 hard-gate contract, unclipped retention, donor-aware/family-clustered Holm bounds, and Arena swap-ladder execution"
     },
     "contracts/tdl-contract-v1.json": {
       "command": "cargo test --locked --lib metrics::",

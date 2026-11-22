@@ -5,7 +5,8 @@ use dope_core::encode::{MlEncoder, Scaling};
 use dope_core::eval::{evaluate, frontier, EvalOptions, FrontierOptions};
 use dope_core::schema::{infer, IntakeOptions, Task};
 use dope_core::{
-    byte_report, decode, device, fit, output, sample, FitOptions, RawTable, SampleOptions,
+    byte_report, decode, device, fit, output, sample, sample_given, FitOptions, RawTable,
+    SampleOptions,
 };
 use std::io::Write;
 use std::path::PathBuf;
@@ -141,13 +142,20 @@ fn run(cli: Cli) -> Result<(), String> {
         Command::Sample(a) => {
             let program =
                 decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
-            let opts = SampleOptions {
-                rows: a.rows,
-                seed: a.seed,
-                device: device::parse(&a.device).map_err(e)?,
-                ..Default::default()
+            let s = if let Some(given_csv) = &a.given {
+                let raw = RawTable::read(given_csv).map_err(e)?;
+                let data = program.schema.to_model(&raw).map_err(e)?;
+                sample_given(&program, &data.x, a.seed).map_err(e)?
+            } else {
+                let opts = SampleOptions {
+                    rows: a.rows,
+                    seed: a.seed,
+                    device: device::parse(&a.device).map_err(e)?,
+                    ..Default::default()
+                };
+                sample(&program, &opts).map_err(e)?
             };
-            let s = sample(&program, &opts).map_err(e)?;
+            let emitted_rows = s.y.len();
             let w = writer(&a.out)?;
             match a.space.as_str() {
                 "raw" => output::write_raw(&program, &s, w).map_err(e)?,
@@ -162,7 +170,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 print_sample_saved_report(
                     &a.model,
                     p,
-                    a.rows,
+                    emitted_rows,
                     program.features(),
                     &program.schema.target.name,
                     &a.space,

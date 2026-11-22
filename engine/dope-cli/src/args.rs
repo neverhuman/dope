@@ -278,6 +278,9 @@ pub(crate) struct SampleArgs {
     pub(crate) seed: u64,
     #[arg(short, long)]
     pub(crate) out: Option<PathBuf>,
+    /// Optional CSV of real/external X rows: draw only y ~ Q(Y|X) (diagnostic swap-ladder control).
+    #[arg(long)]
+    pub(crate) given: Option<PathBuf>,
     /// raw (original units and labels) or ml (one-hot, [0,1]).
     #[arg(long, default_value = "raw")]
     pub(crate) space: String,

@@ -124,6 +124,23 @@ pub fn sample(program: &Program, opts: &SampleOptions) -> Result<Samples> {
     sample_device(program, opts)
 }
 
+/// Draw synthetic targets `y ~ Q(Y | X = given_x)` conditioned on caller-supplied
+/// model-space features (`given_x[feature][row]`).
+pub fn sample_given(program: &Program, given_x: &[Vec<f64>], seed: u64) -> Result<Samples> {
+    if given_x.len() != program.features() {
+        return Err(crate::error::DopeError::Input(
+            "given feature column count does not match artifact schema".into(),
+        ));
+    }
+    let rows = given_x.first().map_or(0, Vec::len);
+    if given_x.iter().any(|col| col.len() != rows) {
+        return Err(crate::error::DopeError::Input(
+            "given feature columns have mismatched row lengths".into(),
+        ));
+    }
+    Ok(crate::sample_cpu::sample_cpu_given(program, given_x, seed))
+}
+
 /// The tensor-program sampler (any candle device; on CPU it is the parity
 /// reference for the native sampler).
 pub fn sample_device(program: &Program, opts: &SampleOptions) -> Result<Samples> {

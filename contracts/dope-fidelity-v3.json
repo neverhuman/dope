@@ -1,0 +1,104 @@
+{
+  "format": "dope-fidelity-contract",
+  "contract_id": "dope-fidelity/v3",
+  "version": 3,
+  "status": "candidate",
+  "protocol_frozen": false,
+  "certified": false,
+  "composite_score": "forbidden",
+  "preparation": {
+    "frozen_canonical": "nc1-minmax-onehot-v1",
+    "candidate_successor": "nc2-bulk-tails-v1",
+    "fit_scope": "A_build_only",
+    "private_metadata_leakage": "forbidden"
+  },
+  "splits": {
+    "roles": ["A_fit", "B_real_twin", "C_dev_calibration", "T_sealed_test", "P_privacy_holdout"],
+    "duplicate_grouping_rule": "rule_a1_canonical_exact_row_and_pair_id",
+    "group_time_respecting": true
+  },
+  "emission_modes": {
+    "headline": {
+      "name": "faithful",
+      "default_row_multiplier": 4
+    },
+    "matched": {
+      "name": "matched",
+      "default_row_multiplier": 1,
+      "always_reported": true
+    },
+    "distill": {
+      "name": "distill",
+      "default_row_multiplier": 4,
+      "utility_only": true,
+      "emits_sidecars": ["weight", "pair_id"]
+    }
+  },
+  "informative_cell_rules": {
+    "min_relative_real_gain": 0.01,
+    "require_real_gain_lcb_gt_zero": true,
+    "real_twin_retention_band": [0.80, 1.20],
+    "raw_retention_clipping": "none"
+  },
+  "gates": {
+    "validity_and_empirical_privacy": {
+      "illegal_rows_max": 0,
+      "support_floor_k": 10,
+      "dcr_share_max": 0.55,
+      "mia_auc_max": 0.55,
+      "mia_tpr_at_1pct_fpr_max": 0.02,
+      "formal_dp_claim": "not_claimed",
+      "hipaa_deidentification_claim": "not_claimed"
+    },
+    "parity_coverage": {
+      "primary_reference": "fresh_real_twin_B",
+      "paired_harm_ucb95_max_gain_fraction": 0.02,
+      "secondary_retention_thresholds_vs_A": [0.95, 0.98],
+      "donor_aware_bootstrap_draws": 1000
+    },
+    "equivalence_coverage": {
+      "calibration_source": "real_C_95th_percentile",
+      "ucb_level": 0.90,
+      "metrics": {
+        "pred": { "floor": 0.01, "default_kappa_star": 1.25 },
+        "lift": { "deciles": 10, "floor": 0.01, "default_kappa_star": 1.25 },
+        "calib": { "ece_bins": 15, "floor": 0.01, "default_kappa_star": 1.25 },
+        "driver": {
+          "cluster_spearman_threshold": 0.70,
+          "components": ["grouped_permutation_tv", "ale_l1", "drop_group_coalition"],
+          "floor": 0.02,
+          "default_kappa_star": 1.25
+        }
+      },
+      "selection_transfer_s_deploy": {
+        "roster_size": 24,
+        "max_regret_above_B": 0.01
+      }
+    },
+    "realism_coverage": {
+      "c2st_auc_max": 0.70,
+      "c2st_auc_strict": 0.65,
+      "marg_auc_max": 0.60,
+      "rule_violation_ratio_max": 2.0
+    }
+  },
+  "confirmation_claim": {
+    "min_sealed_physical_families": 90,
+    "family_cluster_bootstrap_draws": 10000,
+    "ci_level": 0.95,
+    "multiplicity_adjustment": "holm_bonferroni_step_down",
+    "must_beat_authentic_rivals_and_plus_teacher_controls": true,
+    "require_excluded_nonlinear_auditor_direction_agreement": true,
+    "byte_frontier_cap_bytes": 65536,
+    "byte_frontier_comparator": "rows_wire_v2"
+  },
+  "terminal_cell_states": [
+    "complete",
+    "uninformative",
+    "failed",
+    "timed_out",
+    "unsupported",
+    "over_budget",
+    "missing"
+  ]
+}
