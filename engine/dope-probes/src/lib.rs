@@ -15,6 +15,7 @@ pub mod inputs;
 pub mod landmarks;
 pub mod levels;
 pub mod nprng;
+pub mod rows_wire_v2;
 pub mod stats;
 
 /// Every fallible probe operation returns this error. Messages name the file or the step that

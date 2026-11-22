@@ -290,17 +290,28 @@ def fit_and_score_canonical_auditor(
 def pack_rows_complete_wire(
     X_train_s: np.ndarray, y_train_s: np.ndarray, scaler: FitOnlyTableTransform, level: str, seed: int = 20261024
 ) -> bytes:
-    """Serialize a budget-capped complete wire packet (CSC1 sidecar + quantized row subset) for `rows_wire`."""
+    """Serialize an overflow-free budget-capped complete wire packet (`RWW2`, i16 per-column scaled, no 88% cap)."""
     cap, (n, p) = TIER_BYTE_CAPS[level], X_train_s.shape
     sc_bytes = pack_compact_scaler_sidecar(scaler, p)
-    rng = np.random.default_rng(seed)
-    lo, hi, best_wire = 2, max(min(n, max(int(0.88 * n) if level == "ultra" else n, 4)), 2), b""
+    x_arr = np.asarray(X_train_s, dtype=np.float64)
+    fin_all = np.isfinite(x_arr)
+    x_nan = np.where(fin_all, x_arr, np.nan)
+    col_lo = np.where(np.any(fin_all, axis=0), np.nanmin(x_nan, axis=0), 0.0)
+    col_hi = np.where(np.any(fin_all, axis=0), np.nanmax(x_nan, axis=0), 0.0)
+    col_span = np.where(col_hi > col_lo, col_hi - col_lo, 0.0)
+    bounds_bytes = np.column_stack([col_lo, col_span]).astype("<f8").tobytes()
+    perm = np.random.default_rng(seed).permutation(n)
+    lo, hi, best_wire = 2, max(n, 2), b""
     while lo <= hi:
         mid = (lo + hi) // 2
-        idx = rng.choice(n, size=min(mid, n), replace=False)
-        x_q = (np.rint(np.clip(X_train_s[idx], -6.0, 6.0) * 32.0)).astype(np.int8).tobytes()
-        y_q = np.asarray(y_train_s[idx], dtype=np.float16).tobytes()
-        pkt = b"RWW1" + zlib.compress(struct.pack("<HHH", len(idx), p, len(sc_bytes)) + sc_bytes + x_q + y_q, level=9)
+        idx = perm[: min(mid, n)]
+        sub = x_arr[idx]
+        fin = np.isfinite(sub)
+        norm = np.where(col_span > 0.0, np.clip((np.where(fin, sub, col_lo) - col_lo) / np.where(col_span > 0.0, col_span, 1.0), 0.0, 1.0), 0.5)
+        q = np.where(col_span > 0.0, np.clip(np.rint((norm * 2.0 - 1.0) * 32767.0), -32767, 32767), 0).astype("<i2")
+        x_q = np.where(fin, q, np.int16(-32768))
+        y_q = np.asarray(y_train_s[idx], dtype="<f8").tobytes()
+        pkt = b"RWW2" + zlib.compress(struct.pack("<HHH", len(idx), p, len(sc_bytes)) + sc_bytes + bounds_bytes + x_q.tobytes() + y_q, level=9)
         if len(pkt) <= cap or mid == 2:
             best_wire, lo = pkt, mid + 1
         else:
@@ -309,14 +320,24 @@ def pack_rows_complete_wire(
 
 
 def unpack_rows_complete_wire(wire_bytes: bytes, n_rows: int, seed: int = 20261024) -> Tuple[np.ndarray, np.ndarray, FitOnlyTableTransform]:
-    if wire_bytes[:4] != b"RWW1":
+    magic = wire_bytes[:4]
+    if magic not in (b"RWW1", b"RWW2"):
         raise ValueError("invalid_rows_wire_magic")
     inner = zlib.decompress(wire_bytes[4:])
     k_rows, p, len_sc = struct.unpack_from("<HHH", inner, 0)
-    off, x_len = 6 + len_sc, k_rows * p
+    off = 6 + len_sc
     sc = unpack_compact_scaler_sidecar(inner[6:off])
-    X_sub = np.frombuffer(inner[off : off + x_len], dtype=np.int8).astype(np.float64).reshape(k_rows, p) / 32.0
-    y_sub = np.frombuffer(inner[off + x_len : off + x_len + k_rows * 2], dtype=np.float16).astype(np.float64)
+    if magic == b"RWW1":
+        x_len = k_rows * p
+        X_sub = np.frombuffer(inner[off : off + x_len], dtype=np.int8).astype(np.float64).reshape(k_rows, p) / 32.0
+        y_sub = np.frombuffer(inner[off + x_len : off + x_len + k_rows * 2], dtype=np.float16).astype(np.float64)
+    else:
+        bounds = np.frombuffer(inner[off : off + p * 16], dtype="<f8").reshape(p, 2)
+        off += p * 16
+        x_q = np.frombuffer(inner[off : off + k_rows * p * 2], dtype="<i2").reshape(k_rows, p)
+        lo_c, span_c = bounds[:, 0], bounds[:, 1]
+        X_sub = np.where(x_q == -32768, np.nan, np.where(span_c > 0.0, lo_c + ((x_q.astype(np.float64) / 32767.0) + 1.0) * 0.5 * span_c, lo_c))
+        y_sub = np.frombuffer(inner[off + k_rows * p * 2 : off + k_rows * p * 2 + k_rows * 8], dtype="<f8").astype(np.float64)
     rep = np.random.default_rng(seed + 17).choice(k_rows, size=n_rows, replace=True)
     return X_sub[rep], y_sub[rep], sc
 

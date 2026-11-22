@@ -129,3 +129,76 @@ class ValidationTests(unittest.TestCase):
         for cursor in (-1,True,1.5):
             with self.assertRaisesRegex(ResearchError,'invalid_corpus_cursor'):
                 corpus.development(cursor,'owned-balanced-unique-v2')
+
+    def test_p0_truth_repairs_rww2_masked_probe_and_methods_registry(self) -> None:
+        import numpy as np
+        from research.levels.descriptors import LANDMARK_NAMES, FINE_ADDED_INDICES
+        from research.levels.rapid_validate import extract_masked_ultra_probe_vector
+        from research.levels.scaling import FitOnlyTableTransform
+        from research.levels.v3_canonical_roster_eval import (
+            pack_rows_complete_wire,
+            unpack_rows_complete_wire,
+        )
+        from research.levels.v3_canonical_summary import _compute_elo_and_paired_block
+        from research.levels.world_class_eval import INTERNAL_STANDIN_ALIASES, _baseline_generator
+
+        X_ext = np.column_stack([np.linspace(-6.0, 6.0, 50), np.linspace(5.0, -5.0, 50)])
+        y_ext = np.linspace(-2.0, 2.0, 50)
+        sc = FitOnlyTableTransform.fit(X_ext, y_ext, task="regression")
+        pkt = pack_rows_complete_wire(X_ext, y_ext, sc, "ultra", seed=17)
+        self.assertEqual(pkt[:4], b"RWW2")
+        X_dec, y_dec, _ = unpack_rows_complete_wire(pkt, 400, seed=17)
+        self.assertGreater(float(np.max(X_dec[:, 0])), 5.5)
+        self.assertLess(float(np.min(X_dec[:, 0])), -5.5)
+        self.assertEqual(y_dec.shape, (400,))
+
+        base_report = {
+            "task": "regression",
+            "rows": 500,
+            "features": 4,
+            "target_stats": [0.2, 0.1, 0.0],
+            "cells": [
+                {"id": i + 1, "name": name, "state": "complete", "gain": 0.25 + 0.01 * i, "se": 0.02, "stable": True, "lambda_indices": [2]}
+                for i, name in enumerate(LANDMARK_NAMES)
+            ],
+            "spectrum": [{"slot": s, "values": [0.1 * (k + 1) for k in range(9)]} for s in range(4)],
+        }
+        mut_report = json.loads(json.dumps(base_report))
+        for idx in FINE_ADDED_INDICES:
+            mut_report["cells"][idx]["gain"] = 0.99
+            mut_report["cells"][idx]["se"] = 0.50
+        v_base = extract_masked_ultra_probe_vector(base_report)
+        v_mut = extract_masked_ultra_probe_vector(mut_report)
+        self.assertGreater(float(v_base[69]), 0.2)
+        self.assertGreater(float(np.abs(v_base[91:107]).sum()), 0.5)
+        np.testing.assert_array_equal(v_base, v_mut)
+
+        reg_path = Path(__file__).resolve().parents[3] / "bench" / "methods-registry.json"
+        reg = json.loads(reg_path.read_text(encoding="utf-8"))
+        for alias, canon in INTERNAL_STANDIN_ALIASES.items():
+            entry = reg["methods"][canon]
+            self.assertEqual(entry["authenticity"], "internal_standin")
+            self.assertFalse(entry["allowed_in_headline_claims"])
+            Xs_a, _ = _baseline_generator(alias, X_ext, y_ext, "high", "regression", seed=9)
+            Xs_c, _ = _baseline_generator(canon, X_ext, y_ext, "high", "regression", seed=9)
+            np.testing.assert_array_equal(Xs_a, Xs_c)
+
+        rows = [
+            {
+                "dataset_id": f"ds_{fam_i}_{view_i}",
+                "family_id": f"fam_{fam_i}",
+                "level": "high",
+                "task": "regression",
+                "domains": {"sender_scaled_test_domain": {"per_auditor": {
+                    "catboost": {"clipped_R": 0.90}, "lightgbm": {"clipped_R": 0.90}, "mlp": {"clipped_R": 0.90},
+                }}},
+                "comparators": {"rows_wire": {"sender_scaled": {"per_auditor": {
+                    "catboost": {"clipped_R": 0.85}, "lightgbm": {"clipped_R": 0.85}, "mlp": {"clipped_R": 0.85},
+                }}}},
+            }
+            for fam_i in range(4) for view_i in range(2)
+        ]
+        _, paired = _compute_elo_and_paired_block(rows, n_boot=20)
+        blk = paired["dope_mlc_v3_minus_rows_wire"]
+        self.assertEqual(blk["paired_cluster_count"], 4)
+        self.assertEqual(blk["bootstrap_unit"], "physical_source_family_or_dataset_cluster")
