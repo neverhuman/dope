@@ -1,9 +1,16 @@
 //! The native auditor roster and the per-row losses of the scoreboard.
 //!
 //! One entry point fits a named auditor on a training table and predicts the
-//! cell's T rows. `dope_core::eval::run_auditor` is private, so this is a thin
-//! wrapper over the public fitters with the same recipes. Inputs are already
-//! in the cell's A-only unit space (`celldata::ScaleCard`).
+//! cell's T rows. At a row ratio of 1 it returns the same bits as
+//! `dope_core::eval::fit_predict_auditor` (tested below). It stays a thin
+//! wrapper over the public fitters because [`Recipe`] also scales the
+//! count-based knobs with the training table, which that hook cannot do.
+//! Inputs are already in the cell's A-only unit space (`celldata::ScaleCard`).
+//!
+//! The tree auditor keeps exact duplicate rows on one side of its
+//! early-stopping holdout, like dope-core's own auditors. The default of
+//! `gbdt::Params` does not (it keeps `landmarks-native-v1` bit-identical), so
+//! the recipe sets `group_duplicates` explicitly.
 //!
 //! Losses: squared error in A-standardised target units for regression;
 //! log-loss with probabilities clipped at `1e-12` and renormalised for
@@ -90,6 +97,7 @@ impl Recipe {
             min_leaf: (base.min_leaf as f64 * self.row_ratio).round() as usize,
             lambda: base.lambda * self.row_ratio,
             seed: self.seed,
+            group_duplicates: true,
             ..base
         }
     }
@@ -338,5 +346,37 @@ mod tests {
         assert!(err.to_string().contains(REASON_FAILED));
         assert_eq!(Recipe::new(0, 10, 40).row_ratio, 1.0);
         assert_eq!(Recipe::new(0, 10, 0).row_ratio, 10.0);
+    }
+
+    #[test]
+    fn tree_recipe_groups_duplicate_rows_at_every_ratio() {
+        // `gbdt::Params::default()` leaves this off; the scoreboard must not.
+        for (train_rows, reference_rows) in [(400, 400), (1600, 400), (10, 40), (10, 0)] {
+            let params = Recipe::new(3, train_rows, reference_rows).gbdt();
+            assert!(params.group_duplicates, "{train_rows}/{reference_rows}");
+        }
+    }
+
+    #[test]
+    fn at_row_ratio_one_every_auditor_is_the_dope_core_hook() {
+        // Each match arm of `fit_predict` once, on the cheapest head it takes.
+        let cases = [
+            (LINEAR, Head::Regression),
+            (LINEAR, Head::Multiclass(3)),
+            (GBDT, Head::Regression),
+            (MLP, Head::Regression),
+        ];
+        for (auditor, head) in cases {
+            // 200 rows, the fewest for which the tree auditor holds rows out
+            // for early stopping, each twice: a tree recipe that let a copy
+            // reach both sides of the holdout would fit another model.
+            let (x, y) = table(head, 100, 21);
+            let (x, y) = repeat(&x, &y, 2);
+            let (xt, _) = table(head, 20, 22);
+            let recipe = Recipe::new(5, x.rows, x.rows);
+            let local = fit_predict(auditor, head, &x, &y, &xt, recipe).unwrap();
+            let hook = dope_core::eval::fit_predict_auditor(auditor, head, &x, &y, &xt, 5).unwrap();
+            assert_eq!(local, hook, "{auditor} {head:?}");
+        }
     }
 }
