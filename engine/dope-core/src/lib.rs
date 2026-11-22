@@ -57,6 +57,7 @@ pub mod sample;
 pub mod sample_cpu;
 pub mod schema;
 pub mod screen;
+pub mod single_encoding;
 pub mod stats;
 pub mod structure;
 pub mod table;

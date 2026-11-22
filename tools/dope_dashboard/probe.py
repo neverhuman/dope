@@ -92,7 +92,7 @@ def _scan_dope_procs() -> list[dict[str, object]]:
             continue
         low = cmd.lower()
         role = None
-        if "s3_ddp_trainer" in low:
+        if "s3_ddp_trainer" in low or "s3_v7_fast_trainer" in low:
             role = "ddp_trainer"
         elif "s3_kpi_evaluator" in low:
             role = "kpi_evaluator"

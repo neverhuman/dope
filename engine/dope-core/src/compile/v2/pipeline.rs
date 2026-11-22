@@ -356,15 +356,17 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
     // Non-destructive compaction ladder: ONLY engage when `bytes > budget_bytes` (strict cap
     // compliance!) or when non-forest overhead starved `student.forest` down to 0 trees!
     // Never wipe the Gaussian copula or marginals when the artifact already fits under budget!
-    let ladder: &[(usize, usize, usize, bool)] = &[
-        (usize::MAX, usize::MAX, usize::MAX, true),
-        (6, 10, 16, true),
-        (4, 8, 12, true),
-        (2, 6, 8, true),
-        (1, 5, 6, true),
-        (0, 4, 4, true),
+    let ladder: &[(usize, usize, usize, bool, bool)] = &[
+        (usize::MAX, usize::MAX, usize::MAX, true, false),
+        (6, 10, 16, true, false),
+        (4, 8, 12, true, false),
+        (2, 6, 8, true, false),
+        (1, 5, 6, true, false),
+        (0, 4, 4, true, false),
+        (0, 3, 2, true, true),
+        (0, 2, 0, true, true),
     ];
-    for &(max_preds, max_k, max_main, drop_extra) in ladder {
+    for &(max_preds, max_k, max_main, drop_extra, trim_extra) in ladder {
         let starving = kept_t == 0 && student.forest.trees() > 0 && max_preds >= 4;
         if bytes.len() <= budget_bytes && !starving {
             break;
@@ -375,7 +377,7 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
             st_try.pair_effects.clear();
         }
         prune_catf_copula(&mut c_try, max_preds, true);
-        compact_marginals(&mut c_try, max_k);
+        compact_marginals(&mut c_try, max_k, trim_extra && bytes.len() > budget_bytes);
         if max_main < st_try.main_effects.effects.len() {
             prune_main_effects(&mut st_try, max_main);
             st_try.refit_calibration(&cal_x, &cal_y);

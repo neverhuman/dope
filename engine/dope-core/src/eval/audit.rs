@@ -57,6 +57,7 @@ pub(crate) fn audit_predict(
             rounds: 150,
             learning_rate: 0.12,
             seed,
+            group_duplicates: true,
             ..Default::default()
         };
         return Ok(gbdt::fit_predict(x, y, head, test, &p));

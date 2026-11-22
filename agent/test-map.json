@@ -4080,6 +4080,14 @@
       "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
       "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
     },
+    "engine/dope-core/src/single_encoding/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify pure-Rust SingleEncV7 F32 SafeTensors loader, fail-closed guards, row-local invariance, PyTorch parity, landmarks-native-v1 bit-identity, and wide-table Format-2 byte budgets"
+    },
+    "engine/dope-core/tests/single_encoding_v7.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify pure-Rust SingleEncV7 F32 SafeTensors loader, fail-closed guards, row-local invariance, PyTorch parity, landmarks-native-v1 bit-identity, and wide-table Format-2 byte budgets"
+    },
     "tools/dope_dashboard/": {
       "command": "python3 -B -m unittest tools.dope_dashboard.test_dashboard -v",
       "purpose": "verify read-only DOPE Fleet and Fidelity KPI Dashboard probe, metrics aggregation, and aiohttp WebSocket/HTTP server"

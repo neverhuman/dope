@@ -115,23 +115,63 @@ pub(crate) fn prune_catf_copula(catf: &mut CatfModel, max_preds: usize, drop_tre
 }
 
 /// Downsample continuous marginal interior knots to at most `max_k` (keeping endpoints intact).
-pub(crate) fn compact_marginals(catf: &mut CatfModel, max_k: usize) {
+/// When `trim_extra` is true (only used when strict byte cap is still exceeded), also prune
+/// secondary atoms/offgrid/heaping/rare discrete levels and clear auxiliary structural rules.
+pub(crate) fn compact_marginals(catf: &mut CatfModel, max_k: usize, trim_extra: bool) {
+    if trim_extra {
+        catf.rules.rules.clear();
+    }
     for m in &mut catf.marginals {
-        if let crate::marginal::v2::ColumnMarginalV2::Continuous {
-            smooth_u, smooth_x, ..
-        } = m
-        {
-            if smooth_u.len() > max_k && max_k >= 3 {
-                let len = smooth_u.len();
-                let mut nu = Vec::with_capacity(max_k);
-                let mut nx = Vec::with_capacity(max_k);
-                for i in 0..max_k {
-                    let pos = (i * (len - 1)) / (max_k - 1);
-                    nu.push(smooth_u[pos]);
-                    nx.push(smooth_x[pos]);
+        match m {
+            crate::marginal::v2::ColumnMarginalV2::Continuous {
+                atoms,
+                heaping,
+                smooth_u,
+                smooth_x,
+                offgrid_u,
+                offgrid_x,
+                ..
+            } => {
+                if smooth_u.len() > max_k && max_k >= 2 {
+                    let len = smooth_u.len();
+                    let mut nu = Vec::with_capacity(max_k);
+                    let mut nx = Vec::with_capacity(max_k);
+                    for i in 0..max_k {
+                        let pos = (i * (len - 1)) / (max_k - 1);
+                        nu.push(smooth_u[pos]);
+                        nx.push(smooth_x[pos]);
+                    }
+                    *smooth_u = nu;
+                    *smooth_x = nx;
                 }
-                *smooth_u = nu;
-                *smooth_x = nx;
+                if trim_extra {
+                    *heaping = None;
+                    offgrid_u.clear();
+                    offgrid_x.clear();
+                    let keep_a = if max_k <= 2 { 0 } else { 1 };
+                    if atoms.len() > keep_a {
+                        atoms.sort_by(|a, b| b.prob.total_cmp(&a.prob));
+                        atoms.truncate(keep_a);
+                        atoms.sort_by(|a, b| a.value.total_cmp(&b.value));
+                    }
+                }
+            }
+            crate::marginal::v2::ColumnMarginalV2::Discrete { values, probs, .. } => {
+                let cap = max_k.max(2);
+                if trim_extra && values.len() > cap {
+                    let mut idx: Vec<usize> = (0..values.len()).collect();
+                    idx.sort_by(|&a, &b| probs[b].total_cmp(&probs[a]).then(a.cmp(&b)));
+                    idx.truncate(cap);
+                    idx.sort_by(|&a, &b| values[a].total_cmp(&values[b]));
+                    let nv: Vec<f64> = idx.iter().map(|&i| values[i]).collect();
+                    let mut np: Vec<f64> = idx.iter().map(|&i| probs[i]).collect();
+                    let sum: f64 = np.iter().sum::<f64>().max(1e-12);
+                    for p in &mut np {
+                        *p /= sum;
+                    }
+                    *values = nv;
+                    *probs = np;
+                }
             }
         }
     }

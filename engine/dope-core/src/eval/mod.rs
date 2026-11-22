@@ -337,6 +337,7 @@ fn run_auditor(
             test,
             &gbdt::Params {
                 seed,
+                group_duplicates: true,
                 ..Default::default()
             },
         ),

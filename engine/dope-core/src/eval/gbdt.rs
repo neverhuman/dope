@@ -5,6 +5,7 @@
 //! auditor's own training rows. Squared loss, logistic or softmax.
 
 use super::Matrix;
+use crate::rng::Rng;
 use crate::target::Head;
 use rayon::prelude::*;
 
@@ -18,6 +19,10 @@ pub struct Params {
     pub bins: usize,
     pub patience: usize,
     pub seed: u64,
+    /// Group exact duplicate rows when forming the internal 10% early-stopping
+    /// holdout. Defaults to `false` to preserve bit-identical `landmarks-native-v1`
+    /// behavior for `dope-core::landmark`; auditors opt in via `true`.
+    pub group_duplicates: bool,
 }
 
 impl Default for Params {
@@ -31,6 +36,7 @@ impl Default for Params {
             bins: 64,
             patience: 30,
             seed: 0,
+            group_duplicates: false,
         }
     }
 }
@@ -187,7 +193,15 @@ fn softmax_row(z: &[f64]) -> Vec<f64> {
 /// P(class 1) (binary) or row-major class probabilities (multiclass).
 pub fn fit_predict(x: &Matrix, y: &[f64], head: Head, test: &Matrix, p: &Params) -> Vec<f64> {
     let o = head.outputs();
-    let (val, fit) = super::duplicate_grouped_split(x, y, 10, 200, p.seed ^ 0x6bd7);
+    let (val, fit) = if p.group_duplicates {
+        super::duplicate_grouped_split(x, y, 10, 200, p.seed ^ 0x6bd7)
+    } else {
+        let mut idx: Vec<usize> = (0..x.rows).collect();
+        Rng::new(p.seed ^ 0x6bd7).shuffle(&mut idx);
+        let n_val = if x.rows >= 200 { x.rows / 10 } else { 0 };
+        let (val_s, fit_s) = idx.split_at(n_val);
+        (val_s.to_vec(), fit_s.to_vec())
+    };
     let e = edges(x, &fit, p.bins);
     let bf = bin(x, &fit, &e);
     let bv = bin(x, &val, &e);
