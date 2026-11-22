@@ -12,7 +12,7 @@
 use crate::quant::QTensor;
 use crate::stats::solve_spd;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Head {
     Regression,
     Binary,

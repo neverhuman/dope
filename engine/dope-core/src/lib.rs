@@ -31,6 +31,7 @@ pub mod budget;
 pub mod compile;
 pub mod copula;
 pub mod device;
+pub mod distil;
 pub mod dvs;
 pub mod encode;
 pub mod error;
@@ -56,6 +57,7 @@ pub mod screen;
 pub mod stats;
 pub mod table;
 pub mod target;
+pub mod teacher;
 pub mod train;
 pub mod train_cpu;
 
