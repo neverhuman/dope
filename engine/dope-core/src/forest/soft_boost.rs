@@ -321,7 +321,7 @@ pub fn boost_soft(
             }
         }
         let values: Vec<f64> = (0..nl * o)
-            .map(|i| -opts.eta * sg[i] / (sh[i] + opts.lambda))
+            .map(|i| (-opts.eta * sg[i] / (sh[i] + opts.lambda)).clamp(-2.0, 2.0))
             .collect();
         let maxabs = values.iter().fold(0.0f64, |m, v| m.max(v.abs()));
         let scale = f16::from_f64((maxabs / levels as f64).max(1e-7)).to_f64();
@@ -351,5 +351,7 @@ pub fn boost_soft(
             break;
         }
     }
+    // Truncate back to `best_t` so post-plateau diverging trees are never retained (BUG-R1).
+    let forest = forest.truncate(best_t);
     SoftBoosted { forest, probe_path }
 }

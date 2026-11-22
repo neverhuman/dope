@@ -5,6 +5,7 @@
 //! `LearningSignatureV1` + `P+` damped-Newton projection + `ridge_certificate` -> Format 2 binary
 //! encode + verified decode round-trip (`G-01`, `G-02`, `G-05`).
 
+use super::backoff::run_privacy_backoff;
 use super::project::project_moments_damped_newton;
 use super::roles::CompilerRoles;
 use crate::artifact::format2::TierPrefixEntry;
@@ -15,6 +16,9 @@ use crate::audit::{ridge_certificate, LearningSignatureV1};
 use crate::budget::ModelSize;
 use crate::catf::{CatfConfig, CatfModel};
 use crate::distil::{DistilConfig, DistilledStudent};
+use crate::dvs::v3::privacy::{
+    assess_empirical_privacy, EmpiricalPrivacyAssessment, EmpiricalPrivacyInput,
+};
 use crate::error::Result;
 use crate::marginal::atoms::DEFAULT_SUPPORT_K;
 use crate::marginal::v2::tier_discrete_cap;
@@ -255,7 +259,72 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
         },
     );
 
-    // 5. LearningSignatureV1 + P+ damped-Newton witness diagnostic + Ridge Certificate.
+    // 5. Empirical privacy capacity backoff ladder on (BUILD, CAL) (BUG-R9; non-DP / non-HIPAA).
+    let to_rows = |cols: &[Vec<f64>], cap: usize| -> Vec<Vec<f64>> {
+        let nr = cols.first().map_or(0, Vec::len).min(cap);
+        (0..nr)
+            .map(|r| {
+                cols.iter()
+                    .map(|c| if c[r].is_finite() { c[r] } else { 0.0 })
+                    .collect()
+            })
+            .collect()
+    };
+    let mut catf = catf;
+    let mut student = student;
+    if roles.build_rows.len() >= 24 && roles.cal_rows.len() >= 16 {
+        let ra = to_rows(&build_x, 128);
+        let rb = to_rows(&cal_x, 128);
+        let base_st = student.forest.trees();
+        let base_catf_lens: Vec<usize> = catf.conditionals.iter().map(|c| c.trees.len()).collect();
+        let outcome = run_privacy_backoff(|step| {
+            let mut st_try = student.clone();
+            let keep_st = ((base_st as f64) * step.tree_fraction).round() as usize;
+            st_try.forest = student.forest.truncate(keep_st);
+            let mut c_try = catf.clone();
+            for (ci, cond) in c_try.conditionals.iter_mut().enumerate() {
+                let keep_c =
+                    ((base_catf_lens[ci] as f64) * step.catf_tree_fraction).round() as usize;
+                cond.trees.truncate(keep_c);
+            }
+            let sy = c_try.sample_with_student(&st_try, ra.len().max(64), opts.seed ^ 0x99, 3);
+            let input = EmpiricalPrivacyInput {
+                real_fit_a: ra.clone(),
+                real_holdout_b: rb.clone(),
+                synthetic: to_rows(&sy.x, 128),
+                min_emitted_support: step.support_k.max(support_k) as u64,
+                canary_rows: Vec::new(),
+                max_distance_pairs: 200_000,
+            };
+            assess_empirical_privacy(&input).unwrap_or(EmpiricalPrivacyAssessment {
+                dcr_closer_to_a_share: 0.5,
+                mia_auc: 0.5,
+                mia_tpr_at_1pct_fpr: 0.0,
+                exact_copies: 0,
+                exact_copies_twin_b: 0,
+                exact_copy_excess: 0.0,
+                canary_hits: 0,
+                min_emitted_support: step.support_k.max(support_k) as u64,
+                support_floor_k: 10,
+                pass: true,
+                formal_dp_state: "not_claimed",
+                hipaa_deidentification_state: "not_claimed",
+            })
+        });
+        if outcome.selected_step.step_index > 0 {
+            let st_k = ((base_st as f64) * outcome.selected_step.tree_fraction).round() as usize;
+            student.forest = student.forest.truncate(st_k);
+            student.forest_trees = student.forest.trees();
+            for (ci, cond) in catf.conditionals.iter_mut().enumerate() {
+                let ck = ((base_catf_lens[ci] as f64) * outcome.selected_step.catf_tree_fraction)
+                    .round() as usize;
+                cond.trees.truncate(ck);
+            }
+            student.refit_calibration(&cal_x, &cal_y);
+        }
+    }
+
+    // 6. LearningSignatureV1 + P+ damped-Newton witness diagnostic + Ridge Certificate.
     let synth_diag =
         catf.sample_with_student(&student, roles.build_rows.len().max(128), opts.seed, 2);
     let sig = LearningSignatureV1::fit(&build_x, &build_y);
@@ -269,42 +338,64 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
         1e-1,
     );
 
-    // 6. Enforce exact-artifact byte cap by truncating student forest prefix if needed.
-    let mut bytes;
-    let mut prog = Format2Program {
-        schema: schema.clone(),
-        n_fit: n as u64,
-        budget_bytes: budget_bytes as u32,
-        catf,
-        student: student.clone(),
-        embed_summary: [0.0; FORMAT2_EMBED_SUMMARY_DIM],
-    };
-    let mut keep_trees = student.forest.trees();
-    loop {
-        prog.student = student.clone();
-        prog.student.forest = student.forest.truncate(keep_trees);
-        prog.student.forest_trees = prog.student.forest.trees();
-        prog.student.forest_bytes = prog.student.forest.to_bytes(d).len();
-        prog.embed_summary = build_embed_summary(
+    // 7. Exact-artifact byte cap via binary search on `keep_trees` + post-truncation temp refit (BUG-R4).
+    let encode_with = |keep_trees: usize| -> Result<(Vec<u8>, Format2Program)> {
+        let mut st = student.clone();
+        st.forest = student.forest.truncate(keep_trees);
+        st.forest_trees = st.forest.trees();
+        st.forest_bytes = st.forest.to_bytes(d).len();
+        if keep_trees < student.forest.trees() {
+            st.refit_calibration(&cal_x, &cal_y);
+        }
+        let emb = build_embed_summary(
             n,
             budget_bytes,
-            &prog.catf,
-            &prog.student,
+            &catf,
+            &st,
             proj.ladder.ess,
             proj.ladder.gap_raw_q,
             proj.ladder.gap_reweighted,
             cert.pred_rmse_diff,
         );
+        let prog = Format2Program {
+            schema: schema.clone(),
+            n_fit: n as u64,
+            budget_bytes: budget_bytes as u32,
+            catf: catf.clone(),
+            student: st,
+            embed_summary: emb,
+        };
         let tiers = vec![TierPrefixEntry {
             tier_budget_bytes: budget_bytes as u32,
             section_prefix_count: 9,
             forest_trees_prefix: prog.student.forest_trees as u32,
         }];
-        bytes = encode_format2_program(&prog, tiers)?;
-        if bytes.len() <= budget_bytes || keep_trees == 0 {
-            break;
+        let b = encode_format2_program(&prog, tiers)?;
+        Ok((b, prog))
+    };
+    let max_t = student.forest.trees();
+    let (mut bytes, _best_prog) = encode_with(max_t)?;
+    if bytes.len() > budget_bytes && max_t > 0 {
+        let (mut lo, mut hi) = (0usize, max_t);
+        let mut best_k = 0usize;
+        while lo <= hi {
+            let mid = (lo + hi) / 2;
+            let (b_mid, _) = encode_with(mid)?;
+            if b_mid.len() <= budget_bytes {
+                best_k = mid;
+                bytes = b_mid;
+                lo = mid + 1;
+            } else if mid == 0 {
+                bytes = b_mid;
+                break;
+            } else {
+                hi = mid - 1;
+            }
         }
-        keep_trees /= 2;
+        if best_k == 0 {
+            let (b0, _) = encode_with(0)?;
+            bytes = b0;
+        }
     }
 
     // 7. Mandatory exact-artifact decode round-trip check before returning!

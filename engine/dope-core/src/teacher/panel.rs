@@ -36,9 +36,11 @@ pub fn duplicate_grouped_kfolds(x: &[Vec<f64>], y: &[f64], k: usize, seed: u64) 
     let mut buckets: Vec<Vec<usize>> = groups.into_values().collect();
     let mut rng = Rng::new(seed ^ 0x7e4c_f01d);
     rng.shuffle(&mut buckets);
+    // Stratify round-robin assignment by rounded group target so minority classes never vanish (BUG-R5).
+    buckets.sort_by_key(|b| (b.first().map_or(0.0, |&r| y[r]) * 100.0).round() as i64);
     let mut folds = vec![Vec::new(); k];
-    for bucket in buckets {
-        let tgt = (0..k).min_by_key(|&f| (folds[f].len(), f)).unwrap_or(0);
+    for (idx, bucket) in buckets.into_iter().enumerate() {
+        let tgt = idx % k;
         folds[tgt].extend(bucket);
     }
     for f in &mut folds {
@@ -126,8 +128,8 @@ impl LinearMember {
                 }
             }
         }
-        // Damped L2 coordinate / Newton descent (deterministic, invariant to label flips & permutations).
-        let lambda = 1e-2 * (n as f64).sqrt().max(1.0);
+        // Sequential cyclic coordinate Newton (monotone descent on correlated columns, BUG-R3).
+        let lambda = 0.05 * (n as f64).sqrt().max(1.0);
         let mut phi = vec![0.0; n * p];
         for (i, &r) in rows.iter().enumerate() {
             for j in 0..d {
@@ -139,60 +141,74 @@ impl LinearMember {
             }
             phi[i * p + d] = 1.0;
         }
-        for step in 0..45 {
-            let mut grad = vec![0.0; o * p];
-            let mut hess = vec![lambda; o * p];
+        let mut pred = vec![0.0; n * o];
+        for i in 0..n {
             for c in 0..o {
-                hess[c * p + d] = 1e-3;
+                pred[i * o + c] = weights[c * p + d];
             }
-            for (i, &r) in rows.iter().enumerate() {
-                let row_phi = &phi[i * p..(i + 1) * p];
-                let mut f = vec![0.0; o];
-                for c in 0..o {
-                    let w = &weights[c * p..(c + 1) * p];
-                    f[c] = row_phi.iter().zip(w).map(|(&a, &b)| a * b).sum();
-                }
+        }
+        for _step in 0..25 {
+            for j in 0..p {
+                let reg_l = if j == d { 1e-4 } else { lambda };
                 match head {
                     Head::Regression => {
-                        let e = f[0] - y[r];
-                        for j in 0..p {
-                            grad[j] += e * row_phi[j];
-                            hess[j] += row_phi[j] * row_phi[j];
+                        let (mut g, mut h) = (reg_l * weights[j], reg_l);
+                        for (i, &r) in rows.iter().enumerate() {
+                            let xij = phi[i * p + j];
+                            g += (pred[i] - y[r]) * xij;
+                            h += xij * xij;
                         }
-                    }
-                    Head::Binary => {
-                        let pr = 1.0 / (1.0 + (-f[0]).exp());
-                        let e = pr - y[r].clamp(0.0, 1.0);
-                        let h = (pr * (1.0 - pr)).max(1e-4);
-                        for j in 0..p {
-                            grad[j] += e * row_phi[j];
-                            hess[j] += h * row_phi[j] * row_phi[j];
-                        }
-                    }
-                    Head::Multiclass(k) => {
-                        let lse = log_sum_exp(&f);
-                        let yc = (y[r].round() as usize).min(k - 1);
-                        for c in 0..k {
-                            let pr = (f[c] - lse).exp();
-                            let e = pr - if c == yc { 1.0 } else { 0.0 };
-                            let h = (pr * (1.0 - pr)).max(1e-4);
-                            for j in 0..p {
-                                grad[c * p + j] += e * row_phi[j];
-                                hess[c * p + j] += h * row_phi[j] * row_phi[j];
+                        let delta = (-g / h.max(1e-6)).clamp(-2.0, 2.0);
+                        let nw = (weights[j] + delta).clamp(-10.0, 10.0);
+                        let actual = nw - weights[j];
+                        weights[j] = nw;
+                        if actual != 0.0 {
+                            for i in 0..n {
+                                pred[i] += actual * phi[i * p + j];
                             }
                         }
                     }
-                }
-            }
-            let lr = if step < 10 { 0.4 } else { 0.25 };
-            for c in 0..o {
-                for j in 0..p {
-                    let reg = if j == d {
-                        0.0
-                    } else {
-                        lambda * weights[c * p + j]
-                    };
-                    weights[c * p + j] -= lr * (grad[c * p + j] + reg) / hess[c * p + j];
+                    Head::Binary => {
+                        let (mut g, mut h) = (reg_l * weights[j], reg_l);
+                        for (i, &r) in rows.iter().enumerate() {
+                            let xij = phi[i * p + j];
+                            let pr = 1.0 / (1.0 + (-pred[i].clamp(-20.0, 20.0)).exp());
+                            g += (pr - y[r].clamp(0.0, 1.0)) * xij;
+                            h += (pr * (1.0 - pr)).max(1e-4) * xij * xij;
+                        }
+                        let delta = (-0.75 * g / h.max(1e-6)).clamp(-1.5, 1.5);
+                        let nw = (weights[j] + delta).clamp(-8.0, 8.0);
+                        let actual = nw - weights[j];
+                        weights[j] = nw;
+                        if actual != 0.0 {
+                            for i in 0..n {
+                                pred[i] += actual * phi[i * p + j];
+                            }
+                        }
+                    }
+                    Head::Multiclass(k) => {
+                        for c in 0..k {
+                            let idx_w = c * p + j;
+                            let (mut g, mut h) = (reg_l * weights[idx_w], reg_l);
+                            for (i, &r) in rows.iter().enumerate() {
+                                let xij = phi[i * p + j];
+                                let lse = log_sum_exp(&pred[i * o..(i + 1) * o]);
+                                let pr = (pred[i * o + c] - lse).exp();
+                                let yc = (y[r].round() as usize).min(k - 1);
+                                g += (pr - if c == yc { 1.0 } else { 0.0 }) * xij;
+                                h += (pr * (1.0 - pr)).max(1e-4) * xij * xij;
+                            }
+                            let delta = (-0.75 * g / h.max(1e-6)).clamp(-1.5, 1.5);
+                            let nw = (weights[idx_w] + delta).clamp(-8.0, 8.0);
+                            let actual = nw - weights[idx_w];
+                            weights[idx_w] = nw;
+                            if actual != 0.0 {
+                                for i in 0..n {
+                                    pred[i * o + c] += actual * phi[i * p + j];
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

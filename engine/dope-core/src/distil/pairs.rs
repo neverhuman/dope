@@ -79,75 +79,98 @@ pub fn mine_pairs(
     }
 
     let cells = PAIR_GRID * PAIR_GRID;
-    let mut cands = Vec::new();
-    for ii in 0..feat_idx.len() {
-        for jj in (ii + 1)..feat_idx.len() {
-            let (fa, fb) = (feat_idx[ii], feat_idx[jj]);
-            let mut sum = vec![0.0; cells * outputs];
-            let mut wsum = vec![0.0; cells];
-            for r in 0..n {
-                let cell = bins[fa][r] * PAIR_GRID + bins[fb][r];
-                let w = weights[r].max(0.0);
-                wsum[cell] += w;
-                for c in 0..outputs {
-                    sum[cell * outputs + c] += w * residuals[r * outputs + c];
+    let mut cur_res = residuals.to_vec();
+    let mut picked: Vec<PairEffect> = Vec::with_capacity(max_pairs);
+    let mut used_pairs: Vec<(usize, usize)> = Vec::new();
+    let eta_pair = 0.5;
+
+    // Sequential boosting over pairs (BUG-R1): subtract each accepted pair's shrunk contribution
+    // from `cur_res` before fitting the next pair so correlated pairs never over-sum logits.
+    for _ in 0..max_pairs {
+        let mut best: Option<PairEffect> = None;
+        for ii in 0..feat_idx.len() {
+            for jj in (ii + 1)..feat_idx.len() {
+                let (fa, fb) = (feat_idx[ii], feat_idx[jj]);
+                if used_pairs.contains(&(fa, fb)) {
+                    continue;
                 }
-            }
-            let mut grid = vec![0.0; cells * outputs];
-            for cell in 0..cells {
-                let den = wsum[cell] + 4.0;
-                for c in 0..outputs {
-                    grid[cell * outputs + c] = sum[cell * outputs + c] / den;
-                }
-            }
-            // Purify: subtract row and column means so pair term is purely second-order!
-            for c in 0..outputs {
-                for a in 0..PAIR_GRID {
-                    let rm = (0..PAIR_GRID)
-                        .map(|b| grid[(a * PAIR_GRID + b) * outputs + c])
-                        .sum::<f64>()
-                        / PAIR_GRID as f64;
-                    for b in 0..PAIR_GRID {
-                        grid[(a * PAIR_GRID + b) * outputs + c] -= rm;
+                let mut sum = vec![0.0; cells * outputs];
+                let mut wsum = vec![0.0; cells];
+                for r in 0..n {
+                    let cell = bins[fa][r] * PAIR_GRID + bins[fb][r];
+                    let w = weights[r].max(0.0);
+                    wsum[cell] += w;
+                    for c in 0..outputs {
+                        sum[cell * outputs + c] += w * cur_res[r * outputs + c];
                     }
                 }
-                for b in 0..PAIR_GRID {
-                    let cm = (0..PAIR_GRID)
-                        .map(|a| grid[(a * PAIR_GRID + b) * outputs + c])
-                        .sum::<f64>()
-                        / PAIR_GRID as f64;
+                let mut grid = vec![0.0; cells * outputs];
+                for cell in 0..cells {
+                    let den = wsum[cell] + 6.0;
+                    for c in 0..outputs {
+                        grid[cell * outputs + c] =
+                            (eta_pair * sum[cell * outputs + c] / den).clamp(-2.0, 2.0);
+                    }
+                }
+                // Purify: subtract row and column means so pair term is purely second-order!
+                for c in 0..outputs {
                     for a in 0..PAIR_GRID {
-                        grid[(a * PAIR_GRID + b) * outputs + c] -= cm;
+                        let rm = (0..PAIR_GRID)
+                            .map(|b| grid[(a * PAIR_GRID + b) * outputs + c])
+                            .sum::<f64>()
+                            / PAIR_GRID as f64;
+                        for b in 0..PAIR_GRID {
+                            grid[(a * PAIR_GRID + b) * outputs + c] -= rm;
+                        }
+                    }
+                    for b in 0..PAIR_GRID {
+                        let cm = (0..PAIR_GRID)
+                            .map(|a| grid[(a * PAIR_GRID + b) * outputs + c])
+                            .sum::<f64>()
+                            / PAIR_GRID as f64;
+                        for a in 0..PAIR_GRID {
+                            grid[(a * PAIR_GRID + b) * outputs + c] -= cm;
+                        }
                     }
                 }
-            }
-            let gain: f64 = (0..cells)
-                .map(|cell| {
-                    let g2: f64 = (0..outputs).map(|c| grid[cell * outputs + c].powi(2)).sum();
-                    wsum[cell] * g2
-                })
-                .sum();
-            if gain > 1e-6 {
-                cands.push(PairEffect {
-                    feat_a: fa,
-                    feat_b: fb,
-                    edges_a: edges[fa].clone(),
-                    edges_b: edges[fb].clone(),
-                    grid,
-                    outputs,
-                    gain,
-                });
+                let gain: f64 = (0..cells)
+                    .map(|cell| {
+                        let g2: f64 = (0..outputs).map(|c| grid[cell * outputs + c].powi(2)).sum();
+                        wsum[cell] * g2
+                    })
+                    .sum();
+                if gain > 1e-5 {
+                    let replace = best.as_ref().is_none_or(|b| {
+                        gain > b.gain
+                            || ((gain - b.gain).abs() <= 1e-12 && (fa, fb) < (b.feat_a, b.feat_b))
+                    });
+                    if replace {
+                        best = Some(PairEffect {
+                            feat_a: fa,
+                            feat_b: fb,
+                            edges_a: edges[fa].clone(),
+                            edges_b: edges[fb].clone(),
+                            grid,
+                            outputs,
+                            gain,
+                        });
+                    }
+                }
             }
         }
+        let Some(pe) = best else {
+            break;
+        };
+        for r in 0..n {
+            let cell = bins[pe.feat_a][r] * PAIR_GRID + bins[pe.feat_b][r];
+            for c in 0..outputs {
+                cur_res[r * outputs + c] -= pe.grid[cell * outputs + c];
+            }
+        }
+        used_pairs.push((pe.feat_a, pe.feat_b));
+        picked.push(pe);
     }
-    cands.sort_by(|a, b| {
-        b.gain
-            .total_cmp(&a.gain)
-            .then(a.feat_a.cmp(&b.feat_a))
-            .then(a.feat_b.cmp(&b.feat_b))
-    });
-    cands.truncate(max_pairs);
-    cands
+    picked
 }
 
 pub fn add_pair_logits(pairs: &[PairEffect], x: &[Vec<f64>], impute: &[f64], logits: &mut [f64]) {

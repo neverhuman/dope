@@ -148,7 +148,7 @@ impl MainEffectSet {
                         eff.values[b * o + c] -= mean_c[c];
                     }
                 }
-                // Subtract updated purified effect from residual.
+                // Subtract BOTH purified effect AND mean_c shifted to intercept from residual (BUG-R2).
                 for r in 0..n {
                     let v = if x[j][r].is_finite() {
                         x[j][r]
@@ -158,7 +158,7 @@ impl MainEffectSet {
                     let (b0, b1, t) = locate_interp(&eff.edges, v);
                     for c in 0..o {
                         let val = eff.values[b0 * o + c] * (1.0 - t) + eff.values[b1 * o + c] * t;
-                        res[r * o + c] -= val;
+                        res[r * o + c] -= val + mean_c[c];
                     }
                 }
             }

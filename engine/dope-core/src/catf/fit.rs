@@ -394,10 +394,10 @@ pub fn fit_catf_trees(
             }
         }
         let next_nll = mean_state_nll(&next_logits, target_states, n_states);
-        // BIC-style minimum NLL improvement for continuous Hermite tilts prevents overfitting
-        // independent noise while preserving genuine nonlinear & discrete/XOR structure.
+        // Minimum NLL gain for Hermite tilts scaled gently so real nonlinearities pass on medium n
+        // while keeping BIC guard against overfitting pure independent noise (BUG-R8).
         let min_gain = if use_hermite {
-            ((nl * 4) as f64 / (2.0 * n.max(1) as f64)).max(0.002)
+            ((nl * 2) as f64 / (4.0 * n.max(1) as f64)).clamp(0.0005, 0.015)
         } else {
             1e-4
         };
