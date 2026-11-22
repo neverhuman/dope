@@ -1,11 +1,13 @@
 //! Pure-Rust bounds-checked binary codecs for `RuleSet` and `CatfModel` (Format 2).
 
 use super::format2_bin::{BinReader, BinWriter};
-use crate::catf::fit::{CatfConditional, CatfPredicate, CatfTree};
+use crate::catf::fit::{standard_z_bins, CatfConditional, CatfPredicate, CatfTree};
 use crate::catf::CatfModel;
 use crate::error::{DopeError, Result};
 use crate::marginal::v2::ColumnMarginalV2;
+use crate::stats::norm_ppf;
 use crate::structure::{RuleMode, RuleSet, StructuralRule};
+use half::f16;
 use std::collections::BTreeMap;
 
 pub(crate) fn encode_rules_section(rules: &RuleSet) -> Vec<u8> {
@@ -233,6 +235,35 @@ pub(crate) fn decode_rules_section(bytes: &[u8]) -> Result<RuleSet> {
     Ok(RuleSet { mode, rules })
 }
 
+fn recompute_z_bins(marginal: &ColumnMarginalV2, k_bins: usize) -> (Vec<f64>, Vec<f64>) {
+    match marginal {
+        ColumnMarginalV2::Discrete { values, probs, .. } if !values.is_empty() => {
+            let l = values.len();
+            let mut edges = Vec::with_capacity(l + 1);
+            edges.push(f64::NEG_INFINITY);
+            let mut cum = 0.0;
+            for &p in &probs[..l.saturating_sub(1)] {
+                cum += p;
+                edges.push(norm_ppf(cum.clamp(1e-9, 1.0 - 1e-9)));
+            }
+            edges.push(f64::INFINITY);
+            let centers = (0..l)
+                .map(|i| {
+                    let lo = if edges[i].is_finite() { edges[i] } else { -2.5 };
+                    let hi = if edges[i + 1].is_finite() {
+                        edges[i + 1]
+                    } else {
+                        2.5
+                    };
+                    0.5 * (lo + hi)
+                })
+                .collect();
+            (edges, centers)
+        }
+        _ => standard_z_bins(k_bins.max(2)),
+    }
+}
+
 pub(crate) fn encode_catf_section(catf: &CatfModel) -> Vec<u8> {
     let mut w = BinWriter::new();
     w.usize_slice(&catf.order);
@@ -240,21 +271,32 @@ pub(crate) fn encode_catf_section(catf: &CatfModel) -> Vec<u8> {
     for &b in &catf.is_nominal {
         w.u8(u8::from(b));
     }
-    w.u32(catf.nom_levels.len() as u32);
-    for lv in &catf.nom_levels {
-        w.f64_slice(lv);
-    }
+    // `nom_levels` is deterministically recomputed from `marginals` on decode (0 bytes!).
+    w.u32(0);
     w.u32(catf.conditionals.len() as u32);
     for c in &catf.conditionals {
         w.u32(c.col_idx as u32);
-        w.usize_slice(&c.predecessors);
-        w.f32_slice(&c.copula_weights);
+        // Compact v2.2 conditional flags: bit0=is_discrete, bit1=recompute_z_bins, bit2=f16_copula.
+        let compact_copula = c.predecessors.len() <= u16::MAX as usize
+            && c.predecessors.iter().all(|&p| p <= u16::MAX as usize)
+            && c.copula_weights.iter().all(|&w| w.abs() <= 1.25);
+        let flags = u8::from(c.is_discrete) | 2 | if compact_copula { 4 } else { 0 };
+        w.u8(flags);
+        w.u32(c.k_bins as u32);
+        if compact_copula {
+            w.u16(c.predecessors.len() as u16);
+            for &p in &c.predecessors {
+                w.u16(p as u16);
+            }
+            for &cw in &c.copula_weights {
+                w.u16(f16::from_f64(cw).to_bits());
+            }
+        } else {
+            w.usize_slice(&c.predecessors);
+            w.f32_slice(&c.copula_weights);
+        }
         w.f32(c.copula_cond_sd);
         w.f32(c.base_missing_prob);
-        w.u8(u8::from(c.is_discrete));
-        w.u32(c.k_bins as u32);
-        w.f64_slice(&c.z_edges);
-        w.f32_slice(&c.z_centers);
         w.u32(c.trees.len() as u32);
         for t in &c.trees {
             w.u32(t.predicates.len() as u32);
@@ -297,22 +339,71 @@ pub(crate) fn decode_catf_section(
         is_nominal.push(r.u8()? != 0);
     }
     let n_lv = r.len()?;
-    let mut nom_levels = Vec::with_capacity(n_lv);
-    for _ in 0..n_lv {
-        nom_levels.push(r.f64_vec()?);
-    }
+    let nom_levels = if n_lv == 0 {
+        marginals
+            .iter()
+            .map(|m| match m {
+                ColumnMarginalV2::Discrete { values, .. } => values.clone(),
+                _ => Vec::new(),
+            })
+            .collect()
+    } else {
+        let mut out = Vec::with_capacity(n_lv);
+        for _ in 0..n_lv {
+            out.push(r.f64_vec()?);
+        }
+        out
+    };
     let n_cond = r.len()?;
     let mut conditionals = Vec::with_capacity(n_cond);
     for _ in 0..n_cond {
         let col_idx = r.u32()? as usize;
-        let predecessors = r.usize_vec()?;
-        let copula_weights = r.f32_vec()?;
-        let copula_cond_sd = r.f32()?;
-        let base_missing_prob = r.f32()?;
-        let is_discrete = r.u8()? != 0;
-        let k_bins = r.u32()? as usize;
-        let z_edges = r.f64_vec()?;
-        let z_centers = r.f32_vec()?;
+        let flags = r.u8()?;
+        let is_discrete = (flags & 1) != 0;
+        let recompute_bins = (flags & 2) != 0;
+        let compact_copula = (flags & 4) != 0;
+        let (
+            predecessors,
+            copula_weights,
+            copula_cond_sd,
+            base_missing_prob,
+            k_bins,
+            z_edges,
+            z_centers,
+        ) = if recompute_bins {
+            let k_bins = r.u32()? as usize;
+            let (preds, weights) = if compact_copula {
+                let np = r.u16()? as usize;
+                let mut ps = Vec::with_capacity(np);
+                for _ in 0..np {
+                    ps.push(r.u16()? as usize);
+                }
+                let mut ws = Vec::with_capacity(np);
+                for _ in 0..np {
+                    ws.push(f16::from_bits(r.u16()?).to_f64());
+                }
+                (ps, ws)
+            } else {
+                (r.usize_vec()?, r.f32_vec()?)
+            };
+            let sd = r.f32()?;
+            let pm = r.f32()?;
+            let (ze, zc) = marginals.get(col_idx).map_or_else(
+                || standard_z_bins(k_bins.max(2)),
+                |m| recompute_z_bins(m, k_bins),
+            );
+            (preds, weights, sd, pm, k_bins, ze, zc)
+        } else {
+            // Legacy v2.0 layout fallback (kept for clean error/format safety).
+            let preds = r.usize_vec()?;
+            let ws = r.f32_vec()?;
+            let sd = r.f32()?;
+            let pm = r.f32()?;
+            let k_bins = r.u32()? as usize;
+            let ze = r.f64_vec()?;
+            let zc = r.f32_vec()?;
+            (preds, ws, sd, pm, k_bins, ze, zc)
+        };
         let nt = r.len()?;
         let mut trees = Vec::with_capacity(nt);
         for _ in 0..nt {

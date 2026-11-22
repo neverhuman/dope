@@ -1,7 +1,7 @@
 //! CATF split scoring, typed predicates (`NominalIn` for `T05`), depth-2 lookahead (`T16`),
 //! and Hermite/full-K leaf tilt computation.
 
-use super::fit::CatfPredicate;
+use super::fit::{CatfPredicate, CatfTree};
 use crate::target::log_sum_exp;
 
 pub(crate) fn mean_state_nll(logits: &[f64], states: &[usize], n_states: usize) -> f64 {
@@ -53,8 +53,8 @@ pub(crate) fn build_candidate_predicates(
                 continue;
             }
             let mut cuts = Vec::new();
-            for q in 1..8 {
-                let cut = vals[(q * (vals.len() - 1)) / 8];
+            for q in 1..16 {
+                let cut = vals[(q * (vals.len() - 1)) / 16];
                 if cuts
                     .last()
                     .is_none_or(|&prev: &f64| (cut - prev).abs() > 1e-12)
@@ -257,4 +257,73 @@ pub(crate) fn compute_leaf_tilts(
         vals[lf * 4 + 3] = miss_step.clamp(-2.5, 2.5);
     }
     vals
+}
+
+pub(crate) fn apply_tree_leaf_row(
+    tree: &CatfTree,
+    lf: usize,
+    z_centers: &[f64],
+    k_bins: usize,
+    n_states: usize,
+    row_logits: &mut [f64],
+) {
+    if tree.hermite_mode {
+        let base = lf * 4;
+        let (c1, c2, c3, cm) = (
+            tree.leaf_values[base],
+            tree.leaf_values[base + 1],
+            tree.leaf_values[base + 2],
+            tree.leaf_values[base + 3],
+        );
+        for (b, &z) in z_centers.iter().enumerate().take(k_bins) {
+            row_logits[b] += c1 * z + c2 * (z * z - 1.0) + c3 * (z * z * z - 3.0 * z);
+        }
+        row_logits[k_bins] += cm;
+    } else {
+        let base = lf * n_states;
+        for s in 0..n_states {
+            row_logits[s] += tree.leaf_values[base + s];
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn eval_tree_on_select(
+    tree: &CatfTree,
+    sx: &[Vec<f64>],
+    snc: &[Vec<Option<u8>>],
+    prev_logits: &[f64],
+    sel_states: &[usize],
+    z_centers: &[f64],
+    k_bins: usize,
+    n_states: usize,
+) -> (Vec<f64>, f64) {
+    let mut nsl = prev_logits.to_vec();
+    for r in 0..sel_states.len() {
+        let mut lf = 0usize;
+        for (li, pr) in tree.predicates.iter().enumerate() {
+            let bit = match *pr {
+                CatfPredicate::NumericLess { feat, threshold } => {
+                    sx[feat][r].is_finite() && sx[feat][r] < threshold
+                }
+                CatfPredicate::NominalIn { feat, mask } => {
+                    snc[feat][r].is_some_and(|c| c < 64 && ((mask >> c) & 1) == 1)
+                }
+                CatfPredicate::IsMissing { feat } => !sx[feat][r].is_finite(),
+            };
+            if bit {
+                lf |= 1 << li;
+            }
+        }
+        apply_tree_leaf_row(
+            tree,
+            lf,
+            z_centers,
+            k_bins,
+            n_states,
+            &mut nsl[r * n_states..(r + 1) * n_states],
+        );
+    }
+    let nll = mean_state_nll(&nsl, sel_states, n_states);
+    (nsl, nll)
 }

@@ -360,13 +360,13 @@ def evaluate_checkpoint(
 
 
 def _passes_empirical_guard(row: dict[str, Any]) -> bool:
-    """Require empirical privacy safety guards before promoting checkpoints (never blind argmax)."""
+    """Require empirical privacy safety guards before saving dev-best checkpoints."""
     dcr = row.get("dcr_share_median")
     mia = row.get("mia_auc_median")
     ex = row.get("exact_copy_excess_median")
     return (
         (dcr is None or float(dcr) <= 0.55)
-        and (mia is None or float(mia) <= 0.60)
+        and (mia is None or float(mia) <= 0.55)
         and (ex is None or float(ex) <= 0.005)
     )
 
@@ -401,11 +401,11 @@ def _promote_best_and_valley_soup(
         shutil.copy2(ckpt, tmp)
         os.replace(tmp, best_file)
         sha = hashlib.sha256(best_file.read_bytes()).hexdigest()
-        bmeta = {**row, "role": "best_main_kpi", "source_checkpoint": ckpt.name, "sha256": sha, "bytes": best_file.stat().st_size, "delta_vs_prev": round(float(score) - prev_best, 4) if prev_best > -1e8 else None}
+        bmeta = {**row, "role": "best_main_kpi", "promotion_status": "DEV-best (unconfirmed; requires paired compare receipt)", "source_checkpoint": ckpt.name, "sha256": sha, "bytes": best_file.stat().st_size, "delta_vs_prev": round(float(score) - prev_best, 4) if prev_best > -1e8 else None}
         best_json.write_text(json.dumps(bmeta, sort_keys=True, indent=2) + "\n", encoding="utf-8")
         with (ckpt_dir / "ledger.jsonl").open("a", encoding="utf-8") as fh:
             fh.write(json.dumps({**bmeta, "checkpoint": "best_main_kpi.safetensors"}, sort_keys=True) + "\n")
-        print(f"  ★ NEW BEST MAIN KPI @ step={row['step']}: {score:.4f} (saved best_main_kpi.safetensors)", flush=True)
+        print(f"  ★ DEV-best (unconfirmed) @ step={row['step']}: {score:.4f} (saved best_main_kpi.safetensors)", flush=True)
 
     # Maintain top-3 distinct-valley checkpoints (min step gap 150) -> JopeDime k=3 valley soup!
     vp = ckpt_dir / "valleys.json"

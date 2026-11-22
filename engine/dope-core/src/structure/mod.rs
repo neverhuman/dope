@@ -48,10 +48,26 @@ impl RuleSet {
 
     /// Direct stateless rule enforcement on a single feature row (`u_exc`, `u_renorm` in `(0, 1)`).
     /// Zero rejection loops: applies base constraints (`INEQ`/`EXCL`/`MISS`) first, then derived
-    /// functional rules (`ARITH`/`BIN`/`FD-1`/`FD-2`) so constraints never invalidate derived columns.
+    /// functional rules (`ARITH`/`BIN`/`FD-1`/`FD-2`) with independent per-rule hashed uniforms.
     pub fn apply_row(&self, x: &mut [f64], u_exc: f64, u_renorm: f64) {
+        let mix_u = |base: f64, idx: usize, salt: u64| -> f64 {
+            let mut z = base.to_bits() ^ ((idx as u64 + 1).wrapping_mul(salt));
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+            (((z ^ (z >> 31)) >> 11) as f64) / ((1u64 << 53) as f64)
+        };
         // Pass 1: base domain constraints (INEQ, EXCL, MISS).
-        for rule in &self.rules {
+        for (ri, rule) in self.rules.iter().enumerate() {
+            let ue = if ri == 0 {
+                u_exc
+            } else {
+                mix_u(u_exc, ri, 0x9e37_79b9_7f4a_7c15)
+            };
+            let ur = if ri == 0 {
+                u_renorm
+            } else {
+                mix_u(u_renorm, ri, 0x517c_c1b7_2722_0a95)
+            };
             match rule {
                 StructuralRule::Ineq {
                     lo_col,
@@ -59,13 +75,13 @@ impl RuleSet {
                     hi_cap,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon
+                    if ue >= *epsilon
                         && x[*lo_col].is_finite()
                         && x[*hi_col].is_finite()
                         && x[*lo_col] > x[*hi_col]
                     {
                         let upper = hi_cap.max(x[*lo_col]);
-                        x[*hi_col] = x[*lo_col] + u_renorm.clamp(0.0, 1.0) * (upper - x[*lo_col]);
+                        x[*hi_col] = x[*lo_col] + ur.clamp(0.0, 1.0) * (upper - x[*lo_col]);
                     }
                 }
                 StructuralRule::Excl {
@@ -74,13 +90,13 @@ impl RuleSet {
                     prob_a_nonzero,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon
+                    if ue >= *epsilon
                         && x[*col_a].is_finite()
                         && x[*col_b].is_finite()
                         && x[*col_a].abs() > 1e-9
                         && x[*col_b].abs() > 1e-9
                     {
-                        if u_renorm < *prob_a_nonzero {
+                        if ur < *prob_a_nonzero {
                             x[*col_b] = 0.0;
                         } else {
                             x[*col_a] = 0.0;
@@ -93,7 +109,7 @@ impl RuleSet {
                     trigger_value,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon {
+                    if ue >= *epsilon {
                         let trig = match trigger_value {
                             None => !x[*parent].is_finite(),
                             Some(tv) => x[*parent].is_finite() && (x[*parent] - tv).abs() <= 1e-9,
@@ -107,7 +123,12 @@ impl RuleSet {
             }
         }
         // Pass 2: derived functional dependencies (ARITH, BIN, FD-1, FD-2).
-        for rule in &self.rules {
+        for (ri, rule) in self.rules.iter().enumerate() {
+            let ue = if ri == 0 {
+                u_exc
+            } else {
+                mix_u(u_exc, ri, 0x9e37_79b9_7f4a_7c15)
+            };
             match rule {
                 StructuralRule::Fd1 {
                     parent,
@@ -115,7 +136,7 @@ impl RuleSet {
                     map,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon && x[*parent].is_finite() {
+                    if ue >= *epsilon && x[*parent].is_finite() {
                         let k = (x[*parent] * 1e4).round() as i64;
                         if let Some(&v) = map.get(&k) {
                             x[*child] = v;
@@ -129,7 +150,7 @@ impl RuleSet {
                     map,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon && x[*parent_a].is_finite() && x[*parent_b].is_finite() {
+                    if ue >= *epsilon && x[*parent_a].is_finite() && x[*parent_b].is_finite() {
                         let ka = (x[*parent_a] * 1e4).round() as i64;
                         let kb = (x[*parent_b] * 1e4).round() as i64;
                         if let Some(&v) = map.get(&(ka, kb)) {
@@ -147,7 +168,7 @@ impl RuleSet {
                     epsilon,
                     ..
                 } => {
-                    if u_exc >= *epsilon && x[*pa].is_finite() && x[*pb].is_finite() {
+                    if ue >= *epsilon && x[*pa].is_finite() && x[*pb].is_finite() {
                         x[*child] = a * x[*pa] + b * x[*pb] + c;
                     }
                 }
@@ -158,7 +179,7 @@ impl RuleSet {
                     bin_values,
                     epsilon,
                 } => {
-                    if u_exc >= *epsilon && x[*parent].is_finite() {
+                    if ue >= *epsilon && x[*parent].is_finite() {
                         let idx = edges
                             .partition_point(|&e| e < x[*parent])
                             .min(bin_values.len() - 1);

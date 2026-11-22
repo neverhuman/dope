@@ -16,7 +16,7 @@ use crate::target::Head;
 use exchange::TeacherExchangeBundle;
 use noise::TeacherResidualModel;
 use panel::{duplicate_grouped_kfolds, GbdtMember, KnnMember, LinearMember};
-use stack::{fit_simplex_weights, IsotonicCalibrator, MulticlassCalibrator};
+use stack::{fit_simplex_weights, MulticlassCalibrator, PlattCalibrator};
 
 #[derive(Clone, Debug)]
 pub struct TeacherConfig {
@@ -44,7 +44,7 @@ struct FoldTeacher {
     gbdt6: GbdtMember,
     knn: KnnMember,
     weights: Vec<f64>,
-    bin_cal: Option<IsotonicCalibrator>,
+    bin_cal: Option<PlattCalibrator>,
     mc_cal: Option<MulticlassCalibrator>,
 }
 
@@ -154,12 +154,20 @@ impl CrossFittedTeacher {
                     .collect();
                 let in_va: Vec<usize> = in_val_loc.iter().map(|&loc| comp_rows[loc]).collect();
                 let s_in = fold_seed ^ ((in_k as u64 + 1) * 0x517c);
+                let in_t4 = if m_comp < 300 {
+                    cfg.max_trees_d4
+                } else {
+                    (cfg.max_trees_d4 / 2).max(24)
+                };
+                let in_t6 = if m_comp < 300 {
+                    cfg.max_trees_d6
+                } else {
+                    (cfg.max_trees_d6 / 2).max(24)
+                };
                 let preds = [
                     LinearMember::fit(head, x, y, &in_tr).predict_rows(x, &in_va),
-                    GbdtMember::fit(head, x, y, &in_tr, 4, cfg.max_trees_d4 / 2, s_in)
-                        .predict_rows(x, &in_va),
-                    GbdtMember::fit(head, x, y, &in_tr, 6, cfg.max_trees_d6 / 2, s_in ^ 7)
-                        .predict_rows(x, &in_va),
+                    GbdtMember::fit(head, x, y, &in_tr, 4, in_t4, s_in).predict_rows(x, &in_va),
+                    GbdtMember::fit(head, x, y, &in_tr, 6, in_t6, s_in ^ 7).predict_rows(x, &in_va),
                     KnnMember::fit(head, x, y, &in_tr, s_in ^ 13).predict_rows(x, &in_va),
                 ];
                 for m in 0..4 {
@@ -194,7 +202,7 @@ impl CrossFittedTeacher {
                 stacked_inner = inner_oof[bm].clone();
             }
             let bin_cal = if head == Head::Binary {
-                Some(IsotonicCalibrator::fit(&stacked_inner, &comp_y))
+                Some(PlattCalibrator::fit(&stacked_inner, &comp_y))
             } else {
                 None
             };

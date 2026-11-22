@@ -75,27 +75,34 @@ impl ColumnMarginalV2 {
         }
 
         if uniq_counts.len() <= max_discrete {
-            // Only classify as Discrete when the column is genuinely low-cardinality discrete:
-            // either constant (1 value) OR >= 2 supported levels covering >= 80% of observations.
-            // Continuous/lattice columns with many low-count unique values MUST fall through to
-            // Continuous (atoms + lattice + W1 knots) instead of collapsing into a single mass!
+            // Scale discrete classification floor smoothly on small n (< 250) so genuine
+            // low-cardinality binary/ordinal columns aren't smeared as continuous (`BUG-R16`).
+            let disc_k = if obs.len() < support_k * 25 {
+                support_k.min((obs.len() / 25).max(3))
+            } else {
+                support_k
+            };
             let kept: Vec<(f64, usize)> = uniq_counts
                 .iter()
                 .copied()
-                .filter(|&(_, c)| c >= support_k)
+                .filter(|&(_, c)| c >= disc_k)
                 .collect();
             let kept_mass: usize = kept.iter().map(|&(_, c)| c).sum();
+            // Never truncate multi-level ordinal/lattice columns by dropping > 1 level or > 5% mass;
+            // let `Continuous + Lattice + Atoms` smoothly interpolate the full grid instead!
             let genuinely_discrete = uniq_counts.len() == 1
-                || (kept.len() >= 2 && kept_mass * 5 >= obs.len() * 4)
-                || (obs.len() < support_k * 2 && uniq_counts.len() <= 8);
+                || (kept.len() >= 2 && kept.len() == uniq_counts.len())
+                || (kept.len() >= 2
+                    && kept_mass * 20 >= obs.len() * 19
+                    && uniq_counts.len() <= kept.len() + 1)
+                || (obs.len() < disc_k * 2 && uniq_counts.len() <= 4);
             if genuinely_discrete {
                 let final_counts = if kept.is_empty() {
-                    // Small table fallback: single median mass so no singleton is ever exposed.
                     vec![(obs[obs.len() / 2], obs.len())]
                 } else {
                     let mut acc = kept;
                     for &(v, c) in &uniq_counts {
-                        if c < support_k {
+                        if c < disc_k {
                             let best = acc
                                 .iter()
                                 .enumerate()

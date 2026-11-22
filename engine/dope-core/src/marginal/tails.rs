@@ -16,7 +16,11 @@ pub fn fit_w1_knots(sorted: &[f64], max_knots: usize, support_k: usize) -> (Vec<
     }
 
     // Privacy-safe tail anchors at k-th order statistics (support floor k = 10 when n >= 100).
-    let k_ord = support_k.min(n / 10).max(1);
+    let mut k_ord = support_k.min(n / 10).max(1);
+    if sorted[k_ord] == sorted[n - 1 - k_ord] && n >= 30 {
+        // Heavy single-atom column (>90% at one point): relax to k/2 (>= 5) so tails don't freeze.
+        k_ord = (k_ord / 2).max(4).min(n / 10).max(1);
+    }
     let u_lo = (k_ord as f64 / n as f64).clamp(1e-5, 0.05);
     let u_hi = (1.0 - u_lo).clamp(0.95, 1.0 - 1e-5);
     let u_lo2 = (u_lo * 0.02_f64.max(u_lo * 2.0)).sqrt().min(0.10);
@@ -104,8 +108,7 @@ pub fn fit_w1_knots(sorted: &[f64], max_knots: usize, support_k: usize) -> (Vec<
 }
 
 /// Monotone piecewise-linear interpolation on arbitrary knot grid `(us, xs)` with
-/// privacy-safe linear tail continuation beyond the `k`-th order-statistic bounds
-/// (eliminating twin boundary clamping spikes that caused C2ST=0.934, BUG-R6).
+/// domain-bounded log-tail-probability exponential continuation (`S-U P4.4`, `BUG-R15`).
 pub fn interp_uv(us: &[f64], xs: &[f64], u: f64) -> f64 {
     let k = us.len();
     if k == 0 {
@@ -115,17 +118,32 @@ pub fn interp_uv(us: &[f64], xs: &[f64], u: f64) -> f64 {
         return xs[0];
     }
     let span = (xs[k - 1] - xs[0]).abs().max(1e-9);
+    let non_neg = xs[0] >= -1e-12;
+    let unit_hi = non_neg && xs[k - 1] <= 1.0 + 1e-12;
     if u < us[0] {
-        let du0 = (us[1] - us[0]).max(1e-6);
-        let slope = ((xs[1] - xs[0]) / du0).max(0.0);
-        let ext = (slope * (us[0] - u)).min(0.35 * span);
-        return xs[0] - ext;
+        let lr = (us[1].max(1e-9) / us[0].max(1e-9)).ln().max(1e-6);
+        let dx0 = (xs[1] - xs[0]).max(0.0);
+        let tau = dx0 / lr;
+        let raw = tau * (us[0].max(1e-9) / u.max(1e-9)).ln().max(0.0);
+        let max_ext = (1.5 * span).max(4.0 * dx0).max(1e-9);
+        let ext = max_ext * (1.0 - (-raw / max_ext).exp());
+        let val = xs[0] - ext;
+        return if non_neg { val.max(0.0) } else { val };
     }
     if u > us[k - 1] {
-        let duk = (us[k - 1] - us[k - 2]).max(1e-6);
-        let slope = ((xs[k - 1] - xs[k - 2]) / duk).max(0.0);
-        let ext = (slope * (u - us[k - 1])).min(0.35 * span);
-        return xs[k - 1] + ext;
+        let lr = ((1.0 - us[k - 2]).max(1e-9) / (1.0 - us[k - 1]).max(1e-9))
+            .ln()
+            .max(1e-6);
+        let dxk = (xs[k - 1] - xs[k - 2]).max(0.0);
+        let tau = dxk / lr;
+        let raw = tau
+            * ((1.0 - us[k - 1]).max(1e-9) / (1.0 - u).max(1e-9))
+                .ln()
+                .max(0.0);
+        let max_ext = (1.5 * span).max(4.0 * dxk).max(1e-9);
+        let ext = max_ext * (1.0 - (-raw / max_ext).exp());
+        let val = xs[k - 1] + ext;
+        return if unit_hi { val.min(1.0) } else { val };
     }
     let idx = us
         .partition_point(|&ui| ui <= u)
@@ -136,17 +154,35 @@ pub fn interp_uv(us: &[f64], xs: &[f64], u: f64) -> f64 {
     xs[idx] + t * (xs[idx + 1] - xs[idx])
 }
 
-/// Inverse CDF lookup on `(us, xs)`.
+/// Smooth inverse CDF lookup on `(us, xs)` matching `interp_uv` log-exponential tails (`BUG-R15`).
 pub fn invert_uv(us: &[f64], xs: &[f64], x: f64) -> f64 {
     let k = xs.len();
     if k == 0 {
         return 0.5;
     }
-    if k == 1 || x <= xs[0] {
+    if k == 1 {
         return us[0];
     }
-    if x >= xs[k - 1] {
-        return us[k - 1];
+    let span = (xs[k - 1] - xs[0]).abs().max(1e-9);
+    if x < xs[0] {
+        let lr = (us[1].max(1e-9) / us[0].max(1e-9)).ln().max(1e-6);
+        let dx0 = (xs[1] - xs[0]).max(1e-6);
+        let tau = (dx0 / lr).max(1e-6);
+        let max_ext = (1.5 * span).max(4.0 * dx0).max(1e-9);
+        let frac = ((xs[0] - x) / max_ext).clamp(0.0, 0.99);
+        let raw = -max_ext * (1.0 - frac).ln();
+        return (us[0] * (-raw / tau).exp()).clamp(1e-5, us[0]);
+    }
+    if x > xs[k - 1] {
+        let lr = ((1.0 - us[k - 2]).max(1e-9) / (1.0 - us[k - 1]).max(1e-9))
+            .ln()
+            .max(1e-6);
+        let dxk = (xs[k - 1] - xs[k - 2]).max(1e-6);
+        let tau = (dxk / lr).max(1e-6);
+        let max_ext = (1.5 * span).max(4.0 * dxk).max(1e-9);
+        let frac = ((x - xs[k - 1]) / max_ext).clamp(0.0, 0.99);
+        let raw = -max_ext * (1.0 - frac).ln();
+        return (1.0 - (1.0 - us[k - 1]) * (-raw / tau).exp()).clamp(us[k - 1], 1.0 - 1e-5);
     }
     let idx = xs
         .partition_point(|&xi| xi <= x)

@@ -25,7 +25,7 @@ pub fn calibrate_latent_pair(
     if !target_corr.is_finite() || target_corr.abs() < 1e-4 {
         return 0.0;
     }
-    let target = target_corr.clamp(-0.995, 0.995);
+    let target = target_corr.clamp(-0.9995, 0.9995);
     // 11x11 deterministic quasi-normal quadrature grid on (0,1)^2.
     const G: usize = 11;
     let zs: [f64; G] = std::array::from_fn(|k| norm_ppf((k as f64 + 0.5) / G as f64));
@@ -65,8 +65,8 @@ pub fn calibrate_latent_pair(
             (cov / (vx * vy).sqrt()).clamp(-1.0, 1.0)
         }
     };
-    let (mut lo, mut hi) = (-0.995_f64, 0.995_f64);
-    for _ in 0..16 {
+    let (mut lo, mut hi) = (-0.9995_f64, 0.9995_f64);
+    for _ in 0..18 {
         let mid = 0.5 * (lo + hi);
         if eval_corr(mid) < target {
             lo = mid;
@@ -94,7 +94,7 @@ pub fn calibrate_latent_correlation_matrix(
             latent[j * d + i] = rho;
         }
     }
-    nearest_correlation(&latent, d, 1e-3)
+    nearest_correlation(&latent, d, 1e-4)
 }
 
 #[derive(Clone, Debug, PartialEq)]

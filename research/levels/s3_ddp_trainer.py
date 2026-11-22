@@ -157,7 +157,7 @@ def save_atomic_checkpoint(
     with (ckpt_dir / "ledger.jsonl").open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(info, sort_keys=True) + "\n")
 
-    # Prune old step checkpoints while NEVER deleting protected best/valley/soup checkpoints
+    # Prune scored step checkpoints while NEVER deleting protected or unscored checkpoints
     protected: set[str] = {"latest.safetensors", "best_main_kpi.safetensors", "best_soup_k3.safetensors"}
     vp = ckpt_dir / "valleys.json"
     if vp.is_file():
@@ -166,9 +166,24 @@ def save_atomic_checkpoint(
                 protected.add(str(item.get("checkpoint", "")))
         except (OSError, ValueError):
             pass
+    max_scored = -1
+    ev_path = run_dir / "eval.jsonl"
+    if ev_path.is_file():
+        try:
+            for ln in ev_path.read_text(encoding="utf-8").splitlines()[-64:]:
+                if ln.strip():
+                    max_scored = max(max_scored, int(json.loads(ln).get("step", -1)))
+        except (OSError, ValueError):
+            max_scored = -1
     step_files = sorted(ckpt_dir.glob("step_*.safetensors"))
     for pruned_ckpt in step_files[:-keep_last]:
-        if pruned_ckpt.name not in protected:
+        if pruned_ckpt.name in protected:
+            continue
+        try:
+            st_num = int(pruned_ckpt.stem.split("_")[1])
+        except (IndexError, ValueError):
+            st_num = 10**9
+        if st_num <= max_scored:
             pruned_ckpt.unlink(missing_ok=True)
     return info
 
@@ -271,6 +286,8 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
     fam_bank: deque[str] = deque(maxlen=64)
     skipped_spikes = 0
     cohost_yields = 0
+    opt_steps = 0
+    zero_ep_streak = 0
     acc: dict[str, list[float]] = {
         k: [] for k in ("loss", "tstr", "distill", "drv", "real", "mmd", "infonce", "ret", "gn", "n_fit", "n_cols", "n_noise", "n_derived", "enc_bytes")
     }
@@ -345,12 +362,19 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
             infonce_val = s_info / float(max(info_cnt, 1)) if info_cnt > 0 else 0.0
             _sync_ddp_grads(model_raw, world_size)
 
+            if valid_eps == 0:
+                zero_ep_streak += 1
+                if zero_ep_streak >= 3:
+                    raise RuntimeError(f"aborted_zero_valid_episodes_streak:{zero_ep_streak} at step={step}")
+            else:
+                zero_ep_streak = 0
             # Adaptive grad-norm clipping + spike guard (Layer 3 of gradient smoothing!)
             gn = float(torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item())
             med_gn = float(np.median(grad_hist)) if len(grad_hist) >= 16 else 10.0
             if valid_eps > 0 and math.isfinite(gn) and (gn <= max(med_gn * 10.0, 20.0) or step <= args.warmup_steps):
                 optimizer.step()
                 scheduler.step()
+                opt_steps += 1
                 grad_hist.append(gn)
                 # Dual-timescale Polyak EMA (0.995 fast, 0.9995 slow)
                 d_slow = min(0.9995, 1.0 - 1.0 / float(step + 25))
@@ -427,20 +451,13 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
                     buf.clear()
                 last_log_t = now
 
-            if rank == 0 and (step % args.ckpt_every == 0 or step == args.total_steps):
+            if rank == 0 and opt_steps > 0 and (step % args.ckpt_every == 0 or step == args.total_steps):
                 save_atomic_checkpoint(
-                    run_dir,
-                    model_raw,
-                    ema_slow,
-                    step,
+                    run_dir, model_raw, ema_slow, step,
                     {
-                        "run_name": args.run_name,
-                        "arch": args.arch,
-                        "stage": curriculum_stage_for_step(step).stage_id,
-                        "unique_splits_seen": len(seen_splits) * world_size,
-                        "world_size": world_size,
-                        "train_loss": round(s_loss / max(valid_eps, 1), 5),
-                        "train_tstr": round(s_tstr / max(valid_eps, 1), 5),
+                        "run_name": args.run_name, "arch": args.arch, "stage": curriculum_stage_for_step(step).stage_id,
+                        "unique_splits_seen": len(seen_splits) * world_size, "world_size": world_size,
+                        "train_loss": round(s_loss / max(valid_eps, 1), 5), "train_tstr": round(s_tstr / max(valid_eps, 1), 5),
                         "train_mmd": round(s_mmd / max(valid_eps, 1), 5),
                     },
                 )
@@ -453,31 +470,24 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="DOPE v2.0.0 high-speed multi-node trainer")
-    ap.add_argument("--corpus-dir", default="/home/ubuntu/dope-data/s3-v250-corpus")
-    ap.add_argument("--run-dir", default="/home/ubuntu/dope-data/runs/dope_v2")
-    ap.add_argument("--run-name", default="dope_single_enc_v2")
-    ap.add_argument("--arch", choices=("single_enc_v6", "flow_v6"), default="single_enc_v6")
-    ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
-    ap.add_argument("--vram-cap-gib", type=float, default=6.0)
-    ap.add_argument("--cohost-min-free-gib", type=float, default=0.0)
-    ap.add_argument("--cohost-max-cpu-pct", type=float, default=0.0)
-    ap.add_argument("--d-model", type=int, default=384)
-    ap.add_argument("--n-layers", type=int, default=8)
-    ap.add_argument("--n-heads", type=int, default=8)
-    ap.add_argument("--global-dim", type=int, default=128)
-    ap.add_argument("--col-dim", type=int, default=24)
-    ap.add_argument("--total-steps", type=int, default=30000)
-    ap.add_argument("--warmup-steps", type=int, default=400)
-    ap.add_argument("--episodes-per-step", type=int, default=12)
-    ap.add_argument("--grad-accum", type=int, default=2)
-    ap.add_argument("--prep-workers", type=int, default=4)
-    ap.add_argument("--lr", type=float, default=4e-4)
-    ap.add_argument("--weight-decay", type=float, default=1e-2)
-    ap.add_argument("--grad-clip", type=float, default=1.0)
-    ap.add_argument("--seed", type=int, default=20261122)
-    ap.add_argument("--log-every", type=int, default=5)
-    ap.add_argument("--ckpt-every", type=int, default=50)
-    ap.add_argument("--no-preload", action="store_true")
+    for flg, kw in [
+        ("--corpus-dir", {"default": "/home/ubuntu/dope-data/s3-v250-corpus"}),
+        ("--run-dir", {"default": "/home/ubuntu/dope-data/runs/dope_v2"}),
+        ("--run-name", {"default": "dope_single_enc_v2"}),
+        ("--arch", {"choices": ("single_enc_v6", "flow_v6"), "default": "single_enc_v6"}),
+        ("--device", {"default": "cuda" if torch.cuda.is_available() else "cpu"}),
+        ("--vram-cap-gib", {"type": float, "default": 6.0}), ("--cohost-min-free-gib", {"type": float, "default": 0.0}),
+        ("--cohost-max-cpu-pct", {"type": float, "default": 0.0}), ("--d-model", {"type": int, "default": 384}),
+        ("--n-layers", {"type": int, "default": 8}), ("--n-heads", {"type": int, "default": 8}),
+        ("--global-dim", {"type": int, "default": 128}), ("--col-dim", {"type": int, "default": 24}),
+        ("--total-steps", {"type": int, "default": 30000}), ("--warmup-steps", {"type": int, "default": 400}),
+        ("--episodes-per-step", {"type": int, "default": 12}), ("--grad-accum", {"type": int, "default": 2}),
+        ("--prep-workers", {"type": int, "default": 4}), ("--lr", {"type": float, "default": 4e-4}),
+        ("--weight-decay", {"type": float, "default": 1e-2}), ("--grad-clip", {"type": float, "default": 1.0}),
+        ("--seed", {"type": int, "default": 20261122}), ("--log-every", {"type": int, "default": 5}),
+        ("--ckpt-every", {"type": int, "default": 50}), ("--no-preload", {"action": "store_true"}),
+    ]:
+        ap.add_argument(flg, **kw)
     return ap.parse_args()
 
 

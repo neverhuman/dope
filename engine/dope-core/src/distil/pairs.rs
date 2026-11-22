@@ -1,5 +1,6 @@
 //! Purified pairwise interaction mining (`target.pairs`) on teacher residuals.
 
+use crate::target::{log_sum_exp, Head};
 use serde::{Deserialize, Serialize};
 
 pub const PAIR_GRID: usize = 4;
@@ -16,21 +17,24 @@ pub struct PairEffect {
     pub gain: f64,
 }
 
-/// Mine up to `max_pairs` strongest pairwise interactions from the residual `target_logits - main_logits`.
-pub fn mine_pairs(
+/// Mine up to `max_pairs` strongest purified pairwise interactions via Fisher-weighted Newton
+/// updates directly in soft-target loss space (never raw `ln(1e-4)` logit-difference spikes!).
+#[allow(clippy::too_many_arguments)]
+pub fn mine_pairs_fisher(
+    head: Head,
     x: &[Vec<f64>],
-    residuals: &[f64],
+    base_logits: &[f64],
+    soft_targets: &[f64],
     weights: &[f64],
     impute: &[f64],
-    outputs: usize,
     max_pairs: usize,
 ) -> Vec<PairEffect> {
     let d = x.len();
     let n = weights.len();
+    let outputs = head.outputs();
     if d < 2 || n < 20 || max_pairs == 0 {
         return Vec::new();
     }
-    // Precompute 4-bin quantile edges and bin indices per feature.
     let mut edges = Vec::with_capacity(d);
     let mut bins = vec![vec![0usize; n]; d];
     for j in 0..d {
@@ -58,35 +62,70 @@ pub fn mine_pairs(
         edges.push(e);
     }
 
-    // Screen candidate pairs (cap at top 32 features if d > 32 by single-feature residual spread).
+    let mut cur_logits = base_logits.to_vec();
+    let mut grad = vec![0.0; n * outputs];
+    let mut hess = vec![0.0; n * outputs];
+    let fill_gh = |logits: &[f64], g: &mut [f64], h: &mut [f64]| match head {
+        Head::Regression => {
+            for r in 0..n {
+                let w = weights[r].max(0.0);
+                g[r] = w * (logits[r] - soft_targets[r]);
+                h[r] = w;
+            }
+        }
+        Head::Binary => {
+            for r in 0..n {
+                let w = weights[r].max(0.0);
+                let z = logits[r].clamp(-10.0, 10.0);
+                let p = 1.0 / (1.0 + (-z).exp());
+                g[r] = w * (p - soft_targets[r].clamp(0.0, 1.0));
+                h[r] = w * (p * (1.0 - p)).max(0.02);
+            }
+        }
+        Head::Multiclass(k) => {
+            for r in 0..n {
+                let w = weights[r].max(0.0);
+                let row = &logits[r * k..(r + 1) * k];
+                let lse = log_sum_exp(row);
+                for c in 0..k {
+                    let p = (row[c] - lse).exp();
+                    g[r * k + c] = w * (p - soft_targets[r * k + c].clamp(0.0, 1.0));
+                    h[r * k + c] = w * (p * (1.0 - p)).max(0.02);
+                }
+            }
+        }
+    };
+
+    fill_gh(&cur_logits, &mut grad, &mut hess);
     let mut feat_idx: Vec<usize> = (0..d).collect();
-    if d > 32 {
+    if d > 24 {
         let mut scores: Vec<(f64, usize)> = (0..d)
             .map(|j| {
-                let mut sum = [0.0; PAIR_GRID];
-                let mut cnt = [1e-6; PAIR_GRID];
+                let mut sg = [0.0; PAIR_GRID];
+                let mut sh = [1e-6; PAIR_GRID];
                 for r in 0..n {
                     let b = bins[j][r];
-                    sum[b] += weights[r] * residuals[r * outputs];
-                    cnt[b] += weights[r];
+                    sg[b] += grad[r * outputs];
+                    sh[b] += hess[r * outputs];
                 }
-                let var: f64 = (0..PAIR_GRID).map(|b| (sum[b] / cnt[b]).powi(2)).sum();
+                let var: f64 = (0..PAIR_GRID).map(|b| sg[b] * sg[b] / (sh[b] + 4.0)).sum();
                 (var, j)
             })
             .collect();
         scores.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.cmp(&b.1)));
-        feat_idx = scores.into_iter().take(32).map(|(_, j)| j).collect();
+        feat_idx = scores.into_iter().take(24).map(|(_, j)| j).collect();
     }
 
     let cells = PAIR_GRID * PAIR_GRID;
-    let mut cur_res = residuals.to_vec();
     let mut picked: Vec<PairEffect> = Vec::with_capacity(max_pairs);
     let mut used_pairs: Vec<(usize, usize)> = Vec::new();
-    let eta_pair = 0.5;
+    let eta_pair = if head == Head::Regression { 0.5 } else { 0.4 };
+    let ridge = if head == Head::Regression { 6.0 } else { 10.0 };
 
-    // Sequential boosting over pairs (BUG-R1): subtract each accepted pair's shrunk contribution
-    // from `cur_res` before fitting the next pair so correlated pairs never over-sum logits.
-    for _ in 0..max_pairs {
+    for step in 0..max_pairs {
+        if step > 0 {
+            fill_gh(&cur_logits, &mut grad, &mut hess);
+        }
         let mut best: Option<PairEffect> = None;
         for ii in 0..feat_idx.len() {
             for jj in (ii + 1)..feat_idx.len() {
@@ -94,23 +133,18 @@ pub fn mine_pairs(
                 if used_pairs.contains(&(fa, fb)) {
                     continue;
                 }
-                let mut sum = vec![0.0; cells * outputs];
-                let mut wsum = vec![0.0; cells];
+                let mut sg = vec![0.0; cells * outputs];
+                let mut sh = vec![ridge; cells * outputs];
                 for r in 0..n {
                     let cell = bins[fa][r] * PAIR_GRID + bins[fb][r];
-                    let w = weights[r].max(0.0);
-                    wsum[cell] += w;
                     for c in 0..outputs {
-                        sum[cell * outputs + c] += w * cur_res[r * outputs + c];
+                        sg[cell * outputs + c] += grad[r * outputs + c];
+                        sh[cell * outputs + c] += hess[r * outputs + c];
                     }
                 }
                 let mut grid = vec![0.0; cells * outputs];
-                for cell in 0..cells {
-                    let den = wsum[cell] + 6.0;
-                    for c in 0..outputs {
-                        grid[cell * outputs + c] =
-                            (eta_pair * sum[cell * outputs + c] / den).clamp(-2.0, 2.0);
-                    }
+                for idx in 0..(cells * outputs) {
+                    grid[idx] = (-eta_pair * sg[idx] / sh[idx]).clamp(-1.5, 1.5);
                 }
                 // Purify: subtract row and column means so pair term is purely second-order!
                 for c in 0..outputs {
@@ -133,13 +167,13 @@ pub fn mine_pairs(
                         }
                     }
                 }
-                let gain: f64 = (0..cells)
-                    .map(|cell| {
-                        let g2: f64 = (0..outputs).map(|c| grid[cell * outputs + c].powi(2)).sum();
-                        wsum[cell] * g2
+                let gain: f64 = (0..cells * outputs)
+                    .map(|idx| {
+                        let dval = grid[idx];
+                        (-sg[idx] * dval - 0.5 * sh[idx] * dval * dval).max(0.0)
                     })
                     .sum();
-                if gain > 1e-5 {
+                if gain > 1e-4 {
                     let replace = best.as_ref().is_none_or(|b| {
                         gain > b.gain
                             || ((gain - b.gain).abs() <= 1e-12 && (fa, fb) < (b.feat_a, b.feat_b))
@@ -164,13 +198,31 @@ pub fn mine_pairs(
         for r in 0..n {
             let cell = bins[pe.feat_a][r] * PAIR_GRID + bins[pe.feat_b][r];
             for c in 0..outputs {
-                cur_res[r * outputs + c] -= pe.grid[cell * outputs + c];
+                cur_logits[r * outputs + c] += pe.grid[cell * outputs + c];
             }
         }
         used_pairs.push((pe.feat_a, pe.feat_b));
         picked.push(pe);
     }
     picked
+}
+
+/// Legacy residual-space pair miner kept for backwards compatibility with regression callers.
+pub fn mine_pairs(
+    x: &[Vec<f64>],
+    residuals: &[f64],
+    weights: &[f64],
+    impute: &[f64],
+    outputs: usize,
+    max_pairs: usize,
+) -> Vec<PairEffect> {
+    let head = if outputs <= 1 {
+        Head::Regression
+    } else {
+        Head::Multiclass(outputs)
+    };
+    let zeros = vec![0.0; residuals.len()];
+    mine_pairs_fisher(head, x, &zeros, residuals, weights, impute, max_pairs)
 }
 
 pub fn add_pair_logits(pairs: &[PairEffect], x: &[Vec<f64>], impute: &[f64], logits: &mut [f64]) {

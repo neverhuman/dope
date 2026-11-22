@@ -32,7 +32,7 @@ impl LatticeSpec {
     /// Canonical decimal-exact emission avoiding binary float drift (e.g. `0.30000000000000004`).
     pub fn snap_canonical(&self, raw: f64) -> f64 {
         let idx = ((raw - self.origin) / self.step).round();
-        let snapped = if self.origin == 0.0 && self.dec_exp >= 0 {
+        let snapped = if self.mantissa > 0.0 && self.origin == 0.0 && self.dec_exp >= 0 {
             let scale = 10_f64.powi(self.dec_exp as i32);
             // Compute exact scaled integer when mantissa * 10 is integer (1, 2, 2.5, 5).
             let half_m = (self.mantissa * 2.0).round();
@@ -59,8 +59,32 @@ impl LatticeSpec {
     }
 }
 
+/// True when finite observations exhibit nontrivial IEEE-754 `f32` rounding heritage (`T27`).
+pub fn is_f32_heritage(values: &[f64]) -> bool {
+    let mut n = 0usize;
+    let mut f32_exact = 0usize;
+    let mut f32_nontrivial = false;
+    for &v in values {
+        if !v.is_finite() {
+            continue;
+        }
+        n += 1;
+        let f = f64::from(v as f32);
+        if (v - f).abs() <= 1e-12 * v.abs().max(1.0) {
+            f32_exact += 1;
+            let r6 = (v * 1e6).round() / 1e6;
+            if (v - r6).abs() > 1e-10 {
+                f32_nontrivial = true;
+            }
+        }
+    }
+    n >= 4 && f32_nontrivial && (f32_exact as f64 / n as f64) >= 0.995
+}
+
 /// Detect the coarsest decimal-exact lattice `q0 = m * 10^(-d)` (`m in {5, 2.5, 2, 1}`,
-/// `d in [-4, 6]`, `2 <= bulk_range/q0 <= 1e6`) plus optional off-grid mixture weight (`T28`).
+/// `d in [-4, 6]`, `2 <= bulk_range/q0 <= 1e6`), falling back to general uniform arithmetic
+/// lattices (handling scaled/rational grids like `1/6, 1/7, 1/9` and model-space affine steps;
+/// `M01/M02`, `T27`, `T28`).
 pub fn detect_lattice(sorted: &[f64], support_k: usize) -> Option<LatticeSpec> {
     let n = sorted.len();
     if n < support_k.max(10) {
@@ -72,88 +96,174 @@ pub fn detect_lattice(sorted: &[f64], support_k: usize) -> Option<LatticeSpec> {
     let bulk_lo = sorted[k_ord];
     let bulk_hi = sorted[n - 1 - k_ord];
     let range = bulk_hi - bulk_lo;
-    if !range.is_finite() || range <= 0.0 {
-        return None;
-    }
-    let f32_exact = sorted
-        .iter()
-        .filter(|&&v| (v - f64::from(v as f32)).abs() <= 1e-12 * v.abs().max(1.0))
-        .count();
-    let f32_nontrivial = sorted.iter().any(|&v| {
-        let f = f64::from(v as f32);
-        let r6 = (v * 1e6).round() / 1e6;
-        (v - f).abs() <= 1e-12 && (v - r6).abs() > 1e-10
-    });
-    let f32_heritage = f32_nontrivial && (f32_exact as f64 / n as f64) >= 0.995;
+    let f32_heritage = is_f32_heritage(sorted);
 
-    let origins = [0.0, bulk_lo];
-    let mut best_hybrid: Option<(f64, LatticeSpec)> = None;
-    for d in -4i8..=6i8 {
-        let pow10 = 10_f64.powi(-(d as i32));
-        for &m in &[5.0_f64, 2.5, 2.0, 1.0] {
-            let step = m * pow10;
-            let n_steps = range / step;
-            if !(2.0..=1e6).contains(&n_steps) {
-                continue;
-            }
-            let tol = 2e-3 * step;
-            for &origin in &origins {
-                let mut on_grid = 0usize;
-                let mut distinct_idx = std::collections::BTreeSet::new();
-                for &v in sorted {
-                    let idx = ((v - origin) / step).round();
-                    if (v - (origin + idx * step)).abs() <= tol {
-                        on_grid += 1;
-                        if v >= bulk_lo && v <= bulk_hi && distinct_idx.len() < 4 {
-                            distinct_idx.insert(idx as i64);
-                        }
-                    }
-                }
-                // Require at least 3 distinct occupied lattice indices in the bulk!
-                if distinct_idx.len() < 3 {
+    if range.is_finite() && range > 0.0 {
+        let origins = [0.0, bulk_lo];
+        let mut best_hybrid: Option<(f64, LatticeSpec)> = None;
+        for d in -4i8..=6i8 {
+            let pow10 = 10_f64.powi(-(d as i32));
+            for &m in &[5.0_f64, 2.5, 2.0, 1.0] {
+                let step = m * pow10;
+                let n_steps = range / step;
+                if !(2.0..=1e6).contains(&n_steps) {
                     continue;
                 }
-                let share = on_grid as f64 / n as f64;
-                let off_cnt = n - on_grid;
-                if share >= 0.995 {
-                    // Do not override a strong coarse hybrid lattice (`>= 85%`) by refining
-                    // more than 100x finer into noisy sub-digits (`T28`).
-                    if let Some((h_share, ref h_spec)) = best_hybrid {
-                        if h_share >= 0.85 && step <= h_spec.step * 0.01 {
-                            return Some(h_spec.clone());
+                let tol = 2e-3 * step;
+                for &origin in &origins {
+                    let mut on_grid = 0usize;
+                    let mut distinct_idx = std::collections::BTreeSet::new();
+                    for &v in sorted {
+                        let idx = ((v - origin) / step).round();
+                        if (v - (origin + idx * step)).abs() <= tol {
+                            on_grid += 1;
+                            if v >= bulk_lo && v <= bulk_hi && distinct_idx.len() < 4 {
+                                distinct_idx.insert(idx as i64);
+                            }
                         }
                     }
-                    let pi_off = if off_cnt >= support_k {
-                        off_cnt as f64 / n as f64
-                    } else {
-                        0.0
-                    };
-                    return Some(LatticeSpec {
-                        origin,
-                        mantissa: m,
-                        dec_exp: d,
-                        step,
-                        f32_heritage,
-                        pi_offgrid: pi_off,
-                    });
-                }
-                if share >= 0.80 && off_cnt >= support_k {
-                    let cand = LatticeSpec {
-                        origin,
-                        mantissa: m,
-                        dec_exp: d,
-                        step,
-                        f32_heritage,
-                        pi_offgrid: off_cnt as f64 / n as f64,
-                    };
-                    if best_hybrid.as_ref().is_none_or(|(s, _)| share > *s + 0.05) {
-                        best_hybrid = Some((share, cand));
+                    // Require at least 3 distinct occupied lattice indices in the bulk!
+                    if distinct_idx.len() < 3 {
+                        continue;
+                    }
+                    let share = on_grid as f64 / n as f64;
+                    let off_cnt = n - on_grid;
+                    if share >= 0.995 {
+                        // Do not override a strong coarse hybrid lattice (`>= 85%`) by refining
+                        // more than 100x finer into noisy sub-digits (`T28`).
+                        if let Some((h_share, ref h_spec)) = best_hybrid {
+                            if h_share >= 0.85 && step <= h_spec.step * 0.01 {
+                                return Some(h_spec.clone());
+                            }
+                        }
+                        let pi_off = if off_cnt >= support_k {
+                            off_cnt as f64 / n as f64
+                        } else {
+                            0.0
+                        };
+                        return Some(LatticeSpec {
+                            origin,
+                            mantissa: m,
+                            dec_exp: d,
+                            step,
+                            f32_heritage,
+                            pi_offgrid: pi_off,
+                        });
+                    }
+                    if share >= 0.80 && off_cnt >= support_k {
+                        let cand = LatticeSpec {
+                            origin,
+                            mantissa: m,
+                            dec_exp: d,
+                            step,
+                            f32_heritage,
+                            pi_offgrid: off_cnt as f64 / n as f64,
+                        };
+                        if best_hybrid.as_ref().is_none_or(|(s, _)| share > *s + 0.05) {
+                            best_hybrid = Some((share, cand));
+                        }
                     }
                 }
             }
         }
+        if let Some((_, spec)) = best_hybrid {
+            return Some(spec);
+        }
     }
-    best_hybrid.map(|(_, spec)| spec)
+
+    detect_uniform_lattice(sorted, support_k, f32_heritage)
+}
+
+/// Detect a general uniform arithmetic lattice `origin + k * step` (e.g. `k/7`, `k/9`, or
+/// model-space affine-scaled integer/decimal lattices) using repeated (`count >= 2`) values
+/// so private singletons never define the grid (`M01/M02`).
+fn detect_uniform_lattice(
+    sorted: &[f64],
+    support_k: usize,
+    f32_heritage: bool,
+) -> Option<LatticeSpec> {
+    let n = sorted.len();
+    let mut uniq: Vec<(f64, usize)> = Vec::new();
+    for &v in sorted {
+        if let Some(last) = uniq.last_mut() {
+            if (last.0 - v).abs() <= 1e-12 * v.abs().max(1.0) {
+                last.1 += 1;
+                continue;
+            }
+        }
+        uniq.push((v, 1));
+    }
+    let rep: Vec<f64> = uniq
+        .iter()
+        .filter(|&&(_, c)| c >= 2)
+        .map(|&(v, _)| v)
+        .collect();
+    if rep.len() < 3 || rep.len() > 2_000 {
+        return None;
+    }
+    let full_range = rep[rep.len() - 1] - rep[0];
+    if !full_range.is_finite() || full_range <= 0.0 {
+        return None;
+    }
+    let mut gaps: Vec<f64> = rep
+        .windows(2)
+        .map(|w| w[1] - w[0])
+        .filter(|&g| g > 1e-9 * full_range.max(1.0))
+        .collect();
+    if gaps.is_empty() {
+        return None;
+    }
+    gaps.sort_by(f64::total_cmp);
+    let g0 = gaps[0];
+    let mut cands = vec![g0, g0 / 2.0, g0 / 3.0];
+    for &g in gaps.iter().take(6) {
+        if cands.iter().all(|&c| (c - g).abs() > 1e-4 * c.max(1e-9)) {
+            cands.push(g);
+        }
+    }
+    cands.sort_by(|a, b| b.total_cmp(a));
+    let origins = [0.0, rep[0]];
+    for step in cands {
+        let n_steps = full_range / step;
+        if !(2.0..=2_000.0).contains(&n_steps) {
+            continue;
+        }
+        let tol = 2e-3 * step;
+        for &origin in &origins {
+            let mut on_grid = 0usize;
+            let mut distinct_idx = std::collections::BTreeSet::new();
+            for &v in sorted {
+                let idx = ((v - origin) / step).round();
+                if (v - (origin + idx * step)).abs() <= tol {
+                    on_grid += 1;
+                    if distinct_idx.len() < 4 {
+                        distinct_idx.insert(idx as i64);
+                    }
+                }
+            }
+            if distinct_idx.len() < 3 {
+                continue;
+            }
+            let share = on_grid as f64 / n as f64;
+            let off_cnt = n - on_grid;
+            if share >= 0.99 {
+                let pi_off = if off_cnt >= support_k {
+                    off_cnt as f64 / n as f64
+                } else {
+                    0.0
+                };
+                return Some(LatticeSpec {
+                    origin,
+                    mantissa: 0.0,
+                    dec_exp: 0,
+                    step,
+                    f32_heritage,
+                    pi_offgrid: pi_off,
+                });
+            }
+        }
+    }
+    None
 }
 
 /// Detect heaping at coarser multiples `Q = mult * q0` (`mult in {2,5,10,20,25,50,100}`)
