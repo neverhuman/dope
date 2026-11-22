@@ -1,7 +1,8 @@
-//! `dope_statpacket`: fit, inspect, truncate and decode `dope.single-encoding/v1`
-//! statistics packets. Tables travel as `DOPEMAT1` files in raw units (features
-//! first, target last); reports are one JSON object on stdout. Errors go to
-//! stderr and never contain data values or file contents.
+//! `dope_statpacket`: fit, sample, truncate, inspect and embed
+//! `dope.single-encoding/v1` statistics packets. Tables travel as `DOPEMAT1`
+//! files in raw units (features first, target last); every command prints one
+//! JSON object on stdout. Errors go to stderr and never contain data values,
+//! file contents or file names.
 
 use clap::{Parser, Subcommand};
 use serde_json::json;
@@ -15,9 +16,10 @@ use std::process::ExitCode;
 #[path = "../statpacket/mod.rs"]
 mod statpacket;
 
-use statpacket::codec::{fit_to_budget, ledger, pack, truncate, unpack};
-use statpacket::decode::Decoder;
-use statpacket::fit::{fit_features_for_budget, FitInput, Labels};
+use statpacket::codec::{decoder_sha8, ledger, truncate, unpack};
+use statpacket::decode::{Decoder, LabelRule};
+use statpacket::embed::{embed, EMBED_PREFIX};
+use statpacket::fit::{fit_packet, Size, Target};
 use statpacket::matio::Mat;
 use statpacket::packet::{Level, Task};
 use statpacket::scale::ScaleCard;
@@ -37,8 +39,8 @@ struct Cli {
 enum Command {
     /// Fit a packet and its owner-side scale card from FIT rows.
     Fit {
-        /// DOPEMAT1 file with the FIT rows in raw units.
-        #[arg(long)]
+        /// DOPEMAT1 file with the FIT rows in raw units, target last.
+        #[arg(long = "in", alias = "input")]
         input: PathBuf,
         /// regression, binary, multiclass or multilabel.
         #[arg(long)]
@@ -46,32 +48,21 @@ enum Command {
         /// Class count (multiclass) or label count (multilabel).
         #[arg(long, default_value_t = 0)]
         classes: u8,
-        #[arg(long)]
-        packet: PathBuf,
+        /// Packet file to write.
+        #[arg(long = "out", alias = "packet")]
+        out: PathBuf,
         #[arg(long)]
         card: PathBuf,
-        #[arg(long, default_value_t = 2048)]
-        max_bytes: usize,
+        /// Byte budget of the packet.
+        #[arg(long, alias = "max-bytes", default_value_t = 2048)]
+        budget: usize,
         /// Highest level to keep (A..E) before the budget is applied.
         #[arg(long)]
         level: Option<String>,
     },
-    /// Print the byte ledger of a packet.
-    Info {
-        #[arg(long)]
-        packet: PathBuf,
-    },
-    /// Cut a packet down to a lower level.
-    Truncate {
-        #[arg(long)]
-        packet: PathBuf,
-        #[arg(long)]
-        level: String,
-        #[arg(long)]
-        output: PathBuf,
-    },
-    /// Sample feature rows `row0 .. row0 + rows` from a packet.
-    Decode {
+    /// Sample rows `row0 .. row0 + rows` (features and target) from a packet.
+    #[command(alias = "decode")]
+    Sample {
         #[arg(long)]
         packet: PathBuf,
         /// Scale card; without it the rows stay in unit space.
@@ -83,8 +74,31 @@ enum Command {
         row0: u64,
         #[arg(long, default_value_t = 0)]
         seed: u64,
+        /// `sampled` (default) or `regime`: how a class label is drawn.
+        #[arg(long, default_value = "sampled")]
+        labels: String,
+        #[arg(long = "out", alias = "output")]
+        out: PathBuf,
+    },
+    /// Cut a packet down to a lower level.
+    Truncate {
         #[arg(long)]
-        output: PathBuf,
+        packet: PathBuf,
+        #[arg(long)]
+        level: String,
+        #[arg(long = "out", alias = "output")]
+        out: PathBuf,
+    },
+    /// Print the header and the byte ledger of a packet (no data values).
+    #[command(alias = "info")]
+    Inspect {
+        #[arg(long)]
+        packet: PathBuf,
+    },
+    /// Print the 64-D and 128-D int8 embedding of a packet.
+    Embed {
+        #[arg(long)]
+        packet: PathBuf,
     },
 }
 
@@ -96,11 +110,12 @@ fn write(path: &Path, bytes: &[u8]) -> Result<(), StatError> {
     std::fs::write(path, bytes).map_err(|e| StatError::Io(e.kind()))
 }
 
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
+}
+
 fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
+    hex(&Sha256::digest(bytes))
 }
 
 fn level_arg(name: &str) -> Result<Level, StatError> {
@@ -132,13 +147,38 @@ fn integer_labels(values: &[f64], limit: usize) -> Result<Vec<u16>, StatError> {
         .collect()
 }
 
+/// Header fields and byte ledger of a packed file: integers and names only.
+fn describe(bytes: &[u8]) -> Result<serde_json::Value, StatError> {
+    let packet = unpack(bytes)?;
+    Ok(json!({
+        "schema": "dope.single-encoding/v1",
+        "header": {
+            "magic": String::from_utf8_lossy(&bytes[..4]),
+            "version": bytes[4],
+            "kind": bytes[5],
+            "task": packet.task,
+            "classes": packet.k,
+            "cols": packet.p,
+            "level": packet.level.name(),
+            "bit_profile": bytes[11],
+            "sections": bytes[12],
+            "log2_rows": packet.log2_n,
+            "sparse_target": packet.target_sparse,
+            "decoder_sha8": hex(&decoder_sha8()),
+        },
+        "packet_bytes": bytes.len(),
+        "packet_sha256": sha256_hex(bytes),
+        "ledger": ledger(bytes)?,
+    }))
+}
+
 fn fit(
     input: &Path,
     task: &str,
     classes: u8,
-    packet_path: &Path,
+    out: &Path,
     card_path: &Path,
-    max_bytes: usize,
+    budget: usize,
     level: Option<&str>,
 ) -> Result<serde_json::Value, StatError> {
     let mat = Mat::read(input)?;
@@ -154,18 +194,15 @@ fn fit(
         ));
     }
     let raw = mat.features();
-    let mut card = ScaleCard::fit(&raw, mat.rows, mat.x_cols)?;
-    let unit = card.to_unit_rows(&raw)?;
-    let (ids, mut cells): (Vec<u16>, Vec<u8>);
-    let labels = match task {
+    let (values, ids, mut cells): (Vec<f64>, Vec<u16>, Vec<u8>);
+    let target = match task {
         Task::Regression => {
-            card = card.with_regression_target(&mat.target(0))?;
-            Labels::None
+            values = mat.target(0);
+            Target::Regression(&values)
         }
         Task::Binary | Task::Multiclass => {
             ids = integer_labels(&mat.target(0), k as usize)?;
-            card = card.with_classes((0..k).map(f64::from).collect());
-            Labels::Classes(&ids)
+            Target::Classes(&ids)
         }
         Task::Multilabel => {
             cells = Vec::with_capacity(mat.rows * k as usize);
@@ -175,38 +212,79 @@ fn fit(
                     cells.push(integer_labels(&[cell], 2)?[0] as u8);
                 }
             }
-            Labels::Multilabel(&cells)
+            Target::Multilabel(&cells)
         }
     };
-    let fit_input = FitInput {
-        x: &unit,
-        rows: mat.rows,
-        cols: mat.x_cols,
-        task,
-        k,
-        labels,
+    let size = Size {
+        level: match level {
+            Some(name) => level_arg(name)?,
+            None => Level::E,
+        },
+        max_bytes: Some(budget),
     };
-    let mut packet = fit_features_for_budget(&fit_input, max_bytes)?;
-    if let Some(name) = level {
-        packet = packet.at_level(level_arg(name)?)?;
-    }
-    let fitted = fit_to_budget(&packet, max_bytes);
-    let bytes = pack(&fitted.packet, fitted.level)?;
-    write(packet_path, &bytes)?;
-    write(card_path, card.to_json()?.as_bytes())?;
+    let fitted = fit_packet(&raw, target, task, k, size, mat.rows)?;
+    let card_text = fitted.card.to_json()?;
+    write(out, &fitted.bytes)?;
+    write(card_path, card_text.as_bytes())?;
+    let mut report = describe(&fitted.bytes)?;
+    report["status"] = json!(if fitted.budget.fits {
+        "ok"
+    } else {
+        "over_budget"
+    });
+    report["rows"] = json!(mat.rows);
+    report["cols"] = json!(mat.x_cols);
+    report["level"] = json!(fitted.budget.level.name());
+    report["budget"] = json!(budget);
+    report["max_bytes"] = json!(budget);
+    report["budget_step"] = json!(fitted.budget.step);
+    report["target_cols"] = json!(fitted.budget.target_cols);
+    report["main_effect_cols"] = json!(fitted.budget.main_effect_cols);
+    report["card_bytes"] = json!(card_text.len());
+    Ok(report)
+}
+
+fn sample(
+    packet: &Path,
+    card: Option<&Path>,
+    rows: usize,
+    row0: u64,
+    seed: u64,
+    labels: &str,
+    out: &Path,
+) -> Result<serde_json::Value, StatError> {
+    let rule = match labels {
+        "sampled" => LabelRule::Sampled,
+        "regime" => LabelRule::Regime,
+        _ => return Err(StatError::Invalid("labels must be sampled or regime")),
+    };
+    let bytes = read(packet)?;
+    let decoder = Decoder::new(&unpack(&bytes)?)?.with_label_rule(rule);
+    let card = match card {
+        Some(path) => {
+            let text = String::from_utf8(read(path)?)
+                .map_err(|_| StatError::Invalid("scale card is not UTF-8"))?;
+            Some(ScaleCard::from_json(&text)?)
+        }
+        None => None,
+    };
+    let mat = Mat {
+        rows,
+        x_cols: decoder.cols(),
+        y_cols: decoder.targets(),
+        data: decoder.table(card.as_ref(), seed, row0, rows)?,
+    };
+    mat.write(out)?;
     Ok(json!({
-        "schema": "dope.single-encoding/v1",
-        "status": if fitted.fits { "ok" } else { "over_budget" },
-        "rows": mat.rows,
-        "cols": mat.x_cols,
-        "level": fitted.level.name(),
+        "rows": rows,
+        "row0": row0,
+        "seed": seed,
+        "cols": decoder.cols(),
+        "target_cols": decoder.targets(),
+        "units": if card.is_some() { "raw" } else { "unit" },
+        "labels": labels,
         "packet_bytes": bytes.len(),
-        "max_bytes": max_bytes,
-        "budget_step": fitted.step,
-        "target_cols": fitted.target_cols,
-        "main_effect_cols": fitted.main_effect_cols,
         "packet_sha256": sha256_hex(&bytes),
-        "ledger": ledger(&bytes)?,
     }))
 }
 
@@ -216,66 +294,41 @@ fn run(cli: Cli) -> Result<serde_json::Value, StatError> {
             input,
             task,
             classes,
-            packet,
+            out,
             card,
-            max_bytes,
+            budget,
             level,
         } => fit(
             &input,
             &task,
             classes,
-            &packet,
+            &out,
             &card,
-            max_bytes,
+            budget,
             level.as_deref(),
         ),
-        Command::Info { packet } => {
-            let bytes = read(&packet)?;
-            Ok(json!({ "packet_sha256": sha256_hex(&bytes), "ledger": ledger(&bytes)? }))
-        }
-        Command::Truncate {
-            packet,
-            level,
-            output,
-        } => {
-            let cut = truncate(&read(&packet)?, level_arg(&level)?)?;
-            write(&output, &cut)?;
-            Ok(json!({ "packet_sha256": sha256_hex(&cut), "ledger": ledger(&cut)? }))
-        }
-        Command::Decode {
+        Command::Sample {
             packet,
             card,
             rows,
             row0,
             seed,
-            output,
-        } => {
+            labels,
+            out,
+        } => sample(&packet, card.as_deref(), rows, row0, seed, &labels, &out),
+        Command::Truncate { packet, level, out } => {
+            let cut = truncate(&read(&packet)?, level_arg(&level)?)?;
+            write(&out, &cut)?;
+            describe(&cut)
+        }
+        Command::Inspect { packet } => describe(&read(&packet)?),
+        Command::Embed { packet } => {
             let bytes = read(&packet)?;
-            let decoder = Decoder::new(&unpack(&bytes)?)?;
-            let (data, units) = match card {
-                Some(path) => {
-                    let text = String::from_utf8(read(&path)?)
-                        .map_err(|_| StatError::Invalid("scale card is not UTF-8"))?;
-                    let card = ScaleCard::from_json(&text)?;
-                    (decoder.rows_raw(&card, seed, row0, rows)?, "raw")
-                }
-                None => (decoder.rows_unit(seed, row0, rows), "unit"),
-            };
-            let mat = Mat {
-                rows,
-                x_cols: decoder.cols(),
-                y_cols: 0,
-                data,
-            };
-            mat.write(&output)?;
+            let full = embed(&unpack(&bytes)?);
             Ok(json!({
-                "rows": rows,
-                "row0": row0,
-                "seed": seed,
-                "cols": decoder.cols(),
-                "units": units,
-                "packet_bytes": bytes.len(),
                 "packet_sha256": sha256_hex(&bytes),
+                "embedding_64": full[..EMBED_PREFIX].to_vec(),
+                "embedding_128": full.to_vec(),
             }))
         }
     }

@@ -1,6 +1,7 @@
 //! Deterministic fixtures and small statistics shared by the unit tests.
 
-use super::fit::{fit_features, FitInput, Labels};
+use super::codec::unpack;
+use super::fit::{fit_features, fit_packet, FitInput, Labels, Size, Target};
 use super::packet::{
     f64_to_f16, AtomTable, AtomValues, ColumnMarginal, Packet, PairTerm, Task, MAIN_BINS, MAX_RANK,
     PAIRS,
@@ -41,6 +42,28 @@ pub fn fit_regression(unit: &[f64], n: usize, p: usize) -> Packet {
         labels: Labels::None,
     })
     .unwrap()
+}
+
+/// Level-E packet with every section fitted, its scale card and the
+/// unit-space FIT rows, from raw rows and their target.
+pub fn fit_full(
+    raw: &[f64],
+    y: Target,
+    task: Task,
+    k: u8,
+    n: usize,
+) -> (Packet, ScaleCard, Vec<f64>) {
+    let fitted = fit_packet(raw, y, task, k, Size::level(super::packet::Level::E), n).unwrap();
+    let unit = fitted.card.to_unit_rows(raw).unwrap();
+    (unpack(&fitted.bytes).unwrap(), fitted.card, unit)
+}
+
+/// Mean and population SD.
+pub fn mean_sd(v: &[f64]) -> (f64, f64) {
+    let n = v.len() as f64;
+    let mean = v.iter().sum::<f64>() / n;
+    let var = v.iter().map(|x| (x - mean) * (x - mean)).sum::<f64>() / n;
+    (mean, var.sqrt())
 }
 
 pub fn column<T: Copy + Into<f64>>(x: &[T], p: usize, j: usize) -> Vec<f64> {
@@ -146,7 +169,12 @@ pub fn synthetic_packet(
             byte(seed, 1, i) % (255 / prior_len.max(1)) as u8
         };
     }
-    out.resid_sd = byte(seed, 2, 0);
+    // Regression: residual-SD code and ratio nibbles; other tasks: temperature only.
+    out.resid_sd = if task == Task::Regression {
+        byte(seed, 2, 0)
+    } else {
+        0
+    };
     out.temperature = byte(seed, 2, 1);
     let fill = |v: &mut Vec<i8>, stream: u64| {
         v.iter_mut()
@@ -163,10 +191,18 @@ pub fn synthetic_packet(
     for (i, bits) in out.target_intercept.iter_mut().enumerate() {
         *bits = f64_to_f16(byte(seed, 8, i) as f64 / 32.0 - 4.0);
     }
+    // The last entry is the constant term and names no columns.
+    let column = |stream: u64, i: usize| {
+        if i + 1 == PAIRS {
+            0
+        } else {
+            (hash3(seed, stream, i as u64) % p as u64) as u16
+        }
+    };
     out.pairs = (0..PAIRS)
         .map(|i| PairTerm {
-            a: (hash3(seed, 20, i as u64) % p as u64) as u16,
-            b: (hash3(seed, 21, i as u64) % p as u64) as u16,
+            a: column(20, i),
+            b: column(21, i),
             coef: (0..o).map(|q| byte(seed, 22 + q as u64, i) as i8).collect(),
         })
         .collect();

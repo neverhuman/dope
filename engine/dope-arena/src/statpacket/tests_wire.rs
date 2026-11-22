@@ -2,35 +2,67 @@
 //! checks under mutation with a valid checksum, and the budget boundaries.
 
 use super::codec::{decoder_sha8, fit_to_budget, pack, unpack, BudgetStep};
+use super::fit::{fit_packet, Size, Target};
 use super::packet::{Level, Task, CRC_LEN};
 use super::testkit::{fit_regression, synthetic_packet, to_unit, Kind};
 use dope_core::mlc_v3::inflate::crc32_ieee;
+
+const GOLDEN_SHA8: &str = "34db2b6a8d1846ef";
+const GOLDEN_CONSTANT: &str =
+    "4453453101000000010000000304000034db2b6a8d1846ef000002000000000093e67a93";
+const GOLDEN_TWO_SHA256: &str = "52af756efbbfa3d127dff841542414dc42aed32406c314fb18ba91270b26a85e";
+const GOLDEN_FITTED: &str = concat!(
+    "4453453101000000020004000a06000034db2b6a8d1846ef51100005c44eec64",
+    "9b65b965394100ef3c00007f105c5700005ca9000019379a0000000000000000",
+    "df477ae1068201f7fb0509000000000000000000000000000000000000000000",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "000000875a4d48",
+);
 
 fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
-/// The two packets quoted in section 10 of the specification.
+/// The packets quoted in section 11 of the specification.
 #[test]
 fn golden_packets_match_the_specification() {
     use sha2::{Digest, Sha256};
-    assert_eq!(hex(&decoder_sha8()), "9542a24b5ce26f91");
+    println!("decoder sha8 {}", hex(&decoder_sha8()));
     let fit = |raw: &[f64], n: usize, p: usize| {
         let (_, unit) = to_unit(raw, n, p);
         fit_regression(&unit, n, p)
     };
+    // Feature sections only (the target sections stay zero).
     let constant = pack(&fit(&[3.0; 16], 16, 1), Level::A).unwrap();
-    assert_eq!(
-        hex(&constant),
-        "445345310100000001000000030400009542a24b5ce26f910000020000000000f46dd66e"
-    );
+    println!("constant {}", hex(&constant));
     let raw: Vec<f64> = (0..32).flat_map(|i| [i as f64, (i % 2) as f64]).collect();
     let two = pack(&fit(&raw, 32, 2), Level::E).unwrap();
-    assert_eq!(two.len(), 139);
-    assert_eq!(
-        hex(&Sha256::digest(&two)),
-        "23cfd3aba4f988e3dd696507c72a3ebcc1b02d7f1ad4121bbb73db2fb1f9c11d"
+    println!(
+        "two columns {} bytes sha256 {}",
+        two.len(),
+        hex(&Sha256::digest(&two))
     );
+    // Every section fitted: 64 rows, features `i` and `i mod 2`, target `2 i + 5 (i mod 2)`
+    // plus a fixed zig-zag, through `fit_packet`.
+    let raw: Vec<f64> = (0..64).flat_map(|i| [i as f64, (i % 2) as f64]).collect();
+    let y: Vec<f64> = (0..64)
+        .map(|i| 2.0 * i as f64 + 5.0 * (i % 2) as f64 + [0.0, 3.0, -2.0, 1.0][i % 4])
+        .collect();
+    let fitted = fit_packet(
+        &raw,
+        Target::Regression(&y),
+        Task::Regression,
+        0,
+        Size::level(Level::E),
+        64,
+    )
+    .unwrap();
+    println!("fitted {}", hex(&fitted.bytes));
+    assert_eq!(hex(&decoder_sha8()), GOLDEN_SHA8);
+    assert_eq!(hex(&constant), GOLDEN_CONSTANT);
+    assert_eq!(two.len(), 139);
+    assert_eq!(hex(&Sha256::digest(&two)), GOLDEN_TWO_SHA256);
+    assert_eq!(hex(&fitted.bytes), GOLDEN_FITTED);
 }
 
 /// Rewrites the trailer so that only structural checks can reject the file.

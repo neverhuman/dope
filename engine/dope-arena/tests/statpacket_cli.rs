@@ -1,5 +1,7 @@
-//! Black-box tests of the `dope_statpacket` binary: fit, info, truncate and
-//! decode through files only, plus the failure paths.
+//! Black-box tests of the `dope_statpacket` binary under its first command
+//! and flag names (`info`, `decode`, `--input`, `--packet`, `--max-bytes`,
+//! `--output`, kept as aliases): fit, info, truncate and decode through files
+//! only, plus the failure paths.
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -185,7 +187,8 @@ fn fit_info_truncate_and_decode_through_files() {
     decode(&repeat, "1000", "0", true);
     assert_eq!(decode(&plain, "1000", "0", false)["units"], "unit");
     let (rows, x_cols, y_cols, cells) = read_mat(&whole);
-    assert_eq!((rows, x_cols, y_cols), (1000, 10, 0));
+    // Ten features and, since the target stage, the sampled target last.
+    assert_eq!((rows, x_cols, y_cols), (1000, 10, 1));
     let bits = |v: &[f32]| v.iter().map(|x| x.to_bits()).collect::<Vec<_>>();
     let mut joined = read_mat(&head).3;
     joined.extend(read_mat(&tail).3);
@@ -195,7 +198,7 @@ fn fit_info_truncate_and_decode_through_files() {
         std::fs::read(&repeat).unwrap()
     );
     // Raw units: the constant column is restored, the binary and integer columns stay on their levels.
-    for row in cells.chunks(10) {
+    for row in cells.chunks(11) {
         assert_eq!(row[8], 12.5);
         assert!(row[7] == 0.0 || row[7] == 1.0);
         assert_eq!(row[6], row[6].round());
@@ -204,7 +207,7 @@ fn fit_info_truncate_and_decode_through_files() {
     // Unit space: every cell within the clip, the constant column at 0.
     let unit_cells = read_mat(&plain).3;
     assert!(unit_cells.iter().all(|v| v.abs() <= 6.0));
-    assert!(unit_cells.chunks(10).all(|row| row[8] == 0.0));
+    assert!(unit_cells.chunks(11).all(|row| row[8] == 0.0));
 }
 
 #[test]
