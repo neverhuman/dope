@@ -4067,6 +4067,10 @@
     "research/levels/tests/test_s3_v5_training.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
       "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+    },
+    "tools/dope_dashboard/": {
+      "command": "python3 -B -m unittest tools.dope_dashboard.test_dashboard -v",
+      "purpose": "verify read-only DOPE Fleet and Fidelity KPI Dashboard probe, metrics aggregation, and aiohttp WebSocket/HTTP server"
     }
   },
   "workspace": "dope"

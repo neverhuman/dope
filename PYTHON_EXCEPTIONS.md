@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 911
-- **`keep-with-reason`**: 885 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 916
+- **`keep-with-reason`**: 890 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -943,3 +943,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/s3_kpi_evaluator.py` | `research/levels` | `keep-with-reason` | Continuous held-out unseen-family Main-KPI and fidelity/v3 evaluator across regression, binary, multiclass, and multi-label tasks using scikit-learn auditors. | Offline research evaluation worker coupled to third-party scikit-learn auditors; no release authority. |
 | `research/levels/tests/test_s3_v5_training.py` | `research/levels` | `keep-with-reason` | Unit tests verifying fresh random splits, Rule A-1 duplicate grouping, synthetic column insertion, permutation equivariance, and finite 4-task gradients. | Direct Python research test suite for s3_dynamic_augment, v5_fidelity_net, and s3_kpi_evaluator. |
 | `research/levels/v5_fidelity_net.py` | `research/levels` | `keep-with-reason` | Cross-column Set-Attention DopeFidelityV5 neural generator with differentiable Cholesky copula and multi-learner coupled TSTR retention objective. | Offline PyTorch autograd model and training loss; native Rust owns product sampling, certification and release. |
+| `tools/dope_dashboard/__init__.py` | `tools/dope_dashboard` | `keep-with-reason` | Package marker for the read-only DOPE multi-node training and KPI dashboard. | Local monitoring dashboard tooling; no product or certification authority. |
+| `tools/dope_dashboard/metrics.py` | `tools/dope_dashboard` | `keep-with-reason` | Fleet aggregation, DDP stitching, and held-out Main-KPI leaderboard summaries for the live DOPE dashboard. | Local monitoring dashboard tooling; no product or certification authority. |
+| `tools/dope_dashboard/probe.py` | `tools/dope_dashboard` | `keep-with-reason` | Zero-dependency stdlib SSH probe emitting bounded GPU, training, and Fidelity KPI JSONL snapshots across xbabe0-xbabe9. | Local monitoring dashboard tooling; read-only host probe. |
+| `tools/dope_dashboard/server.py` | `tools/dope_dashboard` | `keep-with-reason` | Read-only aiohttp WebSocket and HTTP dashboard server (default 127.0.0.1:8768) mirroring the jsr dashboard UX. | Local monitoring dashboard tooling; coupled to aiohttp WebSocket server. |
+| `tools/dope_dashboard/test_dashboard.py` | `tools/dope_dashboard` | `keep-with-reason` | Unit and aiohttp server tests for the DOPE Fleet and Fidelity KPI Dashboard. | Direct test suite for tools/dope_dashboard. |
