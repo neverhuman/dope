@@ -109,6 +109,38 @@ pub fn write_atomic(path: &Path, bytes: &[u8]) -> ArenaResult<()> {
     std::fs::rename(&staging, path).map_err(|e| file_error(path, &e))
 }
 
+/// Stream pre-rendered lines to `path` (each followed by `\n`) through a
+/// staging file and return the SHA-256 of the bytes written. For outputs too
+/// large to assemble in memory twice.
+pub fn write_lines<'a>(path: &Path, lines: impl Iterator<Item = &'a str>) -> ArenaResult<String> {
+    if let Some(parent) = path.parent() {
+        if !parent.as_os_str().is_empty() {
+            std::fs::create_dir_all(parent).map_err(|e| file_error(parent, &e))?;
+        }
+    }
+    let mut staging_name = path.file_name().unwrap_or_default().to_os_string();
+    staging_name.push(".staging");
+    let staging: PathBuf = path.with_file_name(staging_name);
+    let file = File::create(&staging).map_err(|e| file_error(&staging, &e))?;
+    let mut writer = std::io::BufWriter::with_capacity(1 << 20, file);
+    let mut hasher = Sha256::new();
+    for line in lines {
+        for part in [line.as_bytes(), b"\n"] {
+            hasher.update(part);
+            writer
+                .write_all(part)
+                .map_err(|e| file_error(&staging, &e))?;
+        }
+    }
+    let file = writer
+        .into_inner()
+        .map_err(|e| file_error(&staging, e.error()))?;
+    file.sync_all().map_err(|e| file_error(&staging, &e))?;
+    drop(file);
+    std::fs::rename(&staging, path).map_err(|e| file_error(path, &e))?;
+    Ok(format!("{:x}", hasher.finalize()))
+}
+
 /// Canonical JSONL bytes: one sorted-key object per line, `\n` terminated.
 pub fn jsonl_bytes<T: Serialize>(records: &[T]) -> ArenaResult<Vec<u8>> {
     let mut out = String::new();
@@ -207,6 +239,22 @@ mod tests {
         assert_eq!(digest, sha256_hex(&std::fs::read(&path).unwrap()));
         assert_eq!(read_jsonl::<Record>(&path).unwrap(), records);
         assert!(!path.with_file_name("records.jsonl.staging").exists());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn streamed_lines_match_the_buffered_writer() {
+        let dir = crate::kpi::unit_test_dir("jsonl-lines");
+        let records = vec![sample(1), sample(2), sample(3)];
+        let buffered = write_jsonl(&dir.join("a.jsonl"), &records).unwrap();
+        let lines: Vec<String> = records.iter().map(|r| canonical_json(r).unwrap()).collect();
+        let path = dir.join("deep").join("b.jsonl");
+        let streamed = write_lines(&path, lines.iter().map(String::as_str)).unwrap();
+        assert_eq!(streamed, buffered);
+        assert_eq!(streamed, file_sha256(&path).unwrap());
+        assert!(!path.with_file_name("b.jsonl.staging").exists());
+        let empty = write_lines(&dir.join("c.jsonl"), std::iter::empty()).unwrap();
+        assert_eq!(empty, sha256_hex(b""));
         std::fs::remove_dir_all(&dir).unwrap();
     }
 

@@ -1,0 +1,107 @@
+--- a/docs/plans/v2-gap-closure/formats.md
++++ b/docs/plans/v2-gap-closure/formats.md
+@@ -103,6 +103,14 @@
+ index. Labels are sampled from the model's conditional, never thresholded or
+ arg-maxed. File name: `<arm_id>/<cell_id with ':' replaced by '__'>.s<sample_seed>.m<multiplier>.mat`.
+ 
++An arm of class `source_free` or `rows_at_sampler` delivers exactly
++`multiplier * len(a_idx)` rows; a control may deliver fewer (`twin_c` holds the
++C rows, `copy_a` the A rows) and never more than `max(multipliers) *
++len(a_idx)`. Every file holds at least 16 rows. NaN in a feature is a missing
++cell and is imputed like a real one; an infinite feature, a non-finite target,
++a class label outside `0..K-1` or a single-class classification target fails
++the file.
++
+ ## 6. Emission log — `emit.jsonl`
+ 
+ One object per attempted file, including failures (a failure is a row, never a
+@@ -118,17 +126,82 @@
+ `decode(unpack(pack(encode(A))))`: the encoder sees only `A` rows of the cell,
+ and the decoder receives only the packet bytes.
+ 
++An emitter appends to `emit.jsonl` at the run-directory root (one file for
++all its arms). A native arm of `dope_kpi score` writes `<arm_id>/emit.jsonl`
++instead, ordered by (cell, sample seed, multiplier); the scorer reads both
++places, keeps the rows of the scored arm and refuses a file logged twice.
++`file` is the name of section 5 relative to the run directory, empty when
++`status` is not `ok`. `reason` is a fixed code matching
++`[A-Za-z][A-Za-z0-9_:.-]{0,79}`; any other text is replaced by
++`nonconforming_reason` before it reaches a ledger. `encode_ms` and `decode_ms`
++are wall-clock and are never copied into a scored output. An emitter need not
++write `over_budget`: `dope_kpi score --budget-bytes N` turns every packet
++longer than `N` into an over-budget entry. Optional field
++`min_emitted_support` (int): the smallest fit-row support behind any discrete
++level the generator can emit. It cannot be measured from rows; when it is
++absent the scorer writes the contract floor (10) into the privacy input, so
++that arm's privacy gate rests on the distance tests alone.
++
++Native arms (`artifact_class = control` unless stated): `twin_c`, `copy_a`,
++`bootstrap_a`, `indep_marginals`, `label_shuffle`, and `rust_format2` /
++`rust_format2_b<bytes>` (`dope_core::fit_v2` on the A rows, rows decoded from
++the artifact bytes alone, `artifact_class = source_free`, `packet_bytes` = the
++artifact length, `min_emitted_support` = the engine's support floor).
++
+ ## 7. Score outputs
+ 
++`dope_kpi real-ref --arena DIR --schedule FILE --out realref.jsonl` writes one
++object per (cell, auditor), sorted by (`cell_id`, `auditor`): `cell_id`,
++`cell_sha256` (SHA-256 of the canonical schedule line; `score` refuses a
++reference computed from another schedule), `auditor`, `status` (`ok` or
++`unsupported`), `reason`, `num_outputs`, `informative`, `informative_reason`,
++`l0`, `l_a`, `l_b`, `r_b`, `real_gain_lcb95`, `c2st_real_ref`, and per T row
++`y_true`, `null_losses`, `real_a_losses`, `real_b_losses`, `pred_a`, `pred_b`.
++`informative` is the contract rule as computed by `dvs::v3::harm::assess_parity`
++on real losses only (real gain >= 1% of the null loss, bootstrap LCB95 > 0,
++twin retention within [0.8, 1.2]); the bootstrap seed is the stream
++`informative|<view>|<auditor>`. A cell is `unsupported` for every arm when its
++schedule status is `unsupported`, a real target is invalid, the A target is
++constant, the T target is constant, or the view exceeds an auditor's limits
++(1024 columns; 2,000,000 cells for the neural recipes).
++
+ `dope_kpi score` writes, per arm:
+ 
+ - `ledger.jsonl`: `dope_core::dvs::v3::FidelityCellRequest` objects (one per
+-  cell x auditor x sample seed x multiplier), sorted by `cell_id`, reducible by
+-  `evaluate_v3`.
+-- `rows.jsonl`: one compact object per ledger entry: `cell_id`, `family_id`,
+-  `task`, `view`, `stratum`, `auditor`, `data_seed`, `sample_seed`,
+-  `multiplier`, `l0`, `l_a`, `l_b`, `l_s`, `r_s`, `r_b`, `informative`,
+-  `status`, `packet_bytes`, `artifact_class`, `c2st_auc`, `c2st_real_ref`.
+-
++  cell x auditor x sample seed x multiplier), reducible by `evaluate_v3`. The
++  existing ledger reader refuses a repeated `cell_id`, so the entry id is
++  `<cell_id>:s<sample_seed>:m<multiplier>:<auditor>` and the file is sorted by
++  that id. A missing log row or file, a malformed or mis-shaped file and a
++  failed auditor are `failed` entries, never skips.
++- `rows.jsonl`: one compact object per ledger entry, in the same order:
++  `cell_id`, `family_id`, `task`, `view`, `stratum`, `auditor`, `data_seed`,
++  `sample_seed`, `multiplier`, `l0`, `l_a`, `l_b`, `l_s`, `r_s`, `r_b`,
++  `informative`, `status` (`ok`, `failed`, `over_budget`, `unsupported`),
++  `packet_bytes`, `artifact_class`, `c2st_auc`, `c2st_real_ref`, plus `rows`
++  (synthetic rows read), `reason` (empty when `ok`) and `ledger_id`. `r_s` is
++  null when the real gain `l0 - l_a` is not positive.
++
++Unit space: features are standardised with the mean and standard deviation of
++the cell's A rows (a constant column is centred only) and a missing cell takes
++the A median; a regression target is standardised with the A target
++statistics. The same transform is applied to B, C, T and every synthetic table.
+ Losses: mean squared error in A-standardised target units for regression,
+ log-loss (probabilities clipped at 1e-12 and renormalised) for classification.
++The null predictor is the A mean or the A class prior.
++
++Auditors: `linear-seeded-v1`, `gbdt`, `mlp-seeded-v1` with the recipes of
++`dope_core::eval` and one seed per cell (stream `auditor`) shared by the A, B
++and synthetic fits. Count-based knobs scale with `rows / len(a_idx)` (at least
++1): gbdt `min_leaf` and `lambda`, and the batch of the neural recipes. With
++this, a table that repeats every row `k` times yields the model of the
++unrepeated table; the unscaled recipes do not.
++
++Realism: `dvs::v3::c2st::build_native_realism_input` with the cell's B rows as
++real and the synthetic rows as synthetic (the first `min(n_B, n_S)` of each,
++features and target in unit space). `c2st_real_ref` is the same test with the
++A rows in place of the synthetic rows. Privacy: A, B and synthetic rows in unit
++space rounded to 6 decimals, at most `--privacy-rows` of each (default 4096;
++0 writes no privacy input). `driver` and `deploy_roster` are absent, so a
++strict `evaluate_v3` fails every cell on the driver gate; `dope_kpi
++reduce-ledger --allow-partial` reduces without it, with `--kappa-file` for the
++thresholds and `--multiplier` / `--auditors` to select entries.

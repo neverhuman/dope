@@ -42,6 +42,7 @@ impl Mat {
     }
 
     /// Features and target of one row.
+    #[cfg(test)]
     pub fn row(&self, row: usize) -> ArenaResult<&[f32]> {
         if row >= self.rows {
             return Err(contract("row index outside the matrix"));
