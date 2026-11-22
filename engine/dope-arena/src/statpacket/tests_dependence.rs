@@ -4,7 +4,9 @@
 use super::codec::{fit_to_budget, pack, truncate, unpack};
 use super::decode::Decoder;
 use super::dependence::{tie_scores, untied_score_variance};
-use super::fit::{class_prior_codes, fit_features, fit_features_for_budget, FitInput, Labels};
+use super::fit::{
+    class_prior_codes, fit_features, fit_features_for_budget, FitInput, Labels, MAX_DEPENDENCE_COLS,
+};
 use super::packet::{Level, Packet, Task};
 use super::testkit::{
     column, fit_regression, max_corr_gap, n01, pearson, quantile, sorted, table, to_unit, u01,
@@ -147,6 +149,18 @@ fn a_budget_without_room_for_dependence_skips_the_factor_fit_exactly() {
         // The skip happens exactly when no dependence section fits.
         assert_eq!(lean.loading.iter().all(|&l| l == 0), a.level == Level::A);
     }
+}
+
+#[test]
+fn tables_wider_than_the_factor_limit_keep_zero_loadings() {
+    let (n, p) = (16usize, MAX_DEPENDENCE_COLS + 1);
+    let raw = table(n, p, |i, j| n01(16, j % 7, i) + (j % 3) as f64);
+    let (_, unit) = to_unit(&raw, n, p);
+    let packet = fit_regression(&unit, n, p);
+    assert!(packet.loading.iter().all(|&l| l == 0));
+    let fit = fit_to_budget(&packet, 2048);
+    assert!(!fit.fits && fit.packet.cols() == p);
+    assert_eq!(unpack(&pack(&packet, Level::E).unwrap()).unwrap(), packet);
 }
 
 fn class_fixture(n: usize, p: usize) -> (Vec<f64>, Vec<u16>) {

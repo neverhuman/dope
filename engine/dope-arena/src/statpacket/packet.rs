@@ -424,13 +424,20 @@ fn validate_column(col: &ColumnMarginal) -> Result<(), StatError> {
                 return bad("atom weight outside 1..=63");
             }
             let ascending = match &t.values {
-                AtomValues::Lattice { index, .. } => index.windows(2).all(|w| w[0] < w[1]),
+                AtomValues::Lattice { base, step, index } => {
+                    let (base, step) = (f16_to_f64(*base), f16_to_f64(*step));
+                    base.is_finite()
+                        && step.is_finite()
+                        && step > 0.0
+                        && index.windows(2).all(|w| w[0] < w[1])
+                }
                 AtomValues::Explicit(v) => {
-                    v.windows(2).all(|w| f16_to_f64(w[0]) < f16_to_f64(w[1]))
+                    v.iter().all(|&h| f16_to_f64(h).is_finite())
+                        && v.windows(2).all(|w| f16_to_f64(w[0]) < f16_to_f64(w[1]))
                 }
             };
             if !ascending {
-                return bad("atoms are not strictly ascending");
+                return bad("atoms are not finite and strictly ascending");
             }
             Ok(())
         }
