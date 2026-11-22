@@ -262,22 +262,30 @@ class DopeFidelityV5(nn.Module):
             z_syn = z_syn / z_syn.std(dim=0, unbiased=False).clamp_min(1e-4)
             u_syn = _normal_cdf(z_syn).clamp(1e-5, 1.0 - 1e-5)
 
-            # 2. Monotonic 17-knot empirical + exact identity-initialized multiplicative warp
-            q_grid = torch.linspace(0.01, 0.99, N_QUANTILE_KNOTS, device=dev, dtype=torch.float32)
+            # 2. Monotonic 17-knot [0,1] empirical + identity-init multiplicative warp + discrete STE
+            q_grid = torch.linspace(0.0, 1.0, N_QUANTILE_KNOTS, device=dev, dtype=torch.float32)
             base_knots = torch.quantile(xf, q_grid, dim=0).T  # (p, K)
             warp = enc["knot_warp"].float()
             base_diffs = (base_knots[:, 1:] - base_knots[:, :-1]).clamp_min(0.0)
-            warp_mult = torch.exp(0.25 * torch.tanh(warp[:, 1:]))
-            k0 = base_knots[:, :1] + 0.15 * torch.tanh(warp[:, :1])
+            col_span = (base_knots[:, -1:] - base_knots[:, :1]).clamp_min(0.0)
+            warp_mult = torch.exp(0.15 * torch.tanh(warp[:, 1:]))
+            k0 = base_knots[:, :1] + 0.015 * col_span * torch.tanh(warp[:, :1])
             knots = torch.cat([k0, k0 + torch.cumsum(base_diffs * warp_mult, dim=1)], dim=1)
-            # Linear interpolation per column
             pos = u_syn * (N_QUANTILE_KNOTS - 1)
             lo = pos.floor().long().clamp(0, N_QUANTILE_KNOTS - 2)
             frac = pos - lo.float()
             col_ids = torch.arange(p, device=dev).unsqueeze(0).expand(n_syn, -1)
-            v_lo = knots[col_ids, lo]
-            v_hi = knots[col_ids, lo + 1]
-            X_syn = (v_lo + frac * (v_hi - v_lo)).clamp(-6.0, 6.0)
+            X_cont = (knots[col_ids, lo] + frac * (knots[col_ids, lo + 1] - knots[col_ids, lo])).clamp(-6.0, 6.0)
+            # Preserve exact discrete/atom support (<= 16 unique values) via straight-through lookup
+            X_syn = X_cont
+            disc_cols = [j for j in range(p) if torch.unique(xf[:, j]).numel() <= 16]
+            if disc_cols:
+                X_disc = X_cont.detach().clone()
+                q_idx = (u_syn * float(n_fit)).long().clamp(0, n_fit - 1)
+                for j in disc_cols:
+                    s_col, _ = torch.sort(xf[:, j])
+                    X_disc[:, j] = s_col[q_idx[:, j]]
+                X_syn = X_disc + (X_cont - X_cont.detach())
 
             # 3. Differentiable multi-task conditional target emission via FP32 closed-form Ridge
             phi_f = self._build_basis(xf, enc)
