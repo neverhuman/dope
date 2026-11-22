@@ -1,0 +1,63 @@
+--- a/docs/plans/v2-gap-closure/formats.md
++++ b/docs/plans/v2-gap-closure/formats.md
+@@ -50,6 +50,18 @@
+ `export`, `unknown`, `en`, `csv_layers`, `data`, `train`, `test`, `dataset`)
+ never merge tables by name; they merge only on content evidence.
+
++`family_id` is `lf-<smallest dataset_hash of the cluster>`. `evidence` is
++`name` when another table shares the (non-generic) canonical stem, `content`
++when the table joined its cluster through content links only, else `singleton`.
++Content evidence: a column (features and target) with more than 16 distinct
++finite values, rounded to 6 significant digits, is summarised by the 64
++smallest value hashes; two columns match when the bottom-k Jaccard estimate is
++>= 1/2; two tables are linked when at least 3 columns match in both directions
++and the matched columns are at least half of the eligible columns of the table
++with fewer of them (`--content-share smaller`, the default) or of each table
++(`--content-share each`). The choice is recorded in `overlap_report.json`
++(`rule.content_share`) and must be frozen with the panel.
++
+ ## 3. Panel manifest
+
+ The existing `dope_arena::panel::PanelManifest` JSON (protocol
+@@ -58,6 +70,12 @@
+ canonical_sha256`. Panels: `legacy-v250` (current validation families with no
+ training sibling), later `dev-select`, `dev-confirm`, `sealed`.
+
++`dope_kpi build-panels --arena DIR --out DIR --panel-id ID` writes
++`families.jsonl`, `<panel_id>.panel.json` (with `manifest_sha256` set to the
++canonical sha) and `overlap_report.json` (`dope.kpi-overlap/v1`: counts of
++validation tables and families left out for a training sibling, by evidence
++and task, and their dataset hashes).
++
+ ## 4. Cell schedule — `dope.kpi-schedule/v1`
+
+ `schedule.jsonl`, written by `dope_kpi plan`, read by the emitter and by
+@@ -76,6 +94,7 @@
+ | `a_idx`, `b_idx`, `c_idx`, `t_idx` | int[] | disjoint row indices; no duplicate group straddles roles; `len(a_idx) == len(b_idx)`; `c_idx` may be empty |
+ | `sample_seeds` | int[] | generator seeds to emit for this cell |
+ | `multipliers` | int[] | synthetic row multiples of `len(a_idx)` to emit (`[4, 1]`) |
++| `status` | string | `ok`, or `unsupported` when the table cannot give A, B and T 16 rows each; absent means `ok`. An unsupported cell has empty `a_idx`, `b_idx`, `c_idx`, `t_idx` and still counts in every denominator |
+
+ Role sizes: `n_T = clamp(round(0.30 * G), 200, 2000)` duplicate groups when the
+ table allows, `n_A = n_B = min(1024, floor(rest / 2))`, `C` takes up to `n_A`
+@@ -84,6 +103,20 @@
+ "|" + sample_seed + "|" + purpose)`; split and column streams ignore
+ `sample_seed`.
+
++Precisely: `G` is the number of duplicate groups of the table and `round` is
++half-up. The clamp applies when `G >= 600` (so A and B can still hold 200
++groups each); below that `n_T = round(0.30 * G)`. All sizes are in duplicate
++groups; a role holds every row of its groups, then A and B are thinned by
++seeded row sampling to the same row count (at most 1024) and C to at most that
++count. `stratum` is `headline` iff A, B and T each hold at least 200 duplicate
++groups after thinning (equal to row counts for a table without duplicate
++rows). The u64 seed of a stream is the first 8 bytes of the digest,
++little-endian; the split (`purpose = "split"`) and column (`"cols"`) streams
++use `sample_seed = 0`. Both views of a table share the row roles of their data
++seed. Tiers (data seeds x sample seeds, seeds numbered from 0): `lite` 1x1 on
++one table per family (most rows, ties to the smaller `dataset_hash`), `full`
++2x2, `confirm` 3x2, `sealed` 3x3 on every table.
++
+ ## 5. Synthetic rows — `DOPEMAT1`
+
+ One file per (arm, cell, sample seed, multiplier), written by the emitter or by
