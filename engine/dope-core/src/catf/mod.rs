@@ -249,44 +249,80 @@ impl CatfModel {
 }
 
 /// Map observed column values to latent standard-normal scores while spreading tied point-mass
-/// atom rows evenly across their `[u_lo, u_hi]` interval so `z_cols` matches `N(0, 1)` across
-/// all 32 CATF bins instead of collapsing an entire atom into one artificial bin spike.
+/// atom rows AND discrete level rows evenly across their `[u_lo, u_hi]` interval so `z_cols`
+/// matches `N(0, 1)` across all 32 CATF bins (BUG-R8).
 fn stratified_latent_z(marginal: &ColumnMarginalV2, col: &[f64]) -> Vec<f64> {
     let n = col.len();
-    let ColumnMarginalV2::Continuous { atoms, .. } = marginal else {
-        return col.iter().map(|&v| marginal.z_score(v)).collect();
-    };
-    if atoms.is_empty() {
-        return col.iter().map(|&v| marginal.z_score(v)).collect();
-    }
-    let mut atom_counts = vec![0usize; atoms.len()];
-    let mut row_atom: Vec<Option<usize>> = vec![None; n];
-    for (r, &v) in col.iter().enumerate() {
-        if v.is_finite() {
-            for (ai, a) in atoms.iter().enumerate() {
-                if (v - a.value).abs() <= 1e-12 * a.value.abs().max(1.0) {
-                    row_atom[r] = Some(ai);
-                    atom_counts[ai] += 1;
-                    break;
+    match marginal {
+        ColumnMarginalV2::Discrete { values, probs, .. } if !values.is_empty() => {
+            let mut cum_lo = Vec::with_capacity(probs.len());
+            let mut acc = 0.0;
+            for &p in probs {
+                cum_lo.push(acc);
+                acc += p;
+            }
+            let mut counts = vec![0usize; values.len()];
+            let mut row_lv: Vec<Option<usize>> = vec![None; n];
+            for (r, &v) in col.iter().enumerate() {
+                if v.is_finite() {
+                    let best = values
+                        .iter()
+                        .enumerate()
+                        .min_by(|a, b| (a.1 - v).abs().total_cmp(&(b.1 - v).abs()))
+                        .map(|(i, _)| i);
+                    if let Some(li) = best {
+                        row_lv[r] = Some(li);
+                        counts[li] += 1;
+                    }
                 }
             }
+            let mut seen = vec![0usize; values.len()];
+            (0..n)
+                .map(|r| {
+                    if let Some(li) = row_lv[r] {
+                        let k = seen[li];
+                        seen[li] += 1;
+                        let frac = (k as f64 + 0.5) / counts[li].max(1) as f64;
+                        let u = (cum_lo[li] + frac * probs[li]).clamp(1e-6, 1.0 - 1e-6);
+                        norm_ppf(u)
+                    } else {
+                        f64::NAN
+                    }
+                })
+                .collect()
         }
-    }
-    let mut seen = vec![0usize; atoms.len()];
-    (0..n)
-        .map(|r| {
-            if let Some(ai) = row_atom[r] {
-                let a = &atoms[ai];
-                let k = seen[ai];
-                seen[ai] += 1;
-                let frac = (k as f64 + 0.5) / atom_counts[ai].max(1) as f64;
-                let u = (a.u_lo + frac * (a.u_hi - a.u_lo)).clamp(1e-6, 1.0 - 1e-6);
-                norm_ppf(u)
-            } else {
-                marginal.z_score(col[r])
+        ColumnMarginalV2::Continuous { atoms, .. } if !atoms.is_empty() => {
+            let mut atom_counts = vec![0usize; atoms.len()];
+            let mut row_atom: Vec<Option<usize>> = vec![None; n];
+            for (r, &v) in col.iter().enumerate() {
+                if v.is_finite() {
+                    for (ai, a) in atoms.iter().enumerate() {
+                        if (v - a.value).abs() <= 1e-12 * a.value.abs().max(1.0) {
+                            row_atom[r] = Some(ai);
+                            atom_counts[ai] += 1;
+                            break;
+                        }
+                    }
+                }
             }
-        })
-        .collect()
+            let mut seen = vec![0usize; atoms.len()];
+            (0..n)
+                .map(|r| {
+                    if let Some(ai) = row_atom[r] {
+                        let a = &atoms[ai];
+                        let k = seen[ai];
+                        seen[ai] += 1;
+                        let frac = (k as f64 + 0.5) / atom_counts[ai].max(1) as f64;
+                        let u = (a.u_lo + frac * (a.u_hi - a.u_lo)).clamp(1e-6, 1.0 - 1e-6);
+                        norm_ppf(u)
+                    } else {
+                        marginal.z_score(col[r])
+                    }
+                })
+                .collect()
+        }
+        _ => col.iter().map(|&v| marginal.z_score(v)).collect(),
+    }
 }
 
 fn empirical_corr_matrix(x_cols: &[Vec<f64>]) -> Vec<f64> {

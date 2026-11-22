@@ -219,6 +219,50 @@ def _tail_jsonl(path: Path, limit: int) -> list[dict[str, object]]:
     return rows
 
 
+def _scan_checkpoints(run_dir: Path) -> list[dict[str, object]]:
+    ckpt_dir = run_dir / "checkpoints"
+    if not ckpt_dir.is_dir():
+        return []
+    out: list[dict[str, object]] = []
+    seen_keys: set[str] = set()
+    # 1. Promoted best_main_kpi.json first
+    best_json = ckpt_dir / "best_main_kpi.json"
+    if best_json.is_file():
+        try:
+            obj = json.loads(best_json.read_text(encoding="utf-8"))
+            if isinstance(obj, dict):
+                obj["checkpoint"] = "best_main_kpi.safetensors"
+                obj["role"] = "best_main_kpi"
+                out.append(obj)
+                seen_keys.add(f"best:{obj.get('step')}")
+        except (OSError, ValueError):
+            pass
+    # 2. Immutable checkpoints/ledger.jsonl (tail 40, newest first)
+    ledger = _tail_jsonl(ckpt_dir / "ledger.jsonl", 40)
+    for row in reversed(ledger):
+        key = f"{row.get('role')}:{row.get('checkpoint')}:{row.get('step')}"
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        out.append(row)
+        if len(out) >= 32:
+            break
+    # 3. Fallback: scan *.safetensors files directly if ledger is absent (e.g., v1.3.1 runs)
+    if not out:
+        for sf in sorted(ckpt_dir.glob("*.safetensors"), key=lambda p: p.stat().st_mtime, reverse=True)[:12]:
+            try:
+                st = sf.stat()
+                out.append({
+                    "checkpoint": sf.name,
+                    "role": "best_main_kpi" if "best" in sf.name else ("valley_soup" if "soup" in sf.name else "step_ema"),
+                    "bytes": st.st_size,
+                    "time": round(st.st_mtime, 3),
+                })
+            except OSError:
+                continue
+    return out
+
+
 def _scan_runs(run_roots: tuple[str, ...]) -> list[dict[str, object]]:
     runs = []
     for root_s in run_roots:
@@ -230,7 +274,8 @@ def _scan_runs(run_roots: tuple[str, ...]) -> list[dict[str, object]]:
                 continue
             train_rows = _tail_jsonl(child / "train.jsonl", TAIL_TRAIN)
             eval_rows = _tail_jsonl(child / "eval.jsonl", TAIL_EVAL)
-            if not train_rows and not eval_rows:
+            ckpts = _scan_checkpoints(child)
+            if not train_rows and not eval_rows and not ckpts:
                 continue
             cfg = {}
             cfg_path = child / "config.json"
@@ -239,11 +284,20 @@ def _scan_runs(run_roots: tuple[str, ...]) -> list[dict[str, object]]:
                     cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
                 except (OSError, ValueError):
                     cfg = {}
+            regret = {}
+            reg_path = child / "curriculum_regret.json"
+            if reg_path.is_file():
+                try:
+                    regret = json.loads(reg_path.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    regret = {}
             runs.append(
                 {
                     "name": child.name,
                     "path": str(child),
                     "config": cfg,
+                    "regret": regret,
+                    "checkpoints": ckpts,
                     "train": train_rows,
                     "eval": eval_rows,
                 }

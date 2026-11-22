@@ -3,14 +3,14 @@
   "kind": "dml4",
   "scope": "public synthetic correctness fixtures, no quality or privacy claim",
   "producer": {
-    "base_head": "0bfdff6417b876fc044856db7fd15ed3b7cec01c",
+    "base_head": "d7ecc2ef27e71607c6a38c749e829683b6f23441",
     "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
     "rust_source_files": {
       "engine/dope-norm/Cargo.toml": "1f71304cc25d01e3a543e36799c9c43ec8d246571a3d20a170a45fda1c528503",
       "engine/dope-norm/src/card.rs": "7b78d13c27bfec1377f5cbd2dd9d5b3be6c8fe058d5c3f64e50013e2a5a295e7",
       "engine/dope-norm/src/apply.rs": "2beefd67a883509b90f86551e17b5c017f9afcc4e51377658d974869d8973a98",
       "engine/dope-norm/src/public_schema.rs": "4b9388aa90247d88d5b58a0e87446d586a5708aef081da81907554f573ebd381",
-      "engine/dope-norm/src/lib.rs": "40a2ba0439c8fef1fd81e35f77d7304a273ee93331e1cf7e34aed10a352b12b0",
+      "engine/dope-norm/src/lib.rs": "dee8184c0baf4655511a08272ea28767c97d5d7c40550f78cf7ca0b9c836dd5b",
       "engine/dope-norm/src/fit.rs": "9d3de463fc68464549e696007ad7127c9e6c39c36836100eb3a53f5f3cde2842",
       "engine/dope-core/src/mlc_v4/sample.rs": "a3216265bb9cebb7550835cf804cabcf07b2b46e2e0d202425ffe54aac2f7089",
       "engine/dope-core/src/mlc_v4/basis.rs": "d4e1f165decfe59e979b3b23e1dc0bea599704c9cd460cbacfc5f77339110a45",
@@ -20,11 +20,11 @@
       "engine/dope-core/src/mlc_v4/wire.rs": "23e5bf771366e126542e51c83790c87f923324c74b4258b0be385f8100f84d90",
       "engine/dope-core/examples/dml4_conformance_export.rs": "8addc485d3c859aa134eabf34a266d001d016c5113599d6f321d6893dce2dc12"
     },
-    "source_snapshot_sha256": "64510c520d464c6f3ce89c8fd7ed416d27043f9207f99327185611342207c497",
+    "source_snapshot_sha256": "9fdbaf7698b273cad572f62e818ca00a9778f78aee57c4cd72f0d21d5a668871",
     "command": "cargo run --example dml4_conformance_export -- --out NEW_DIRECTORY",
     "execution": "actual source-bound lightweight Rust harness; no model/source data/Candle/GPU",
-    "dependency_lock_sha256": "1cd54ab1dc4e8c7103dde649c0166e35d0f8c622f6cfb919217f41a6eb11c25b",
-    "generator_binary_sha256": "c1c4450eaf6a3730b497bfac3b88d584f831824b3b5bc8eaceee6b2e2a899575"
+    "dependency_lock_sha256": "9e07d0dca52591974cfd1ac55f887b8a59ed64a1815a957d619c7a1df8b2fe50",
+    "generator_binary_sha256": "d789113d8540ed3abc5526c56295a4d8995526726e3cde3eb10da81bd222aaf5"
   },
   "files": {
     "grouped-classification/input.json": "2af1956d34b2a09a9c71490335c76de71d8b68a294ab65c011ebecfa556291ad",

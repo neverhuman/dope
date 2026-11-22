@@ -104,17 +104,28 @@ pub fn fit_w1_knots(sorted: &[f64], max_knots: usize, support_k: usize) -> (Vec<
 }
 
 /// Monotone piecewise-linear interpolation on arbitrary knot grid `(us, xs)` with
-/// clamped/linear tail extension up to the `k`-th order-statistic bounds.
+/// privacy-safe linear tail continuation beyond the `k`-th order-statistic bounds
+/// (eliminating twin boundary clamping spikes that caused C2ST=0.934, BUG-R6).
 pub fn interp_uv(us: &[f64], xs: &[f64], u: f64) -> f64 {
     let k = us.len();
     if k == 0 {
         return 0.0;
     }
-    if k == 1 || u <= us[0] {
+    if k == 1 {
         return xs[0];
     }
-    if u >= us[k - 1] {
-        return xs[k - 1];
+    let span = (xs[k - 1] - xs[0]).abs().max(1e-9);
+    if u < us[0] {
+        let du0 = (us[1] - us[0]).max(1e-6);
+        let slope = ((xs[1] - xs[0]) / du0).max(0.0);
+        let ext = (slope * (us[0] - u)).min(0.35 * span);
+        return xs[0] - ext;
+    }
+    if u > us[k - 1] {
+        let duk = (us[k - 1] - us[k - 2]).max(1e-6);
+        let slope = ((xs[k - 1] - xs[k - 2]) / duk).max(0.0);
+        let ext = (slope * (u - us[k - 1])).min(0.35 * span);
+        return xs[k - 1] + ext;
     }
     let idx = us
         .partition_point(|&ui| ui <= u)

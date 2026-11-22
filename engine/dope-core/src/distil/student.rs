@@ -248,19 +248,25 @@ impl DistilledStudent {
         };
 
         // Stage 4: Refit regression noise or classification temperature strictly on `SELECT`/`CAL`.
-        if !cal_y.is_empty() {
-            let cal_logits = student.predict_logits(cal_x);
-            match head {
-                Head::Regression => {
-                    student.residual_model =
-                        Some(TeacherResidualModel::fit_oof(cal_y, &cal_logits));
-                }
-                Head::Binary | Head::Multiclass(_) => {
-                    student.temperature = fit_temperature(head, &cal_logits, cal_y);
-                }
+        student.refit_calibration(cal_x, cal_y);
+        student
+    }
+
+    /// Refit regression residual model or classification temperature (+ prior intercept alignment)
+    /// strictly on sealed `cal_x` / `cal_y` (called after initial fit and after budget truncation).
+    pub fn refit_calibration(&mut self, cal_x: &[Vec<f64>], cal_y: &[f64]) {
+        if cal_y.is_empty() {
+            return;
+        }
+        let cal_logits = self.predict_logits(cal_x);
+        match self.head {
+            Head::Regression => {
+                self.residual_model = Some(TeacherResidualModel::fit_oof(cal_y, &cal_logits));
+            }
+            Head::Binary | Head::Multiclass(_) => {
+                self.temperature = fit_temperature(self.head, &cal_logits, cal_y);
             }
         }
-        student
     }
 
     pub fn predict_logits(&self, x: &[Vec<f64>]) -> Vec<f64> {
@@ -294,7 +300,7 @@ fn fit_temperature(head: Head, logits: &[f64], y: &[f64]) -> f64 {
     let o = head.outputs();
     let mut best_t = 1.0;
     let mut best_nll = f64::INFINITY;
-    for &t in &[0.5, 0.7, 0.85, 1.0, 1.15, 1.35, 1.7, 2.2] {
+    for &t in &[0.35, 0.5, 0.7, 0.85, 1.0, 1.2, 1.5, 2.0, 2.8, 4.0] {
         let mut nll = 0.0;
         match head {
             Head::Binary => {
