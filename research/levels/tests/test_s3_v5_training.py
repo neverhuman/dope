@@ -161,6 +161,40 @@ class TestS3V5DynamicTraining(unittest.TestCase):
             self.assertGreaterEqual(res["tables_evaluated"], 2)
             self.assertIsNotNone(res["main_kpi_retention_median"])
 
+    def test_v6_single_encoding_zero_raw_row_bottleneck_and_fast_pipeline(self) -> None:
+        from research.levels.s3_fast_pipeline import (
+            curriculum_stage_for_step,
+            synthesize_scm_prior_table,
+        )
+        from research.levels.v6_single_encoding import DopeSingleEncV6, compute_single_enc_loss
+
+        rng = np.random.default_rng(17)
+        s1 = curriculum_stage_for_step(100)
+        s3 = curriculum_stage_for_step(15000)
+        self.assertLess(s1.max_fit, s3.max_fit)
+        scm = synthesize_scm_prior_table(rng, s1)
+        self.assertIn(scm["task"], ("regression", "binary", "multiclass"))
+
+        model = DopeSingleEncV6(d_model=64, n_layers=2, n_heads=4, global_dim=32, col_dim=16)
+        self.assertLess(model.encoding_bytes_fp16(12), 2048)  # compact single encoding!
+        cfg = AugmentConfig(min_fit_rows=40, max_fit_rows=64, min_query_rows=32, max_query_rows=48)
+        for task in ("regression", "binary", "multiclass", "multilabel"):
+            tbl = _make_mock_table("regression" if task == "multilabel" else task, n=180, p=8, seed=19)
+            ep = sample_dynamic_episode(
+                tbl, global_seed=99, step=1, rank=0,
+                cfg=AugmentConfig(
+                    min_fit_rows=40, max_fit_rows=64, min_query_rows=32, max_query_rows=48,
+                    multilabel_view_prob=1.0 if task == "multilabel" else 0.0,
+                ),
+            )
+            ep["miss_fit"] = np.zeros_like(ep["X_fit"])
+            model.zero_grad()
+            out = compute_single_enc_loss(model, ep, torch.device("cpu"), step_seed=77)
+            self.assertTrue(torch.isfinite(out["total"]))
+            out["total"].backward()
+            gn = sum(float(p.grad.abs().sum().item()) for p in model.parameters() if p.grad is not None)
+            self.assertGreater(gn, 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()

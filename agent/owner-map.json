@@ -999,8 +999,11 @@
     "ops/merge_guard/native_process_correction_tests.rs": "governance",
     "research/levels/s3_ddp_trainer.py": "external-evidence",
     "research/levels/s3_dynamic_augment.py": "external-evidence",
+    "research/levels/s3_fast_pipeline.py": "external-evidence",
     "research/levels/s3_kpi_evaluator.py": "external-evidence",
     "research/levels/v5_fidelity_net.py": "external-evidence",
+    "research/levels/v6_landmarks.py": "external-evidence",
+    "research/levels/v6_single_encoding.py": "external-evidence",
     "research/levels/tests/test_s3_v5_training.py": "external-evidence",
     "tools/dope_dashboard/": "governance"
   },

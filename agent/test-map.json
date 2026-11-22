@@ -4050,7 +4050,19 @@
     },
     "research/levels/s3_ddp_trainer.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
-      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5/DopeSingleEncV6 gradients, and held-out Main-KPI evaluator"
+    },
+    "research/levels/s3_fast_pipeline.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify RAM-resident unique-per-batch pipeline, progressive stages, synthetic SCM priors, target-swap views, and missingness injection"
+    },
+    "research/levels/v6_landmarks.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify 48-dim FIT-only ANOVA/interaction landmarks, multi-bandwidth RBF-MMD, and differentiable 3-step IRLS downstream loss"
+    },
+    "research/levels/v6_single_encoding.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify compact zero-raw-row single-encoding DopeSingleEncV6 forward/backward across all 4 tasks"
     },
     "research/levels/s3_dynamic_augment.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
