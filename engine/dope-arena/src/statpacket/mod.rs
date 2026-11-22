@@ -36,6 +36,8 @@ mod tests_marginals;
 mod tests_privacy;
 #[cfg(test)]
 mod tests_scale;
+#[cfg(test)]
+mod tests_wire;
 
 /// Every failure of the module. Messages are static text plus section numbers.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
