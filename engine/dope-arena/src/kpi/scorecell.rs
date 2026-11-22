@@ -11,8 +11,8 @@ use super::auditors::{self, Recipe};
 use super::celldata::{target_varies, targets_valid, task_kind, CellData, Rows};
 use super::cellplan::Cell;
 use super::emitlog::{
-    sanitize_reason, EmitKey, EmitRow, CLASS_CONTROL, EMIT_FAILED, EMIT_OK, EMIT_OVER_BUDGET,
-    EMIT_UNSUPPORTED,
+    known_class, sanitize_reason, EmitKey, EmitRow, CLASS_CONTROL, EMIT_FAILED, EMIT_OK,
+    EMIT_OVER_BUDGET, EMIT_UNSUPPORTED,
 };
 use super::io::Arena;
 use super::mat::{mat_relpath, read_mat};
@@ -152,6 +152,15 @@ fn load_file(
             synthetic_rows: 0,
         };
     };
+    if !known_class(&emit.artifact_class) {
+        // Free text from a log is never copied into a scored output.
+        return FileOutcome {
+            state: failed("unknown_artifact_class"),
+            packet_bytes: emit.packet_bytes,
+            artifact_class: String::new(),
+            synthetic_rows: 0,
+        };
+    }
     let outcome = |state, synthetic_rows| FileOutcome {
         state,
         packet_bytes: emit.packet_bytes,
