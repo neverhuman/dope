@@ -26,7 +26,6 @@ import torch
 import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.parallel import DistributedDataParallel as DDP
 
 from .s3_fast_pipeline import AsyncBatchPrefetcher, RamCorpusStore, curriculum_stage_for_step
 from .v5_fidelity_net import DopeFidelityV5, compute_main_kpi_loss
@@ -66,24 +65,37 @@ def _cohost_yield_if_needed(device: torch.device, min_free_gib: float, max_cpu_p
     return yielded
 
 
-def _split_invariance_infonce(
-    z_a: list[torch.Tensor], z_b: list[torch.Tensor], families: list[str], tau: float = 0.12
+def _pair_infonce_with_bank(
+    za: torch.Tensor,
+    zb: torch.Tensor,
+    z_bank: deque[torch.Tensor],
+    fam_bank: deque[str],
+    fam_key: str,
+    tau: float = 0.12,
 ) -> torch.Tensor:
-    if len(z_a) < 2:
-        return torch.tensor(0.0, device=z_a[0].device if z_a else "cpu")
-    za = F.normalize(torch.stack(z_a, dim=0).float(), dim=-1)
-    zb = F.normalize(torch.stack(z_b, dim=0).float(), dim=-1)
-    sim = (za @ zb.T) / tau
-    n = sim.shape[0]
-    mask = torch.eye(n, device=sim.device, dtype=torch.bool)
-    for i in range(n):
-        for j in range(n):
-            if i != j and families[i] == families[j]:
-                mask[i, j] = True
-    pos = sim.diagonal()
-    neg = sim.masked_fill(mask, -1e9)
-    all_logits = torch.cat([pos.unsqueeze(1), neg], dim=1)
-    return F.cross_entropy(all_logits, torch.zeros(n, device=sim.device, dtype=torch.long))
+    """Single-pair split-invariance InfoNCE against a 64-entry detached negative queue (O(1) VRAM)."""
+    negs = [z for z, f in zip(z_bank, fam_bank) if f != fam_key]
+    if not negs:
+        return torch.tensor(0.0, device=za.device)
+    zan = F.normalize(za.float().unsqueeze(0), dim=-1)
+    zbn = F.normalize(zb.float().unsqueeze(0), dim=-1)
+    zneg = F.normalize(torch.stack(negs, dim=0).to(za.device).float(), dim=-1)
+    pos = (zan * zbn).sum(dim=-1, keepdim=True) / tau
+    neg = (zan @ zneg.T) / tau
+    logits = torch.cat([pos, neg], dim=1)
+    return F.cross_entropy(logits, torch.zeros(1, device=za.device, dtype=torch.long))
+
+
+def _sync_ddp_grads(model: nn.Module, world_size: int) -> None:
+    """Synchronize gradients cleanly across ranks (handles sparse task-head activation safely)."""
+    if world_size <= 1:
+        return
+    for p in model.parameters():
+        if not p.requires_grad:
+            continue
+        if p.grad is None:
+            p.grad = torch.zeros_like(p.data)
+        dist.all_reduce(p.grad, op=dist.ReduceOp.AVG)
 
 
 def _param_groups(model: nn.Module, wd: float) -> list[dict[str, Any]]:
@@ -213,12 +225,14 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
         print(f"[DOPE v2.0.0] Preloaded {len(store)} S3 tables into RAM in {time.time() - t_load:.2f}s", flush=True)
 
     model_raw = build_model(args).to(device)
+    if world_size > 1:
+        with torch.no_grad():
+            for p in model_raw.parameters():
+                dist.broadcast(p.data, src=0)
+            for b in model_raw.buffers():
+                dist.broadcast(b.data, src=0)
     n_params = sum(p.numel() for p in model_raw.parameters())
-    model: nn.Module = (
-        DDP(model_raw, device_ids=[device.index] if device.type == "cuda" else None, find_unused_parameters=True)
-        if world_size > 1
-        else model_raw
-    )
+    model: nn.Module = model_raw
     optimizer = torch.optim.AdamW(
         _param_groups(model_raw, wd=args.weight_decay), lr=args.lr, betas=(0.9, 0.98), eps=1e-6
     )
@@ -253,6 +267,8 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
     seen_splits: set[str] = set()
     task_totals: dict[str, int] = {"regression": 0, "binary": 0, "multiclass": 0, "multilabel": 0}
     grad_hist: deque[float] = deque(maxlen=64)
+    z_bank: deque[torch.Tensor] = deque(maxlen=64)
+    fam_bank: deque[str] = deque(maxlen=64)
     skipped_spikes = 0
     cohost_yields = 0
     acc: dict[str, list[float]] = {
@@ -267,11 +283,8 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
 
             model.train()
             optimizer.zero_grad(set_to_none=True)
-            s_loss = s_tstr = s_dist = s_drv = s_real = s_mmd = s_ret = s_encb = 0.0
-            valid_eps = 0
-            z_a_list: list[torch.Tensor] = []
-            z_b_list: list[torch.Tensor] = []
-            fam_list: list[str] = []
+            s_loss = s_tstr = s_dist = s_drv = s_real = s_mmd = s_ret = s_encb = s_info = 0.0
+            valid_eps = info_cnt = 0
 
             for accum_i in range(args.grad_accum):
                 _, eps_a, eps_b = prefetch.next_batch()
@@ -285,15 +298,15 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
                     acc["n_noise"].append(st["n_noise_cols"])
                     acc["n_derived"].append(st["n_derived_cols"])
                     try:
-                        raw_m = model.module if isinstance(model, DDP) else model
                         with torch.amp.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=use_bf16):
                             if args.arch == "single_enc_v6":
-                                out = compute_single_enc_loss(raw_m, ep, device, args.seed + step * 97 + rank * 13 + ep_i + accum_i * 31)
+                                out = compute_single_enc_loss(model_raw, ep, device, args.seed + step * 97 + rank * 13 + ep_i + accum_i * 31)
                             else:
-                                out = compute_main_kpi_loss(raw_m, ep, device, args.seed + step * 97 + rank * 13 + ep_i + accum_i * 31)
+                                out = compute_main_kpi_loss(model_raw, ep, device, args.seed + step * 97 + rank * 13 + ep_i + accum_i * 31)
                         loss_ep = out["total"] / denom
                         if not bool(torch.isfinite(loss_ep).all()):
                             continue
+                        fam_key = ep["family_stem"] or ep["dataset_hash"]
                         if accum_i == 0 and ep_i < len(eps_b):
                             eb = eps_b[ep_i]
                             seen_splits.add(eb["split_sig"])
@@ -302,12 +315,16 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
                                 yf_b = torch.as_tensor(eb["y_fit"], dtype=torch.float32, device=device)
                                 mf_b = torch.as_tensor(eb["miss_fit"], dtype=torch.float32, device=device)
                                 if args.arch == "single_enc_v6":
-                                    eb_enc = raw_m.encode_to_single_latent(xf_b, yf_b, mf_b, eb["task"], int(eb["n_classes"]))
+                                    eb_enc = model_raw.encode_to_single_latent(xf_b, yf_b, mf_b, eb["task"], int(eb["n_classes"]))
                                 else:
-                                    eb_enc = raw_m.encode_table(xf_b, yf_b, eb["task"], int(eb["n_classes"]), mf_b)
-                            z_a_list.append(out["task_latent"])
-                            z_b_list.append(eb_enc["task_latent"])
-                            fam_list.append(ep["family_stem"] or ep["dataset_hash"])
+                                    eb_enc = model_raw.encode_table(xf_b, yf_b, eb["task"], int(eb["n_classes"]), mf_b)
+                            info_ep = _pair_infonce_with_bank(out["task_latent"], eb_enc["task_latent"], z_bank, fam_bank, fam_key)
+                            if bool(torch.isfinite(info_ep).all()):
+                                loss_ep = loss_ep + (0.05 / float(max(len(eps_b), 1))) * info_ep
+                                s_info += float(info_ep.item())
+                                info_cnt += 1
+                            z_bank.append(out["task_latent"].detach().cpu())
+                            fam_bank.append(fam_key)
                         loss_ep.backward()
                         s_loss += float(out["total"].item())
                         s_tstr += float(out["tstr_loss"])
@@ -324,12 +341,8 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
                             torch.cuda.empty_cache()
                         continue
 
-            infonce_val = 0.0
-            if len(z_a_list) >= 2:
-                info_l = 0.05 * _split_invariance_infonce(z_a_list, z_b_list, fam_list)
-                if bool(torch.isfinite(info_l).all()):
-                    info_l.backward()
-                    infonce_val = float(info_l.item())
+            infonce_val = s_info / float(max(info_cnt, 1)) if info_cnt > 0 else 0.0
+            _sync_ddp_grads(model_raw, world_size)
 
             # Adaptive grad-norm clipping + spike guard (Layer 3 of gradient smoothing!)
             gn = float(torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item())

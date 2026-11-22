@@ -286,7 +286,17 @@ def evaluate_checkpoint(
                 syn = model.synthesize_differentiable(xf_t, yf_t, enc, task, k_cls, n_syn, gen)
             Xs = syn["X_syn"].cpu().numpy()
             ys_raw = syn["y_syn"].cpu().numpy()
-            ys = np.argmax(ys_raw, axis=1).astype(np.float32) if task == "multiclass" else ys_raw
+            if task == "binary":
+                p_b = np.clip(ys_raw.reshape(-1), 1e-4, 1.0 - 1e-4)
+                ys = (rng.random(len(p_b)) < p_b).astype(np.float32)
+                if len(np.unique(ys)) < 2:
+                    ys = (p_b >= float(np.quantile(p_b, np.clip(1.0 - float((ya > 0.5).mean()), 0.05, 0.95)))).astype(np.float32)
+            elif task == "multiclass":
+                pr = np.clip(ys_raw, 1e-6, 1.0)
+                pr = pr / pr.sum(axis=1, keepdims=True)
+                ys = (np.cumsum(pr, axis=1) >= rng.random((len(pr), 1))).argmax(axis=1).astype(np.float32)
+            else:
+                ys = ys_raw
 
             if task == "regression":
                 res = _eval_regression(Xa, ya, Xb, yb, Xs, ys, Xt, yt)
@@ -321,7 +331,8 @@ def evaluate_checkpoint(
                 else:
                     enc_ml = model.encode_table(xf_t, yma_t, "multilabel", n_lbl, mf_t)
                     syn_ml = model.synthesize_differentiable(xf_t, yma_t, enc_ml, "multilabel", n_lbl, n_syn, gen)
-                Xs_ml, ys_ml = syn_ml["X_syn"].cpu().numpy(), syn_ml["y_syn"].cpu().numpy()
+                Xs_ml, ys_ml_p = syn_ml["X_syn"].cpu().numpy(), np.clip(syn_ml["y_syn"].cpu().numpy(), 1e-4, 1.0 - 1e-4)
+                ys_ml = (rng.random(ys_ml_p.shape) < ys_ml_p).astype(np.float32)
                 lbl_rets = []
                 for li in range(n_lbl):
                     r_li = _eval_binary(Xa, yma[:, li], Xb, ymb[:, li], Xs_ml, ys_ml[:, li], Xt, ymt[:, li])

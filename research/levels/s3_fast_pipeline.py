@@ -13,7 +13,6 @@ Guarantees:
 """
 from __future__ import annotations
 
-from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import hashlib
@@ -29,7 +28,6 @@ from .s3_dynamic_augment import (
     S3CorpusStore,
     _duplicate_grouped_split,
     _fit_only_nc2_scale,
-    _insert_synthetic_columns,
     _step_rng,
     _synthesize_multilabel_targets,
 )
@@ -58,16 +56,16 @@ class RamCorpusStore:
     """RAM-resident preloaded S3 v250 store with JopeDime regret-weighted sampling."""
 
     def __init__(self, corpus_dir: str | Path, split: str = "train", preload: bool = True) -> None:
-        self.base = S3CorpusStore(corpus_dir, split=split, cache_cap=4096 if preload else 512)
-        self.tables: list[dict[str, Any] | None] = [None] * len(self.base.rows)
-        self.regret_weights = np.ones(len(self.base.rows), dtype=np.float64)
-        self.hash_to_idx = {r["dataset_hash"]: i for i, r in enumerate(self.base.rows)}
+        self.base = S3CorpusStore(Path(corpus_dir), split=split, cache_cap=4096 if preload else 512)
+        self.tables: list[dict[str, Any] | None] = [None] * len(self.base.entries)
+        self.regret_weights = np.ones(len(self.base.entries), dtype=np.float64)
+        self.hash_to_idx = {r["dataset_hash"]: i for i, r in enumerate(self.base.entries)}
         if preload:
-            for i in range(len(self.base.rows)):
+            for i in range(len(self.base.entries)):
                 self.tables[i] = self.base.load_table(i)
 
     def __len__(self) -> int:
-        return len(self.base.rows)
+        return len(self.base.entries)
 
     def get(self, idx: int) -> dict[str, Any]:
         tbl = self.tables[idx]
@@ -86,8 +84,8 @@ class RamCorpusStore:
             return 1.0
         task_mult = payload.get("task_multipliers", {})
         hash_mult = payload.get("hash_multipliers", {})
-        w = np.ones(len(self.base.rows), dtype=np.float64)
-        for i, row in enumerate(self.base.rows):
+        w = np.ones(len(self.base.entries), dtype=np.float64)
+        for i, row in enumerate(self.base.entries):
             tm = float(task_mult.get(row["task"], 1.0))
             hm = float(hash_mult.get(row["dataset_hash"], 1.0))
             raw_m = min(max(tm * hm, 1.0), max_mult)
@@ -102,10 +100,10 @@ class RamCorpusStore:
         task_cycle = ["regression", "binary", "multiclass", "regression", "binary", "multiclass"]
         for slot in range(batch_size):
             pref = task_cycle[slot % len(task_cycle)]
-            pool = self.base.by_task.get(pref) or list(range(len(self.base.rows)))
+            pool = self.base.by_task.get(pref) or list(range(len(self.base.entries)))
             avail = [i for i in pool if i not in used]
             if not avail:
-                avail = [i for i in range(len(self.base.rows)) if i not in used]
+                avail = [i for i in range(len(self.base.entries)) if i not in used]
             if not avail:
                 break
             w = self.regret_weights[avail]
@@ -356,17 +354,34 @@ def build_unique_episode(
     miss_f = np.maximum(miss_f_inj, mf_obs).astype(np.float32)
     miss_q = np.maximum(miss_q_inj, mq_obs).astype(np.float32)
 
-    # Synthetic noise + derived interaction columns + column permutation
-    if float(rng.random()) < aug_prob:
-        Xf, Xq, dmask, n_noise, n_derived = _insert_synthetic_columns(
-            Xf, Xq, rng, max_noise=6, max_derived=4, max_total_cols=stage.max_cols
-        )
-        pad_c = Xf.shape[1] - miss_f.shape[1]
-        if pad_c > 0:
-            miss_f = np.concatenate([miss_f, np.zeros((Xf.shape[0], pad_c), dtype=np.float32)], axis=1)
-            miss_q = np.concatenate([miss_q, np.zeros((Xq.shape[0], pad_c), dtype=np.float32)], axis=1)
-    else:
-        dmask, n_noise, n_derived = np.zeros(Xf.shape[1], dtype=bool), 0, 0
+    # Synthetic noise + derived interaction columns (aligned with miss_f/miss_q) + column permutation
+    nf, p_cur = Xf.shape
+    nq = Xq.shape[0]
+    room = max(0, stage.max_cols - p_cur)
+    dmask = np.zeros(p_cur, dtype=bool)
+    n_noise, n_derived = 0, 0
+    if float(rng.random()) < aug_prob and room >= 1:
+        n_noise = int(rng.integers(1, min(6, room) + 1))
+        n_derived = int(rng.integers(0, min(4, room - n_noise) + 1)) if (room - n_noise >= 1 and p_cur >= 2) else 0
+        nf_add = [rng.standard_normal((nf, n_noise)).astype(np.float32)] if n_noise else []
+        nq_add = [rng.standard_normal((nq, n_noise)).astype(np.float32)] if n_noise else []
+        dm_add = [np.ones(n_noise, dtype=bool)] if n_noise else []
+        if n_derived:
+            df_c, dq_c = np.empty((nf, n_derived), dtype=np.float32), np.empty((nq, n_derived), dtype=np.float32)
+            for j in range(n_derived):
+                c1, c2 = rng.choice(p_cur, size=2, replace=False)
+                op = int(rng.integers(0, 3))
+                vf, vq = (Xf[:, c1] * Xf[:, c2], Xq[:, c1] * Xq[:, c2]) if op == 0 else ((np.sin(1.5 * Xf[:, c1]), np.sin(1.5 * Xq[:, c1])) if op == 1 else (Xf[:, c1] - Xf[:, c2], Xq[:, c1] - Xq[:, c2]))
+                mu_d, sd_d = float(np.mean(vf)), max(float(np.std(vf)), 1e-5)
+                df_c[:, j], dq_c[:, j] = np.clip((vf - mu_d) / sd_d, -5.0, 5.0), np.clip((vq - mu_d) / sd_d, -5.0, 5.0)
+            nf_add.append(df_c); nq_add.append(dq_c); dm_add.append(np.zeros(n_derived, dtype=bool))
+        if nf_add:
+            Xf = np.concatenate([Xf, *nf_add], axis=1)
+            Xq = np.concatenate([Xq, *nq_add], axis=1)
+            dmask = np.concatenate([dmask, *dm_add], axis=0)
+            pad_c = n_noise + n_derived
+            miss_f = np.concatenate([miss_f, np.zeros((nf, pad_c), dtype=np.float32)], axis=1)
+            miss_q = np.concatenate([miss_q, np.zeros((nq, pad_c), dtype=np.float32)], axis=1)
 
     cperm = rng.permutation(Xf.shape[1])
     Xf, Xq, miss_f, miss_q, dmask = Xf[:, cperm], Xq[:, cperm], miss_f[:, cperm], miss_q[:, cperm], dmask[cperm]
@@ -415,22 +430,10 @@ class AsyncBatchPrefetcher:
     """Background thread-pool prefetcher producing guaranteed-unique step batches at RAM speed."""
 
     def __init__(
-        self,
-        store: RamCorpusStore,
-        *,
-        batch_size: int,
-        global_seed: int,
-        rank: int,
-        start_step: int = 1,
-        num_workers: int = 4,
-        queue_size: int = 12,
-        regret_path: Path | None = None,
+        self, store: RamCorpusStore, *, batch_size: int, global_seed: int, rank: int,
+        start_step: int = 1, num_workers: int = 4, queue_size: int = 12, regret_path: Path | None = None,
     ) -> None:
-        self.store = store
-        self.batch_size = batch_size
-        self.global_seed = global_seed
-        self.rank = rank
-        self.regret_path = regret_path
+        self.store, self.batch_size, self.global_seed, self.rank, self.regret_path = store, batch_size, global_seed, rank, regret_path
         self._step = start_step
         self._stop = threading.Event()
         self._q: queue.Queue[tuple[int, list[dict[str, Any]], list[dict[str, Any]]]] = queue.Queue(maxsize=queue_size)
@@ -439,45 +442,35 @@ class AsyncBatchPrefetcher:
         self._prod = threading.Thread(target=self._run, daemon=True)
         self._prod.start()
 
-    def _build_one_step(self, step: int, idxs: list[int]) -> tuple[int, list[dict[str, Any]], list[dict[str, Any]]]:
-        futs_a = [
-            self._pool.submit(
-                build_unique_episode, self.store, idx,
-                global_seed=self.global_seed, step=step, rank=self.rank, slot=slot, view_tag="a",
-            )
-            for slot, idx in enumerate(idxs)
-        ]
-        # Two paired independent split views for InfoNCE split invariance
-        futs_b = [
-            self._pool.submit(
-                build_unique_episode, self.store, idxs[s],
-                global_seed=self.global_seed, step=step, rank=self.rank, slot=s, view_tag="b",
-                scm_prob=0.0, target_swap_prob=0.0,
-            )
-            for s in range(min(2, len(idxs)))
-        ]
-        eps_a = [f.result() for f in futs_a]
-        eps_b = [f.result() for f in futs_b]
-        return step, eps_a, eps_b
-
     def _run(self) -> None:
-        pending: deque[Any] = deque()
         while not self._stop.is_set():
-            while len(pending) < 4 and not self._stop.is_set():
-                step = self._step
-                self._step += 1
-                if self.regret_path is not None and step % 50 == 0:
-                    self.store.update_regret_from_file(self.regret_path)
-                idxs = self.store.sample_unique_indices(self.batch_size, self._rng)
-                pending.append(self._pool.submit(self._build_one_step, step, idxs))
-            if pending:
-                item = pending.popleft().result()
-                while not self._stop.is_set():
-                    try:
-                        self._q.put(item, timeout=0.5)
-                        break
-                    except queue.Full:
-                        continue
+            step = self._step
+            self._step += 1
+            if self.regret_path is not None and step % 50 == 0:
+                self.store.update_regret_from_file(self.regret_path)
+            idxs = self.store.sample_unique_indices(self.batch_size, self._rng)
+            futs_a = [
+                self._pool.submit(
+                    build_unique_episode, self.store, idx,
+                    global_seed=self.global_seed, step=step, rank=self.rank, slot=slot, view_tag="a",
+                )
+                for slot, idx in enumerate(idxs)
+            ]
+            futs_b = [
+                self._pool.submit(
+                    build_unique_episode, self.store, idxs[s],
+                    global_seed=self.global_seed, step=step, rank=self.rank, slot=s, view_tag="b",
+                    scm_prob=0.0, target_swap_prob=0.0,
+                )
+                for s in range(min(2, len(idxs)))
+            ]
+            item = (step, [f.result() for f in futs_a], [f.result() for f in futs_b])
+            while not self._stop.is_set():
+                try:
+                    self._q.put(item, timeout=0.5)
+                    break
+                except queue.Full:
+                    continue
 
     def next_batch(self) -> tuple[int, list[dict[str, Any]], list[dict[str, Any]]]:
         return self._q.get()
