@@ -27,6 +27,8 @@ enum Command {
     BuildPanels(kpi::panels_build::BuildPanelsArgs),
     /// Write the frozen cell schedule (row roles and column views) for a panel and tier.
     Plan(kpi::cellplan::PlanArgs),
+    /// Run an external generator command on every scheduled cell and log one row per file.
+    EmitCli(kpi::ext_emit::EmitCliArgs),
     /// Fit the auditors on real rows once: per-row losses, informative flags, C2ST reference.
     RealRef(kpi::realref::RealRefArgs),
     /// Score one arm (external files or a native control) into a ledger and compact rows.
@@ -39,6 +41,7 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
     match &cli.command {
         Command::BuildPanels(args) => kpi::panels_build::run(args),
         Command::Plan(args) => kpi::cellplan::run(args),
+        Command::EmitCli(args) => kpi::ext_emit::run(args),
         Command::RealRef(args) => kpi::realref::run(args),
         Command::Score(args) => kpi::score::run(args),
         Command::ReduceLedger(args) => kpi::reduce::run(args),
