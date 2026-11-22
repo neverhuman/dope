@@ -97,19 +97,29 @@ pub fn sample_catf_covariates(
                 PURPOSE_CATF,
                 (col * 3 + 2) as u32,
             );
-            // Direct truncated-normal inversion inside bin `[z_edges[picked], z_edges[picked+1]]`.
+            // Exact conditional truncated-normal inversion: Z | (Z in [e_lo, e_hi]) with Z ~ N(mu, sd^2).
+            // At 0 CATF trees this recovers the exact Gaussian copula conditional by law of total probability.
+            let sd = cond.copula_cond_sd.max(1e-4);
             let p_lo = if cond.z_edges[picked].is_finite() {
-                norm_cdf(cond.z_edges[picked])
+                norm_cdf((cond.z_edges[picked] - mu) / sd)
             } else {
                 1e-6
             };
             let p_hi = if cond.z_edges[picked + 1].is_finite() {
-                norm_cdf(cond.z_edges[picked + 1])
+                norm_cdf((cond.z_edges[picked + 1] - mu) / sd)
             } else {
                 1.0 - 1e-6
             };
-            let u_draw = (p_lo + u_in * (p_hi - p_lo).max(1e-9)).clamp(1e-6, 1.0 - 1e-6);
-            z_row[col] = norm_ppf(u_draw);
+            let z_draw = if (p_hi - p_lo) > 1e-9 {
+                let u_cond = (p_lo + u_in * (p_hi - p_lo)).clamp(1e-7, 1.0 - 1e-7);
+                mu + sd * norm_ppf(u_cond)
+            } else {
+                let lo = cond.z_edges[picked].max(-5.0);
+                let hi = cond.z_edges[picked + 1].min(5.0);
+                lo + u_in * (hi - lo).max(1e-6)
+            };
+            z_row[col] = z_draw.clamp(-6.0, 6.0);
+            let u_draw = norm_cdf(z_row[col]).clamp(1e-6, 1.0 - 1e-6);
             x_row[col] = marginals[col].sample_from_uniform(u_draw, u_mix, 1.0);
             if is_nominal[col] {
                 let code = nom_levels[col]

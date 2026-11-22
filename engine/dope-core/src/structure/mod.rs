@@ -26,6 +26,26 @@ impl RuleSet {
         }
     }
 
+    /// Return the set of columns deterministically derived by high-support functional rules
+    /// (`FD-1`, `FD-2`, `ARITH`, `BIN` with `epsilon <= 0.01`) so CATF skips wasting tree bytes on them.
+    pub fn derived_columns(&self) -> std::collections::BTreeSet<usize> {
+        let mut out = std::collections::BTreeSet::new();
+        for r in &self.rules {
+            match *r {
+                StructuralRule::Fd1 { child, epsilon, .. }
+                | StructuralRule::Fd2 { child, epsilon, .. }
+                | StructuralRule::Arith { child, epsilon, .. }
+                | StructuralRule::Bin { child, epsilon, .. }
+                    if epsilon <= 0.01 =>
+                {
+                    out.insert(child);
+                }
+                _ => {}
+            }
+        }
+        out
+    }
+
     /// Direct stateless rule enforcement on a single feature row (`u_exc`, `u_renorm` in `(0, 1)`).
     /// Zero rejection loops: applies base constraints (`INEQ`/`EXCL`/`MISS`) first, then derived
     /// functional rules (`ARITH`/`BIN`/`FD-1`/`FD-2`) so constraints never invalidate derived columns.

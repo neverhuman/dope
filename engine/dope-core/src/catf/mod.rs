@@ -102,6 +102,10 @@ impl CatfModel {
             })
             .collect();
 
+        // Mine structural rules BEFORE CATF so deterministically derived columns skip CATF tree fitting.
+        let rules = RuleSet::mine(build_x, select_x, &is_discrete, cfg.rule_mode, support_k);
+        let derived_cols = rules.derived_columns();
+
         // Empirical Pearson correlation matrix + zero-byte copula latent calibration!
         let emp_corr = empirical_corr_matrix(build_x);
         let latent_corr = calibrate_latent_correlation_matrix(&marginals, &emp_corr);
@@ -194,23 +198,24 @@ impl CatfModel {
                 z_centers,
                 trees: Vec::new(),
             };
-            fit_catf_trees(
-                build_x,
-                &z_cols,
-                is_nominal,
-                &nom_codes,
-                &mut cond,
-                &target_states,
-                cfg.max_trees_per_col,
-                cfg.max_depth,
-                min_leaf,
-                cfg.alpha_shrink,
-                cfg.eta,
-            );
+            if !derived_cols.contains(&col) {
+                fit_catf_trees(
+                    build_x,
+                    &z_cols,
+                    is_nominal,
+                    &nom_codes,
+                    &mut cond,
+                    &target_states,
+                    cfg.max_trees_per_col,
+                    cfg.max_depth,
+                    min_leaf,
+                    cfg.alpha_shrink,
+                    cfg.eta,
+                );
+            }
             conditionals.push(cond);
         }
 
-        let rules = RuleSet::mine(build_x, select_x, &is_discrete, cfg.rule_mode, support_k);
         Self {
             order,
             conditionals,

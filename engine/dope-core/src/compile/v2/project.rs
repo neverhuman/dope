@@ -169,6 +169,33 @@ pub fn project_moments_damped_newton(
     }
 }
 
+/// Full `P+` refit-and-serialize projection driver: solves damped Newton for `w_i`,
+/// materializes the `N_eff * w_i` pseudo-count pool `(comp_x, comp_y)`, invokes
+/// `refit_and_decode(&comp_x, &comp_y)` to refit & decode a fresh compiled sampler,
+/// and records all 5 gaps honestly (`gap_raw_q`, `gap_reweighted`, `gap_compiled`, `gap_decoded`).
+pub fn compile_projected_sampler<F>(
+    sig: &LearningSignatureV1,
+    synth_x: &[Vec<f64>],
+    synth_y: &[f64],
+    mut refit_and_decode: F,
+) -> ProjectionResult
+where
+    F: FnMut(&[Vec<f64>], &[f64]) -> Option<(Vec<Vec<f64>>, Vec<f64>)>,
+{
+    let mut proj = project_moments_damped_newton(sig, synth_x, synth_y, None);
+    let comp_x: Vec<Vec<f64>> = synth_x
+        .iter()
+        .map(|col| proj.compiled_indices.iter().map(|&i| col[i]).collect())
+        .collect();
+    let comp_y: Vec<f64> = proj.compiled_indices.iter().map(|&i| synth_y[i]).collect();
+    if let Some((dec_x, dec_y)) = refit_and_decode(&comp_x, &comp_y) {
+        if !dec_y.is_empty() && dec_x.len() == synth_x.len() {
+            proj.ladder.gap_decoded = sig.evaluate_gaps(&dec_x, &dec_y, None).max_abs_gap;
+        }
+    }
+    proj
+}
+
 fn tilted_weights(delta: &[f64], theta: &[f64], n: usize, m: usize) -> (Vec<f64>, f64) {
     let mut scores = Vec::with_capacity(n);
     let mut max_s = f64::NEG_INFINITY;

@@ -11,7 +11,9 @@ pub mod noise;
 pub mod panel;
 pub mod stack;
 
+use crate::error::Result;
 use crate::target::Head;
+use exchange::TeacherExchangeBundle;
 use noise::TeacherResidualModel;
 use panel::{duplicate_grouped_kfolds, GbdtMember, KnnMember, LinearMember};
 use stack::{fit_simplex_weights, IsotonicCalibrator, MulticlassCalibrator};
@@ -97,6 +99,9 @@ pub struct CrossFittedTeacher {
     pub oof_agreement: Vec<f64>,
     pub residual_model: Option<TeacherResidualModel>,
     pub seen_teacher_families: Vec<String>,
+    pub oof_beats_null: bool,
+    pub external_probe_predictions: Option<Vec<f64>>,
+    pub external_probe_agreement: Option<Vec<f64>>,
     fold_models: Vec<FoldTeacher>,
     y_scale: f64,
 }
@@ -165,12 +170,28 @@ impl CrossFittedTeacher {
                     }
                 }
             }
-            let weights = fit_simplex_weights(head, &inner_oof, &comp_y);
+            let mut weights = fit_simplex_weights(head, &inner_oof, &comp_y);
             let mut stacked_inner = vec![0.0; m_comp * o];
             for m in 0..4 {
                 for i in 0..m_comp * o {
                     stacked_inner[i] += weights[m] * inner_oof[m][i];
                 }
+            }
+            // Teacher quality gate: if stacked inner OOF is worse than best single member, fall back.
+            let stack_loss = teacher_oof_loss(head, &stacked_inner, &comp_y);
+            let mut best_m = None;
+            let mut best_l = stack_loss;
+            for (m, pred) in inner_oof.iter().enumerate() {
+                let ml = teacher_oof_loss(head, pred, &comp_y);
+                if ml + 1e-6 < best_l {
+                    best_l = ml;
+                    best_m = Some(m);
+                }
+            }
+            if let Some(bm) = best_m {
+                weights = vec![0.0; 4];
+                weights[bm] = 1.0;
+                stacked_inner = inner_oof[bm].clone();
             }
             let bin_cal = if head == Head::Binary {
                 Some(IsotonicCalibrator::fit(&stacked_inner, &comp_y))
@@ -218,6 +239,10 @@ impl CrossFittedTeacher {
             None
         };
 
+        let null_pred = null_baseline_pred(head, y);
+        let oof_beats_null = teacher_oof_loss(head, &oof_predictions, y) + 1e-6
+            < teacher_oof_loss(head, &null_pred, y);
+
         Self {
             head,
             d,
@@ -230,16 +255,70 @@ impl CrossFittedTeacher {
                 "native_gbdt_d6".into(),
                 "native_knn16".into(),
             ],
+            oof_beats_null,
+            external_probe_predictions: None,
+            external_probe_agreement: None,
             fold_models,
             y_scale,
         }
     }
 
+    /// Construct a teacher directly from a validated external `TeacherExchangeBundle`
+    /// (`--teacher external:DIR`), propagating `seen_teacher_families` for auditor independence.
+    pub fn from_exchange(
+        head: Head,
+        d: usize,
+        y_build: &[f64],
+        bundle: &TeacherExchangeBundle,
+    ) -> Result<Self> {
+        bundle.validate(y_build.len(), head.outputs())?;
+        let n = y_build.len();
+        let y_mean = y_build.iter().sum::<f64>() / n.max(1) as f64;
+        let y_scale = (y_build.iter().map(|&v| (v - y_mean).powi(2)).sum::<f64>()
+            / n.max(1) as f64)
+            .sqrt()
+            .max(1e-4);
+        let residual_model = if head == Head::Regression {
+            Some(TeacherResidualModel::fit_oof(
+                y_build,
+                &bundle.oof_predictions,
+            ))
+        } else {
+            None
+        };
+        let null_pred = null_baseline_pred(head, y_build);
+        let oof_beats_null = teacher_oof_loss(head, &bundle.oof_predictions, y_build) + 1e-6
+            < teacher_oof_loss(head, &null_pred, y_build);
+        Ok(Self {
+            head,
+            d,
+            oof_predictions: bundle.oof_predictions.clone(),
+            oof_agreement: vec![1.0; n],
+            residual_model,
+            seen_teacher_families: bundle.seen_teacher_families.clone(),
+            oof_beats_null,
+            external_probe_predictions: bundle.probe_predictions.clone(),
+            external_probe_agreement: bundle.probe_agreement.clone(),
+            fold_models: Vec::new(),
+            y_scale,
+        })
+    }
+
     /// Score arbitrary synthetic probes `x_probe` by averaging across all `K` retained fold
-    /// teachers and returning `(soft_targets, agreement_scores)`.
+    /// teachers (or returning precomputed external exchange probe predictions).
     pub fn predict_probes(&self, x_probe: &[Vec<f64>]) -> (Vec<f64>, Vec<f64>) {
         let n = x_probe.first().map_or(0, Vec::len);
         let o = self.head.outputs();
+        if let Some(ref ext) = self.external_probe_predictions {
+            if ext.len() == n * o {
+                let agr = self
+                    .external_probe_agreement
+                    .clone()
+                    .filter(|a| a.len() == n)
+                    .unwrap_or_else(|| vec![1.0; n]);
+                return (ext.clone(), agr);
+            }
+        }
         if n == 0 || self.fold_models.is_empty() {
             return (vec![0.0; n * o], vec![1.0; n]);
         }
@@ -259,6 +338,66 @@ impl CrossFittedTeacher {
             }
         }
         (avg, agr)
+    }
+}
+
+fn null_baseline_pred(head: Head, y: &[f64]) -> Vec<f64> {
+    let n = y.len().max(1);
+    match head {
+        Head::Regression => {
+            let m = y.iter().sum::<f64>() / n as f64;
+            vec![m; y.len()]
+        }
+        Head::Binary => {
+            let p = (y.iter().sum::<f64>() / n as f64).clamp(1e-4, 1.0 - 1e-4);
+            vec![p; y.len()]
+        }
+        Head::Multiclass(k) => {
+            let mut cnt = vec![1.0; k];
+            for &v in y {
+                let c = (v.round() as usize).min(k - 1);
+                cnt[c] += 1.0;
+            }
+            let tot: f64 = cnt.iter().sum();
+            let probs: Vec<f64> = cnt.into_iter().map(|c| c / tot).collect();
+            let mut out = Vec::with_capacity(y.len() * k);
+            for _ in 0..y.len() {
+                out.extend_from_slice(&probs);
+            }
+            out
+        }
+    }
+}
+
+fn teacher_oof_loss(head: Head, pred: &[f64], y: &[f64]) -> f64 {
+    let n = y.len().max(1);
+    match head {
+        Head::Regression => {
+            y.iter()
+                .zip(pred)
+                .map(|(&a, &b)| (a - b).powi(2))
+                .sum::<f64>()
+                / n as f64
+        }
+        Head::Binary => {
+            -y.iter()
+                .zip(pred)
+                .map(|(&yi, &pi)| {
+                    let p = pi.clamp(1e-6, 1.0 - 1e-6);
+                    yi * p.ln() + (1.0 - yi) * (1.0 - p).ln()
+                })
+                .sum::<f64>()
+                / n as f64
+        }
+        Head::Multiclass(k) => {
+            -(0..y.len())
+                .map(|i| {
+                    let c = (y[i].round() as usize).min(k - 1);
+                    pred[i * k + c].clamp(1e-6, 1.0).ln()
+                })
+                .sum::<f64>()
+                / n as f64
+        }
     }
 }
 

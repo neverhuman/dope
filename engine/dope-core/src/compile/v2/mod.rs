@@ -16,7 +16,8 @@ pub use loop_driver::{
     lineage_hash, run_exact_artifact_loop, CompileLedger, CompilerMove, DecodedCandidateArtifact,
 };
 pub use project::{
-    project_moments_damped_newton, ProjectionFiveGapLadder, ProjectionResult, MIN_PROJECTION_ESS,
+    compile_projected_sampler, project_moments_damped_newton, ProjectionFiveGapLadder,
+    ProjectionResult, MIN_PROJECTION_ESS,
 };
 pub use roles::CompilerRoles;
 pub use select::{select_best_decoded, CandidateScore};
