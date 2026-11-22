@@ -6,6 +6,7 @@
     "catboost_info/time_left.tsv": "external-evidence",
     "research/levels/v3_canonical_summary.py": "external-evidence",
     "research/levels/v4_training_helpers.py": "external-evidence",
+    "engine/dope-arena/": "rust-core",
     "engine/dope-sdk/": "rust-core",
     "docs/adr/normalize-once-and-dvs-v1.md": "governance",
     "docs/plans/dope-jope-contract-decisions.json": "governance",
@@ -42,6 +43,7 @@
     "bench/": "external-evidence",
     "build.rs": "rust-core",
     "contracts/": "rust-core",
+    "contracts/dope-fidelity-v3.json": "rust-core",
     "contracts/tdl-contract-v1.json": "rust-core",
     "contracts/tdl-contract-v2-candidate.json": "rust-core",
     "crates/dope-service/": "rust-core",
@@ -994,7 +996,13 @@
     "ops/merge_guard/native_process_tree.rs": "governance",
     "ops/merge_guard/native_process_supervisor.rs": "governance",
     "ops/merge_guard/native_process_tests.rs": "governance",
-    "ops/merge_guard/native_process_correction_tests.rs": "governance"
+    "ops/merge_guard/native_process_correction_tests.rs": "governance",
+    "research/levels/s3_ddp_trainer.py": "external-evidence",
+    "research/levels/s3_dynamic_augment.py": "external-evidence",
+    "research/levels/s3_kpi_evaluator.py": "external-evidence",
+    "research/levels/v5_fidelity_net.py": "external-evidence",
+    "research/levels/tests/test_s3_v5_training.py": "external-evidence",
+    "tools/dope_dashboard/": "governance"
   },
   "workspace": "dope"
 }

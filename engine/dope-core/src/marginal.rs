@@ -6,6 +6,11 @@
 //! identically on CPU and GPU. Discrete marginals (categorical codes, small
 //! integer supports) are thresholds `t_k = Φ⁻¹(cum_k)` in the same z space.
 
+pub mod atoms;
+pub mod lattice;
+pub mod tails;
+pub mod v2;
+
 use crate::stats::{norm_cdf, norm_pdf, norm_ppf, normal_scores, quantile_sorted};
 use serde::{Deserialize, Serialize};
 

@@ -51,6 +51,8 @@ pub(crate) enum Command {
     Predict(PredictArgs),
     /// Show what an artifact contains and where its bytes go.
     Inspect(InspectArgs),
+    /// Extract deterministic source-free PacketFeaturesV2 structural embedding from a .dope packet.
+    Embed(EmbedArgs),
     /// Write an ML-ready version of a CSV (one-hot categoricals, numerics on [0,1]).
     Encode(EncodeArgs),
     /// Measure retention: train auditors on synthetic vs real rows, test on held-out real rows.
@@ -189,9 +191,21 @@ pub(crate) struct FitArgs {
     /// Whole-file cap: 2048 bytes, 4k/4KiB (binary), 4KB (decimal).
     #[arg(short, long)]
     pub(crate) budget: Option<String>,
-    /// small (2 KiB), medium (4 KiB), large (16 KiB); --budget overrides this cap.
+    /// small (2 KiB), medium (4 KiB), large (16 KiB), max (1 MiB); --budget overrides this cap.
     #[arg(long)]
     pub(crate) size: Option<dope_core::ModelSize>,
+    /// Artifact wire format: 1 (Format 1 legacy safetensors) or 2 (Fidelity Engine 2.0 Format 2).
+    #[arg(long, default_value_t = 1)]
+    pub(crate) format: u8,
+    /// Teacher mode for --format 2: native | external:<DIR>.
+    #[arg(long, default_value = "native")]
+    pub(crate) teacher: String,
+    /// Structural rule mining for --format 2: structural | all | off.
+    #[arg(long, default_value = "structural")]
+    pub(crate) rules: String,
+    /// Structural minimum support floor k for discrete levels/atoms/rules (--format 2).
+    #[arg(long, default_value_t = 10)]
+    pub(crate) k_anon: usize,
     /// Hard cap on complete-generator scalar parameters, including marginals and trees.
     #[arg(long)]
     pub(crate) max_parameters: Option<usize>,
@@ -272,12 +286,25 @@ pub(crate) struct TierArgs {
 #[derive(Args)]
 pub(crate) struct SampleArgs {
     pub(crate) model: PathBuf,
-    #[arg(short = 'n', long, default_value_t = 1000)]
-    pub(crate) rows: usize,
+    /// Number of rows to emit, or `auto` (4000 for faithful/distill, 1000 for matched/legacy).
+    #[arg(short = 'n', long, default_value = "1000")]
+    pub(crate) rows: String,
     #[arg(long, default_value_t = 0)]
     pub(crate) seed: u64,
+    /// Emission contract mode: legacy | faithful | distill | matched.
+    #[arg(long, default_value = "legacy")]
+    pub(crate) mode: String,
+    /// Independent stateless RNG table stream ID (for multi-table draws, T12).
+    #[arg(long, default_value_t = 0)]
+    pub(crate) table_id: u64,
+    /// Optional sidecar CSV path for `weight,pair_id` in `distill` mode.
+    #[arg(long)]
+    pub(crate) sidecar: Option<PathBuf>,
     #[arg(short, long)]
     pub(crate) out: Option<PathBuf>,
+    /// Optional CSV of real/external X rows: draw only y ~ Q(Y|X) (diagnostic swap-ladder control).
+    #[arg(long)]
+    pub(crate) given: Option<PathBuf>,
     /// raw (original units and labels) or ml (one-hot, [0,1]).
     #[arg(long, default_value = "raw")]
     pub(crate) space: String,
@@ -314,6 +341,13 @@ pub(crate) struct InspectArgs {
     pub(crate) model: PathBuf,
     #[arg(long)]
     pub(crate) json: bool,
+}
+
+#[derive(Args)]
+pub(crate) struct EmbedArgs {
+    pub(crate) model: PathBuf,
+    #[arg(short, long)]
+    pub(crate) out: Option<PathBuf>,
 }
 
 #[derive(Args)]

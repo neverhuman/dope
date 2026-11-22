@@ -23,7 +23,9 @@ use crate::rng::{normal_block, uniform_block};
 use crate::target::Head;
 use candle_core::{DType, Device, Tensor, D};
 
+pub mod emit;
 mod forest;
+pub use emit::{sample_with_mode, EmissionMode, EmitOptions, EmittedSamples};
 use forest::DeviceForest;
 
 #[derive(Clone, Debug)]
@@ -122,6 +124,23 @@ pub fn sample(program: &Program, opts: &SampleOptions) -> Result<Samples> {
         return Ok(crate::sample_cpu::sample_cpu(program, opts.rows, opts.seed));
     }
     sample_device(program, opts)
+}
+
+/// Draw synthetic targets `y ~ Q(Y | X = given_x)` conditioned on caller-supplied
+/// model-space features (`given_x[feature][row]`).
+pub fn sample_given(program: &Program, given_x: &[Vec<f64>], seed: u64) -> Result<Samples> {
+    if given_x.len() != program.features() {
+        return Err(crate::error::DopeError::Input(
+            "given feature column count does not match artifact schema".into(),
+        ));
+    }
+    let rows = given_x.first().map_or(0, Vec::len);
+    if given_x.iter().any(|col| col.len() != rows) {
+        return Err(crate::error::DopeError::Input(
+            "given feature columns have mismatched row lengths".into(),
+        ));
+    }
+    Ok(crate::sample_cpu::sample_cpu_given(program, given_x, seed))
 }
 
 /// The tensor-program sampler (any candle device; on CPU it is the parity

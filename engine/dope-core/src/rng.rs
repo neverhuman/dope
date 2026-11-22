@@ -6,6 +6,92 @@
 
 use crate::stats::norm_ppf;
 use rayon::prelude::*;
+use sha2::{Digest, Sha256};
+
+/// Default 128-bit namespace for DOPE v2 stateless row-keyed RNG.
+pub const DEFAULT_NAMESPACE_128: [u8; 16] = *b"dope.rowkey.v2\0\0";
+
+pub const PURPOSE_COPULA_EPS: u32 = 1;
+pub const PURPOSE_REGIME: u32 = 2;
+pub const PURPOSE_MISSING: u32 = 3;
+pub const PURPOSE_NOISE: u32 = 4;
+pub const PURPOSE_LABEL: u32 = 5;
+pub const PURPOSE_CATF: u32 = 6;
+pub const PURPOSE_RULE: u32 = 7;
+
+/// Stateless cryptographic draw keyed strictly by:
+/// `SHA256(domain || namespace_128 || seed || table_id || row_id || group_id || purpose || draw_idx)`.
+///
+/// Intentionally excludes any packet digest so Common Random Numbers (`T25`) hold across
+/// candidate packets during closed-loop compilation and paired evaluations.
+#[allow(clippy::too_many_arguments)]
+pub fn row_keyed_u64(
+    domain: &str,
+    namespace_128: &[u8; 16],
+    seed: u64,
+    table_id: u64,
+    row_id: u64,
+    group_id: u64,
+    purpose: u32,
+    draw_idx: u32,
+) -> u64 {
+    let mut h = Sha256::new();
+    h.update((domain.len() as u32).to_le_bytes());
+    h.update(domain.as_bytes());
+    h.update(namespace_128);
+    h.update(seed.to_le_bytes());
+    h.update(table_id.to_le_bytes());
+    h.update(row_id.to_le_bytes());
+    h.update(group_id.to_le_bytes());
+    h.update(purpose.to_le_bytes());
+    h.update(draw_idx.to_le_bytes());
+    let digest = h.finalize();
+    u64::from_le_bytes(digest[..8].try_into().unwrap_or([0; 8]))
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn row_keyed_uniform(
+    namespace_128: &[u8; 16],
+    seed: u64,
+    table_id: u64,
+    row_id: u64,
+    group_id: u64,
+    purpose: u32,
+    draw_idx: u32,
+) -> f64 {
+    let bits = row_keyed_u64(
+        "DOPE_ROW_KEYED_RNG_V2",
+        namespace_128,
+        seed,
+        table_id,
+        row_id,
+        group_id,
+        purpose,
+        draw_idx,
+    );
+    ((bits >> 11) as f64 + 0.5) * (1.0 / (1u64 << 53) as f64)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn row_keyed_normal(
+    namespace_128: &[u8; 16],
+    seed: u64,
+    table_id: u64,
+    row_id: u64,
+    group_id: u64,
+    purpose: u32,
+    draw_idx: u32,
+) -> f64 {
+    norm_ppf(row_keyed_uniform(
+        namespace_128,
+        seed,
+        table_id,
+        row_id,
+        group_id,
+        purpose,
+        draw_idx,
+    ))
+}
 
 #[inline]
 pub fn splitmix64(mut x: u64) -> u64 {

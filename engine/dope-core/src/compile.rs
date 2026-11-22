@@ -160,6 +160,7 @@ fn anonymize(schema: &mut Schema) {
 
 mod allocate;
 mod ctx;
+pub mod v2;
 
 use allocate::{allocate, Candidate};
 use ctx::Ctx;

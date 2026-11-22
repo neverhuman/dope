@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DOPE Multi-Node Training &amp; Fidelity KPI Dashboard</title>
+<style>
+:root{--bg:#0b0f14;--panel:#131a23;--panel2:#19222e;--border:#263242;--text:#e6edf3;--muted:#8b9bb0;--green:#3fb950;--cyan:#58a6ff;--amber:#d29922;--purple:#bc8cff;--red:#f85149;--teal:#39c5cf}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:#0f151d;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{margin:0;font-size:17px;letter-spacing:.2px}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;background:#1b2636;color:var(--cyan);border:1px solid #2b3c54;font-weight:600}
+.tag.warn{color:var(--amber);border-color:#4d3b15;background:#241c0d}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--panel)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.pill[data-status="live"] .dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+.pill[data-status="offline"] .dot{background:var(--red)}
+main{max-width:1520px;margin:0 auto;padding:18px 22px 40px;display:flex;flex-direction:column;gap:18px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-label{margin:0 0 4px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat-value{margin:0;font-size:28px;font-weight:700;letter-spacing:-.4px}
+.stat-value.kpi{color:var(--green)}
+.stat-value.cyan{color:var(--cyan)}
+.stat-value.amber{color:var(--amber)}
+.stat-sub{margin:6px 0 0;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px}
+.badge{padding:2px 6px;border-radius:5px;background:var(--panel2);border:1px solid var(--border);font-size:11px;color:var(--text)}
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-head h2,.card-head h3{margin:0;font-size:14px;font-weight:600}
+.tabs{display:flex;gap:6px}
+.tab{background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+.tab.active{color:var(--text);border-color:var(--cyan);background:#16283e}
+.chart-box{width:100%;height:230px;background:#0c1219;border:1px solid #1d2735;border-radius:8px;position:relative;overflow:hidden}
+svg.chart{width:100%;height:100%;display:block}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:7px 8px;text-align:right;border-bottom:1px solid #1e2836}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}
+tr:hover td{background:#172130}
+.nodes-grid{display:grid;grid-template-columns:280px 1fr;gap:14px}
+@media(max-width:960px){.nodes-grid{grid-template-columns:1fr}}
+.host-list{display:flex;flex-direction:column;gap:6px}
+.host-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);cursor:pointer;text-align:left}
+.host-btn:hover{border-color:#3a4c63}
+.host-btn.selected{border-color:var(--cyan);background:#162538}
+.hleft{display:flex;align-items:center;gap:8px;font-weight:600}
+.hrole{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;background:#1e2b3b;color:var(--cyan)}
+.hrole.ddp{background:#13311f;color:var(--green)}
+.hrole.eval{background:#2d1f3e;color:var(--purple)}
+.hrole.jsr{background:#2d2512;color:var(--amber)}
+.hrole.off{background:#34181a;color:var(--red)}
+.gpu-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0}
+.gpu-card{background:#0e141c;border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.bar{height:8px;border-radius:999px;background:#1c2532;overflow:hidden;display:flex;margin:6px 0}
+.bar-dope{background:var(--green);height:100%}
+.bar-other{background:var(--cyan);height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted);margin-top:6px}
+.lg-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.muted{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>DOPE v1.3.1 · Multi-Node Training &amp; Fidelity KPI Dashboard</h1>
+    <span class="tag">S3 v250 · 4,598 Datasets (Reg/Bin/MC/ML)</span>
+    <span class="tag warn">Empirical Privacy Only · Formal DP Not Claimed</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="muted" id="clock">—</span>
+    <span class="pill" id="conn" data-status="connecting"><span class="dot"></span><span id="conn-txt">Connecting</span></span>
+  </div>
+</header>
+<main>
+  <section class="stats">
+    <article class="card">
+      <p class="stat-label">MAIN KPI · Held-Out Unclipped Retention</p>
+      <p class="stat-value kpi" id="kpi-ret">—</p>
+      <div class="stat-sub" id="kpi-tasks">Waiting for first held-out eval…</div>
+    </article>
+    <article class="card">
+      <p class="stat-label">Fidelity/v3 Hard-Gate Coverages</p>
+      <p class="stat-value cyan" id="kpi-gates">—</p>
+      <div class="stat-sub" id="kpi-gates-sub">Parity · Realism (C2ST) · Privacy (DCR)</div>
+    </article>
+    <article class="card">
+      <p class="stat-label">Fleet Throughput &amp; Resplit Diversity</p>
+      <p class="stat-value" id="kpi-rate">—</p>
+      <div class="stat-sub" id="kpi-aug">Unique splits · Synthetic cols · Row len</div>
+    </article>
+    <article class="card">
+      <p class="stat-label">Live Cluster &amp; Co-Host Safety</p>
+      <p class="stat-value amber" id="kpi-nodes">—</p>
+      <div class="stat-sub" id="kpi-vram">DOPE VRAM · JSR Co-Host · Free Headroom</div>
+    </article>
+  </section>
+
+  <section class="grid2">
+    <article class="card">
+      <div class="card-head">
+        <h2 id="fleet-chart-title">Fleet Main KPI &amp; Loss Trajectory</h2>
+        <div class="tabs" id="fleet-tabs">
+          <button class="tab active" data-mode="kpi">Main KPI Retention</button>
+          <button class="tab" data-mode="loss">Coupled TSTR Loss</button>
+          <button class="tab" data-mode="rate">Tables/sec</button>
+        </div>
+      </div>
+      <div class="chart-box" id="fleet-chart"></div>
+      <div class="legend" id="fleet-legend"></div>
+    </article>
+    <article class="card">
+      <div class="card-head">
+        <h2>Held-Out Unseen-Family Main KPI Leaderboard</h2>
+        <span class="muted">No weighted composite</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>Host</th><th>Run</th><th>Step</th><th>MAIN KPI</th><th>Reg</th><th>Bin</th><th>MC</th><th>ML</th><th>Parity</th><th>C2ST</th><th>Drv ρ</th><th>DCR</th></tr>
+          </thead>
+          <tbody id="lb-body"><tr><td colspan="12" style="text-align:center;color:var(--muted)">Waiting for held-out evaluations…</td></tr></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section class="nodes-grid">
+    <div class="card">
+      <div class="card-head"><h3>Cluster Nodes (xbabe0–xbabe9)</h3></div>
+      <div class="host-list" id="host-list"></div>
+    </div>
+    <div class="card" id="node-detail">
+      <div class="card-head">
+        <div>
+          <h2 id="nd-title" style="display:inline">Select a node</h2>
+          <span class="hrole" id="nd-badge" style="margin-left:8px">—</span>
+        </div>
+        <span class="muted" id="nd-res">—</span>
+      </div>
+      <div class="gpu-bars" id="nd-gpus"></div>
+      <div class="card-head" style="margin-top:10px">
+        <h3>Selected Node Runs</h3>
+        <select id="run-select" class="tab" style="padding:4px 8px"></select>
+      </div>
+      <div class="grid2" style="margin-top:8px">
+        <div>
+          <p class="muted" style="margin:0 0 6px">Training: Coupled TSTR / Driver / Realism Loss &amp; Train Retention</p>
+          <div class="chart-box" id="run-train-chart"></div>
+          <div class="legend" id="run-train-legend"></div>
+        </div>
+        <div>
+          <p class="muted" style="margin:0 0 6px">Held-Out Unseen-Family Main KPI &amp; Task Retention by Step</p>
+          <div class="chart-box" id="run-eval-chart"></div>
+          <div class="legend" id="run-eval-legend"></div>
+        </div>
+      </div>
+      <div class="stat-sub" id="run-aug-summary" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+<script>
+const state = { hosts: new Map(), fleet: null, selected: "xbabe5", selectedRun: null, fleetMode: "kpi", at: 0 };
+const fmt = (v, d=3) => (v == null || !Number.isFinite(v)) ? "—" : v.toFixed(d);
+const pct = (v) => (v == null || !Number.isFinite(v)) ? "—" : (v * 100).toFixed(1) + "%";
+
+function renderSvgChart(elId, legendId, seriesList, yZero=false) {
+  const el = document.getElementById(elId);
+  const leg = document.getElementById(legendId);
+  const valid = seriesList.filter(s => s.pts.length > 0);
+  if (!valid.length) {
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8b9bb0;font-size:12px">Waiting for telemetry…</div>';
+    if (leg) leg.innerHTML = "";
+    return;
+  }
+  const W = 640, H = 220, L = 46, R = 14, T = 14, B = 24;
+  let xs = [], ys = [];
+  valid.forEach(s => s.pts.forEach(p => { xs.push(p[0]); ys.push(p[1]); }));
+  let xMin = Math.min(...xs), xMax = Math.max(...xs);
+  let yMin = Math.min(...ys), yMax = Math.max(...ys);
+  if (yZero) yMin = Math.min(0, yMin);
+  if (xMax <= xMin) xMax = xMin + 1;
+  if (yMax <= yMin) { yMax = yMin + 0.1; yMin = yMin - 0.1; }
+  const pad = (yMax - yMin) * 0.08;
+  yMin -= pad; yMax += pad;
+  const sx = x => L + ((x - xMin) / (xMax - xMin)) * (W - L - R);
+  const sy = y => H - B - ((y - yMin) / (yMax - yMin)) * (H - T - B);
+  let grid = "";
+  for (let i = 0; i <= 4; i++) {
+    const yv = yMin + (i / 4) * (yMax - yMin);
+    const yp = sy(yv);
+    grid += `<line x1="${L}" y1="${yp.toFixed(1)}" x2="${W-R}" y2="${yp.toFixed(1)}" stroke="#1b2533" stroke-width="1"/>`;
+    grid += `<text x="${L-6}" y="${(yp+4).toFixed(1)}" fill="#8b9bb0" font-size="10" text-anchor="end">${yv.toFixed(2)}</text>`;
+  }
+  let paths = "";
+  valid.forEach(s => {
+    const d = s.pts.map((p, idx) => `${idx===0?"M":"L"}${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(" ");
+    paths += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"/>`;
+    const last = s.pts[s.pts.length - 1];
+    paths += `<circle cx="${sx(last[0]).toFixed(1)}" cy="${sy(last[1]).toFixed(1)}" r="3.2" fill="${s.color}"/>`;
+  });
+  el.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}${paths}</svg>`;
+  if (leg) {
+    leg.innerHTML = valid.map(s => {
+      const last = s.pts[s.pts.length - 1][1];
+      return `<span><span class="lg-dot" style="background:${s.color}"></span>${s.label}: <b>${fmt(last,3)}</b></span>`;
+    }).join("");
+  }
+}
+
+function renderFleet() {
+  const f = state.fleet;
+  if (!f) return;
+  const be = f.best_eval;
+  const mainKpi = be ? be.main_kpi_retention_median : f.median_train_retention;
+  document.getElementById("kpi-ret").textContent = mainKpi != null ? (mainKpi * 100).toFixed(1) + "%" : "—";
+  document.getElementById("kpi-tasks").innerHTML = be
+    ? `<span class="badge">Reg ${pct(be.regression_retention)}</span><span class="badge">Bin ${pct(be.binary_retention)}</span><span class="badge">MC ${pct(be.multiclass_retention)}</span><span class="badge">ML ${pct(be.multilabel_retention)}</span>`
+    : `<span class="badge">Train TSTR Ret ${pct(f.median_train_retention)}</span><span class="badge">Awaiting step-100 eval</span>`;
+  document.getElementById("kpi-gates").textContent = be ? `${pct(be.parity_coverage)} / ${pct(be.realism_coverage)} / ${pct(be.privacy_pass_coverage)}` : "—";
+  document.getElementById("kpi-gates-sub").innerHTML = be
+    ? `<span class="badge">C2ST ${fmt(be.c2st_auc_median,3)}</span><span class="badge">Drv ρ ${fmt(be.driver_spearman_median,3)}</span><span class="badge">DCR ${fmt(be.dcr_share_median,3)}</span>`
+    : "Parity · Realism · Privacy coverages";
+  document.getElementById("kpi-rate").textContent = `${fmt(f.tables_per_s, 1)} tbl/s`;
+  document.getElementById("kpi-aug").innerHTML = `<span class="badge">${(f.unique_splits_seen||0).toLocaleString()} unique splits</span><span class="badge">+${fmt(f.avg_noise_cols,1)} noise cols</span><span class="badge">avg n_fit ${fmt(f.avg_n_fit,0)}</span>`;
+  const ddpTxt = Object.values(f.ddp_groups||{}).length ? `DDP×${Math.max(...Object.values(f.ddp_groups))}` : `${f.active_dope_procs} procs`;
+  document.getElementById("kpi-nodes").textContent = `${f.live_nodes}/${f.total_nodes} · ${ddpTxt}`;
+  document.getElementById("kpi-vram").innerHTML = `<span class="badge" style="color:var(--green)">DOPE ${fmt(f.dope_vram_gib,1)} GiB</span><span class="badge" style="color:var(--cyan)">JSR ${fmt(f.other_vram_gib,1)} GiB</span><span class="badge">Free ${fmt(f.free_vram_gib,1)} GiB</span>`;
+
+  const hist = f.history || [];
+  if (state.fleetMode === "kpi") {
+    renderSvgChart("fleet-chart", "fleet-legend", [
+      { label: "Main KPI Retention", color: "#3fb950", pts: hist.filter(p => p.main_kpi_retention != null).map((p,i) => [i, p.main_kpi_retention]) }
+    ]);
+  } else if (state.fleetMode === "loss") {
+    renderSvgChart("fleet-chart", "fleet-legend", [
+      { label: "Total Loss", color: "#58a6ff", pts: hist.filter(p => p.median_loss != null).map((p,i) => [i, p.median_loss]) },
+      { label: "Coupled TSTR Loss", color: "#bc8cff", pts: hist.filter(p => p.median_tstr_loss != null).map((p,i) => [i, p.median_tstr_loss]) }
+    ], true);
+  } else {
+    renderSvgChart("fleet-chart", "fleet-legend", [
+      { label: "Tables/sec", color: "#39c5cf", pts: hist.map((p,i) => [i, p.tables_per_s || 0]) }
+    ], true);
+  }
+
+  const lb = document.getElementById("lb-body");
+  const rows = f.leaderboard || [];
+  if (!rows.length) {
+    lb.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--muted)">Waiting for held-out evaluations…</td></tr>';
+  } else {
+    lb.innerHTML = rows.map(r => `<tr>
+      <td><b>${r.host}</b></td><td>${r.run}</td><td>${r.step}</td>
+      <td style="color:var(--green);font-weight:700">${pct(r.main_kpi_retention_median)}</td>
+      <td>${pct(r.regression_retention)}</td><td>${pct(r.binary_retention)}</td>
+      <td>${pct(r.multiclass_retention)}</td><td>${pct(r.multilabel_retention)}</td>
+      <td>${pct(r.parity_coverage)}</td><td>${fmt(r.c2st_auc_median,3)}</td>
+      <td>${fmt(r.driver_spearman_median,3)}</td><td>${fmt(r.dcr_share_median,3)}</td>
+    </tr>`).join("");
+  }
+}
+
+function renderHostList() {
+  const list = document.getElementById("host-list");
+  const names = Array.from(state.hosts.keys()).sort();
+  list.innerHTML = names.map(name => {
+    const h = state.hosts.get(name);
+    const b = h.role_badge || "IDLE";
+    const cls = b.startsWith("DDP") || b === "TRAIN" ? "ddp" : (b === "EVAL" || b === "ARENA" ? "eval" : (b === "JSR-HOST" ? "jsr" : (b === "OFFLINE" || b === "STALE" ? "off" : "")));
+    const gpus = h.gpus || [];
+    const gpuTxt = gpus.length ? `${gpus.length}×GPU · ${(gpus.reduce((a,g)=>a+(g.memory_free_mib||0),0)/1024).toFixed(0)}G free` : `${(h.resources||{}).cpus||0} CPUs`;
+    return `<button class="host-btn ${state.selected===name?"selected":""}" data-host="${name}">
+      <div><div class="hleft">${name}</div><div class="muted" style="font-size:11px">${gpuTxt}</div></div>
+      <span class="hrole ${cls}">${b}</span>
+    </button>`;
+  }).join("");
+  list.querySelectorAll(".host-btn").forEach(btn => btn.onclick = () => { state.selected = btn.dataset.host; state.selectedRun = null; renderHostList(); renderNode(); });
+}
+
+function renderNode() {
+  const h = state.hosts.get(state.selected);
+  if (!h) return;
+  document.getElementById("nd-title").textContent = h.host;
+  document.getElementById("nd-badge").textContent = h.role_badge || h.status;
+  const r = h.resources || {};
+  document.getElementById("nd-res").textContent = `CPUs: ${r.cpus||"—"} · Load: ${fmt(r.load1,2)} · RAM Free: ${fmt(r.ram_free_gib,0)}/${fmt(r.ram_total_gib,0)} GiB · Disk Free: ${fmt(r.disk_free_gib,0)} GiB`;
+
+  const gbox = document.getElementById("nd-gpus");
+  const gpus = h.gpus || [];
+  gbox.innerHTML = gpus.length ? gpus.map(g => {
+    const tot = Math.max(g.memory_total_mib || 1, 1);
+    const dp = Math.min(100, ((g.dope_vram_mib || 0) / tot) * 100);
+    const op = Math.min(100 - dp, ((g.other_vram_mib || 0) / tot) * 100);
+    return `<div class="gpu-card">
+      <div style="display:flex;justify-content:space-between;font-size:12px"><b>GPU ${g.index} · ${g.name}</b><span>${fmt(g.util_pct,0)}% util · ${fmt(g.temperature_c,0)}°C</span></div>
+      <div class="bar"><div class="bar-dope" style="width:${dp.toFixed(1)}%"></div><div class="bar-other" style="width:${op.toFixed(1)}%"></div></div>
+      <div class="muted" style="font-size:11px">DOPE ${(g.dope_vram_mib/1024).toFixed(1)}G · JSR/Other ${(g.other_vram_mib/1024).toFixed(1)}G · Free ${(g.memory_free_mib/1024).toFixed(1)}G / ${(tot/1024).toFixed(0)}G</div>
+    </div>`;
+  }).join("") : '<div class="muted">CPU-only host (coordinator / Rust Arena / dashboard)</div>';
+
+  const runs = h.runs || [];
+  const sel = document.getElementById("run-select");
+  if (!runs.length) {
+    sel.innerHTML = '<option value="">No local DOPE run directories</option>';
+    renderSvgChart("run-train-chart", "run-train-legend", []);
+    renderSvgChart("run-eval-chart", "run-eval-legend", []);
+    document.getElementById("run-aug-summary").innerHTML = "";
+    return;
+  }
+  if (!state.selectedRun || !runs.some(x => x.name === state.selectedRun)) state.selectedRun = runs[0].name;
+  sel.innerHTML = runs.map(x => `<option value="${x.name}" ${x.name===state.selectedRun?"selected":""}>${x.name}</option>`).join("");
+  sel.onchange = () => { state.selectedRun = sel.value; renderNode(); };
+  const run = runs.find(x => x.name === state.selectedRun) || runs[0];
+
+  const tr = run.train || [];
+  renderSvgChart("run-train-chart", "run-train-legend", [
+    { label: "Coupled TSTR Loss", color: "#58a6ff", pts: tr.filter(p=>p.tstr_loss!=null).map(p=>[p.step, p.tstr_loss]) },
+    { label: "Driver Loss", color: "#d29922", pts: tr.filter(p=>p.driver_loss!=null).map(p=>[p.step, p.driver_loss]) },
+    { label: "Realism Loss", color: "#bc8cff", pts: tr.filter(p=>p.realism_loss!=null).map(p=>[p.step, p.realism_loss]) },
+    { label: "Train Retention", color: "#3fb950", pts: tr.filter(p=>p.train_unclipped_retention!=null).map(p=>[p.step, p.train_unclipped_retention]) },
+  ]);
+
+  const ev = run.eval || [];
+  renderSvgChart("run-eval-chart", "run-eval-legend", [
+    { label: "MAIN KPI Ret", color: "#3fb950", pts: ev.filter(p=>p.main_kpi_retention_median!=null).map(p=>[p.step, p.main_kpi_retention_median]) },
+    { label: "Reg Ret", color: "#58a6ff", pts: ev.filter(p=>p.regression_retention!=null).map(p=>[p.step, p.regression_retention]) },
+    { label: "Bin Ret", color: "#39c5cf", pts: ev.filter(p=>p.binary_retention!=null).map(p=>[p.step, p.binary_retention]) },
+    { label: "MC Ret", color: "#d29922", pts: ev.filter(p=>p.multiclass_retention!=null).map(p=>[p.step, p.multiclass_retention]) },
+    { label: "ML Ret", color: "#bc8cff", pts: ev.filter(p=>p.multilabel_retention!=null).map(p=>[p.step, p.multilabel_retention]) },
+  ]);
+
+  const lt = run.latest_train;
+  document.getElementById("run-aug-summary").innerHTML = lt
+    ? `<span class="badge">Step ${lt.step}</span><span class="badge">LR ${lt.lr}</span><span class="badge">${fmt(lt.tables_per_s,1)} tbl/s</span><span class="badge">${(lt.unique_splits_seen||0).toLocaleString()} unique splits</span><span class="badge">avg n_fit ${fmt(lt.avg_n_fit,0)}</span><span class="badge">avg cols ${fmt(lt.avg_n_cols,1)} (+${fmt(lt.avg_noise_cols,1)} noise, +${fmt(lt.avg_derived_cols,1)} derived)</span><span class="badge">Tasks ${JSON.stringify(lt.task_counts||{})}</span>`
+    : "";
+}
+
+document.querySelectorAll("#fleet-tabs .tab").forEach(btn => btn.onclick = () => {
+  document.querySelectorAll("#fleet-tabs .tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  state.fleetMode = btn.dataset.mode;
+  renderFleet();
+});
+
+function connect() {
+  const proto = location.protocol === "https:" ? "wss:" : "ws:";
+  const ws = new WebSocket(`${proto}//${location.host}/ws`);
+  const pill = document.getElementById("conn");
+  const txt = document.getElementById("conn-txt");
+  ws.onopen = () => { pill.dataset.status = "live"; txt.textContent = "Live"; };
+  ws.onclose = () => { pill.dataset.status = "offline"; txt.textContent = "Reconnecting…"; setTimeout(connect, 2000); };
+  ws.onmessage = (ev) => {
+    const msg = JSON.parse(ev.data);
+    state.at = msg.at || Date.now()/1000;
+    document.getElementById("clock").textContent = new Date(state.at * 1000).toLocaleTimeString();
+    if (msg.type === "snapshot") {
+      (msg.hosts || []).forEach(h => state.hosts.set(h.host, h));
+      state.fleet = msg.fleet;
+    } else if (msg.type === "update") {
+      if (msg.host) state.hosts.set(msg.host.host, msg.host);
+      if (msg.fleet) state.fleet = { ...state.fleet, ...msg.fleet, history: msg.fleet.history || (state.fleet||{}).history };
+    } else if (msg.type === "tick") {
+      if (msg.fleet) state.fleet = msg.fleet;
+    }
+    renderFleet();
+    renderHostList();
+    renderNode();
+  };
+}
+connect();
+</script>
+</body>
+</html>

@@ -10,7 +10,12 @@ pub enum ModelSize {
     Small,
     Medium,
     Large,
+    /// Fidelity 2.0 Max Tier (1 MiB default, up to 2 MiB via `--budget`).
+    Max,
 }
+
+/// Hard upper bound for Max Tier packets (2 MiB).
+pub const MAX_TIER_BUDGET_BYTES: usize = 2 * 1024 * 1024;
 
 impl ModelSize {
     pub fn budget(self) -> usize {
@@ -18,6 +23,7 @@ impl ModelSize {
             Self::Small => 2048,
             Self::Medium => 4096,
             Self::Large => 16384,
+            Self::Max => 1_048_576,
         }
     }
 }
@@ -29,7 +35,8 @@ impl FromStr for ModelSize {
             "small" => Ok(Self::Small),
             "medium" => Ok(Self::Medium),
             "large" => Ok(Self::Large),
-            _ => Err("model size must be small, medium or large"),
+            "max" => Ok(Self::Max),
+            _ => Err("model size must be small, medium, large or max"),
         }
     }
 }

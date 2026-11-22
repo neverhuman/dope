@@ -27,11 +27,15 @@
 #![allow(clippy::needless_range_loop, clippy::excessive_precision)]
 
 pub mod artifact;
+pub mod audit;
 pub mod budget;
+pub mod catf;
 pub mod compile;
 pub mod copula;
 pub mod device;
+pub mod distil;
 pub mod dvs;
+pub mod embed;
 pub mod encode;
 pub mod error;
 pub mod eval;
@@ -54,18 +58,26 @@ pub mod sample_cpu;
 pub mod schema;
 pub mod screen;
 pub mod stats;
+pub mod structure;
 pub mod table;
 pub mod target;
+pub mod teacher;
 pub mod train;
 pub mod train_cpu;
 
-pub use artifact::{byte_report, decode, ByteReport};
+pub use artifact::{
+    byte_report, decode, decode_format2_program, is_format2, ByteReport, Format2Program,
+};
 pub use budget::{ModelSize, ParameterCount};
+pub use compile::v2::{fit_v2, FitV2Options, FitV2Report, FittedV2};
 pub use compile::{fit, FitOptions, FitReport, Fitted, DEFAULT_BUDGET};
 pub use encode::{MlEncoder, Scaling};
 pub use error::{DopeError, Result};
 pub use program::Program;
-pub use sample::{sample, SampleOptions, Samples};
+pub use sample::{
+    sample, sample_given, sample_with_mode, EmissionMode, EmitOptions, EmittedSamples,
+    SampleOptions, Samples,
+};
 pub use schema::Task;
 pub use table::RawTable;
 

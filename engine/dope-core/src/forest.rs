@@ -200,7 +200,9 @@ impl Forest {
 }
 
 mod boost;
+pub mod soft_boost;
 pub use boost::{boost, BoostOptions, Boosted, Split};
+pub use soft_boost::{boost_soft, soft_loss, SoftBoostOptions, SoftBoosted, SoftSplit};
 
 /// Column-major input codes of selected rows (`x[feature][row]`), with
 /// missing values replaced by `impute[feature]`.

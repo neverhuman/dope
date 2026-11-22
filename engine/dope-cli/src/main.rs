@@ -5,7 +5,8 @@ use dope_core::encode::{MlEncoder, Scaling};
 use dope_core::eval::{evaluate, frontier, EvalOptions, FrontierOptions};
 use dope_core::schema::{infer, IntakeOptions, Task};
 use dope_core::{
-    byte_report, decode, device, fit, output, sample, FitOptions, RawTable, SampleOptions,
+    byte_report, decode, device, fit, output, sample, sample_given, sample_with_mode, EmissionMode,
+    EmitOptions, FitOptions, RawTable, SampleOptions,
 };
 use std::io::Write;
 use std::path::PathBuf;
@@ -13,6 +14,7 @@ use std::process::ExitCode;
 
 mod args;
 mod dvs;
+mod format2_cli;
 mod landmarks;
 mod learned;
 mod levels;
@@ -97,8 +99,15 @@ fn run(cli: Cli) -> Result<(), String> {
                     Some((v[0], v[1], v[2]))
                 }
             };
+            let budget = a.budget.as_deref().map(parse_bytes).transpose()?;
+            if a.format == 2 {
+                format2_cli::run_fit_v2(&a, &table, target, task, budget)?;
+                return Ok(());
+            } else if a.format != 1 {
+                return Err("--format must be 1 or 2".into());
+            }
             let opts = FitOptions {
-                budget: a.budget.as_deref().map(parse_bytes).transpose()?,
+                budget,
                 size: a.size,
                 max_parameters: a.max_parameters,
                 seed: a.seed,
@@ -139,15 +148,50 @@ fn run(cli: Cli) -> Result<(), String> {
         }
         Command::FitTiers(a) => tiers::fit_tiers(a)?,
         Command::Sample(a) => {
-            let program =
-                decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
-            let opts = SampleOptions {
-                rows: a.rows,
-                seed: a.seed,
-                device: device::parse(&a.device).map_err(e)?,
-                ..Default::default()
+            let raw_bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
+            if dope_core::is_format2(&raw_bytes) {
+                let w = writer(&a.out)?;
+                format2_cli::run_sample_v2(&a, &raw_bytes, w, style)?;
+                return Ok(());
+            }
+            let program = decode(&raw_bytes).map_err(e)?;
+            let mode = EmissionMode::parse(&a.mode).map_err(e)?;
+            let req_rows = if a.rows.trim().eq_ignore_ascii_case("auto") {
+                1000 * mode.default_row_multiplier()
+            } else {
+                a.rows
+                    .trim()
+                    .parse::<usize>()
+                    .map_err(|_| "--rows must be a positive integer or 'auto'".to_string())?
             };
-            let s = sample(&program, &opts).map_err(e)?;
+            let (s, sidecar_data) = if let Some(given_csv) = &a.given {
+                let raw = RawTable::read(given_csv).map_err(e)?;
+                let data = program.schema.to_model(&raw).map_err(e)?;
+                (sample_given(&program, &data.x, a.seed).map_err(e)?, None)
+            } else if mode == EmissionMode::Legacy {
+                let opts = SampleOptions {
+                    rows: req_rows,
+                    seed: a.seed,
+                    device: device::parse(&a.device).map_err(e)?,
+                    ..Default::default()
+                };
+                (sample(&program, &opts).map_err(e)?, None)
+            } else {
+                let emitted = sample_with_mode(
+                    &program,
+                    &EmitOptions {
+                        mode,
+                        rows: req_rows,
+                        seed: a.seed,
+                        table_id: a.table_id,
+                        ..Default::default()
+                    },
+                )
+                .map_err(e)?;
+                let sc = emitted.weights.zip(emitted.pair_ids);
+                (emitted.samples, sc)
+            };
+            let emitted_rows = s.y.len();
             let w = writer(&a.out)?;
             match a.space.as_str() {
                 "raw" => output::write_raw(&program, &s, w).map_err(e)?,
@@ -158,11 +202,26 @@ fn run(cli: Cli) -> Result<(), String> {
                 }
                 _ => return Err("--space must be raw or ml".into()),
             }
+            if let Some((weights, pair_ids)) = sidecar_data {
+                let sidecar_path = a.sidecar.clone().or_else(|| {
+                    a.out.as_ref().map(|p| {
+                        let mut s = p.as_os_str().to_os_string();
+                        s.push(".sidecar.csv");
+                        PathBuf::from(s)
+                    })
+                });
+                if let Some(sp) = sidecar_path {
+                    let sw = std::io::BufWriter::new(
+                        std::fs::File::create(&sp).map_err(|x| x.to_string())?,
+                    );
+                    output::write_distill_sidecar(&weights, &pair_ids, sw).map_err(e)?;
+                }
+            }
             if let Some(p) = &a.out {
                 print_sample_saved_report(
                     &a.model,
                     p,
-                    a.rows,
+                    emitted_rows,
                     program.features(),
                     &program.schema.target.name,
                     &a.space,
@@ -218,6 +277,13 @@ fn run(cli: Cli) -> Result<(), String> {
             } else {
                 print_inspect_report(&a.model, &program, &report, style);
             }
+        }
+        Command::Embed(a) => {
+            let bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
+            let emb = dope_core::embed::embed_packet(&bytes).map_err(e)?;
+            let json = serde_json::to_string_pretty(&emb).map_err(|x| x.to_string())?;
+            let mut w = writer(&a.out)?;
+            writeln!(w, "{json}").map_err(|x| x.to_string())?;
         }
         Command::Encode(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;

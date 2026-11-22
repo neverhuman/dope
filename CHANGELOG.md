@@ -1,7 +1,42 @@
 # Changelog
 
-## Unreleased
+## Engine 1.3.1 - 2026-11-22
 
+- Land the DOPE Fidelity Engine 2.0 Rust architecture and end-to-end Format 2
+  binary pipeline (`engine/dope-core`, `engine/dope-norm`, `engine/dope-arena`,
+  `engine/dope-cli`):
+  - Unified Rust Arena (`engine/dope-arena`) and fail-closed `dope-fidelity/v3`
+    hard-gate coverage reducers (`dope-core/src/dvs/v3/`), including donor-aware
+    paired ratio bootstrap, `real_C` `kappa` threshold calibration, native
+    2-fold depth-3 boosted-tree C2ST & `MargAUC`, and twin-`B` exact-copy
+    excess empirical privacy checks (explicitly non-DP / non-HIPAA).
+  - Stateless SHA-256 row-keyed RNG and `faithful | distill | matched` emission
+    contracts with `weight,pair_id` sidecars and true `n_fit`-based `--rows auto`.
+  - Phase P3 `ColumnMarginalV2` (support-floor `k=10` atoms, decimal lattice
+    + `f32` heritage, heaping, off-grid mixture, W1 DP knots + tails, and
+    continuous-vs-discrete support guard), Phase P4 nested `K=5` cross-fitted
+    teacher with OOF quality gate & `TeacherExchangeBundle` ingestion +
+    soft-Newton `DistilledStudent` (`ModelSize::Max`), Phase P5 zero-byte copula
+    calibration + pre-CATF mined `RuleSet` + exact conditional truncated-normal
+    CATF with stratified atom latent scores, Phase P6 `P+` damped-Newton moment
+    projection + `LearningSignatureV1` + `RidgeCertificate`, and Phase P7
+    `Nc2ScaleCard` + zero-JSON `.dope` Format 2 binary section codecs +
+    `dope fit --format 2`, Format-2 `dope sample`, and `dope embed`.
+- Add S3 `catalog/v250` dynamic per-batch random splitting & tabular
+  augmentation (`research/levels/s3_dynamic_augment.py` — fresh Rule A-1
+  duplicate-grouped splits every step, random row lengths, synthetic noise &
+  derived column insertion, multi-label views), the `DopeFidelityV5`
+  cross-column Set-Attention + differentiable Cholesky copula multi-node DDP
+  GPU trainer (`v5_fidelity_net.py`, `s3_ddp_trainer.py`), continuous
+  unseen-family Main-KPI evaluator (`s3_kpi_evaluator.py`), and the read-only
+  live DOPE Fleet & Fidelity KPI Dashboard (`tools/dope_dashboard/`, default
+  `127.0.0.1:8768`).
+- Preserve Format 1, `DPK3.2`/v1 receipts, `DML2`–`DML4`, `Dope512`/`DopeEncoder629`,
+  `nc1-minmax-onehot-v1`, and published `v1.0.0` weights bit-identically.
+- This is an uncertified engine release (`dope-engine-v1.3.1`). It makes no new
+  formal DP, HIPAA de-identification, or sealed-holdout certification claim;
+  `scripts/install.sh` retains `dope-engine-v1.3.0` until the signed
+  `dope-engine-v1.3.1` release artifacts are built and verified.
 - Switch the default signed binary tag in `scripts/install.sh` and README quickstart
   snippets to `dope-engine-v1.3.0` (`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`) while
   keeping independent `v1.0.0` model weights (`d0b69603…`) (#381).
