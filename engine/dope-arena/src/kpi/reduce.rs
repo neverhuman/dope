@@ -1,23 +1,23 @@
 //! `dope_kpi reduce-ledger`: run `dvs::v3::evaluate_v3` on a score ledger.
 //!
-//! The existing `dope-arena reduce` fixes the kappa thresholds at their
-//! defaults and refuses partial evidence. This reducer takes the thresholds
-//! from a file, makes `allow_partial_diagnostic` a flag, and can restrict the
-//! ledger to one multiplier or to some auditors. `--kappa-out` writes the
-//! thresholds calibrated from the kappa points of this ledger, which is
-//! meaningful for the real twin arm (`twin_c`) only.
+//! The reduction is `dope_arena::report::reduce_cells_with_options`, the call
+//! behind `dope-arena reduce --kappa-file --allow-partial`. This subcommand
+//! adds what the scoreboard needs around it: the ledger restricted to one
+//! multiplier or to some auditors, a receipt file that records the ledger
+//! hash and the thresholds used, and `--kappa-out`, which writes the
+//! thresholds calibrated from the kappa points of this ledger (meaningful
+//! for the real twin arm `twin_c` only). The kappa file is parsed here so a
+//! malformed file is reported without quoting its content.
 
 use super::jsonl::{
     canonical_json, canonical_pretty, parse_json, read_file, sha256_hex, write_atomic,
 };
 use super::score::parse_ledger_id;
 use dope_arena::ledger::read_ledger;
+use dope_arena::report::reduce_cells_with_options;
 use dope_arena::{ArenaError, ArenaResult};
 use dope_core::dvs::v3::equiv::KappaThresholds;
-use dope_core::dvs::v3::{
-    evaluate_v3, CoverageSummary, FidelityCellRequest, FidelityV3Receipt, FidelityV3Request,
-    PROTOCOL_V3,
-};
+use dope_core::dvs::v3::{CoverageSummary, FidelityCellRequest, FidelityV3Receipt};
 use serde::Serialize;
 use std::path::PathBuf;
 
@@ -140,15 +140,14 @@ pub fn run(args: &ReduceArgs) -> ArenaResult<String> {
             "no ledger entry passes the filters".into(),
         ));
     }
-    let receipt = evaluate_v3(&FidelityV3Request {
-        protocol: PROTOCOL_V3.to_string(),
-        mode: args.mode.clone(),
-        seed: args.seed,
-        bootstrap_draws: args.bootstrap_draws,
-        kappa_thresholds,
-        allow_partial_diagnostic: args.allow_partial,
+    let receipt = reduce_cells_with_options(
         cells,
-    })?;
+        args.mode.clone(),
+        args.seed,
+        args.bootstrap_draws,
+        kappa_thresholds,
+        args.allow_partial,
+    )?;
     let text = canonical_pretty(&ReceiptFile {
         ledger_sha256: &ledger_sha256,
         filters: Filters {
