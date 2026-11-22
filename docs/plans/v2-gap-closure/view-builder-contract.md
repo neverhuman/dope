@@ -110,10 +110,14 @@ exact bucket need no row padding; `micro_batches(row_slack=0.25)` groups collate
 ## 6. Measured on `s3-v250` (seed 0, batch 64, 40 steps = 2,560 slots)
 
 Reproduce with `python3 -B -m research.levels.s3_view_bench --steps 40 --baseline-steps 10`.
-The view audit is deterministic; the timings are not. Timing is one thread, CPU time
-(`thread_time_ns`), best of 3 per episode, on a host at load 69–84 of 128 threads with the SMT
-sibling busy; three runs are given as a range (a fixed numpy kernel, a sort of 448 × 10
-doubles, took 134–166 µs across them).
+The view audit is deterministic and was identical in every run; the timings are not. Timing
+is one thread, CPU time (`thread_time_ns`), best of 3 per episode, on a host at load 69–84 of
+128 threads with the SMT sibling busy. Four runs are given as a range. The three runs on the
+committed tree, at load 80–84, are the slow end (495–534 and 666–699 episodes / s); the fast
+end is one run at load 69 taken two small edits earlier (about 5 µs per episode). A fixed
+numpy kernel, a sort of 448 × 10 doubles, took 134–166 µs across the runs. The existing
+builders slowed by 7 % between the quiet and the busy runs and the new builder by 25 %: it
+spends its time in memory-bound numpy passes, not in the interpreter.
 
 | View audit | Existing pipeline | This stage |
 |---|---|---|
@@ -126,16 +130,16 @@ doubles, took 134–166 µs across them).
 
 | Episodes per second, one core | Existing builders | This stage |
 |---|---|---|
-| Planned mix (all kinds) | — | 519–665 (mean 1.50–1.93 ms, median 0.99–1.25 ms) |
-| Median-size episode (9,760 cells ± 25 %) | — | 690–868 (mean 1.15–1.45 ms, median 1.01–1.26 ms) |
-| Real slots at the planned sizes | 208–225 (`sample_dynamic_episode`, 4.45–4.81 ms) | 671–861 (1.16–1.49 ms), 3.2–3.8 times faster |
-| Real slots at each builder's own sizes | 224–242 (`sample_dynamic_episode`, n_fit ≤ 512), 136–147 (`build_unique_episode`, stage 3) | as above |
+| Planned mix (all kinds) | — | 495–665 (mean 1.50–2.02 ms, median 0.99–1.27 ms) |
+| Median-size episode (9,760 cells ± 25 %) | — | 666–868 (mean 1.15–1.50 ms, median 1.01–1.29 ms) |
+| Real slots at the planned sizes | 206–225 (`sample_dynamic_episode`, 4.45–4.86 ms) | 630–861 (1.16–1.59 ms), 3.1–3.8 times faster in the same run |
+| Real slots at each builder's own sizes | 219–242 (`sample_dynamic_episode`, n_fit ≤ 512), 134–147 (`build_unique_episode`, stage 3) | as above |
 
-Cost model of the new builder: 0.51–0.58 ms fixed plus 59–80 ns per cell. Prior tables are
-12.5 % of slots and 31 % of the time (3.7–4.8 ms each: unlimited row supply makes them large).
-**The target of 1,000 episodes per second for the median-size episode is not met on this
-host**: the best run reaches it by the median time (1.01 ms) and misses it by the mean
-(868 / s); the two later runs gave 690–699 / s. What is left: the FIT order statistics
-(`np.partition`, about 25 ns per FIT cell), the two sorts of the group split, the sort and
-grid test of the lattice probe in the 47 % of episodes with jitter or warps, and about 340
-Python-level calls per episode, which is the fixed half millisecond.
+Cost model of the new builder: 0.51–0.58 ms fixed plus 59–89 ns per cell. Prior tables are
+12.5 % of slots and 30–31 % of the time (3.7–4.9 ms each: unlimited row supply makes them
+large). **The target of 1,000 episodes per second for the median-size episode is not met on
+this host**: the best run reaches it by the median time (1.01 ms) and misses it by the mean
+(868 / s); the runs on the committed tree gave 666–699 / s. What is left: the FIT order
+statistics (`np.partition`, about 25 ns per FIT cell), the two sorts of the group split, the
+sort and grid test of the lattice probe in the 47 % of episodes with jitter or warps, and
+about 340 Python-level calls per episode, which is the fixed half millisecond.
