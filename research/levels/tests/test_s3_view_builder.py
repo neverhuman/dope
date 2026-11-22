@@ -14,6 +14,7 @@ import pytest
 
 from research.levels.s3_counter_sampler import SamplerConfig, sampler_for
 from research.levels.s3_dynamic_augment import _fit_only_nc2_scale
+from research.levels.s3_view_bench import synthetic_corpus
 from research.levels.s3_view_builder import RetryEpisode, ViewConfig, build_episode, build_slot
 from research.levels.s3_view_corpus import ArenaCorpus, MemoryCorpus, write_flat_arena
 from research.levels.tests.s3_view_fixtures import (
@@ -272,18 +273,23 @@ def test_one_class_or_constant_fit_half_is_a_retry_never_invented_labels():
     assert isinstance(marker, RetryEpisode) and marker.reason == "constant_target"
 
 
-@pytest.mark.skipif(not (REAL_ARENA / "index.jsonl").is_file(), reason="flat arena not present on this host")
-def test_real_arena_views_are_built_and_free_of_cross_half_duplicates():
-    corpus = ArenaCorpus(REAL_ARENA)
-    sampler = sampler_for(SamplerConfig(batch_size=64, arena=str(REAL_ARENA)))
-    retries, built = Counter(), 0
-    for step in range(3):
-        for spec in sampler.plan_step(0, step):
-            ep, used, why = build_slot(corpus, sampler, 0, spec)
-            retries.update(why)
-            built += 1
-            assert ep["X_fit"].shape == (used.n_fit, used.p_total) and np.isfinite(ep["X_qry"]).all()
-            if ep["kind"] != "scm_prior":
-                view, target = _source(corpus, ep)
-                assert not _row_keys(view, target, ep["fit_rows"], False) & _row_keys(view, target, ep["qry_rows"], False)
-    assert built == 3 * 64 and sum(retries.values()) < built // 4
+def test_arena_views_are_built_and_free_of_cross_half_duplicates():
+    """On the real flat arena when this host has it, otherwise on a synthetic arena of the same layout."""
+    with tempfile.TemporaryDirectory(prefix="dope-c2-") as tmp:
+        real = (REAL_ARENA / "index.jsonl").is_file()
+        arena = str(REAL_ARENA) if real else str(write_flat_arena(synthetic_corpus(160, seed=4), tmp))
+        corpus = ArenaCorpus(arena)
+        sampler = sampler_for(SamplerConfig(batch_size=64, arena=arena))
+        retries, built, grouped = Counter(), 0, 0
+        for step in range(3):
+            for spec in sampler.plan_step(0, step):
+                ep, used, why = build_slot(corpus, sampler, 0, spec)
+                retries.update(why)
+                built += 1
+                grouped += ep["aug_stats"]["dup_rows"] > 0
+                assert ep["X_fit"].shape == (used.n_fit, used.p_total) and np.isfinite(ep["X_qry"]).all()
+                if ep["kind"] != "scm_prior":
+                    view, target = _source(corpus, ep)
+                    assert not _row_keys(view, target, ep["fit_rows"], False) & _row_keys(view, target, ep["qry_rows"], False)
+        assert built == 3 * 64 and sum(retries.values()) < built // 4 and (grouped >= 10 or not real)
+        sampler_for.cache_clear()

@@ -217,12 +217,12 @@ def raw_augment(x: np.ndarray, n_fit: int, rng: np.random.Generator, cfg: Any) -
                 kind = (u[1] * 3).astype(np.intp)  # 0 power, 1 heaping, 2 the dropped affine rescale (no-op)
                 pick = u[0] < cfg.warp_col_prob
                 power, heap = pick & (kind == 0), pick & (kind == 1)
-                if power.any():  # sign(x) |x / m|^a m with m = max |x| over FIT: the legacy warp, made scale-free
+                if power.any():  # sign(x) |x / m|^a m with m = max |x| over FIT: the s3_fast_pipeline warp, made scale-free
                     v = x[cont[power]]
                     ref = np.nanmax(np.abs(v[:, :n_fit]), axis=1)[:, None]
                     ref = np.where(ref > 0, ref, 1.0)
                     x[cont[power]] = np.sign(v) * np.abs(v / ref) ** (1.3 + 1.5 * u[2, power])[:, None] * ref
-                if heap.any():  # heaping on a step of 5-25 % of the FIT IQR (the legacy step was absolute)
+                if heap.any():  # heaping on a step of 5-25 % of the FIT IQR (the s3_fast_pipeline step was absolute)
                     step = (_ROUND_STEPS[(u[2, heap] * 3).astype(np.intp)] * width[heap])[:, None]
                     x[cont[heap]] = np.rint(x[cont[heap]] / step) * step
                 done["warp_cols"] = int(power.sum() + heap.sum())
