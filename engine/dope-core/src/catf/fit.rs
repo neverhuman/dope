@@ -394,7 +394,14 @@ pub fn fit_catf_trees(
             }
         }
         let next_nll = mean_state_nll(&next_logits, target_states, n_states);
-        if next_nll < cur_nll - 1e-4 {
+        // BIC-style minimum NLL improvement for continuous Hermite tilts prevents overfitting
+        // independent noise while preserving genuine nonlinear & discrete/XOR structure.
+        let min_gain = if use_hermite {
+            ((nl * 4) as f64 / (2.0 * n.max(1) as f64)).max(0.002)
+        } else {
+            1e-4
+        };
+        if next_nll < cur_nll - min_gain {
             logits = next_logits;
             cur_nll = next_nll;
             cond.trees.push(tree);

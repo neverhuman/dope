@@ -68,13 +68,12 @@ pub fn roc_auc(labels: &[u8], scores: &[f64], symmetric: bool) -> Result<f64, Dv
     Ok(if symmetric { auc.max(1.0 - auc) } else { auc })
 }
 
-/// Compute single-column empirical `MargAUC` directly from real vs synthetic column samples.
+/// Compute unbiased 2-fold cross-fitted single-column `MargAUC` from real vs synthetic samples.
 pub fn column_marginal_auc(real_col: &[f64], synth_col: &[f64]) -> Result<f64, DvsError> {
     ensure(
-        !real_col.is_empty() && !synth_col.is_empty(),
+        real_col.len() >= 4 && synth_col.len() >= 4,
         "empty_marginal_col",
     )?;
-    // Use 32-bin histogram density ratio on combined finite values plus explicit missing bin.
     let mut all_fin: Vec<f64> = real_col
         .iter()
         .chain(synth_col)
@@ -82,7 +81,8 @@ pub fn column_marginal_auc(real_col: &[f64], synth_col: &[f64]) -> Result<f64, D
         .filter(|v| v.is_finite())
         .collect();
     all_fin.sort_by(f64::total_cmp);
-    let bins = 32usize;
+    // Cap bin count cleanly to avoid empty-bin noise on small n while preserving fine resolution.
+    let bins = (real_col.len().min(synth_col.len()) / 12).clamp(4, 32);
     let mut edges = Vec::with_capacity(bins + 1);
     if !all_fin.is_empty() {
         for b in 0..=bins {
@@ -97,28 +97,39 @@ pub fn column_marginal_auc(real_col: &[f64], synth_col: &[f64]) -> Result<f64, D
         let pos = edges.partition_point(|&e| e < v);
         pos.min(bins - 1)
     };
-    let mut r_cnt = vec![1.0_f64; bins + 1];
-    let mut s_cnt = vec![1.0_f64; bins + 1];
-    for &v in real_col {
-        r_cnt[bucket(v)] += 1.0;
-    }
-    for &v in synth_col {
-        s_cnt[bucket(v)] += 1.0;
-    }
-    let r_tot: f64 = r_cnt.iter().sum();
-    let s_tot: f64 = s_cnt.iter().sum();
-    let log_ratio: Vec<f64> = (0..=bins)
-        .map(|b| (s_cnt[b] / s_tot).ln() - (r_cnt[b] / r_tot).ln())
-        .collect();
     let mut labels = Vec::with_capacity(real_col.len() + synth_col.len());
     let mut scores = Vec::with_capacity(real_col.len() + synth_col.len());
-    for &v in real_col {
-        labels.push(0);
-        scores.push(log_ratio[bucket(v)]);
-    }
-    for &v in synth_col {
-        labels.push(1);
-        scores.push(log_ratio[bucket(v)]);
+    // 2-fold parity split (even indices vs odd indices) for unbiased out-of-fold density ratio.
+    for fold in 0..2 {
+        let mut r_cnt = vec![1.0_f64; bins + 1];
+        let mut s_cnt = vec![1.0_f64; bins + 1];
+        for (i, &v) in real_col.iter().enumerate() {
+            if i % 2 != fold {
+                r_cnt[bucket(v)] += 1.0;
+            }
+        }
+        for (i, &v) in synth_col.iter().enumerate() {
+            if i % 2 != fold {
+                s_cnt[bucket(v)] += 1.0;
+            }
+        }
+        let r_tot: f64 = r_cnt.iter().sum();
+        let s_tot: f64 = s_cnt.iter().sum();
+        let log_ratio: Vec<f64> = (0..=bins)
+            .map(|b| (s_cnt[b] / s_tot).ln() - (r_cnt[b] / r_tot).ln())
+            .collect();
+        for (i, &v) in real_col.iter().enumerate() {
+            if i % 2 == fold {
+                labels.push(0);
+                scores.push(log_ratio[bucket(v)]);
+            }
+        }
+        for (i, &v) in synth_col.iter().enumerate() {
+            if i % 2 == fold {
+                labels.push(1);
+                scores.push(log_ratio[bucket(v)]);
+            }
+        }
     }
     roc_auc(&labels, &scores, true)
 }
