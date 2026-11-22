@@ -3,22 +3,22 @@
   "kind": "nc1",
   "scope": "public synthetic correctness fixtures, no quality or privacy claim",
   "producer": {
-    "base_head": "0bfdff6417b876fc044856db7fd15ed3b7cec01c",
+    "base_head": "d7ecc2ef27e71607c6a38c749e829683b6f23441",
     "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
     "rust_source_files": {
       "engine/dope-norm/Cargo.toml": "1f71304cc25d01e3a543e36799c9c43ec8d246571a3d20a170a45fda1c528503",
       "engine/dope-norm/src/card.rs": "7b78d13c27bfec1377f5cbd2dd9d5b3be6c8fe058d5c3f64e50013e2a5a295e7",
       "engine/dope-norm/src/apply.rs": "2beefd67a883509b90f86551e17b5c017f9afcc4e51377658d974869d8973a98",
       "engine/dope-norm/src/public_schema.rs": "4b9388aa90247d88d5b58a0e87446d586a5708aef081da81907554f573ebd381",
-      "engine/dope-norm/src/lib.rs": "40a2ba0439c8fef1fd81e35f77d7304a273ee93331e1cf7e34aed10a352b12b0",
+      "engine/dope-norm/src/lib.rs": "dee8184c0baf4655511a08272ea28767c97d5d7c40550f78cf7ca0b9c836dd5b",
       "engine/dope-norm/src/fit.rs": "9d3de463fc68464549e696007ad7127c9e6c39c36836100eb3a53f5f3cde2842",
       "engine/dope-norm/examples/conformance_export.rs": "eb25e1120b11d57a8c11dd5fd2f8e246a371780f2e9656e40924db274c30ae0e"
     },
-    "source_snapshot_sha256": "246b0269e5c2849a182a631ffa621fbf16de6170fb2b79e5c74f55904d9c00fb",
+    "source_snapshot_sha256": "dc4a4285a7c303da08fc263e277c98224c77400b678ac897b9b62052b4dfba54",
     "command": "cargo run --example conformance_export -- --out NEW_DIRECTORY",
     "execution": "actual source-bound lightweight Rust harness; no model/source data/Candle/GPU",
-    "dependency_lock_sha256": "1cd54ab1dc4e8c7103dde649c0166e35d0f8c622f6cfb919217f41a6eb11c25b",
-    "generator_binary_sha256": "71c16d787b69957ac7475b17bdfff5866d7e6dc4ca5f8f6907a822e5fa81b959"
+    "dependency_lock_sha256": "9e07d0dca52591974cfd1ac55f887b8a59ed64a1815a957d619c7a1df8b2fe50",
+    "generator_binary_sha256": "4619fd56934a8fb3c478434b2096dcb8eae7bcca94a4db2f8ed8bb51c5ce29c4"
   },
   "files": {
     "card.json": "3fd0ba59256ef9390291b03a2c84344827e126245c339339b6778bcac9afb053",
