@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 906
-- **`keep-with-reason`**: 880 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 911
+- **`keep-with-reason`**: 885 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -938,3 +938,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/transfer_losses.py` | `research/levels` | `keep-with-reason` | Decision-supervised response losses, task reductions, and opt-in coupled FP32 ridge TSTR loss. | Offline PyTorch autograd training objectives; native Rust owns product sampling, certification and release. |
 | `research/levels/transfer_projection.py` | `research/levels` | `keep-with-reason` | Frozen full629 affine projection initialization preserving Stage-1B linear coordinates. | Offline PyTorch transfer-representation research module; native Rust owns product sampling, certification and release. |
 | `research/levels/transfer_stream.py` | `research/levels` | `keep-with-reason` | Bounded single-device indexed stream trainer with microbatch parity and atomic checkpoint resume. | Offline PyTorch training runtime; native Rust owns product sampling, certification and release. |
+| `research/levels/s3_ddp_trainer.py` | `research/levels` | `keep-with-reason` | Multi-node PyTorch DDP GPU trainer for DopeFidelityV5 over S3 catalog/v250 with VRAM safety caps and safetensors checkpoints. | Offline PyTorch multi-node training runtime; native Rust owns product sampling, certification and release. |
+| `research/levels/s3_dynamic_augment.py` | `research/levels` | `keep-with-reason` | Dynamic per-batch Rule A-1 duplicate-grouped random FIT/QUERY splitter, row-length randomizer, synthetic column inserter, and multi-label view generator. | Offline PyTorch training data loader and augmentation pipeline; native Rust owns product inference and certification. |
+| `research/levels/s3_kpi_evaluator.py` | `research/levels` | `keep-with-reason` | Continuous held-out unseen-family Main-KPI and fidelity/v3 evaluator across regression, binary, multiclass, and multi-label tasks using scikit-learn auditors. | Offline research evaluation worker coupled to third-party scikit-learn auditors; no release authority. |
+| `research/levels/tests/test_s3_v5_training.py` | `research/levels` | `keep-with-reason` | Unit tests verifying fresh random splits, Rule A-1 duplicate grouping, synthetic column insertion, permutation equivariance, and finite 4-task gradients. | Direct Python research test suite for s3_dynamic_augment, v5_fidelity_net, and s3_kpi_evaluator. |
+| `research/levels/v5_fidelity_net.py` | `research/levels` | `keep-with-reason` | Cross-column Set-Attention DopeFidelityV5 neural generator with differentiable Cholesky copula and multi-learner coupled TSTR retention objective. | Offline PyTorch autograd model and training loss; native Rust owns product sampling, certification and release. |

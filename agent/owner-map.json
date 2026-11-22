@@ -996,7 +996,12 @@
     "ops/merge_guard/native_process_tree.rs": "governance",
     "ops/merge_guard/native_process_supervisor.rs": "governance",
     "ops/merge_guard/native_process_tests.rs": "governance",
-    "ops/merge_guard/native_process_correction_tests.rs": "governance"
+    "ops/merge_guard/native_process_correction_tests.rs": "governance",
+    "research/levels/s3_ddp_trainer.py": "external-evidence",
+    "research/levels/s3_dynamic_augment.py": "external-evidence",
+    "research/levels/s3_kpi_evaluator.py": "external-evidence",
+    "research/levels/v5_fidelity_net.py": "external-evidence",
+    "research/levels/tests/test_s3_v5_training.py": "external-evidence"
   },
   "workspace": "dope"
 }

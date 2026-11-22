@@ -1594,15 +1594,15 @@
     },
     "research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices006-007-cost-delta-v1/render.py --check",
-      "purpose": "replay hash-frozen closed indices006–007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
+      "purpose": "replay hash-frozen closed indices006\u2013007 costs, exact logical500 partition and alternative historical/current clock bases without restricted inputs or scoring"
     },
     "research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices009-010-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay frozen indices009–010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay frozen indices009\u2013010 native outcomes, logical500 coverage, observed residency and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-indices011-014-progress-and-cost-delta-v1/render.py --check",
-      "purpose": "replay the frozen indices011–014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
+      "purpose": "replay the frozen indices011\u2013014 outcomes, 500-slot seed coverage, all100 native budget deltas and distinct parent-cost bases without private inputs or gated claims"
     },
     "research/benchmark/results/work-order-b-native-paid-cost-delta-v1/": {
       "command": "python3 -I -S -B research/benchmark/results/work-order-b-native-paid-cost-delta-v1/render.py --check",
@@ -4047,6 +4047,26 @@
     "ops/merge_guard/native_process_correction_tests.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin native-process -j1 -- --test-threads=1",
       "purpose": "Real owned capture-name/root-directory rename/replacement refusal, persistent observer-error wait4 reaping of known child and valid120001ms quick-exit reservation. Authored NOT_RUN; no guards weakened and no payload entrypoint counted as qualification."
+    },
+    "research/levels/s3_ddp_trainer.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+    },
+    "research/levels/s3_dynamic_augment.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+    },
+    "research/levels/s3_kpi_evaluator.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+    },
+    "research/levels/v5_fidelity_net.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
+    },
+    "research/levels/tests/test_s3_v5_training.py": {
+      "command": "python3 -B -m unittest research.levels.tests.test_s3_v5_training -v",
+      "purpose": "verify fresh per-batch random splits, synthetic column/row-length augmentation, 4-task DopeFidelityV5 gradients, and held-out Main-KPI evaluator"
     }
   },
   "workspace": "dope"
