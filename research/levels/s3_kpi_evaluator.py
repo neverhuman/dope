@@ -394,7 +394,7 @@ def _promote_best_and_valley_soup(
         try:
             prev_best = float(json.loads(best_json.read_text(encoding="utf-8")).get("main_kpi_retention_median", -1e9))
         except (OSError, ValueError):
-            pass
+            prev_best = -1e9
 
     if float(score) > prev_best:
         best_file = ckpt_dir / "best_main_kpi.safetensors"
@@ -483,7 +483,7 @@ def main() -> None:
                     _update_regret_curriculum(run_dir, row)
                     _promote_best_and_valley_soup(run_dir, ckpt, meta, row, store, device, args.max_per_task, eval_log)
                     last_step = step
-            except Exception as exc:
+            except (OSError, ValueError, KeyError, RuntimeError) as exc:
                 print(f"[EVAL warn] {exc}", flush=True)
         if args.once:
             break
