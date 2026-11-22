@@ -27,6 +27,7 @@
 #![allow(clippy::needless_range_loop, clippy::excessive_precision)]
 
 pub mod artifact;
+pub mod audit;
 pub mod budget;
 pub mod catf;
 pub mod compile;
