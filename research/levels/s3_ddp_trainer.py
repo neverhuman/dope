@@ -339,7 +339,8 @@ def run_training(args: argparse.Namespace) -> dict[str, Any]:
                     except RuntimeError as exc:
                         if "out of memory" in str(exc).lower() and device.type == "cuda":
                             torch.cuda.empty_cache()
-                        continue
+                            continue
+                        raise
 
             infonce_val = s_info / float(max(info_cnt, 1)) if info_cnt > 0 else 0.0
             _sync_ddp_grads(model_raw, world_size)

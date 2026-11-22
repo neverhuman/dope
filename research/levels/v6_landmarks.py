@@ -36,6 +36,17 @@ def extract_rich_landmarks(
     n_classes: int,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Compute 48-dim FIT-only permutation-invariant landmarks per column + global class priors."""
+    with torch.amp.autocast(device_type=X_fit.device.type, enabled=False):
+        return _extract_rich_landmarks_fp32(X_fit, y_fit, miss_fit, task, n_classes)
+
+
+def _extract_rich_landmarks_fp32(
+    X_fit: torch.Tensor,
+    y_fit: torch.Tensor,
+    miss_fit: torch.Tensor | None,
+    task: str,
+    n_classes: int,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     xf, yf = X_fit.float(), y_fit.float()
     n, p = xf.shape
     dev = xf.device
@@ -154,16 +165,17 @@ def extract_rich_landmarks(
 
 def _rbf_mmd_loss(X_real: torch.Tensor, X_syn: torch.Tensor) -> torch.Tensor:
     """Multi-bandwidth RBF-MMD realism loss (drives C2ST AUC down directly)."""
-    nr, ns = min(X_real.shape[0], 128), min(X_syn.shape[0], 128)
-    xr, xs = X_real[:nr].float(), X_syn[:ns].float()
-    ps = float(max(xr.shape[1], 1))
-    d_rr = torch.cdist(xr, xr).pow(2) / ps
-    d_ss = torch.cdist(xs, xs).pow(2) / ps
-    d_rs = torch.cdist(xr, xs).pow(2) / ps
-    mmd = torch.tensor(0.0, device=xr.device)
-    for bw in (0.25, 1.0, 4.0):
-        mmd = mmd + (torch.exp(-d_rr / bw).mean() + torch.exp(-d_ss / bw).mean() - 2.0 * torch.exp(-d_rs / bw).mean()).clamp_min(0.0)
-    return mmd / 3.0
+    with torch.amp.autocast(device_type=X_real.device.type, enabled=False):
+        nr, ns = min(X_real.shape[0], 128), min(X_syn.shape[0], 128)
+        xr, xs = X_real[:nr].float(), X_syn[:ns].float()
+        ps = float(max(xr.shape[1], 1))
+        d_rr = torch.cdist(xr, xr).pow(2) / ps
+        d_ss = torch.cdist(xs, xs).pow(2) / ps
+        d_rs = torch.cdist(xr, xs).pow(2) / ps
+        mmd = torch.tensor(0.0, device=xr.device)
+        for bw in (0.25, 1.0, 4.0):
+            mmd = mmd + (torch.exp(-d_rr / bw).mean() + torch.exp(-d_ss / bw).mean() - 2.0 * torch.exp(-d_rs / bw).mean()).clamp_min(0.0)
+        return mmd / 3.0
 
 
 def _irls_downstream_eval(
@@ -176,6 +188,19 @@ def _irls_downstream_eval(
     alpha: float = 0.25,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Differentiable FP32 Ridge (reg) or 3-step IRLS Logistic/Softmax (bin/mc/ml) downstream learner."""
+    with torch.amp.autocast(device_type=X_tr.device.type, enabled=False):
+        return _irls_downstream_eval_fp32(X_tr, y_tr, X_ev, y_ev, task, n_classes, alpha)
+
+
+def _irls_downstream_eval_fp32(
+    X_tr: torch.Tensor,
+    y_tr: torch.Tensor,
+    X_ev: torch.Tensor,
+    y_ev: torch.Tensor,
+    task: str,
+    n_classes: int,
+    alpha: float = 0.25,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     nt, p = X_tr.shape
     ne = X_ev.shape[0]
     dev = X_tr.device

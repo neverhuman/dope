@@ -218,19 +218,20 @@ class DopeSingleEncV6(nn.Module):
     def predict_target_from_latent(
         self, X: torch.Tensor, enc: dict[str, torch.Tensor], task: str, n_classes: int
     ) -> torch.Tensor:
-        zg, cc = enc["z_global"].float(), enc["col_codes"].float()
-        p = cc.shape[0]
-        ctx = torch.cat([cc, zg.unsqueeze(0).expand(p, -1)], dim=-1)
-        w1_all = self.hyper_w1(ctx)
-        w1_lin = w1_all[:, : self.target_hidden] / math.sqrt(max(p, 1))
-        w1_quad = w1_all[:, self.target_hidden :] / math.sqrt(max(p, 1))
-        xf = X.float().clamp(-6.0, 6.0)
-        h1 = F.gelu(xf @ w1_lin + 0.35 * (xf.pow(2).clamp_max(16.0) @ w1_quad) + self.hyper_b1(zg))
-        w2_flat = self.hyper_w2(zg)
-        k_out = 1 if task in ("regression", "binary") else min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
-        w2 = w2_flat[: self.target_hidden * MAX_CLASSES_SUPPORT].view(self.target_hidden, MAX_CLASSES_SUPPORT)[:, :k_out]
-        b2 = w2_flat[self.target_hidden * MAX_CLASSES_SUPPORT : self.target_hidden * MAX_CLASSES_SUPPORT + MAX_CLASSES_SUPPORT][:k_out]
-        return (h1 @ w2) / math.sqrt(self.target_hidden) + b2
+        with torch.amp.autocast(device_type=X.device.type, enabled=False):
+            zg, cc = enc["z_global"].float(), enc["col_codes"].float()
+            p = cc.shape[0]
+            ctx = torch.cat([cc, zg.unsqueeze(0).expand(p, -1)], dim=-1)
+            w1_all = self.hyper_w1(ctx)
+            w1_lin = w1_all[:, : self.target_hidden] / math.sqrt(max(p, 1))
+            w1_quad = w1_all[:, self.target_hidden :] / math.sqrt(max(p, 1))
+            xf = X.float().clamp(-6.0, 6.0)
+            h1 = F.gelu(xf @ w1_lin + 0.35 * (xf.pow(2).clamp_max(16.0) @ w1_quad) + self.hyper_b1(zg))
+            w2_flat = self.hyper_w2(zg)
+            k_out = 1 if task in ("regression", "binary") else min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
+            w2 = w2_flat[: self.target_hidden * MAX_CLASSES_SUPPORT].view(self.target_hidden, MAX_CLASSES_SUPPORT)[:, :k_out]
+            b2 = w2_flat[self.target_hidden * MAX_CLASSES_SUPPORT : self.target_hidden * MAX_CLASSES_SUPPORT + MAX_CLASSES_SUPPORT][:k_out]
+            return (h1 @ w2) / math.sqrt(self.target_hidden) + b2
 
 
 def compute_single_enc_loss(
@@ -246,66 +247,67 @@ def compute_single_enc_loss(
     task, n_classes = str(episode["task"]), int(episode["n_classes"])
 
     enc = model.encode_to_single_latent(X_fit, y_fit, miss_fit, task, n_classes)
-    gen = torch.Generator(device=device).manual_seed(step_seed & 0x7FFF_FFFF)
-    syn = model.decode_from_single_latent(enc, task, n_classes, max(int(X_fit.shape[0]) * 2, 128), gen)
-    X_syn, y_syn = syn["X_syn"], syn["y_syn"]
+    with torch.amp.autocast(device_type=device.type, enabled=False):
+        gen = torch.Generator(device=device).manual_seed(step_seed & 0x7FFF_FFFF)
+        syn = model.decode_from_single_latent(enc, task, n_classes, max(int(X_fit.shape[0]) * 2, 128), gen)
+        X_syn, y_syn = syn["X_syn"], syn["y_syn"]
 
-    l_syn1, l_null1, imp_syn1 = _irls_downstream_eval(X_syn, y_syn, X_qry, y_qry, task, n_classes)
-    with torch.no_grad():
-        l_real1, _, imp_real1 = _irls_downstream_eval(X_fit, y_fit, X_qry, y_qry, task, n_classes)
+        l_syn1, l_null1, imp_syn1 = _irls_downstream_eval(X_syn, y_syn, X_qry, y_qry, task, n_classes)
+        with torch.no_grad():
+            l_real1, _, imp_real1 = _irls_downstream_eval(X_fit, y_fit, X_qry, y_qry, task, n_classes)
 
-    p = X_fit.shape[1]
-    rff_d = min(48, max(16, p * 2))
-    rgen = torch.Generator(device=device).manual_seed((step_seed ^ 0x517C) & 0x7FFF_FFFF)
-    W_rff = torch.randn((p, rff_d), generator=rgen, device=device) * (0.7 / math.sqrt(max(p, 1)))
-    b_rff = torch.rand((1, rff_d), generator=rgen, device=device) * (2.0 * math.pi)
-    l_syn2, l_null2, _ = _irls_downstream_eval(
-        torch.cat([X_syn, torch.cos(X_syn @ W_rff + b_rff)], dim=1), y_syn,
-        torch.cat([X_qry, torch.cos(X_qry @ W_rff + b_rff)], dim=1), y_qry, task, n_classes, alpha=0.4,
-    )
-    with torch.no_grad():
-        l_real2, _, _ = _irls_downstream_eval(
-            torch.cat([X_fit, torch.cos(X_fit @ W_rff + b_rff)], dim=1), y_fit,
+        p = X_fit.shape[1]
+        rff_d = min(48, max(16, p * 2))
+        rgen = torch.Generator(device=device).manual_seed((step_seed ^ 0x517C) & 0x7FFF_FFFF)
+        W_rff = torch.randn((p, rff_d), generator=rgen, device=device) * (0.7 / math.sqrt(max(p, 1)))
+        b_rff = torch.rand((1, rff_d), generator=rgen, device=device) * (2.0 * math.pi)
+        l_syn2, l_null2, _ = _irls_downstream_eval(
+            torch.cat([X_syn, torch.cos(X_syn @ W_rff + b_rff)], dim=1), y_syn,
             torch.cat([X_qry, torch.cos(X_qry @ W_rff + b_rff)], dim=1), y_qry, task, n_classes, alpha=0.4,
         )
+        with torch.no_grad():
+            l_real2, _, _ = _irls_downstream_eval(
+                torch.cat([X_fit, torch.cos(X_fit @ W_rff + b_rff)], dim=1), y_fit,
+                torch.cat([X_qry, torch.cos(X_qry @ W_rff + b_rff)], dim=1), y_qry, task, n_classes, alpha=0.4,
+            )
 
-    g1 = F.smooth_l1_loss(l_syn1, l_real1.detach(), beta=0.5) + 0.5 * F.relu(l_syn1 - l_real1.detach())
-    g2 = F.smooth_l1_loss(l_syn2, l_real2.detach(), beta=0.5) + 0.5 * F.relu(l_syn2 - l_real2.detach())
-    tstr_loss = (0.55 * g1 + 0.45 * g2).clamp_max(5.0)
+        g1 = F.smooth_l1_loss(l_syn1, l_real1.detach(), beta=0.5) + 0.5 * F.relu(l_syn1 - l_real1.detach())
+        g2 = F.smooth_l1_loss(l_syn2, l_real2.detach(), beta=0.5) + 0.5 * F.relu(l_syn2 - l_real2.detach())
+        tstr_loss = (0.55 * g1 + 0.45 * g2).clamp_max(5.0)
 
-    q_logits = model.predict_target_from_latent(X_qry, enc, task, n_classes)
-    if task == "regression":
-        distill_loss = F.smooth_l1_loss(q_logits.squeeze(-1), y_qry.float(), beta=1.0)
-    elif task == "binary":
-        distill_loss = F.binary_cross_entropy_with_logits(q_logits.squeeze(-1), y_qry.float().clamp(0.0, 1.0))
-    elif task == "multilabel":
-        ym = y_qry.float() if y_qry.ndim == 2 else y_qry.float().unsqueeze(1)
-        distill_loss = F.binary_cross_entropy_with_logits(q_logits, ym.clamp(0.0, 1.0))
-    else:
-        k = min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
-        distill_loss = F.cross_entropy(torch.log(enc["priors"][:k].clamp_min(1e-4)).unsqueeze(0) + q_logits[:, :k], y_qry.long().clamp(0, k - 1))
-    distill_loss = distill_loss.clamp_max(5.0)
+        q_logits = model.predict_target_from_latent(X_qry, enc, task, n_classes)
+        if task == "regression":
+            distill_loss = F.smooth_l1_loss(q_logits.squeeze(-1), y_qry.float(), beta=1.0)
+        elif task == "binary":
+            distill_loss = F.binary_cross_entropy_with_logits(q_logits.squeeze(-1), y_qry.float().clamp(0.0, 1.0))
+        elif task == "multilabel":
+            ym = y_qry.float() if y_qry.ndim == 2 else y_qry.float().unsqueeze(1)
+            distill_loss = F.binary_cross_entropy_with_logits(q_logits, ym.clamp(0.0, 1.0))
+        else:
+            k = min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
+            distill_loss = F.cross_entropy(torch.log(enc["priors"][:k].clamp_min(1e-4)).unsqueeze(0) + q_logits[:, :k], y_qry.long().clamp(0, k - 1))
+        distill_loss = distill_loss.clamp_max(5.0)
 
-    knot_loss = F.smooth_l1_loss(syn["knots"], enc["emp_qs"].detach(), beta=0.25)
-    xc_f, xc_s = X_fit - X_fit.mean(dim=0, keepdim=True), X_syn - X_syn.mean(dim=0, keepdim=True)
-    cov_loss = F.smooth_l1_loss((xc_s.T @ xc_s) / float(max(X_syn.shape[0], 1)), ((xc_f.T @ xc_f) / float(max(X_fit.shape[0], 1))).detach(), beta=0.25)
-    mmd_loss = _rbf_mmd_loss(X_fit, X_syn)
-    miss_loss = F.binary_cross_entropy(syn["miss_prob"].clamp(1e-4, 1.0 - 1e-4), miss_fit.mean(dim=0).clamp(0.0, 1.0))
-    realism_loss = (knot_loss + 0.8 * cov_loss + 1.5 * mmd_loss + 0.2 * miss_loss).clamp_max(5.0)
+        knot_loss = F.smooth_l1_loss(syn["knots"], enc["emp_qs"].detach(), beta=0.25)
+        xc_f, xc_s = X_fit - X_fit.mean(dim=0, keepdim=True), X_syn - X_syn.mean(dim=0, keepdim=True)
+        cov_loss = F.smooth_l1_loss((xc_s.T @ xc_s) / float(max(X_syn.shape[0], 1)), ((xc_f.T @ xc_f) / float(max(X_fit.shape[0], 1))).detach(), beta=0.25)
+        mmd_loss = _rbf_mmd_loss(X_fit, X_syn)
+        miss_loss = F.binary_cross_entropy(syn["miss_prob"].clamp(1e-4, 1.0 - 1e-4), miss_fit.mean(dim=0).clamp(0.0, 1.0))
+        realism_loss = (knot_loss + 0.8 * cov_loss + 1.5 * mmd_loss + 0.2 * miss_loss).clamp_max(5.0)
 
-    ir = imp_real1.detach() / imp_real1.detach().sum().clamp_min(1e-5)
-    is_ = imp_syn1 / imp_syn1.sum().clamp_min(1e-5)
-    dw = syn["driver_weights"]
-    dist_pen = dw[dmask].pow(2).mean() if bool(dmask.any()) else torch.tensor(0.0, device=device)
-    driver_loss = (0.5 * (1.0 - F.cosine_similarity(ir.unsqueeze(0), is_.unsqueeze(0)).squeeze(0)) + 0.5 * F.mse_loss(dw / dw.sum().clamp_min(1e-5), ir) * float(p) + 0.5 * dist_pen).clamp_max(3.0)
+        ir = imp_real1.detach() / imp_real1.detach().sum().clamp_min(1e-5)
+        is_ = imp_syn1 / imp_syn1.sum().clamp_min(1e-5)
+        dw = syn["driver_weights"]
+        dist_pen = dw[dmask].pow(2).mean() if bool(dmask.any()) else torch.tensor(0.0, device=device)
+        driver_loss = (0.5 * (1.0 - F.cosine_similarity(ir.unsqueeze(0), is_.unsqueeze(0)).squeeze(0)) + 0.5 * F.mse_loss(dw / dw.sum().clamp_min(1e-5), ir) * float(p) + 0.5 * dist_pen).clamp_max(3.0)
 
-    gain1, gain2 = float((l_null1 - l_real1).item()), float((l_null2 - l_real2).item())
-    rets = [r for r, g in [(float(((l_null1 - l_syn1) / gain1).item()) if gain1 > 1e-3 else float("nan"), gain1), (float(((l_null2 - l_syn2) / gain2).item()) if gain2 > 1e-3 else float("nan"), gain2)] if math.isfinite(r)]
-    unclipped_ret = float(sum(rets) / len(rets)) if rets else float("nan")
-    total = 1.0 * tstr_loss + 0.45 * distill_loss + 0.70 * realism_loss + 0.25 * driver_loss
-    return {
-        "total": total, "tstr_loss": float(tstr_loss.item()), "distill_loss": float(distill_loss.item()),
-        "driver_loss": float(driver_loss.item()), "realism_loss": float(realism_loss.item()),
-        "mmd_loss": float(mmd_loss.item()), "unclipped_retention": unclipped_ret,
-        "task_latent": enc["task_latent"], "encoding_bytes": model.encoding_bytes_fp16(p),
-    }
+        gain1, gain2 = float((l_null1 - l_real1).item()), float((l_null2 - l_real2).item())
+        rets = [r for r, g in [(float(((l_null1 - l_syn1) / gain1).item()) if gain1 > 1e-3 else float("nan"), gain1), (float(((l_null2 - l_syn2) / gain2).item()) if gain2 > 1e-3 else float("nan"), gain2)] if math.isfinite(r)]
+        unclipped_ret = float(sum(rets) / len(rets)) if rets else float("nan")
+        total = 1.0 * tstr_loss + 0.45 * distill_loss + 0.70 * realism_loss + 0.25 * driver_loss
+        return {
+            "total": total, "tstr_loss": float(tstr_loss.item()), "distill_loss": float(distill_loss.item()),
+            "driver_loss": float(driver_loss.item()), "realism_loss": float(realism_loss.item()),
+            "mmd_loss": float(mmd_loss.item()), "unclipped_retention": unclipped_ret,
+            "task_latent": enc["task_latent"], "encoding_bytes": model.encoding_bytes_fp16(p),
+        }

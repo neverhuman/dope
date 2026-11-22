@@ -332,62 +332,63 @@ def compute_main_kpi_loss(
     n_classes: int = int(episode["n_classes"])
 
     enc = model.encode_table(X_fit, y_fit, task, n_classes, miss_fit)
-    gen = torch.Generator(device=device).manual_seed(step_seed & 0x7FFF_FFFF)
-    n_syn = max(int(X_fit.shape[0]) * 2, 128)
-    syn = model.synthesize_differentiable(X_fit, y_fit, enc, task, n_classes, n_syn, gen)
-    X_syn, y_syn = syn["X_syn"], syn["y_syn"]
+    with torch.amp.autocast(device_type=device.type, enabled=False):
+        gen = torch.Generator(device=device).manual_seed(step_seed & 0x7FFF_FFFF)
+        n_syn = max(int(X_fit.shape[0]) * 2, 128)
+        syn = model.synthesize_differentiable(X_fit, y_fit, enc, task, n_classes, n_syn, gen)
+        X_syn, y_syn = syn["X_syn"], syn["y_syn"]
 
-    l_syn1, l_null1, imp_syn1 = _irls_downstream_eval(X_syn, y_syn, X_qry, y_qry, task, n_classes)
-    with torch.no_grad():
-        l_real1, _, imp_real1 = _irls_downstream_eval(X_fit, y_fit, X_qry, y_qry, task, n_classes)
+        l_syn1, l_null1, imp_syn1 = _irls_downstream_eval(X_syn, y_syn, X_qry, y_qry, task, n_classes)
+        with torch.no_grad():
+            l_real1, _, imp_real1 = _irls_downstream_eval(X_fit, y_fit, X_qry, y_qry, task, n_classes)
 
-    p = X_fit.shape[1]
-    rff_d = min(48, max(16, p * 2))
-    rgen = torch.Generator(device=device).manual_seed((step_seed ^ 0x517C) & 0x7FFF_FFFF)
-    W_rff = torch.randn((p, rff_d), generator=rgen, device=device) * (0.7 / math.sqrt(max(p, 1)))
-    b_rff = torch.rand((1, rff_d), generator=rgen, device=device) * (2.0 * math.pi)
-    z_syn_nl = torch.cat([X_syn, torch.cos(X_syn @ W_rff + b_rff)], dim=1)
-    z_fit_nl = torch.cat([X_fit, torch.cos(X_fit @ W_rff + b_rff)], dim=1)
-    z_qry_nl = torch.cat([X_qry, torch.cos(X_qry @ W_rff + b_rff)], dim=1)
-    l_syn2, l_null2, _ = _irls_downstream_eval(z_syn_nl, y_syn, z_qry_nl, y_qry, task, n_classes, alpha=0.4)
-    with torch.no_grad():
-        l_real2, _, _ = _irls_downstream_eval(z_fit_nl, y_fit, z_qry_nl, y_qry, task, n_classes, alpha=0.4)
+        p = X_fit.shape[1]
+        rff_d = min(48, max(16, p * 2))
+        rgen = torch.Generator(device=device).manual_seed((step_seed ^ 0x517C) & 0x7FFF_FFFF)
+        W_rff = torch.randn((p, rff_d), generator=rgen, device=device) * (0.7 / math.sqrt(max(p, 1)))
+        b_rff = torch.rand((1, rff_d), generator=rgen, device=device) * (2.0 * math.pi)
+        z_syn_nl = torch.cat([X_syn, torch.cos(X_syn @ W_rff + b_rff)], dim=1)
+        z_fit_nl = torch.cat([X_fit, torch.cos(X_fit @ W_rff + b_rff)], dim=1)
+        z_qry_nl = torch.cat([X_qry, torch.cos(X_qry @ W_rff + b_rff)], dim=1)
+        l_syn2, l_null2, _ = _irls_downstream_eval(z_syn_nl, y_syn, z_qry_nl, y_qry, task, n_classes, alpha=0.4)
+        with torch.no_grad():
+            l_real2, _, _ = _irls_downstream_eval(z_fit_nl, y_fit, z_qry_nl, y_qry, task, n_classes, alpha=0.4)
 
-    tstr_gap1 = F.smooth_l1_loss(l_syn1, l_real1.detach(), beta=0.5) + 0.5 * F.relu(l_syn1 - l_real1.detach())
-    tstr_gap2 = F.smooth_l1_loss(l_syn2, l_real2.detach(), beta=0.5) + 0.5 * F.relu(l_syn2 - l_real2.detach())
-    tstr_loss = (0.55 * tstr_gap1 + 0.45 * tstr_gap2).clamp_max(5.0)
+        tstr_gap1 = F.smooth_l1_loss(l_syn1, l_real1.detach(), beta=0.5) + 0.5 * F.relu(l_syn1 - l_real1.detach())
+        tstr_gap2 = F.smooth_l1_loss(l_syn2, l_real2.detach(), beta=0.5) + 0.5 * F.relu(l_syn2 - l_real2.detach())
+        tstr_loss = (0.55 * tstr_gap1 + 0.45 * tstr_gap2).clamp_max(5.0)
 
-    ir = imp_real1.detach() / imp_real1.detach().sum().clamp_min(1e-5)
-    is_ = imp_syn1 / imp_syn1.sum().clamp_min(1e-5)
-    drv_align = 1.0 - F.cosine_similarity(ir.unsqueeze(0), is_.unsqueeze(0)).squeeze(0)
-    dw = enc["driver_weights"]
-    drv_pred = F.mse_loss(dw / dw.sum().clamp_min(1e-5), ir) * float(p)
-    dist_pen = dw[dmask].pow(2).mean() if bool(dmask.any()) else torch.tensor(0.0, device=device)
-    driver_loss = (0.5 * drv_align + 0.5 * drv_pred + 0.5 * dist_pen).clamp_max(3.0)
+        ir = imp_real1.detach() / imp_real1.detach().sum().clamp_min(1e-5)
+        is_ = imp_syn1 / imp_syn1.sum().clamp_min(1e-5)
+        drv_align = 1.0 - F.cosine_similarity(ir.unsqueeze(0), is_.unsqueeze(0)).squeeze(0)
+        dw = enc["driver_weights"].float()
+        drv_pred = F.mse_loss(dw / dw.sum().clamp_min(1e-5), ir) * float(p)
+        dist_pen = dw[dmask].pow(2).mean() if bool(dmask.any()) else torch.tensor(0.0, device=device)
+        driver_loss = (0.5 * drv_align + 0.5 * drv_pred + 0.5 * dist_pen).clamp_max(3.0)
 
-    # Multi-bandwidth RBF-MMD + covariance + marginal quantile realism (fixes C2ST plateau!)
-    xc_f, xc_s = X_fit - X_fit.mean(dim=0, keepdim=True), X_syn - X_syn.mean(dim=0, keepdim=True)
-    cov_f = (xc_f.T @ xc_f) / float(max(X_fit.shape[0], 1))
-    cov_s = (xc_s.T @ xc_s) / float(max(X_syn.shape[0], 1))
-    q_pts = torch.linspace(0.05, 0.95, 9, device=device)
-    q_loss = F.smooth_l1_loss(torch.quantile(X_syn, q_pts, dim=0), torch.quantile(X_fit, q_pts, dim=0), beta=0.25)
-    mmd_loss = _rbf_mmd_loss(X_fit, X_syn)
-    realism_loss = (0.6 * F.smooth_l1_loss(cov_s, cov_f, beta=0.25) + 0.6 * q_loss + 2.0 * mmd_loss).clamp_max(5.0)
+        # Multi-bandwidth RBF-MMD + covariance + marginal quantile realism (fixes C2ST plateau!)
+        xc_f, xc_s = X_fit - X_fit.mean(dim=0, keepdim=True), X_syn - X_syn.mean(dim=0, keepdim=True)
+        cov_f = (xc_f.T @ xc_f) / float(max(X_fit.shape[0], 1))
+        cov_s = (xc_s.T @ xc_s) / float(max(X_syn.shape[0], 1))
+        q_pts = torch.linspace(0.05, 0.95, 9, device=device)
+        q_loss = F.smooth_l1_loss(torch.quantile(X_syn, q_pts, dim=0), torch.quantile(X_fit, q_pts, dim=0), beta=0.25)
+        mmd_loss = _rbf_mmd_loss(X_fit, X_syn)
+        realism_loss = (0.6 * F.smooth_l1_loss(cov_s, cov_f, beta=0.25) + 0.6 * q_loss + 2.0 * mmd_loss).clamp_max(5.0)
 
-    gain1 = float((l_null1 - l_real1).item())
-    ret1 = float(((l_null1 - l_syn1) / gain1).item()) if gain1 > 1e-3 else float("nan")
-    gain2 = float((l_null2 - l_real2).item())
-    ret2 = float(((l_null2 - l_syn2) / gain2).item()) if gain2 > 1e-3 else float("nan")
-    rets = [r for r in (ret1, ret2) if math.isfinite(r)]
-    unclipped_ret = float(sum(rets) / len(rets)) if rets else float("nan")
+        gain1 = float((l_null1 - l_real1).item())
+        ret1 = float(((l_null1 - l_syn1) / gain1).item()) if gain1 > 1e-3 else float("nan")
+        gain2 = float((l_null2 - l_real2).item())
+        ret2 = float(((l_null2 - l_syn2) / gain2).item()) if gain2 > 1e-3 else float("nan")
+        rets = [r for r in (ret1, ret2) if math.isfinite(r)]
+        unclipped_ret = float(sum(rets) / len(rets)) if rets else float("nan")
 
-    total = 1.0 * tstr_loss + 0.25 * driver_loss + 0.55 * realism_loss
-    return {
-        "total": total,
-        "tstr_loss": float(tstr_loss.item()),
-        "driver_loss": float(driver_loss.item()),
-        "realism_loss": float(realism_loss.item()),
-        "mmd_loss": float(mmd_loss.item()),
-        "unclipped_retention": unclipped_ret,
-        "task_latent": enc["task_latent"],
-    }
+        total = 1.0 * tstr_loss + 0.25 * driver_loss + 0.55 * realism_loss
+        return {
+            "total": total,
+            "tstr_loss": float(tstr_loss.item()),
+            "driver_loss": float(driver_loss.item()),
+            "realism_loss": float(realism_loss.item()),
+            "mmd_loss": float(mmd_loss.item()),
+            "unclipped_retention": unclipped_ret,
+            "task_latent": enc["task_latent"],
+        }
