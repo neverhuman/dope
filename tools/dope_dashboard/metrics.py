@@ -249,9 +249,18 @@ def fleet_summary(hosts: list[dict[str, Any]], history: deque[dict[str, Any]], n
                     run["eval"],
                     key=lambda r: r["main_kpi_retention_median"] if r["main_kpi_retention_median"] is not None else -999.0,
                 )
+                arch_s = str(le.get("arch") or "")
+                acls = str(
+                    le.get("artifact_class")
+                    or (
+                        "source_free"
+                        if any(t in arch_s or t in run["name"] for t in ("single_enc", "rust_dope_format2", "rust_format2", "stat_packet"))
+                        else "rows_at_sampler"
+                    )
+                )
                 leaderboard.append(
                     {
-                        "host": h["host"], "run": run["name"], "arch": le.get("arch") or "",
+                        "host": h["host"], "run": run["name"], "arch": arch_s, "artifact_class": acls,
                         "step": le["step"], "best_step": best_ev["step"],
                         "best_main_kpi": best_ev["main_kpi_retention_median"],
                         "main_kpi_retention_median": le["main_kpi_retention_median"],

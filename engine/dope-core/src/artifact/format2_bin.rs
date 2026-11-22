@@ -5,7 +5,9 @@ use crate::error::{DopeError, Result};
 use crate::marginal::atoms::AtomV2;
 use crate::marginal::lattice::{HeapingSpec, LatticeSpec};
 use crate::marginal::v2::ColumnMarginalV2;
+use crate::noise::RESIDUAL_KNOTS;
 use crate::schema::{CategoricalSpec, ColumnSpec, Kind, NumericSpec, Schema, Task};
+use crate::teacher::noise::TeacherResidualModel;
 
 const MAX_SEQ: usize = 1 << 20;
 
@@ -56,6 +58,13 @@ impl BinWriter {
         self.u32(xs.len() as u32);
         for &v in xs {
             self.u32(v as u32);
+        }
+    }
+    pub fn u01_u16_slice(&mut self, us: &[f64]) {
+        self.u32(us.len() as u32);
+        for &u in us {
+            let q = (u.clamp(0.0, 1.0) * 65535.0).round() as u16;
+            self.u16(q);
         }
     }
 }
@@ -137,14 +146,22 @@ impl<'a> BinReader<'a> {
         }
         Ok(out)
     }
+    pub fn u01_u16_vec(&mut self) -> Result<Vec<f64>> {
+        let n = self.len()?;
+        let mut out = Vec::with_capacity(n);
+        for _ in 0..n {
+            out.push(f64::from(self.u16()?) / 65535.0);
+        }
+        Ok(out)
+    }
 }
 
-fn write_col_spec(w: &mut BinWriter, c: &ColumnSpec) {
+fn write_col_spec(w: &mut BinWriter, c: &ColumnSpec, f32_heritage: bool) {
     w.str(&c.name);
     match &c.kind {
         Kind::Numeric(n) => {
             w.u8(0);
-            w.u8((u8::from(n.log)) | (u8::from(n.integer) << 1));
+            w.u8((u8::from(n.log)) | (u8::from(n.integer) << 1) | (u8::from(f32_heritage) << 2));
             w.f64(n.lo);
             w.f64(n.hi);
         }
@@ -158,19 +175,22 @@ fn write_col_spec(w: &mut BinWriter, c: &ColumnSpec) {
     }
 }
 
-fn read_col_spec(r: &mut BinReader<'_>) -> Result<ColumnSpec> {
+fn read_col_spec(r: &mut BinReader<'_>) -> Result<(ColumnSpec, bool)> {
     let name = r.str()?;
-    let kind = match r.u8()? {
+    let (kind, f32_heritage) = match r.u8()? {
         0 => {
             let fl = r.u8()?;
             let lo = r.f64()?;
             let hi = r.f64()?;
-            Kind::Numeric(NumericSpec {
-                log: (fl & 1) != 0,
-                integer: (fl & 2) != 0,
-                lo,
-                hi,
-            })
+            (
+                Kind::Numeric(NumericSpec {
+                    log: (fl & 1) != 0,
+                    integer: (fl & 2) != 0,
+                    lo,
+                    hi,
+                }),
+                (fl & 4) != 0,
+            )
         }
         1 => {
             let n = r.len()?;
@@ -178,14 +198,19 @@ fn read_col_spec(r: &mut BinReader<'_>) -> Result<ColumnSpec> {
             for _ in 0..n {
                 levels.push(r.str()?);
             }
-            Kind::Categorical(CategoricalSpec { levels })
+            (Kind::Categorical(CategoricalSpec { levels }), false)
         }
         _ => return Err(DopeError::Artifact("format2 invalid column kind".into())),
     };
-    Ok(ColumnSpec { name, kind })
+    Ok((ColumnSpec { name, kind }, f32_heritage))
 }
 
-pub(crate) fn encode_schema_section(schema: &Schema, n_fit: u64, budget_bytes: u32) -> Vec<u8> {
+pub(crate) fn encode_schema_section(
+    schema: &Schema,
+    col_f32_heritage: &[bool],
+    n_fit: u64,
+    budget_bytes: u32,
+) -> Vec<u8> {
     let mut w = BinWriter::new();
     w.u64(n_fit);
     w.u32(budget_bytes);
@@ -194,14 +219,18 @@ pub(crate) fn encode_schema_section(schema: &Schema, n_fit: u64, budget_bytes: u
         Task::Classification => 1,
     });
     w.u32(schema.features.len() as u32);
-    for f in &schema.features {
-        write_col_spec(&mut w, f);
+    for (i, f) in schema.features.iter().enumerate() {
+        write_col_spec(&mut w, f, col_f32_heritage.get(i).copied().unwrap_or(false));
     }
-    write_col_spec(&mut w, &schema.target);
+    let t_f32 = col_f32_heritage
+        .get(schema.features.len())
+        .copied()
+        .unwrap_or(false);
+    write_col_spec(&mut w, &schema.target, t_f32);
     w.0
 }
 
-pub(crate) fn decode_schema_section(bytes: &[u8]) -> Result<(Schema, u64, u32)> {
+pub(crate) fn decode_schema_section(bytes: &[u8]) -> Result<(Schema, Vec<bool>, u64, u32)> {
     let mut r = BinReader::new(bytes);
     let n_fit = r.u64()?;
     let budget_bytes = r.u32()?;
@@ -212,10 +241,14 @@ pub(crate) fn decode_schema_section(bytes: &[u8]) -> Result<(Schema, u64, u32)> 
     };
     let n_feat = r.len()?;
     let mut features = Vec::with_capacity(n_feat);
+    let mut col_f32_heritage = Vec::with_capacity(n_feat + 1);
     for _ in 0..n_feat {
-        features.push(read_col_spec(&mut r)?);
+        let (spec, f32h) = read_col_spec(&mut r)?;
+        features.push(spec);
+        col_f32_heritage.push(f32h);
     }
-    let target = read_col_spec(&mut r)?;
+    let (target, t_f32) = read_col_spec(&mut r)?;
+    col_f32_heritage.push(t_f32);
     Ok((
         Schema {
             features,
@@ -223,6 +256,7 @@ pub(crate) fn decode_schema_section(bytes: &[u8]) -> Result<(Schema, u64, u32)> 
             task,
             dropped: Vec::new(),
         },
+        col_f32_heritage,
         n_fit,
         budget_bytes,
     ))
@@ -256,8 +290,9 @@ pub(crate) fn encode_marginals_section(marginals: &[ColumnMarginalV2]) -> Vec<u8
                 p_missing,
                 support_k,
             } => {
-                w.u8(1);
-                w.f64(*p_missing);
+                // Tag 2: compact v2.2 continuous marginal (`u16` smooth_u + `f32` smooth_x, exact `f64` atoms/lattice).
+                w.u8(2);
+                w.f32(*p_missing);
                 w.u32(*support_k as u32);
                 w.u32(atoms.len() as u32);
                 for a in atoms {
@@ -289,9 +324,9 @@ pub(crate) fn encode_marginals_section(marginals: &[ColumnMarginalV2]) -> Vec<u8
                         w.f32(h.excess);
                     }
                 }
-                w.f32_slice(smooth_u);
+                w.u01_u16_slice(smooth_u);
                 w.f32_slice(smooth_x);
-                w.f32_slice(offgrid_u);
+                w.u01_u16_slice(offgrid_u);
                 w.f32_slice(offgrid_x);
             }
         }
@@ -317,8 +352,8 @@ pub(crate) fn decode_marginals_section(bytes: &[u8]) -> Result<Vec<ColumnMargina
                     support_k,
                 });
             }
-            1 => {
-                let p_missing = r.f64()?;
+            tag @ (1 | 2) => {
+                let p_missing = if tag == 2 { r.f32()? } else { r.f64()? };
                 let support_k = r.u32()? as usize;
                 let na = r.len()?;
                 let mut atoms = Vec::with_capacity(na);
@@ -353,14 +388,24 @@ pub(crate) fn decode_marginals_section(bytes: &[u8]) -> Result<Vec<ColumnMargina
                 } else {
                     None
                 };
+                let (smooth_u, smooth_x, offgrid_u, offgrid_x) = if tag == 2 {
+                    (
+                        r.u01_u16_vec()?,
+                        r.f32_vec()?,
+                        r.u01_u16_vec()?,
+                        r.f32_vec()?,
+                    )
+                } else {
+                    (r.f64_vec()?, r.f64_vec()?, r.f64_vec()?, r.f64_vec()?)
+                };
                 out.push(ColumnMarginalV2::Continuous {
                     atoms,
                     lattice,
                     heaping,
-                    smooth_u: r.f32_vec()?,
-                    smooth_x: r.f32_vec()?,
-                    offgrid_u: r.f32_vec()?,
-                    offgrid_x: r.f32_vec()?,
+                    smooth_u,
+                    smooth_x,
+                    offgrid_u,
+                    offgrid_x,
                     p_missing,
                     support_k,
                 });
@@ -369,4 +414,59 @@ pub(crate) fn decode_marginals_section(bytes: &[u8]) -> Result<Vec<ColumnMargina
         }
     }
     Ok(out)
+}
+
+pub(crate) fn encode_noise_temp(temperature: f64, res: &Option<TeacherResidualModel>) -> Vec<u8> {
+    let mut w = BinWriter::new();
+    w.f64(temperature);
+    match res {
+        None => w.u8(0),
+        Some(m) => {
+            w.u8(1);
+            w.f64(m.log_sigma_intercept);
+            w.f64(m.log_sigma_slope_yhat);
+            w.f64(m.sigma_lo);
+            w.f64(m.sigma_hi);
+            w.f32_slice(&m.bin_edges);
+            w.u32(m.bin_knots.len() as u32);
+            for k in &m.bin_knots {
+                for &v in k {
+                    w.f32(v);
+                }
+            }
+        }
+    }
+    w.0
+}
+
+pub(crate) fn decode_noise_temp(bytes: &[u8]) -> Result<(f64, Option<TeacherResidualModel>)> {
+    let mut r = BinReader::new(bytes);
+    let temperature = r.f64()?;
+    let res = if r.u8()? == 1 {
+        let log_sigma_intercept = r.f64()?;
+        let log_sigma_slope_yhat = r.f64()?;
+        let sigma_lo = r.f64()?;
+        let sigma_hi = r.f64()?;
+        let bin_edges = r.f32_vec()?;
+        let nb = r.len()?;
+        let mut bin_knots = Vec::with_capacity(nb);
+        for _ in 0..nb {
+            let mut arr = [0.0; RESIDUAL_KNOTS];
+            for slot in &mut arr {
+                *slot = r.f32()?;
+            }
+            bin_knots.push(arr);
+        }
+        Some(TeacherResidualModel {
+            log_sigma_intercept,
+            log_sigma_slope_yhat,
+            sigma_lo,
+            sigma_hi,
+            bin_edges,
+            bin_knots,
+        })
+    } else {
+        None
+    };
+    Ok((temperature, res))
 }

@@ -312,3 +312,183 @@ fn fidelity_engine_2_full_pipeline_end_to_end() {
     assert_eq!(bridge.synthetic_rows, 4096);
     assert_eq!(bridge.feature_count, 4);
 }
+
+fn assert_distill_weights_unit(
+    decoded: &dope_core::artifact::format2_codec::Format2Program,
+    rows: usize,
+) {
+    let dist = decoded
+        .sample_with_mode(&EmitOptions {
+            mode: EmissionMode::Distill,
+            rows,
+            seed: 3,
+            table_id: 1,
+            ..Default::default()
+        })
+        .unwrap();
+    let mut by_pair = std::collections::BTreeMap::<u64, f64>::new();
+    for (&pid, &w) in dist
+        .pair_ids
+        .as_ref()
+        .unwrap()
+        .iter()
+        .zip(dist.weights.as_ref().unwrap())
+    {
+        *by_pair.entry(pid).or_insert(0.0) += w;
+    }
+    assert!(!by_pair.is_empty());
+    for (&pid, &sum_w) in &by_pair {
+        assert!(
+            (sum_w - 1.0).abs() < 1e-6,
+            "pair_id {pid} weight sum {sum_w}"
+        );
+    }
+}
+
+#[test]
+fn fidelity_engine_2_binary_retention_and_distill_weights() {
+    let n = 400usize;
+    let make_bin = |offset: u64| -> RawTable {
+        let (mut x0, mut x1, mut x2, mut y) = (vec![], vec![], vec![], vec![]);
+        for i in 0..n {
+            let mut s = ((i as u64 + 1 + offset).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+                .wrapping_mul(0xbf58_476d_1ce4_e5b9);
+            let u0 = ((s >> 11) as f64) / ((1u64 << 53) as f64);
+            s = s.wrapping_mul(0x94d0_49bb_1331_11eb);
+            let u1 = ((s >> 11) as f64) / ((1u64 << 53) as f64);
+            s = s.wrapping_mul(0x517c_c1b7_2722_0a95);
+            let u2 = ((s >> 11) as f64) / ((1u64 << 53) as f64);
+            s = s.wrapping_mul(0x2545_f491_4f6c_dd1d);
+            let u3 = ((s >> 11) as f64) / ((1u64 << 53) as f64);
+            let logit = 5.5 * (u0 - 0.5) - 4.5 * (u1 - 0.5) + 2.0 * ((u0 - 0.5) * (u2 - 0.5));
+            let p = 1.0 / (1.0 + (-logit).exp());
+            x0.push(format!("{u0:.6}"));
+            x1.push(format!("{u1:.6}"));
+            x2.push(format!("{u2:.6}"));
+            y.push(if u3 < p { "1".into() } else { "0".into() });
+        }
+        RawTable {
+            headers: vec!["x0".into(), "x1".into(), "x2".into(), "y".into()],
+            columns: vec![x0, x1, x2, y],
+        }
+    };
+    let tr = make_bin(10);
+    let te = make_bin(9000);
+    let fitted = fit_v2(
+        &tr,
+        3,
+        &FitV2Options {
+            budget: Some(32_768),
+            seed: 7,
+            task: Some(Task::Classification),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let decoded = decode_format2_program(&fitted.bytes).unwrap();
+    assert_distill_weights_unit(&decoded, 200);
+    // Verify Faithful emission preserves class balance and binary signal.
+    let syn = decoded
+        .sample_with_mode(&EmitOptions {
+            mode: EmissionMode::Faithful,
+            rows: 800,
+            seed: 5,
+            table_id: 2,
+            ..Default::default()
+        })
+        .unwrap();
+    let data_tr = decoded.schema.to_model(&tr).unwrap();
+    let data_te = decoded.schema.to_model(&te).unwrap();
+    let p_real = data_tr.y.iter().sum::<f64>() / data_tr.y.len() as f64;
+    let p_syn = syn.samples.y.iter().sum::<f64>() / syn.samples.y.len() as f64;
+    assert!(
+        (p_syn - p_real).abs() < 0.12,
+        "binary prior drift: real={p_real:.3}, syn={p_syn:.3}"
+    );
+    let rows_a: Vec<usize> = (0..data_tr.y.len()).collect();
+    let rows_s: Vec<usize> = (0..syn.samples.y.len()).collect();
+    let rows_t: Vec<usize> = (0..data_te.y.len()).collect();
+    let lin_a = LinearMember::fit(Head::Binary, &data_tr.x, &data_tr.y, &rows_a);
+    let lin_s = LinearMember::fit(Head::Binary, &syn.samples.x, &syn.samples.y, &rows_s);
+    let acc_of = |pred: &[f64]| -> f64 {
+        pred.iter()
+            .zip(&data_te.y)
+            .filter(|(&p, &yt)| ((p >= 0.5) as u8 as f64 - yt).abs() < 0.5)
+            .count() as f64
+            / data_te.y.len() as f64
+    };
+    let acc_a = acc_of(&lin_a.predict_rows(&data_te.x, &rows_t));
+    let acc_s = acc_of(&lin_s.predict_rows(&data_te.x, &rows_t));
+    assert!(
+        acc_s >= acc_a - 0.06 && acc_s >= 0.72,
+        "binary Format-2 auditor accuracy too low: syn={acc_s:.3} vs real={acc_a:.3}"
+    );
+}
+
+#[test]
+fn fidelity_engine_2_multiclass_and_f32_uniform_lattice() {
+    let n = 420usize;
+    let (mut x0, mut x1, mut y) = (vec![], vec![], vec![]);
+    for i in 0..n {
+        // Non-decimal 1/7 f32 lattice with a rare level (index 6 has only 6 rows < k=10).
+        let g = if i < 6 { 6 } else { i % 6 };
+        let v0 = f64::from((g as f32) / 7.0_f32);
+        let v1 = f64::from(((i % 9) as f32) / 9.0_f32);
+        let cls = if i < 12 {
+            3 // rare minority class (~2.9%) must survive regularized calibration!
+        } else if v0 < 0.3 {
+            0
+        } else if v1 < 0.5 {
+            1
+        } else {
+            2
+        };
+        x0.push(format!("{v0}"));
+        x1.push(format!("{v1}"));
+        y.push(format!("c{cls}"));
+    }
+    let tr = RawTable {
+        headers: vec!["x0".into(), "x1".into(), "y".into()],
+        columns: vec![x0, x1, y],
+    };
+    let fitted = fit_v2(
+        &tr,
+        2,
+        &FitV2Options {
+            budget: Some(32_768),
+            seed: 19,
+            task: Some(Task::Classification),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let decoded = decode_format2_program(&fitted.bytes).unwrap();
+    assert!(decoded.col_f32_heritage[0] && decoded.col_f32_heritage[1]);
+    assert_distill_weights_unit(&decoded, 160);
+    // Verify write_raw preserves exact f32 lattice strings (not `:.6` truncated).
+    let syn = decoded
+        .sample_with_mode(&EmitOptions {
+            mode: EmissionMode::Faithful,
+            rows: 600,
+            seed: 11,
+            table_id: 2,
+            ..Default::default()
+        })
+        .unwrap();
+    let mut buf = Vec::new();
+    decoded.write_raw(&syn.samples, &mut buf).unwrap();
+    let csv = String::from_utf8(buf).unwrap();
+    let target_val = format!("{}", f64::from(1.0_f32 / 7.0_f32));
+    assert!(
+        csv.contains(&target_val),
+        "expected exact f32 1/7 representation {target_val} in Format-2 raw CSV"
+    );
+    let mut cls_cnt = [0usize; 4];
+    for &yv in &syn.samples.y {
+        cls_cnt[(yv.round() as usize).min(3)] += 1;
+    }
+    assert!(
+        cls_cnt[0] > 50 && cls_cnt[1] > 50 && cls_cnt[2] > 50 && cls_cnt[3] >= 1,
+        "multiclass minority collapsed: {cls_cnt:?}"
+    );
+}

@@ -85,6 +85,66 @@ pub fn fit_simplex_weights(head: Head, member_preds: &[Vec<f64>], y: &[f64]) -> 
     w
 }
 
+/// Smooth L2-regularized Platt (temperature + intercept) logistic calibrator for binary probs.
+/// Avoids PAV isotonic step-collapse and extreme ±9.21 logit saturation on small folds (`BUG-R11`).
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PlattCalibrator {
+    pub slope: f64,
+    pub bias: f64,
+}
+
+impl PlattCalibrator {
+    pub fn fit(probs: &[f64], y: &[f64]) -> Self {
+        let n = probs.len();
+        if n < 10 {
+            return Self {
+                slope: 1.0,
+                bias: 0.0,
+            };
+        }
+        let logits: Vec<f64> = probs
+            .iter()
+            .map(|&p| {
+                let pc = p.clamp(1e-4, 1.0 - 1e-4);
+                (pc / (1.0 - pc)).ln().clamp(-6.0, 6.0)
+            })
+            .collect();
+        let mut a = 1.0_f64;
+        let mut b = 0.0_f64;
+        let reg_a = 1.5_f64;
+        let reg_b = 0.5_f64;
+        for _ in 0..16 {
+            let (mut ga, mut gb, mut haa, mut hab, mut hbb) = (0.0, 0.0, reg_a, 0.0, reg_b);
+            for r in 0..n {
+                let z = (a * logits[r] + b).clamp(-10.0, 10.0);
+                let p = 1.0 / (1.0 + (-z).exp());
+                let diff = p - y[r].clamp(0.0, 1.0);
+                let h = (p * (1.0 - p)).max(1e-4);
+                ga += diff * logits[r];
+                gb += diff;
+                haa += h * logits[r] * logits[r];
+                hab += h * logits[r];
+                hbb += h;
+            }
+            ga += reg_a * (a - 1.0);
+            gb += reg_b * b;
+            let det = (haa * hbb - hab * hab).max(1e-9);
+            let da = (hbb * ga - hab * gb) / det;
+            let db = (-hab * ga + haa * gb) / det;
+            a = (a - 0.7 * da).clamp(0.25, 3.5);
+            b = (b - 0.7 * db).clamp(-3.0, 3.0);
+        }
+        Self { slope: a, bias: b }
+    }
+
+    pub fn transform(&self, p: f64) -> f64 {
+        let pc = p.clamp(1e-4, 1.0 - 1e-4);
+        let logit = (pc / (1.0 - pc)).ln().clamp(-6.0, 6.0);
+        let z = (self.slope * logit + self.bias).clamp(-6.5, 6.5);
+        (1.0 / (1.0 + (-z).exp())).clamp(1e-4, 1.0 - 1e-4)
+    }
+}
+
 /// Pool-Adjacent-Violators (PAV) monotone isotonic calibrator for binary probabilities.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct IsotonicCalibrator {
@@ -191,11 +251,12 @@ impl MulticlassCalibrator {
                 best_temp = t;
             }
         }
-        // Per-class additive bias correction via damped Newton steps on calibrated logits.
+        // L2-regularized per-class additive bias correction so rare/absent fold classes don't collapse.
         let mut bias = vec![0.0; k];
+        let reg_b = 4.0_f64;
         for _ in 0..12 {
             let mut g = vec![0.0; k];
-            let mut h = vec![0.0; k];
+            let mut h = vec![reg_b; k];
             for r in 0..n {
                 let row: Vec<f64> = (0..k)
                     .map(|c| logits[r * k + c] / best_temp + bias[c])
@@ -209,7 +270,8 @@ impl MulticlassCalibrator {
                 }
             }
             for c in 0..k {
-                bias[c] = (bias[c] - 0.5 * g[c] / (h[c] + 1.0)).clamp(-3.0, 3.0);
+                g[c] += reg_b * bias[c];
+                bias[c] = (bias[c] - 0.5 * g[c] / h[c]).clamp(-1.5, 1.5);
             }
             let mean_b = bias.iter().sum::<f64>() / k as f64;
             for b in &mut bias {

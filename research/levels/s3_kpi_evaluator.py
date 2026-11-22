@@ -344,10 +344,12 @@ def evaluate_checkpoint(
     all_rets = [r for vals in by_task_ret.values() for r in vals]
     med = lambda xs: round(float(np.median(xs)), 4) if xs else None
     mean = lambda xs: round(float(np.mean(xs)), 4) if xs else None
+    artifact_class = "source_free" if arch in ("single_enc_v6", "single_enc_v7", "stat_packet_v0") else "rows_at_sampler"
+    kpi_v1 = med(all_rets)
     return {
         "time": round(time.time(), 3), "step": int(meta.get("step", 0)), "arch": arch,
-        "checkpoint": ckpt_path.name, "eval_role": eval_role,
-        "main_kpi_retention_median": med(all_rets), "main_kpi_retention_mean": mean(all_rets),
+        "artifact_class": artifact_class, "checkpoint": ckpt_path.name, "eval_role": eval_role,
+        "kpi_v1": kpi_v1, "main_kpi_retention_median": kpi_v1, "main_kpi_retention_mean": mean(all_rets),
         "regression_retention": med(by_task_ret["regression"]), "binary_retention": med(by_task_ret["binary"]),
         "multiclass_retention": med(by_task_ret["multiclass"]), "multilabel_retention": med(by_task_ret["multilabel"]),
         "parity_coverage": mean(parity_vals), "realism_coverage": mean(real_pass), "privacy_pass_coverage": mean(priv_pass),
@@ -357,20 +359,16 @@ def evaluate_checkpoint(
     }
 
 
-def _update_regret_curriculum(run_dir: Path, row: dict[str, Any]) -> None:
-    """Emit JopeDime-style per-task regret multipliers so the live trainer boosts lagging tasks."""
-    mults: dict[str, float] = {}
-    for task, key in [("regression", "regression_retention"), ("binary", "binary_retention"), ("multiclass", "multiclass_retention")]:
-        v = row.get(key)
-        if v is None:
-            mults[task] = 1.5
-        else:
-            gap = max(0.0, 0.95 - float(v))
-            mults[task] = round(min(1.0 + gap * 6.0, 5.0), 3)
-    payload = {"updated_at": round(time.time(), 3), "step": row["step"], "task_multipliers": mults, "hash_multipliers": {}}
-    tmp = run_dir / ".curriculum_regret.json.tmp"
-    tmp.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-    os.replace(tmp, run_dir / "curriculum_regret.json")
+def _passes_empirical_guard(row: dict[str, Any]) -> bool:
+    """Require empirical privacy safety guards before saving dev-best checkpoints."""
+    dcr = row.get("dcr_share_median")
+    mia = row.get("mia_auc_median")
+    ex = row.get("exact_copy_excess_median")
+    return (
+        (dcr is None or float(dcr) <= 0.55)
+        and (mia is None or float(mia) <= 0.55)
+        and (ex is None or float(ex) <= 0.005)
+    )
 
 
 def _promote_best_and_valley_soup(
@@ -383,9 +381,9 @@ def _promote_best_and_valley_soup(
     max_per_task: int,
     eval_log: Path,
 ) -> None:
-    """Preserve `best_main_kpi.safetensors` permanently & build JopeDime k=3 valley soup."""
+    """Preserve guarded `best_main_kpi.safetensors` permanently & build JopeDime k=3 valley soup."""
     score = row.get("main_kpi_retention_median")
-    if score is None:
+    if score is None or not _passes_empirical_guard(row):
         return
     ckpt_dir = run_dir / "checkpoints"
     best_json = ckpt_dir / "best_main_kpi.json"
@@ -396,17 +394,18 @@ def _promote_best_and_valley_soup(
         except (OSError, ValueError):
             prev_best = -1e9
 
-    if float(score) > prev_best:
+    min_delta = 0.005 if prev_best > -1e8 else 0.0
+    if float(score) >= prev_best + min_delta:
         best_file = ckpt_dir / "best_main_kpi.safetensors"
         tmp = ckpt_dir / ".best_main_kpi.safetensors.tmp"
         shutil.copy2(ckpt, tmp)
         os.replace(tmp, best_file)
         sha = hashlib.sha256(best_file.read_bytes()).hexdigest()
-        bmeta = {**row, "role": "best_main_kpi", "source_checkpoint": ckpt.name, "sha256": sha, "bytes": best_file.stat().st_size, "delta_vs_prev": round(float(score) - prev_best, 4) if prev_best > -1e8 else None}
+        bmeta = {**row, "role": "best_main_kpi", "promotion_status": "DEV-best (unconfirmed; requires paired compare receipt)", "source_checkpoint": ckpt.name, "sha256": sha, "bytes": best_file.stat().st_size, "delta_vs_prev": round(float(score) - prev_best, 4) if prev_best > -1e8 else None}
         best_json.write_text(json.dumps(bmeta, sort_keys=True, indent=2) + "\n", encoding="utf-8")
         with (ckpt_dir / "ledger.jsonl").open("a", encoding="utf-8") as fh:
             fh.write(json.dumps({**bmeta, "checkpoint": "best_main_kpi.safetensors"}, sort_keys=True) + "\n")
-        print(f"  ★ NEW BEST MAIN KPI @ step={row['step']}: {score:.4f} (saved best_main_kpi.safetensors)", flush=True)
+        print(f"  ★ DEV-best (unconfirmed) @ step={row['step']}: {score:.4f} (saved best_main_kpi.safetensors)", flush=True)
 
     # Maintain top-3 distinct-valley checkpoints (min step gap 150) -> JopeDime k=3 valley soup!
     vp = ckpt_dir / "valleys.json"
@@ -480,7 +479,6 @@ def main() -> None:
                         f"drv={row['driver_spearman_median']} dcr={row['dcr_share_median']} mia={row['mia_auc_median']} ({row['eval_wall_s']}s)",
                         flush=True,
                     )
-                    _update_regret_curriculum(run_dir, row)
                     _promote_best_and_valley_soup(run_dir, ckpt, meta, row, store, device, args.max_per_task, eval_log)
                     last_step = step
             except (OSError, ValueError, KeyError, RuntimeError) as exc:

@@ -3,8 +3,8 @@
 //! and depth-2 lookahead for XOR / 3-bit parity (`T16`).
 
 use super::split::{
-    best_lookahead_pair, best_split_gain, build_candidate_predicates, compute_leaf_tilts,
-    mean_state_nll,
+    apply_tree_leaf_row, best_lookahead_pair, best_split_gain, build_candidate_predicates,
+    compute_leaf_tilts, eval_tree_on_select, mean_state_nll,
 };
 use crate::stats::{cholesky, norm_cdf, norm_ppf};
 use crate::target::log_sum_exp;
@@ -206,6 +206,8 @@ pub fn standard_z_bins(k: usize) -> (Vec<f64>, Vec<f64>) {
     (edges, centers)
 }
 
+pub type SelectEval<'a> = (&'a [Vec<f64>], &'a [Vec<f64>], &'a [Vec<Option<u8>>]);
+
 /// Fit CATF oblivious residual trees on top of the Gaussian copula anchor for column `col_idx`.
 #[allow(clippy::too_many_arguments)]
 pub fn fit_catf_trees(
@@ -213,6 +215,7 @@ pub fn fit_catf_trees(
     z_cols: &[Vec<f64>],
     is_nominal: &[bool],
     nom_codes: &[Vec<Option<u8>>],
+    select_eval: Option<SelectEval<'_>>,
     cond: &mut CatfConditional,
     target_states: &[usize],
     max_trees: usize,
@@ -276,6 +279,39 @@ pub fn fit_catf_trees(
     let mut hess = vec![0.0; n * n_states];
     let base_nll = mean_state_nll(&logits, target_states, n_states);
     let mut cur_nll = base_nll;
+
+    // Optional held-out SELECT logits & states so trees are accepted ONLY on OOS NLL gain (`BUG-R17`).
+    let (mut sel_logits, sel_states, mut cur_sel_nll) = if let Some((sx, sz, snc)) = select_eval {
+        let ns = sx.first().map_or(0, Vec::len);
+        let mut sl = vec![0.0; ns * n_states];
+        let mut ss = vec![k_bins; ns];
+        for r in 0..ns {
+            let mut mu = 0.0;
+            for (p_i, &pf) in cond.predecessors.iter().enumerate() {
+                let zv = sz[pf][r];
+                if zv.is_finite() {
+                    mu += cond.copula_weights[p_i] * zv;
+                }
+            }
+            copula_base_logits(
+                &cond.z_edges,
+                mu,
+                cond.copula_cond_sd,
+                cond.base_missing_prob,
+                &mut sl[r * n_states..(r + 1) * n_states],
+            );
+            let zc = sz[cond.col_idx][r];
+            if zc.is_finite() {
+                ss[r] = cond.z_edges[1..k_bins]
+                    .partition_point(|&e| e < zc)
+                    .min(k_bins - 1);
+            }
+        }
+        let s0 = mean_state_nll(&sl, &ss, n_states);
+        (Some((sx, snc, sl)), ss, s0)
+    } else {
+        (None, Vec::new(), f64::INFINITY)
+    };
 
     for _t in 0..max_trees {
         for r in 0..n {
@@ -369,41 +405,53 @@ pub fn fit_catf_trees(
             leaf_values,
             n_states,
         };
-        // Apply candidate tree and keep ONLY if log-likelihood improves (zero-regression guard!).
         let mut next_logits = logits.clone();
-        for r in 0..n {
-            let lf = row_leaf[r];
-            if tree.hermite_mode {
-                let base = lf * 4;
-                let (c1, c2, c3, cm) = (
-                    tree.leaf_values[base],
-                    tree.leaf_values[base + 1],
-                    tree.leaf_values[base + 2],
-                    tree.leaf_values[base + 3],
-                );
-                for (b, &z) in cond.z_centers.iter().enumerate().take(k_bins) {
-                    next_logits[r * n_states + b] +=
-                        c1 * z + c2 * (z * z - 1.0) + c3 * (z * z * z - 3.0 * z);
-                }
-                next_logits[r * n_states + k_bins] += cm;
-            } else {
-                let base = lf * n_states;
-                for s in 0..n_states {
-                    next_logits[r * n_states + s] += tree.leaf_values[base + s];
-                }
-            }
+        for (r, &lf) in row_leaf.iter().enumerate().take(n) {
+            apply_tree_leaf_row(
+                &tree,
+                lf,
+                &cond.z_centers,
+                k_bins,
+                n_states,
+                &mut next_logits[r * n_states..(r + 1) * n_states],
+            );
         }
         let next_nll = mean_state_nll(&next_logits, target_states, n_states);
-        // Minimum NLL gain for Hermite tilts scaled gently so real nonlinearities pass on medium n
-        // while keeping BIC guard against overfitting pure independent noise (BUG-R8).
         let min_gain = if use_hermite {
             ((nl * 2) as f64 / (4.0 * n.max(1) as f64)).clamp(0.0005, 0.015)
         } else {
             1e-4
         };
-        if next_nll < cur_nll - min_gain {
+        let mut accept = next_nll < cur_nll - min_gain;
+        let mut next_sel_opt: Option<(Vec<f64>, f64)> = None;
+        if accept {
+            if let Some((sx, snc, ref sl)) = sel_logits {
+                let (nsl, sn) = eval_tree_on_select(
+                    &tree,
+                    sx,
+                    snc,
+                    sl,
+                    &sel_states,
+                    &cond.z_centers,
+                    k_bins,
+                    n_states,
+                );
+                if sn < cur_sel_nll - 1e-4 {
+                    next_sel_opt = Some((nsl, sn));
+                } else {
+                    accept = false;
+                }
+            }
+        }
+        if accept {
             logits = next_logits;
             cur_nll = next_nll;
+            if let Some((nsl, sn)) = next_sel_opt {
+                if let Some((_, _, ref mut sl)) = sel_logits {
+                    *sl = nsl;
+                }
+                cur_sel_nll = sn;
+            }
             cond.trees.push(tree);
         } else {
             break;

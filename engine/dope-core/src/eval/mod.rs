@@ -299,6 +299,19 @@ fn observed(data: &ModelData, cap: usize) -> Vec<usize> {
     rows.into_iter().step_by(stride).collect()
 }
 
+/// Fit one named native auditor (`linear`, `linear-seeded-v1`, `gbdt`, `mlp`, `mlp-seeded-v1`)
+/// on `(x, y)` and return held-out predictions on `test`.
+pub fn fit_predict_auditor(
+    name: &str,
+    head: Head,
+    x: &Matrix,
+    y: &[f64],
+    test: &Matrix,
+    seed: u64,
+) -> Result<Vec<f64>> {
+    run_auditor(name, head, x, y, test, seed)
+}
+
 fn run_auditor(
     name: &str,
     head: Head,

@@ -4,12 +4,13 @@
 //! synthetic probes weighted by `clip(agreement * support, 0.2, 1.0)`), refitting regression
 //! residual noise / classification temperature strictly on sealed `SELECT`/`CAL` (`T01`, `T10`).
 
-use super::main_effects::{targets_to_logits, MainEffectSet};
-use super::pairs::{add_pair_logits, mine_pairs, PairEffect};
+use super::main_effects::{fit_temperature_and_bias, MainEffectSet, MAIN_BINS};
+use super::pairs::{add_pair_logits, mine_pairs_fisher, PairEffect};
 use crate::forest::{
-    boost_soft, column_codes, predict_columns, Forest, SoftBoostOptions, SoftSplit,
+    boost, boost_soft, column_codes, predict_columns, soft_loss, BoostOptions, Forest,
+    SoftBoostOptions, SoftSplit, Split,
 };
-use crate::target::{log_sum_exp, Head};
+use crate::target::{loss as target_loss, Head};
 use crate::teacher::noise::TeacherResidualModel;
 use crate::teacher::panel::logits_to_expectations;
 use crate::teacher::CrossFittedTeacher;
@@ -17,6 +18,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug)]
 pub struct DistilConfig {
+    pub main_bins: usize,
     pub max_pairs: usize,
     pub depth: usize,
     pub bits: u8,
@@ -30,8 +32,9 @@ pub struct DistilConfig {
 impl Default for DistilConfig {
     fn default() -> Self {
         Self {
-            max_pairs: 12,
-            depth: 6,
+            main_bins: MAIN_BINS,
+            max_pairs: 8,
+            depth: 5,
             bits: 8,
             max_trees: 600,
             forest_byte_cap: Some(48_000),
@@ -44,6 +47,25 @@ impl Default for DistilConfig {
 
 fn default_forest() -> Forest {
     Forest::empty(1)
+}
+
+fn col_means(x: &[Vec<f64>]) -> Vec<f64> {
+    x.iter()
+        .map(|col| {
+            let (mut s, mut cnt) = (0.0, 0usize);
+            for &v in col {
+                if v.is_finite() {
+                    s += v;
+                    cnt += 1;
+                }
+            }
+            if cnt > 0 {
+                s / cnt as f64
+            } else {
+                0.5
+            }
+        })
+        .collect()
 }
 
 /// Complete distilled conditional model `Q_{Y|X}`: purified `main` + `pairs` + oblivious forest
@@ -121,23 +143,7 @@ impl DistilledStudent {
         let n_build = build_x.first().map_or(0, Vec::len);
         let n_probe = probe_x.first().map_or(0, Vec::len).min(200_000);
 
-        let impute: Vec<f64> = (0..d)
-            .map(|j| {
-                let mut s = 0.0;
-                let mut cnt = 0usize;
-                for &v in &build_x[j] {
-                    if v.is_finite() {
-                        s += v;
-                        cnt += 1;
-                    }
-                }
-                if cnt > 0 {
-                    s / cnt as f64
-                } else {
-                    0.5
-                }
-            })
-            .collect();
+        let impute = col_means(build_x);
 
         // Score `Q_X` probes with the retained `K=5` cross-fitted teacher ensemble.
         let (probe_t, probe_agr) = teacher.predict_probes(probe_x);
@@ -178,21 +184,29 @@ impl DistilledStudent {
             (tr_x.clone(), tr_t.clone(), tr_w.clone())
         };
 
-        // Stage 1: Purified `target.main` across ALL columns.
-        let main_effects = MainEffectSet::fit(head, &tr_x, &tr_t, &tr_w, &impute);
+        // Stage 1: Purified `target.main` across ALL columns (budget-adaptive knot count).
+        let main_effects =
+            MainEffectSet::fit_with_bins(head, &tr_x, &tr_t, &tr_w, &impute, cfg.main_bins);
         let mut base_tr = main_effects.predict_logits(&tr_x, &impute);
         let mut base_mon = main_effects.predict_logits(&mon_x, &impute);
 
-        // Stage 2: Purified `target.pairs` on residual teacher logits.
-        let target_logits = targets_to_logits(head, &tr_t, n_tr);
-        let res_tr: Vec<f64> = target_logits
-            .iter()
-            .zip(&base_tr)
-            .map(|(&t, &b)| t - b)
-            .collect();
-        let pair_effects = mine_pairs(&tr_x, &res_tr, &tr_w, &impute, o, cfg.max_pairs);
-        add_pair_logits(&pair_effects, &tr_x, &impute, &mut base_tr);
-        add_pair_logits(&pair_effects, &mon_x, &impute, &mut base_mon);
+        // Stage 2: Fisher-weighted `target.pairs` gated by held-out `mon` soft loss (no ln(1e-4) spikes!).
+        let cand_pairs =
+            mine_pairs_fisher(head, &tr_x, &base_tr, &tr_t, &tr_w, &impute, cfg.max_pairs);
+        let pair_effects = if !cand_pairs.is_empty() {
+            let l0 = soft_loss(head, &base_mon, &mon_t, &mon_w);
+            let mut bm_try = base_mon.clone();
+            add_pair_logits(&cand_pairs, &mon_x, &impute, &mut bm_try);
+            if soft_loss(head, &bm_try, &mon_t, &mon_w) + 1e-4 < l0 {
+                add_pair_logits(&cand_pairs, &tr_x, &impute, &mut base_tr);
+                base_mon = bm_try;
+                cand_pairs
+            } else {
+                Vec::new()
+            }
+        } else {
+            Vec::new()
+        };
 
         // Stage 3: Weighted soft-target oblivious vector-leaf student (`boost_soft`).
         let tr_rows: Vec<usize> = (0..n_tr).collect();
@@ -225,15 +239,6 @@ impl DistilledStudent {
                 ..Default::default()
             },
         );
-        let forest_trees = boosted.forest.trees();
-        let forest_bytes = Forest::byte_len(
-            forest_trees,
-            boosted.forest.depth,
-            o,
-            boosted.forest.bits,
-            d,
-        );
-
         let mut student = Self {
             head,
             d,
@@ -241,15 +246,199 @@ impl DistilledStudent {
             main_effects,
             pair_effects,
             forest: boosted.forest,
-            forest_trees,
-            forest_bytes,
+            forest_trees: 0,
+            forest_bytes: 0,
             temperature: 1.0,
             residual_model: None,
         };
-
-        // Stage 4: Refit regression noise or classification temperature strictly on `SELECT`/`CAL`.
+        // Prune student.forest prefix on real held-out CAL loss to prevent probe over-boosting.
+        student.prune_prefix_on_cal(cal_x, cal_y);
+        student.forest_trees = student.forest.trees();
+        student.forest_bytes = Forest::byte_len(
+            student.forest_trees,
+            student.forest.depth,
+            o,
+            student.forest.bits,
+            d,
+        );
         student.refit_calibration(cal_x, cal_y);
         student
+    }
+
+    /// Direct-label regularized `MainEffectSet + Oblivious Forest` candidate trained strictly on
+    /// `(train_x, train_y)` and early-stopped/calibrated on `CAL` (`T10` direct-label control).
+    pub fn fit_direct(
+        head: Head,
+        train_x: &[Vec<f64>],
+        train_y: &[f64],
+        cal_x: &[Vec<f64>],
+        cal_y: &[f64],
+        cfg: &DistilConfig,
+    ) -> Self {
+        let d = train_x.len();
+        let n = train_y.len();
+        let o = head.outputs();
+        let impute = col_means(train_x);
+        let soft_y: Vec<f64> = match head {
+            Head::Regression => train_y.to_vec(),
+            Head::Binary => train_y.iter().map(|&v| v.clamp(0.0, 1.0)).collect(),
+            Head::Multiclass(k) => {
+                let mut out = vec![0.0; n * k];
+                for r in 0..n {
+                    out[r * k + (train_y[r].round() as usize).min(k - 1)] = 1.0;
+                }
+                out
+            }
+        };
+        let ones = vec![1.0; n];
+        // Hold out an internal 15% monitor slice of `train` so `cal_x`/`cal_y` stays strictly
+        // unbiased for T10 selection between `distilled` and `direct` (zero winner's curse!).
+        let mut tr_rows = Vec::with_capacity(n);
+        let mut val_rows = Vec::with_capacity(n / 6 + 1);
+        for r in 0..n {
+            if n >= 40 && r % 7 == 0 {
+                val_rows.push(r);
+            } else {
+                tr_rows.push(r);
+            }
+        }
+        let sub_x: Vec<Vec<f64>> = (0..d)
+            .map(|j| tr_rows.iter().map(|&r| train_x[j][r]).collect())
+            .collect();
+        let sub_y: Vec<f64> = tr_rows.iter().map(|&r| train_y[r]).collect();
+        let val_x: Vec<Vec<f64>> = (0..d)
+            .map(|j| val_rows.iter().map(|&r| train_x[j][r]).collect())
+            .collect();
+        let val_y: Vec<f64> = val_rows.iter().map(|&r| train_y[r]).collect();
+        let main_effects =
+            MainEffectSet::fit_with_bins(head, train_x, &soft_y, &ones, &impute, cfg.main_bins);
+        let (b_tr_x, b_tr_y, b_va_x, b_va_y) = if val_rows.len() >= 12 {
+            (
+                sub_x.as_slice(),
+                sub_y.as_slice(),
+                val_x.as_slice(),
+                val_y.as_slice(),
+            )
+        } else {
+            (train_x, train_y, cal_x, cal_y)
+        };
+        let base_tr = main_effects.predict_logits(b_tr_x, &impute);
+        let base_va = main_effects.predict_logits(b_va_x, &impute);
+        let b_tr_idx: Vec<usize> = (0..b_tr_y.len()).collect();
+        let b_va_idx: Vec<usize> = (0..b_va_y.len()).collect();
+        let tr_codes = column_codes(b_tr_x, &b_tr_idx, &impute);
+        let va_codes = column_codes(b_va_x, &b_va_idx, &impute);
+        let eff_depth = if n < 400 && matches!(head, Head::Multiclass(_)) {
+            cfg.depth.min(4)
+        } else {
+            cfg.depth
+        };
+        let boosted = boost(
+            head,
+            d,
+            &Split {
+                codes: &tr_codes,
+                base: &base_tr,
+                y: b_tr_y,
+            },
+            &Split {
+                codes: &va_codes,
+                base: &base_va,
+                y: b_va_y,
+            },
+            &BoostOptions {
+                depth: eff_depth,
+                bits: cfg.bits,
+                eta: cfg.eta,
+                lambda: cfg.lambda.max(2.0),
+                max_trees: cfg.max_trees.min(220),
+                patience: 25,
+                min_rows: 10.min((b_tr_y.len() / 10).max(2)),
+                sample_rows: 20_000,
+                seed: cfg.seed ^ 0xD1EC,
+            },
+        );
+        let best_t = boosted
+            .val_path
+            .iter()
+            .enumerate()
+            .min_by(|a, b| a.1.total_cmp(b.1).then(a.0.cmp(&b.0)))
+            .map_or(0, |(t, _)| t);
+        let forest = boosted.forest.truncate(best_t);
+        let mut st = Self {
+            head,
+            d,
+            impute,
+            main_effects,
+            pair_effects: Vec::new(),
+            forest,
+            forest_trees: 0,
+            forest_bytes: 0,
+            temperature: 1.0,
+            residual_model: None,
+        };
+        st.prune_prefix_on_cal(cal_x, cal_y);
+        st.forest_trees = st.forest.trees();
+        st.forest_bytes = Forest::byte_len(st.forest_trees, st.forest.depth, o, st.forest.bits, d);
+        st.refit_calibration(cal_x, cal_y);
+        st
+    }
+
+    fn prune_prefix_on_cal(&mut self, cal_x: &[Vec<f64>], cal_y: &[f64]) {
+        let total = self.forest.trees();
+        if total <= 4 || cal_y.len() < 16 {
+            return;
+        }
+        let mut base = self.main_effects.predict_logits(cal_x, &self.impute);
+        add_pair_logits(&self.pair_effects, cal_x, &self.impute, &mut base);
+        let rows: Vec<usize> = (0..cal_y.len()).collect();
+        let codes = column_codes(cal_x, &rows, &self.impute);
+        let mut best_t = total;
+        let mut best_l = f64::INFINITY;
+        let mut loss_zero = f64::INFINITY;
+        let mut cands = vec![
+            0usize, 2, 4, 8, 12, 18, 26, 38, 56, 80, 120, 180, 260, total,
+        ];
+        cands.retain(|&k| k <= total);
+        cands.sort_unstable();
+        cands.dedup();
+        for k in cands {
+            let mut logits = base.clone();
+            if k > 0 {
+                let sub = self.forest.truncate(k);
+                let f_out = predict_columns(&sub, &codes, self.d, cal_y.len());
+                for (dst, src) in logits.iter_mut().zip(f_out) {
+                    *dst += src;
+                }
+            }
+            let l = target_loss(self.head, &logits, cal_y);
+            if k == 0 {
+                loss_zero = l;
+            } else if l + 1e-4 < best_l {
+                best_l = l;
+                best_t = k;
+            }
+        }
+        if loss_zero + 1e-3 < best_l {
+            best_t = 0;
+        }
+        if best_t < total {
+            self.forest = self.forest.truncate(best_t);
+        }
+    }
+
+    /// Evaluate calibrated held-out loss on `(cal_x, cal_y)` for candidate selection (`T10`).
+    pub fn cal_loss(&self, cal_x: &[Vec<f64>], cal_y: &[f64]) -> f64 {
+        if cal_y.is_empty() {
+            return f64::INFINITY;
+        }
+        let mut logits = self.predict_logits(cal_x);
+        if self.head != Head::Regression && (self.temperature - 1.0).abs() > 1e-9 {
+            for v in &mut logits {
+                *v /= self.temperature;
+            }
+        }
+        target_loss(self.head, &logits, cal_y)
     }
 
     /// Refit regression residual model or classification temperature (+ prior intercept alignment)
@@ -264,7 +453,11 @@ impl DistilledStudent {
                 self.residual_model = Some(TeacherResidualModel::fit_oof(cal_y, &cal_logits));
             }
             Head::Binary | Head::Multiclass(_) => {
-                self.temperature = fit_temperature(self.head, &cal_logits, cal_y);
+                let (t_opt, b_shift) = fit_temperature_and_bias(self.head, &cal_logits, cal_y);
+                self.temperature = t_opt;
+                for (dst, db) in self.main_effects.intercept.iter_mut().zip(b_shift) {
+                    *dst += db * t_opt;
+                }
             }
         }
     }
@@ -293,41 +486,4 @@ impl DistilledStudent {
         }
         logits_to_expectations(self.head, &logits)
     }
-}
-
-fn fit_temperature(head: Head, logits: &[f64], y: &[f64]) -> f64 {
-    let n = y.len();
-    let o = head.outputs();
-    let mut best_t = 1.0;
-    let mut best_nll = f64::INFINITY;
-    for &t in &[0.35, 0.5, 0.7, 0.85, 1.0, 1.2, 1.5, 2.0, 2.8, 4.0] {
-        let mut nll = 0.0;
-        match head {
-            Head::Binary => {
-                for r in 0..n {
-                    let z = logits[r] / t;
-                    let ce = if z >= 0.0 {
-                        z + (-z).exp().ln_1p()
-                    } else {
-                        z.exp().ln_1p()
-                    } - y[r].clamp(0.0, 1.0) * z;
-                    nll += ce;
-                }
-            }
-            Head::Multiclass(k) => {
-                for r in 0..n {
-                    let row: Vec<f64> = (0..k).map(|c| logits[r * o + c] / t).collect();
-                    let lse = log_sum_exp(&row);
-                    let c = (y[r].round() as usize).min(k - 1);
-                    nll += lse - row[c];
-                }
-            }
-            Head::Regression => return 1.0,
-        }
-        if nll < best_nll {
-            best_nll = nll;
-            best_t = t;
-        }
-    }
-    best_t
 }

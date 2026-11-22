@@ -321,6 +321,14 @@ impl GbdtMember {
         let bv: Vec<f64> = (0..va.len())
             .flat_map(|_| base_bias.iter().copied())
             .collect();
+        let small_mc = matches!(head, Head::Multiclass(k) if tr.len() < k * 60);
+        let eff_depth = if small_mc {
+            depth.min(3)
+        } else if tr.len() < 120 {
+            depth.min(4)
+        } else {
+            depth
+        };
         let boosted = boost(
             head,
             d,
@@ -335,13 +343,13 @@ impl GbdtMember {
                 y: &yv,
             },
             &BoostOptions {
-                depth,
+                depth: eff_depth,
                 bits: 8,
-                eta: 0.15,
-                lambda: 1.0,
+                eta: if tr.len() < 200 { 0.10 } else { 0.15 },
+                lambda: if small_mc { 3.0 } else { 1.0 },
                 max_trees,
-                patience: 20,
-                min_rows: 10.min((tr.len() / 6).max(2)),
+                patience: 25,
+                min_rows: 10.min((tr.len() / 8).max(2)),
                 sample_rows: 20_000,
                 seed,
             },
@@ -381,31 +389,36 @@ pub struct KnnMember {
     head: Head,
     d: usize,
     k_nn: usize,
-    ref_x: Vec<Vec<f64>>, // [m][d]
+    ref_x: Vec<Vec<f64>>, // [m][d] standardized
     ref_y: Vec<f64>,
     impute: Vec<f64>,
+    inv_std: Vec<f64>,
 }
 
 impl KnnMember {
     pub fn fit(head: Head, x: &[Vec<f64>], y: &[f64], rows: &[usize], seed: u64) -> Self {
         let d = x.len();
-        let impute: Vec<f64> = (0..d)
-            .map(|j| {
-                let mut s = 0.0;
-                let mut cnt = 0usize;
-                for &r in rows {
-                    if x[j][r].is_finite() {
-                        s += x[j][r];
-                        cnt += 1;
-                    }
+        let mut impute = vec![0.5; d];
+        let mut inv_std = vec![1.0; d];
+        for j in 0..d {
+            let (mut s, mut cnt) = (0.0, 0usize);
+            for &r in rows {
+                if x[j][r].is_finite() {
+                    s += x[j][r];
+                    cnt += 1;
                 }
-                if cnt > 0 {
-                    s / cnt as f64
-                } else {
-                    0.5
+            }
+            let mu = if cnt > 0 { s / cnt as f64 } else { 0.5 };
+            impute[j] = mu;
+            let mut v = 0.0;
+            for &r in rows {
+                if x[j][r].is_finite() {
+                    let dv = x[j][r] - mu;
+                    v += dv * dv;
                 }
-            })
-            .collect();
+            }
+            inv_std[j] = 1.0 / (v / cnt.max(1) as f64).sqrt().max(1e-4);
+        }
         let mut chosen = rows.to_vec();
         if chosen.len() > 2048 {
             let mut rng = Rng::new(seed ^ 0x4444);
@@ -417,11 +430,12 @@ impl KnnMember {
             .map(|&r| {
                 (0..d)
                     .map(|j| {
-                        if x[j][r].is_finite() {
+                        let v = if x[j][r].is_finite() {
                             x[j][r]
                         } else {
                             impute[j]
-                        }
+                        };
+                        ((v - impute[j]) * inv_std[j]).clamp(-6.0, 6.0)
                     })
                     .collect()
             })
@@ -434,6 +448,7 @@ impl KnnMember {
             ref_x,
             ref_y,
             impute,
+            inv_std,
         }
     }
 
@@ -444,11 +459,12 @@ impl KnnMember {
         let mut dists: Vec<(f64, usize)> = Vec::with_capacity(self.ref_x.len());
         for (i, &r) in rows.iter().enumerate() {
             for j in 0..self.d {
-                q[j] = if x[j][r].is_finite() {
+                let v = if x[j][r].is_finite() {
                     x[j][r]
                 } else {
                     self.impute[j]
                 };
+                q[j] = ((v - self.impute[j]) * self.inv_std[j]).clamp(-6.0, 6.0);
             }
             dists.clear();
             for (idx, rx) in self.ref_x.iter().enumerate() {

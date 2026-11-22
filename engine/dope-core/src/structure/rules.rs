@@ -148,10 +148,10 @@ pub fn mine_structural_rules(
             .then(j.cmp(&i))
     });
     for c in arith_order {
-        if locked_child[c] || is_parent[c] {
+        if is_discrete[c] || locked_child[c] || is_parent[c] {
             continue;
         }
-        let tol = (0.002 * col_span(&build_x[c])).max(1e-4);
+        let tol = (1e-4 * col_span(&build_x[c])).max(1e-6);
         let mut found = None;
         'pairs: for pa in 0..scan_d {
             if pa == c || locked_child[pa] {
@@ -260,10 +260,15 @@ fn try_fd1(
     c: usize,
     support_k: usize,
 ) -> Option<StructuralRule> {
-    let mut counts: BTreeMap<i64, BTreeMap<i64, usize>> = BTreeMap::new();
+    let mut counts: BTreeMap<i64, BTreeMap<i64, (usize, f64)>> = BTreeMap::new();
     for r in 0..bx[0].len() {
         if let (Some(kp), Some(kc)) = (qkey(bx[p][r]), qkey(bx[c][r])) {
-            *counts.entry(kp).or_default().entry(kc).or_insert(0) += 1;
+            let e = counts
+                .entry(kp)
+                .or_default()
+                .entry(kc)
+                .or_insert((0, bx[c][r]));
+            e.0 += 1;
         }
     }
     if counts.is_empty() || counts.len() > 64 {
@@ -272,13 +277,13 @@ fn try_fd1(
     let mut map = BTreeMap::new();
     let (mut ok_b, mut tot_b) = (0usize, 0usize);
     for (kp, ch) in counts {
-        let tot: usize = ch.values().sum();
+        let tot: usize = ch.values().map(|&(cnt, _)| cnt).sum();
         if tot < support_k {
             continue;
         }
-        let (&best_k, &best_n) = ch.iter().max_by_key(|&(_, &cnt)| cnt)?;
+        let (_, &(best_n, exact_v)) = ch.iter().max_by_key(|&(_, &(cnt, _))| cnt)?;
         if best_n as f64 / tot as f64 >= 0.995 {
-            map.insert(kp, best_k as f64 / 1e4);
+            map.insert(kp, exact_v);
             ok_b += best_n;
             tot_b += tot;
         } else {
@@ -290,10 +295,10 @@ fn try_fd1(
     }
     let (mut ok_s, mut tot_s) = (0usize, 0usize);
     for r in 0..sx[0].len() {
-        if let (Some(kp), Some(kc)) = (qkey(sx[p][r]), qkey(sx[c][r])) {
+        if let (Some(kp), true) = (qkey(sx[p][r]), sx[c][r].is_finite()) {
             if let Some(&v) = map.get(&kp) {
                 tot_s += 1;
-                if (kc as f64 / 1e4 - v).abs() <= 1e-3 {
+                if (sx[c][r] - v).abs() <= 1e-4 {
                     ok_s += 1;
                 }
             }
@@ -320,10 +325,15 @@ fn try_fd2(
     c: usize,
     support_k: usize,
 ) -> Option<StructuralRule> {
-    let mut counts: BTreeMap<(i64, i64), BTreeMap<i64, usize>> = BTreeMap::new();
+    let mut counts: BTreeMap<(i64, i64), BTreeMap<i64, (usize, f64)>> = BTreeMap::new();
     for r in 0..bx[0].len() {
         if let (Some(ka), Some(kb), Some(kc)) = (qkey(bx[pa][r]), qkey(bx[pb][r]), qkey(bx[c][r])) {
-            *counts.entry((ka, kb)).or_default().entry(kc).or_insert(0) += 1;
+            let e = counts
+                .entry((ka, kb))
+                .or_default()
+                .entry(kc)
+                .or_insert((0, bx[c][r]));
+            e.0 += 1;
         }
     }
     if counts.len() < 2 || counts.len() > 128 {
@@ -331,13 +341,13 @@ fn try_fd2(
     }
     let mut map = BTreeMap::new();
     for (kpair, ch) in counts {
-        let tot: usize = ch.values().sum();
+        let tot: usize = ch.values().map(|&(cnt, _)| cnt).sum();
         if tot < support_k {
             continue;
         }
-        let (&best_k, &best_n) = ch.iter().max_by_key(|&(_, &cnt)| cnt)?;
+        let (_, &(best_n, exact_v)) = ch.iter().max_by_key(|&(_, &(cnt, _))| cnt)?;
         if best_n as f64 / tot as f64 >= 0.995 {
-            map.insert(kpair, best_k as f64 / 1e4);
+            map.insert(kpair, exact_v);
         } else {
             return None;
         }
@@ -347,10 +357,11 @@ fn try_fd2(
     }
     let (mut ok_s, mut tot_s) = (0usize, 0usize);
     for r in 0..sx[0].len() {
-        if let (Some(ka), Some(kb), Some(kc)) = (qkey(sx[pa][r]), qkey(sx[pb][r]), qkey(sx[c][r])) {
+        if let (Some(ka), Some(kb), true) = (qkey(sx[pa][r]), qkey(sx[pb][r]), sx[c][r].is_finite())
+        {
             if let Some(&v) = map.get(&(ka, kb)) {
                 tot_s += 1;
-                if (kc as f64 / 1e4 - v).abs() <= 1e-3 {
+                if (sx[c][r] - v).abs() <= 1e-4 {
                     ok_s += 1;
                 }
             }
@@ -426,7 +437,7 @@ fn try_arith(
     }
     let rb = ok_b as f64 / tot_b as f64;
     let rs = ok_s as f64 / tot_s as f64;
-    (rb >= 0.99 && rs >= 0.99).then_some(StructuralRule::Arith {
+    (rb >= 0.995 && rs >= 0.995).then_some(StructuralRule::Arith {
         pa,
         pb,
         child: c,

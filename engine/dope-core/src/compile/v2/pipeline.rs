@@ -5,26 +5,25 @@
 //! `LearningSignatureV1` + `P+` damped-Newton projection + `ridge_certificate` -> Format 2 binary
 //! encode + verified decode round-trip (`G-01`, `G-02`, `G-05`).
 
-use super::backoff::run_privacy_backoff;
+use super::backoff::apply_standardized_privacy_backoff;
 use super::project::project_moments_damped_newton;
 use super::roles::CompilerRoles;
+use super::{build_embed_summary, compact_marginals, prune_catf_copula, prune_main_effects};
 use crate::artifact::format2::TierPrefixEntry;
 use crate::artifact::format2_codec::{
-    decode_format2_program, encode_format2_program, Format2Program, FORMAT2_EMBED_SUMMARY_DIM,
+    decode_format2_program, encode_format2_program, Format2Program,
 };
 use crate::audit::{ridge_certificate, LearningSignatureV1};
 use crate::budget::ModelSize;
 use crate::catf::{CatfConfig, CatfModel};
 use crate::distil::{DistilConfig, DistilledStudent};
-use crate::dvs::v3::privacy::{
-    assess_empirical_privacy, EmpiricalPrivacyAssessment, EmpiricalPrivacyInput,
-};
 use crate::error::Result;
 use crate::marginal::atoms::DEFAULT_SUPPORT_K;
+use crate::marginal::lattice::is_f32_heritage;
 use crate::marginal::v2::tier_discrete_cap;
 use crate::schema::{infer, IntakeOptions, Kind, Task};
 use crate::structure::RuleMode;
-use crate::table::RawTable;
+use crate::table::{parse_number, RawTable};
 use crate::target::Head;
 use crate::teacher::exchange::TeacherExchangeBundle;
 use crate::teacher::{CrossFittedTeacher, TeacherConfig};
@@ -95,59 +94,6 @@ fn slice_vec(v: &[f64], rows: &[usize]) -> Vec<f64> {
     rows.iter().map(|&r| v[r]).collect()
 }
 
-#[allow(clippy::too_many_arguments)]
-fn build_embed_summary(
-    n_fit: usize,
-    budget_bytes: usize,
-    catf: &CatfModel,
-    student: &DistilledStudent,
-    ess: f64,
-    gap_raw: f64,
-    gap_rew: f64,
-    ridge_risk: f64,
-) -> [f64; FORMAT2_EMBED_SUMMARY_DIM] {
-    let d = catf.marginals.len();
-    let n_disc = catf
-        .marginals
-        .iter()
-        .filter(|m| matches!(m, crate::marginal::v2::ColumnMarginalV2::Discrete { .. }))
-        .count();
-    let catf_trees: usize = catf.conditionals.iter().map(|c| c.trees.len()).sum();
-    let mean_sd = if catf.conditionals.is_empty() {
-        1.0
-    } else {
-        catf.conditionals
-            .iter()
-            .map(|c| c.copula_cond_sd)
-            .sum::<f64>()
-            / catf.conditionals.len() as f64
-    };
-    let head_code = match student.head {
-        Head::Regression => 0.0,
-        Head::Binary => 1.0,
-        Head::Multiclass(k) => 2.0 + (k as f64) * 0.01,
-    };
-    let mut s = [0.0; FORMAT2_EMBED_SUMMARY_DIM];
-    s[0] = (n_fit as f64).max(1.0).ln();
-    s[1] = (budget_bytes as f64).max(1.0).ln();
-    s[2] = d as f64;
-    s[3] = (d as f64 + 1.0).ln();
-    s[4] = if d > 0 { n_disc as f64 / d as f64 } else { 0.0 };
-    s[5] = catf.rules.rules.len() as f64;
-    s[6] = catf_trees as f64;
-    s[7] = mean_sd;
-    s[8] = head_code;
-    s[9] = student.main_effects.effects.len() as f64;
-    s[10] = student.pair_effects.len() as f64;
-    s[11] = student.forest.trees() as f64;
-    s[12] = student.temperature;
-    s[13] = ess;
-    s[14] = gap_raw;
-    s[15] = gap_rew;
-    s[16] = ridge_risk.min(10.0);
-    s
-}
-
 /// Compile a `RawTable` through the complete Fidelity Engine 2.0 pipeline into a verified
 /// `.dope` Format 2 binary artifact.
 pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<FittedV2> {
@@ -163,6 +109,26 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
     };
     let mut schema = infer(table, target, &intake)?;
     let data = schema.to_model(table)?;
+    let raw_f32 = |name: &str| -> bool {
+        table
+            .headers
+            .iter()
+            .position(|h| h == name)
+            .is_some_and(|c| {
+                let vals: Vec<f64> = table.columns[c]
+                    .iter()
+                    .filter_map(|s| parse_number(s))
+                    .collect();
+                is_f32_heritage(&vals)
+            })
+    };
+    let mut col_f32_heritage: Vec<bool> = schema
+        .features
+        .iter()
+        .map(|f| matches!(f.kind, Kind::Numeric(_)) && raw_f32(&f.name))
+        .collect();
+    col_f32_heritage
+        .push(matches!(schema.target.kind, Kind::Numeric(_)) && raw_f32(&schema.target.name));
     if opts.anonymize {
         for (i, f) in schema.features.iter_mut().enumerate() {
             f.name = format!("f{i}");
@@ -189,212 +155,240 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
         .collect();
 
     // 1. Disjoint BUILD / SELECT / CAL roles under Rule A-1 duplicate grouping.
+    // Fit final model on BUILD and SELECT (80% of n_fit, CL-11) while keeping CAL (20%) isolated!
     let roles = CompilerRoles::split(&data.x, &data.y, opts.seed);
+    let mut train_rows = Vec::with_capacity(roles.build_rows.len() + roles.select_rows.len());
+    train_rows.extend_from_slice(&roles.build_rows);
+    train_rows.extend_from_slice(&roles.select_rows);
     let build_x = slice_cols(&data.x, &roles.build_rows);
-    let build_y = slice_vec(&data.y, &roles.build_rows);
     let select_x = slice_cols(&data.x, &roles.select_rows);
+    let train_x = slice_cols(&data.x, &train_rows);
+    let train_y = slice_vec(&data.y, &train_rows);
     let cal_x = slice_cols(&data.x, &roles.cal_rows);
     let cal_y = slice_vec(&data.y, &roles.cal_rows);
 
     // 2. Column realism + pre-CATF structural rules + zero-byte calibrated copula + CATF.
-    let max_catf_trees = if budget_bytes <= 8_192 {
+    let catf_cap = if budget_bytes <= 4_500 {
+        0
+    } else if budget_bytes <= 8_192 {
         2
     } else if budget_bytes <= 32_768 {
-        4
+        6
     } else {
+        10
+    };
+    let max_catf_trees = ((budget_bytes / 4) / (d.max(1) * 140)).min(catf_cap);
+    let max_knots = if budget_bytes <= 2_500 {
+        6
+    } else if budget_bytes <= 4_500 {
+        10
+    } else if budget_bytes <= 16_384 {
+        16
+    } else {
+        24
+    };
+    let max_copula_preds = if budget_bytes <= 2_500 {
+        4
+    } else if budget_bytes <= 4_500 {
         8
+    } else if budget_bytes <= 8_192 {
+        16
+    } else {
+        usize::MAX
     };
     let catf_cfg = CatfConfig {
         max_trees_per_col: max_catf_trees,
         max_depth: 3,
         support_k,
-        max_knots: if budget_bytes <= 8_192 { 16 } else { 24 },
+        max_knots,
         max_discrete: tier_discrete_cap(budget_bytes),
+        max_copula_preds,
         rule_mode: opts.rule_mode,
         ..Default::default()
     };
-    let catf = CatfModel::fit(&build_x, &select_x, &is_nominal, &catf_cfg);
+    let mut catf = CatfModel::fit(&build_x, &select_x, &is_nominal, &catf_cfg);
 
-    // 3. Cross-fitted K=5 teacher (native or verified external TeacherExchangeBundle).
+    // 3. Cross-fitted K=5 teacher on full BUILD and SELECT (80%, CL-11) or verified external bundle.
     let teacher = if let Some(ref dir) = opts.teacher_exchange_dir {
         let bundle = TeacherExchangeBundle::load_dir(dir)?;
-        CrossFittedTeacher::from_exchange(head, d, &build_y, &bundle)?
+        CrossFittedTeacher::from_exchange(head, d, &train_y, &bundle)?
     } else {
         let t_cfg = TeacherConfig {
             folds: 5,
-            max_trees_d4: if budget_bytes <= 8_192 { 40 } else { 80 },
-            max_trees_d6: if budget_bytes <= 8_192 { 40 } else { 80 },
+            max_trees_d4: if budget_bytes <= 8_192 { 60 } else { 120 },
+            max_trees_d6: if budget_bytes <= 8_192 { 80 } else { 180 },
             seed: opts.seed,
         };
-        CrossFittedTeacher::fit(head, &build_x, &build_y, &t_cfg)
+        CrossFittedTeacher::fit(head, &train_x, &train_y, &t_cfg)
     };
 
-    // 4. Synthetic probe pool Q_X + Distilled Student fitted within budget tree schedule.
-    let n_probes = (roles.build_rows.len() * 4).clamp(128, 4_096);
+    // 4. Synthetic probe pool Q_X + Distilled Student + direct-label T10 CAL control selector.
+    let n_probes = (train_rows.len() * 8).clamp(512, 16_384);
     let probe_x = catf.sample_x(n_probes, opts.seed ^ 0xA11CE, 1);
-    let max_student_trees = if budget_bytes <= 8_192 {
-        24
-    } else if budget_bytes <= 32_768 {
-        80
+    let max_student_trees = if budget_bytes <= 4_500 {
+        48
+    } else if budget_bytes <= 16_384 {
+        120
     } else if budget_bytes <= 131_072 {
-        240
+        360
     } else {
-        600
+        800
     };
-    let student = DistilledStudent::fit(
-        &teacher,
-        &build_x,
-        &probe_x,
-        &cal_x,
-        &cal_y,
-        &DistilConfig {
-            max_pairs: if budget_bytes <= 8_192 { 4 } else { 12 },
-            depth: if budget_bytes <= 8_192 { 4 } else { 5 },
-            bits: 8,
-            max_trees: max_student_trees,
-            forest_byte_cap: Some((budget_bytes / 2).max(1_024)),
-            eta: 0.15,
-            lambda: 1.0,
-            seed: opts.seed ^ 0xD157,
+    let distil_cfg = DistilConfig {
+        main_bins: if budget_bytes <= 2_500 {
+            2
+        } else if budget_bytes <= 4_500 {
+            3
+        } else if budget_bytes <= 16_384 {
+            4
+        } else {
+            5
         },
-    );
-
-    // 5. Empirical privacy capacity backoff ladder on (BUILD, CAL) (BUG-R9; non-DP / non-HIPAA).
-    let to_rows = |cols: &[Vec<f64>], cap: usize| -> Vec<Vec<f64>> {
-        let nr = cols.first().map_or(0, Vec::len).min(cap);
-        (0..nr)
-            .map(|r| {
-                cols.iter()
-                    .map(|c| if c[r].is_finite() { c[r] } else { 0.0 })
-                    .collect()
-            })
-            .collect()
+        max_pairs: if budget_bytes <= 8_192 { 0 } else { 4 },
+        depth: if budget_bytes <= 16_384 { 4 } else { 5 },
+        bits: if budget_bytes <= 16_384 { 6 } else { 7 },
+        max_trees: max_student_trees,
+        forest_byte_cap: Some((budget_bytes / 2).max(1_024)),
+        eta: 0.15,
+        lambda: 1.0,
+        seed: opts.seed ^ 0xD157,
     };
-    let mut catf = catf;
-    let mut student = student;
-    if roles.build_rows.len() >= 24 && roles.cal_rows.len() >= 16 {
-        let ra = to_rows(&build_x, 128);
-        let rb = to_rows(&cal_x, 128);
-        let base_st = student.forest.trees();
-        let base_catf_lens: Vec<usize> = catf.conditionals.iter().map(|c| c.trees.len()).collect();
-        let outcome = run_privacy_backoff(|step| {
-            let mut st_try = student.clone();
-            let keep_st = ((base_st as f64) * step.tree_fraction).round() as usize;
-            st_try.forest = student.forest.truncate(keep_st);
-            let mut c_try = catf.clone();
-            for (ci, cond) in c_try.conditionals.iter_mut().enumerate() {
-                let keep_c =
-                    ((base_catf_lens[ci] as f64) * step.catf_tree_fraction).round() as usize;
-                cond.trees.truncate(keep_c);
-            }
-            let sy = c_try.sample_with_student(&st_try, ra.len().max(64), opts.seed ^ 0x99, 3);
-            let input = EmpiricalPrivacyInput {
-                real_fit_a: ra.clone(),
-                real_holdout_b: rb.clone(),
-                synthetic: to_rows(&sy.x, 128),
-                min_emitted_support: step.support_k.max(support_k) as u64,
-                canary_rows: Vec::new(),
-                max_distance_pairs: 200_000,
-            };
-            assess_empirical_privacy(&input).unwrap_or(EmpiricalPrivacyAssessment {
-                dcr_closer_to_a_share: 0.5,
-                mia_auc: 0.5,
-                mia_tpr_at_1pct_fpr: 0.0,
-                exact_copies: 0,
-                exact_copies_twin_b: 0,
-                exact_copy_excess: 0.0,
-                canary_hits: 0,
-                min_emitted_support: step.support_k.max(support_k) as u64,
-                support_floor_k: 10,
-                pass: true,
-                formal_dp_state: "not_claimed",
-                hipaa_deidentification_state: "not_claimed",
-            })
-        });
-        if outcome.selected_step.step_index > 0 {
-            let st_k = ((base_st as f64) * outcome.selected_step.tree_fraction).round() as usize;
-            student.forest = student.forest.truncate(st_k);
-            student.forest_trees = student.forest.trees();
-            for (ci, cond) in catf.conditionals.iter_mut().enumerate() {
-                let ck = ((base_catf_lens[ci] as f64) * outcome.selected_step.catf_tree_fraction)
-                    .round() as usize;
-                cond.trees.truncate(ck);
-            }
-            student.refit_calibration(&cal_x, &cal_y);
+    let mut student =
+        DistilledStudent::fit(&teacher, &train_x, &probe_x, &cal_x, &cal_y, &distil_cfg);
+    if opts.teacher_exchange_dir.is_none() && cal_y.len() >= 16 {
+        let direct =
+            DistilledStudent::fit_direct(head, &train_x, &train_y, &cal_x, &cal_y, &distil_cfg);
+        if direct.cal_loss(&cal_x, &cal_y) + 1e-3 < student.cal_loss(&cal_x, &cal_y) {
+            student = direct;
         }
     }
 
+    // 5. Standardized (X, Y) empirical privacy backoff (BUG-R10 / PK-17; non-DP / non-HIPAA).
+    apply_standardized_privacy_backoff(
+        &mut catf,
+        &mut student,
+        &train_x,
+        &train_y,
+        &cal_x,
+        &cal_y,
+        support_k,
+        opts.seed,
+    );
+
     // 6. LearningSignatureV1 + P+ damped-Newton witness diagnostic + Ridge Certificate.
-    let synth_diag =
-        catf.sample_with_student(&student, roles.build_rows.len().max(128), opts.seed, 2);
-    let sig = LearningSignatureV1::fit(&build_x, &build_y);
+    let synth_diag = catf.sample_with_student(&student, train_rows.len().max(128), opts.seed, 2);
+    let sig = LearningSignatureV1::fit(&train_x, &train_y);
     let proj = project_moments_damped_newton(&sig, &synth_diag.x, &synth_diag.y, None);
     let cert = ridge_certificate(
-        &build_x,
-        &build_y,
+        &train_x,
+        &train_y,
         &synth_diag.x,
         &synth_diag.y,
         &cal_x,
         1e-1,
     );
 
-    // 7. Exact-artifact byte cap via binary search on `keep_trees` + post-truncation temp refit (BUG-R4).
-    let encode_with = |keep_trees: usize| -> Result<(Vec<u8>, Format2Program)> {
-        let mut st = student.clone();
-        st.forest = student.forest.truncate(keep_trees);
-        st.forest_trees = st.forest.trees();
-        st.forest_bytes = st.forest.to_bytes(d).len();
-        if keep_trees < student.forest.trees() {
-            st.refit_calibration(&cal_x, &cal_y);
-        }
-        let emb = build_embed_summary(
-            n,
-            budget_bytes,
-            &catf,
-            &st,
-            proj.ladder.ess,
-            proj.ladder.gap_raw_q,
-            proj.ladder.gap_reweighted,
-            cert.pred_rmse_diff,
-        );
-        let prog = Format2Program {
-            schema: schema.clone(),
-            n_fit: n as u64,
-            budget_bytes: budget_bytes as u32,
-            catf: catf.clone(),
-            student: st,
-            embed_summary: emb,
-        };
-        let tiers = vec![TierPrefixEntry {
-            tier_budget_bytes: budget_bytes as u32,
-            section_prefix_count: 9,
-            forest_trees_prefix: prog.student.forest_trees as u32,
-        }];
-        let b = encode_format2_program(&prog, tiers)?;
-        Ok((b, prog))
-    };
-    let max_t = student.forest.trees();
-    let (mut bytes, _best_prog) = encode_with(max_t)?;
-    if bytes.len() > budget_bytes && max_t > 0 {
-        let (mut lo, mut hi) = (0usize, max_t);
-        let mut best_k = 0usize;
-        while lo <= hi {
-            let mid = (lo + hi) / 2;
-            let (b_mid, _) = encode_with(mid)?;
-            if b_mid.len() <= budget_bytes {
-                best_k = mid;
-                bytes = b_mid;
-                lo = mid + 1;
-            } else if mid == 0 {
-                bytes = b_mid;
-                break;
-            } else {
-                hi = mid - 1;
+    // 7. Strict exact-artifact byte-cap enforcer: compact non-forest overhead if needed so
+    //    `bytes.len() <= budget_bytes` holds even at 2–4 KiB, while keeping predictive forest trees!
+    let encode_cfg =
+        |catf_ref: &CatfModel, st_base: &DistilledStudent, keep_trees: usize| -> Result<Vec<u8>> {
+            let mut st = st_base.clone();
+            st.forest = st_base.forest.truncate(keep_trees);
+            st.forest_trees = st.forest.trees();
+            st.forest_bytes = st.forest.to_bytes(d).len();
+            if keep_trees < st_base.forest.trees() {
+                st.refit_calibration(&cal_x, &cal_y);
             }
+            let emb = build_embed_summary(
+                n,
+                budget_bytes,
+                catf_ref,
+                &st,
+                proj.ladder.ess,
+                proj.ladder.gap_raw_q,
+                proj.ladder.gap_reweighted,
+                cert.pred_rmse_diff,
+            );
+            let prog = Format2Program {
+                schema: schema.clone(),
+                col_f32_heritage: col_f32_heritage.clone(),
+                n_fit: n as u64,
+                budget_bytes: budget_bytes as u32,
+                catf: catf_ref.clone(),
+                student: st,
+                embed_summary: emb,
+            };
+            let tiers = vec![TierPrefixEntry {
+                tier_budget_bytes: budget_bytes as u32,
+                section_prefix_count: 9,
+                forest_trees_prefix: prog.student.forest_trees as u32,
+            }];
+            encode_format2_program(&prog, tiers)
+        };
+    let fit_trees =
+        |catf_ref: &CatfModel, st_base: &DistilledStudent| -> Result<(usize, Vec<u8>)> {
+            let max_t = st_base.forest.trees();
+            let b_full = encode_cfg(catf_ref, st_base, max_t)?;
+            if b_full.len() <= budget_bytes || max_t == 0 {
+                return Ok((max_t, b_full));
+            }
+            let (mut lo, mut hi, mut best_k, mut best_b) =
+                (0usize, max_t, 0usize, encode_cfg(catf_ref, st_base, 0)?);
+            if best_b.len() > budget_bytes {
+                return Ok((0, best_b));
+            }
+            while lo <= hi {
+                let mid = (lo + hi) / 2;
+                let b_mid = encode_cfg(catf_ref, st_base, mid)?;
+                if b_mid.len() <= budget_bytes {
+                    best_k = mid;
+                    best_b = b_mid;
+                    lo = mid + 1;
+                } else if mid == 0 {
+                    break;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+            Ok((best_k, best_b))
+        };
+    let (mut kept_t, mut bytes) = fit_trees(&catf, &student)?;
+    // Non-destructive compaction ladder: ONLY engage when `bytes > budget_bytes` (strict cap
+    // compliance!) or when non-forest overhead starved `student.forest` down to 0 trees!
+    // Never wipe the Gaussian copula or marginals when the artifact already fits under budget!
+    let ladder: &[(usize, usize, usize, bool)] = &[
+        (usize::MAX, usize::MAX, usize::MAX, true),
+        (6, 10, 16, true),
+        (4, 8, 12, true),
+        (2, 6, 8, true),
+        (1, 5, 6, true),
+        (0, 4, 4, true),
+    ];
+    for &(max_preds, max_k, max_main, drop_extra) in ladder {
+        let starving = kept_t == 0 && student.forest.trees() > 0 && max_preds >= 4;
+        if bytes.len() <= budget_bytes && !starving {
+            break;
         }
-        if best_k == 0 {
-            let (b0, _) = encode_with(0)?;
-            bytes = b0;
+        let mut c_try = catf.clone();
+        let mut st_try = student.clone();
+        if drop_extra {
+            st_try.pair_effects.clear();
+        }
+        prune_catf_copula(&mut c_try, max_preds, true);
+        compact_marginals(&mut c_try, max_k);
+        if max_main < st_try.main_effects.effects.len() {
+            prune_main_effects(&mut st_try, max_main);
+            st_try.refit_calibration(&cal_x, &cal_y);
+        }
+        let (kt, b_try) = fit_trees(&c_try, &st_try)?;
+        let fixes_cap = bytes.len() > budget_bytes && b_try.len() < bytes.len();
+        let fixes_starve =
+            bytes.len() <= budget_bytes && b_try.len() <= budget_bytes && kept_t == 0 && kt > 0;
+        if fixes_cap || fixes_starve {
+            catf = c_try;
+            student = st_try;
+            kept_t = kt;
+            bytes = b_try;
         }
     }
 

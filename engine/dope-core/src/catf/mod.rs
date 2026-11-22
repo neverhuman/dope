@@ -26,6 +26,7 @@ pub struct CatfConfig {
     pub eta: f64,
     pub max_knots: usize,
     pub max_discrete: usize,
+    pub max_copula_preds: usize,
     pub rule_mode: RuleMode,
     pub forced_first: Vec<usize>,
 }
@@ -40,6 +41,7 @@ impl Default for CatfConfig {
             eta: 0.35,
             max_knots: 24,
             max_discrete: 64,
+            max_copula_preds: usize::MAX,
             rule_mode: RuleMode::Structural,
             forced_first: Vec::new(),
         }
@@ -106,18 +108,61 @@ impl CatfModel {
         let rules = RuleSet::mine(build_x, select_x, &is_discrete, cfg.rule_mode, support_k);
         let derived_cols = rules.derived_columns();
 
-        // Empirical Pearson correlation matrix + zero-byte copula latent calibration!
+        // Empirical observed correlation matrix + zero-byte copula latent calibration, plus
+        // deterministic hash-permuted stratified latent normal scores for ordering & CATF (`BUG-R17`).
         let emp_corr = empirical_corr_matrix(build_x);
         let latent_corr = calibrate_latent_correlation_matrix(&marginals, &emp_corr);
         let z_cols: Vec<Vec<f64>> = (0..d)
-            .map(|j| stratified_latent_z(&marginals[j], &build_x[j]))
+            .map(|j| stratified_latent_z(j, &marginals[j], &build_x[j]))
             .collect();
         let order = least_predictable_order(&z_cols, &cfg.forced_first);
         let min_leaf = support_k.max(((0.005 * n as f64).ceil() as usize).max(4));
 
+        let sel_n = select_x.first().map_or(0, Vec::len);
+        let sel_z: Vec<Vec<f64>> = if sel_n >= 20 {
+            (0..d)
+                .map(|j| stratified_latent_z(j, &marginals[j], &select_x[j]))
+                .collect()
+        } else {
+            Vec::new()
+        };
+        let sel_nom_codes: Vec<Vec<Option<u8>>> = if sel_z.is_empty() {
+            Vec::new()
+        } else {
+            (0..d)
+                .map(|j| {
+                    if !is_nominal[j] || nom_levels[j].is_empty() {
+                        vec![None; sel_n]
+                    } else {
+                        (0..sel_n)
+                            .map(|r| {
+                                let v = select_x[j][r];
+                                v.is_finite().then(|| {
+                                    nom_levels[j]
+                                        .iter()
+                                        .enumerate()
+                                        .min_by(|a, b| (a.1 - v).abs().total_cmp(&(b.1 - v).abs()))
+                                        .map_or(0, |(i, _)| i as u8)
+                                })
+                            })
+                            .collect()
+                    }
+                })
+                .collect()
+        };
         let mut conditionals = Vec::with_capacity(d);
         for (pos, &col) in order.iter().enumerate() {
-            let preds = order[..pos].to_vec();
+            let mut preds = order[..pos].to_vec();
+            if cfg.max_copula_preds < preds.len() {
+                preds.sort_by(|&a, &b| {
+                    latent_corr[b * d + col]
+                        .abs()
+                        .total_cmp(&latent_corr[a * d + col].abs())
+                        .then(a.cmp(&b))
+                });
+                preds.truncate(cfg.max_copula_preds);
+                preds.sort_unstable();
+            }
             let (copula_weights, copula_cond_sd) =
                 copula_conditional_params(&latent_corr, d, col, &preds);
             let (k_bins, z_edges, z_centers, base_missing_prob, target_states) =
@@ -199,6 +244,11 @@ impl CatfModel {
                     &z_cols,
                     is_nominal,
                     &nom_codes,
+                    if sel_z.is_empty() {
+                        None
+                    } else {
+                        Some((select_x, &sel_z[..], &sel_nom_codes[..]))
+                    },
                     &mut cond,
                     &target_states,
                     cfg.max_trees_per_col,
@@ -248,10 +298,20 @@ impl CatfModel {
     }
 }
 
+#[inline]
+fn splitmix64_key(col: usize, grp: usize, row: usize) -> u64 {
+    let mut z = ((col as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+        ^ ((grp as u64).wrapping_mul(0xbf58_476d_1ce4_e5b9))
+        ^ (row as u64).wrapping_add(0x94d0_49bb_1331_11eb);
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
 /// Map observed column values to latent standard-normal scores while spreading tied point-mass
-/// atom rows AND discrete level rows evenly across their `[u_lo, u_hi]` interval so `z_cols`
-/// matches `N(0, 1)` across all 32 CATF bins (BUG-R8).
-fn stratified_latent_z(marginal: &ColumnMarginalV2, col: &[f64]) -> Vec<f64> {
+/// atom rows AND discrete level rows evenly in a DETERMINISTIC HASH-PERMUTED order (never raw
+/// row order, eliminating spurious cross-column correlation on sorted tables; BUG-R17).
+fn stratified_latent_z(col_idx: usize, marginal: &ColumnMarginalV2, col: &[f64]) -> Vec<f64> {
     let n = col.len();
     match marginal {
         ColumnMarginalV2::Discrete { values, probs, .. } if !values.is_empty() => {
@@ -261,65 +321,54 @@ fn stratified_latent_z(marginal: &ColumnMarginalV2, col: &[f64]) -> Vec<f64> {
                 cum_lo.push(acc);
                 acc += p;
             }
-            let mut counts = vec![0usize; values.len()];
-            let mut row_lv: Vec<Option<usize>> = vec![None; n];
+            let mut by_lv: Vec<Vec<usize>> = vec![Vec::new(); values.len()];
             for (r, &v) in col.iter().enumerate() {
                 if v.is_finite() {
-                    let best = values
+                    if let Some((li, _)) = values
                         .iter()
                         .enumerate()
                         .min_by(|a, b| (a.1 - v).abs().total_cmp(&(b.1 - v).abs()))
-                        .map(|(i, _)| i);
-                    if let Some(li) = best {
-                        row_lv[r] = Some(li);
-                        counts[li] += 1;
+                    {
+                        by_lv[li].push(r);
                     }
                 }
             }
-            let mut seen = vec![0usize; values.len()];
-            (0..n)
-                .map(|r| {
-                    if let Some(li) = row_lv[r] {
-                        let k = seen[li];
-                        seen[li] += 1;
-                        let frac = (k as f64 + 0.5) / counts[li].max(1) as f64;
-                        let u = (cum_lo[li] + frac * probs[li]).clamp(1e-6, 1.0 - 1e-6);
-                        norm_ppf(u)
-                    } else {
-                        f64::NAN
-                    }
-                })
-                .collect()
+            let mut out = vec![f64::NAN; n];
+            for (li, mut rows) in by_lv.into_iter().enumerate() {
+                rows.sort_by_key(|&r| (splitmix64_key(col_idx, li, r), r));
+                let cnt = rows.len().max(1) as f64;
+                for (k, r) in rows.into_iter().enumerate() {
+                    let u =
+                        (cum_lo[li] + ((k as f64 + 0.5) / cnt) * probs[li]).clamp(1e-6, 1.0 - 1e-6);
+                    out[r] = norm_ppf(u);
+                }
+            }
+            out
         }
         ColumnMarginalV2::Continuous { atoms, .. } if !atoms.is_empty() => {
-            let mut atom_counts = vec![0usize; atoms.len()];
-            let mut row_atom: Vec<Option<usize>> = vec![None; n];
+            let mut by_atom: Vec<Vec<usize>> = vec![Vec::new(); atoms.len()];
+            let mut out: Vec<f64> = col.iter().map(|&v| marginal.z_score(v)).collect();
             for (r, &v) in col.iter().enumerate() {
                 if v.is_finite() {
                     for (ai, a) in atoms.iter().enumerate() {
                         if (v - a.value).abs() <= 1e-12 * a.value.abs().max(1.0) {
-                            row_atom[r] = Some(ai);
-                            atom_counts[ai] += 1;
+                            by_atom[ai].push(r);
                             break;
                         }
                     }
                 }
             }
-            let mut seen = vec![0usize; atoms.len()];
-            (0..n)
-                .map(|r| {
-                    if let Some(ai) = row_atom[r] {
-                        let a = &atoms[ai];
-                        let k = seen[ai];
-                        seen[ai] += 1;
-                        let frac = (k as f64 + 0.5) / atom_counts[ai].max(1) as f64;
-                        let u = (a.u_lo + frac * (a.u_hi - a.u_lo)).clamp(1e-6, 1.0 - 1e-6);
-                        norm_ppf(u)
-                    } else {
-                        marginal.z_score(col[r])
-                    }
-                })
-                .collect()
+            for (ai, mut rows) in by_atom.into_iter().enumerate() {
+                let a = &atoms[ai];
+                rows.sort_by_key(|&r| (splitmix64_key(col_idx, ai + 1024, r), r));
+                let cnt = rows.len().max(1) as f64;
+                for (k, r) in rows.into_iter().enumerate() {
+                    let u = (a.u_lo + ((k as f64 + 0.5) / cnt) * (a.u_hi - a.u_lo))
+                        .clamp(1e-6, 1.0 - 1e-6);
+                    out[r] = norm_ppf(u);
+                }
+            }
+            out
         }
         _ => col.iter().map(|&v| marginal.z_score(v)).collect(),
     }
@@ -358,7 +407,7 @@ fn empirical_corr_matrix(x_cols: &[Vec<f64>]) -> Vec<f64> {
                 if vx <= 1e-12 || vy <= 1e-12 {
                     0.0
                 } else {
-                    (num / (vx * vy).sqrt()).clamp(-0.995, 0.995)
+                    (num / (vx * vy).sqrt()).clamp(-0.9995, 0.9995)
                 }
             };
             r[i * d + j] = corr;

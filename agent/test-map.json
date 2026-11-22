@@ -220,7 +220,7 @@
       "command": "cargo test --locked production::tests::embedded_contract_is_canonical_and_bound",
       "purpose": "verify generated tier constants and embedded digest"
     },
-    "contracts/dope-fidelity-v3.json": {
+    "contracts/dope-fidelity-v3-candidate.json": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs_v3 && cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
       "purpose": "verify dope-fidelity/v3 hard-gate contract, unclipped retention, donor-aware/family-clustered Holm bounds, and Arena swap-ladder execution"
     },

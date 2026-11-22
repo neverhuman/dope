@@ -1,7 +1,7 @@
 """DOPE v2.0.0 Upgraded Landmark+Flow Generator (DopeFidelityV5 / DopeFlowV6).
 
 Resolves ALL 4 P0 bottlenecks identified in the 5-hour v1.3.1 plateau audit:
-- BUG-V5-1: Replaces capped `3.2*temp<=7.2` one-hot Ridge with differentiable 3-step IRLS
+- BUG-V5-1: Replaces capped `3.2*scale<=7.2` one-hot Ridge with differentiable 3-step IRLS
   binary/multiclass logistic regression in BOTH target synthesis and coupled downstream TSTR loss.
 - BUG-V5-2: Uses class-permutation-invariant ANOVA eta^2 + max-class |corr| landmarks (`LANDMARK_DIM=48`).
 - BUG-V5-3: Adds top-M driver-gated pairwise interactions `(xw_i * xw_j)` to the target basis.
@@ -266,7 +266,7 @@ class DopeFidelityV5(nn.Module):
             reg_eye = torch.eye(d_b, device=dev)
             reg_eye[-1, -1] = 1e-3
             lam = enc["gates"]["ridge_alpha"].float() * float(n_fit) + 1.0
-            temp = enc["gates"]["logit_temp"].float()
+            logit_scale = enc["gates"]["logit_temp"].float()
 
             if task == "regression":
                 yf_col = yf.reshape(-1, 1)
@@ -280,37 +280,40 @@ class DopeFidelityV5(nn.Module):
                 p1 = yf_b.mean().clamp(1e-3, 1.0 - 1e-3)
                 w_t = torch.zeros((d_b, 1), device=dev)
                 w_t[-1, 0] = torch.log(p1 / (1.0 - p1))
-                for _ in range(3):
+                for _ in range(5):
                     pr = torch.sigmoid((Df @ w_t).clamp(-12.0, 12.0))
                     h = (pr * (1.0 - pr)).clamp_min(0.02)
                     H = (Df * h).T @ Df + lam * reg_eye
                     g = Df.T @ (pr - yf_b) + lam * (reg_eye @ w_t)
                     w_t = w_t - 0.85 * torch.linalg.solve(H, g).clamp(-3.0, 3.0)
-                y_syn = torch.sigmoid(((Ds @ w_t).squeeze(-1) * temp).clamp(-12.0, 12.0)).clamp(1e-4, 1.0 - 1e-4)
+                logits_b = w_t[-1, 0] + logit_scale * (phi_s @ w_t[:-1, 0])
+                y_syn = torch.sigmoid(logits_b.clamp(-12.0, 12.0)).clamp(1e-4, 1.0 - 1e-4)
             elif task == "multilabel":
                 ym = yf if yf.ndim == 2 else yf.unsqueeze(1)
                 pr = ym.mean(dim=0, keepdim=True).clamp(1e-3, 1.0 - 1e-3)
                 w_t = torch.zeros((d_b, ym.shape[1]), device=dev)
                 w_t[-1, :] = torch.log(pr / (1.0 - pr)).squeeze(0)
-                for _ in range(2):
+                for _ in range(3):
                     prob = torch.sigmoid((Df @ w_t).clamp(-12.0, 12.0))
                     h = (prob * (1.0 - prob)).mean(dim=1, keepdim=True).clamp_min(0.04)
                     H = (Df * h).T @ Df + lam * reg_eye
                     g = Df.T @ (prob - ym) + lam * (reg_eye @ w_t)
                     w_t = w_t - 0.85 * torch.linalg.solve(H, g).clamp(-3.0, 3.0)
-                y_syn = torch.sigmoid(((Ds @ w_t) * temp).clamp(-12.0, 12.0)).clamp(1e-4, 1.0 - 1e-4)
+                logits_ml = w_t[-1:, :] + logit_scale * (phi_s @ w_t[:-1, :])
+                y_syn = torch.sigmoid(logits_ml.clamp(-12.0, 12.0)).clamp(1e-4, 1.0 - 1e-4)
             else:
                 k = min(max(n_classes, 2), MAX_CLASSES_SUPPORT)
                 y_oh = F.one_hot(yf.long().clamp(0, k - 1), num_classes=k).float()
                 pr = y_oh.mean(dim=0).clamp_min(1e-3)
                 w_t = torch.zeros((d_b, k), device=dev)
                 w_t[-1, :] = torch.log(pr)
-                for _ in range(3):
+                for _ in range(5):
                     prob = F.softmax((Df @ w_t).clamp(-12.0, 12.0), dim=-1)
                     H = 0.25 * (Df.T @ Df) + lam * reg_eye
                     g = Df.T @ (prob - y_oh) + lam * (reg_eye @ w_t)
                     w_t = w_t - 0.9 * torch.linalg.solve(H, g).clamp(-3.0, 3.0)
-                y_syn = F.softmax(((Ds @ w_t) * temp).clamp(-12.0, 12.0), dim=-1).clamp(1e-4, 1.0)
+                logits_mc = w_t[-1:, :] + logit_scale * (phi_s @ w_t[:-1, :])
+                y_syn = F.softmax(logits_mc.clamp(-12.0, 12.0), dim=-1).clamp(1e-4, 1.0)
 
             return {"X_syn": X_syn, "y_syn": y_syn, "u_syn": u_syn}
 
