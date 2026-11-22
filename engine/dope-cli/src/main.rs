@@ -14,6 +14,7 @@ use std::process::ExitCode;
 
 mod args;
 mod dvs;
+mod format2_cli;
 mod landmarks;
 mod learned;
 mod levels;
@@ -98,8 +99,15 @@ fn run(cli: Cli) -> Result<(), String> {
                     Some((v[0], v[1], v[2]))
                 }
             };
+            let budget = a.budget.as_deref().map(parse_bytes).transpose()?;
+            if a.format == 2 {
+                format2_cli::run_fit_v2(&a, &table, target, task, budget)?;
+                return Ok(());
+            } else if a.format != 1 {
+                return Err("--format must be 1 or 2".into());
+            }
             let opts = FitOptions {
-                budget: a.budget.as_deref().map(parse_bytes).transpose()?,
+                budget,
                 size: a.size,
                 max_parameters: a.max_parameters,
                 seed: a.seed,
@@ -140,8 +148,13 @@ fn run(cli: Cli) -> Result<(), String> {
         }
         Command::FitTiers(a) => tiers::fit_tiers(a)?,
         Command::Sample(a) => {
-            let program =
-                decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
+            let raw_bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
+            if dope_core::is_format2(&raw_bytes) {
+                let w = writer(&a.out)?;
+                format2_cli::run_sample_v2(&a, &raw_bytes, w, style)?;
+                return Ok(());
+            }
+            let program = decode(&raw_bytes).map_err(e)?;
             let mode = EmissionMode::parse(&a.mode).map_err(e)?;
             let req_rows = if a.rows.trim().eq_ignore_ascii_case("auto") {
                 1000 * mode.default_row_multiplier()

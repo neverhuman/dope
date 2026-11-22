@@ -65,8 +65,11 @@ pub mod teacher;
 pub mod train;
 pub mod train_cpu;
 
-pub use artifact::{byte_report, decode, ByteReport};
+pub use artifact::{
+    byte_report, decode, decode_format2_program, is_format2, ByteReport, Format2Program,
+};
 pub use budget::{ModelSize, ParameterCount};
+pub use compile::v2::{fit_v2, FitV2Options, FitV2Report, FittedV2};
 pub use compile::{fit, FitOptions, FitReport, Fitted, DEFAULT_BUDGET};
 pub use encode::{MlEncoder, Scaling};
 pub use error::{DopeError, Result};

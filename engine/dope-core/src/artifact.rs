@@ -25,10 +25,14 @@ pub const FORMAT_VERSION: u64 = 1;
 pub mod container;
 mod decode;
 pub mod format2;
+mod format2_bin;
+pub mod format2_codec;
+mod format2_rules_catf;
 mod limits;
 pub use container::{unpack, Parts};
 pub use decode::decode;
 pub use format2::{decode_format2, encode_format2, is_format2, Format2Packet, Format2Section};
+pub use format2_codec::{decode_format2_program, encode_format2_program, Format2Program};
 
 fn f16_bytes(v: &[f64]) -> Vec<u8> {
     v.iter()

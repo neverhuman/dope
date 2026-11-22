@@ -110,12 +110,7 @@ impl CatfModel {
         let emp_corr = empirical_corr_matrix(build_x);
         let latent_corr = calibrate_latent_correlation_matrix(&marginals, &emp_corr);
         let z_cols: Vec<Vec<f64>> = (0..d)
-            .map(|j| {
-                build_x[j]
-                    .iter()
-                    .map(|&v| marginals[j].z_score(v))
-                    .collect()
-            })
+            .map(|j| stratified_latent_z(&marginals[j], &build_x[j]))
             .collect();
         let order = least_predictable_order(&z_cols, &cfg.forced_first);
         let min_leaf = support_k.max(((0.005 * n as f64).ceil() as usize).max(4));
@@ -251,6 +246,47 @@ impl CatfModel {
         let post_rule_x = self.sample_x(n_rows, seed, table_id);
         sample_post_rule_targets(student, &post_rule_x, seed, table_id)
     }
+}
+
+/// Map observed column values to latent standard-normal scores while spreading tied point-mass
+/// atom rows evenly across their `[u_lo, u_hi]` interval so `z_cols` matches `N(0, 1)` across
+/// all 32 CATF bins instead of collapsing an entire atom into one artificial bin spike.
+fn stratified_latent_z(marginal: &ColumnMarginalV2, col: &[f64]) -> Vec<f64> {
+    let n = col.len();
+    let ColumnMarginalV2::Continuous { atoms, .. } = marginal else {
+        return col.iter().map(|&v| marginal.z_score(v)).collect();
+    };
+    if atoms.is_empty() {
+        return col.iter().map(|&v| marginal.z_score(v)).collect();
+    }
+    let mut atom_counts = vec![0usize; atoms.len()];
+    let mut row_atom: Vec<Option<usize>> = vec![None; n];
+    for (r, &v) in col.iter().enumerate() {
+        if v.is_finite() {
+            for (ai, a) in atoms.iter().enumerate() {
+                if (v - a.value).abs() <= 1e-12 * a.value.abs().max(1.0) {
+                    row_atom[r] = Some(ai);
+                    atom_counts[ai] += 1;
+                    break;
+                }
+            }
+        }
+    }
+    let mut seen = vec![0usize; atoms.len()];
+    (0..n)
+        .map(|r| {
+            if let Some(ai) = row_atom[r] {
+                let a = &atoms[ai];
+                let k = seen[ai];
+                seen[ai] += 1;
+                let frac = (k as f64 + 0.5) / atom_counts[ai].max(1) as f64;
+                let u = (a.u_lo + frac * (a.u_hi - a.u_lo)).clamp(1e-6, 1.0 - 1e-6);
+                norm_ppf(u)
+            } else {
+                marginal.z_score(col[r])
+            }
+        })
+        .collect()
 }
 
 fn empirical_corr_matrix(x_cols: &[Vec<f64>]) -> Vec<f64> {

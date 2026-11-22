@@ -75,39 +75,48 @@ impl ColumnMarginalV2 {
         }
 
         if uniq_counts.len() <= max_discrete {
-            // Retain values meeting privacy support floor `support_k` (falling back to nearest kept).
+            // Only classify as Discrete when the column is genuinely low-cardinality discrete:
+            // either constant (1 value) OR >= 2 supported levels covering >= 80% of observations.
+            // Continuous/lattice columns with many low-count unique values MUST fall through to
+            // Continuous (atoms + lattice + W1 knots) instead of collapsing into a single mass!
             let kept: Vec<(f64, usize)> = uniq_counts
                 .iter()
                 .copied()
                 .filter(|&(_, c)| c >= support_k)
                 .collect();
-            let final_counts = if kept.is_empty() {
-                // Small table fallback: single median mass so no singleton is ever exposed.
-                vec![(obs[obs.len() / 2], obs.len())]
-            } else {
-                let mut acc = kept;
-                for &(v, c) in &uniq_counts {
-                    if c < support_k {
-                        let best = acc
-                            .iter()
-                            .enumerate()
-                            .min_by(|a, b| (a.1 .0 - v).abs().total_cmp(&(b.1 .0 - v).abs()))
-                            .map_or(0, |(i, _)| i);
-                        acc[best].1 += c;
+            let kept_mass: usize = kept.iter().map(|&(_, c)| c).sum();
+            let genuinely_discrete = uniq_counts.len() == 1
+                || (kept.len() >= 2 && kept_mass * 5 >= obs.len() * 4)
+                || (obs.len() < support_k * 2 && uniq_counts.len() <= 8);
+            if genuinely_discrete {
+                let final_counts = if kept.is_empty() {
+                    // Small table fallback: single median mass so no singleton is ever exposed.
+                    vec![(obs[obs.len() / 2], obs.len())]
+                } else {
+                    let mut acc = kept;
+                    for &(v, c) in &uniq_counts {
+                        if c < support_k {
+                            let best = acc
+                                .iter()
+                                .enumerate()
+                                .min_by(|a, b| (a.1 .0 - v).abs().total_cmp(&(b.1 .0 - v).abs()))
+                                .map_or(0, |(i, _)| i);
+                            acc[best].1 += c;
+                        }
                     }
-                }
-                acc
-            };
-            let tot = final_counts.iter().map(|&(_, c)| c).sum::<usize>() as f64;
-            return Self::Discrete {
-                values: final_counts.iter().map(|&(v, _)| v).collect(),
-                probs: final_counts
-                    .iter()
-                    .map(|&(_, c)| c as f64 / tot.max(1.0))
-                    .collect(),
-                p_missing,
-                support_k,
-            };
+                    acc
+                };
+                let tot = final_counts.iter().map(|&(_, c)| c).sum::<usize>() as f64;
+                return Self::Discrete {
+                    values: final_counts.iter().map(|&(v, _)| v).collect(),
+                    probs: final_counts
+                        .iter()
+                        .map(|&(_, c)| c as f64 / tot.max(1.0))
+                        .collect(),
+                    p_missing,
+                    support_k,
+                };
+            }
         }
 
         let atoms = detect_atoms(&obs, support_k);

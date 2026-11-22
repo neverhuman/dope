@@ -3,6 +3,7 @@
 
 pub mod backoff;
 pub mod loop_driver;
+pub mod pipeline;
 pub mod project;
 pub mod roles;
 pub mod select;
@@ -11,6 +12,7 @@ pub mod tiers;
 pub use backoff::{
     run_privacy_backoff, CapacityBackoffStep, PrivacyBackoffOutcome, PRIVACY_BACKOFF_LADDER,
 };
+pub use pipeline::{fit_v2, FitV2Options, FitV2Report, FittedV2};
 
 pub use loop_driver::{
     lineage_hash, run_exact_artifact_loop, CompileLedger, CompilerMove, DecodedCandidateArtifact,

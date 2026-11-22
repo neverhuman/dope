@@ -1,7 +1,10 @@
 //! Deterministic source-free `dope embed` (`PacketFeaturesV2` + `DopeEncoder629` bridge).
 
 use crate::artifact::decode;
-use crate::artifact::format2::{decode_format2, is_format2};
+use crate::artifact::format2::{decode_format2, is_format2, TAG_EMBED_SUMMARY};
+use crate::artifact::format2_codec::{
+    decode_embed_summary, decode_format2_program, FORMAT2_EMBED_SUMMARY_DIM,
+};
 use crate::copula::Dependence;
 use crate::error::Result;
 use crate::marginal::Marginal;
@@ -46,9 +49,19 @@ pub fn embed_packet(bytes: &[u8]) -> Result<PacketFeaturesV2> {
         vec[1] = 2.0;
         vec[2] = pkt.sections.len() as f64;
         vec[3] = pkt.tiers.len() as f64;
-        for (i, sec) in pkt.sections.iter().take(16).enumerate() {
-            vec[4 + i] = (sec.data.len() as f64 + 1.0).ln();
-            vec[20 + i] = sec.tag as f64;
+        if let Some(sec) = pkt.sections.iter().find(|s| s.tag == TAG_EMBED_SUMMARY) {
+            if sec.data.len() == FORMAT2_EMBED_SUMMARY_DIM * 4 {
+                if let Ok(summary) = decode_embed_summary(&sec.data) {
+                    for (i, &val) in summary.iter().enumerate() {
+                        vec[4 + i] = val;
+                    }
+                }
+            }
+        } else {
+            for (i, sec) in pkt.sections.iter().take(16).enumerate() {
+                vec[4 + i] = (sec.data.len() as f64 + 1.0).ln();
+                vec[20 + i] = sec.tag as f64;
+            }
         }
         for (i, tier) in pkt.tiers.iter().take(8).enumerate() {
             vec[36 + i] = (tier.tier_budget_bytes as f64 + 1.0).ln();
@@ -155,18 +168,22 @@ pub fn embed_packet(bytes: &[u8]) -> Result<PacketFeaturesV2> {
 /// Deterministic 4,096-row source-free bridge summary for JopeDime `DopeEncoder629` compatibility.
 pub fn embed_to_629_bridge(bytes: &[u8], seed: u64) -> Result<Encoder629Bridge> {
     let sha = format!("{:x}", Sha256::digest(bytes));
-    let program = decode(bytes)?;
-    let emitted = sample_with_mode(
-        &program,
-        &EmitOptions {
-            mode: EmissionMode::Faithful,
-            rows: 4096,
-            seed,
-            table_id: 629,
-            ..Default::default()
-        },
-    )?;
-    let d = program.features();
+    let opts = EmitOptions {
+        mode: EmissionMode::Faithful,
+        rows: 4096,
+        seed,
+        table_id: 629,
+        ..Default::default()
+    };
+    let (emitted, d) = if is_format2(bytes) {
+        let prog = decode_format2_program(bytes)?;
+        let d = prog.features();
+        (prog.sample_with_mode(&opts)?, d)
+    } else {
+        let program = decode(bytes)?;
+        let d = program.features();
+        (sample_with_mode(&program, &opts)?, d)
+    };
     let mut col_means = Vec::with_capacity(d);
     let mut col_stds = Vec::with_capacity(d);
     for j in 0..d {
