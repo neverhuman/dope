@@ -262,13 +262,14 @@ class DopeFidelityV5(nn.Module):
             z_syn = z_syn / z_syn.std(dim=0, unbiased=False).clamp_min(1e-4)
             u_syn = _normal_cdf(z_syn).clamp(1e-5, 1.0 - 1e-5)
 
-            # 2. Monotonic 17-knot empirical + learned warp marginal inversion
+            # 2. Monotonic 17-knot empirical + exact identity-initialized multiplicative warp
             q_grid = torch.linspace(0.01, 0.99, N_QUANTILE_KNOTS, device=dev, dtype=torch.float32)
             base_knots = torch.quantile(xf, q_grid, dim=0).T  # (p, K)
-            raw_knots = base_knots + enc["knot_warp"].float()
-            # Enforce monotonicity via cumulative positive increments from knot 0
-            deltas = F.softplus(raw_knots[:, 1:] - raw_knots[:, :-1] + 1e-3)
-            knots = torch.cat([raw_knots[:, :1], raw_knots[:, :1] + torch.cumsum(deltas, dim=1)], dim=1)
+            warp = enc["knot_warp"].float()
+            base_diffs = (base_knots[:, 1:] - base_knots[:, :-1]).clamp_min(0.0)
+            warp_mult = torch.exp(0.25 * torch.tanh(warp[:, 1:]))
+            k0 = base_knots[:, :1] + 0.15 * torch.tanh(warp[:, :1])
+            knots = torch.cat([k0, k0 + torch.cumsum(base_diffs * warp_mult, dim=1)], dim=1)
             # Linear interpolation per column
             pos = u_syn * (N_QUANTILE_KNOTS - 1)
             lo = pos.floor().long().clamp(0, N_QUANTILE_KNOTS - 2)
