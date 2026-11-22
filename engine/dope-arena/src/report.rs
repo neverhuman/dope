@@ -214,6 +214,7 @@ pub fn reduce_cells(
         seed,
         bootstrap_draws,
         kappa_thresholds: KappaThresholds::default(),
+        allow_partial_diagnostic: false,
         cells,
     };
     Ok(evaluate_v3(&req)?)

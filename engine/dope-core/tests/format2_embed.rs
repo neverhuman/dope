@@ -174,6 +174,8 @@ fn t24_format1_bit_identity_dope_embed_and_privacy_backoff() {
             mia_auc: 0.52,
             mia_tpr_at_1pct_fpr: 0.01,
             exact_copies: 0,
+            exact_copies_twin_b: 0,
+            exact_copy_excess: 0.0,
             canary_hits: 0,
             min_emitted_support: step.support_k as u64,
             support_floor_k: 10,

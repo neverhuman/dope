@@ -27,6 +27,8 @@ pub struct EmpiricalPrivacyAssessment {
     pub mia_auc: f64,
     pub mia_tpr_at_1pct_fpr: f64,
     pub exact_copies: usize,
+    pub exact_copies_twin_b: usize,
+    pub exact_copy_excess: f64,
     pub canary_hits: usize,
     pub min_emitted_support: u64,
     pub support_floor_k: u64,
@@ -132,7 +134,17 @@ pub fn assess_empirical_privacy(
     let fpr_thr = non_member_scores[thr_idx];
     let tpr_at_1pct = member_scores.iter().filter(|&&s| s > fpr_thr).count() as f64 / m as f64;
 
-    // 3. Canary check.
+    // 3. Exact-copy excess vs disjoint real twin B (`rate(S in A) - rate(B in A) <= 0.005`) + Canary check.
+    let mut exact_copies_twin_b = 0usize;
+    for b in ref_b {
+        if min_dist_to_set(b, ref_a)? <= 1e-12 {
+            exact_copies_twin_b += 1;
+        }
+    }
+    let s_copy_rate = exact_copies as f64 / input.synthetic.len() as f64;
+    let b_copy_rate = exact_copies_twin_b as f64 / m as f64;
+    let exact_copy_excess = (s_copy_rate - b_copy_rate).max(0.0);
+
     let mut canary_hits = 0usize;
     for c in &input.canary_rows {
         if min_dist_to_set(c, &input.synthetic)? <= 1e-9 {
@@ -143,6 +155,7 @@ pub fn assess_empirical_privacy(
     let pass = dcr_share <= 0.55
         && mia_auc <= 0.55
         && tpr_at_1pct <= 0.02
+        && exact_copy_excess <= 0.005
         && canary_hits == 0
         && input.min_emitted_support >= SUPPORT_FLOOR_K;
 
@@ -151,6 +164,8 @@ pub fn assess_empirical_privacy(
         mia_auc,
         mia_tpr_at_1pct_fpr: tpr_at_1pct,
         exact_copies,
+        exact_copies_twin_b,
+        exact_copy_excess,
         canary_hits,
         min_emitted_support: input.min_emitted_support,
         support_floor_k: SUPPORT_FLOOR_K,

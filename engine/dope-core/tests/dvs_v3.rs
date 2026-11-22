@@ -2,6 +2,7 @@
 //! `S_deploy`, `C2ST`/`MargAUC`, empirical privacy, and correlated driver groups).
 
 use dope_core::dvs::v3::bundle::{PredictionBundle, TaskKind};
+use dope_core::dvs::v3::c2st::{boosted_tree_c2st, build_native_realism_input};
 use dope_core::dvs::v3::deploy::{assess_deploy_selection, RosterConfigScore};
 use dope_core::dvs::v3::equiv::{DriverEquivalenceInput, KappaThresholds};
 use dope_core::dvs::v3::groups::correlated_driver_groups;
@@ -74,6 +75,7 @@ fn t18_and_t22_unclipped_retention_and_complete_failure_denominator() {
         seed: 42,
         bootstrap_draws: 400,
         kappa_thresholds: KappaThresholds::default(),
+        allow_partial_diagnostic: false,
         cells: vec![
             FidelityCellRequest {
                 cell_id: "c1".into(),
@@ -114,7 +116,18 @@ fn t18_and_t22_unclipped_retention_and_complete_failure_denominator() {
                         real_rule_violation_rate: Some(0.01),
                         illegal_rows: 0,
                     })),
-                    privacy: None,
+                    privacy: Some(Box::new(EmpiricalPrivacyInput {
+                        real_fit_a: (0..24).map(|i| vec![(i as f64) * 0.1, 0.0]).collect(),
+                        real_holdout_b: (0..24)
+                            .map(|i| vec![(i as f64) * 0.1 + 0.05, 0.0])
+                            .collect(),
+                        synthetic: (0..24)
+                            .map(|i| vec![(i as f64) * 0.1 + 0.025, 0.02])
+                            .collect(),
+                        min_emitted_support: 10,
+                        canary_rows: vec![],
+                        max_distance_pairs: 100_000,
+                    })),
                 },
             },
             FidelityCellRequest {
@@ -132,6 +145,45 @@ fn t18_and_t22_unclipped_retention_and_complete_failure_denominator() {
     assert_eq!(receipt.coverage.eligible_denominator, 2);
     assert_eq!(receipt.coverage.failed_or_missing_cells, 1);
     assert!((receipt.coverage.overall_pass_coverage - 0.5).abs() < 1e-9);
+
+    // Strict fail-closed check (G-03): omitting privacy or realism MUST FAIL overall coverage.
+    let mut missing_priv = req.clone();
+    if let FidelityCellInput::Complete {
+        ref mut privacy, ..
+    } = missing_priv.cells[0].input
+    {
+        *privacy = None;
+    }
+    let fail_rec = evaluate_v3(&missing_priv).unwrap();
+    assert_eq!(fail_rec.coverage.privacy_pass_coverage, 0.0);
+    assert_eq!(fail_rec.coverage.overall_pass_coverage, 0.0);
+}
+
+#[test]
+fn native_boosted_tree_c2st_and_kappa_calibration() {
+    let real: Vec<Vec<f64>> = (0..64)
+        .map(|i| {
+            let x = (i as f64) / 64.0;
+            vec![x, (x * 6.0).sin()]
+        })
+        .collect();
+    let shifted: Vec<Vec<f64>> = real.iter().map(|r| vec![r[0] + 1.5, r[1] - 1.2]).collect();
+    let (_, _, same_auc) = boosted_tree_c2st(&real, &real, 10).unwrap();
+    let (_, _, shift_auc) = boosted_tree_c2st(&real, &shifted, 10).unwrap();
+    assert!(same_auc <= 0.60, "same_auc={same_auc}");
+    assert!(shift_auc >= 0.85, "shift_auc={shift_auc}");
+    let r_in = build_native_realism_input(&real, &real, Some(0.0), Some(0.0), 0, 8).unwrap();
+    assert_eq!(r_in.marginal_aucs.len(), 2);
+
+    let thr = KappaThresholds::calibrate_from_real_c(
+        &[1.05, 1.12, 1.38, 1.44],
+        &[0.95, 1.10],
+        &[],
+        &[1.20, 1.60],
+    );
+    assert!(thr.pred_kappa_star >= 1.38 && thr.pred_kappa_star <= 1.45);
+    assert_eq!(thr.calib_kappa_star, 1.25);
+    assert!(thr.driver_kappa_star >= 1.55);
 }
 
 #[test]

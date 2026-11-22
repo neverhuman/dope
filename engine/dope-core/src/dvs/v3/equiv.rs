@@ -1,7 +1,7 @@
 //! Equivalence coverage (`kappa` for pred, lift, calibration, and feature drivers).
 
 use super::bundle::{PredictionBundle, TaskKind};
-use super::harm::{donor_bootstrap_bounds, donor_clusters, SplitMix64};
+use super::harm::{donor_clusters, SplitMix64};
 use crate::dvs::{ensure, DvsError};
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +21,33 @@ impl Default for KappaThresholds {
             lift_kappa_star: 1.25,
             calib_kappa_star: 1.25,
             driver_kappa_star: 1.25,
+        }
+    }
+}
+
+impl KappaThresholds {
+    /// Calibrate `kappa*` thresholds at empirical 95th percentile of disjoint real split `C`
+    /// comparisons (`[1.0, 2.5]` guard; falls back to `1.25` when empty).
+    pub fn calibrate_from_real_c(
+        pred_c: &[f64],
+        lift_c: &[f64],
+        calib_c: &[f64],
+        driver_c: &[f64],
+    ) -> Self {
+        let q95 = |xs: &[f64]| -> f64 {
+            let mut v: Vec<f64> = xs.iter().copied().filter(|x| x.is_finite()).collect();
+            if v.is_empty() {
+                return 1.25;
+            }
+            v.sort_by(f64::total_cmp);
+            let idx = ((0.95 * (v.len() as f64 - 1.0)).ceil() as usize).min(v.len() - 1);
+            v[idx].clamp(1.0, 2.5)
+        };
+        Self {
+            pred_kappa_star: q95(pred_c),
+            lift_kappa_star: q95(lift_c),
+            calib_kappa_star: q95(calib_c),
+            driver_kappa_star: q95(driver_c),
         }
     }
 }
@@ -171,24 +198,24 @@ fn scalar_score_view(bundle: &PredictionBundle, preds: &[f64]) -> Vec<f64> {
         .collect()
 }
 
-fn make_kappa(
+fn make_kappa_ratio(
     error: f64,
     calib_scale: f64,
     floor: f64,
-    ucb90_err: f64,
+    kappa_ucb90: f64,
     kappa_star: f64,
 ) -> MetricKappa {
     let denom = calib_scale.max(floor);
     let kappa_point = error / denom;
-    let kappa_ucb90 = ucb90_err / denom;
+    let ucb = kappa_ucb90.max(kappa_point);
     MetricKappa {
         error,
         calibration_scale: calib_scale,
         floor,
         kappa_point,
-        kappa_ucb90,
+        kappa_ucb90: ucb,
         kappa_star,
-        pass: kappa_ucb90 <= kappa_star,
+        pass: ucb <= kappa_star,
     }
 }
 
@@ -251,30 +278,17 @@ pub fn assess_equivalence(
             .collect()
     };
     let pred_s_rows = row_pred_dist(&bundle.pred_a, &bundle.pred_s);
-    let (pred_err, _, pred_ucb90) = donor_bootstrap_bounds(
-        &pred_s_rows,
-        bundle.donor_ids.as_deref(),
-        draws,
-        seed ^ 0x31,
-        0.90,
-    )?;
-    let pred_scale = bundle
+    let pred_b_rows = bundle
         .pred_b
         .as_deref()
-        .map(|pb| {
-            let v = row_pred_dist(&bundle.pred_a, pb);
-            v.iter().sum::<f64>() / v.len() as f64
-        })
+        .map(|pb| row_pred_dist(&bundle.pred_a, pb));
+    let pred_err = pred_s_rows.iter().sum::<f64>() / pred_s_rows.len() as f64;
+    let pred_scale = pred_b_rows
+        .as_deref()
+        .map(|v| v.iter().sum::<f64>() / v.len() as f64)
         .unwrap_or(0.01);
-    let pred = make_kappa(
-        pred_err,
-        pred_scale,
-        0.01,
-        pred_ucb90,
-        thresholds.pred_kappa_star,
-    );
 
-    // 2. Lift (`lift`) + Calibration (`calib`) via donor-cluster bootstrap.
+    // 2. Lift (`lift`) + Calibration (`calib`) + Paired ratio bootstrap over donor clusters.
     let sa = scalar_score_view(bundle, &bundle.pred_a);
     let ss = scalar_score_view(bundle, &bundle.pred_s);
     let sb = bundle
@@ -299,17 +313,34 @@ pub fn assess_equivalence(
     let clusters = donor_clusters(n, bundle.donor_ids.as_deref());
     let m = clusters.len();
     let mut rng = SplitMix64::new(seed ^ 0x41);
-    let mut lift_boot = Vec::with_capacity(draws);
-    let mut calib_boot = Vec::with_capacity(draws);
+    let mut pred_ratio_boot = Vec::with_capacity(draws);
+    let mut lift_ratio_boot = Vec::with_capacity(draws);
+    let mut calib_ratio_boot = Vec::with_capacity(draws);
     for _ in 0..draws {
         let mut idxs = Vec::with_capacity(n);
         for _ in 0..m {
             idxs.extend_from_slice(&clusters[rng.gen_range(m)]);
         }
+        let ps_m = idxs.iter().map(|&i| pred_s_rows[i]).sum::<f64>() / idxs.len() as f64;
+        let pb_m = pred_b_rows
+            .as_deref()
+            .map(|r| idxs.iter().map(|&i| r[i]).sum::<f64>() / idxs.len() as f64)
+            .unwrap_or(0.01);
+        pred_ratio_boot.push(ps_m / pb_m.max(0.01));
+
         let yb: Vec<f64> = idxs.iter().map(|&i| bundle.y_true[i]).collect();
         let sab: Vec<f64> = idxs.iter().map(|&i| sa[i]).collect();
         let ssb: Vec<f64> = idxs.iter().map(|&i| ss[i]).collect();
-        lift_boot.push(max_decile_lift_gap(&yb, &sab, &ssb));
+        let l_s = max_decile_lift_gap(&yb, &sab, &ssb);
+        let l_b = sb
+            .as_deref()
+            .map(|b| {
+                let sbb: Vec<f64> = idxs.iter().map(|&i| b[i]).collect();
+                max_decile_lift_gap(&yb, &sab, &sbb)
+            })
+            .unwrap_or(0.01);
+        lift_ratio_boot.push(l_s / l_b.max(0.01));
+
         let sub_a: Vec<f64> = idxs
             .iter()
             .flat_map(|&i| bundle.pred_a[i * k..(i + 1) * k].iter().copied())
@@ -318,6 +349,11 @@ pub fn assess_equivalence(
             .iter()
             .flat_map(|&i| bundle.pred_s[i * k..(i + 1) * k].iter().copied())
             .collect();
+        let sub_b: Option<Vec<f64>> = bundle.pred_b.as_deref().map(|pb| {
+            idxs.iter()
+                .flat_map(|&i| pb[i * k..(i + 1) * k].iter().copied())
+                .collect()
+        });
         let sub_bundle = PredictionBundle {
             task: bundle.task,
             null_losses: vec![0.0; idxs.len()],
@@ -331,31 +367,41 @@ pub fn assess_equivalence(
             pred_s: sub_s,
             num_outputs: k,
         };
-        calib_boot.push(
-            (calibration_error(&sub_bundle, &sub_bundle.pred_s)
-                - calibration_error(&sub_bundle, &sub_bundle.pred_a))
-            .abs(),
-        );
+        let ca = calibration_error(&sub_bundle, &sub_bundle.pred_a);
+        let c_s = (calibration_error(&sub_bundle, &sub_bundle.pred_s) - ca).abs();
+        let c_b = sub_b
+            .as_deref()
+            .map(|pb| (calibration_error(&sub_bundle, pb) - ca).abs())
+            .unwrap_or(0.01);
+        calib_ratio_boot.push(c_s / c_b.max(0.01));
     }
-    lift_boot.sort_by(f64::total_cmp);
-    calib_boot.sort_by(f64::total_cmp);
+    pred_ratio_boot.sort_by(f64::total_cmp);
+    lift_ratio_boot.sort_by(f64::total_cmp);
+    calib_ratio_boot.sort_by(f64::total_cmp);
     let q90 = ((0.90 * (draws as f64 - 1.0)).ceil() as usize).min(draws - 1);
-    let lift = make_kappa(
+    let pred = make_kappa_ratio(
+        pred_err,
+        pred_scale,
+        0.01,
+        pred_ratio_boot[q90],
+        thresholds.pred_kappa_star,
+    );
+    let lift = make_kappa_ratio(
         lift_err,
         lift_scale,
         0.01,
-        lift_boot[q90],
+        lift_ratio_boot[q90],
         thresholds.lift_kappa_star,
     );
-    let calib = make_kappa(
+    let calib = make_kappa_ratio(
         calib_err,
         calib_scale,
         0.01,
-        calib_boot[q90],
+        calib_ratio_boot[q90],
         thresholds.calib_kappa_star,
     );
 
-    // 3. Driver equivalence (`TV` on grouped permutation + optional ALE L1 + coalition L1).
+    // 3. Driver equivalence (`TV` on grouped permutation + optional ALE/coalition L1) with ratio bootstrap.
     let driver_kappa = if let Some(d) = driver {
         let mut s_parts = vec![normalized_tv(&d.perm_a, &d.perm_s)?];
         let mut b_parts = Vec::new();
@@ -380,11 +426,35 @@ pub fn assess_equivalence(
         } else {
             b_parts.iter().sum::<f64>() / b_parts.len() as f64
         };
-        Some(make_kappa(
+        let p_len = d.perm_a.len();
+        let mut drv_boot = Vec::with_capacity(draws);
+        let mut drng = SplitMix64::new(seed ^ 0x99);
+        for _ in 0..draws {
+            let mut pa = Vec::with_capacity(p_len);
+            let mut ps = Vec::with_capacity(p_len);
+            let mut pb = d.perm_b.as_ref().map(|_| Vec::with_capacity(p_len));
+            for _ in 0..p_len {
+                let idx = drng.gen_range(p_len);
+                pa.push(d.perm_a[idx]);
+                ps.push(d.perm_s[idx]);
+                if let (Some(ref mut out), Some(ref src)) = (&mut pb, &d.perm_b) {
+                    out.push(src[idx]);
+                }
+            }
+            let tv_s = normalized_tv(&pa, &ps)?;
+            let tv_b = match pb {
+                Some(ref bv) => normalized_tv(&pa, bv)?,
+                None => 0.02,
+            };
+            drv_boot.push(tv_s / tv_b.max(0.02));
+        }
+        drv_boot.sort_by(f64::total_cmp);
+        let ucb = drv_boot[q90].max(err / scale.max(0.02));
+        Some(make_kappa_ratio(
             err,
             scale,
             0.02,
-            err,
+            ucb,
             thresholds.driver_kappa_star,
         ))
     } else {
@@ -392,7 +462,7 @@ pub fn assess_equivalence(
     };
 
     let equivalence_pass =
-        pred.pass && lift.pass && calib.pass && driver_kappa.as_ref().is_none_or(|d| d.pass);
+        pred.pass && lift.pass && calib.pass && driver_kappa.as_ref().is_some_and(|d| d.pass);
     Ok(EquivalenceAssessment {
         pred,
         lift,

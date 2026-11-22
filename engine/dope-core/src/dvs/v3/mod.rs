@@ -7,6 +7,7 @@
 //! 4. Realism Coverage (`C2ST`, `MargAUC`, rule violations)
 
 pub mod bundle;
+pub mod c2st;
 pub mod deploy;
 pub mod equiv;
 pub mod groups;
@@ -65,6 +66,10 @@ pub struct FidelityV3Request {
     pub seed: u64,
     pub bootstrap_draws: usize,
     pub kappa_thresholds: KappaThresholds,
+    /// When `false` (default, mandatory for qualification), absent `driver`, `realism`, or
+    /// `privacy` evidence fails closed instead of silently passing.
+    #[serde(default)]
+    pub allow_partial_diagnostic: bool,
     pub cells: Vec<FidelityCellRequest>,
 }
 
@@ -153,9 +158,27 @@ pub fn evaluate_v3(req: &FidelityV3Request) -> Result<FidelityV3Receipt, DvsErro
                 } else {
                     "uninformative"
                 };
-                let equiv_ok = equiv.equivalence_pass && deploy.as_ref().is_none_or(|d| d.pass);
-                let real_ok = real.as_ref().is_none_or(|r| r.pass_standard);
-                let priv_ok = priv_a.as_ref().is_none_or(|p| p.pass);
+                let partial = req.allow_partial_diagnostic;
+                let driver_ok = if partial {
+                    equiv.driver.as_ref().is_none_or(|d| d.pass)
+                } else {
+                    equiv.driver.as_ref().is_some_and(|d| d.pass)
+                };
+                let equiv_ok = equiv.pred.pass
+                    && equiv.lift.pass
+                    && equiv.calib.pass
+                    && driver_ok
+                    && deploy.as_ref().is_none_or(|d| d.pass);
+                let real_ok = if partial {
+                    real.as_ref().is_none_or(|r| r.pass_standard)
+                } else {
+                    real.as_ref().is_some_and(|r| r.pass_standard)
+                };
+                let priv_ok = if partial {
+                    priv_a.as_ref().is_none_or(|p| p.pass)
+                } else {
+                    priv_a.as_ref().is_some_and(|p| p.pass)
+                };
                 let all_ok = parity.parity_pass && equiv_ok && real_ok && priv_ok;
                 FidelityCellReceipt {
                     cell_id: cell.cell_id.clone(),
@@ -206,17 +229,40 @@ pub fn evaluate_v3(req: &FidelityV3Request) -> Result<FidelityV3Receipt, DvsErro
         .iter()
         .filter(|c| {
             c.status == "complete"
-                && c.equivalence.as_ref().is_some_and(|e| e.equivalence_pass)
+                && c.equivalence.as_ref().is_some_and(|e| {
+                    e.pred.pass
+                        && e.lift.pass
+                        && e.calib.pass
+                        && if req.allow_partial_diagnostic {
+                            e.driver.as_ref().is_none_or(|d| d.pass)
+                        } else {
+                            e.driver.as_ref().is_some_and(|d| d.pass)
+                        }
+                })
                 && c.deploy.as_ref().is_none_or(|d| d.pass)
         })
         .count();
     let real_hits = cell_receipts
         .iter()
-        .filter(|c| c.status == "complete" && c.realism.as_ref().is_none_or(|r| r.pass_standard))
+        .filter(|c| {
+            c.status == "complete"
+                && if req.allow_partial_diagnostic {
+                    c.realism.as_ref().is_none_or(|r| r.pass_standard)
+                } else {
+                    c.realism.as_ref().is_some_and(|r| r.pass_standard)
+                }
+        })
         .count();
     let priv_hits = cell_receipts
         .iter()
-        .filter(|c| c.status == "complete" && c.privacy.as_ref().is_none_or(|p| p.pass))
+        .filter(|c| {
+            c.status == "complete"
+                && if req.allow_partial_diagnostic {
+                    c.privacy.as_ref().is_none_or(|p| p.pass)
+                } else {
+                    c.privacy.as_ref().is_some_and(|p| p.pass)
+                }
+        })
         .count();
     let overall_hits = cell_receipts
         .iter()

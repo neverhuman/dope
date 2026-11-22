@@ -197,6 +197,7 @@ fn fidelity_engine_2_full_pipeline_end_to_end() {
         seed: 7,
         bootstrap_draws: 300,
         kappa_thresholds: KappaThresholds::default(),
+        allow_partial_diagnostic: true,
         cells: vec![FidelityCellRequest {
             cell_id: "e2e_v2".into(),
             family_id: "fam_e2e".into(),
