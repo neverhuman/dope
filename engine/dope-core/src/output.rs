@@ -35,3 +35,22 @@ pub fn write_ml<W: Write>(enc: &MlEncoder<'_>, s: &Samples, writer: W) -> Result
         format_number(rows[r][c])
     })
 }
+
+/// Write row-aligned `distill` sidecar metadata (`row_id,weight,pair_id`), preserving
+/// the main synthetic table's mandatory target-last schema without extra columns.
+pub fn write_distill_sidecar<W: Write>(
+    weights: &[f64],
+    pair_ids: &[u64],
+    mut writer: W,
+) -> Result<()> {
+    if weights.len() != pair_ids.len() {
+        return Err(crate::error::DopeError::Input(
+            "distill sidecar weight and pair_id lengths differ".into(),
+        ));
+    }
+    writeln!(writer, "row_id,weight,pair_id")?;
+    for (r, (&w, &pid)) in weights.iter().zip(pair_ids).enumerate() {
+        writeln!(writer, "{r},{w:.8},{pid}")?;
+    }
+    Ok(())
+}

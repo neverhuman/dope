@@ -272,10 +272,20 @@ pub(crate) struct TierArgs {
 #[derive(Args)]
 pub(crate) struct SampleArgs {
     pub(crate) model: PathBuf,
-    #[arg(short = 'n', long, default_value_t = 1000)]
-    pub(crate) rows: usize,
+    /// Number of rows to emit, or `auto` (4000 for faithful/distill, 1000 for matched/legacy).
+    #[arg(short = 'n', long, default_value = "1000")]
+    pub(crate) rows: String,
     #[arg(long, default_value_t = 0)]
     pub(crate) seed: u64,
+    /// Emission contract mode: legacy | faithful | distill | matched.
+    #[arg(long, default_value = "legacy")]
+    pub(crate) mode: String,
+    /// Independent stateless RNG table stream ID (for multi-table draws, T12).
+    #[arg(long, default_value_t = 0)]
+    pub(crate) table_id: u64,
+    /// Optional sidecar CSV path for `weight,pair_id` in `distill` mode.
+    #[arg(long)]
+    pub(crate) sidecar: Option<PathBuf>,
     #[arg(short, long)]
     pub(crate) out: Option<PathBuf>,
     /// Optional CSV of real/external X rows: draw only y ~ Q(Y|X) (diagnostic swap-ladder control).

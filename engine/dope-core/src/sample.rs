@@ -23,7 +23,9 @@ use crate::rng::{normal_block, uniform_block};
 use crate::target::Head;
 use candle_core::{DType, Device, Tensor, D};
 
+pub mod emit;
 mod forest;
+pub use emit::{sample_with_mode, EmissionMode, EmitOptions, EmittedSamples};
 use forest::DeviceForest;
 
 #[derive(Clone, Debug)]
