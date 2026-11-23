@@ -149,7 +149,7 @@ def unpack_dse8_packet_py(raw: bytes) -> dict[str, Any]:
     }
     marginals: list[dict[str, Any]] = []
     loadings = np.zeros((p_eff, V8_MAX_RANK), dtype=np.float32)
-    linear: dict[str, Any] = {"o_dim": o_dim, "w": np.zeros((o_dim, p_eff), dtype=np.float32), "b": np.zeros(o_dim, dtype=np.float32), "temp": 1.0}
+    linear: dict[str, Any] = {"o_dim": o_dim, "w": np.zeros((o_dim, p_eff), dtype=np.float32), "b": np.zeros(o_dim, dtype=np.float32), "logit_tau": 1.0}
     nominal_groups: list[dict[str, Any]] = []
     regimes: list[dict[str, Any]] = []
     effects: list[dict[str, Any]] = []
@@ -245,8 +245,8 @@ def unpack_dse8_packet_py(raw: bytes) -> dict[str, Any]:
             arr = np.frombuffer(pl, dtype=np.int8).reshape(p_eff, rank_use)
             loadings[:, :rank_use] = arr.astype(np.float32) / 127.0
         elif tag == 0x04:  # TAG_LINEAR
-            temp = min(max(_f16_bits_to_f32(struct.unpack("<H", pl[:2])[0]), 0.2), 5.0)
-            linear["temp"] = temp
+            logit_tau = min(max(_f16_bits_to_f32(struct.unpack("<H", pl[:2])[0]), 0.2), 5.0)
+            linear["logit_tau"] = logit_tau
             lc = 2
             for c in range(o_dim):
                 sc_w, bv = struct.unpack("<ff", pl[lc : lc + 8])
@@ -394,7 +394,7 @@ def build_decoder_inputs_py(pkt: dict[str, Any]) -> tuple[np.ndarray, np.ndarray
     glob[20] = len(pkt["trees"]) / 40.0
     glob[21] = len(pkt["nominal_groups"]) / 8.0
     glob[22] = h["code_tier"] / 3.0
-    glob[23] = pkt["linear"]["temp"]
+    glob[23] = pkt["linear"]["logit_tau"]
 
     return col, edge, glob, pkt["code_vec"].astype(np.float32)
 

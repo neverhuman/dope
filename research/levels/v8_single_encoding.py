@@ -694,7 +694,7 @@ def decode_dse8_rows_py_parity(
             logits[:o_dim] += float(plan_np["alpha_table"]) * nl
 
         if h["task_id"] != 0:
-            logits[:o_dim] *= float(pkt["linear"]["temp"])
+            logits[:o_dim] *= float(pkt["linear"]["logit_tau"])
 
         if h["task_id"] == 0:
             eps_y = counter_normal(seed, row_idx, STREAM_TARGET, 0)
