@@ -10,8 +10,8 @@
 //! would put decoded values off the grid.
 
 use dope_core::evidence::{
-    extract, ColumnMeta as EvidenceMeta, EvidenceInput, EvidenceTier, COL_DIM, EDGE_DIM,
-    GLOB_DIM as EV_GLOB_DIM,
+    extract_with_rows, ColumnMeta as EvidenceMeta, EvidenceInput, EvidenceTier, RowIdentity,
+    COL_DIM, EDGE_DIM, GLOB_DIM as EV_GLOB_DIM,
 };
 use dope_core::marginal::column_meta::META_FIELDS;
 use dope_core::single_encoding::v8::{
@@ -158,6 +158,41 @@ pub fn v8_episode(
     tier: u8,
     seed: u64,
 ) -> Result<V8Episode, Code> {
+    v8_episode_rows(
+        x_fit,
+        n_fit,
+        p,
+        y_fit,
+        x_qry,
+        n_qry,
+        y_qry,
+        task,
+        budget,
+        normalized_only,
+        tier,
+        seed,
+        None,
+    )
+}
+
+/// `v8_episode` with stable physical ids of the FIT rows: the evidence bank is then the same for
+/// any order of those rows and cross-fits on duplicate-group folds (`extract_with_rows`).
+#[allow(clippy::too_many_arguments)]
+pub fn v8_episode_rows(
+    x_fit: &[f32],
+    n_fit: usize,
+    p: usize,
+    y_fit: &[f32],
+    x_qry: &[f32],
+    n_qry: usize,
+    y_qry: &[f32],
+    task: u8,
+    budget: usize,
+    normalized_only: bool,
+    tier: u8,
+    seed: u64,
+    fit_row_ids: Option<&[u64]>,
+) -> Result<V8Episode, Code> {
     let shape_ok = p > 0
         && p <= u16::MAX as usize
         && n_fit >= 4
@@ -168,7 +203,8 @@ pub fn v8_episode(
         && x_fit.len() == n_fit * p
         && y_fit.len() == n_fit
         && x_qry.len() == n_qry * p
-        && y_qry.len() == n_qry;
+        && y_qry.len() == n_qry
+        && fit_row_ids.is_none_or(|ids| ids.len() == n_fit);
     if !shape_ok {
         return Err(Code::Shape);
     }
@@ -238,18 +274,26 @@ pub fn v8_episode(
         1 => 2,
         _ => card.classes.len().clamp(2, V8_MAX_CLASSES),
     };
-    let ev = extract(&EvidenceInput {
-        x_unit: &ev_unit,
-        x_raw: Some(&ev_raw),
-        y: &ev_y,
-        task_id: task,
-        n_classes,
-        col_meta: Some(&ev_meta),
-        packet_probe: None,
-        tier: tier_enum,
-        target_free: false,
-        seed,
-    })
+    let ev_ids: Option<Vec<u64>> = fit_row_ids.map(|ids| keep.iter().map(|&i| ids[i]).collect());
+    let rows = ev_ids.as_deref().map(|row_ids| RowIdentity {
+        row_ids,
+        group_ids: None,
+    });
+    let ev = extract_with_rows(
+        &EvidenceInput {
+            x_unit: &ev_unit,
+            x_raw: Some(&ev_raw),
+            y: &ev_y,
+            task_id: task,
+            n_classes,
+            col_meta: Some(&ev_meta),
+            packet_probe: None,
+            tier: tier_enum,
+            target_free: false,
+            seed,
+        },
+        rows,
+    )
     .map_err(|_| Code::Fit)?;
     if ev.p != p_eff || ev.col.len() != p_eff || ev.edge.len() != p_eff * p_eff {
         return Err(Code::Fit);
@@ -357,7 +401,8 @@ pub extern "C" fn dope_ffi_v8_offset(block: u32, p: u32) -> u64 {
 /// Same buffer contract as `dope_ffi_dse7_episode`; `out_f32_cap` must be at least
 /// `dope_ffi_v8_len(p, n_fit, n_qry)`. Each input is an aligned, initialized range within one
 /// live allocation and stays immutable for the call. The output ranges are writable and do not
-/// overlap any input or each other.
+/// overlap any input or each other. `fit_row_ids` is null or `n_fit` distinct stable physical ids
+/// of the FIT rows (ABI 4), see [`v8_episode_rows`].
 #[no_mangle]
 #[allow(clippy::too_many_arguments)]
 pub unsafe extern "C" fn dope_ffi_v8_episode(
@@ -373,6 +418,7 @@ pub unsafe extern "C" fn dope_ffi_v8_episode(
     normalized_only: u8,
     tier: u8,
     seed: u64,
+    fit_row_ids: *const u64,
     out_f32: *mut f32,
     out_f32_cap: u64,
     out_packet: *mut u8,
@@ -402,7 +448,11 @@ pub unsafe extern "C" fn dope_ffi_v8_episode(
         // SAFETY: the caller guarantees the query ranges. Nonempty query pointers were checked
         // for null, and copy_input never dereferences a pointer for an empty range.
         let (xq, yq) = unsafe { (copy_input(x_qry, qry_cells)?, copy_input(y_qry, n_qry)?) };
-        v8_episode(
+        // SAFETY: a non-null id pointer covers n_fit values by the caller's contract.
+        let ids = (!fit_row_ids.is_null())
+            .then(|| unsafe { copy_input(fit_row_ids, n_fit) })
+            .transpose()?;
+        v8_episode_rows(
             &xf,
             n_fit,
             p,
@@ -415,6 +465,7 @@ pub unsafe extern "C" fn dope_ffi_v8_episode(
             normalized_only != 0,
             tier,
             seed,
+            ids.as_deref(),
         )
     }));
     match result {

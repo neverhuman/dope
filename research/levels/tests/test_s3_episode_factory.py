@@ -286,6 +286,25 @@ def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
         assert out.read_bytes() == packet, (i, episode["task"])
 
 
+def test_native_v8_evidence_follows_the_physical_fit_rows(corpus):
+    """Episodes carry distinct source-row ids for their FIT rows; with them the evidence bank is
+    the same for any order of those rows (ties between equal X fingerprints included)."""
+    sampler = make_sampler(corpus, **NATIVE)
+    evk = ("ev_col", "ev_edge", "ev_glob")
+    checked = 0
+    for spec in sampler.plan_step(SEED, 5)[:6]:
+        episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
+        ids = np.asarray(episode["fit_rows"])
+        assert ids.shape == (episode["y_fit"].shape[0],) and np.unique(ids).size == ids.size
+        perm = np.random.default_rng(checked).permutation(ids.size)
+        moved = dict(episode, X_fit=episode["X_fit"][perm], y_fit=episode["y_fit"][perm], fit_rows=ids[perm])
+        a, b = ef.native_v8(episode), ef.native_v8(moved)
+        for key in evk:
+            assert np.array_equal(a[key], b[key]), (key, spec.table_id)
+        checked += 1
+    assert checked == 6
+
+
 # -- gradient-farm adapter ------------------------------------------------------------------
 def boom_stage(episode, **_):
     """A coding mistake in a stage: not an episode fault, so the producer dies."""

@@ -23,7 +23,7 @@ use dope_core::single_encoding::{
 };
 
 /// Bumped on any change of a signature or of [`layout`] / [`v8::offsets`].
-pub const ABI_VERSION: u32 = 3;
+pub const ABI_VERSION: u32 = 4;
 
 pub mod v8;
 /// Largest packet budget accepted (the 64 KiB development frontier).
@@ -93,13 +93,13 @@ pub(crate) fn columns(x: &[f32], n: usize, p: usize) -> Vec<Vec<f64>> {
 /// # Safety
 /// For nonzero `len`, `src` must be aligned and readable for `len` initialized floats within a
 /// single live allocation. The caller keeps the source immutable during the copy.
-unsafe fn copy_input(src: *const f32, len: usize) -> Result<Vec<f32>, Code> {
+unsafe fn copy_input<T: Copy + Default>(src: *const T, len: usize) -> Result<Vec<T>, Code> {
     let mut input = Vec::new();
     if len > 0 {
         input.try_reserve_exact(len).map_err(|_| Code::Capacity)?;
-        input.resize(len, 0.0);
+        input.resize(len, T::default());
         // SAFETY: the caller guarantees the source range. The independent vector owns len
-        // writable floats, so the two ranges cannot overlap. No source ownership is transferred.
+        // writable values, so the two ranges cannot overlap. No source ownership is transferred.
         unsafe { std::ptr::copy_nonoverlapping(src, input.as_mut_ptr(), len) };
     }
     Ok(input)

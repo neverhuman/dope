@@ -64,34 +64,85 @@ fn splitmix64(mut x: u64) -> u64 {
     x ^ (x >> 31)
 }
 
-/// Column-permutation-invariant canonical row ordering from `X` only.
-/// Guarantees exact bit-for-bit row-permutation invariance AND column-permutation equivariance
-/// without ever reading target labels `y`.
-pub(crate) fn canonical_row_order(x_unit: &[Vec<f32>]) -> Vec<usize> {
-    let p = x_unit.len();
+/// Per-row X fingerprint, invariant to column order: two order-free 64-bit mixes of every cell
+/// (`-0.0` and `+0.0` unified, every non-finite value one code). Never reads the target.
+pub(crate) fn row_fingerprints(x_unit: &[Vec<f32>]) -> Vec<(u64, u64)> {
     let n = x_unit.first().map(|c| c.len()).unwrap_or(0);
-    let mut keys: Vec<(u64, u64, usize)> = Vec::with_capacity(n);
-    for r in 0..n {
-        let mut h1 = 0u64;
-        let mut h2 = 0u64;
-        for col in x_unit.iter().take(p) {
-            let v = col[r];
-            let bits = if !v.is_finite() {
-                0x7FC0_0000u64
-            } else if v == 0.0 {
-                0u64 // unify -0.0 and +0.0
-            } else {
-                v.to_bits() as u64
-            };
-            let m1 = splitmix64(bits ^ 0xA24B_AED4_963E_E407);
-            let m2 = splitmix64(bits ^ 0x9FB2_1C65_1E98_DF25);
-            h1 = h1.wrapping_add(m1);
-            h2 ^= m2;
-        }
-        keys.push((h1, h2, r));
-    }
+    (0..n)
+        .map(|r| {
+            let (mut h1, mut h2) = (0u64, 0u64);
+            for col in x_unit {
+                let v = col[r];
+                let bits = if !v.is_finite() {
+                    0x7FC0_0000u64
+                } else if v == 0.0 {
+                    0u64
+                } else {
+                    v.to_bits() as u64
+                };
+                h1 = h1.wrapping_add(splitmix64(bits ^ 0xA24B_AED4_963E_E407));
+                h2 ^= splitmix64(bits ^ 0x9FB2_1C65_1E98_DF25);
+            }
+            (h1, h2)
+        })
+        .collect()
+}
+
+/// Canonical row order: rows sorted by X fingerprint, ties broken by `row_ids` (stable physical
+/// ids) or, without them, by input position. With distinct stable ids the order follows the
+/// physical rows for any input order; by position it does so only when no fingerprints tie.
+pub(crate) fn order_by_fingerprint(fp: &[(u64, u64)], row_ids: Option<&[u64]>) -> Vec<usize> {
+    let mut keys: Vec<(u64, u64, u64, usize)> = fp
+        .iter()
+        .enumerate()
+        .map(|(r, &(h1, h2))| (h1, h2, row_ids.map_or(r as u64, |ids| ids[r]), r))
+        .collect();
     keys.sort_unstable();
-    keys.into_iter().map(|(_, _, r)| r).collect()
+    keys.into_iter().map(|k| k.3).collect()
+}
+
+/// Column-permutation-invariant canonical row order from `X` only, ties broken by input position
+/// (see `order_by_fingerprint`).
+pub(crate) fn canonical_row_order(x_unit: &[Vec<f32>]) -> Vec<usize> {
+    order_by_fingerprint(&row_fingerprints(x_unit), None)
+}
+
+const FOLD_SALT: u64 = 0x6A09_E667_F3BC_C908;
+
+/// Cross-fitting folds over canonical rows. The default is the historical `r % k` split, which
+/// sends adjacent equal fingerprints to different folds; `grouped` keeps each group in one fold.
+#[derive(Clone, Debug, Default)]
+pub(crate) struct Folds {
+    group_rank: Option<Vec<u32>>,
+    n_groups: usize,
+}
+
+impl Folds {
+    /// One group key per canonical row. Groups are ranked by a salted hash of their key, so fold
+    /// sizes balance by group count and do not depend on row order.
+    pub(crate) fn grouped(keys: &[u64]) -> Self {
+        let tag = |g: u64| (splitmix64(g ^ FOLD_SALT), g);
+        let mut distinct: Vec<(u64, u64)> = keys.iter().map(|&g| tag(g)).collect();
+        distinct.sort_unstable();
+        distinct.dedup();
+        let rank = keys
+            .iter()
+            .map(|&g| distinct.binary_search(&tag(g)).unwrap_or(0) as u32)
+            .collect();
+        Self {
+            group_rank: Some(rank),
+            n_groups: distinct.len(),
+        }
+    }
+
+    /// Fold of canonical row `r` among `k`. With fewer than `k` groups no group-safe split
+    /// exists and the historical split is used.
+    pub(crate) fn of(&self, r: usize, k: usize) -> usize {
+        match &self.group_rank {
+            Some(rank) if self.n_groups >= k => rank[r] as usize % k,
+            _ => r % k,
+        }
+    }
 }
 
 /// Compute tie-aware conditional-mean normal scores and tie-attenuation factor `kappa_j in [0.15, 1.0]`.
@@ -334,4 +385,45 @@ pub fn gaussian_copula_tail10_ref(rho: f64) -> f64 {
         joint += norm_pdf(z) * cond_p * h;
     }
     (joint / 0.10).clamp(0.0, 1.0)
+}
+
+#[cfg(test)]
+mod fold_tests {
+    use super::Folds;
+
+    #[test]
+    fn grouped_folds_keep_groups_whole_and_ignore_row_order() {
+        // 40 groups of 1-4 rows.
+        let keys: Vec<u64> = (0..100u64).map(|r| (r * r + 3) % 40).collect();
+        let f = Folds::grouped(&keys);
+        let fold_of_group = |k: usize| {
+            (0..keys.len())
+                .filter(|&r| keys[r] == k as u64)
+                .map(|r| f.of(r, 3))
+                .collect::<Vec<_>>()
+        };
+        for g in 0..40 {
+            let folds = fold_of_group(g);
+            assert!(
+                folds.windows(2).all(|w| w[0] == w[1]),
+                "group {g} split across folds"
+            );
+        }
+        for k in 0..3 {
+            assert!((0..keys.len()).any(|r| f.of(r, 3) == k), "fold {k} empty");
+        }
+        // The same groups listed in another order land in the same folds.
+        let rev: Vec<u64> = keys.iter().rev().copied().collect();
+        let g = Folds::grouped(&rev);
+        for (r, &key) in keys.iter().enumerate() {
+            assert_eq!(f.of(r, 3), g.of(keys.len() - 1 - r, 3), "key {key}");
+        }
+        // Fewer groups than folds: the historical split.
+        let two = Folds::grouped(&[5, 5, 9, 9]);
+        assert_eq!(
+            (0..4).map(|r| two.of(r, 3)).collect::<Vec<_>>(),
+            vec![0, 1, 2, 0]
+        );
+        assert_eq!(Folds::default().of(7, 3), 1);
+    }
 }

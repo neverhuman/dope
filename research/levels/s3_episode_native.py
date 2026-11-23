@@ -22,7 +22,7 @@ _TASK_ID = {"regression": 0, "binary": 1, "multiclass": 2}
 _CODES = {1: "null_pointer", 2: "shape", 3: "fit", 4: "capacity", 5: "panic", 6: "unpack", 7: "target"}
 _BLOCKS = ("col_feats", "q_nl", "glob", "knots", "loadings", "w_base", "b_base", "misc", "col_mask",
            "is_const", "col_index", "col_meta", "head")
-ABI_VERSION = 3
+ABI_VERSION = 4
 META_FIELDS = 12  # Nc2ColumnMetaV2::to_f32s
 _LIB: Any = None  # the loaded library handle (code, not data: nothing row-derived is kept)
 
@@ -66,8 +66,8 @@ def load_ffi(path: str | Path | None = None) -> Any:
         lib.dope_ffi_v8_episode.restype = ctypes.c_int32
         lib.dope_ffi_v8_episode.argtypes = [
             f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, f32p, ctypes.c_uint32, f32p, ctypes.c_uint8,
-            ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint64, f32p, ctypes.c_uint64, u8p,
-            ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32)]
+            ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64),
+            f32p, ctypes.c_uint64, u8p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32)]
         _LIB = lib
     return _LIB
 
@@ -113,8 +113,12 @@ V8_MAX_COLS = 64
 
 def v8_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: np.ndarray, task: str,
               budget: int = 2048, normalized_only: bool = False, tier: int = 2,
-              seed: int = 0) -> tuple[bytes, np.ndarray, int]:
-    """(DSE8 packet bytes, flat float32 V8 tensors, layout width) from FIT rows; query rows are only mapped."""
+              seed: int = 0, fit_row_ids: np.ndarray | None = None) -> tuple[bytes, np.ndarray, int]:
+    """(DSE8 packet bytes, flat float32 V8 tensors, layout width) from FIT rows; query rows are only mapped.
+
+    ``fit_row_ids`` (distinct stable physical ids of the FIT rows, e.g. source-table row indices)
+    makes the evidence bank independent of the FIT row order and cross-fits on duplicate groups.
+    """
     lib = load_ffi()
     if task not in _TASK_ID:
         raise StageError("task_unsupported")
@@ -126,6 +130,9 @@ def v8_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: np
     n_qry = xq.shape[0]
     if xq.shape[1] != p or yf.shape != (n_fit,) or yq.shape != (n_qry,):
         raise StageError("shape")
+    ids = None if fit_row_ids is None else np.ascontiguousarray(fit_row_ids, dtype=np.uint64)
+    if ids is not None and ids.shape != (n_fit,):
+        raise StageError("shape")
     out = np.empty(int(lib.dope_ffi_v8_len(p, n_fit, n_qry)), dtype=np.float32)
     cap = max(budget, 64)
     pkt = np.empty(cap, dtype=np.uint8)
@@ -133,7 +140,8 @@ def v8_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: np
     code = lib.dope_ffi_v8_episode(
         _ptr(xf, ctypes.c_float), n_fit, p, _ptr(yf, ctypes.c_float), _ptr(xq, ctypes.c_float), n_qry,
         _ptr(yq, ctypes.c_float), _TASK_ID[task], budget, int(bool(normalized_only)), tier,
-        seed & 0xFFFFFFFFFFFFFFFF, _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
+        seed & 0xFFFFFFFFFFFFFFFF, None if ids is None else _ptr(ids, ctypes.c_uint64),
+        _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
         ctypes.byref(pkt_len))
     if code != 0:
         raise StageError("ffi_" + _CODES.get(int(code), "unknown"))
@@ -179,8 +187,11 @@ def native_v8(episode: dict[str, Any], budget: int = 2048, normalized_only: bool
     # A pure function of this episode's identity (its split and view), so payloads stay identical
     # for any producer count.
     seed = int(hashlib.sha256(f"{episode['split_sig']}|{episode['view_sig']}".encode()).hexdigest()[:16], 16)
+    # Stable physical FIT row ids (source-table rows) make the evidence free of the row order.
+    ids = episode.get("fit_rows")
     packet, floats, w = v8_arrays(episode["X_fit"], episode["y_fit"], episode["X_qry"], episode["y_qry"],
-                                  episode["task"], budget, normalized_only, tier, seed)
+                                  episode["task"], budget, normalized_only, tier, seed,
+                                  None if ids is None else np.asarray(ids, dtype=np.uint64))
     n_fit, n_qry = int(episode["y_fit"].shape[0]), int(episode["y_qry"].shape[0])
     v = split_v8(floats, int(episode["X_fit"].shape[1]), n_fit, n_qry)
     misc = v["misc"]

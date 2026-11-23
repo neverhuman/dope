@@ -22,7 +22,8 @@ use crate::error::{DopeError, Result};
 use closed_loop::extract_closed_loop_t3;
 use dependence_pairs::extract_dependence_t1;
 use primitives::{
-    canonical_row_order, set_mask_bit, tie_aware_normal_scores, value_consistent_bins,
+    order_by_fingerprint, row_fingerprints, set_mask_bit, tie_aware_normal_scores,
+    value_consistent_bins, Folds,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -130,9 +131,31 @@ pub fn evidence_layout_sha256() -> [u8; 32] {
     Sha256::digest(LAYOUT_JSON).into()
 }
 
+/// Stable identity of the FIT rows, one entry per `x_unit` row.
+#[derive(Clone, Copy, Debug)]
+pub struct RowIdentity<'a> {
+    /// Distinct physical row ids (e.g. source-table row indices). They break ties between rows
+    /// with equal X fingerprints, so the canonical order follows the physical rows.
+    pub row_ids: &'a [u64],
+    /// Duplicate-group ids: every row of a group goes to one cross-fitting fold. `None` groups
+    /// rows by their X fingerprint.
+    pub group_ids: Option<&'a [u64]>,
+}
+
 /// Pure-function FIT-only evidence extractor up to `input.tier`.
 /// Zero global state, zero caching, single-threaded deterministic, query-poison-safe.
+/// Rows tie-break by input position and folds are the historical `r % k` split; see
+/// `extract_with_rows` for a result that is free of the input row order.
 pub fn extract(input: &EvidenceInput<'_>) -> Result<Evidence> {
+    extract_with_rows(input, None)
+}
+
+/// `extract` with stable row identity: the same evidence for any order of the same physical
+/// rows, and duplicate-group cross-fitting folds. `rows: None` is exactly `extract`.
+pub fn extract_with_rows(
+    input: &EvidenceInput<'_>,
+    rows: Option<RowIdentity<'_>>,
+) -> Result<Evidence> {
     let p = input.x_unit.len();
     if p == 0 {
         return Err(DopeError::Input("evidence_empty_columns".into()));
@@ -164,8 +187,27 @@ pub fn extract(input: &EvidenceInput<'_>) -> Result<Evidence> {
         }
     }
 
+    if let Some(id) = rows {
+        let mut ids = id.row_ids.to_vec();
+        ids.sort_unstable();
+        if ids.len() != n
+            || ids.windows(2).any(|w| w[0] == w[1])
+            || id.group_ids.is_some_and(|g| g.len() != n)
+        {
+            return Err(DopeError::Input("evidence_row_identity_mismatch".into()));
+        }
+    }
+
     // Canonicalize FIT row order using column-permutation-invariant X fingerprint.
-    let order = canonical_row_order(input.x_unit);
+    let fp = row_fingerprints(input.x_unit);
+    let order = order_by_fingerprint(&fp, rows.map(|id| id.row_ids));
+    let folds = rows.map_or_else(Folds::default, |id| {
+        let key = |r: usize| {
+            id.group_ids
+                .map_or(fp[r].0 ^ fp[r].1.rotate_left(29), |g| g[r])
+        };
+        Folds::grouped(&order.iter().map(|&r| key(r)).collect::<Vec<_>>())
+    });
     let x_unit_c: Vec<Vec<f32>> = (0..p)
         .map(|j| order.iter().map(|&r| input.x_unit[j][r]).collect())
         .collect();
@@ -268,6 +310,7 @@ pub fn extract(input: &EvidenceInput<'_>) -> Result<Evidence> {
         if !input.target_free {
             let tgt = extract_target_t1(
                 &x_unit_c,
+                &folds,
                 &z_tie,
                 &bins16,
                 &y_c,

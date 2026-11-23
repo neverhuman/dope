@@ -6,7 +6,7 @@ use super::dependence_pairs::DepContext;
 use super::irls::{fit_irls_subset, predict_irls_rows};
 use super::primitives::{
     clamp_f32, dcor_unbiased_1d, kendall_tau_b, miller_madow_mi_and_z, pava_isotonic_r2,
-    set_mask_bit, squash, squash_z, value_consistent_bins, SUPPORT_FLOOR_K,
+    set_mask_bit, squash, squash_z, value_consistent_bins, Folds, SUPPORT_FLOOR_K,
 };
 use super::support_marginal::ColT0Summary;
 use super::target_helpers::{
@@ -21,6 +21,8 @@ pub(crate) struct TargetContext {
     pub oof_pred: Vec<Vec<f64>>,
     pub lin_gain: f64,
     pub composite_signal: Vec<f64>,
+    /// Cross-fitting folds of the canonical FIT rows, shared with the T2 witness.
+    pub folds: Folds,
 }
 
 /// Extract Tier T1 supervised target evidence, OOF residuals, signed pair/XOR interactions,
@@ -28,6 +30,7 @@ pub(crate) struct TargetContext {
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn extract_target_t1(
     x_unit: &[Vec<f32>],
+    folds: &Folds,
     z_tie: &[Vec<f64>],
     bins16: &[Vec<u8>],
     y: &[f64],
@@ -56,8 +59,8 @@ pub(crate) fn extract_target_t1(
     let n_folds = if n >= 30 { 3 } else { 2 };
     let mut oof_pred = vec![vec![0.0f64; n]; o_dim];
     for f in 0..n_folds {
-        let train_rows: Vec<usize> = (0..n).filter(|r| r % n_folds != f).collect();
-        let val_rows: Vec<usize> = (0..n).filter(|r| r % n_folds == f).collect();
+        let train_rows: Vec<usize> = (0..n).filter(|&r| folds.of(r, n_folds) != f).collect();
+        let val_rows: Vec<usize> = (0..n).filter(|&r| folds.of(r, n_folds) == f).collect();
         let (wf, bf) = fit_irls_subset(x_unit, y, &train_rows, task_id, k_eff);
         let pv = predict_irls_rows(x_unit, &val_rows, &wf, &bf, task_id);
         for c in 0..o_dim {
@@ -458,5 +461,6 @@ pub(crate) fn extract_target_t1(
         oof_pred,
         lin_gain,
         composite_signal,
+        folds: folds.clone(),
     }
 }

@@ -273,8 +273,8 @@ pub(crate) fn extract_witness_t2(
         };
 
         for fold in 0..2 {
-            let tr: Vec<usize> = (0..n).filter(|r| r % 2 != fold).collect();
-            let va: Vec<usize> = (0..n).filter(|r| r % 2 == fold).collect();
+            let tr: Vec<usize> = (0..n).filter(|&r| tgt.folds.of(r, 2) != fold).collect();
+            let va: Vec<usize> = (0..n).filter(|&r| tgt.folds.of(r, 2) == fold).collect();
             let (base, trees) = fit_obliv_gbdt(bins16, &y_use, &tr, is_binary, n_trees, 0.20);
             let l0 = eval_obliv_loss(bins16, &y_use, &va, base, &[], is_binary, None);
             let l_base = eval_obliv_loss(bins16, &y_use, &va, base, &trees, is_binary, None);

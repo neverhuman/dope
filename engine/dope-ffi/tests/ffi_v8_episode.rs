@@ -8,7 +8,7 @@ use dope_core::single_encoding::v8::{
 };
 use dope_ffi::v8::{
     block, dope_ffi_v8_episode, dope_ffi_v8_len, dope_ffi_v8_offset, offsets, p_cap, total,
-    v8_episode, MISC_LEN,
+    v8_episode, v8_episode_rows, MISC_LEN,
 };
 use dope_ffi::Code;
 
@@ -276,6 +276,7 @@ fn bad_shapes_are_codes_and_the_c_abi_matches() {
             0,
             2,
             7,
+            std::ptr::null(),
             out.as_mut_ptr(),
             cap,
             pkt.as_mut_ptr(),
@@ -293,4 +294,126 @@ fn bad_shapes_are_codes_and_the_c_abi_matches() {
         call(&mut out, len as u64 - 1, &mut pkt, &mut pkt_len),
         Code::Capacity as i32
     );
+}
+
+/// FIT rows where every other row repeats the previous row's X with its own target, so X
+/// fingerprints tie in pairs; returned with stable physical ids.
+fn tied_fit(task: u8) -> (Vec<f32>, Vec<f32>, Vec<u64>) {
+    let (mut xf, yf) = table(N_FIT, P, task, 3);
+    for i in (1..N_FIT).step_by(2) {
+        let prev = xf[(i - 1) * P..i * P].to_vec();
+        xf[i * P..(i + 1) * P].copy_from_slice(&prev);
+    }
+    let ids = (0..N_FIT as u64).map(|i| 1_000 + 7 * i).collect();
+    (xf, yf, ids)
+}
+
+/// The same physical rows in another order (a fixed stride permutation), ids moved with them.
+fn permuted(xf: &[f32], yf: &[f32], ids: &[u64]) -> (Vec<f32>, Vec<f32>, Vec<u64>) {
+    let order: Vec<usize> = (0..N_FIT).map(|i| (i * 157 + 11) % N_FIT).collect();
+    let x = order
+        .iter()
+        .flat_map(|&r| xf[r * P..(r + 1) * P].to_vec())
+        .collect();
+    (
+        x,
+        order.iter().map(|&r| yf[r]).collect(),
+        order.iter().map(|&r| ids[r]).collect(),
+    )
+}
+
+fn evidence_block(ep: &dope_ffi::v8::V8Episode) -> Vec<f32> {
+    let off = offsets(p_cap(P));
+    ep.floats[off[block::EV_COL]..off[block::EV_GLOB] + 160].to_vec()
+}
+
+#[test]
+fn stable_row_ids_make_evidence_free_of_row_order() {
+    let (xq, yq) = table(N_QRY, P, 1, 9);
+    for task in [0u8, 1] {
+        let (xf, yf, ids) = tied_fit(task);
+        let (xp, yp, idp) = permuted(&xf, &yf, &ids);
+        let run = |x: &[f32], y: &[f32], id: Option<&[u64]>| {
+            v8_episode_rows(x, N_FIT, P, y, &xq, N_QRY, &yq, task, 2048, false, 2, 7, id).unwrap()
+        };
+        let (a, b) = (run(&xf, &yf, Some(&ids)), run(&xp, &yp, Some(&idp)));
+        assert_eq!(
+            evidence_block(&a),
+            evidence_block(&b),
+            "task {task}: evidence follows the rows"
+        );
+        // The fixture exercises the ties: by input position the evidence moves with the order.
+        let (la, lb) = (run(&xf, &yf, None), run(&xp, &yp, None));
+        assert_ne!(
+            evidence_block(&la),
+            evidence_block(&lb),
+            "task {task}: fixture has no effective ties"
+        );
+        assert_eq!(
+            evidence_block(&la),
+            evidence_block(
+                &v8_episode(&xf, N_FIT, P, &yf, &xq, N_QRY, &yq, task, 2048, false, 2, 7).unwrap()
+            )
+        );
+    }
+}
+
+#[test]
+fn row_ids_reach_the_c_abi_and_are_checked() {
+    let (xf, yf, ids) = tied_fit(1);
+    let (xq, yq) = table(N_QRY, P, 1, 9);
+    let want = v8_episode_rows(
+        &xf,
+        N_FIT,
+        P,
+        &yf,
+        &xq,
+        N_QRY,
+        &yq,
+        1,
+        2048,
+        false,
+        2,
+        7,
+        Some(&ids),
+    )
+    .unwrap();
+    let mut out = vec![0.0f32; total(P, N_FIT, N_QRY)];
+    let mut pkt = vec![0u8; 65_536];
+    let mut pkt_len = 0u32;
+    let call = |ids: &[u64], out: &mut [f32], pkt: &mut [u8], pkt_len: &mut u32| unsafe {
+        dope_ffi_v8_episode(
+            xf.as_ptr(),
+            N_FIT as u32,
+            P as u32,
+            yf.as_ptr(),
+            xq.as_ptr(),
+            N_QRY as u32,
+            yq.as_ptr(),
+            1,
+            2048,
+            0,
+            2,
+            7,
+            ids.as_ptr(),
+            out.as_mut_ptr(),
+            out.len() as u64,
+            pkt.as_mut_ptr(),
+            pkt.len() as u32,
+            pkt_len,
+        )
+    };
+    assert_eq!(
+        call(&ids, &mut out, &mut pkt, &mut pkt_len),
+        Code::Ok as i32
+    );
+    assert_eq!(out, want.floats);
+    let mut dup = ids.clone();
+    dup[5] = dup[4];
+    assert_eq!(
+        call(&dup, &mut out, &mut pkt, &mut pkt_len),
+        Code::Fit as i32,
+        "ids must be distinct"
+    );
+    assert_eq!(dope_ffi::ABI_VERSION, 4);
 }
