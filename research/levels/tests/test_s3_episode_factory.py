@@ -24,10 +24,11 @@ NATIVE = dict(NARROW, multilabel_view_prob=0.0)  # DSE7 has no multilabel task
 
 
 def _have_ffi() -> bool:
+    """False only when the library is not built; a stale build (ABI mismatch) fails the tests."""
     try:
-        ef.load_ffi()
+        ef.ffi_path()
         return True
-    except (ef.FactoryError, OSError):
+    except ef.FactoryError:
         return False
 
 
@@ -175,6 +176,9 @@ def test_native_packet_uses_fit_rows_only(corpus):
             assert np.array_equal(va[name], vb[name]), name
         p_eff = int(va["misc"][1])
         assert 0 < p_eff <= 48 and np.all(va["col_index"][:p_eff] >= 0)
+        assert np.array_equal(va["col_meta"], vb["col_meta"])  # FIT-only meta
+        assert va["col_meta"].shape == (48, ef.META_FIELDS) and not va["col_meta"][p_eff:].any()
+        assert set(np.unique(va["col_meta"][:p_eff, 4])) <= {0.0, 1.0, 2.0, 3.0, 4.0}
         assert va["x_fit"].shape == (a["n_fit"], 48) and va["y_qry"].shape == (a["n_qry"],)
         checked += 1
     assert checked == 24
@@ -202,3 +206,13 @@ def test_native_stage_counts_unsupported_tasks():
     with pytest.raises(ef.StageError, match="ffi_fit"):
         ef.dse7_arrays(np.random.default_rng(0).normal(size=(20, 3)), np.ones(20), np.zeros((0, 3)),
                        np.zeros(0), "binary")
+
+
+@needs_ffi
+def test_column_meta_of_raw_fit_rows(corpus):
+    sampler = make_sampler(corpus, **NATIVE)
+    episode, _, _ = build_slot(corpus, sampler, SEED, sampler.plan_step(SEED, 0)[0], RAW)
+    meta = ef.column_meta(episode["X_fit"])
+    assert meta.shape == (episode["X_fit"].shape[1], ef.META_FIELDS)
+    assert np.array_equal(meta, ef.column_meta(episode["X_fit"][::-1]))  # row order never matters
+    assert np.isfinite(meta).all()

@@ -143,8 +143,9 @@ fn c_abi_matches_rust_entry_point() {
     let want = dse7_episode(&xf, n_fit, p, &yf, &xq, n_qry, &yq, 1, 2048).unwrap();
     let len = dope_ffi_dse7_len(n_fit as u32, n_qry as u32) as usize;
     assert_eq!(len, want.floats.len());
-    assert_eq!(dope_ffi_dse7_offset(11), layout::HEAD as u64);
-    assert_eq!(dope_ffi_dse7_offset(12), u64::MAX);
+    assert_eq!(dope_ffi_dse7_offset(11), layout::COL_META as u64);
+    assert_eq!(dope_ffi_dse7_offset(12), layout::HEAD as u64);
+    assert_eq!(dope_ffi_dse7_offset(13), u64::MAX);
     let mut out = vec![f32::NAN; len];
     let mut pkt = vec![0u8; 4096];
     let mut pkt_len = 0u32;
@@ -208,4 +209,44 @@ fn c_abi_matches_rust_entry_point() {
         )
     };
     assert_eq!(code, Code::NullPointer as i32);
+}
+
+#[test]
+fn column_meta_is_fit_only_and_in_packet_units() {
+    use dope_core::marginal::column_meta::{
+        fit_columns, ColumnDecl, Nc2ColumnMetaV2, UnitSpace, META_FIELDS,
+    };
+    let ep = episode(0, 2);
+    let (_, header, card) = unpack_dse7_packet(&ep.packet).unwrap();
+    let (xf, _) = table(300, 9, 0, 1);
+    let cols: Vec<Vec<f64>> = (0..9)
+        .map(|j| (0..300).map(|i| xf[i * 9 + j] as f64).collect())
+        .collect();
+    for c in 0..MAX_COLS {
+        let got = &ep.floats[layout::COL_META + c * META_FIELDS..][..META_FIELDS];
+        if c >= header.p_eff as usize {
+            assert!(got.iter().all(|&v| v == 0.0));
+            continue;
+        }
+        let j = card.col_indices[c];
+        let unit = UnitSpace {
+            center: card.center_active[c] as f64,
+            scale: card.scale_active[c] as f64,
+        };
+        let want = Nc2ColumnMetaV2::fit(&cols[j], ColumnDecl::single(j), Some(unit)).to_f32s();
+        assert_eq!(got, &want[..]);
+    }
+    // Columns 4 of every 5 are 6-level integers: atoms; the rest are continuous.
+    let metas = fit_columns(&cols, None, None);
+    assert_eq!(metas[4].support_class, 2);
+    assert_eq!(metas[0].support_class, 0);
+    let mut out = vec![f32::NAN; 9 * META_FIELDS];
+    let code = unsafe {
+        dope_ffi::dope_ffi_column_meta(xf.as_ptr(), 300, 9, out.as_mut_ptr(), out.len() as u64)
+    };
+    assert_eq!(code, Code::Ok as i32);
+    let want: Vec<f32> = metas.iter().flat_map(|m| m.to_f32s()).collect();
+    assert_eq!(out, want);
+    let code = unsafe { dope_ffi::dope_ffi_column_meta(xf.as_ptr(), 300, 9, out.as_mut_ptr(), 10) };
+    assert_eq!(code, Code::Capacity as i32);
 }

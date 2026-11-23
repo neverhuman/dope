@@ -134,7 +134,7 @@ class EpisodeRing:
         stride = -(-(SLOT_HEAD + capacity) // PAGE) * PAGE
         size = PAGE + n_slots * stride
         room = os.statvfs(SHM_DIR)
-        if room.f_bavail * room.f_frsize < size + (256 << 20):
+        if room.f_bavail * room.f_frsize < size + (64 << 20):
             raise FactoryError("shm_no_space")
         blob = json.dumps(meta or {}, sort_keys=True).encode()
         if len(blob) >= PAGE - META_AT:
@@ -495,8 +495,9 @@ def arena_sampler(corpus: Any, cfg: Any) -> Any:
 _TASK_ID = {"regression": 0, "binary": 1, "multiclass": 2}
 _CODES = {1: "null_pointer", 2: "shape", 3: "fit", 4: "capacity", 5: "panic", 6: "unpack", 7: "target"}
 _BLOCKS = ("col_feats", "q_nl", "glob", "knots", "loadings", "w_base", "b_base", "misc", "col_mask",
-           "is_const", "col_index", "head")
-ABI_VERSION = 1
+           "is_const", "col_index", "col_meta", "head")
+ABI_VERSION = 2
+META_FIELDS = 12  # Nc2ColumnMetaV2::to_f32s
 _LIB: Any = None  # the loaded library handle (code, not data: nothing row-derived is kept)
 
 
@@ -525,6 +526,8 @@ def load_ffi(path: str | Path | None = None) -> Any:
         lib.dope_ffi_dse7_offset.restype = ctypes.c_uint64
         lib.dope_ffi_dse7_offset.argtypes = [ctypes.c_uint32]
         f32p, u8p = ctypes.POINTER(ctypes.c_float), ctypes.POINTER(ctypes.c_uint8)
+        lib.dope_ffi_column_meta.restype = ctypes.c_int32
+        lib.dope_ffi_column_meta.argtypes = [f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, ctypes.c_uint64]
         lib.dope_ffi_dse7_episode.restype = ctypes.c_int32
         lib.dope_ffi_dse7_episode.argtypes = [
             f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, f32p, ctypes.c_uint32, f32p, ctypes.c_uint8,
@@ -565,11 +568,26 @@ def dse7_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: 
     return pkt[:pkt_len.value].tobytes(), out
 
 
+def column_meta(x_fit: np.ndarray) -> np.ndarray:
+    """``Nc2ColumnMetaV2`` of every column of the FIT rows ``(n_fit, p)``: ``(p, 12)`` float32."""
+    lib = load_ffi()
+    xf = np.ascontiguousarray(x_fit, dtype=np.float32)
+    n_fit, p = xf.shape
+    out = np.empty((p, META_FIELDS), dtype=np.float32)
+    code = lib.dope_ffi_column_meta(_ptr(xf, ctypes.c_float), n_fit, p, _ptr(out, ctypes.c_float), out.size)
+    if code != 0:
+        raise StageError("ffi_" + _CODES.get(int(code), "unknown"))
+    return out
+
+
 def native_dse7(episode: dict[str, Any], budget: int = 2048) -> dict[str, Any]:
     """Stage: the DSE7 packet of this episode's FIT rows plus FIT and query rows in its coordinates.
 
     Wants a view built with ``ViewConfig(emit="raw")`` so the Rust scale card sees raw values, as
     serving does. Multiclass FIT classes beyond the packet's eight most frequent get code -1.
+    ``split_native(...)["col_meta"]`` holds each packet column's ``Nc2ColumnMetaV2`` from FIT raw
+    values in packet units: group id, kind, width, parent, support class, skew guard, lattice q0
+    and phase, lower / upper bound flags, tail asymmetry, distinct-count bucket.
     """
     packet, floats = dse7_arrays(episode["X_fit"], episode["y_fit"], episode["X_qry"], episode["y_qry"],
                                  episode["task"], budget)
@@ -605,7 +623,7 @@ def split_native(payload: dict[str, Any]) -> dict[str, np.ndarray]:
 
 def native_capacity(max_fit: int, max_qry: int, budget: int = 2048) -> int:
     """Bytes of the largest pickled ``native_dse7`` payload, with headroom for metadata."""
-    head = 48 * 42 + 48 * 4 + 16 + 48 * 17 + 48 * 12 + 8 * 48 + 8 + 8 + 3 * 48
+    head = 48 * 42 + 48 * 4 + 16 + 48 * 17 + 48 * 12 + 8 * 48 + 8 + 8 + 3 * 48 + 48 * META_FIELDS
     return 4 * (head + (max_fit + max_qry) * 49) + budget + 16 * (max_fit + max_qry) + (256 << 10)
 
 

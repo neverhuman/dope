@@ -15,12 +15,15 @@
 
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
+use dope_core::marginal::column_meta::{
+    fit_columns, ColumnDecl, Nc2ColumnMetaV2, UnitSpace, META_FIELDS,
+};
 use dope_core::single_encoding::{
     fit_dse7_packet, unpack_dse7_packet, COL_FEAT_DIM, KNOT_COUNT, MAX_CLASSES, MAX_COLS, MAX_RANK,
 };
 
 /// Bumped on any change of a signature or of [`layout`].
-pub const ABI_VERSION: u32 = 1;
+pub const ABI_VERSION: u32 = 2;
 /// Largest packet budget accepted (the 64 KiB development frontier).
 pub const MAX_BUDGET: u32 = 65_536;
 
@@ -56,7 +59,10 @@ pub mod layout {
     pub const IS_CONST: usize = COL_MASK + MAX_COLS;
     /// Source column of each packet column, -1 when unused.
     pub const COL_INDEX: usize = IS_CONST + MAX_COLS;
-    pub const HEAD: usize = COL_INDEX + MAX_COLS;
+    /// `Nc2ColumnMetaV2::to_f32s` of each packet column, from FIT raw values, in the packet's own
+    /// unit space (the scale card's center and scale): `[MAX_COLS][META_FIELDS]`, zero when unused.
+    pub const COL_META: usize = COL_INDEX + MAX_COLS;
+    pub const HEAD: usize = COL_META + MAX_COLS * super::META_FIELDS;
 
     /// Total f32 elements for an episode of `n_fit` FIT and `n_qry` query rows.
     pub const fn total(n_fit: usize, n_qry: usize) -> usize {
@@ -149,6 +155,15 @@ pub fn dse7_episode(
         out[layout::COL_MASK + c] = pkt.col_mask[c];
         out[layout::IS_CONST + c] = pkt.is_const[c];
         out[layout::COL_INDEX + c] = card.col_indices.get(c).map_or(-1.0, |&j| j as f32);
+        if let Some(&j) = card.col_indices.get(c) {
+            let unit = UnitSpace {
+                center: card.center_active[c] as f64,
+                scale: card.scale_active[c] as f64,
+            };
+            let meta = Nc2ColumnMetaV2::fit(&fit_cols[j], ColumnDecl::single(j), Some(unit));
+            out[layout::COL_META + c * META_FIELDS..][..META_FIELDS]
+                .copy_from_slice(&meta.to_f32s());
+        }
     }
     out[layout::GLOB..][..GLOB_DIM].copy_from_slice(&pkt.glob_feats);
     for k in 0..MAX_CLASSES {
@@ -208,13 +223,13 @@ pub extern "C" fn dope_ffi_dse7_len(n_fit: u32, n_qry: u32) -> u64 {
 }
 
 /// Offset of a named head block (0 COL_FEATS, 1 Q_NL, 2 GLOB, 3 KNOTS, 4 LOADINGS, 5 W_BASE,
-/// 6 B_BASE, 7 MISC, 8 COL_MASK, 9 IS_CONST, 10 COL_INDEX, 11 HEAD), or u64::MAX.
+/// 6 B_BASE, 7 MISC, 8 COL_MASK, 9 IS_CONST, 10 COL_INDEX, 11 COL_META, 12 HEAD), or u64::MAX.
 #[no_mangle]
 pub extern "C" fn dope_ffi_dse7_offset(block: u32) -> u64 {
     use layout::*;
     let all = [
         COL_FEATS, Q_NL, GLOB, KNOTS, LOADINGS, W_BASE, B_BASE, MISC, COL_MASK, IS_CONST,
-        COL_INDEX, HEAD,
+        COL_INDEX, COL_META, HEAD,
     ];
     all.get(block as usize).map_or(u64::MAX, |&v| v as u64)
 }
@@ -290,6 +305,45 @@ pub unsafe extern "C" fn dope_ffi_dse7_episode(
                 std::ptr::copy_nonoverlapping(ep.packet.as_ptr(), out_packet, ep.packet.len());
                 *out_packet_len = ep.packet.len() as u32;
             }
+            Code::Ok as i32
+        }
+    }
+}
+
+/// `Nc2ColumnMetaV2` of every raw column from FIT rows alone, in each column's robust unit space
+/// (FIT median and IQR / 1.349). Writes `[p][META_FIELDS]` floats, one row per column.
+///
+/// # Safety
+/// `x_fit` must hold `n_fit * p` floats (row-major) and `out` `out_cap` floats.
+#[no_mangle]
+pub unsafe extern "C" fn dope_ffi_column_meta(
+    x_fit: *const f32,
+    n_fit: u32,
+    p: u32,
+    out: *mut f32,
+    out_cap: u64,
+) -> i32 {
+    if x_fit.is_null() || out.is_null() {
+        return Code::NullPointer as i32;
+    }
+    let (n_fit, p) = (n_fit as usize, p as usize);
+    let Some(cells) = n_fit.checked_mul(p) else {
+        return Code::Shape as i32;
+    };
+    if p == 0 || (out_cap as usize) < p * META_FIELDS {
+        return Code::Capacity as i32;
+    }
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        // SAFETY: lengths are the caller's contract stated above.
+        let xf = unsafe { std::slice::from_raw_parts(x_fit, cells) };
+        fit_columns(&columns(xf, n_fit, p), None, None)
+    }));
+    match result {
+        Err(_) => Code::Panic as i32,
+        Ok(metas) => {
+            let flat: Vec<f32> = metas.iter().flat_map(|m| m.to_f32s()).collect();
+            // SAFETY: `out_cap >= p * META_FIELDS` was checked.
+            unsafe { std::ptr::copy_nonoverlapping(flat.as_ptr(), out, flat.len()) };
             Code::Ok as i32
         }
     }
