@@ -4176,6 +4176,14 @@
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets; FIT-only native_v8 payloads with the trainer's shapes"
     },
+    "research/levels/s3_episode_native.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the native DSE7/V8 episode stages through the factory: FIT-only packets and tensors, query rows only mapped, the V8 packet byte-identical to `dope_v8_emit fit --fit-meta`"
+    },
+    "research/levels/s3_episode_ring.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the shared-memory episode ring through the factory: slot handoff, backpressure, producer death and stale-ring sweep"
+    },
     "engine/dope-core/src/marginal/column_meta.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test column_meta_v2",
       "purpose": "verify per-episode FIT-only Nc2ColumnMetaV2: planted support classes, k=10 bound floor, row-order and missing-cell invariance"
