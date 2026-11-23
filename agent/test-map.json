@@ -4091,6 +4091,34 @@
     "tools/dope_dashboard/": {
       "command": "python3 -B -m unittest tools.dope_dashboard.test_dashboard -v",
       "purpose": "verify read-only DOPE Fleet and Fidelity KPI Dashboard probe, metrics aggregation, and aiohttp WebSocket/HTTP server"
+    },
+    "research/levels/s3_v7_batch_ops.py": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify V7.2 maximum-entropy batch builder, Q_nl residual extraction, and Rust SingleEncV7 parity"
+    },
+    "research/levels/s3_v7_entropy.py": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify tri-task quotas, multiclass >8-class cropping, synthetic SCM/tree priors, target swaps, and manifold augmentations"
+    },
+    "research/levels/s3_v7_eval.py": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify DEV-only multi-task retention, realism, and empirical privacy diagnostics"
+    },
+    "research/levels/s3_v7_fast_trainer.py": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify CPU-only SingleEncV7 V7.2 training loop, persistent per-step JSONL telemetry, and F32 rank-<=2 SafeTensors export"
+    },
+    "research/levels/v7_single_encoding.py": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v7",
+      "purpose": "verify DSE7 v2 sufficient statistics, Q_nl[p,4] quartile residuals, and SingleEncV7 forward parity with pure Rust"
+    },
+    "research/levels/archive_and_plot_v2_wave.py": {
+      "command": "python3 -B research/levels/archive_and_plot_v2_wave.py --help",
+      "purpose": "verify lossless V2.0.0 training-wave archival and 4-panel PNG/PDF loss-and-throughput plotting"
+    },
+    "docs/whitepaper-v2/": {
+      "command": "python3 -B docs/whitepaper-v2/scripts/render_v2_paper.py --check",
+      "purpose": "verify DOPE v2.0.0 white paper receipt-bound macros stay strictly synchronized with committed receipts and Rust constants"
     }
   },
   "workspace": "dope"

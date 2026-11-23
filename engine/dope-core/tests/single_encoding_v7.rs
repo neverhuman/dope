@@ -9,7 +9,8 @@ use dope_core::eval::{gbdt, Matrix};
 use dope_core::rng::Rng;
 use dope_core::sample::{EmissionMode, EmitOptions};
 use dope_core::single_encoding::{
-    SingleEncV7Packet, SingleEncV7Weights, COL_FEAT_DIM, GLOB_FEAT_DIM, KNOT_COUNT, MAX_CLASSES,
+    fit_dse7_packet, sample_zero_init_rows, unpack_dse7_packet, SingleEncV7Packet,
+    SingleEncV7Weights, COL_FEAT_DIM, COL_FEAT_DIM_V2, GLOB_FEAT_DIM, KNOT_COUNT, MAX_CLASSES,
     MAX_COLS, MAX_RANK,
 };
 use dope_core::table::RawTable;
@@ -107,6 +108,7 @@ fn synthetic_v7_safetensors(d: usize, h_target: usize, nonzero: bool) -> Vec<u8>
 fn sample_packet() -> SingleEncV7Packet {
     let mut pkt = SingleEncV7Packet {
         col_feats: [[0.0; COL_FEAT_DIM]; MAX_COLS],
+        q_nl: [[0.0; 4]; MAX_COLS],
         glob_feats: [0.0; GLOB_FEAT_DIM],
         knots: [[0.0; KNOT_COUNT]; MAX_COLS],
         loadings: [[0.0; MAX_RANK]; MAX_COLS],
@@ -310,6 +312,7 @@ fn single_enc_v7_pytorch_parity_when_fixture_provided() {
         .expect("load parity weights");
     let mut pkt = SingleEncV7Packet {
         col_feats: [[0.0; COL_FEAT_DIM]; MAX_COLS],
+        q_nl: [[0.0; 4]; MAX_COLS],
         glob_feats: [0.0; GLOB_FEAT_DIM],
         knots: [[0.0; KNOT_COUNT]; MAX_COLS],
         loadings: [[0.0; MAX_RANK]; MAX_COLS],
@@ -320,7 +323,10 @@ fn single_enc_v7_pytorch_parity_when_fixture_provided() {
         is_const: [0.0; MAX_COLS],
     };
     for c in 0..MAX_COLS {
-        pkt.col_feats[c].copy_from_slice(&fix.col_feats[c]);
+        pkt.col_feats[c].copy_from_slice(&fix.col_feats[c][..COL_FEAT_DIM]);
+        if fix.col_feats[c].len() == COL_FEAT_DIM_V2 {
+            pkt.q_nl[c].copy_from_slice(&fix.col_feats[c][COL_FEAT_DIM..COL_FEAT_DIM_V2]);
+        }
         pkt.knots[c].copy_from_slice(&fix.knots[c]);
         pkt.loadings[c].copy_from_slice(&fix.loadings[c]);
         pkt.col_mask[c] = fix.col_mask[c];
@@ -351,4 +357,125 @@ fn single_enc_v7_pytorch_parity_when_fixture_provided() {
         max_diff < 1e-4,
         "PyTorch vs Pure-Rust SingleEncV7 max_abs_diff={max_diff} exceeds 1e-4!"
     );
+}
+
+#[test]
+fn dse7_v2_self_contained_budget_roundtrip_and_v72_loader() {
+    for &(task_id, p_raw, n_rows) in &[
+        (0u8, 12usize, 128usize),
+        (1u8, 24usize, 160usize),
+        (2u8, 18usize, 180usize),
+        (0u8, 250usize, 140usize),
+    ] {
+        let mut rng = Rng::new(4242 + p_raw as u64 + task_id as u64 * 100);
+        let mut x = vec![vec![0.0f64; n_rows]; p_raw];
+        let mut y = vec![0.0f64; n_rows];
+        for r in 0..n_rows {
+            let z0 = rng.normal();
+            let z1 = rng.normal();
+            for (c, xc) in x.iter_mut().enumerate().take(p_raw) {
+                xc[r] = if c == 0 {
+                    1000.0 + 50.0 * z0
+                } else if c == 1 {
+                    z1
+                } else {
+                    0.3 * z0 + 0.9 * rng.normal()
+                };
+            }
+            let sig = 0.8 * z0 + 0.6 * (z0 * z0 - 1.0) - 0.5 * z1;
+            y[r] = match task_id {
+                0 => 20.0 + 5.0 * sig + 0.4 * rng.normal(),
+                1 => f64::from(sig > 0.0),
+                _ => ((sig.clamp(-2.5, 2.5) + 2.5) as i64 % 5) as f64,
+            };
+        }
+        let wire = fit_dse7_packet(&x, &y, task_id, 2048).expect("fit dse7 v2");
+        assert!(
+            wire.len() <= 2048,
+            "task={task_id} p_raw={p_raw} exceeded 2048 B: got {}",
+            wire.len()
+        );
+        let (pkt, hdr, card) = unpack_dse7_packet(&wire).expect("unpack dse7 v2");
+        assert_eq!(hdr.task_id, task_id);
+        assert_eq!(hdr.x_cols_raw as usize, p_raw);
+        let rows = sample_zero_init_rows(&pkt, 32, 777);
+        assert_eq!(rows.len(), 32);
+        let raw0 = card.inverse_row_x(&rows[0].x);
+        assert_eq!(raw0.len(), p_raw);
+        assert!(raw0.iter().all(|v| v.is_finite()));
+        // Flip a byte -> CRC32 must fail closed.
+        let mut bad = wire.clone();
+        bad[8] ^= 0xFF;
+        assert!(unpack_dse7_packet(&bad).is_err());
+    }
+    // Verify V7.2 (col_in = 46) checkpoint also loads cleanly alongside V7.0/V7.1 (col_in = 42).
+    let mut t: BTreeMap<String, (Vec<usize>, Vec<f32>)> = BTreeMap::new();
+    let d = 16;
+    add_lin(&mut t, "col_in", d, COL_FEAT_DIM_V2, 0.1);
+    add_lin(&mut t, "glob_in", d, GLOB_FEAT_DIM, 0.1);
+    add_ln(&mut t, "final_norm", d);
+    add_lin(&mut t, "delta_knots", KNOT_COUNT, d, 0.05);
+    add_lin(&mut t, "delta_L", MAX_RANK, d, 0.05);
+    add_lin(&mut t, "delta_W", MAX_CLASSES, d, 0.05);
+    add_lin(&mut t, "hyper_w1", 8, d, 0.1);
+    add_lin(&mut t, "hyper_b1", 8, d, 0.05);
+    add_lin(&mut t, "hyper_w2", 8 * MAX_CLASSES, d, 0.05);
+    add_lin(&mut t, "hyper_temp", 2, d, 0.05);
+    let m_v72 = SingleEncV7Weights::from_safetensors_bytes(&pack_safetensors(&t), 4)
+        .expect("load v7.2 col_in=46");
+    let rows = m_v72.sample_counter_rows(&sample_packet(), 8, 123);
+    assert_eq!(rows.len(), 8);
+
+    // Verify Format 2 discrete-level compaction never panics in catf::sample and fails closed on tiny budget.
+    let mut rng = Rng::new(7777);
+    let n = 320usize;
+    let n_feat = 28usize;
+    let mut headers = Vec::with_capacity(n_feat + 1);
+    let mut columns: Vec<Vec<String>> = Vec::with_capacity(n_feat + 1);
+    for j in 0..n_feat {
+        headers.push(format!("d{j}"));
+        let vals: Vec<String> = (0..n).map(|r| format!("{}", (r + j * 3) % 10)).collect();
+        columns.push(vals);
+    }
+    headers.push("y".into());
+    columns.push(
+        (0..n)
+            .map(|r| format!("{:.3}", (r % 10) as f64 + 0.1 * rng.normal()))
+            .collect(),
+    );
+    let raw = RawTable { headers, columns };
+    let fit_ok = fit_v2(
+        &raw,
+        n_feat,
+        &FitV2Options {
+            budget: Some(2048),
+            seed: 9,
+            ..Default::default()
+        },
+    );
+    if let Ok(fitted) = fit_ok {
+        assert!(fitted.bytes.len() <= 2048);
+        let em = fitted
+            .program
+            .sample_with_mode(&EmitOptions {
+                rows: 64,
+                seed: 11,
+                mode: EmissionMode::Faithful,
+                table_id: 1,
+                ..Default::default()
+            })
+            .expect("zero-panic sample after discrete trim_extra");
+        assert_eq!(em.samples.y.len(), 64);
+    }
+    // Impossibly tiny budget must fail closed with Budget error, never exit Ok over budget!
+    let tiny = fit_v2(
+        &raw,
+        n_feat,
+        &FitV2Options {
+            budget: Some(64),
+            seed: 9,
+            ..Default::default()
+        },
+    );
+    assert!(tiny.is_err());
 }

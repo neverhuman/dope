@@ -39,11 +39,31 @@ def _wire(msg: dict) -> str:
 
 
 class DopeFleetState:
-    def __init__(self, hosts: tuple[str, ...]) -> None:
+    def __init__(self, hosts: tuple[str, ...], history_log: Path | None = None) -> None:
         self.readings: dict[str, tuple[dict | None, float | None, str]] = {h: (None, None, "") for h in hosts}
         self.hosts: dict[str, dict] = {}
         self.revisions: dict[str, int] = dict.fromkeys(hosts, 0)
         self.history: deque[dict] = deque(maxlen=240)
+        self.history_log = history_log
+        self._last_logged_at: float | None = None
+        if history_log is not None and history_log.is_file():
+            try:
+                tail: deque[str] = deque(maxlen=240)
+                with history_log.open("r", encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        if line.strip():
+                            tail.append(line)
+                for line in tail:
+                    try:
+                        obj = json.loads(line)
+                        if isinstance(obj, dict) and "at" in obj:
+                            self.history.append(obj)
+                    except ValueError:
+                        continue
+                if self.history:
+                    self._last_logged_at = float(self.history[-1]["at"])
+            except OSError:
+                pass
         self.waiters: set[asyncio.Event] = set()
         self.at = time.time()
         self.summary: dict = {}
@@ -64,6 +84,25 @@ class DopeFleetState:
                 self.revisions[host] += 1
                 self.hosts[host] = view
         self.summary = fleet_summary(list(self.hosts.values()), self.history, now)
+        if self.history_log is not None and self.history:
+            pt = self.history[-1]
+            if pt.get("at") != self._last_logged_at and self.summary.get("live_nodes", 0) > 0:
+                self._last_logged_at = pt.get("at")
+                rec = {
+                    **pt,
+                    "live_nodes": self.summary.get("live_nodes"),
+                    "active_dope_procs": self.summary.get("active_dope_procs"),
+                    "encoding_bytes_median": self.summary.get("encoding_bytes_median"),
+                    "dope_vram_gib": self.summary.get("dope_vram_gib"),
+                    "median_grad_norm": self.summary.get("median_grad_norm"),
+                }
+                try:
+                    self.history_log.parent.mkdir(parents=True, exist_ok=True)
+                    with self.history_log.open("a", encoding="utf-8") as fh:
+                        fh.write(json.dumps(rec, sort_keys=True) + "\n")
+                        fh.flush()
+                except OSError:
+                    pass
         for ev in list(self.waiters):
             ev.set()
 
@@ -184,7 +223,8 @@ def build_app(state: DopeFleetState) -> web.Application:
 async def _serve(args: argparse.Namespace) -> None:
     hosts = tuple(args.hosts.split(",")) if args.hosts else DEFAULT_HOSTS
     local_host = args.local_host or socket.gethostname().split(".")[0]
-    state = DopeFleetState(hosts)
+    hist_path = Path(args.history_log) if args.history_log else None
+    state = DopeFleetState(hosts, history_log=hist_path)
     app = build_app(state)
     runner = web.AppRunner(app)
     await runner.setup()
@@ -213,6 +253,7 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=8768)
     ap.add_argument("--hosts", default=",".join(DEFAULT_HOSTS))
     ap.add_argument("--local-host", default="")
+    ap.add_argument("--history-log", default="/home/ubuntu/dope-data/dashboard/fleet_history.jsonl")
     asyncio.run(_serve(ap.parse_args()))
 
 

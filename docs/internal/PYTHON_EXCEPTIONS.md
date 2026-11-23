@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 919
-- **`keep-with-reason`**: 893 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 926
+- **`keep-with-reason`**: 900 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -951,3 +951,10 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `tools/dope_dashboard/probe.py` | `tools/dope_dashboard` | `keep-with-reason` | Zero-dependency stdlib SSH probe emitting bounded GPU, training, and Fidelity KPI JSONL snapshots across xbabe0-xbabe9. | Local monitoring dashboard tooling; read-only host probe. |
 | `tools/dope_dashboard/server.py` | `tools/dope_dashboard` | `keep-with-reason` | Read-only aiohttp WebSocket and HTTP dashboard server (default 127.0.0.1:8768) mirroring the jsr dashboard UX. | Local monitoring dashboard tooling; coupled to aiohttp WebSocket server. |
 | `tools/dope_dashboard/test_dashboard.py` | `tools/dope_dashboard` | `keep-with-reason` | Unit and aiohttp server tests for the DOPE Fleet and Fidelity KPI Dashboard. | Direct test suite for tools/dope_dashboard. |
+| `docs/whitepaper-v2/scripts/render_v2_paper.py` | `docs/whitepaper-v2/scripts` | `keep-with-reason` | Receipt-bound LaTeX macro renderer and drift verifier for the DOPE v2.0.0 white paper. | Coupled to documentation build receipts and LaTeX macro generation outside the Rust runtime. |
+| `research/levels/s3_v7_batch_ops.py` | `research/levels` | `keep-with-reason` | Maximum-entropy flat-arena episode builder, Q_nl packet collation, and trust-region differentiable multi-auditor loss for SingleEncV7 V7.2. | Offline PyTorch training data pipeline and autograd loss; pure Rust owns production fit/sample and certification. |
+| `research/levels/s3_v7_entropy.py` | `research/levels` | `keep-with-reason` | Tri-task balanced quota scheduler, >8-class multiclass cropping, infinite synthetic nonlinear SCM/tree priors, target swaps, and manifold augmentations. | Offline PyTorch/NumPy pretraining augmentation engine; zero production inference authority. |
+| `research/levels/s3_v7_eval.py` | `research/levels` | `keep-with-reason` | Held-out DEV-only regression/binary/multiclass retention, C2ST realism, and empirical privacy diagnostics for SingleEncV7 training runs. | Offline research evaluation helper coupled to scikit-learn auditors; never touches CONFIRM or release promotion. |
+| `research/levels/s3_v7_fast_trainer.py` | `research/levels` | `keep-with-reason` | CPU-only SingleEncV7 V7.2 multi-node DDP trainer with persistent per-step JSONL telemetry and canonical F32 rank-<=2 SafeTensors export. | Offline PyTorch training loop; pure Rust `dope_v7_emit` and `dope-core` own production inference and certification. |
+| `research/levels/v7_single_encoding.py` | `research/levels` | `keep-with-reason` | SingleEncV7 split-QKV column-Transformer architecture and DSE7 v2 sufficient-statistics + Q_nl[p,4] extractor matching pure Rust `<1e-4`. | Offline PyTorch model definition for training and parity fixture generation; pure Rust owns production inference. |
+| `research/levels/archive_and_plot_v2_wave.py` | `research/levels` | `keep-with-reason` | Lossless SHA-256 training-telemetry archiver and 4-panel matplotlib PNG/PDF convergence and throughput plotter for DOPE v2.0.0. | Coupled to matplotlib vector/raster publication plotting outside the zero-dependency Rust CLI. |

@@ -5,19 +5,26 @@
 //! `dope.single-encoding/v1`-aligned packet statistics via split-QKV column attention, and decodes
 //! synthetic rows strictly row-locally (zero batch statistics, zero cross-row state).
 
+mod math;
+pub mod packet;
 mod safetensors;
+pub mod scale_card;
 
 use crate::error::{DopeError, Result};
 use crate::rng::Rng;
+use math::{gelu_exact, silu};
 use safetensors::{parse_f32_rank2_safetensors, take_layernorm, take_linear, LayerNorm, Linear};
 
+pub use packet::{fit_dse7_packet, unpack_dse7_packet, Dse7Header, DSE7_MAGIC};
 pub use safetensors::{MAX_HEADER_BYTES, MAX_SAFETENSORS_BYTES};
+pub use scale_card::{sample_zero_init_rows, ScaleCardV7};
 
 pub const MAX_COLS: usize = 48;
 pub const KNOT_COUNT: usize = 17;
 pub const MAX_RANK: usize = 12;
 pub const MAX_CLASSES: usize = 8;
-pub const COL_FEAT_DIM: usize = KNOT_COUNT + MAX_RANK + MAX_CLASSES + 5; // 42
+pub const COL_FEAT_DIM: usize = KNOT_COUNT + MAX_RANK + MAX_CLASSES + 5; // 42 (V7.0 / V7.1)
+pub const COL_FEAT_DIM_V2: usize = COL_FEAT_DIM + 4; // 46 (V7.2 with 4-quartile nonlinear residuals)
 pub const GLOB_FEAT_DIM: usize = 4 + MAX_CLASSES + 4; // 16
 
 #[derive(Clone, Debug)]
@@ -108,32 +115,11 @@ impl SplitAttnBlock {
     }
 }
 
-#[inline]
-fn gelu_exact(x: f32) -> f32 {
-    let z = (x as f64) * std::f64::consts::FRAC_1_SQRT_2;
-    (0.5 * (x as f64) * (1.0 + erf_f64(z))) as f32
-}
-
-#[inline]
-fn erf_f64(x: f64) -> f64 {
-    let sign = if x < 0.0 { -1.0 } else { 1.0 };
-    let ax = x.abs();
-    let t = 1.0 / (1.0 + 0.3275911 * ax);
-    let poly = (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t
-        + 0.254829592)
-        * t;
-    sign * (1.0 - poly * (-ax * ax).exp())
-}
-
-#[inline]
-fn silu(x: f32) -> f32 {
-    x / (1.0 + (-x).exp())
-}
-
 /// Dequantized `SingleEncV7` packet input (strictly `source_free`: zero raw rows).
 #[derive(Clone, Debug)]
 pub struct SingleEncV7Packet {
     pub col_feats: [[f32; COL_FEAT_DIM]; MAX_COLS],
+    pub q_nl: [[f32; 4]; MAX_COLS],
     pub glob_feats: [f32; GLOB_FEAT_DIM],
     pub knots: [[f32; KNOT_COUNT]; MAX_COLS],
     pub loadings: [[f32; MAX_RANK]; MAX_COLS],
@@ -195,9 +181,15 @@ pub struct SingleEncV7Weights {
 
 impl SingleEncV7Weights {
     /// Fail-closed parser for canonical HF SafeTensors (`dtype == "F32"`, `rank <= 2`).
+    /// Auto-detects both V7.0/V7.1 (`col_in = 42`) and V7.2 (`col_in = 46` with `q_nl`).
     pub fn from_safetensors_bytes(bytes: &[u8], n_heads: usize) -> Result<Self> {
         let tensors = parse_f32_rank2_safetensors(bytes)?;
-        let col_in = take_linear(&tensors, "col_in", Some(COL_FEAT_DIM), None)?;
+        let col_in = take_linear(&tensors, "col_in", None, None)?;
+        if col_in.in_dim != COL_FEAT_DIM && col_in.in_dim != COL_FEAT_DIM_V2 {
+            return Err(DopeError::Artifact(
+                "col_in input dim must be 42 (v7.0/v7.1) or 46 (v7.2)".into(),
+            ));
+        }
         let d_model = col_in.out_dim;
         if n_heads == 0 || !d_model.is_multiple_of(n_heads) {
             return Err(DopeError::Artifact("invalid n_heads for d_model".into()));
@@ -280,9 +272,17 @@ impl SingleEncV7Weights {
     /// Run column Transformer once per packet to build a fast row-local decoder state.
     pub fn refine_packet(&self, pkt: &SingleEncV7Packet) -> RefinedV7Packet {
         let g_tok = self.glob_in.forward_vec(&pkt.glob_feats);
+        let use_v2 = self.col_in.in_dim == COL_FEAT_DIM_V2;
+        let mut feat_buf = [0.0f32; COL_FEAT_DIM_V2];
         let mut h = Vec::with_capacity(MAX_COLS);
         for c in 0..MAX_COLS {
-            let ci = self.col_in.forward_vec(&pkt.col_feats[c]);
+            let ci = if use_v2 {
+                feat_buf[..COL_FEAT_DIM].copy_from_slice(&pkt.col_feats[c]);
+                feat_buf[COL_FEAT_DIM..].copy_from_slice(&pkt.q_nl[c]);
+                self.col_in.forward_vec(&feat_buf)
+            } else {
+                self.col_in.forward_vec(&pkt.col_feats[c])
+            };
             let m = pkt.col_mask[c];
             h.push((0..self.d_model).map(|t| (ci[t] + g_tok[t]) * m).collect());
         }

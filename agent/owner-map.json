@@ -1007,7 +1007,14 @@
     "research/levels/tests/test_s3_v5_training.py": "external-evidence",
     "engine/dope-core/src/single_encoding/": "rust-core",
     "engine/dope-core/tests/single_encoding_v7.rs": "rust-core",
-    "tools/dope_dashboard/": "governance"
+    "research/levels/archive_and_plot_v2_wave.py": "external-evidence",
+    "research/levels/s3_v7_batch_ops.py": "external-evidence",
+    "research/levels/s3_v7_entropy.py": "external-evidence",
+    "research/levels/s3_v7_eval.py": "external-evidence",
+    "research/levels/s3_v7_fast_trainer.py": "external-evidence",
+    "research/levels/v7_single_encoding.py": "external-evidence",
+    "tools/dope_dashboard/": "governance",
+    "docs/whitepaper-v2/": "governance"
   },
   "workspace": "dope"
 }
