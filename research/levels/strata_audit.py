@@ -1,7 +1,7 @@
 """Independent Verification, Cohort Strata Decomposition & 132 Filtered-Candidate Bias Audit."""
 from __future__ import annotations
 
-import csv, hashlib, math, struct, warnings
+import csv, hashlib, math, struct, warnings, zlib
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple
 

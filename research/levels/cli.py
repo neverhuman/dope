@@ -148,6 +148,7 @@ def _read_csv_table(path, target):
 def run_encode(args):
     """``encode``: none/fast/full -> one JSON record; progressive -> NDJSON per update."""
     import time
+    import numpy as np
     import torch
     from .encoder import DopeEncoder629
     from .multilevel_model import build_conditioning

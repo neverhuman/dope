@@ -10,7 +10,7 @@ import math
 import torch
 import torch.nn.functional as F
 
-from .v4_model import basis, require, ridge
+from .v4_model import V4Error, basis, require, ridge
 
 
 @dataclass(frozen=True)

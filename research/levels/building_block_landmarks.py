@@ -12,7 +12,7 @@ D_train to compute:
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence, Tuple
 import numpy as np
 
 LEVEL_RANK = {"low": 0, "small": 0, "medium": 1, "high": 2, "ultra": 3}

@@ -8,7 +8,7 @@ import subprocess
 import time
 import numpy as np
 from .comparison import schedule, ridge_loss, retention, summarize
-from .contracts import level_widths, ResearchError, digest, levels, require
+from .contracts import LEVELS, level_widths, ResearchError, digest, levels, require
 from .corpus import file_sha
 from .checkpoints import private_json
 from .train import append

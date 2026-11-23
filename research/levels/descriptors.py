@@ -8,7 +8,7 @@ Partitions pre-calculated S3 FIT-CV landmark features and rich data descriptors 
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 
 LANDMARK_NAMES: Tuple[str, ...] = (

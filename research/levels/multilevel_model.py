@@ -9,7 +9,7 @@ Single unified model supporting four nested encoding tiers across Regression, Bi
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import torch
 from torch import nn
@@ -22,7 +22,7 @@ from .optional_landmarks import (  # noqa: F401
 )
 from .multiclass_head import (
     InterLandmarkAttentionBlock, build_enriched_numpy_basis, erf_approx as _erf_approx,
-    eval_oblivious_trees as _eval_oblivious_trees,
+    erfinv_approx as _erfinv_approx, eval_oblivious_trees as _eval_oblivious_trees,
     fit_copula_regimes as _fit_copula_regimes, fit_multiclass_target_bundle,
     fit_oblivious_trees as _fit_oblivious_trees, predict_multiclass_from_bundle,
     to_normal_scores as _to_normal_scores,

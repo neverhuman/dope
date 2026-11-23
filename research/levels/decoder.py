@@ -2,7 +2,7 @@
 import math
 import torch
 from torch import nn
-from .blocks import Block, Tokenizer
+from .blocks import Block, Tokenizer, binding_vectors
 from .contracts import block_widths, level_widths, require
 
 

@@ -20,16 +20,20 @@ Contract (shared with Rust, see ``/home/ubuntu/jope_plan/comms.md``):
 """
 from __future__ import annotations
 
+import csv
 import hashlib
+import io
 import json
 import math
 import struct
+import subprocess
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from pathlib import Path
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 import numpy as np
 
-from .descriptors import FINE_ADDED_INDICES, LARGER_ADDED_INDICES, MACRO_INDICES
+from .descriptors import FINE_ADDED_INDICES, LANDMARK_NAMES, LARGER_ADDED_INDICES, MACRO_INDICES
 
 LARGER_INDICES = LARGER_ADDED_INDICES
 FINE_INDICES = FINE_ADDED_INDICES
