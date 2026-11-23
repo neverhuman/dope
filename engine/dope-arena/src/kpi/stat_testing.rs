@@ -45,6 +45,7 @@ pub fn row(table: &str, family: &str, task: &str, auditor: &str, r_s: f64) -> Kp
         artifact_class: "source_free".to_string(),
         c2st_auc: Some(0.6),
         c2st_real_ref: Some(0.5),
+        ledger_id: None,
         realism_pass: None,
         privacy_pass: None,
         exact_copy_excess: None,

@@ -2,16 +2,21 @@
 
 `primary`, `compare`, `null` and `render-readme` turn the rows that
 `dope_kpi real-ref` and `dope_kpi score` write into the scoreboard's primary
-statistic, paired comparisons, a sign-flip null and the README block. The
+statistic, paired comparisons, a sign-flip null and the README block;
+`guards` adds the realism and privacy gates and the exact-copy excess that
+the promotion rule's guards read. The
 protocol lives in [`contracts/dope-kpi-v2.json`](../../../contracts/dope-kpi-v2.json)
 (`dope.kpi-contract/v2`), is compiled into the binary, and its SHA-256 is
 written into every receipt. The contract is a **candidate** with
 `protocol_frozen: false`; freezing it is a separate, owner-approved step.
 
-Code: `src/kpi/{rundir,trg,boot,spec,rule,pairing,primary,compare,null,receipt,render,panelsel}.rs`.
-Tests: unit tests in each module plus `src/kpi/stat_tests.rs`, and the
-black-box test `tests/kpi_stat_cli.rs` on the static run directory
-`tests/fixtures/kpi-stat/`.
+Code: `src/kpi/{rundir,trg,boot,spec,rule,pairing,primary,compare,null,receipt,render,panelsel}.rs`
+and, for `guards`, `src/kpi/{guards,guard_eval,guard_merge}.rs`.
+Tests: unit tests in each module plus `src/kpi/stat_tests.rs` and
+`src/kpi/guard_tests.rs` (hand-made ledgers in `src/kpi/guard_fixture.rs`),
+the black-box test `tests/kpi_stat_cli.rs` on the static run directory
+`tests/fixtures/kpi-stat/`, and `tests/kpi_guards_cli.rs`, which writes its
+run directory from the same hand-made ledgers.
 
 ## Commands
 
@@ -22,6 +27,7 @@ dope_kpi compare --run-dir D --candidate C [--candidate C2 ...] --baseline B
 dope_kpi null    --run-dir D --candidate C --baseline B [--replicates 2000] [--null-seed S]
                  [--replicates-out N.jsonl] --out N.json
 dope_kpi render-readme --receipt R.json [--receipt R2.json ...]
+dope_kpi guards  --run-dir D --arm A [--arm B ...] [--threads N]
 ```
 
 Every statistic command also takes `--schedule FILE` (default: the run
@@ -41,10 +47,96 @@ metadata, and repeat the real reference's real-only columns (`l0`, `l_a`,
 JSON round trip). Arms read from one run directory are therefore paired on
 identical cells, splits and informative flags.
 
-Guard fields a later `score` may add are read when present:
-`realism_pass`, `privacy_pass` (per entry) and `exact_copy_excess` (per file).
-No rows file written so far carries them, so those guards are "not
-evaluated" and nothing can be promoted yet.
+The guard fields `realism_pass`, `privacy_pass` (per entry) and
+`exact_copy_excess` come from `dope_kpi guards` (next section): when
+`score/<arm>/guards.jsonl` exists, loading the arm merges its flags into the
+rows by `ledger_id` and sets every row's `exact_copy_excess` to that of its
+synthetic file in `guards-summary.json`. Without that file the rows are read
+as written (no rows file carries the fields), and the realism, privacy and
+exact-copy guards are `not_evaluated`, so nothing can be promoted.
+
+## Guards (`dope.kpi-guards/v2`)
+
+`guards` reads `score/<arm>/ledger.jsonl` (the `FidelityCellRequest` of every
+entry, as `score` wrote it) and writes next to it, without touching the
+ledger or `rows.jsonl`:
+
+- `guards.jsonl`: one line per ledger entry in ledger order: `ledger_id`,
+  `cell_id`, `status`, `realism_pass`, `privacy_pass`, the exact-copy counts
+  (`synthetic_rows`, `exact_copies`, `twin_rows`, `twin_exact_copies`),
+  dope-core's two assessments and, for an input dope-core refused, its
+  refusal code;
+- `guards-summary.json`: entries by status, per gate the passes, assessed,
+  absent and refused entries, distinct assessments and the pass share over
+  every entry and over the complete ones, `file_exact_copy_excess` (one value
+  per synthetic file `<cell>:s<seed>:m<multiplier>`), the exact-copy counts,
+  rates and `pooled_exact_copy_excess` of the whole arm, the rule text, the
+  tool, and the SHA-256 of the ledger, the rows file and `guards.jsonl`.
+
+The gates are dope-core's, applied as `dvs::v3::evaluate_v3` applies them
+when partial evidence is not allowed; no threshold is set here:
+
+| Gate | Passes iff | Source |
+| --- | --- | --- |
+| realism | `assess_realism(..).pass_standard`: no illegal row, C2ST AUC <= 0.70, max marginal AUC (folded, `max(a, 1-a)`) <= 0.60, synthetic/real rule-violation ratio <= 2.0 when both rates are present | `dope-core/src/dvs/v3/realism.rs` |
+| privacy (empirical) | `assess_empirical_privacy(..).pass`: share of synthetic rows nearer the first `m` rows of A than the first `m` of B, `m` the smaller of the two (ties count half), <= 0.55, distance MIA AUC <= 0.55, MIA TPR at 1% FPR <= 0.02, this file's exact-copy excess <= 0.005, no canary hit, emitted support >= 10 | `dope-core/src/dvs/v3/privacy.rs` |
+
+These are the realism and privacy gates of
+`contracts/dope-fidelity-v3-candidate.json`. `c2st_real_ref` enters no gate.
+A complete entry without a realism (privacy) input, or with one dope-core
+refuses, fails that gate; a failed, over-budget or unsupported entry fails
+both and holds no counts. The privacy input is what `score` wrote: the first
+`--privacy-rows` (default 4,096) rows of A, B and S in unit space, rounded to
+6 decimals, no canaries, and the emitter's declared support, else the floor
+10 (`score.rs`). The privacy result is an empirical audit, never formal
+differential privacy or HIPAA de-identification.
+
+An exact copy is a synthetic row within Euclidean distance 1e-12 of one of
+those `m` rows of A; the twin's are the `m` rows of B within 1e-12 of them.
+A synthetic file's
+
+```text
+exact_copy_excess = max(0, sum exact_copies / sum synthetic_rows
+                           - sum twin_exact_copies / sum twin_rows)
+```
+
+sums over the file's complete entries with an assessed privacy input (its
+auditors share one input, so this is dope-core's per-file
+`exact_copy_excess`); a file without such an entry has no value, and its rows
+none. Every row of the file carries the file's value, so the promotion guard
+is the contract's `promotion.exact_copy`: the mean over the candidate's scored
+headline files at multiplier 4 on the comparison's common cells. The summary's
+`pooled_exact_copy_excess` applies the formula to every complete entry of the
+arm (all strata, multipliers and auditors); it is descriptive and no guard
+reads it.
+
+The three auditors of one synthetic file (cell, sample seed, multiplier)
+carry the same realism and privacy inputs. The ledger is sorted by entry id,
+so a file's entries are consecutive: `guards` streams them one file at a time,
+`--threads` files in parallel, and assesses each distinct input of a file once
+(bit-for-bit equality; the summary's `assessments`). The bytes do not depend
+on `--threads`, and a rerun writes the same bytes.
+
+Before writing, every ledger entry must find the row with its `ledger_id`,
+and that row the same cell and status, and every row an entry. When the arm is
+loaded, every row's `ledger_id` must name its own cell, sample seed,
+multiplier and auditor, every row must find its line, every line its row
+(same cell and status), the summary must name the arm and hold the SHA-256
+of both `guards.jsonl` and the current `rows.jsonl`, and the rows must not
+carry guard fields of their own. Any mismatch stops the command with the
+file and line numbers, never a value; a changed rows file asks for `guards`
+to be rerun. Receipts then record the SHA-256 of each arm's two guard files.
+
+On `lite-prelim-20261122` (seven arms of 2,022 entries; 4.5 minutes at
+`--threads 4` under nice 19 on a loaded host, 96 MB peak memory) `copy_a`
+and `bootstrap_a` fail privacy on every complete entry with excess 1, and
+`twin_c` passes on 93% with no exact copy: two of its cells miss the TPR
+bound by one row (21 of 1,024) and one has a 34-row twin. `indep_marginals`,
+a column-wise permutation of A, passes on only 44%: its rows are made of A's
+values, which the distance tests detect on small tables (94% of its files
+with fewer than 64 matched rows fail, 14% of those with 1,024 or more), and
+on one table of a single feature and a binary target 329 of its 347
+permuted rows are rows of A.
 
 ## Statistic (TRG)
 
@@ -154,6 +246,15 @@ counts, cells, failed and not-applicable cells, MLP value, packet bytes
 median / max / share within budget, unclipped median retention per auditor,
 median C2ST); `comparisons`; `null`. No path, clock or host is written.
 
+When an arm read has guard files, `inputs` also holds `guards_sha256` and
+`guards_summary_sha256` per arm, and that arm's summary holds
+`realism_coverage` and `privacy_coverage` (the statistic's aggregation of the
+per-cell pass shares over the informative `linear-seeded-v1` and `gbdt`
+entries at the primary multiplier, a non-ok entry counting as a miss) and
+`exact_copy_excess` (the mean of the file excesses over its scored headline
+files at the primary multiplier on the cells in the statistic). Without guard
+files these keys are absent, so earlier receipts keep their bytes.
+
 ## README block
 
 `render-readme` reads receipts of one run (same contract, schedule, real
@@ -174,8 +275,17 @@ bytes.
 
 ## Limits
 
-- No rows file carries realism, privacy or exact-copy fields yet, so no
-  comparison can PROMOTE until `score` writes them.
+- No comparison can PROMOTE until `guards` has run for its candidate and
+  baseline.
+- The gates' fixed bounds leave little room for sampling noise on small
+  tables: even for synthetic rows exchangeable with the real ones, the DCR
+  share over `n` of them has a binomial standard deviation near `0.5 / sqrt(n)`
+  (0.06 at `n = 64`, against the 0.55 bound), and on the prelim run the
+  real-data controls fail realism on most files with fewer than 64 matched
+  rows. The coverage guards compare paired deltas, which cancels part of this.
+- `guards` checks the rows file's SHA-256, not the ledger's, when an arm is
+  loaded: a ledger rescored with other privacy inputs but identical rows is
+  not detected until `guards` is rerun.
 - Control arms carry no packet, so their byte guard is not evaluated.
 - The contract is unfrozen; the percentile interval is anti-conservative on
   tasks with few families (see the null above).

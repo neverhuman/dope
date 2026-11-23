@@ -16,14 +16,14 @@
 use super::boot::{holm, BootPlan, BootStats};
 use super::emitlog::check_arm_id;
 use super::pairing::{pair, parse_specs, Diffs, Paired, Spec, States};
-use super::primary::{headline_files, summarize};
+use super::primary::{exact_copy_excess, headline_files, summarize};
 use super::receipt::{write_receipt, Context, RunArgs};
 use super::rule::{decide, BytesEvidence, Decision, Evidence, SeedEvidence};
 use super::rundir::{contract, Arm, STATUS_OK, TASKS};
-use super::trg::{cell_states, mean, Families};
+use super::trg::{cell_states, Families};
 use dope_arena::ArenaResult;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 #[derive(clap::Args, Debug)]
@@ -142,20 +142,6 @@ fn states(ctx: &Context, arm: &Arm, multiplier: u32) -> States {
     })
 }
 
-/// Exact-copy excess of the candidate: mean over its scored files on the common cells.
-fn exact_copy(ctx: &Context, members: &[&Arm], common: &BTreeSet<String>) -> Option<f64> {
-    let multiplier = ctx.contract.statistic.primary_multiplier;
-    let mut values = Vec::new();
-    for arm in members {
-        for ((cell, _), row) in headline_files(ctx, arm, multiplier) {
-            if common.contains(cell) && row.status == STATUS_OK {
-                values.push(row.exact_copy_excess?);
-            }
-        }
-    }
-    mean(values)
-}
-
 /// Packet bytes of the candidate's headline files on the panel. A file was
 /// produced when it was scored or carries a measured packet (an over-budget
 /// file is produced but not scored).
@@ -211,7 +197,8 @@ pub fn prepare(ctx: &Context, spec: &Spec, baseline: &str) -> ArenaResult<Prepar
     let pooled = stats.overall.value;
     let same_sign = |d: f64| d != 0.0 && pooled != 0.0 && d.signum() == pooled.signum();
     let fixed = Fixed {
-        exact_copy_excess: exact_copy(ctx, &members, &paired.common),
+        // The candidate's scored headline files on the common cells.
+        exact_copy_excess: exact_copy_excess(ctx, &members, &|cell| paired.common.contains(cell)),
         bytes: bytes(ctx, &members),
         seed_group: spec.seed_group.then(|| SeedEvidence {
             seeds: members.len(),

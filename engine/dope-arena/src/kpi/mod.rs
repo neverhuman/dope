@@ -23,6 +23,9 @@ pub mod ext_summary;
 pub mod ext_template;
 pub mod families;
 pub mod format2;
+pub mod guard_eval;
+pub mod guard_merge;
+pub mod guards;
 pub mod io;
 pub mod jsonl;
 pub mod mat;
@@ -49,6 +52,10 @@ pub mod trg;
 
 #[cfg(test)]
 pub mod fixture;
+#[cfg(test)]
+pub mod guard_fixture;
+#[cfg(test)]
+mod guard_tests;
 #[cfg(test)]
 pub mod stat_testing;
 #[cfg(test)]

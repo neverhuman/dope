@@ -7,12 +7,14 @@
 //! share within the headline budget, over the files that carry a packet);
 //! the unclipped median retention of each auditor over the scored
 //! informative headline entries; the median C2ST AUC over the scored files
-//! of the cells in the statistic; failed and not-applicable cell counts.
+//! of the cells in the statistic; failed and not-applicable cell counts; and
+//! the inputs of the realism, privacy and exact-copy guards on the cells in
+//! the statistic (absent when a needed guard field is absent).
 
 use super::boot::BootPlan;
 use super::receipt::{write_receipt, Context, RunArgs};
 use super::rundir::{Arm, KpiRow, STATUS_OK, TASKS};
-use super::trg::{cell_states, scored, trg_families, CellState, Families};
+use super::trg::{cell_states, mean, scored, trg_families, CellScore, CellState, Families};
 use dope_arena::ArenaResult;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -85,6 +87,14 @@ pub struct ArmSummary {
     pub median_retention: Vec<AuditorMedian>,
     pub c2st_median: Option<f64>,
     pub c2st_files: usize,
+    /// Realism (privacy) coverage of the cells in the statistic, aggregated like the TRG.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub realism_coverage: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub privacy_coverage: Option<f64>,
+    /// Mean exact-copy excess of the scored headline files of the cells in the statistic.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exact_copy_excess: Option<f64>,
 }
 
 pub fn median(mut values: Vec<f64>) -> Option<f64> {
@@ -175,6 +185,36 @@ pub fn headline_files<'a>(
         }
     }
     files
+}
+
+/// Mean `exact_copy_excess` over the scored headline files of `arms` whose
+/// cell `keep` accepts; absent when there is none or one lacks the value.
+pub fn exact_copy_excess(ctx: &Context, arms: &[&Arm], keep: &dyn Fn(&str) -> bool) -> Option<f64> {
+    let multiplier = ctx.contract.statistic.primary_multiplier;
+    let mut values = Vec::new();
+    for arm in arms {
+        for ((cell, _), row) in headline_files(ctx, arm, multiplier) {
+            if keep(cell) && row.status == STATUS_OK {
+                values.push(row.exact_copy_excess?);
+            }
+        }
+    }
+    mean(values)
+}
+
+/// A guard share of the cells in the statistic, aggregated like the TRG;
+/// absent when some cell lacks it.
+fn coverage(
+    states: &BTreeMap<String, CellState>,
+    pick: fn(&CellScore) -> Option<f64>,
+) -> Option<f64> {
+    let cells: Option<Vec<(usize, &str, f64)>> = states
+        .values()
+        .filter_map(CellState::score)
+        .filter(|c| c.trg.is_some())
+        .map(|c| pick(c).map(|share| (c.task, c.family_id.as_str(), share)))
+        .collect();
+    Families::from_cells(cells?).point()
 }
 
 fn bytes(ctx: &Context, files: &BTreeMap<(&str, u64), &KpiRow>) -> Bytes {
@@ -274,6 +314,9 @@ pub fn summarize(ctx: &Context, arm: &Arm) -> ArmSummary {
         median_retention,
         c2st_files: c2st.len(),
         c2st_median: median(c2st),
+        realism_coverage: coverage(&states, |c| c.realism),
+        privacy_coverage: coverage(&states, |c| c.privacy),
+        exact_copy_excess: exact_copy_excess(ctx, &[arm], &in_statistic),
     }
 }
 

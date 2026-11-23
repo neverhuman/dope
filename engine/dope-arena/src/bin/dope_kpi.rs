@@ -35,6 +35,8 @@ enum Command {
     Score(kpi::score::ScoreArgs),
     /// Reduce a score ledger with `evaluate_v3` (kappa file, partial evidence, filters).
     ReduceLedger(kpi::reduce::ReduceArgs),
+    /// Realism and privacy gates and the exact-copy excess of scored arms (`guards.jsonl`).
+    Guards(kpi::guards::GuardsArgs),
     /// TRG of each arm with its stratified family bootstrap interval (dope.kpi-receipt/v2).
     Primary(kpi::primary::PrimaryArgs),
     /// Paired comparison of candidates with one baseline under the promotion rule.
@@ -53,6 +55,7 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
         Command::RealRef(args) => kpi::realref::run(args),
         Command::Score(args) => kpi::score::run(args),
         Command::ReduceLedger(args) => kpi::reduce::run(args),
+        Command::Guards(args) => kpi::guards::run(args),
         Command::Primary(args) => kpi::primary::run(args),
         Command::Compare(args) => kpi::compare::run(args),
         Command::Null(args) => kpi::null::run(args),
