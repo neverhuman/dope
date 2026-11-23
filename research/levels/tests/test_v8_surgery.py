@@ -1,6 +1,7 @@
 """Unit & native Rust loading tests for `SingleEncV8` model surgery (`v7-to-v8` & `repair-v8`)."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import numpy as np
@@ -19,9 +20,10 @@ SHIPPED_V7 = REPO_ROOT / "models" / "single-enc-v7" / "model.safetensors"
 
 
 def _find_v8_emit_bin() -> Path | None:
+    env = os.environ.get("DOPE_V8_EMIT")
     for cand in (
+        *((Path(env),) if env else ()),
         REPO_ROOT / "engine" / "target" / "release" / "dope_v8_emit",
-        Path("/home/ubuntu/dope/.agent/reports/v3-train/deploy/v3-7bdd58f4/engine/target/release/dope_v8_emit"),
     ):
         if cand.is_file():
             return cand

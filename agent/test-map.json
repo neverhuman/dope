@@ -4300,6 +4300,14 @@
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery.py",
       "purpose": "verify function-preserving v7-to-v8 and repair-v8 SafeTensors model surgery and native Rust dope_v8_emit loading"
     },
+    "research/levels/v8_surgery.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery_select.py",
+      "purpose": "verify V7 -> V8 consistent-selection surgery (d160 -> d128): exact V7 trunk at equal width, analytic DSE8 plan at step 0, deterministic release-weight transplant"
+    },
+    "research/levels/tests/test_v8_surgery_select.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery_select.py",
+      "purpose": "unit tests for the consistent-selection V7 -> V8 decoder surgery that produced the v8-s7/v8-s7w init files"
+    },
     "research/levels/tests/test_v8_surgery.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery.py",
       "purpose": "unit and native Rust round-trip test suite for SingleEncV8 model surgery and v8-r3 trainer hooks"

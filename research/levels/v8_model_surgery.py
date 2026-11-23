@@ -7,8 +7,8 @@ produce checkpoints natively loadable by frozen `dope 3.0.0` (`SingleEncV8Weight
 1. `v7-to-v8`: Grafts a pre-trained `SingleEncV7` checkpoint (e.g. shipped `dope 2.0.0`
    `models/single-enc-v7/model.safetensors`, `d_model=160, n_heads=4, n_layers=3`) into
    `SingleEncV8(d_model=160, n_heads=4, n_enc_layers=3, n_dec_layers=3)` via exact 1:1 input
-   coordinate remapping (`col_in` [0..37, 39..42] -> `dec_col_in` [0..37, 41..44], `glob_in`
-   [0..16] -> `dec_glob_in` [0..16]), exact Pre-LN Split-QKV block transfer with zero-init
+   coordinate remapping (`col_in` [0..36] -> `dec_col_in` [0..36], 38 (is_disc) -> 39 (is_int),
+   [39..41] -> [41..43]; `glob_in` [0..15] minus slot 3 -> the same `dec_glob_in` slots), exact Pre-LN Split-QKV block transfer with zero-init
    `edge_proj`, pre-trained column-attention cloning into `enc_blocks`, shipped `delta_W` transfer,
    bilinear cubic-saddle-point breaking (`bilin_u/v ~ N(0, 0.05), bilin_w = 0`), and open initial
    trust gate (`alpha_table = 0.25`).
@@ -30,7 +30,6 @@ import math
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 from safetensors.torch import load_file as st_load
 from safetensors.torch import save_file as st_save
 import torch
@@ -43,9 +42,11 @@ V7_TO_V8_COL_MAP: list[tuple[int, int]] = (
     [(i, i) for i in range(17)]        # knots17
     + [(17 + i, 17 + i) for i in range(12)]  # loadings (rank 12)
     + [(29 + i, 29 + i) for i in range(8)]   # linear.w (up to 8 classes)
+    + [(38, 39)]                             # is_disc -> is_int (V8's discrete flag)
     + [(39, 41), (40, 42), (41, 43)]         # log1p(span), z_max, knot_level/17
 )
-V7_TO_V8_GLOB_MAP: list[tuple[int, int]] = [(i, i) for i in range(16)]
+# V7 never sets global slot 3, while V8 slot 3 is `normalized_only`: leave it untrained (zero weight).
+V7_TO_V8_GLOB_MAP: list[tuple[int, int]] = [(i, i) for i in range(16) if i != 3]
 # V7 encodes width as p/48 while DSE8 encodes p/64 (`V8_MAX_COLS = 64`), so rescale slot 13 by 64/48.
 V7_TO_V8_GLOB_SCALE: dict[int, float] = {13: 64.0 / 48.0}
 
