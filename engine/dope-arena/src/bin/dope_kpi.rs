@@ -45,6 +45,8 @@ enum Command {
     Null(kpi::null::NullArgs),
     /// README scoreboard block from primary, compare and null receipts.
     RenderReadme(kpi::render::RenderArgs),
+    /// README hook graphic (SVG): TRG against artifact bytes from primary or compare receipts.
+    RenderHero(kpi::hero::HeroArgs),
 }
 
 fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
@@ -60,6 +62,7 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
         Command::Compare(args) => kpi::compare::run(args),
         Command::Null(args) => kpi::null::run(args),
         Command::RenderReadme(args) => kpi::render::run(args),
+        Command::RenderHero(args) => kpi::hero::run(args),
     }
 }
 

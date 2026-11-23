@@ -4,19 +4,23 @@
 `dope_kpi real-ref` and `dope_kpi score` write into the scoreboard's primary
 statistic, paired comparisons, a sign-flip null and the README block;
 `guards` adds the realism and privacy gates and the exact-copy excess that
-the promotion rule's guards read. The
+the promotion rule's guards read, and `render-hero` draws the README hook
+graphic from the receipts. The
 protocol lives in [`contracts/dope-kpi-v2.json`](../../../contracts/dope-kpi-v2.json)
 (`dope.kpi-contract/v2`), is compiled into the binary, and its SHA-256 is
 written into every receipt. The contract is a **candidate** with
 `protocol_frozen: false`; freezing it is a separate, owner-approved step.
 
 Code: `src/kpi/{rundir,trg,boot,spec,rule,pairing,primary,compare,null,receipt,render,panelsel}.rs`
-and, for `guards`, `src/kpi/{guards,guard_eval,guard_merge}.rs`.
-Tests: unit tests in each module plus `src/kpi/stat_tests.rs` and
-`src/kpi/guard_tests.rs` (hand-made ledgers in `src/kpi/guard_fixture.rs`),
-the black-box test `tests/kpi_stat_cli.rs` on the static run directory
-`tests/fixtures/kpi-stat/`, and `tests/kpi_guards_cli.rs`, which writes its
-run directory from the same hand-made ledgers.
+and, for `guards`, `src/kpi/{guards,guard_eval,guard_merge}.rs`; for
+`render-hero`, `src/kpi/hero.rs` (receipts and flags) over the standard-library
+drawing in `src/kpi/{hero_model,hero_layout,hero_labels,hero_svg}.rs`.
+Tests: unit tests in each module plus `src/kpi/stat_tests.rs`,
+`src/kpi/guard_tests.rs` (hand-made ledgers in `src/kpi/guard_fixture.rs`) and
+`src/kpi/hero_tests.rs`, the black-box tests `tests/kpi_stat_cli.rs` and
+`tests/kpi_hero_cli.rs` on the static run directory `tests/fixtures/kpi-stat/`,
+and `tests/kpi_guards_cli.rs`, which writes its run directory from the same
+hand-made ledgers.
 
 ## Commands
 
@@ -27,6 +31,9 @@ dope_kpi compare --run-dir D --candidate C [--candidate C2 ...] --baseline B
 dope_kpi null    --run-dir D --candidate C --baseline B [--replicates 2000] [--null-seed S]
                  [--panel ... --dev-tables F] [--noise-sd X] [--replicates-out N.jsonl] --out N.json
 dope_kpi render-readme --receipt R.json [--receipt R2.json ...]
+dope_kpi render-hero --receipt R.json [--receipt R2.json ...] --theme light|dark --out hero.svg
+                 [--label ARM=Text ...] [--highlight ARM] [--previous ARM ...]
+                 [--reference ARM ...] [--title TEXT] [--note TEXT]
 dope_kpi guards  --run-dir D --arm A [--arm B ...] [--threads N]
 ```
 
@@ -40,8 +47,9 @@ describe the method, which must equal the compiled contract's; only a contract
 whose SHA-256 is compiled into `dope_kpi` as frozen (an owner decision; none
 yet) may declare `protocol_frozen: true` or a status other than `candidate`.
 Each command prints a one-line JSON summary with the receipt SHA-256;
-`render-readme` prints the markdown block. Errors name files, lines, cells and
-flags, never a value.
+`render-readme` prints the markdown block and `render-hero` a summary with the
+point and reference counts, the unplotted arms and the SVG's SHA-256. Errors
+name files, lines, cells, arms and flags, never a value.
 
 ## Inputs
 
@@ -318,6 +326,11 @@ files at the primary multiplier on the cells in the statistic) with
 `exact_copy` (that mean, the maximum file and the share of files above 0.005).
 Without guard files these keys are absent.
 
+A release binary stamps its commit when built from a clean tree in `engine/`
+with `DOPE_KPI_GIT_SHA=$(git rev-parse HEAD) CARGO_INCREMENTAL=0 cargo build
+--release --locked -p dope-arena --bin dope_kpi`; cargo rebuilds `dope_kpi`
+whenever the variable changes.
+
 ## README block
 
 `render-readme` reads receipts of one run (same contract, schedule, real
@@ -331,6 +344,40 @@ it covers, every guard with its value, the sign-flip false-PROMOTE rate,
 outcome), one line per null, and a footer with the contract (id, source,
 status, SHA-256), the panel id and every receipt's SHA-256. Numbers have 3
 decimals; the block is a pure function of the receipt bytes.
+
+## README hero graphic
+
+`render-hero` draws the README hook graphic from receipts of one run (the
+`render-readme` checks) as a 960 x 540 SVG, one file per `--theme` (`light`
+or `dark`; a README picks one with `<picture>` and `prefers-color-scheme`).
+x is an arm's `bytes.median` on a log10 axis with ticks from 100 B to 10 MiB,
+the needed range padded to the nearest ticks. For a third-party arm that
+median is the fitted model file, scored without the headline cap, so the
+2,048-byte budget is a dashed vertical reference line, never a filter. y is
+the primary TRG with its 95% interval as a whisker, gridlines every 0.25 and
+0 always in range. Every arm with a byte median and a TRG is a point with a
+direct label (`--label`, default the arm id): the `--highlight` arm wears the
+accent and a bold label with its TRG to 3 decimals, `--previous` arms
+(default: arms named `dope-X.Y.Z-...` with a lower release than the
+highlight) a lighter step of the accent, the rest neutral gray. `--reference`
+arms (controls without bytes) are dotted horizontal lines labelled at the
+right end; any other arm without a byte median is listed as `unplotted`. A
+small key names the four kinds of mark. Labels are placed in a fixed order
+(budget, controls, highlight, earlier releases, the rest) on the first
+candidate box (right, left, above, below a point, then one to three rows up
+or down; above or below a control line, sliding left from its right end)
+that stays in the plot, overlaps no earlier label, marker or whisker, and
+keeps off the control and budget lines; failing that, the box that overlaps
+least. The title defaults to "Predictive structure kept vs. artifact size";
+`--note` is the subtitle, with `{cells}`, `{families}` and `{panel}` filled
+from the highlight's statistic and the panel id; it wraps at spaces, so a
+no-break space keeps words together. The footer holds the SHA-256 prefixes of
+the contract and of every receipt. Colors are theme tokens and text wears
+only the ink tokens. Coordinates have one decimal and arms keep receipt
+order, so the same receipts and flags give the same bytes; the file holds
+labels, numbers and digests only, no path, host, source value or header.
+Label boxes are sized with DejaVu Sans metrics, the widest common `system-ui`
+fallback, so narrower faces leave more room.
 
 ## Panels
 
@@ -358,3 +405,9 @@ decimals; the block is a pure function of the receipt bytes.
   comparison's own sign-flip rate (`null_calibration`, reported beside it):
   making it a guard is an owner decision and a change of the pre-registered
   rule.
+- In the hero's dark theme the accent `#3987e5` and its lighter step
+  `#5598e7` are close (OKLab difference about 5.5, below the 15 that keeps
+  two marks apart at a glance); the highlight is told apart by its larger
+  marker and bold label. A control line within a label height of another
+  line or gridline can only be labelled on its far side, which may touch
+  that neighbour.
