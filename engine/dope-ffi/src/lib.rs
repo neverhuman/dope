@@ -86,6 +86,23 @@ fn columns(x: &[f32], n: usize, p: usize) -> Vec<Vec<f64>> {
         .collect()
 }
 
+/// Copy an ABI input into Rust-owned storage.
+///
+/// # Safety
+/// For nonzero `len`, `src` must be aligned and readable for `len` initialized floats within a
+/// single live allocation. The caller keeps the source immutable during the copy.
+unsafe fn copy_input(src: *const f32, len: usize) -> Result<Vec<f32>, Code> {
+    let mut input = Vec::new();
+    if len > 0 {
+        input.try_reserve_exact(len).map_err(|_| Code::Capacity)?;
+        input.resize(len, 0.0);
+        // SAFETY: the caller guarantees the source range. The independent vector owns len
+        // writable floats, so the two ranges cannot overlap. No source ownership is transferred.
+        unsafe { std::ptr::copy_nonoverlapping(src, input.as_mut_ptr(), len) };
+    }
+    Ok(input)
+}
+
 /// Map raw targets into the packet's target coordinates. Classes outside the packet's class list
 /// become -1 (masked), never another class.
 fn target_codes(y: &[f32], task: u8, y_mean: f32, y_sd: f32, classes: &[i32]) -> Vec<f32> {
@@ -238,6 +255,8 @@ pub extern "C" fn dope_ffi_dse7_offset(block: u32) -> u64 {
 /// Every pointer must be valid for the stated number of elements: `x_fit` `n_fit * p`, `y_fit`
 /// `n_fit`, `x_qry` `n_qry * p` and `y_qry` `n_qry` (both may be null when `n_qry == 0`),
 /// `out_f32` `out_f32_cap`, `out_packet` `out_packet_cap`, and `out_packet_len` one u32.
+/// Each input is an aligned, initialized range within one live allocation and stays immutable
+/// for the call. The output ranges are writable and do not overlap any input or each other.
 #[no_mangle]
 #[allow(clippy::too_many_arguments)]
 pub unsafe extern "C" fn dope_ffi_dse7_episode(
@@ -277,20 +296,12 @@ pub unsafe extern "C" fn dope_ffi_dse7_episode(
         return Code::Capacity as i32;
     }
     let result = catch_unwind(AssertUnwindSafe(|| {
-        // SAFETY: lengths are the caller's contract stated above.
-        let xf = unsafe { std::slice::from_raw_parts(x_fit, cells) };
-        let yf = unsafe { std::slice::from_raw_parts(y_fit, n_fit) };
-        let (xq, yq): (&[f32], &[f32]) = if n_qry == 0 {
-            (&[], &[])
-        } else {
-            unsafe {
-                (
-                    std::slice::from_raw_parts(x_qry, qry_cells),
-                    std::slice::from_raw_parts(y_qry, n_qry),
-                )
-            }
-        };
-        dse7_episode(xf, n_fit, p, yf, xq, n_qry, yq, task, budget as usize)
+        // SAFETY: FIT pointers were checked for null. The caller guarantees both source ranges.
+        let (xf, yf) = unsafe { (copy_input(x_fit, cells)?, copy_input(y_fit, n_fit)?) };
+        // SAFETY: the caller guarantees the query ranges. Nonempty query pointers were checked
+        // for null, and copy_input never dereferences a pointer for an empty range.
+        let (xq, yq) = unsafe { (copy_input(x_qry, qry_cells)?, copy_input(y_qry, n_qry)?) };
+        dse7_episode(&xf, n_fit, p, &yf, &xq, n_qry, &yq, task, budget as usize)
     }));
     match result {
         Err(_) => Code::Panic as i32,
@@ -314,7 +325,9 @@ pub unsafe extern "C" fn dope_ffi_dse7_episode(
 /// (FIT median and IQR / 1.349). Writes `[p][META_FIELDS]` floats, one row per column.
 ///
 /// # Safety
-/// `x_fit` must hold `n_fit * p` floats (row-major) and `out` `out_cap` floats.
+/// `x_fit` must hold `n_fit * p` aligned, initialized floats (row-major) in one live
+/// allocation and stay immutable for the call. `out` must hold `out_cap` writable floats
+/// and must not overlap `x_fit`.
 #[no_mangle]
 pub unsafe extern "C" fn dope_ffi_column_meta(
     x_fit: *const f32,
@@ -333,14 +346,15 @@ pub unsafe extern "C" fn dope_ffi_column_meta(
     if p == 0 || (out_cap as usize) < p * META_FIELDS {
         return Code::Capacity as i32;
     }
-    let result = catch_unwind(AssertUnwindSafe(|| {
-        // SAFETY: lengths are the caller's contract stated above.
-        let xf = unsafe { std::slice::from_raw_parts(x_fit, cells) };
-        fit_columns(&columns(xf, n_fit, p), None, None)
+    let result = catch_unwind(AssertUnwindSafe(|| -> Result<_, Code> {
+        // SAFETY: x_fit was checked for null. The caller guarantees cells readable floats.
+        let xf = unsafe { copy_input(x_fit, cells)? };
+        Ok(fit_columns(&columns(&xf, n_fit, p), None, None))
     }));
     match result {
         Err(_) => Code::Panic as i32,
-        Ok(metas) => {
+        Ok(Err(code)) => code as i32,
+        Ok(Ok(metas)) => {
             let flat: Vec<f32> = metas.iter().flat_map(|m| m.to_f32s()).collect();
             // SAFETY: `out_cap >= p * META_FIELDS` was checked.
             unsafe { std::ptr::copy_nonoverlapping(flat.as_ptr(), out, flat.len()) };

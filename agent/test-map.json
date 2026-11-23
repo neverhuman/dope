@@ -4176,6 +4176,14 @@
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets"
     },
+    "research/levels/s3_episode_ring.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify training ring handoff, ordering, backpressure, and producer failure propagation"
+    },
+    "research/levels/tests/test_s3_episode_factory.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the episode-factory proof on Linux x86-64 with its native library"
+    },
     "engine/dope-core/src/marginal/column_meta.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test column_meta_v2",
       "purpose": "verify per-episode FIT-only Nc2ColumnMetaV2: planted support classes, k=10 bound floor, row-order and missing-cell invariance"
