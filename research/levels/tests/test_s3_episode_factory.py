@@ -252,3 +252,27 @@ def test_dead_producer_stops_every_consumer(corpus):
             ef.farm_episode(spec, state)
         assert not isinstance(ef.RingDown("x"), (RuntimeError, ValueError, LookupError, ArithmeticError))
         state["ring"].close()
+
+
+REAL_ARENA = "/home/ubuntu/dope-data/flat/s3-v250"
+
+
+@pytest.mark.skipif(not __import__("os").path.exists(REAL_ARENA + "/index.jsonl"), reason="real arena absent")
+def test_v3_preset_plans_meet_the_plan_targets():
+    """Plan-level shares of the v3 preset on the real arena (index only, no rows read)."""
+    from research.levels.s3_counter_sampler import sampler_for
+
+    spec = ef.v3_spec(REAL_ARENA, seed=7)
+    assert spec.view.emit == "raw" and spec.stage.endswith(":native_dse7")
+    sampler = sampler_for(spec.sampler_args[0])
+    real = fit = qry = n = 0
+    for step in range(200):
+        plan = sampler.plan_step(7, step)
+        step_real = sum(s.kind == "real" for s in plan)
+        assert step_real >= 0.6 * len(plan)  # real views >= 60 % of every step
+        assert not any(s.task == "multilabel" for s in plan)
+        real += step_real
+        fit += sum(s.n_fit >= 256 for s in plan)
+        qry += sum(s.n_qry >= 256 for s in plan)
+        n += len(plan)
+    assert fit >= 0.4 * n and qry >= 0.5 * n

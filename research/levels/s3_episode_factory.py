@@ -30,6 +30,13 @@ machines.
 
 A failed episode (no view after ``max_tries`` re-plans, a stage fault, a payload over capacity)
 is a READY payload carrying a static error code: counted, never skipped, never a source value.
+
+Producers are spawned, so they re-import the leader's ``__main__``: run the trainer as a module
+(``python -m ...``) or a script whose work sits under ``if __name__ == "__main__":``, never from
+stdin. A producer that cannot start is reported as ``producer_died``.
+
+For v3 training use ``v3_spec(arena, seed, batch_size)``: the counter sampler with
+``V3_SAMPLER``, the raw-emit view and the native DSE7 stage.
 """
 from __future__ import annotations
 
@@ -525,6 +532,26 @@ def farm_episode(spec: Any, state: dict[str, Any]) -> dict[str, Any]:
     except FactoryError as exc:
         raise RingDown(str(exc)) from None
     return payload["episode"]
+
+
+# -- the v3 training preset (plan C3) -------------------------------------------------------
+# Native stages have no multilabel task and 48 packet columns; query sets get at least 256 rows
+# where the table allows. Measured on s3-v250 (seed 7, 10 steps x 64 through the factory):
+# 75 % real views in every step, 0 failed, 2 of 640 slots retried and none fell back to a prior,
+# n_fit >= 256 in 59.7 %, |Q| >= 256 in 62.3 %, packets 805 B median.
+V3_SAMPLER: dict[str, Any] = {"qry_lo": 256, "multilabel_view_prob": 0.0, "max_view_cols": 48,
+                              "max_total_cols": 48}
+
+
+def v3_spec(arena: str, seed: int, batch_size: int = 64, budget: int = 2048, **sampler: Any) -> FactorySpec:
+    """The v3 factory spec over a flat arena; ``sampler`` overrides ``V3_SAMPLER`` fields."""
+    from .s3_counter_sampler import SamplerConfig
+    from .s3_view_builder import ViewConfig
+
+    cfg = SamplerConfig(arena=arena, batch_size=batch_size, **{**V3_SAMPLER, **sampler})
+    return FactorySpec(seed=seed, corpus=f"{__name__}:arena_corpus", corpus_args=(arena,),
+                       sampler=f"{__name__}:arena_sampler", sampler_args=(cfg,), view=ViewConfig(emit="raw"),
+                       stage=f"{__name__}:native_dse7", stage_kwargs={"budget": budget})
 
 
 def arena_corpus(arena: str) -> Any:
