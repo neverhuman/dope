@@ -158,8 +158,7 @@ FIXTURES = _make_12_fixtures()
 @pytest.fixture(scope="module")
 def v8_emit_bin() -> Path:
     exe = find_v8_emit_binary()
-    if exe is None:
-        pytest.skip("dope_v8_emit binary not built")
+    assert exe is not None, "build it: cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit"
     return exe
 
 
