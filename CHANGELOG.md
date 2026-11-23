@@ -2,7 +2,30 @@
 
 ## Engine 2.0.0 - 2026-11-22
 
-- Major DOPE Fidelity Engine 2.0, Compact Single-Encoding Neural Anonymizer, and
+- Release encoder, Rust-only V7 inference and the `dope_kpi` scoreboard:
+  - **`dope fit --format auto`** (`engine/dope-core/src/auto/`, `engine/dope-cli`): per table,
+    fits the Format 1 program and the SingleEncV7 `DSE7` v2 packet within one whole-file byte
+    budget (`--budget`, default `2k`, `DPA1` header included), scores both on an internal
+    duplicate-grouped split of the input rows, keeps V7 only when its internal retention is
+    higher by the fixed selection margin (otherwise Format 1), falls back to whichever
+    candidate fits, and stores the candidate fitted on all rows in a `DPA1` container.
+    `dope sample` dispatches on the file magic.
+  - **Rust-only V7 inference**: the trained SingleEncV7 SafeTensors checkpoint
+    (`models/single-enc-v7/`) is compiled into the `dope` binary, so V7 fitting and sampling
+    need no Python and no LibTorch; a V7 artifact names its weights' fingerprint and is
+    refused by a binary with other weights.
+  - **Format 2 budget**: `dope fit --format 2` refuses an artifact larger than the requested
+    `--budget` or `--size` instead of writing it.
+  - **`dope_kpi` scoreboard** (`engine/dope-arena`): the twin-referenced gap (TRG) of every arm
+    on identical cells, a stratified family bootstrap, Holm-adjusted paired comparisons,
+    guards (per-task lower bounds, held-out MLP, realism and empirical privacy coverage,
+    exact-copy excess, bytes), a sign-flip null, and the README block `DOPE1 SCOREBOARD`
+    plus the light and dark v2.0.0 hero, rendered from the receipts committed in
+    `bench/real-world/results/scoreboard/v2.0.0/` and hash-bound by `tools/claims/dope1.py`.
+  - The promotion outcome against `dope-engine-v1.3.0` (PROMOTE, HOLD or REJECT) is the one
+    the pre-registered one-look confirmation measured; the README scoreboard block prints it
+    from those receipts, so this entry carries no result number.
+- Major DOPE Fidelity Engine 2.0, Compact Single-Encoding Neural Generator, and
   High-Speed Fleet Training / Live Dashboard upgrade:
   - **Rust Fidelity Engine 2.0 Format-2 P0 Fixes (`BUG-R1`–`BUG-R9`)**:
     sequential residual interaction mining (`mine_pairs`), `MainEffectSet`

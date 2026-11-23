@@ -1,0 +1,13 @@
+{
+  "files": {
+    "bench/real-world/figures/hero-v2-dark.svg": "d2322c891dfb6bbf1047c2476603dc0395de050d0497376d9c0234cae0cfa8dd",
+    "bench/real-world/figures/hero-v2-light.svg": "2836888e147a3a983309141c0112b67a09611a2e0a57164c335dca820bb1f6db",
+    "bench/real-world/results/scoreboard/v2.0.0/readme-block.md": "51d691f2a6943fa2c2a48da4a6a280eb29acb3dd0042fe1ce206995609abf047"
+  },
+  "receipts": {
+    "bench/real-world/results/scoreboard/v2.0.0/compare.json": "7a313bec99840e5ad33d71d74e46d4b7c2298bcf83cb0795bcd1a4515c5016ec",
+    "bench/real-world/results/scoreboard/v2.0.0/primary.json": "a0df32778cec155bd678abd3d1f57967847b66c2061718151a68c043a4cc5d37"
+  },
+  "renderer": "dope_kpi render-readme",
+  "schema": "dope.scoreboard-render-manifest/v1"
+}
