@@ -43,8 +43,10 @@ pub const DARK: Tokens = Tokens {
     muted: "#898781",
     grid: "#2c2c2a",
     axis: "#383835",
-    accent: "#3987e5",
-    accent_light: "#5598e7",
+    // Darker previous-release step: on a dark surface the step toward the
+    // surface is the darker one (OKLab difference 15.6, both >= 3:1).
+    accent: "#4a95ee",
+    accent_light: "#2e66ad",
     gray: "#898781",
 };
 
