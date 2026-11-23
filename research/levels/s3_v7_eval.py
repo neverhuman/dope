@@ -294,9 +294,14 @@ def load_v7_resume_state(
     )
     if saved_arch != expected_arch:
         raise ValueError(f"resume_arch_mismatch:saved={saved_arch}:expected={expected_arch}")
-    base_model.load_state_dict(state["base_model"], strict=True)
-    ema_model.load_state_dict(state["ema_model"], strict=True)
+    dev = next(base_model.parameters()).device
+    base_model.load_state_dict({k: v.to(dev) for k, v in state["base_model"].items()}, strict=True)
+    ema_model.load_state_dict({k: v.to(dev) for k, v in state["ema_model"].items()}, strict=True)
     opt.load_state_dict(state["optimizer"])
+    for st in opt.state.values():
+        for sk, sv in st.items():
+            if torch.is_tensor(sv):
+                st[sk] = sv.to(dev)
     if "torch_rng" in state:
         torch.set_rng_state(state["torch_rng"])
     if "numpy_rng" in state:
@@ -428,7 +433,7 @@ def save_v7_valley_soup(
 
 
 def tree_visible_joint_loss(
-    x_syn: torch.Tensor, lg_syn: torch.Tensor, y_reg_syn: torch.Tensor, batch: dict[str, torch.Tensor]
+    x_syn: torch.Tensor, lg_syn: torch.Tensor, y_reg_syn: torch.Tensor, batch: dict[str, torch.Tensor], max_shifts: int = 4,
 ) -> torch.Tensor:
     """Differentiable 4-quartile axis-aligned 2-way copula + conditional target moment loss.
 
@@ -456,7 +461,7 @@ def tree_visible_joint_loss(
     bs, bq = _qbins(zs), _qbins(zq)
     p_dim = x_syn.shape[2]
     cop_terms = []
-    for shift in (1, 2, 3, 5):
+    for shift in (1, 2, 3, 5, 7, 9, 11, 13, 15, 17, 19, 23)[: max(1, int(max_shifts))]:
         if shift >= p_dim:
             continue
         pm = col_mask * torch.roll(col_mask, shifts=-shift, dims=1)

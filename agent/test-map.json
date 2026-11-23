@@ -136,6 +136,10 @@
       "command": "gitleaks detect --source . --no-banner --redact",
       "purpose": "verify the path/regex allowlist for synthetic test tokens while all other secret findings remain enforced"
     },
+    ".gitleaksignore": {
+      "command": "gitleaks detect --source . --no-banner --redact",
+      "purpose": "verify commit-pinned false-positive fingerprints while all other secret findings remain enforced"
+    },
     "AGENTS.md": {
       "command": "just fast",
       "purpose": "verify repository guidance"

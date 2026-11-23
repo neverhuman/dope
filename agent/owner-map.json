@@ -22,6 +22,7 @@
     ".github/": "governance",
     ".gitignore": "governance",
     ".gitleaks.toml": "governance",
+    ".gitleaksignore": "governance",
     "AGENTS.md": "governance",
     "CHANGELOG.md": "governance",
     "CITATION.cff": "governance",

@@ -160,7 +160,7 @@ def build_unique_v7_episode(
     n_fit_target = int(round(math.exp(rng.uniform(math.log(32.0), math.log(max(64.0, float(n_fit_cap)))))))
     n_qry_target = int(round(math.exp(rng.uniform(math.log(24.0), math.log(max(32.0, float(n_qry_cap)))))))
 
-    use_synth = rng.random() < 0.20
+    use_synth = rng.random() < (0.75 if real_queue is not None else 0.20)
     tbl_idx: int | None = None
     from_reg_synth = False
     if not use_synth:
@@ -302,17 +302,19 @@ def build_unique_v7_episode(
     return pkt
 
 
-def collate_v7_batch(episodes: list[dict[str, Any]]) -> dict[str, Any]:
+def collate_v7_batch(episodes: list[dict[str, Any]], as_numpy: bool = False) -> dict[str, Any]:
     keys = [
         "col_feats", "glob_feats", "knots", "L", "class_means",
         "W", "b", "prior", "resid_sd", "col_mask", "is_const",
         "X_qry", "y_qry", "q_mask",
     ]
-    out: dict[str, Any] = {k: torch.from_numpy(np.stack([e[k] for e in episodes], axis=0)) for k in keys}
-    for k, dt in (("task_id", torch.long), ("k_eff", torch.long), ("packet_bytes", torch.float32), ("n_fit", torch.float32), ("n_noise", torch.float32)):
-        out[k] = torch.tensor([e[k] for e in episodes], dtype=dt)
+    out: dict[str, Any] = {k: np.stack([e[k] for e in episodes], axis=0) for k in keys}
+    for k, dt in (("task_id", np.int64), ("k_eff", np.int64), ("packet_bytes", np.float32), ("n_fit", np.float32), ("n_noise", np.float32)):
+        out[k] = np.array([e[k] for e in episodes], dtype=dt)
     for k, dv in (("is_synth_prior", 0), ("is_swapped", 0), ("is_cropped", 0), ("col_crop_ratio", 1.0)):
-        out[k] = torch.tensor([e.get(k, dv) for e in episodes], dtype=torch.float32)
+        out[k] = np.array([e.get(k, dv) for e in episodes], dtype=np.float32)
+    if not as_numpy:
+        out = {k: torch.from_numpy(v) for k, v in out.items()}
     out["dataset_hashes"] = [str(e.get("dataset_hash", "")) for e in episodes]
     out["split_hashes"] = [str(e.get("split_hash", "")) for e in episodes]
     return out
@@ -327,19 +329,18 @@ def compute_v7_batch_loss(
     sd_qry: torch.Tensor | None = None,
     ref: dict[str, torch.Tensor] | None = None,
     hard_tstr_v73: bool = False,
+    rff_dim: int = 16,
+    swd_projs: int = 24,
 ) -> tuple[torch.Tensor, dict[str, float]]:
     """Differentiable multi-auditor loss + proper-scoring-rule NLL + trust-region residual anchor."""
     bsz, n_syn, p_dim = x_syn.shape
     device = x_syn.device
-    col_mask = batch["col_mask"]
-    X_qry = batch["X_qry"] * col_mask.unsqueeze(1)
-    y_qry = batch["y_qry"]
-    q_mask = batch["q_mask"]
-    task_id = batch["task_id"]
-    k_eff = batch["k_eff"]
+    col_mask, X_qry, y_qry, q_mask, task_id, k_eff = (
+        batch["col_mask"], batch["X_qry"] * batch["col_mask"].unsqueeze(1),
+        batch["y_qry"], batch["q_mask"], batch["task_id"], batch["k_eff"],
+    )
 
     # 1. Differentiable RFF + Linear TSTR surrogate on (X_syn -> QRY)
-    rff_dim = 16
     w_rff = torch.randn((p_dim, rff_dim), device=device, dtype=x_syn.dtype) * 0.45
     b_rff = torch.rand((1, 1, rff_dim), device=device, dtype=x_syn.dtype) * (2.0 * math.pi)
     phi_syn = torch.cat(
@@ -424,7 +425,7 @@ def compute_v7_batch_loss(
     pair_mask = col_mask.unsqueeze(2) * col_mask.unsqueeze(1)
     corr_loss = (((c_syn - c_qry) ** 2) * pair_mask).sum() / pair_mask.sum().clamp_min(1.0)
 
-    proj = torch.randn((p_dim, 24), device=device, dtype=x_syn.dtype)
+    proj = torch.randn((p_dim, swd_projs), device=device, dtype=x_syn.dtype)
     proj = proj / proj.norm(dim=0, keepdim=True).clamp_min(1e-6)
     swd_loss = (
         torch.quantile(torch.matmul(x_syn, proj), q_grid, dim=1)
@@ -467,14 +468,17 @@ def compute_v7_batch_loss(
         if hard_tstr_v73:
             anchor_loss = (
                 anchor_loss
-                + 1.50 * (ref["d_W"] ** 2).mean()
-                + 2.50 * (ref["w2"] ** 2).mean()
-                + 0.50 * (ref["w1"] ** 2).mean()
-                + 1.00 * (ref["temp_sd"] ** 2).mean()
+                + 1.50 * (ref["d_W"] ** 2).mean() + 2.50 * (ref["w2"] ** 2).mean()
+                + 0.50 * (ref["w1"] ** 2).mean() + 1.00 * (ref["temp_sd"] ** 2).mean()
+                + 0.25 * (ref["d_knots"] ** 2).mean() + 0.25 * (ref["d_L"] ** 2).mean()
             )
             if bin_m.any():
                 tau_scale = torch.exp(ref["temp_sd"][bin_m, 0])
-                anchor_loss = anchor_loss + 0.50 * (torch.relu(0.90 - tau_scale) ** 2).mean()
+                anchor_loss = (
+                    anchor_loss
+                    + 6.0 * (ref["d_W"][bin_m, 0] ** 2).mean() + 12.0 * (ref["w2"][bin_m, :, 0] ** 2).mean()
+                    + 4.0 * (ref["temp_sd"][bin_m, 0] ** 2).mean() + 0.50 * (torch.relu(0.90 - tau_scale) ** 2).mean()
+                )
 
     mmd_proxy = marg_loss + 0.5 * corr_loss + 0.5 * swd_loss
     total_loss = 0.70 * cond_loss + 0.30 * tstr_loss + 1.0 * marg_loss + 1.2 * corr_loss + 0.9 * swd_loss + anchor_loss
