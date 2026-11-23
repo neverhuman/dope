@@ -238,7 +238,7 @@ mod tests {
     fn mk_st(vals: &[f32]) -> Vec<u8> {
         let mut m = TensorMap::new();
         m.insert("w".into(), (vec![vals.len()], vals.to_vec()));
-        encode_f32_safetensors(&m)
+        encode_f32_safetensors(&m).expect("an f32 tensor map always serialises")
     }
 
     #[test]

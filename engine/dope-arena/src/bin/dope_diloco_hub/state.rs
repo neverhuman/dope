@@ -114,7 +114,7 @@ pub fn parse_f32_safetensors(bytes: &[u8]) -> Result<TensorMap, String> {
     Ok(out)
 }
 
-pub fn encode_f32_safetensors(tensors: &TensorMap) -> Vec<u8> {
+pub fn encode_f32_safetensors(tensors: &TensorMap) -> Result<Vec<u8>, String> {
     let mut header = serde_json::Map::new();
     let mut offset = 0usize;
     let mut total_body = 0usize;
@@ -127,7 +127,8 @@ pub fn encode_f32_safetensors(tensors: &TensorMap) -> Vec<u8> {
         offset += nbytes;
         total_body += nbytes;
     }
-    let mut hb = serde_json::to_vec(&Value::Object(header)).unwrap_or_default();
+    let mut hb = serde_json::to_vec(&Value::Object(header))
+        .map_err(|e| format!("cannot serialise the safetensors header: {e}"))?;
     while hb.len() % 8 != 0 {
         hb.push(b' ');
     }
@@ -139,7 +140,7 @@ pub fn encode_f32_safetensors(tensors: &TensorMap) -> Vec<u8> {
             out.extend_from_slice(&v.to_le_bytes());
         }
     }
-    out
+    Ok(out)
 }
 
 fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<()> {
@@ -200,7 +201,7 @@ impl HubState {
                     self.cached_bytes.clone(),
                 ));
             }
-            let encoded = encode_f32_safetensors(&incoming);
+            let encoded = encode_f32_safetensors(&incoming)?;
             self.persist_global(incoming, encoded, worker_id, 0, 0, 0.0)?;
             return Ok((
                 self.round,
@@ -209,7 +210,7 @@ impl HubState {
             ));
         }
         let Some(ref mut g_weights) = self.weights else {
-            let encoded = encode_f32_safetensors(&incoming);
+            let encoded = encode_f32_safetensors(&incoming)?;
             self.persist_global(incoming, encoded, worker_id, 0, 0, 0.0)?;
             return Ok((
                 self.round,
@@ -277,7 +278,7 @@ impl HubState {
             next_g.insert(k.clone(), (shape.clone(), updated));
         }
         let delta_rms = (sum_sq / (total_elems.max(1) as f64)).sqrt();
-        let encoded = encode_f32_safetensors(&next_g);
+        let encoded = encode_f32_safetensors(&next_g)?;
         self.persist_global(next_g, encoded, worker_id, base_round, staleness, delta_rms)?;
         Ok((
             self.round,
