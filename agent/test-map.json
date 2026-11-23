@@ -4167,6 +4167,18 @@
     "models/single-enc-v7/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope v7_weights && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test auto_encoder",
       "purpose": "verify the compiled SingleEncV7 weights against manifest.json and their use by --format auto"
+    },
+    "engine/dope-ffi/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-ffi",
+      "purpose": "verify the per-episode FIT-only DSE7 stage and its C ABI: query rows never reach the packet, deterministic, error codes not panics"
+    },
+    "research/levels/s3_episode_factory.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets"
+    },
+    "engine/dope-core/src/marginal/column_meta.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test column_meta_v2",
+      "purpose": "verify per-episode FIT-only Nc2ColumnMetaV2: planted support classes, k=10 bound floor, row-order and missing-cell invariance"
     }
   },
   "workspace": "dope"

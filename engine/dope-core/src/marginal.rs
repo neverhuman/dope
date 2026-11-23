@@ -7,6 +7,7 @@
 //! integer supports) are thresholds `t_k = Φ⁻¹(cum_k)` in the same z space.
 
 pub mod atoms;
+pub mod column_meta;
 pub mod lattice;
 pub mod tails;
 pub mod v2;
