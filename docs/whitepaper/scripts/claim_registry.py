@@ -367,16 +367,22 @@ def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> lis
 
 
 # Generated hero figures admitted on the README: the historical TDL card's
-# figure and the DOPE engine benchmark figure (authenticated by tools/claims/dope1.py).
-README_HEROES = ("paper/generated/hero-frontier.png", "bench/real-world/figures/hero.png")
+# figure, the DOPE engine benchmark figure and the v2.0.0 scoreboard figures
+# (light and dark; the last three are authenticated by tools/claims/dope1.py).
+README_HEROES = ("paper/generated/hero-frontier.png", "bench/real-world/figures/hero.png",
+                 "bench/real-world/figures/hero-v2-light.svg", "bench/real-world/figures/hero-v2-dark.svg")
 
 
 def readme_hero_failures(readme: str) -> list[str]:
-    """A generated hero figure is a README image above the first section heading."""
+    """A generated hero figure is a README image above the first section heading: a Markdown
+    image, or a <picture> whose every source and alt-texted fallback image is an admitted hero."""
     first_section = re.search(r"(?m)^## ", readme)
     head = readme[:first_section.start()] if first_section else readme
     heroes = "|".join(re.escape(path) for path in README_HEROES)
-    if not re.search(r"(?m)^!\[[^\]\n]+\]\((?:" + heroes + r")\)", head):
+    pictures = [body for body in re.findall(r"(?ms)^<picture>\n(.*?)^</picture>$", head)
+                if re.search(r'(?m)^\s*<img alt="[^"\n]+" src="(?:' + heroes + r')">$', body)
+                and set(re.findall(r'(?:srcset|src)="([^"]*)"', body)) <= set(README_HEROES)]
+    if not pictures and not re.search(r"(?m)^!\[[^\]\n]+\]\((?:" + heroes + r")\)", head):
         return ["README: the generated hero figure must appear above the first section"]
     return []
 

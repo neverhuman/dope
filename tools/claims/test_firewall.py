@@ -1,6 +1,7 @@
 """Seeded publication violations must fail the actual public registry."""
 import copy
 import json
+import re
 import sys
 import unittest
 from contextlib import contextmanager
@@ -341,15 +342,21 @@ class FirewallTests(unittest.TestCase):
         with self.public_fixture() as root:
             readme = (root / 'README.md').read_text()
             self.assertEqual(C.readme_hero_failures(readme), [])
-            # The landing hero is the first admitted generated figure (others may follow below sections).
-            hero = next(line for line in readme.splitlines()
-                        if line.startswith('![') and any(path in line for path in C.README_HEROES))
+            # The landing hero is the first admitted generated figure (others may follow below sections):
+            # a <picture> of admitted heroes above the first section, else a Markdown image line.
+            picture = re.search(r'(?ms)^<picture>\n.*?^</picture>$', readme[:readme.index('\n## ')])
+            hero = picture.group(0) if picture else next(
+                line for line in readme.splitlines()
+                if line.startswith('![') and any(path in line for path in C.README_HEROES))
             path = next(path for path in C.README_HEROES if path in hero)
             without = readme.replace(hero + '\n', '', 1)
             heading_end = without.index('\n', without.index('\n## ') + 1)
             moved = without[:heading_end + 1] + hero + '\n' + without[heading_end + 1:]
+            unlabeled = re.sub(r'alt="[^"]*"', 'alt=""', hero) if picture else f'![]({path})'
+            foreign = re.sub(r'srcset="[^"]*"', 'srcset="docs/readme/pareto.png"', hero)
             for label, text in (('moved below a section', moved), ('removed', without),
-                                ('without alt text', readme.replace(hero, f'![]({path})'))):
+                                ('without alt text', readme.replace(hero, unlabeled)),
+                                ('unadmitted picture source', readme.replace(hero, foreign) if picture else without)):
                 with self.subTest(label=label):
                     (root / 'README.md').write_text(text)
                     self.assertIn('README: the generated hero figure must appear above the first section',
