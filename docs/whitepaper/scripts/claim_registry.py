@@ -367,10 +367,10 @@ def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> lis
 
 
 # Generated hero figures admitted on the README: the historical TDL card's
-# figure, the DOPE engine benchmark figure and the v2.0.0 scoreboard figures
+# figure, the DOPE engine benchmark figure and the v3.0.0 scoreboard figures
 # (light and dark; the last three are authenticated by tools/claims/dope1.py).
 README_HEROES = ("paper/generated/hero-frontier.png", "bench/real-world/figures/hero.png",
-                 "bench/real-world/figures/hero-v2-light.svg", "bench/real-world/figures/hero-v2-dark.svg")
+                 "bench/real-world/figures/hero-v3-light.svg", "bench/real-world/figures/hero-v3-dark.svg")
 
 
 def readme_hero_failures(readme: str) -> list[str]:

@@ -4,13 +4,13 @@
 The README carries three generated blocks, each a byte-for-byte copy of a file
 written by a generator, and generated hero figures:
 
-* ``DOPE1 SCOREBOARD``: ``bench/real-world/results/scoreboard/v2.0.0/readme-block.md``
-  (``dope_kpi render-readme`` from the v2.0.0 scoreboard receipts beside it);
+* ``DOPE1 SCOREBOARD``: ``bench/real-world/results/scoreboard/v3.0.0/readme-block.md``
+  (``dope_kpi render-readme`` from the v3.0.0 scoreboard receipts beside it);
 * ``DOPE1 RESULTS``: ``bench/real-world/results/readme-block.md``
   (``bench/real-world/render.py`` from the benchmark summary);
 * ``DOPE1 WALKTHROUGH``: ``examples/adult/TRANSCRIPT.md``
   (``examples/adult/walkthrough.py`` from a recorded CLI run);
-* heroes: the v2.0.0 ``bench/real-world/figures/hero-v2-{light,dark}.svg``
+* heroes: the v3.0.0 ``bench/real-world/figures/hero-v3-{light,dark}.svg``
   (``dope_kpi render-hero``), hash-listed in the scoreboard manifest next to the
   receipt digests, and the v1.0.0 ``bench/real-world/figures/hero.png``,
   hash-listed in the render manifest next to the summary digest.
@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCOREBOARD = "bench/real-world/results/scoreboard/v2.0.0"
+SCOREBOARD = "bench/real-world/results/scoreboard/v3.0.0"
 BLOCKS = {
     "DOPE1 SCOREBOARD": f"{SCOREBOARD}/readme-block.md",
     "DOPE1 RESULTS": "bench/real-world/results/readme-block.md",
@@ -37,7 +37,7 @@ BLOCKS = {
 HERO = "bench/real-world/figures/hero.png"
 MANIFEST = "bench/real-world/results/render-manifest.json"
 SUMMARY = "bench/real-world/results/confirm/summary.json"
-HEROES_V2 = ("bench/real-world/figures/hero-v2-light.svg", "bench/real-world/figures/hero-v2-dark.svg")
+HEROES = ("bench/real-world/figures/hero-v3-light.svg", "bench/real-world/figures/hero-v3-dark.svg")
 SCOREBOARD_MANIFEST = f"{SCOREBOARD}/render-manifest.json"
 
 
@@ -108,7 +108,7 @@ def failures(readme: str, root: Path = ROOT) -> list[str]:
             if (not rel.startswith(SCOREBOARD + "/") or digest not in block
                     or hashlib.sha256((root / rel).read_bytes()).hexdigest() != digest):
                 out.append(f"README: scoreboard receipt {rel} differs from the scoreboard manifest or block")
-        for rel in (BLOCKS["DOPE1 SCOREBOARD"], *HEROES_V2):
+        for rel in (BLOCKS["DOPE1 SCOREBOARD"], *HEROES):
             if board["files"].get(rel) != hashlib.sha256((root / rel).read_bytes()).hexdigest():
                 out.append(f"README: {rel} differs from the scoreboard render manifest")
     except (OSError, KeyError, ValueError, AttributeError, TypeError):
