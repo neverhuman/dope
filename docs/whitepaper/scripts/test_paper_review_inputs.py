@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,7 +21,14 @@ PREPARE_SPEC.loader.exec_module(PREPARE)
 
 class CommittedInputTests(unittest.TestCase):
     def test_committed_graph_and_all_public_inputs_match_the_lock(self):
-        self.assertEqual(REVIEW.authenticated_graph()['format'], 'dope-review-paper-build-v1')
+        graph, _inputs, _lock = REVIEW._load_authenticated_graph()
+        self.assertEqual(graph['format'], 'dope-review-paper-build-v1')
+        # Replay every declared reducer from the committed bytes in a fresh interpreter, the
+        # way paper_build does, so the independent replays run in parallel workers.
+        result = subprocess.run([sys.executable, '-B', str(ROOT / 'ops/ci/paper-review-outputs.py'), '--check-inputs'],
+                                cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout[-2000:] + result.stderr[-2000:])
+        self.assertIn('declared scalar panels reproduced', result.stdout)
 
     def test_tost_constants_and_supplement_use_the_original_declaration(self):
         text = PREPARE.tost_protocol_tex()

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import sys
 
 import numpy as np
 from scipy import stats
@@ -102,28 +103,180 @@ def _hier_median_ci(array: np.ndarray, cluster_ids, rng: np.random.Generator) ->
     members = [np.asarray(groups[key], dtype=float) for key in ids]
     if all(len(item) == 1 for item in members):
         return _iid_median_ci(np.array([item[0] for item in members]), rng)
-    n_clusters = len(ids)
-    width = n_clusters * max(len(group) for group in members)
-    buffer = np.empty(width, dtype=float)
-    samples = np.empty(DRAWS, dtype=float)
-    for draw in range(DRAWS):
-        chosen = rng.integers(0, n_clusters, size=n_clusters)
-        cursor = 0
-        for index in chosen:
-            group = members[int(index)]
-            # NumPy's high=1 draw is deterministic and leaves the RNG unchanged.
-            # Preserve the historical stream while avoiding a call per singleton.
-            if len(group) == 1:
-                buffer[cursor] = group[0]
-                cursor += 1
-                continue
-            take = rng.integers(0, len(group), size=len(group))
-            nxt = cursor + len(group)
-            buffer[cursor:nxt] = group[take]
-            cursor = nxt
-        samples[draw] = float(np.median(buffer[:cursor]))
+    sizes = np.asarray([len(group) for group in members], dtype=np.int64)
+    tape = _WordTape(rng)
+    samples, used = _hier_samples(np.concatenate(members), sizes, tape, DRAWS)
+    tape.commit(used)
     lo, hi = np.quantile(samples, [0.025, 0.975])
     return {"median": float(np.median(array)), "lo": float(lo), "hi": float(hi)}
+
+
+# The historical cluster bootstrap made, per draw, one rng.integers(0, C, size=C) call for the
+# C clusters, then one rng.integers(0, s, size=s) call per chosen cluster with s > 1 members,
+# and took the median of the chosen members in that order (a range of one draws nothing, so a
+# singleton contributes its only member). For int64 bounds below 2**32 NumPy draws each such
+# integer with Lemire's method from the next 32-bit word of the bit generator, which buffers
+# the second half of each 64-bit output; integers(0, 2**32, dtype=uint64) returns exactly those
+# words. The code below applies the same rule to the same words for all draws at once, so every
+# median, every interval and the generator's final state are unchanged.
+_WORD = 1 << 32
+_LOW32 = np.uint64(0xFFFFFFFF)
+_SHIFT = np.uint64(32)
+
+
+class _WordTape:
+    """The generator's 32-bit words, drawn ahead in bulk.
+
+    PCG64 (default_rng) hands out the low half of each 64-bit output, then the buffered high
+    half, so its words are the halves of random_raw outputs in that order, after any half
+    already buffered. commit(used) restores the generator and advances it by exactly the words
+    used, so drawing ahead never shows: the generator ends where the per-value calls left it.
+    """
+
+    def __init__(self, rng: np.random.Generator):
+        self.rng = rng
+        self.saved = rng.bit_generator.state
+        # On a little-endian host the uint32 view of the outputs is their halves, low first.
+        self.raw = type(rng.bit_generator) is np.random.PCG64 and sys.byteorder == "little"
+        self.buffered = 1 if self.raw and self.saved["has_uint32"] else 0
+        self.words = np.asarray([self.saved["uinteger"]] if self.buffered else [], dtype=np.uint32)
+
+    def get(self, stop: int) -> np.ndarray:
+        if stop > self.words.size:
+            more = max(stop - self.words.size, self.words.size, 1 << 16)
+            if self.raw:
+                fresh = self.rng.bit_generator.random_raw((more + 1) // 2).view(np.uint32)
+            else:
+                fresh = self.rng.integers(0, _WORD, size=more, dtype=np.uint64).astype(np.uint32)
+            self.words = np.concatenate([self.words, fresh]) if self.words.size else fresh
+        return self.words
+
+    def commit(self, used: int) -> None:
+        self.rng.bit_generator.state = self.saved
+        if not self.raw:
+            if used:
+                self.rng.integers(0, _WORD, size=used, dtype=np.uint64)
+            return
+        head = min(used, self.buffered)
+        if head:
+            self.rng.integers(0, _WORD, size=head, dtype=np.uint64)
+        rest = used - head
+        if rest:
+            # Skip whole outputs in bulk; the last one or two words go through integers so the
+            # buffered half is left exactly as the per-value calls left it.
+            last = 2 if rest % 2 == 0 else 1
+            if rest > last:
+                self.rng.bit_generator.random_raw((rest - last) // 2)
+            self.rng.integers(0, _WORD, size=last, dtype=np.uint64)
+
+
+def _below(tape, position: int, bound: int) -> tuple[int, int]:
+    """NumPy's Lemire draw in [0, bound) from the words at position; returns (value, next)."""
+    threshold = (_WORD - bound) % bound
+    while True:
+        value = int(tape.get(position + 1)[position]) * bound
+        position += 1
+        if value & 0xFFFFFFFF >= threshold:
+            return value >> 32, position
+
+
+def _exact_draw(flat, sizes, starts, tape, position: int) -> tuple[float, int]:
+    """One bootstrap draw exactly as the historical per-value calls made it."""
+    n_clusters = sizes.size
+    chosen = []
+    for _ in range(n_clusters if n_clusters > 1 else 0):
+        index, position = _below(tape, position, n_clusters)
+        chosen.append(index)
+    picked = []
+    for index in chosen or [0]:
+        size, start = int(sizes[index]), int(starts[index])
+        if size == 1:
+            picked.append(flat[start])
+            continue
+        for _ in range(size):
+            local, position = _below(tape, position, size)
+            picked.append(flat[start + local])
+    return float(np.median(np.asarray(picked, dtype=float))), position
+
+
+def _hier_samples(flat, sizes, tape, draws: int) -> tuple[np.ndarray, int]:
+    """All bootstrap medians and the number of words they used."""
+    n_clusters = sizes.size
+    starts = np.cumsum(sizes) - sizes
+    samples = np.empty(draws, dtype=float)
+    position = done = 0
+    signed_zero = bool(np.any((flat == 0) & np.signbit(flat)))
+    if n_clusters == 1:  # One cluster draws no cluster word.
+        for draw in range(draws):
+            samples[draw], position = _exact_draw(flat, sizes, starts, tape, position)
+        return samples, position
+    member_words = np.where(sizes > 1, sizes, 0)  # Words a chosen cluster spends on its members.
+    per_draw = n_clusters + int(member_words.sum())
+    block = max(16, 15_000 // per_draw)
+    # An array, not a scalar: NumPy 1.x would keep uint32 words * a small uint64 scalar in uint32.
+    bound = np.asarray([n_clusters], dtype=np.uint64)
+    cluster_threshold = (_WORD - n_clusters) % n_clusters
+    span = np.arange(n_clusters)
+    tape.get(position + draws * per_draw * 21 // 20 + 4 * per_draw)
+    while done < draws:
+        count = min(block, draws - done)
+        # Each draw spends C cluster words, then one word per member of each chosen
+        # multi-member cluster; the next draw starts after them.
+        offsets, multis, cursor = [], [], 0
+        for _ in range(count):
+            words = tape.get(position + cursor + n_clusters)
+            start = position + cursor
+            taken = int(member_words[(words[start:start + n_clusters] * bound) >> _SHIFT].sum())
+            offsets.append(cursor)
+            multis.append(taken)
+            cursor += n_clusters + taken
+        window = tape.get(position + cursor)[position:position + cursor]
+        offsets = np.asarray(offsets, dtype=np.int64)
+        multis = np.asarray(multis, dtype=np.int64)
+        kept = offsets.size
+        cluster_scaled = window[offsets[:, None] + span] * bound
+        chosen = (cluster_scaled >> _SHIFT).astype(np.int64)
+        rejected = ((cluster_scaled & _LOW32) < cluster_threshold).any(axis=1)
+        lengths = sizes[chosen]
+        totals = lengths.sum(axis=1)
+        cluster = np.repeat(chosen.ravel(), lengths.ravel())
+        draw_of = np.repeat(np.arange(kept), totals)
+        multi = sizes[cluster] > 1
+        before = np.cumsum(multis) - multis
+        word_at = np.repeat(offsets + n_clusters - before, multis) + np.arange(int(multis.sum()))
+        member_bounds = sizes[cluster[multi]].astype(np.uint64)
+        member_scaled = window[word_at] * member_bounds
+        member_rejected = (member_scaled & _LOW32) < (_WORD - member_bounds) % member_bounds
+        rejected[draw_of[multi][member_rejected]] = True
+        good = int(np.argmax(rejected)) if rejected.any() else kept
+        if good:
+            local = np.zeros(cluster.size, dtype=np.int64)
+            local[multi] = (member_scaled >> _SHIFT).astype(np.int64)
+            used = int(totals[:good].sum())
+            values = flat[starts[cluster[:used]] + local[:used]]
+            widths = totals[:good]
+            grid = np.full((good, int(widths.max())), np.inf)
+            grid[draw_of[:used], np.arange(used) - np.repeat(np.cumsum(widths) - widths, widths)] = values
+            grid.sort(axis=1)
+            rows, half = np.arange(good), widths // 2
+            upper = grid[rows, half]
+            lower = grid[rows, np.maximum(half - 1, 0)]
+            medians = np.where(widths % 2 == 1, upper, (lower + upper) / 2)
+            if signed_zero:
+                # A sort and np.median's partition can return -0.0 and 0.0 in either order, so
+                # a zero median is taken again by np.median from the values in drawn order.
+                ends = np.cumsum(widths)
+                for row in np.flatnonzero(medians == 0):
+                    medians[row] = float(np.median(values[ends[row] - widths[row]:ends[row]]))
+            samples[done:done + good] = medians
+            done += good
+        if good < kept:
+            # Lemire rejected a word in this draw, shifting every later word: replay it exactly.
+            samples[done], position = _exact_draw(flat, sizes, starts, tape, position + int(offsets[good]))
+            done += 1
+        else:
+            position += int(offsets[-1]) + n_clusters + int(multis[-1])
+    return samples, position
 
 
 def holm(p_values):

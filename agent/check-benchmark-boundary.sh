@@ -2,8 +2,27 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 evidence_dir=target/jankurai/boundaries/offline-benchmark-evidence
-mkdir -p "$evidence_dir"
-if ! (cd target && PYTHONPATH=.. python3 -m unittest discover -s ../research/benchmark/tests -v) > "$evidence_dir/unittest.log" 2>&1; then
+rm -rf "$evidence_dir/modules"
+mkdir -p "$evidence_dir/modules"
+# The suite has no shared state between modules (each passes alone), so every module runs in
+# its own process, one per CPU. The log keeps discovery order; any failing module fails the
+# check, and a module with no recorded result counts as failed. Exit 5 ("NO TESTS RAN") marks a
+# pytest-style module that unittest discovery never collected; it added no tests to the old
+# single-process run either. At least one module must run tests.
+mapfile -t modules < <(cd research/benchmark/tests && ls test_*.py)
+[[ ${#modules[@]} -gt 0 ]]
+printf '%s\n' "${modules[@]}" | xargs -P "$(nproc)" -I{} sh -c \
+  'cd target && PYTHONPATH=.. python3 -m unittest discover -s ../research/benchmark/tests -p "$1" -v \
+     > "../$2/modules/$1.log" 2>&1; echo $? > "../$2/modules/$1.status"' _ {} "$evidence_dir" || true
+failed=0
+ran=0
+for module in "${modules[@]}"; do
+  cat "$evidence_dir/modules/$module.log"
+  status="$(cat "$evidence_dir/modules/$module.status" 2>/dev/null || true)"
+  if [[ "$status" == 0 ]]; then ran=1; elif [[ "$status" != 5 ]]; then failed=1; fi
+done > "$evidence_dir/unittest.log"
+[[ "$ran" == 1 ]] || failed=1
+if [[ "$failed" != 0 ]]; then
   cat "$evidence_dir/unittest.log" >&2
   exit 1
 fi

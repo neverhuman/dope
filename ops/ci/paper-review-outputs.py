@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Run the declared Lane B paper-reduction graph; never discover experiments."""
 import argparse
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 import hashlib
 import json
+import multiprocessing
+import os
 import subprocess
 import sys
 import tempfile
@@ -185,6 +188,7 @@ def _authenticated_graph():
 
 def replay_graph(graph, inputs):
     replayed = set()
+    kinds = []
     required_panels = {CONTROL_RENDERER: CONTROL_PANEL, FIDELITY_RENDERER: FIDELITY_PANEL,
                        V2_RENDERER: V2_PANEL, V2_FAMILY_RENDERER: V2_FAMILY,
                        V2_ALL_FIVE_RENDERER: V2_ALL_FIVE}
@@ -220,19 +224,58 @@ def replay_graph(graph, inputs):
         key = (kind, panel)
         if key in replayed:
             continue
-        if kind == 'controls':
-            authenticated_controls(inputs)
-        elif kind in ('privacy', 'tabsyn'):
-            authenticated_bound(inputs, kind)
-        elif kind == 'fidelity':
-            authenticated_fidelity(inputs)
-        elif kind == 'v2':
-            authenticated_v2(inputs)
-        elif kind == 'v2-all-five':
-            authenticated_v2_reduction(inputs, 'v2_all_five', V2_ALL_FIVE)
-        else:
-            authenticated_v2_family(inputs)
         replayed.add(key)
+        kinds.append(kind)
+    run_replays(kinds, inputs)
+
+
+def replay_one(kind, inputs):
+    if kind == 'controls':
+        authenticated_controls(inputs)
+    elif kind in ('privacy', 'tabsyn'):
+        authenticated_bound(inputs, kind)
+    elif kind == 'fidelity':
+        authenticated_fidelity(inputs)
+    elif kind == 'v2':
+        authenticated_v2(inputs)
+    elif kind == 'v2-all-five':
+        authenticated_v2_reduction(inputs, 'v2_all_five', V2_ALL_FIVE)
+    else:
+        authenticated_v2_family(inputs)
+
+
+_FORKED_INPUTS = None
+
+
+def _forked_replay(kind):
+    # The pool is the parallelism: one BLAS thread per worker, set before this child
+    # first imports NumPy. The pinned panels are compared byte for byte either way.
+    for name in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS'):
+        os.environ[name] = '1'
+    replay_one(kind, _FORKED_INPUTS)
+
+
+def run_replays(kinds, inputs):
+    """Replay the independent reducers; any failure is raised in graph order.
+
+    Each reducer is a pure function of the authenticated input bytes, so running them in
+    forked workers yields the same verdicts as a serial loop. Fork only from a process that
+    has not imported NumPy (the fresh interpreter paper_build starts for this step), so no
+    BLAS thread or patched test double crosses the fork; otherwise replay serially.
+    """
+    global _FORKED_INPUTS
+    workers = min(len(kinds), len(os.sched_getaffinity(0)))
+    if workers < 2 or 'numpy' in sys.modules or sys.modules.get(__name__) is None:
+        for kind in kinds:
+            replay_one(kind, inputs)
+        return
+    _FORKED_INPUTS = inputs
+    try:
+        with ProcessPoolExecutor(workers, mp_context=multiprocessing.get_context('fork')) as pool:
+            for future in [pool.submit(_forked_replay, kind) for kind in kinds]:
+                future.result()
+    finally:
+        _FORKED_INPUTS = None
 
 
 def authenticated_graph():
