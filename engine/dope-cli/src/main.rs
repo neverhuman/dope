@@ -27,6 +27,7 @@ mod safe_io;
 mod style;
 mod tiers;
 mod v7_weights;
+mod v8_weights;
 use args::*;
 use style::{
     print_eval_report, print_fit_report, print_frontier_report, print_inspect_report,
@@ -102,9 +103,13 @@ fn run(cli: Cli) -> Result<(), String> {
                 }
             };
             let budget = a.budget.as_deref().map(parse_bytes).transpose()?;
-            let dpa1 = a.format == "auto" || a.format == "v7";
-            if a.v7_weights.is_some() && !dpa1 {
+            let dpa1_v7 = a.format == "auto" || a.format == "v7";
+            let dpa1_v8 = a.format == "v8" || a.format == "v8-analytic" || a.format == "auto-v8";
+            if a.v7_weights.is_some() && !dpa1_v7 {
                 return Err("--v7-weights applies to --format auto or v7".into());
+            }
+            if a.v8_weights.is_some() && !(a.format == "v8" || a.format == "auto-v8") {
+                return Err("--v8-weights applies to --format v8 or auto-v8".into());
             }
             if a.format == "2" {
                 format2_cli::run_fit_v2(&a, &table, target, task, budget)?;
@@ -126,8 +131,11 @@ fn run(cli: Cli) -> Result<(), String> {
                 audit: !a.no_audit,
                 ..Default::default()
             };
-            if dpa1 {
+            if dpa1_v7 {
                 return auto_fit::run_fit_auto(&a, &table, target, opts);
+            }
+            if dpa1_v8 {
+                return auto_fit::run_fit_v8(&a, &table, target, opts);
             }
             let fitted = fit(&table, target, &opts).map_err(e)?;
             std::fs::write(&a.out, &fitted.bytes).map_err(|x| x.to_string())?;

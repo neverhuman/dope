@@ -206,7 +206,7 @@ impl V7Decoder {
     fn require_v7(dpa: &Dpa1<'_>) -> Result<()> {
         match dpa.encoder {
             Encoder::V7 => Ok(()),
-            Encoder::Format1 => Err(DopeError::Artifact(
+            Encoder::Format1 | Encoder::V8 => Err(DopeError::Artifact(
                 "DPA1 payload is not a V7 packet".into(),
             )),
         }

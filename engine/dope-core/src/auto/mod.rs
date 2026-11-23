@@ -19,6 +19,7 @@ mod container;
 mod v7;
 mod v7_schema;
 pub mod v8;
+pub mod v8_dpa;
 
 pub use check::{
     AuditorRetention, CheckReport, CHECK_SYNTH_FACTOR, CHECK_TEST_SHARE, MAX_CHECK_ROWS,
@@ -29,6 +30,7 @@ pub use container::{
     NO_FINGERPRINT,
 };
 pub use v7::{V7Decode, V7Decoder, V7Model};
+pub use v8_dpa::{fit_dpa1_v8, V8Decoder, V8DpaFitted, V8DpaMode, V8DpaReport, V8Model};
 
 use crate::compile::{fit, FitOptions};
 use crate::error::{DopeError, Result};
@@ -205,7 +207,7 @@ pub fn fit_auto(
     };
     let fingerprint = match encoder {
         Encoder::V7 => model.fingerprint(),
-        Encoder::Format1 => NO_FINGERPRINT,
+        Encoder::Format1 | Encoder::V8 => NO_FINGERPRINT,
     };
     let bytes = wrap_dpa1(encoder, fingerprint, &payload);
     if bytes.len() > budget {
