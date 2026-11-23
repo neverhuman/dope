@@ -1,0 +1,23 @@
+\section{Arms of the report look}\label{app:arms}
+
+\begin{table}[h]
+  \centering\small
+  \begin{tabular}{@{}lp{0.68\linewidth}@{}}
+    \toprule
+    Arm & What it is \\
+    \midrule
+    \VThree{CandId} & \cli{dope fit -{}-format auto-v8 -{}-budget}~\VThree{BudgetBytes} built from the v3 integration branch (\S\ref{sec:method}) \\
+    \VThree{BaseId} & release~\VThree{BaseVersion} \cli{-{}-format auto}: Format~1 or the V7 single-encoding packet, chosen by an internal check \\
+    \VThree{PrevSmallId} & Format~1 at the \texttt{small} level of release~\VThree{BaseVersion} \\
+    \VThree{OldSmallId} & Format~1 at the \texttt{small} level of release~\VThree{OldVersion} \\
+    \VThree{V7Id} & the V7 single-encoding packet decoded with untrained decoder weights \\
+    \VThree{AnalyticId} & the analytic \texttt{DSE8} packet on every table, without selection \\
+    \midrule
+    \VThree{TwinCId} & the cell's calibration rows $C$ (only where $C$ has enough rows) \\
+    \VThree{CopyAId} & the rows of $A$ themselves \\
+    \VThree{BootAId} & $m\,|A|$ rows drawn from $A$ with replacement \\
+    \VThree{IndepId} & every column of $A$ permuted on its own, target included \\
+    \VThree{LabelShuffleId} & $A$ with only the target permuted \\
+    \bottomrule
+  \end{tabular}
+\end{table}

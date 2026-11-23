@@ -1,0 +1,13 @@
+\section{A FIT-only evidence bank}\label{sec:evidence}
+
+Learned encoders need many training episodes, and every episode must be computed from the rows the encoder would see at fit time and nothing else.
+The evidence bank (\path{engine/dope-core/src/evidence/}) is the summary those encoders read.
+It is a pure function of the fitting rows, the column schema, a tier and a seed, with these properties:
+\begin{itemize}
+  \item \textbf{Structurally FIT-only.} Its input type has no field for query or test rows, and the episode entry point of the C ABI (\path{engine/dope-ffi}) has tests asserting that the packet, the decoder inputs and the evidence do not change when the query rows change.
+  \item \textbf{Order-invariant.} Rows are put in a canonical order by a fingerprint of their feature values that does not depend on column order, so the output is exactly invariant to row permutations and equivariant to column permutations.
+  \item \textbf{Bounded disclosure.} The same support floor as the packet ($k=\VThree{SupportK}$) applies throughout; no raw value, header or extremum is emitted.
+  \item \textbf{Frozen layout, no cache.} The output is a set of fixed-width tensors with validity bitmasks: \VThree{EvColDim} slots per column, \VThree{EvEdgeDim} per column pair, \VThree{EvClassDim} per class, \VThree{EvClassColDim} per class and column, \VThree{EvGroupDim} per nominal group and \VThree{EvGlobDim} global slots, arranged in \VThree{EvTiers} tiers from single-pass marginal summaries to a closed-loop probe of a fitted packet. The layout is fixed by \path{contracts/evidence-layout-v1.json} (SHA-256 prefix \texttt{\VThree{EvLayoutSha}}), and nothing is cached across episodes or tables.
+\end{itemize}
+An episode factory built on the same C ABI draws a fresh random split of a table into fitting and query rows for every episode and computes the analytic packet and the evidence from the fitting rows.
+The released analytic encoder uses only the bank's primitives (the support floor and the canonical row order); the full evidence tensors feed the learned encoder of \S\ref{sec:learned}.

@@ -1,175 +1,68 @@
-% DOPE v3.0.0 White Paper -- receipt-bound, zero-hand-typed LaTeX manuscript.
-% Every quantitative result is rendered into generated/v3-macros.tex by scripts/render_v3_paper.py;
-% any unverified or not-yet-committed receipt renders an explicit red [pending] marker.
+% DOPE v3.0.0 white paper. Each section is one file under sections/. Every number in the text is a
+% \VThree macro written by scripts/render_v3_paper.py from committed receipts, contracts and Rust
+% constants; `render_v3_paper.py --check` rejects a digit typed into a section or the title block.
 \documentclass[10pt,letterpaper]{article}
+\pdfminorversion=7
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{mathptmx}
 \usepackage[scaled=0.9]{helvet}
 \usepackage{courier}
-\usepackage[letterpaper,textwidth=6.35in,textheight=9.2in,centering]{geometry}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage[letterpaper,textwidth=6.5in,textheight=9in,centering]{geometry}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{makecell}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{natbib}
 \usepackage{microtype}
 \usepackage{enumitem}
-\usepackage{caption}
-\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 
 \input{generated/v3-macros}
 
 \hypersetup{
-  pdftitle={D.O.P.E. v3.0.0: Downstream Objective-Preserving Encoding},
-  pdfauthor={Jepson Taylor; Alton Alexander; Jordan Morrow},
-  pdfsubject={Version 3.0.0 -- Calibrated DSE8 Binary Synthesis, FIT-Only Evidence Bank, Stratified 2-Fold Acceptance Guard, and Honest Multi-Auditor Evaluation}
+  pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding},
+  pdfauthor={Jepson Taylor; Alton Alexander; Jordan Morrow}
 }
-
-\newtheorem{definition}{Definition}
+\setlist{leftmargin=1.4em,itemsep=1pt,topsep=2pt}
+\renewcommand{\arraystretch}{1.08}
+\setlength{\tabcolsep}{4pt}
+\newcommand{\cli}[1]{\texttt{#1}}
+\newcommand{\TRG}{\mathrm{TRG}}
 
 \begin{document}
 
 \begin{center}
   {\LARGE\bfseries D.O.P.E.: Downstream Objective-Preserving Encoding\par}
-  \vspace{0.35em}
-  {\large\itshape Release~\VThree{ReleaseVersion} (\texttt{\VThree{ReleaseTag}}) --- Calibrated \texttt{DSE8} Sub-2\,KiB Tabular Synthesis,\\
-  FIT-Only Evidence Extraction, Stratified 2-Fold Acceptance Gating, and Neural Compiler Audit\par}
-  \vspace{0.7em}
+  \vspace{0.4em}
+  {\large\itshape Release~\VThree{ReleaseVersion}: compiling a table into at most \VThree{BudgetKiB}\,KiB\\
+  with per-table codec selection, and a twin-referenced evaluation\par}
+  \vspace{0.8em}
   {\normalsize Jepson Taylor \qquad Alton Alexander \qquad Jordan Morrow\par}
   {\small NEVERHUMAN Research\par}
 \end{center}
-\vspace{0.25em}
+\vspace{0.3em}
 
-\begin{abstract}
-\textbf{DOPE~\VThree{ReleaseVersion}} upgrades our pure-Rust, zero-Python tabular compiler with the \texttt{DSE8}~v1 nested-prefix binary codec (wrapped in \texttt{DPA1} tag~8), a FIT-only statistical Evidence Bank (\path{contracts/evidence-layout-v1.json}, SHA-256 \texttt{\VThree{EvLayoutSha}}), calibrated Step-0 target and copula modeling, a target-stratified 2-fold grouped acceptance guard (\texttt{-{}-format auto-v8}), and the pre-bottleneck \texttt{SingleEncV8} neural compiler trained on fresh duplicate-grouped splits with zero per-table caching.
-Every serialized program obeys the literal on-disk cap $\mathrm{len}(\texttt{file})\le 2{,}048\,\text{B}$ and preserves bit-identical backward compatibility with \texttt{DPK3.2}, Format~1, and \texttt{DSE7} (\texttt{DPA1} tag~7).
-On our fresh-split \texttt{\VThree{ReportPanel}} report schedule (\VThree{ReportCells} informative cells across \VThree{ReportFamilies} lineage families; no CONFIRM look was opened under the active pause), \texttt{dope -{}-format auto-v8} achieves $4\times$ Twin-Referenced Gain (TRG) \textbf{\VThree{AutoV8Trg}} at \VThree{AutoV8Bytes} versus \texttt{\VThree{CompBaseline}} at \VThree{V2AutoTrg} (\VThree{V2AutoBytes}), a paired gain of \textbf{\VThree{CompDelta}} ($p_{\mathrm{Holm}}=\VThree{CompPHolm}$, contract outcome: \textbf{\VThree{CompOutcome}}).
-Analytic \texttt{DSE8} Step-0 alone reaches \VThree{Dse8P0Trg} (\VThree{Dse8P0Bytes}) with zero neural weights.
-We also provide an honest audit of every contract guard (including held-out MLP, empirical privacy coverage, and task-level bounds) and of our fresh-split CPU DiLoCo \texttt{SingleEncV8} training waves.
-Empirical privacy diagnostics reported here are neither formal differential privacy nor HIPAA de-identification.
-\end{abstract}
-
-\IfFileExists{figures/v3-frontier-and-tasks.pdf}{%
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/v3-frontier-and-tasks.pdf}
-  \caption{\textbf{DOPE~\VThree{ReleaseVersion} Value Frontier and Task Breakdown (\texttt{dope\_kpi}, scope: \texttt{\VThree{ReportPanel}}, \VThree{ReportCells} informative cells, receipt \texttt{\VThree{PrimarySha}}).}
-  (a)~$4\times$ TRG ($0 =$ indistinguishable from a second real draw) with 95\% family-clustered bootstrap intervals versus median on-disk artifact bytes (\texttt{len(file)}, hard cap $2{,}048\,\text{B}$).
-  (b)~Per-task breakdown (regression, binary, multiclass) and strictly held-out MLP TRG comparing \texttt{DOPE \VThree{ReleaseVersion} (-{}-format auto-v8)} and analytic \texttt{DSE8}~P0 against \texttt{DOPE 2.0.0} and \texttt{DOPE 1.3.0}.}
-  \label{fig:v3-frontier}
-\end{figure}%
-}{}
-
-\section{The \texttt{DSE8} v1 Nested-Prefix Wire Protocol and \texttt{DPA1} Tag~8}
-Deep tabular generators such as latent diffusion~\citep{zhang2024tabsyn} and adversarial random forests~\citep{watson2023arf} require multi-megabyte artifacts and Python runtimes, while DOPE~\VThree{ReleaseVersion} targets strict $\le 2{,}048\,\text{B}$ pure-Rust single-file compilation (\path{engine/dope-core/src/single_encoding/v8/}).
-Building on DOPE~v1~\citep{dope2026v1} and DOPE~v2~\citep{dope2026v2}, \texttt{DSE8}~v1 replaces monolithic fixed headers with a strict ascending-tag TLV container framed by a 24-byte header, a trailing CRC32 integrity tag, and an optional 8-byte \texttt{TAG\_WEIGHTS\_FP} binding neural artifacts to their exact SafeTensors digest:
-\begin{itemize}[leftmargin=1.3em,itemsep=2pt]
-  \item \textbf{Prefix-truncatable budget planner (\path{planner.rs}):} Every packet allocates up to $p\le\VThree{MaxCols}$ active columns, $K\le\VThree{MaxClasses}$ classes, and copula rank $r\le\VThree{MaxRank}$ under an explicit priority hierarchy: preserve all active features $p_{\max}$ first, then trim copula rank, knot density (\VThree{KnotCount} knots per column), regimes, and enhancement sections (\texttt{Effects}, \texttt{Pairs}, \texttt{Trees}, \texttt{Resid}) via an adaptive shrink-retry loop so zero over-budget failures occur across $512$--$65{,}536\,\text{B}$ budgets.
-  \item \textbf{Typed marginals and exact nominal simplex decoding (\path{marginals.rs}, \path{nominal.rs}):} Each column is classified strictly on FIT rows into continuous, regular/heaped lattice, discrete atoms, zero-inflated continuous, or constant under the $k\ge 10$ support floor (singleton extrema are never echoed). One-hot nominal groups decode via categorical simplex sampling, guaranteeing zero illegal multi-hot or all-zero rows.
-  \item \textbf{\texttt{DPA1} tag~8 envelope and strict backward compatibility (\path{auto/v8_dpa.rs}):} Product artifacts wrap \texttt{DSE8}~v1 inside \texttt{DPA1} format tag~8 alongside a compact \texttt{V7Schema} descriptor. Wide tables whose schema leaves $<96\,\text{B}$ for \texttt{DSE8} fall back cleanly to Format~1 inside the same byte budget. Legacy \texttt{DPK3.2}, Format~1, and \texttt{DSE7} (\texttt{DPA1} tag~7) decoding remain 100\% bit-identical.
-\end{itemize}
-
-\section{Calibrated Step-0 Target/Copula Modeling and 2-Fold \texttt{auto-v8} Guard}
-Early DEV diagnostics showed uncalibrated \texttt{DSE8} Step-0 lagging Format~1 on discrete/zero-inflated tables, collinear binary tables, and imbalanced multiclass priors.
-DOPE~\VThree{ReleaseVersion} resolves all seven structural fitting defects without changing a single wire byte:
-\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
-  \item \textbf{Decode-aligned tie-interval binning (\path{calibrate.rs}, \path{trees_v8.rs}):} Discrete and zero-inflated columns occupy an exact CDF interval $[u_{\mathrm{lo}}, u_{\mathrm{hi}}]$ rather than a single point; exact interval overlap weighting across 8-bin main effects and 16-bin oblivious tree splits aligns training histograms with Gaussian-copula decoding~\citep{sklar1959fonctions}.
-  \item \textbf{OOF-CV Newton-IRLS with uniform backtracking (\path{irls.rs}, \path{target_v8.rs}):} 3-fold OOF cross-validation over $\lambda\in[10^{-3}, 20]$ with uniform backtracking line search (preserving cancellation on collinear columns), an int8-quantized synthetic-$X$ stability guard, and OOF logit temperature calibration for both binary and multiclass targets.
-  \item \textbf{Sequential deflated stagewise boosting (\path{effects_v8.rs}, \path{trees_v8.rs}):} Main effects, pairwise product/XOR interactions, and depth-3 oblivious trees fit sequentially on deflated zero-centered working residuals and are admitted only when an 80/20 inner split lowers true proper loss (MSE or log-loss~\citep{gneiting2007strictly}).
-  \item \textbf{Post-pack synthetic-$X$ intercept calibration (\path{calibrate.rs}):} Immediately after budget packing, the encoder decodes $N_{\mathrm{cal}}=512$ deterministic synthetic feature rows from the packet's own $X$ sections and solves Newton/IPS intercepts $b$ so $\mathbb{E}[P(Y=c\mid X_{\mathrm{syn}})] = \hat{\pi}_{\mathrm{fit}}[c]$ (and $\mathbb{E}[y_{\mathrm{syn}}]=\bar{y}_{\mathrm{fit}}$ for regression). Decoding remains 100\% row-local and counter-seeded.
-  \item \textbf{Collinearity precision and unit-variance regimes (\path{copula_regimes.rs}, \path{decode.rs}):} Loading norms cap at $\|L_j\|_2\le 0.999$ ($\sigma_{\epsilon,j}\ge 10^{-2}$), regime centroids shrink via $\sqrt{\max(1-\min(\mu^2,0.75),\,0.25)}$, and regression residuals apply zero-centered 5-quantile shifts with variance-normalized heteroscedastic log-scale weights.
-\end{enumerate}
-
-\begin{definition}[Target-Stratified 2-Fold Grouped Acceptance Guard (\texttt{-{}-format auto-v8})]
-Given a raw table $(X_A, y_A)$ with duplicate groups $\mathcal{G}$, when $|\mathcal{G}|\ge 80$ we shuffle $\mathcal{G}$ deterministically, stratify by target label for classification, and partition $\mathcal{G}$ into two disjoint halves $(H_0, H_1)$ keeping every duplicate group intact.
-On both folds $(H_0\!\to\!H_1)$ and $(H_1\!\to\!H_0)$ (requiring $\ge 5$ test rows per active class), we fit and sample Format~1, \texttt{DSE8} analytic~P0, and optional \texttt{DSE8} neural inside the same budget $B$ and compute worst-auditor retention $s_f^{(m)}$ over linear and GBDT auditors (keeping MLP strictly held out).
-A candidate $m\in\{\mathrm{P0},\mathrm{NN}\}$ is promoted over Format~1 only if its 2-fold mean exceeds Format~1 by $>0.02$ \emph{and} neither fold drops $>0.05$ below Format~1.
-\end{definition}
-
-\section{FIT-Only Evidence Bank, Zero-Cache Factory, and \texttt{SingleEncV8}}
-To prevent any table-level leakage across training episodes, DOPE~\VThree{ReleaseVersion} enforces a strict per-episode contract: every training episode draws a fresh duplicate-grouped random split $(X_{\mathrm{fit}}, y_{\mathrm{fit}}, X_{\mathrm{qry}}, y_{\mathrm{qry}})$, and all metadata, packets, and evidence tensors are computed strictly from FIT rows with zero per-table caching:
-\begin{itemize}[leftmargin=1.3em,itemsep=2pt]
-  \item \textbf{Pure-Rust FIT-Only Evidence Bank (\path{engine/dope-core/src/evidence/}):} Bound to \path{contracts/evidence-layout-v1.json} (\texttt{\VThree{EvLayoutSha}}), emitting fixed-width, validity-bitmasked tensors: column (\VThree{EvColDim}), pairwise edge (\VThree{EvEdgeDim}, including tie-disattenuated Spearman/Kendall, Chatterjee~$\xi$~\citep{chatterjee2021new}, unbiased dCor, tail dependence, and signed XOR/XNOR quadrants), class (\VThree{EvClassDim}), class-column (\VThree{EvClassColDim}), nominal group (\VThree{EvGroupDim}), and global (\VThree{EvGlobDim}) across Tiers~T0--T2 (with T3 closed-loop probe masked by default). Explicit \texttt{RowIdentity} tie-breaking and grouped fold assignment eliminate input-order sensitivity.
-  \item \textbf{Parallel Rust C-ABI Factory (\path{engine/dope-ffi}, ABI~4):} Pinned spawn workers call \path{dope_ffi_v8_episode} into a shared-memory ring (\path{research/levels/s3_episode_factory.py}, \path{s3_v8_feed.py}), preventing batch starvation while proving query-poison invariance in unit tests.
-  \item \textbf{\texttt{SingleEncV8} Architecture (\path{model.rs}, \path{v8_single_encoding.py}):} An owner-side split-QKV attention encoder (\texttt{PairSplitAttnBlock}) compresses FIT evidence into a nested 4-bit FSQ~\citep{mentzer2024fsq} code $Z\in[-1,1]^{\VThree{DecCodeDim}}$ (Tiers~0--3). A strictly source-free receiver decoder maps packet summaries (\VThree{DecColDim}\,/\,\VThree{DecEdgeDim}\,/\,\VThree{DecGlobDim}\,/\,\VThree{DecCodeDim}) via zero-initialized residual heads to monotone knot warps, loading updates, a 2-layer row-local RealNVP coupling flow~\citep{dinh2017realnvp}, a Soft-NODE ensemble ($T=\VThree{NodeTrees}, D=\VThree{NodeDepth}$ using exact $\mathrm{entmax}_{1.5}$~\citep{peters2019sparse,popov2020node}), a rank-\VThree{BilinRank} bilinear head, and a learned trust gate $\alpha=\sigma(g-2)$. Thirteen Rust-vs-Python parity fixtures verify max absolute error $\le 10^{-4}$ across analytic and non-zero F32 SafeTensors checkpoints.
-  \item \textbf{KPI-Aligned Training and CPU DiLoCo Waves:} Training optimizes a smooth $\tanh$-saturated worst-auditor retention gap over differentiable linear, soft oblivious-tree, and multi-bandwidth RFF~\citep{rahimi2007random} auditors (using Gumbel-Rao $K=4$ straight-through estimators~\citep{paulus2021raoblackwellizing} while holding MLP strictly out), plus proper conditional NLL, Cram\'er--von Mises PIT, copula correlation, tree leaf occupancy, driver TV, and a smooth DCR privacy hinge. Our first wave (\texttt{v8-r1}, 3 DiLoCo replicas $\times$ 12k steps on pre-calibration packets) confirmed pipeline soundness via an 8-episode overfit control but stayed flat on DEV due to high gradient variance; \texttt{v8-r2} runs from scratch on calibrated \texttt{DSE8} packets with effective batch~32 (\texttt{-{}-grad-accum-steps 4}), smooth gap saturation, and width curriculum ($p\le 16$) strictly for the opt-in neural tier.
-\end{itemize}
-
-\section{Receipt-Bound Multi-Auditor Evaluation (\texttt{dope\_kpi})}
-All headline tables below render directly from committed \texttt{dope\_kpi} receipts under \path{contracts/dope-kpi.json} (\texttt{\VThree{KpiContractSha}}) with family-clustered 95\% bootstrap intervals and Holm--Bonferroni control~\citep{holm1979simple}.
-Under the active pause on protected splits, \textbf{all results reported here are DEV-panel estimates} (fresh-split report schedule, scope: \texttt{\VThree{ReportPanel}}, \VThree{ReportCells} informative headline cells of \VThree{ReportScheduled} headline scheduled across \VThree{ReportFamilies} informative families; no CONFIRM, HOLDOUT, or SEALED look was taken).
-Every product packet reproduced by the release binary is byte-verified against its scored SHA-256 digest.
-
-\begin{table}[t]
-  \centering
-  \small
-  \caption{\textbf{DOPE~\VThree{ReleaseVersion} Receipt-Bound Sub-2\,KiB Scoreboard (\texttt{dope\_kpi}, scope: \texttt{\VThree{ReportPanel}}, \VThree{ReportCells} cells, receipt \texttt{\VThree{PrimarySha}}).}
-  All metrics are generated by \texttt{render\_v3\_paper.py} with zero hand-typed numbers.}
-  \label{tab:v3-kpi}
-  \resizebox{\linewidth}{!}{%
-  \begin{tabular}{@{}lllllllc@{}}
-    \toprule
-    Arm & Bytes (Med / Max) & $4\times$ TRG [95\% CI] & Reg / Bin / Mc & Held-Out MLP & Med Ret (Lin/GBDT/MLP) & C2ST & Fail \\
-    \midrule
-    \textbf{DOPE \VThree{ReleaseVersion} (\texttt{-{}-format auto-v8})} & \VThree{AutoV8Bytes} & \textbf{\VThree{AutoV8Trg}} & \VThree{AutoV8Reg} / \VThree{AutoV8Bin} / \VThree{AutoV8Mc} & \VThree{AutoV8MlpTrg} & \VThree{AutoV8AudMed} & \VThree{AutoV8C2st} & \VThree{AutoV8FailCell} \\
-    \texttt{DSE8} P0 Analytic (0\,B neural) & \VThree{Dse8P0Bytes} & \VThree{Dse8P0Trg} & \VThree{Dse8P0Reg} / \VThree{Dse8P0Bin} / \VThree{Dse8P0Mc} & \VThree{Dse8P0MlpTrg} & \VThree{Dse8P0AudMed} & \VThree{Dse8P0C2st} & \VThree{Dse8P0FailCell} \\
-    \midrule
-    DOPE 2.0.0 (\texttt{-{}-format auto}) & \VThree{V2AutoBytes} & \VThree{V2AutoTrg} & \VThree{V2AutoReg} / \VThree{V2AutoBin} / \VThree{V2AutoMc} & \VThree{V2AutoMlpTrg} & \VThree{V2AutoAudMed} & \VThree{V2AutoC2st} & \VThree{V2AutoFailCell} \\
-    DOPE 2.0.0 (\texttt{small}, Format~1) & \VThree{V2SmallBytes} & \VThree{V2SmallTrg} & \VThree{V2SmallReg} / \VThree{V2SmallBin} / \VThree{V2SmallMc} & \VThree{V2SmallMlpTrg} & \VThree{V2SmallAudMed} & \VThree{V2SmallC2st} & \VThree{V2SmallFailCell} \\
-    Signed \texttt{\VThree{PriorSignedTag}} (\texttt{small}) & \VThree{V13SmallBytes} & \VThree{V13SmallTrg} & \VThree{V13SmallReg} / \VThree{V13SmallBin} / \VThree{V13SmallMc} & \VThree{V13SmallMlpTrg} & \VThree{V13SmallAudMed} & \VThree{V13SmallC2st} & \VThree{V13SmallFailCell} \\
-    \texttt{DSE7} Step-0 (\texttt{pr390-v7-step0}) & \VThree{V7Step0Bytes} & \VThree{V7Step0Trg} & \VThree{V7Step0Reg} / \VThree{V7Step0Bin} / \VThree{V7Step0Mc} & \VThree{V7Step0MlpTrg} & \VThree{V7Step0AudMed} & \VThree{V7Step0C2st} & \VThree{V7Step0FailCell} \\
-    \midrule
-    Control: Copy~$A$ (raw table) & --- & \VThree{CopyATrg} & \VThree{CopyAReg} / \VThree{CopyABin} / \VThree{CopyAMc} & \VThree{CopyAMlpTrg} & \VThree{CopyAAudMed} & \VThree{CopyAC2st} & \VThree{CopyAFailCell} \\
-    Control: Bootstrap~$A$ (raw table) & --- & \VThree{BootATrg} & \VThree{BootAReg} / \VThree{BootABin} / \VThree{BootAMc} & \VThree{BootAMlpTrg} & \VThree{BootAAudMed} & \VThree{BootAC2st} & \VThree{BootAFailCell} \\
-    Null: Independent Marginals & --- & \VThree{IndepTrg} & \VThree{IndepReg} / \VThree{IndepBin} / \VThree{IndepMc} & \VThree{IndepMlpTrg} & \VThree{IndepAudMed} & \VThree{IndepC2st} & \VThree{IndepFailCell} \\
-    \bottomrule
-  \end{tabular}}
-\end{table}
-
-\begin{table}[t]
-  \centering
-  \small
-  \caption{\textbf{Paired Comparison and Complete Contract-Guard Audit (\texttt{dope\_kpi compare}, receipt \texttt{\VThree{CompareSha}}).}
-  Compares \texttt{DOPE \VThree{ReleaseVersion} (-{}-format auto-v8)} against \texttt{\VThree{CompBaseline}}.}
-  \label{tab:v3-guards}
-  \resizebox{\linewidth}{!}{%
-  \begin{tabular}{@{}llll@{}}
-    \toprule
-    Primary / Guard Criterion & Contract Threshold & Measured Value & Status \\
-    \midrule
-    Paired $4\times$ $\Delta$TRG [95\% CI] & $\mathrm{CI}_{\mathrm{lo}}>0,\ \Delta>0.01$ & \VThree{CompDelta} & $p_{\mathrm{Holm}}=\VThree{CompPHolm}$ \\
-    Paired $1\times$ Matched $\Delta$TRG [95\% CI] & Diagnostic & \VThree{CompMatchedDelta} & Sign-flip PROMOTE: \VThree{CompSignFlip} \\
-    Per-Task $\Delta$TRG (Reg / Bin / Mc) & $\min\mathrm{CI}_{\mathrm{lo}} > -0.02$ & \VThree{CompRegDelta} / \VThree{CompBinDelta} / \VThree{CompMcDelta} & \texttt{\VThree{GuardTaskChk}} (\VThree{GuardTaskVal}) \\
-    Held-Out MLP $\Delta$TRG & $> 0.000$ & \VThree{GuardMlpVal} & \texttt{\VThree{GuardMlpChk}} \\
-    Realism Coverage $\Delta$ & $> -0.030$ & \VThree{GuardRealVal} & \texttt{\VThree{GuardRealChk}} \\
-    Empirical Privacy Coverage $\Delta$ & $> -0.030$ & \VThree{GuardPrivVal} & \texttt{\VThree{GuardPrivChk}} \\
-    Exact-Copy Excess (pooled) & $\le 0.005$ & \VThree{GuardCopyVal} & \texttt{\VThree{GuardCopyChk}} \\
-    Artifact Wire Budget & $\le 2{,}048\,\text{B}$ & \VThree{GuardByteVal}\,B & \texttt{\VThree{GuardByteChk}} \\
-    \midrule
-    \textbf{Contract Decision Outcome} & All conditions + guards & \textbf{\VThree{CompOutcome}} & Reproduction: 108/108 packets SHA-identical \\
-    \bottomrule
-  \end{tabular}}
-\end{table}
-
-\subsection{Honest Diagnostic Audit of Contract Guard Limitations}
-While \texttt{auto-v8} delivers a statistically significant primary TRG gain over \texttt{\VThree{CompBaseline}} (Table~\ref{tab:v3-guards}) and cuts failures from $7/44$ (\texttt{DOPE 1.3.0}/\texttt{2.0.0 small}) to $0/44$ at smaller median wire size (\VThree{AutoV8Bytes} vs.\ \VThree{V2AutoBytes}), transparent engineering requires surfacing all four failing contract guards on the fresh DEV report schedule:
-\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
-  \item \textbf{Realism coverage (\VThree{GuardRealVal}, C2ST \VThree{AutoV8C2st} vs.\ \VThree{V2AutoC2st}):} Selecting \texttt{DSE8} improves predictive utility substantially on binary and multiclass tables while slightly lowering the realism pass share relative to Format~1.
-  \item \textbf{Held-out MLP sensitivity (\VThree{GuardMlpVal} on fresh DEV; larger on wide DEV):} Forensic inspection of binary table \texttt{0a64bb31} (sparse word-frequency features with $>90\%$ zeros) showed that \texttt{DSE8} preserves MLP ranking quality ($\mathrm{AUC}\approx 0.92$) yet suffers inflated cross-entropy loss when the $k\ge 10$ upper-tail clamp truncates sparse heavy-tailed column variance by $9$--$10\times$ (producing extreme standardized test inputs $|z_{\mathrm{test}}|>200$ under an MLP's \texttt{StandardScaler}), compounded by sharp post-stack synthetic logits. Tree auditors are rank-invariant to this scaling, whereas MLPs are not.
-  \item \textbf{Empirical privacy coverage (\VThree{GuardPrivVal} vs.\ $-0.030$ threshold):} Inspecting per-cell privacy flips revealed higher \path{dcr_closer_to_a_share} on tables with high aspect ratio $p/n$ (e.g., $p=48, n<100$) when sample correlation loadings cap near $\|L_j\|_2\le 0.999$ without finite-sample Ledoit--Wolf covariance shrinkage~\citep{ledoit2004well} and when multi-regime centroids are unshrunk on small $n$. Pooled exact-copy excess remains \VThree{GuardCopyVal} (well below $0.005$).
-  \item \textbf{Regression lower-bound variance (\VThree{GuardTaskVal}) and default CLI flag:} Binary and multiclass gains carry the headline lift while regression exhibits wider fold variance on small-$n$ splits. The CLI default \texttt{-{}-format} remains \texttt{1} for conservative compatibility, while \texttt{-{}-format auto-v8} is the documented DOPE~\VThree{ReleaseVersion} release encoder.
-\end{enumerate}
-
-\section{Runtime Provenance, Scope Boundaries, and Post-v3.0.0 Roadmap}
-\begin{itemize}[leftmargin=1.3em,itemsep=2pt]
-  \item \textbf{Pure-Rust zero-dependency execution \& provenance:} All production encoding, decoding, and scoring paths execute strictly in Rust (\path{engine/dope-core}, \path{engine/dope-cli}, \path{engine/dope-arena}, \path{engine/dope-ffi}) with zero Python or LibTorch runtime linkage, strict $<500$-line non-test source caps, pinned Jankurai audit conformance, and reproducible release binaries verified by SHA-256.
-  \item \textbf{Explicit non-claims:} Empirical privacy diagnostics (\path{dcr_closer_to_a_share}, \path{mia_auc}, \path{mia_tpr_at_1pct_fpr}, exact-copy excess, $k\ge 10$ support floor) measure observed memorization only and are \emph{neither formal differential privacy nor HIPAA de-identification}. All v3.0.0 scoreboard claims are explicitly scoped as DEV-panel estimates pending any future authorized CONFIRM look.
-  \item \textbf{Post-v3.0.0 v3.1 roadmap (frozen out of v3.0.0 to preserve packet SHA-256 reproducibility):} (1)~apply analytic Ledoit--Wolf correlation shrinkage $\alpha_{\mathrm{LW}}=\mathrm{clip}(p/(n+p), 0.02, 0.40)$ and regime-centroid shrinkage in \path{copula_regimes.rs}; (2)~add variance-preserving sparse heavy-tail extrapolation and post-stack OOF \path{logit_tau} re-calibration to resolve sparse-table MLP sensitivity; (3)~migrate \texttt{DSE8} packet-fit fold splits onto \texttt{RowIdentity} and grouped \texttt{Folds}; and (4)~qualify \texttt{v8-r2} neural checkpoints strictly on equal-byte DEV lift.
-  \item \textbf{Reproducibility:} Verify zero macro drift via \texttt{python3} \path{docs/whitepaper-v3/scripts/render_v3_paper.py} \texttt{-{}-check}, regenerate figures with \texttt{-{}-figures}, and rebuild via \texttt{latexmk -pdf dope-v3.tex}. Historical manuscripts (\path{docs/whitepaper/dope-mfs.tex}, \path{docs/whitepaper-v2/dope-v2.tex}) remain untouched.
-\end{itemize}
+\input{sections/00-abstract}
+\input{sections/01-introduction}
+\input{sections/02-related-work}
+\input{sections/03-method}
+\input{sections/04-evidence-bank}
+\input{sections/05-evaluation-protocol}
+\input{sections/06-results}
+\input{sections/07-learned-encoder}
+\input{sections/08-limitations}
+\input{sections/09-reproducibility}
 
 \bibliographystyle{plainnat}
 \bibliography{references-v3}
+
+\appendix
+\input{sections/appendix-a-codec}
+\input{sections/appendix-b-guards}
+\input{sections/appendix-c-arms}
 
 \end{document}

@@ -175,6 +175,15 @@ runs `just paper`, and requires a zero diff. `bash ops/ci/check-review-fixes.sh`
 runs the review-fix and predeclare_v2 statistics, binder, and sealed-gate fixtures.
 `bash scripts/ci-local.sh cpu|security|audit` reproduces the hosted lanes locally.
 
+The DOPE v3.0.0 white paper (`docs/whitepaper-v3/`) is rendered from the v3.0.0 scoreboard
+receipts by `just paper-v3`. `render_v3_paper.py --check` fails on drift of a generated file,
+on a hero PDF whose provenance differs from the README hero, on a digit typed into a section
+and on a comparative claim the receipts contradict; `build_v3_pdf.sh` builds the PDF
+deterministically in `target/paper-v3/`. `just paper-check` runs both and requires a zero
+diff under `docs/whitepaper-v3`, `just paper-tests` runs its unit suite, and
+`ops/ci/paper-clean.sh` deletes its generated tables, macros and PDF, rebuilds them and runs
+the unit suite.
+
 Admission captures the verified lock bytes without rereading them as a new pin.
 The driver replays reducers and renders expected bytes from captured code and
 inputs in one private snapshot child; different reducer contracts cannot share

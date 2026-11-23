@@ -1,0 +1,25 @@
+\section{Related work}\label{sec:related}
+
+\paragraph{Tabular generative models.}
+Gaussian-copula synthesizers combine per-column marginals with a dependence model~\citep{sklar1959fonctions,patki2016sdv}.
+CTGAN and TVAE fit conditional adversarial and variational models with mode-specific normalization~\citep{xu2019ctgan}; adversarial random forests alternate between a forest discriminator and a density estimate on its leaves~\citep{watson2023arf}; TabDDPM and TabSyn are diffusion models, the latter in a learned latent space~\citep{kotelnikov2023tabddpm,zhang2024tabsyn}.
+These methods are designed for fidelity at whatever model size the data needs.
+DOPE fixes the artifact size instead and asks how much downstream utility survives at that size.
+Third-party baselines scored under the same protocol are pending; Table~\ref{tab:arms} gains their rows when their receipts are committed (\S\ref{sec:repro}).
+
+\paragraph{Dataset distillation and coresets.}
+Dataset distillation learns a few synthetic examples on which a model trains well~\citep{wang2018distillation}, and coresets select weighted subsets whose loss approximates the full data's~\citep{bachem2017coresets,mirzasoleiman2020craig}.
+Both store examples, real or synthetic, and are budgeted in examples.
+A DOPE artifact stores a parametric generator and no rows, and is budgeted in bytes of the whole file.
+
+\paragraph{Utility, realism and privacy metrics.}
+Train-on-synthetic, test-on-real (TSTR) scores a generator by the test loss of a model trained on its samples~\citep{esteban2017tstr}.
+TRG (\S\ref{sec:protocol}) is a TSTR variant that normalizes by a train-on-real reference and subtracts the same quantity for a second real sample of equal size, so that zero means ``as useful as fresh real data''.
+Classifier two-sample tests (C2ST) measure whether synthetic and real rows can be told apart~\citep{lopezpaz2017c2st}; sample-level fidelity and coverage metrics refine this view~\citep{alaa2022faithful}.
+Differential privacy gives formal guarantees~\citep{dwork2006calibrating}; synthetic data without such a mechanism can still leak membership~\citep{shokri2017membership,stadler2022groundhog}.
+Our privacy gates are distance- and attack-based audits of that kind, not guarantees.
+
+\paragraph{Statistical protocol.}
+Intervals come from a bootstrap~\citep{efron1979bootstrap} that resamples lineage families, the cluster bootstrap of \citet{davison1997bootstrap}; comparisons use Holm's step-down adjustment~\citep{holm1979simple}.
+The decision rule and comparison were fixed before the reported look~\citep{nosek2018preregistration}.
+Because the same development tables were used for selection, the look is subject to the adaptive-reuse concerns studied by \citet{dwork2015reusable} (\S\ref{sec:limits}).

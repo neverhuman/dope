@@ -1,0 +1,22 @@
+\section{Reproducibility}\label{sec:repro}
+
+\paragraph{From receipts to this paper.}
+The chain has three links, each checked by a tool rather than by hand.
+\begin{enumerate}
+  \item \texttt{dope\_kpi primary} and \texttt{compare} write the receipts \path{bench/real-world/results/scoreboard/v3.0.0/primary.json} and \path{compare.json} (SHA-256 prefixes \texttt{\VThree{PrimarySha}} and \texttt{\VThree{CompareSha}}): sorted-key JSON with every float rounded, the contract's SHA-256, the schedule's SHA-256 and the SHA-256 of every rows file read.
+  \item \texttt{dope\_kpi render-readme} and \texttt{render-hero} turn those receipts into the README block and the hero figure, and \path{render-manifest.json} records the SHA-256 of each; \path{tools/claims/dope1.py --check} refuses drift between them.
+  \item \path{docs/whitepaper-v3/scripts/render_v3_paper.py} writes every \texttt{\textbackslash VThree} macro and both results tables of this paper from the receipts, the contracts and constants parsed from the Rust sources. It renders each table cell as \texttt{render-readme} does and fails unless every row equals the README block's. It converts the hero SVG to PDF with the recorded \texttt{rsvg-convert} command and records the SHA-256 of the source and the output. Third-party rows appear only if \path{primary-methods.json} is committed beside the receipts and was scored on the same run.
+\end{enumerate}
+
+\paragraph{What continuous integration checks.}
+\texttt{render\_v3\_paper.py -{}-check} fails on any drift of a generated file, on a hero PDF whose source SHA-256 differs from the scoreboard manifest or whose text lacks any text of the SVG, on an undefined macro, and on any digit typed into a section or the title block outside a macro, citation, label or a short allowlist of names.
+The \texttt{paper-clean} job deletes the generated files, regenerates them, builds the PDF with fixed timestamps and requires a zero diff of the generated files, the PDF and the bibliography.
+
+\paragraph{Commands.}
+From the repository root, with TeX Live and \texttt{rsvg-convert}:
+\begin{quote}\small
+\texttt{python3 docs/whitepaper-v3/scripts/render\_v3\_paper.py -{}-figures}\\
+\texttt{python3 docs/whitepaper-v3/scripts/render\_v3\_paper.py -{}-check}\\
+\texttt{bash docs/whitepaper-v3/scripts/build\_v3\_pdf.sh}
+\end{quote}
+The receipts' own regeneration commands are in the scoreboard's README.

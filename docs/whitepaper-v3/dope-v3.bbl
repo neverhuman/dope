@@ -1,21 +1,53 @@
-\begin{thebibliography}{15}
+\begin{thebibliography}{23}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Chatterjee(2021)]{chatterjee2021new}
-Sourav Chatterjee.
-\newblock A new coefficient of correlation.
-\newblock \emph{Journal of the American Statistical Association}, 116\penalty0
-  (536):\penalty0 2009--2022, 2021.
+\bibitem[Alaa et~al.(2022)Alaa, van Breugel, Saveliev, and van~der
+  Schaar]{alaa2022faithful}
+Ahmed~M. Alaa, Boris van Breugel, Evgeny Saveliev, and Mihaela van~der Schaar.
+\newblock How faithful is your synthetic data? sample-level metrics for
+  evaluating and auditing generative models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2022.
 
-\bibitem[Dinh et~al.(2017)Dinh, Sohl-Dickstein, and Bengio]{dinh2017realnvp}
-Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio.
-\newblock Density estimation using real {NVP}.
-\newblock In \emph{International Conference on Learning Representations
-  (ICLR)}, 2017.
+\bibitem[Bachem et~al.(2017)Bachem, Lucic, and Krause]{bachem2017coresets}
+Olivier Bachem, Mario Lucic, and Andreas Krause.
+\newblock Practical coreset constructions for machine learning.
+\newblock \emph{arXiv preprint arXiv:1703.06476}, 2017.
+
+\bibitem[Davison and Hinkley(1997)]{davison1997bootstrap}
+Anthony~C. Davison and David~V. Hinkley.
+\newblock \emph{Bootstrap Methods and their Application}.
+\newblock Cambridge University Press, 1997.
+
+\bibitem[Dwork et~al.(2006)Dwork, McSherry, Nissim, and
+  Smith]{dwork2006calibrating}
+Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam Smith.
+\newblock Calibrating noise to sensitivity in private data analysis.
+\newblock In \emph{Theory of Cryptography Conference (TCC)}, pages 265--284,
+  2006.
+
+\bibitem[Dwork et~al.(2015)Dwork, Feldman, Hardt, Pitassi, Reingold, and
+  Roth]{dwork2015reusable}
+Cynthia Dwork, Vitaly Feldman, Moritz Hardt, Toniann Pitassi, Omer Reingold,
+  and Aaron Roth.
+\newblock The reusable holdout: Preserving validity in adaptive data analysis.
+\newblock \emph{Science}, 349\penalty0 (6248):\penalty0 636--638, 2015.
+
+\bibitem[Efron(1979)]{efron1979bootstrap}
+Bradley Efron.
+\newblock Bootstrap methods: Another look at the jackknife.
+\newblock \emph{The Annals of Statistics}, 7\penalty0 (1):\penalty0 1--26,
+  1979.
+
+\bibitem[Esteban et~al.(2017)Esteban, Hyland, and R{\"a}tsch]{esteban2017tstr}
+Crist{\'o}bal Esteban, Stephanie~L. Hyland, and Gunnar R{\"a}tsch.
+\newblock Real-valued (medical) time series generation with recurrent
+  conditional {GANs}.
+\newblock \emph{arXiv preprint arXiv:1706.02633}, 2017.
 
 \bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
 Tilmann Gneiting and Adrian~E. Raftery.
@@ -29,46 +61,45 @@ Sture Holm.
 \newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
   65--70, 1979.
 
-\bibitem[Ledoit and Wolf(2004)]{ledoit2004well}
-Olivier Ledoit and Michael Wolf.
-\newblock A well-conditioned estimator for large-dimensional covariance
-  matrices.
-\newblock \emph{Journal of Multivariate Analysis}, 88\penalty0 (2):\penalty0
-  365--411, 2004.
+\bibitem[Kotelnikov et~al.(2023)Kotelnikov, Baranchuk, Rubachev, and
+  Babenko]{kotelnikov2023tabddpm}
+Akim Kotelnikov, Dmitry Baranchuk, Ivan Rubachev, and Artem Babenko.
+\newblock {TabDDPM}: Modelling tabular data with diffusion models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2023.
 
-\bibitem[Mentzer et~al.(2024)Mentzer, Minnen, Agustsson, and
-  Tschannen]{mentzer2024fsq}
-Fabian Mentzer, David Minnen, Eirikur Agustsson, and Michael Tschannen.
-\newblock Finite scalar quantization: {VQ-VAE} made simple.
+\bibitem[Lopez-Paz and Oquab(2017)]{lopezpaz2017c2st}
+David Lopez-Paz and Maxime Oquab.
+\newblock Revisiting classifier two-sample tests.
 \newblock In \emph{International Conference on Learning Representations
-  (ICLR)}, 2024.
+  (ICLR)}, 2017.
 
-\bibitem[Paulus et~al.(2021)Paulus, Maddison, and
-  Krause]{paulus2021raoblackwellizing}
-Max~B. Paulus, Chris~J. Maddison, and Andreas Krause.
-\newblock {Rao-Blackwellizing} the straight-through {Gumbel-Softmax} gradient
-  estimator.
-\newblock In \emph{International Conference on Learning Representations
-  (ICLR)}, 2021.
+\bibitem[Mirzasoleiman et~al.(2020)Mirzasoleiman, Bilmes, and
+  Leskovec]{mirzasoleiman2020craig}
+Baharan Mirzasoleiman, Jeff Bilmes, and Jure Leskovec.
+\newblock Coresets for data-efficient training of machine learning models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2020.
 
-\bibitem[Peters et~al.(2019)Peters, Niculae, and Martins]{peters2019sparse}
-Ben Peters, Vlad Niculae, and Andr{\'e} F.~T. Martins.
-\newblock Sparse sequence-to-sequence models.
-\newblock In \emph{Proceedings of the 57th Annual Meeting of the Association
-  for Computational Linguistics (ACL)}, pages 1504--1519, 2019.
+\bibitem[Nosek et~al.(2018)Nosek, Ebersole, DeHaven, and
+  Mellor]{nosek2018preregistration}
+Brian~A. Nosek, Charles~R. Ebersole, Alexander~C. DeHaven, and David~T. Mellor.
+\newblock The preregistration revolution.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0
+  (11):\penalty0 2600--2606, 2018.
 
-\bibitem[Popov et~al.(2020)Popov, Morozov, and Babenko]{popov2020node}
-Sergei Popov, Stanislav Morozov, and Artem Babenko.
-\newblock Neural oblivious decision ensembles for deep learning on tabular
-  data.
-\newblock In \emph{International Conference on Learning Representations
-  (ICLR)}, 2020.
+\bibitem[Patki et~al.(2016)Patki, Wedge, and Veeramachaneni]{patki2016sdv}
+Neha Patki, Roy Wedge, and Kalyan Veeramachaneni.
+\newblock The synthetic data vault.
+\newblock In \emph{IEEE International Conference on Data Science and Advanced
+  Analytics (DSAA)}, pages 399--410, 2016.
 
-\bibitem[Rahimi and Recht(2007)]{rahimi2007random}
-Ali Rahimi and Benjamin Recht.
-\newblock Random features for large-scale kernel machines.
-\newblock In \emph{Advances in Neural Information Processing Systems
-  (NeurIPS)}, volume~20, 2007.
+\bibitem[Shokri et~al.(2017)Shokri, Stronati, Song, and
+  Shmatikov]{shokri2017membership}
+Reza Shokri, Marco Stronati, Congzheng Song, and Vitaly Shmatikov.
+\newblock Membership inference attacks against machine learning models.
+\newblock In \emph{IEEE Symposium on Security and Privacy (S\&P)}, pages 3--18,
+  2017.
 
 \bibitem[Sklar(1959)]{sklar1959fonctions}
 Abe Sklar.
@@ -76,28 +107,46 @@ Abe Sklar.
 \newblock \emph{Publications de l'Institut de Statistique de l'Universit{\'e}
   de Paris}, 8:\penalty0 229--231, 1959.
 
+\bibitem[Stadler et~al.(2022)Stadler, Oprisanu, and
+  Troncoso]{stadler2022groundhog}
+Theresa Stadler, Bristena Oprisanu, and Carmela Troncoso.
+\newblock Synthetic data -- anonymisation groundhog day.
+\newblock In \emph{USENIX Security Symposium}, 2022.
+
 \bibitem[Taylor et~al.(2026{\natexlab{a}})Taylor, Alexander, and
   Morrow]{dope2026v1}
 Jepson Taylor, Alton Alexander, and Jordan Morrow.
-\newblock {D.O.P.E.}: Downstream objective-preserving encoding --- learning to
-  compile tables into small generative programs that train real-world models.
-\newblock In \emph{NEVERHUMAN Research Technical Report (DOPE v1.0.0)},
-  2026{\natexlab{a}}.
+\newblock {D.O.P.E.}: Downstream objective-preserving encoding --- generative
+  compression of predictive structure.
+\newblock Technical report, NEVERHUMAN Research, 2026{\natexlab{a}}.
+\newblock DOPE v1.0.0 manuscript, \texttt{docs/whitepaper/dope-mfs.tex}.
 
 \bibitem[Taylor et~al.(2026{\natexlab{b}})Taylor, Alexander, and
   Morrow]{dope2026v2}
 Jepson Taylor, Alton Alexander, and Jordan Morrow.
 \newblock {D.O.P.E.} v2.0.0: Sub-2\,{KiB} pure-{Rust} tabular synthesis,
   fidelity engine~2.0, and twin-referenced multi-auditor confirmation.
-\newblock In \emph{NEVERHUMAN Research Technical Report (DOPE v2.0.0)},
-  2026{\natexlab{b}}.
+\newblock Technical report, NEVERHUMAN Research, 2026{\natexlab{b}}.
+\newblock \texttt{docs/whitepaper-v2/dope-v2.tex}.
+
+\bibitem[Wang et~al.(2018)Wang, Zhu, Torralba, and Efros]{wang2018distillation}
+Tongzhou Wang, Jun-Yan Zhu, Antonio Torralba, and Alexei~A. Efros.
+\newblock Dataset distillation.
+\newblock \emph{arXiv preprint arXiv:1811.10959}, 2018.
 
 \bibitem[Watson et~al.(2023)Watson, Blesch, Kapar, and Wright]{watson2023arf}
 David~S. Watson, Kristin Blesch, Jan Kapar, and Marvin~N. Wright.
 \newblock Adversarial random forests for density estimation and generative
   modeling.
-\newblock In \emph{Proceedings of the 26th International Conference on
-  Artificial Intelligence and Statistics (AISTATS)}, 2023.
+\newblock In \emph{Proceedings of the International Conference on Artificial
+  Intelligence and Statistics (AISTATS)}, 2023.
+
+\bibitem[Xu et~al.(2019)Xu, Skoularidou, Cuesta-Infante, and
+  Veeramachaneni]{xu2019ctgan}
+Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, and Kalyan Veeramachaneni.
+\newblock Modeling tabular data using conditional {GAN}.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, volume~32, 2019.
 
 \bibitem[Zhang et~al.(2024)Zhang, Zhang, Srinivasan, Shen, Qin, Faloutsos,
   Rangwala, and Karypis]{zhang2024tabsyn}

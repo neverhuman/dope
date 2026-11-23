@@ -1,0 +1,47 @@
+\section{Results}\label{sec:results}
+
+\begin{table}[t]
+  \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+  \caption{Every arm of the report look (receipt \texttt{\VThree{PrimarySha}}), with the README's rows, columns and values; the columns are wrapped into panels (a) and (b). Bytes are whole-file sizes. TRG uses the \VThree{PrimaryMult}$\times$ sample; per-task values give the number of families in parentheses. Retention medians are unclipped. C2ST is the median two-sample AUC (chance level means indistinguishable). Realism and privacy are coverage shares, and copies the exact-copy excess, mean (maximum file). Controls carry no artifact.}
+  \label{tab:arms}
+  \input{generated/v3-results-table}
+\end{table}
+
+\begin{table}[t]
+  \centering\footnotesize
+  \caption{The pre-registered comparison (receipt \texttt{\VThree{CompareSha}}): the README row, then each condition and guard of the decision rule with its contract threshold. Sign-flip PROMOTE is the false-PROMOTE rate of the conditions and the guards a sign flip moves (\S\ref{sec:protocol}).}
+  \label{tab:compare}
+  \input{generated/v3-comparison-table}
+\end{table}
+
+Figure~\ref{fig:hero} and Tables~\ref{tab:arms} and~\ref{tab:compare} report the single look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
+
+\paragraph{Headline.}
+\cli{auto-v8} reaches a TRG of \VThree{CandTrg}, against \VThree{BaseTrg} for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{Delta} with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
+Its median file is \VThree{CandBytesMed}~bytes (\VThree{BaseBytesMed} for the baseline), the largest is \VThree{CandBytesMax}, and it fails \VThree{CandFailed} of \VThree{CandCells} cells.
+The gain comes from classification: the paired task differences are \VThree{DeltaBinary} for binary and \VThree{DeltaMulticlass} for multiclass targets, and \VThree{DeltaRegression} for regression, where \cli{auto-v8} is lower on the point estimate (\VThree{CandRegression} against \VThree{BaseRegression}).
+
+\paragraph{Matched size.}
+With a synthetic sample the size of $A$ ($m=\VThree{MatchedMult}$), \cli{auto-v8} scores \VThree{CandMatched} against \VThree{BaseMatched}; the paired gain \VThree{MatchedDelta} has one-sided $p=\VThree{MatchedP}$ and its interval contains zero.
+At matched size the gain is not resolved; the headline rests on the \VThree{PrimaryMult}$\times$ sample.
+
+\paragraph{Against the other arms.}
+The analytic packet used on every table, without selection (\VThree{AnalyticId}), scores \VThree{AnalyticTrg} at a median of \VThree{AnalyticBytesMed}~bytes: better than the baseline on regression (\VThree{AnalyticRegression}) but far worse on multiclass targets (\VThree{AnalyticMulticlass}).
+Used alone it is worse than the baseline; within \cli{auto-v8} it is written only where the check of \S\ref{sec:select} prefers it.
+The Format~1 \texttt{small} programs of releases \VThree{BaseVersion} and \VThree{OldVersion} score \VThree{PrevSmallTrg} and \VThree{OldSmallTrg} and fail \VThree{PrevSmallFailed} of \VThree{PrevSmallCells} cells, and the V7 packet with untrained decoder weights (\VThree{V7Id}) scores \VThree{V7Trg}.
+
+\paragraph{Controls.}
+Training on $A$ itself (\VThree{CopyAId}) scores \VThree{CopyATrgPoint} rather than zero: its entry value is $1-R_B$, and the minimum over auditors falls below zero whenever the twin trains one auditor better than $A$ does. A bootstrap resample of $A$ scores \VThree{BootATrgPoint}.
+Both are reference points for a generator that only sees $A$.
+Permuting each column independently (\VThree{IndepId}) scores \VThree{IndepTrgPoint}, and permuting only the target scores \VThree{LabelShuffleTrgPoint}.
+The real-twin control from the calibration rows is applicable on only \VThree{TwinCCells} cells (\VThree{TwinCNotApplicable} lack enough rows).
+
+\paragraph{The decision.}
+Conditions (i)--(iii) hold, but \VThree{GuardsFailed} of the \VThree{GuardsTotal} guards fail (Table~\ref{tab:compare}): the regression lower bound (\VThree{GuardTasks} against a threshold of \VThree{TaskCiLowGt}), the held-out MLP difference (\VThree{GuardMlp}), realism coverage (\VThree{GuardRealism}; \VThree{CandRealism} against \VThree{BaseRealism}) and privacy coverage (\VThree{GuardPrivacy} against a threshold of \VThree{PrivacyDeltaGt}).
+The exact-copy and byte guards pass.
+The outcome is \textbf{\VThree{Outcome}}.
+
+\paragraph{Calibration of the decision.}
+Under the comparison's sign-flip null, the statistical conditions alone pass in \VThree{StatPassPct} of \VThree{NullReplicates} replicates (Wilson interval \VThree{StatPassLowPct}--\VThree{StatPassHighPct}), far above the contract's \VThree{NullMaxRatePct}.
+With \VThree{Families} families (\VThree{RegressionFamilies}, \VThree{BinaryFamilies} and \VThree{MulticlassFamilies} per task), the percentile interval is too narrow, and the headline $p$ should be read in that light.
+With the guards a flip can move, the rate is \VThree{FlipRatePct} (upper Wilson bound \VThree{FlipHighPct}): the guards, not the interval, are what keep the rule calibrated on this panel.

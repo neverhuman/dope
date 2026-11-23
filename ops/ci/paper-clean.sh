@@ -6,6 +6,8 @@ output_paths=(
   docs/whitepaper/generated docs/whitepaper/figures
   docs/whitepaper/dope-mfs.pdf docs/whitepaper/dope-mfs-anonymous.pdf
   docs/whitepaper/supplement.pdf docs/whitepaper/supplement-anonymous.pdf
+  docs/whitepaper-v3/generated docs/whitepaper-v3/figures
+  docs/whitepaper-v3/dope-v3.pdf docs/whitepaper-v3/dope-v3.bbl
 )
 if [[ -n "$(git status --porcelain -- "${output_paths[@]}")" ]]; then
   echo 'paper clean rebuild requires unchanged generated outputs' >&2
@@ -34,6 +36,12 @@ rm -rf docs/whitepaper/generated
 rm -f docs/whitepaper/figures/architecture.pdf
 nice -n 10 ionice -c 3 just paper
 nice -n 10 ionice -c 3 bash paper/build.sh
+# The v3 paper: its macros and tables are rebuilt from the receipts; the hero PDF and its
+# recorded provenance stay, and render_v3_paper.py --check verifies them.
+rm -f docs/whitepaper-v3/generated/v3-macros.tex docs/whitepaper-v3/generated/v3-results-table.tex \
+  docs/whitepaper-v3/generated/v3-comparison-table.tex docs/whitepaper-v3/dope-v3.pdf docs/whitepaper-v3/dope-v3.bbl
+nice -n 10 ionice -c 3 just paper-v3
+nice -n 10 ionice -c 3 python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py'
 # Include absent/untracked files as well as tracked drift in the clean-rebuild gate.
 git diff --exit-code
 if [[ -n "$(git status --porcelain -- "${output_paths[@]}")" ]]; then

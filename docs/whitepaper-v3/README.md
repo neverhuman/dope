@@ -1,26 +1,60 @@
-# DOPE v3.0.0 White Paper
+# DOPE v3.0.0 white paper
 
-This directory houses the versioned **DOPE v3.0.0** white paper:
+**D.O.P.E.: Downstream Objective-Preserving Encoding. Release v3.0.0: compiling a table into at
+most 2 KiB with per-table codec selection, and a twin-referenced evaluation.**
 
-> **D.O.P.E. v3.0.0: Downstream Objective-Preserving Encoding — Calibrated `DSE8` Sub-2 KiB Tabular Synthesis, FIT-Only Evidence Extraction, Stratified 2-Fold Acceptance Gating, and Neural Compiler Audit**
+The paper describes the v3.0.0 release encoder (`dope fit --format auto-v8`), the `DSE8` codec,
+the FIT-only evidence bank and the `dope_kpi` evaluation, and reports the scoreboard of
+[`bench/real-world/results/scoreboard/v3.0.0/`](../../bench/real-world/results/scoreboard/v3.0.0/README.md).
+Earlier releases appear only as baselines. The v1 and v2 manuscripts
+([`docs/whitepaper/`](../whitepaper/), [`docs/whitepaper-v2/`](../whitepaper-v2/)) are unchanged.
 
-The historical manuscripts ([`docs/whitepaper/dope-mfs.tex`](../whitepaper/dope-mfs.tex) and [`docs/whitepaper-v2/dope-v2.tex`](../whitepaper-v2/dope-v2.tex)) remain untouched so `ops/ci/paper-clean.sh` stays zero-diff.
+No number is typed into the manuscript. Every quantity is a `\VThree{...}` macro written by
+`scripts/render_v3_paper.py` from the committed receipts, contracts and Rust constants, and
+`--check` rejects a digit typed into a section.
 
 ## Layout
 
 | Path | Role |
 | --- | --- |
-| `dope-v3.tex` | Main DOPE v3.0.0 LaTeX manuscript (zero hand-typed numbers; uses `\VThree{...}` macros) |
-| `dope-v3.pdf` | Compiled DOPE v3.0.0 white paper PDF |
-| `references-v3.bib` | Bibliography |
-| `scripts/render_v3_paper.py` | Receipt-bound macro & figure renderer (`--check` fails on any drift from committed `scoreboard/v3.0.0/` JSON receipts, contracts, or Rust constants) |
-| `generated/v3-macros.tex` | Generated `\VThree{...}` macros bound to `bench/real-world/results/scoreboard/v3.0.0/`, `contracts/evidence-layout-v1.json`, `contracts/dope-kpi.json`, and `engine/dope-core/src/single_encoding/v8/` |
-| `figures/v3-frontier-and-tasks.pdf` | Vector 2-panel value frontier and per-task/MLP breakdown rendered from committed `primary.json` |
+| `dope-v3.tex` | Preamble, title block and `\input` of each section |
+| `sections/*.tex` | One file per section (`00-abstract` to `09-reproducibility`) and per appendix (`appendix-*`) |
+| `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
+| `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
+| `figures/hero-v3.pdf` | Figure 1: the README hero `bench/real-world/figures/hero-v3-light.svg`, converted with `rsvg-convert -f pdf` |
+| `generated/v3-macros.tex` | Every `\VThree` macro |
+| `generated/v3-results-table.tex` | Table 2: the README arm table, same rows, columns and values, wrapped into two panels |
+| `generated/v3-comparison-table.tex` | Table 3: the README comparison row with each condition and guard of the decision rule |
+| `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
+| `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
+| `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every cell equals the README block |
+| `scripts/test_render_v3_paper.py` | Unit tests |
+| `scripts/build_v3_pdf.sh` | Deterministic `latexmk` build in `target/paper-v3/` |
 
-## Build & Verify
+## Third-party baselines
+
+If `bench/real-world/results/scoreboard/v3.0.0/primary-methods.json` is committed (a `dope_kpi`
+receipt of the same run holding SDV GaussianCopula, CTGAN, TVAE or ARF arms), the renderer adds
+those arms to Table 2 between the DOPE arms and the controls. Without that file the table has no
+third-party rows.
+
+## Build and verify
+
+From the repository root:
 
 ```bash
-python3 docs/whitepaper-v3/scripts/render_v3_paper.py --figures
-(cd docs/whitepaper-v3 && latexmk -pdf -interaction=nonstopmode dope-v3.tex)
-python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check
+python3 docs/whitepaper-v3/scripts/render_v3_paper.py --figures   # needs rsvg-convert; only when the hero SVG changes
+python3 docs/whitepaper-v3/scripts/render_v3_paper.py              # macros, tables, manifest
+python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero provenance, digit lint
+bash docs/whitepaper-v3/scripts/build_v3_pdf.sh                    # dope-v3.pdf and dope-v3.bbl
 ```
+
+`just paper-v3` runs the last three. `just paper-check` and `just paper-tests` include the v3
+paper, and `ops/ci/paper-clean.sh` deletes its generated files, rebuilds it and requires a
+zero diff.
+
+When the scoreboard receipts change (for example after a rebase onto a new release), re-run
+`render_v3_paper.py` (with `--figures` if the hero SVG changed) and `build_v3_pdf.sh`. The text
+cites values only through macros, but its comparative wording (which arm is higher, which
+guards fail, that no third-party arm has been scored) is typed; `prose_errors` in the renderer
+checks each such claim against the receipts and names the one that no longer holds.

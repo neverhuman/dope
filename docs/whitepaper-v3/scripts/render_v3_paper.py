@@ -1,393 +1,447 @@
-"""Receipt-bound macro & figure renderer for the DOPE v3.0.0 White Paper (`docs/whitepaper-v3/`).
+"""Receipt-bound renderer and checker for the DOPE v3.0.0 white paper (`docs/whitepaper-v3/`).
 
-Reads frozen contracts (`contracts/evidence-layout-v1.json`, `contracts/dope-kpi.json`),
-Rust source constants (`engine/dope-core/src/single_encoding/v8/`), and committed
-`dope_kpi` v3.0.0 scoreboard receipts (`bench/real-world/results/scoreboard/v3.0.0/`) to
-generate `docs/whitepaper-v3/generated/v3-macros.tex`. Missing receipts emit `\\PendingVal`
-so zero hand-typed quantitative claims can enter the manuscript.
+Every number in the manuscript is a `\\VThree{...}` macro written here from committed inputs:
+the `dope_kpi` receipts under `bench/real-world/results/scoreboard/v3.0.0/`, the contracts
+under `contracts/`, and constants of the Rust sources. Nothing falls back to a default: a
+missing receipt, contract key or source constant is an error.
+
+  render_v3_paper.py            write generated/{v3-macros.tex, v3-results-table.tex,
+                                v3-comparison-table.tex, v3-render-manifest.json}
+  render_v3_paper.py --figures  also convert the README hero SVG to figures/hero-v3.pdf
+  render_v3_paper.py --check    write nothing; fail on drift of any generated file, on a hero
+                                PDF whose provenance does not match, on any digit typed into
+                                a section body (sections/*.tex) or the title block, and on a
+                                comparative claim of the prose that the receipts contradict.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
-from pathlib import Path
+import math
+import os
 import re
+import shutil
+import subprocess
 import sys
+from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import v3_paper_tables as tables  # noqa: E402
 
-def _tex_escape(s: str) -> str:
-    return (
-        s.replace("\\", "\\textbackslash{}")
-        .replace("_", "\\_")
-        .replace("%", "\\%")
-        .replace("&", "\\&")
-        .replace("#", "\\#")
-        .replace("\u2212", "$-$")
-        .replace("\u2013", "--")
-        .replace("\u2014", "---")
-    )
+REPO = Path(__file__).resolve().parents[3]
+SCOREBOARD = "bench/real-world/results/scoreboard/v3.0.0"
+METHODS_RECEIPT = f"{SCOREBOARD}/primary-methods.json"
+HERO_SVG = "bench/real-world/figures/hero-v3-light.svg"
+HERO_PDF = "docs/whitepaper-v3/figures/hero-v3.pdf"
+GEN = "docs/whitepaper-v3/generated"
+OUT = {"macros": f"{GEN}/v3-macros.tex", "arms": f"{GEN}/v3-results-table.tex",
+       "comparison": f"{GEN}/v3-comparison-table.tex", "manifest": f"{GEN}/v3-render-manifest.json"}
+HERO_EPOCH = "1795392000"  # 2026-11-23T00:00:00Z: fixes the PDF creation date of the conversion.
+V8 = "engine/dope-core/src/single_encoding/v8"
+RUST = {  # macro: (source, regex); the first group is the value.
+    "DseHeaderBytes": (f"{V8}/planner.rs", r"pub const DSE8_HEADER_BYTES: usize = (\d+);"),
+    "CrcBytes": (f"{V8}/planner.rs", r"pub const DSE8_CRC_BYTES: usize = (\d+);"),
+    "TlvBytes": (f"{V8}/planner.rs", r"pub const TLV_HDR_BYTES: usize = (\d+);"),
+    "MargBaseBytes": (f"{V8}/planner.rs", r"let marg_b = p \* \((\d+) \+ kl\)"),
+    "LinFixedBytes": (f"{V8}/planner.rs", r"let lin_b = (\d+) \+ o_dim \* \(\d+ \+ p\);"),
+    "LinPerOutBytes": (f"{V8}/planner.rs", r"let lin_b = \d+ \+ o_dim \* \((\d+) \+ p\);"),
+    "EffectBytes": (f"{V8}/packet.rs", r"effects\.len\(\) \* (\d+)\)"),
+    "PairBytes": (f"{V8}/packet.rs", r"pairs\.len\(\) \* (\d+)\)"),
+    "TreeBytes": (f"{V8}/trees_v8.rs", r"pub const V8_TREE_WIRE_BYTES: usize = (\d+);"),
+    "TreeLeaves": (f"{V8}/trees_v8.rs", r"pub leaves: \[f32; (\d+)\]"),
+    "MaxTrees": (f"{V8}/trees_v8.rs", r"pub const V8_MAX_TREES: usize = (\d+);"),
+    "EffectBins": (f"{V8}/target_v8.rs", r"pub bins8: \[f32; (\d+)\]"),
+    "MaxEffects": (f"{V8}/target_v8.rs", r"pub const V8_MAX_EFFECTS: usize = (\d+);"),
+    "MaxPairs": (f"{V8}/target_v8.rs", r"pub const V8_MAX_PAIRS: usize = (\d+);"),
+    "MaxCols": (f"{V8}/scale_v8.rs", r"pub const V8_MAX_COLS: usize = (\d+);"),
+    "MaxClasses": (f"{V8}/scale_v8.rs", r"pub const V8_MAX_CLASSES: usize = (\d+);"),
+    "MaxRank": (f"{V8}/copula_regimes.rs", r"pub const V8_MAX_RANK: usize = (\d+);"),
+    "MaxRegimes": (f"{V8}/copula_regimes.rs", r"pub const V8_MAX_REGIMES: usize = (\d+);"),
+    "KnotCount": ("engine/dope-core/src/single_encoding/mod.rs", r"pub const KNOT_COUNT: usize = (\d+);"),
+    "DpaHeaderBytes": ("engine/dope-core/src/auto/container.rs", r"pub const DPA1_HEADER_BYTES: usize = (\d+);"),
+    "MinPacketRoom": ("engine/dope-core/src/auto/v8_dpa.rs", r"if packet_room < (\d+) \{"),
+    "CliBudget": ("engine/dope-core/src/auto/v8.rs", r"budget: (\d+),"),
+    "FoldVeto": ("engine/dope-core/src/auto/v8.rs", r"x >= a - ([0-9.]+) && y >= b - [0-9.]+"),
+    "MinTestPerClass": ("engine/dope-core/src/auto/v8.rs", r"any\(\|&c\| c < (\d+)\)"),
+    "MinCheckGroups": ("engine/dope-core/src/auto/check.rs", r"pub const MIN_CHECK_GROUPS: usize = (\d+);"),
+    "CheckSynthFactor": ("engine/dope-core/src/auto/check.rs", r"pub const CHECK_SYNTH_FACTOR: usize = (\d+);"),
+    "SelectionMargin": ("engine/dope-core/src/auto/mod.rs", r"pub const SELECTION_MARGIN: f64 = ([0-9.]+);"),
+}
+LINT_ALLOW = ("SHA-256", "Format~1", r"-{}-format 1")
+# Inside math, a lone 0 or 1 is structure (N(0, I), 1/|T|, 1 - R_B), not a measured quantity.
+LINT_MATH = re.compile(r"\$[^$]*\$|\\begin\{(equation|align)\*?\}.*?\\end\{\1\*?\}", re.S)
+LINT_STRUCTURAL = re.compile(r"(?<![\d.])[01](?![\d.])")
+LINT_STRIP = (
+    r"\\VThree\{[^{}]*\}",
+    r"\\(?:cite[a-z]*|ref|eqref|autoref|label|input|includegraphics|path|url|href|bibliography"
+    r"|bibliographystyle)\*?(?:\[[^\]]*\])*\{[^{}]*\}",
+    r"-?\d*\.?\d+(?:em|ex|pt|bp|mm|cm|in)\b",
+    r"[\d.]*\\(?:linewidth|textwidth|columnwidth|baselineskip)",
+    r"[_^]\{?\d+\}?",
+    r"[A-Za-z]+\d[A-Za-z0-9]*",
+)
 
 
-def _sha256_short(path: Path, n: int = 12) -> str:
+class RenderError(RuntimeError):
+    pass
+
+
+def sha256(rel: str) -> str:
+    return hashlib.sha256((REPO / rel).read_bytes()).hexdigest()
+
+
+def read_json(rel: str) -> dict[str, Any]:
+    path = REPO / rel
     if not path.is_file():
-        return r"\PendingVal"
-    return hashlib.sha256(path.read_bytes()).hexdigest()[:n]
-
-
-def _fmt_int(val: Any) -> str:
-    if isinstance(val, (int, float)):
-        return f"{int(round(val)):,}"
-    return r"\PendingVal"
-
-
-def _fmt_float(val: Any, digits: int = 3, signed: bool = False) -> str:
-    if isinstance(val, (int, float)):
-        spec = f"+.{digits}f" if signed else f".{digits}f"
-        s = format(float(val), spec)
-        return s.replace("-", "$-$") if s.startswith("-") else s
-    return r"\PendingVal"
-
-
-def _fmt_ci(val: Any, lo: Any, hi: Any, digits: int = 3, signed: bool = False) -> str:
-    if all(isinstance(x, (int, float)) for x in (val, lo, hi)):
-        return f"{_fmt_float(val, digits, signed)} [{_fmt_float(lo, digits, signed)}, {_fmt_float(hi, digits, signed)}]"
-    return r"\PendingVal"
-
-
-def _fmt_bytes(arm: dict[str, Any] | None) -> str:
-    if not arm:
-        return r"\PendingVal"
-    if arm.get("artifact_class") == "control":
-        return "---"
-    b = arm.get("bytes")
-    if not isinstance(b, dict):
-        return r"\PendingVal"
-    med, mx = b.get("median"), b.get("max")
-    if isinstance(med, (int, float)) and isinstance(mx, (int, float)):
-        return f"{int(round(med)):,}\\,B / {int(round(mx)):,}\\,B"
-    return r"\PendingVal"
-
-
-def _find_arm(primary: dict[str, Any], candidates: tuple[str, ...]) -> dict[str, Any] | None:
-    arms = primary.get("arms")
-    if not isinstance(arms, list):
-        return None
-    by_id = {str(a.get("arm_id", "")): a for a in arms if isinstance(a, dict)}
-    for cid in candidates:
-        if cid in by_id:
-            return by_id[cid]
-    for cid in candidates:
-        for k, v in by_id.items():
-            if cid in k:
-                return v
-    return None
-
-
-def _task_val(block: dict[str, Any] | None, task: str) -> Any:
-    if not isinstance(block, dict):
-        return None
-    for t in block.get("tasks", []):
-        if isinstance(t, dict) and t.get("task") == task:
-            return t.get("value")
-    return None
-
-
-def _auditor_med(arm: dict[str, Any] | None, name_prefix: str) -> Any:
-    if not isinstance(arm, dict):
-        return None
-    for row in arm.get("median_retention", []):
-        if isinstance(row, dict) and str(row.get("auditor", "")).startswith(name_prefix):
-            return row.get("median")
-    return None
-
-
-def _arm_macros(prefix: str, arm: dict[str, Any] | None) -> list[tuple[str, str]]:
-    if not isinstance(arm, dict):
-        keys = ("Trg", "MatchedTrg", "Reg", "Bin", "Mc", "Bytes", "MlpTrg", "C2st", "FailCell", "AudMed")
-        return [(f"{prefix}{k}", r"\PendingVal") for k in keys]
-    pr = arm.get("primary") or {}
-    ma = arm.get("matched") or {}
-    lin = _auditor_med(arm, "linear")
-    gbd = _auditor_med(arm, "gbdt")
-    mlp = _auditor_med(arm, "mlp")
-    aud = (
-        f"{_fmt_float(lin, 3)} / {_fmt_float(gbd, 3)} / {_fmt_float(mlp, 3)}"
-        if all(isinstance(x, (int, float)) for x in (lin, gbd, mlp))
-        else r"\PendingVal"
-    )
-    fc, cc = pr.get("failed_cells"), pr.get("cells")
-    fail_str = f"{int(fc)}/{int(cc)}" if isinstance(fc, (int, float)) and isinstance(cc, (int, float)) else r"\PendingVal"
-    return [
-        (f"{prefix}Trg", _fmt_ci(pr.get("trg"), pr.get("ci_low"), pr.get("ci_high"), 3)),
-        (f"{prefix}MatchedTrg", _fmt_ci(ma.get("trg"), ma.get("ci_low"), ma.get("ci_high"), 3)),
-        (f"{prefix}Reg", _fmt_float(_task_val(pr, "regression"), 3)),
-        (f"{prefix}Bin", _fmt_float(_task_val(pr, "binary"), 3)),
-        (f"{prefix}Mc", _fmt_float(_task_val(pr, "multiclass"), 3)),
-        (f"{prefix}Bytes", _fmt_bytes(arm)),
-        (f"{prefix}MlpTrg", _fmt_float(arm.get("mlp_trg"), 3)),
-        (f"{prefix}C2st", _fmt_float(arm.get("c2st_median"), 3)),
-        (f"{prefix}FailCell", fail_str),
-        (f"{prefix}AudMed", aud),
-    ]
-
-
-def _find_comparison(compare: dict[str, Any], cand_hints: tuple[str, ...], base_hints: tuple[str, ...]) -> dict[str, Any] | None:
-    comps = compare.get("comparisons")
-    if not isinstance(comps, list):
-        return None
-    for c in comps:
-        if not isinstance(c, dict):
-            continue
-        cid = str(c.get("id", ""))
-        bid = str(c.get("baseline", ""))
-        if any(h in cid for h in cand_hints) and any(h in bid for h in base_hints):
-            return c
-    return None
-
-
-def _guard_entry(comp: dict[str, Any] | None, name: str) -> dict[str, Any] | None:
-    if not isinstance(comp, dict):
-        return None
-    dec = comp.get("decision") or {}
-    for g in dec.get("guards", []):
-        if isinstance(g, dict) and g.get("name") == name:
-            return g
-    return None
-
-
-def _fmt_guard(g: dict[str, Any] | None, digits: int = 3, signed: bool = True) -> tuple[str, str]:
-    if not isinstance(g, dict):
-        return (r"\PendingVal", r"\PendingVal")
-    chk = _tex_escape(str(g.get("check", "pending")).upper())
-    val = g.get("value")
-    if not isinstance(val, (int, float)):
-        return ("n/e", chk)
-    return (_fmt_float(val, digits, signed), chk)
-
-
-def _extract_v8_consts(repo_root: Path) -> dict[str, str]:
-    out = {
-        "MaxCols": "48", "MaxRank": "12", "MaxClasses": "8", "KnotCount": "17",
-        "DecColDim": "48", "DecEdgeDim": "4", "DecGlobDim": "32", "DecCodeDim": "64",
-        "NodeTrees": "8", "NodeDepth": "3", "BilinRank": "4",
-    }
-    pkt = repo_root / "engine/dope-core/src/single_encoding/v8/packet.rs"
-    if pkt.is_file():
-        txt = pkt.read_text(encoding="utf-8")
-        for rust_k, tex_k in (("V8_MAX_COLS", "MaxCols"), ("V8_MAX_RANK", "MaxRank"), ("V8_MAX_CLASSES", "MaxClasses")):
-            m = re.search(rf"pub const {rust_k}:\s*usize\s*=\s*(\d+);", txt)
-            if m:
-                out[tex_k] = m.group(1)
-    return out
-
-
-def _read_json(path: Path) -> dict[str, Any]:
-    if not path.is_file():
-        return {}
+        raise RenderError(f"missing input {rel}")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def render_macros(repo_root: Path, receipt_dir: Path | None = None) -> str:
-    ev_path = repo_root / "contracts/evidence-layout-v1.json"
-    kpi_contract = repo_root / "contracts/dope-kpi.json"
-    ev = _read_json(ev_path)
-    sb_dir = receipt_dir or (repo_root / "bench/real-world/results/scoreboard/v3.0.0")
-    primary_path = sb_dir / "primary.json"
-    compare_path = sb_dir / "compare.json"
-    primary = _read_json(primary_path)
-    compare = _read_json(compare_path)
-    consts = _extract_v8_consts(repo_root)
+def rust_constants() -> tuple[dict[str, str], set[str]]:
+    out, files = {}, set()
+    for name, (rel, pattern) in RUST.items():
+        match = re.search(pattern, (REPO / rel).read_text(encoding="utf-8"))
+        if not match:
+            raise RenderError(f"{rel}: constant for {name} not found (pattern {pattern})")
+        out[name] = match.group(1)
+        files.add(rel)
+    return out, files
 
-    auto_v8 = _find_arm(primary, ("dope-3.0.0-auto-v8", "dope-v3b-auto-v8", "dope-v3-auto-v8", "auto-v8"))
-    dse8_p0 = _find_arm(primary, ("dse8-p0-v3b", "dse8-p0", "dope-3.0.0-v8-analytic"))
-    v2_auto = _find_arm(primary, ("dope-2.0.0-auto",))
-    v2_small = _find_arm(primary, ("dope-2.0.0-small",))
-    v13_small = _find_arm(primary, ("dope-1.3.0-small",))
-    v7_step0 = _find_arm(primary, ("pr390-v7-step0", "v7-step0"))
-    copy_a = _find_arm(primary, ("copy_a",))
-    boot_a = _find_arm(primary, ("bootstrap_a",))
-    indep_m = _find_arm(primary, ("indep_marginals",))
 
-    comp_v2 = _find_comparison(compare, ("auto-v8", "3.0.0", "v3b"), ("2.0.0-auto", "2.0.0", "1.3.0"))
-    dims = ev.get("dimensions") if isinstance(ev.get("dimensions"), dict) else {}
-    panel_obj = primary.get("panel") if isinstance(primary.get("panel"), dict) else {}
-    panel_fams = panel_obj.get("families")
-    panel_label = (
-        f"fresh DEV report ({int(panel_fams)} families)"
-        if isinstance(panel_fams, (int, float))
-        else "fresh DEV report"
-    )
-    pr_block = (auto_v8 or {}).get("primary") or {}
+def num(x: float, digits: int = 3, signed: bool = False) -> str:
+    text = format(float(x), f"{'+' if signed else ''}.{digits}f")
+    if re.fullmatch(r"[+-]?0\.?0*", text):
+        text = text.lstrip("+-")
+    return text.replace("-", r"\ensuremath{-}")
 
-    entries: list[tuple[str, str]] = [
-        ("ReleaseVersion", "v3.0.0"),
-        ("ReleaseTag", "dope-engine-v3.0.0"),
-        ("PriorReleaseTag", "dope-engine-v2.0.0"),
-        ("PriorSignedTag", "dope-engine-v1.3.0"),
-        ("EvLayoutSha", _sha256_short(ev_path, 12)),
-        ("KpiContractSha", _sha256_short(kpi_contract, 12)),
-        ("PrimarySha", _sha256_short(primary_path, 12)),
-        ("CompareSha", _sha256_short(compare_path, 12)),
-        ("EvColDim", _fmt_int(dims.get("col_dim", 128))),
-        ("EvEdgeDim", _fmt_int(dims.get("edge_dim", 16))),
-        ("EvClassDim", _fmt_int(dims.get("class_dim", 16))),
-        ("EvClassColDim", _fmt_int(dims.get("class_col_dim", 4))),
-        ("EvGroupDim", _fmt_int(dims.get("group_dim", 8))),
-        ("EvGlobDim", _fmt_int(dims.get("glob_dim", 160))),
-        ("ReportPanel", _tex_escape(panel_label)),
-        ("ReportCells", _fmt_int(pr_block.get("cells"))),
-        ("ReportScheduled", _fmt_int(pr_block.get("scheduled_cells"))),
-        ("ReportFamilies", _fmt_int(pr_block.get("families"))),
-        *consts.items(),
+
+def ci(v: float, lo: float, hi: float, signed: bool = False) -> str:
+    return f"{num(v, 3, signed)} [{num(lo, 3, signed)}, {num(hi, 3, signed)}]"
+
+
+def grouped(x: float) -> str:
+    whole = f"{x:,.0f}" if float(x).is_integer() else f"{x:,.1f}"
+    return whole.replace(",", "{,}").replace("-", r"\ensuremath{-}")
+
+
+def short(x: float) -> str:
+    return format(float(x), "g").replace("-", r"\ensuremath{-}")
+
+
+def pct(x: float, digits: int = 1) -> str:
+    return f"{100 * x:.{digits}f}\\%"
+
+
+def tt(s: str) -> str:
+    return r"\texttt{" + s.replace("_", r"\_") + "}"
+
+
+def role_ids(primary: dict[str, Any], comp: dict[str, Any]) -> dict[str, str]:
+    ids = [a["arm_id"] for a in primary["arms"]]
+    base_version = re.match(r"dope-(\d+\.\d+\.\d+)-", comp["baseline"])
+    if not base_version:
+        raise RenderError(f"baseline {comp['baseline']} names no release")
+
+    def one(pattern: str) -> str:
+        hits = [i for i in ids if re.search(pattern, i)]
+        if len(hits) != 1:
+            raise RenderError(f"expected one arm matching {pattern}, found {hits}")
+        return hits[0]
+    return {"Cand": comp["id"], "Base": comp["baseline"], "Analytic": one(r"dse8"), "V7": one(r"v7"),
+            "PrevSmall": one(rf"^dope-{re.escape(base_version.group(1))}-small$"),
+            "OldSmall": one(rf"^dope-(?!{re.escape(base_version.group(1))})[\d.]+-small$"),
+            "CopyA": "copy_a", "BootA": "bootstrap_a", "Indep": "indep_marginals",
+            "LabelShuffle": "label_shuffle", "TwinC": "twin_c"}
+
+
+def arm_macros(role: str, arm: dict[str, Any]) -> list[tuple[str, str]]:
+    p, m, b = arm["primary"], arm["matched"], arm["bytes"]
+    out = [(f"{role}Id", tt(arm["arm_id"])), (f"{role}Trg", ci(p["trg"], p["ci_low"], p["ci_high"])),
+           (f"{role}TrgPoint", num(p["trg"])), (f"{role}Matched", ci(m["trg"], m["ci_low"], m["ci_high"])),
+           (f"{role}Mlp", num(arm["mlp_trg"])), (f"{role}Failed", str(p["failed_cells"])),
+           (f"{role}Cells", str(p["cells"])), (f"{role}NotApplicable", str(p["not_applicable_cells"]))]
+    if arm.get("c2st_median") is not None:
+        out.append((f"{role}C2st", num(arm["c2st_median"])))
+    for task in p["tasks"]:
+        out.append((f"{role}{task['task'].capitalize()}", num(task["value"])))
+    if b.get("median") is not None:
+        out += [(f"{role}BytesMed", grouped(b["median"])), (f"{role}BytesMax", grouped(b["max"]))]
+    for key, name in (("realism_coverage", "Realism"), ("privacy_coverage", "Privacy")):
+        if arm.get(key) is not None:
+            out.append((f"{role}{name}", num(arm[key])))
+    for row in arm["median_retention"]:
+        out.append((f"{role}Ret{row['auditor'].split('-')[0].capitalize()}", num(row["median"])))
+    return out
+
+
+def comparison_macros(comp: dict[str, Any], compare: dict[str, Any]) -> list[tuple[str, str]]:
+    m, cal = comp["matched"], comp["null_calibration"]
+    out = [("Delta", ci(comp["delta"], comp["ci_low"], comp["ci_high"], True)),
+           ("DeltaPoint", num(comp["delta"], 3, True)), ("PHolm", num(comp["p_holm"])),
+           ("HolmM", str(comp["holm_m"])), ("Outcome", comp["decision"]["outcome"]),
+           ("MatchedDelta", ci(m["delta"], m["ci_low"], m["ci_high"], True)),
+           ("MatchedP", num(m["p_one_sided"])), ("MatchedMult", str(m["multiplier"])),
+           ("CompCells", str(comp["cells"])), ("CompFamilies", str(comp["families"])),
+           ("MlpCells", str(comp["mlp_cells"])), ("NoiseSd", short(compare["noise_sd"]["value"])),
+           ("NullReplicates", grouped(cal["replicates"])),
+           ("FlipRatePct", pct(cal["flip_guard_rule"]["rate"])),
+           ("FlipHighPct", pct(cal["flip_guard_rule"]["wilson95_high"])),
+           ("StatPassPct", pct(cal["statistical_pass"]["rate"])),
+           ("StatPassLowPct", pct(cal["statistical_pass"]["wilson95_low"])),
+           ("StatPassHighPct", pct(cal["statistical_pass"]["wilson95_high"]))]
+    for t in comp["tasks"]:
+        out.append((f"Delta{t['task'].capitalize()}", ci(t["delta"], t["ci_low"], t["ci_high"], True)))
+    guards = comp["decision"]["guards"]
+    for g in guards:
+        name = "".join(w.capitalize() for w in tables.GUARD_NAMES.get(g["name"], g["name"]).split("_"))
+        value = grouped(g["value"]) if g["name"] == "bytes" else num(g["value"], 3, g["name"] != "exact_copy_excess")
+        out += [(f"Guard{name}", value), (f"Guard{name}Check", tables.CHECK_WORDS[g["check"]])]
+    failed = sum(g["check"] == "fail" for g in guards)
+    return out + [("GuardsFailed", str(failed)), ("GuardsTotal", str(len(guards)))]
+
+
+def contract_macros(kpi: dict[str, Any], fid: dict[str, Any], layout: dict[str, Any]) -> list[tuple[str, str]]:
+    st, pr, bs, nl = kpi["statistic"], kpi["promotion"], kpi["bootstrap"], kpi["null"]
+    gates = fid["gates"]
+    priv, real = gates["validity_and_empirical_privacy"], gates["realism_coverage"]
+    tpr_key = next(k for k in priv if k.startswith("mia_tpr_at_"))
+    if layout["support_floor_k"] != priv["support_floor_k"]:
+        raise RenderError("evidence layout and fidelity contract disagree on the support floor")
+    dims = layout["dims"]
+    return [("ContractId", tt(kpi["contract_id"])), ("ContractStatus", kpi["status"]),
+            ("ClipLow", short(st["clip_low"])), ("ClipHigh", short(st["clip_high"])),
+            ("FailedValue", short(st["failed_value"])), ("PrimaryMult", str(st["primary_multiplier"])),
+            ("CiLevel", f"{round(100 * (bs['upper_quantile'] - bs['lower_quantile']))}\\%"),
+            ("LowerPct", short(100 * bs["lower_quantile"])), ("UpperPct", short(100 * bs["upper_quantile"])),
+            ("HolmAlpha", short(pr["holm_p_lt"])), ("MinDelta", short(pr["min_delta"])),
+            ("CiLowGt", short(pr["ci_low_gt"])), ("TaskCiLowGt", short(pr["task_ci_low_gt"])),
+            ("MlpDeltaGe", short(pr["mlp_delta_ge"])), ("RealismDeltaGt", short(pr["realism_coverage_delta_gt"])),
+            ("PrivacyDeltaGt", short(pr["privacy_coverage_delta_gt"])), ("CopyLe", short(pr["exact_copy_excess_le"])),
+            ("NullMaxRatePct", pct(nl["max_false_promote_rate"], 0)), ("BudgetBytes", grouped(kpi["bytes"]["headline"])),
+            ("BudgetKiB", short(kpi["bytes"]["headline"] / 1024)),
+            ("C2stMax", short(real["c2st_auc_max"])), ("MargAucMax", short(real["marg_auc_max"])),
+            ("RuleViolationMax", short(real["rule_violation_ratio_max"])), ("DcrMax", short(priv["dcr_share_max"])),
+            ("MiaAucMax", short(priv["mia_auc_max"])), ("MiaTprMax", short(priv[tpr_key])),
+            ("MiaFprPct", re.search(r"at_(\d+)pct", tpr_key).group(1) + r"\%"),
+            ("SupportK", str(layout["support_floor_k"])), ("EvTiers", str(len(layout["tiers"]))),
+            *[(f"Ev{k.title().replace('_', '')}Dim", str(v)) for k, v in dims.items()]]
+
+
+def check_same_run(primary: dict[str, Any], other: dict[str, Any], name: str) -> None:
+    for key in ("contract", "panel", "bootstrap"):
+        if primary[key] != other[key]:
+            raise RenderError(f"{name} and primary.json differ in {key}")
+    for key in ("schedule_sha256", "realref_sha256"):
+        if primary["inputs"].get(key) != other["inputs"].get(key):
+            raise RenderError(f"{name} and primary.json differ in inputs.{key}")
+
+
+def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str, str], third: list) -> list[str]:
+    """The comparative wording of the sections, checked against the receipts.
+
+    The sections cite every value through a macro, but words such as "fails", "below", "the same
+    as" or "not yet scored" are typed. Each claim here names the sentence it protects; when a new
+    receipt falsifies one, --check fails until the prose is rewritten."""
+    arm = {role: next(a for a in primary["arms"] if a["arm_id"] == arm_id) for role, arm_id in roles.items()}
+    trg = {role: a["primary"]["trg"] for role, a in arm.items()}
+    task = {role: {t["task"]: t["value"] for t in a["primary"]["tasks"]} for role, a in arm.items()}
+    delta = {t["task"]: t for t in comp["tasks"]}
+    dec, cal, m = comp["decision"], comp["null_calibration"], comp["matched"]
+    failed = [g["name"] for g in dec["guards"] if g["check"] == "fail"]
+    privacy = next(g for g in dec["guards"] if g["name"] == "privacy_coverage_delta")
+    families = {t["task"]: t["families"] for t in arm["Cand"]["primary"]["tasks"]}
+    claims = [
+        ("outcome is HOLD", dec["outcome"] == "HOLD"),
+        ("conditions (i)-(iii) hold", all(c["check"] == "pass" for c in dec["conditions"])),
+        ("the failing guards are tasks, mlp, realism and privacy",
+         failed == ["task_ci_low", "mlp_delta", "realism_coverage_delta", "privacy_coverage_delta"]),
+        ("auto-v8 improves TRG with a positive lower bound", comp["delta"] > 0 and comp["ci_low"] > 0),
+        ("the matched-size interval contains zero", m["ci_low"] < 0 < m["ci_high"]),
+        ("the gain comes from classification; regression favours the baseline",
+         delta["regression"]["delta"] < 0 < min(delta["binary"]["delta"], delta["multiclass"]["delta"])
+         and task["Cand"]["regression"] < task["Base"]["regression"]),
+        ("the MLP auditor prefers the baseline", arm["Cand"]["mlp_trg"] < arm["Base"]["mlp_trg"]),
+        ("realism coverage is lower than the baseline's", arm["Cand"]["realism_coverage"] < arm["Base"]["realism_coverage"]),
+        ("privacy coverage is just below its guard", privacy["threshold"] - 0.005 < privacy["value"] < privacy["threshold"]),
+        ("statistical conditions alone exceed the null rate; with guards they do not",
+         not cal["statistical_pass"]["acceptable"] and cal["flip_guard_rule"]["acceptable"]),
+        ("analytic alone is worse than the baseline, better on regression, worse on multiclass",
+         trg["Analytic"] < trg["Base"] and task["Analytic"]["regression"] > task["Base"]["regression"]
+         and task["Analytic"]["multiclass"] < task["Base"]["multiclass"]),
+        ("both small arms fail the same number of cells",
+         arm["PrevSmall"]["primary"]["failed_cells"] == arm["OldSmall"]["primary"]["failed_cells"]),
+        ("copy of A scores below zero", trg["CopyA"] < 0),
+        ("twin_c is not applicable on some cells", arm["TwinC"]["primary"]["not_applicable_cells"] > 0),
+        ("auto-v8 C2ST is the same as independent marginals at three decimals",
+         num(arm["Cand"]["c2st_median"]) == num(arm["Indep"]["c2st_median"])),
+        ("binary has the fewest families", families["binary"] == min(families.values())),
+        ("Holm covers a single comparison", comp["holm_m"] == 1),
+        ("the contract is not frozen", primary["contract"]["protocol_frozen"] is False),
+        ("third-party generators have not yet been scored", not third),
     ]
-    for pfx, arm in (
-        ("AutoV8", auto_v8), ("Dse8P0", dse8_p0), ("V2Auto", v2_auto),
-        ("V2Small", v2_small), ("V13Small", v13_small), ("V7Step0", v7_step0),
-        ("CopyA", copy_a), ("BootA", boot_a), ("Indep", indep_m),
-    ):
-        entries.extend(_arm_macros(pfx, arm))
-
-    if isinstance(comp_v2, dict):
-        dec = comp_v2.get("decision") or {}
-        ma = comp_v2.get("matched") or {}
-        t_map = {t["task"]: t for t in comp_v2.get("tasks", []) if isinstance(t, dict) and "task" in t}
-        g_task = _fmt_guard(_guard_entry(comp_v2, "task_ci_low"), 3, True)
-        g_mlp = _fmt_guard(_guard_entry(comp_v2, "mlp_delta"), 3, True)
-        g_real = _fmt_guard(_guard_entry(comp_v2, "realism_coverage_delta"), 3, True)
-        g_priv = _fmt_guard(_guard_entry(comp_v2, "privacy_coverage_delta"), 3, True)
-        g_copy = _fmt_guard(_guard_entry(comp_v2, "exact_copy_excess"), 4, False)
-        g_byte = _fmt_guard(_guard_entry(comp_v2, "bytes"), 0, False)
-        nc = (comp_v2.get("null_calibration") or {}).get("flip_guard_rule") or {}
-        entries.extend([
-            ("CompBaseline", _tex_escape(str(comp_v2.get("baseline", "dope-2.0.0-auto")))),
-            ("CompDelta", _fmt_ci(comp_v2.get("delta"), comp_v2.get("ci_low"), comp_v2.get("ci_high"), 3, True)),
-            ("CompMatchedDelta", _fmt_ci(ma.get("delta"), ma.get("ci_low"), ma.get("ci_high"), 3, True)),
-            ("CompPHolm", _fmt_float(comp_v2.get("p_holm"), 4)),
-            ("CompSignFlip", _fmt_float(nc.get("rate"), 3)),
-            ("CompOutcome", _tex_escape(str(dec.get("outcome", "HOLD")))),
-            ("CompRegDelta", _fmt_ci(t_map.get("regression", {}).get("delta"), t_map.get("regression", {}).get("ci_low"), t_map.get("regression", {}).get("ci_high"), 3, True)),
-            ("CompBinDelta", _fmt_ci(t_map.get("binary", {}).get("delta"), t_map.get("binary", {}).get("ci_low"), t_map.get("binary", {}).get("ci_high"), 3, True)),
-            ("CompMcDelta", _fmt_ci(t_map.get("multiclass", {}).get("delta"), t_map.get("multiclass", {}).get("ci_low"), t_map.get("multiclass", {}).get("ci_high"), 3, True)),
-            ("GuardTaskVal", g_task[0]), ("GuardTaskChk", g_task[1]),
-            ("GuardMlpVal", g_mlp[0]), ("GuardMlpChk", g_mlp[1]),
-            ("GuardRealVal", g_real[0]), ("GuardRealChk", g_real[1]),
-            ("GuardPrivVal", g_priv[0]), ("GuardPrivChk", g_priv[1]),
-            ("GuardCopyVal", g_copy[0]), ("GuardCopyChk", g_copy[1]),
-            ("GuardByteVal", g_byte[0]), ("GuardByteChk", g_byte[1]),
-        ])
-    else:
-        for k in (
-            "CompBaseline", "CompDelta", "CompMatchedDelta", "CompPHolm", "CompSignFlip", "CompOutcome",
-            "CompRegDelta", "CompBinDelta", "CompMcDelta",
-            "GuardTaskVal", "GuardTaskChk", "GuardMlpVal", "GuardMlpChk",
-            "GuardRealVal", "GuardRealChk", "GuardPrivVal", "GuardPrivChk",
-            "GuardCopyVal", "GuardCopyChk", "GuardByteVal", "GuardByteChk",
-        ):
-            entries.append((k, r"\PendingVal"))
-
-    lines = [
-        "% Auto-generated by docs/whitepaper-v3/scripts/render_v3_paper.py -- DO NOT EDIT BY HAND.",
-        r"\providecommand{\PendingVal}{\textcolor{red!70!black}{\texttt{[pending]}}}",
-        r"\newcommand{\VThree}[1]{\csname VThree@#1\endcsname}",
-    ]
-    for k, v in entries:
-        lines.append(rf"\expandafter\newcommand\csname VThree@{k}\endcsname{{{v}}}")
-    return "\n".join(lines) + "\n"
+    return [f"prose claim no longer holds for the receipts: {text}" for text, ok in claims if not ok]
 
 
-def render_figures(repo_root: Path, receipt_dir: Path | None = None) -> bool:
-    """Render vector frontier + per-task PDF figure when v3.0.0 primary.json is present."""
-    sb_dir = receipt_dir or (repo_root / "bench/real-world/results/scoreboard/v3.0.0")
-    primary_path = sb_dir / "primary.json"
-    if not primary_path.is_file():
-        return False
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
+    """The generated files, and the prose claims the receipts no longer support."""
+    primary, compare = read_json(f"{SCOREBOARD}/primary.json"), read_json(f"{SCOREBOARD}/compare.json")
+    kpi, fid = read_json("contracts/dope-kpi.json"), read_json("contracts/dope-fidelity-v3-candidate.json")
+    layout = read_json("contracts/evidence-layout-v1.json")
+    check_same_run(primary, compare, "compare.json")
+    if len(compare["comparisons"]) != 1:
+        raise RenderError("compare.json must hold exactly the one pre-registered comparison")
+    comp = compare["comparisons"][0]
+    if kpi["contract_id"] != primary["contract"]["id"] or sha256("contracts/dope-kpi.json") != primary["contract"]["sha256"]:
+        raise RenderError("contracts/dope-kpi.json is not the contract the receipts were scored under")
+    methods = read_json(METHODS_RECEIPT) if (REPO / METHODS_RECEIPT).is_file() else None
+    known = {a["arm_id"] for a in primary["arms"]}
+    third = [a for a in (methods or {}).get("arms", []) if a["arm_id"] not in known]
+    if methods:
+        check_same_run(primary, methods, "primary-methods.json")
+    readme = (REPO / f"{SCOREBOARD}/readme-block.md").read_text(encoding="utf-8")
+    tables.cross_check(readme, primary["arms"] + third, compare["comparisons"], {a["arm_id"] for a in third})
+    consts, rust_files = rust_constants()
+    by_id = {a["arm_id"]: a for a in primary["arms"]}
+    roles = role_ids(primary, comp)
+    cand = by_id[roles["Cand"]]["primary"]
+    entries = [("ReleaseVersion", Path(SCOREBOARD).name), ("BaseVersion", roles["PrevSmall"].split("-")[1]),
+               ("OldVersion", roles["OldSmall"].split("-")[1]), ("PrimarySha", sha256(f"{SCOREBOARD}/primary.json")[:12]),
+               ("CompareSha", sha256(f"{SCOREBOARD}/compare.json")[:12]), ("KpiContractSha", primary["contract"]["sha256"][:12]),
+               ("EvLayoutSha", sha256("contracts/evidence-layout-v1.json")[:12]),
+               ("ScheduleSha", compare["inputs"]["schedule_sha256"][:12]), ("ToolVersion", primary["tool"]["version"]),
+               ("ToolGitSha", primary["tool"]["git_sha"]), ("ProtocolFrozen", str(primary["contract"]["protocol_frozen"]).lower()),
+               ("BootDraws", grouped(primary["bootstrap"]["draws"])), ("Scheduled", str(cand["scheduled_cells"])),
+               ("Uninformative", str(cand["uninformative_cells"])), ("Families", str(cand["families"])),
+               ("ArmCount", str(len(primary["arms"]))), ("ThirdPartyCount", str(len(third)))]
+    entries += [(k, grouped(float(v)) if v.isdigit() else v) for k, v in consts.items()]
+    entries.append(("TreeDepth", str(int(math.log2(int(consts["TreeLeaves"]))))))
+    for t in cand["tasks"]:
+        entries.append((f"{t['task'].capitalize()}Families", str(t["families"])))
+    entries += contract_macros(kpi, fid, layout)
+    for role, arm_id in roles.items():
+        entries += arm_macros(role, by_id[arm_id])
+    entries += comparison_macros(comp, compare)
+    if hero:
+        entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
+    names = [k for k, _ in entries]
+    if len(names) != len(set(names)):
+        raise RenderError(f"duplicate macro names: {sorted({n for n in names if names.count(n) > 1})}")
+    lines = ["% Generated by docs/whitepaper-v3/scripts/render_v3_paper.py -- DO NOT EDIT BY HAND.",
+             r"\newcommand{\VThree}[1]{\ifcsname VThree@#1\endcsname\csname VThree@#1\endcsname"
+             r"\else\PackageError{dope-v3}{undefined receipt macro #1}{Re-run render_v3_paper.py}\fi}"]
+    lines += [rf"\expandafter\newcommand\csname VThree@{k}\endcsname{{{v}}}" for k, v in entries]
+    out = {"macros": "\n".join(lines) + "\n",
+           "arms": tables.render_arm_table(primary["arms"], third, roles["Cand"]),
+           "comparison": tables.render_comparison_table(comp)}
+    inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
+                    | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
+                       "contracts/evidence-layout-v1.json"} | rust_files | ({METHODS_RECEIPT} if methods else set()))
+    manifest = {"schema": "dope.whitepaper-v3-render/v1", "hero": hero,
+                "inputs": {rel: sha256(rel) for rel in inputs},
+                "outputs": {OUT[k]: hashlib.sha256(v.encode()).hexdigest() for k, v in out.items()}}
+    out["manifest"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    return out, prose_errors(primary, comp, roles, third)
 
-    primary = _read_json(primary_path)
-    specs = [
-        ("DOPE 3.0.0 (auto-v8)", ("dope-3.0.0-auto-v8", "dope-v3b-auto-v8", "auto-v8"), "#0f766e", "o", 90),
-        ("DOPE 2.0.0 (auto)", ("dope-2.0.0-auto",), "#1d4ed8", "^", 70),
-        ("DOPE 2.0.0 (small)", ("dope-2.0.0-small",), "#64748b", "v", 60),
-        ("DOPE 1.3.0 (small)", ("dope-1.3.0-small",), "#94a3b8", "D", 55),
-        ("DSE8 P0 (analytic)", ("dse8-p0-v3b", "dse8-p0"), "#0284c7", "s", 65),
-        ("DSE7 Step-0", ("pr390-v7-step0", "v7-step0"), "#b45309", "P", 60),
-    ]
-    found = [(lbl, _find_arm(primary, hints), col, mk, sz) for lbl, hints, col, mk, sz in specs]
-    found = [x for x in found if isinstance(x[1], dict)]
-    if len(found) < 2:
-        return False
 
-    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(10.5, 3.8), dpi=220)
-    for lbl, arm, col, mk, sz in found:
-        pr = arm["primary"]
-        med_b = float((arm.get("bytes") or {}).get("median", 2048.0))
-        y, lo, hi = float(pr["trg"]), float(pr["ci_low"]), float(pr["ci_high"])
-        ax0.errorbar(
-            med_b, y, yerr=[[max(0.0, y - lo)], [max(0.0, hi - y)]],
-            fmt=mk, color=col, markersize=7.5 if sz > 75 else 6.0, capsize=3, label=lbl, lw=1.4,
-        )
-    ax0.axvline(2048.0, color="#dc2626", ls="--", lw=1.1, label="2,048 B hard cap")
-    ax0.axhline(0.0, color="#334155", ls=":", lw=0.9)
-    ax0.set_xlim(650, 2150)
-    ax0.set_xlabel("Median Serialized Artifact Size (bytes)")
-    ax0.set_ylabel("4x TRG (0 = real twin)")
-    ax0.set_title("(a) Sub-2 KiB Value Frontier (Fresh DEV Report)")
-    ax0.grid(alpha=0.25)
-    ax0.legend(fontsize=7.3, loc="lower left", frameon=True)
+def convert_hero() -> dict[str, Any]:
+    tool = shutil.which("rsvg-convert")
+    if not tool:
+        raise RenderError("--figures needs rsvg-convert (librsvg2-bin)")
+    cmd = ["rsvg-convert", "-f", "pdf", "-o", HERO_PDF, HERO_SVG]
+    (REPO / HERO_PDF).parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(cmd, cwd=REPO, check=True, env=dict(os.environ, SOURCE_DATE_EPOCH=HERO_EPOCH))
+    version = subprocess.run([tool, "--version"], capture_output=True, text=True, check=True).stdout.strip()
+    return {"source": HERO_SVG, "source_sha256": sha256(HERO_SVG), "output": HERO_PDF,
+            "output_sha256": sha256(HERO_PDF), "tool": version,
+            "command": f"SOURCE_DATE_EPOCH={HERO_EPOCH} " + " ".join(cmd)}
 
-    tasks = ["regression", "binary", "multiclass", "mlp"]
-    tlabels = ["Regression", "Binary", "Multiclass", "Held-out MLP"]
-    show = [found[0], found[1], found[2], found[4]] if len(found) >= 5 else found[:4]
-    w = 0.8 / max(len(show), 1)
-    xs = list(range(len(tasks)))
-    for i, (lbl, arm, col, _mk, _sz) in enumerate(show):
-        vals = []
-        for tk in tasks:
-            v = arm.get("mlp_trg") if tk == "mlp" else _task_val(arm.get("primary"), tk)
-            vals.append(float(v) if isinstance(v, (int, float)) else 0.0)
-        offs = [x - 0.4 + (i + 0.5) * w for x in xs]
-        ax1.bar(offs, vals, width=w * 0.92, color=col, alpha=0.92, label=lbl)
-    ax1.axhline(0.0, color="#334155", lw=0.9)
-    ax1.set_xticks(xs)
-    ax1.set_xticklabels(tlabels, fontsize=8.5)
-    ax1.set_ylabel("TRG (higher is better)")
-    ax1.set_title("(b) Per-Task & Held-Out MLP Breakdown")
-    ax1.grid(axis="y", alpha=0.25)
-    ax1.legend(fontsize=7.3, loc="lower left", frameon=True)
 
-    fig.tight_layout()
-    out_fig = repo_root / "docs/whitepaper-v3/figures/v3-frontier-and-tasks.pdf"
-    out_fig.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_fig, bbox_inches="tight")
-    plt.close(fig)
-    return True
+def hero_errors(hero: dict[str, Any] | None) -> list[str]:
+    if not hero:
+        return ["no hero provenance recorded; run render_v3_paper.py --figures"]
+    errors = []
+    scoreboard = read_json(f"{SCOREBOARD}/render-manifest.json")["files"].get(HERO_SVG)
+    if sha256(HERO_SVG) != hero["source_sha256"]:
+        errors.append(f"{HERO_SVG} changed since {HERO_PDF} was converted; run --figures")
+    if scoreboard != hero["source_sha256"]:
+        errors.append("hero SVG SHA-256 differs from the scoreboard render-manifest.json entry")
+    if not (REPO / HERO_PDF).is_file() or sha256(HERO_PDF) != hero["output_sha256"]:
+        return errors + [f"{HERO_PDF} is not the recorded conversion output; run --figures"]
+    if not shutil.which("pdftotext"):
+        return errors + ["pdftotext (poppler-utils) is required to verify the hero PDF text"]
+    text = subprocess.run(["pdftotext", "-raw", str(REPO / HERO_PDF), "-"], capture_output=True,
+                          text=True, check=True).stdout
+    flat = re.sub(r"\s+", "", text)
+    svg = (REPO / HERO_SVG).read_text(encoding="utf-8")
+    for item in re.findall(r"<text[^>]*>([^<]*)</text>", svg):
+        if re.sub(r"\s+", "", html.unescape(item)) not in flat:
+            errors.append(f"hero PDF lacks the SVG text {html.unescape(item)!r}")
+    return errors
+
+
+def lint_tex(rel: str, text: str) -> list[str]:
+    """Digits typed into prose; every quantity must come from a \\VThree macro."""
+    originals = text.splitlines()
+    body = "\n".join(re.sub(r"(?<!\\)%.*", "", line) for line in originals)
+    body = LINT_MATH.sub(lambda m: LINT_STRUCTURAL.sub(" ", m.group(0)), body)
+    errors = []
+    for no, line in enumerate(body.splitlines(), 1):
+        for phrase in LINT_ALLOW:
+            line = line.replace(phrase, " ")
+        for pattern in LINT_STRIP:
+            line = re.sub(pattern, " ", line)
+        if re.search(r"\d", line):
+            errors.append(f"{rel}:{no}: hand-typed digit outside a \\VThree macro: {originals[no - 1].strip()[:90]}")
+    return errors
+
+
+def paper_errors(macros: str) -> list[str]:
+    defined = set(re.findall(r"\\csname VThree@([^\\]+)\\endcsname\{", macros))
+    errors, used = [], set()
+    main = (REPO / "docs/whitepaper-v3/dope-v3.tex").read_text(encoding="utf-8")
+    body = main[main.index(r"\begin{document}"):]
+    sources = [("docs/whitepaper-v3/dope-v3.tex", body)]
+    sources += [(p.relative_to(REPO).as_posix(), p.read_text(encoding="utf-8"))
+                for p in sorted((REPO / "docs/whitepaper-v3/sections").glob("*.tex"))]
+    for rel, text in sources:
+        errors += lint_tex(rel, text)
+        used |= set(re.findall(r"\\VThree\{([^{}]*)\}", text))
+    return errors + [f"undefined macro \\VThree{{{n}}}" for n in sorted(used - defined)]
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Render or verify DOPE v3.0.0 white paper macros")
-    ap.add_argument("--check", action="store_true", help="Exit nonzero if generated macro file drifts")
-    ap.add_argument("--figures", action="store_true", help="Render vector PDF figures from receipts")
-    ap.add_argument("--receipt-dir", type=Path, default=None, help="Override scoreboard v3.0.0 directory")
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--check", action="store_true", help="write nothing; fail on drift, provenance or lint")
+    ap.add_argument("--figures", action="store_true", help="convert the README hero SVG to PDF first")
     args = ap.parse_args()
-    repo_root = Path(__file__).resolve().parents[3]
-    out_path = repo_root / "docs/whitepaper-v3/generated/v3-macros.tex"
-    rendered = render_macros(repo_root, args.receipt_dir)
+    manifest_path = REPO / OUT["manifest"]
+    old = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
+    try:
+        hero = convert_hero() if args.figures and not args.check else old.get("hero")
+        errors = hero_errors(hero)
+        out, prose = render(hero)
+    except (RenderError, KeyError, subprocess.CalledProcessError, tables.TableError) as err:
+        print(f"render_v3_paper: {err}", file=sys.stderr)
+        return 1
+    errors += prose + paper_errors(out["macros"])
     if args.check:
-        if not out_path.is_file() or out_path.read_text(encoding="utf-8") != rendered:
-            print(f"DRIFT: {out_path} does not match committed v3.0.0 receipts!", file=sys.stderr)
-            return 1
-        print(f"OK: {out_path} matches committed v3.0.0 receipts.")
-        return 0
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(rendered, encoding="utf-8")
-    print(f"Wrote {out_path} ({len(rendered)} bytes)")
-    if args.figures and render_figures(repo_root, args.receipt_dir):
-        print("Rendered docs/whitepaper-v3/figures/v3-frontier-and-tasks.pdf")
-    return 0
+        for key, text in out.items():
+            path = REPO / OUT[key]
+            if not path.is_file() or path.read_text(encoding="utf-8") != text:
+                errors.append(f"DRIFT: {OUT[key]} differs from its rendering; run render_v3_paper.py")
+    else:
+        for key, text in out.items():
+            (REPO / OUT[key]).parent.mkdir(parents=True, exist_ok=True)
+            (REPO / OUT[key]).write_text(text, encoding="utf-8")
+            print(f"wrote {OUT[key]}")
+    for err in errors:
+        print(f"render_v3_paper: {err}", file=sys.stderr)
+    if not errors and args.check:
+        print("OK: generated files, hero provenance, prose claims and the digit lint match the committed inputs")
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":
