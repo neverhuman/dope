@@ -165,7 +165,7 @@ Built from T0–T3 tiers as (value, z, mask) triples, FIT-only, k ≥ 10, comput
 - header and group map;
 - scale card for continuous columns only;
 - support class, atoms, lattice, heaping;
-- categorical intercepts with arg-max decode;
+- categorical intercepts: the decoder samples one level per group from its categorical conditional and writes the exclusive one-hot. Nothing is decoded by arg-max, and Y is always sampled;
 - knots with tail shape;
 - loadings with κ;
 - regimes / class means;
