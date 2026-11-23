@@ -172,7 +172,8 @@ pub(crate) fn compact_marginals(catf: &mut CatfModel, max_k: usize, trim_extra: 
                     let new_k = nv.len();
                     *values = nv;
                     *probs = np;
-                    if let Some(cond) = catf.conditionals.iter_mut().find(|c| c.col_idx == col_idx) {
+                    if let Some(cond) = catf.conditionals.iter_mut().find(|c| c.col_idx == col_idx)
+                    {
                         cond.k_bins = new_k;
                         cond.trees.clear();
                     }

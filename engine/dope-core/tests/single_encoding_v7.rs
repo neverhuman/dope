@@ -434,13 +434,15 @@ fn dse7_v2_self_contained_budget_roundtrip_and_v72_loader() {
     let mut columns: Vec<Vec<String>> = Vec::with_capacity(n_feat + 1);
     for j in 0..n_feat {
         headers.push(format!("d{j}"));
-        let vals: Vec<String> = (0..n)
-            .map(|r| format!("{}", (r + j * 3) % 10))
-            .collect();
+        let vals: Vec<String> = (0..n).map(|r| format!("{}", (r + j * 3) % 10)).collect();
         columns.push(vals);
     }
     headers.push("y".into());
-    columns.push((0..n).map(|r| format!("{:.3}", (r % 10) as f64 + 0.1 * rng.normal())).collect());
+    columns.push(
+        (0..n)
+            .map(|r| format!("{:.3}", (r % 10) as f64 + 0.1 * rng.normal()))
+            .collect(),
+    );
     let raw = RawTable { headers, columns };
     let fit_ok = fit_v2(
         &raw,
