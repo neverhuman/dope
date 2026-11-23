@@ -108,7 +108,7 @@ fn only_a_native_control_has_cells_that_cannot_exist() {
     let twin = unsupported("t1", LINEAR);
     let control = Arm::sorted("twin_c", String::new(), vec![twin.clone()]);
     let states = cell_states(&protocol(), &control, 4, &all);
-    let na = CellState::NotApplicable { in_statistic: true };
+    let na = TrgCellState::NotApplicable { in_statistic: true };
     assert_eq!(states["p:t1:full:d0"], na);
     assert!(states["p:t1:full:d0"].in_statistic());
     // Any other arm has failed the cell, whatever class its log claims.
@@ -135,7 +135,7 @@ fn a_cell_informative_only_for_the_held_out_auditor_is_not_a_statistic_cell() {
     let state = &states["p:t1:full:d0"];
     assert_eq!(
         *state,
-        CellState::NotApplicable {
+        TrgCellState::NotApplicable {
             in_statistic: false
         }
     );

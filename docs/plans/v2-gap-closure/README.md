@@ -213,7 +213,7 @@ rows, so the scoreboard sets `group_duplicates: true` itself.
 | `compare.rs` (`primary`, `compare`, `null`) | Primary statistic, stratified family bootstrap, guards, receipt; A/A null from ≥ 2,000 label-swap replicates | `dvs/v3/qualify.rs`, `evaluate_v3` |
 | `research/levels/s3_emit.py` (Python, the only one) | PyTorch checkpoint → packet bytes → rows with **sampled** labels as `DOPEMAT1` files; failures are rows, never skips | `S3CorpusStore`, V6 encode/decode |
 
-Definitions (written into `contracts/dope-kpi-v2.json`, frozen by hash in M4):
+Definitions (written into `contracts/dope-kpi.json`, frozen by hash in M4):
 - **Cell**: n_T = clamp(0.30·G, 200, 2000) duplicate-groups; n_A = n_B ≤ 1024;
   headline iff n_A, n_T ≥ 200, else a separately reported small-n stratum.
   Every stream = sha256(panel, table, data seed, sample seed, purpose).
@@ -310,7 +310,7 @@ one, i.e. ≈ 100–220 episodes/s on the 16 always-free cores (3.6–8× the ol
   DEV-SELECT / DEV-CONFIRM / SEALED (≥ 90 families); every old-val family stays
   out of train; old-vs-new comparisons only on LEGACY; a model is eligible for
   CONFIRM/SEALED only if trained from scratch on the new train split.
-- Freeze `contracts/dope-kpi-v2.json` (statistic, roster, tiers, clip bounds,
+- Freeze `contracts/dope-kpi.json` (statistic, roster, tiers, clip bounds,
   guards, decision rule, the 0.5 / 1 / 2 / 4 KiB byte grid with the 2 KiB
   headline) before any trained-model outcome is read.
 - **Promotion rule**: PROMOTE iff the 2.5th percentile of ΔTRG > 0 on

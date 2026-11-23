@@ -9,7 +9,7 @@ use super::primary::summarize;
 use super::receipt::{receipt_bytes, Context};
 use super::rule::{Check, Outcome};
 use super::stat_testing::{arm_of, context, edit, with_guard_fields, MLP};
-use super::trg::CellState;
+use super::trg::TrgCellState;
 
 const DRAWS: f64 = 10_000.0;
 
@@ -196,7 +196,7 @@ fn inapplicable_cells_leave_the_arm_and_every_comparison() {
     let states = super::trg::cell_states(&ctx.contract.protocol(), ctx.arm("twin_c"), 4, &|_| true);
     assert_eq!(
         states["p:t3:full:d0"],
-        CellState::NotApplicable { in_statistic: true }
+        TrgCellState::NotApplicable { in_statistic: true }
     );
     assert_eq!(
         (s.primary.scheduled_cells, s.primary.uninformative_cells),

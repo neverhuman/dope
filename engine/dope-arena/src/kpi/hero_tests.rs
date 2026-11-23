@@ -7,12 +7,12 @@ use super::hero_layout::{
     byte_domain, text_width, trg_steps, wrap, Anchor, Candidate, Placer, Rect,
 };
 use super::hero_model::{
-    budget_text, bytes_text, esc, tick_text, trg_text, Hero, Point, Reference, Theme, Tier,
+    budget_text, bytes_text, esc, tick_text, trg_text, Emphasis, Hero, Point, Reference, Theme,
     DEFAULT_TITLE,
 };
 use super::hero_svg::{draw, render};
 
-fn point(label: &str, bytes: f64, trg: f64, half: f64, tier: Tier) -> Point {
+fn point(label: &str, bytes: f64, trg: f64, half: f64, tier: Emphasis) -> Point {
     Point {
         label: label.to_string(),
         bytes,
@@ -38,11 +38,11 @@ pub fn fixture() -> Hero {
                 .to_string(),
         ),
         points: vec![
-            point("DOPE v2.0.0", 1462.0, -0.232, 0.108, Tier::Highlight),
-            point("DOPE v1.3.0", 1462.0, -0.234, 0.108, Tier::Previous),
-            point("v7 step 0 (PR 390)", 535.0, -0.381, 0.071, Tier::Other),
-            point("format2 2 KiB (PR 390)", 1992.0, -0.454, 0.097, Tier::Other),
-            point("SDV Gaussian copula", 105_848.0, -0.686, 0.069, Tier::Other),
+            point("DOPE v2.0.0", 1462.0, -0.232, 0.108, Emphasis::Highlight),
+            point("DOPE v1.3.0", 1462.0, -0.234, 0.108, Emphasis::Previous),
+            point("v7 step 0 (PR 390)", 535.0, -0.381, 0.071, Emphasis::Other),
+            point("format2 2 KiB (PR 390)", 1992.0, -0.454, 0.097, Emphasis::Other),
+            point("SDV Gaussian copula", 105_848.0, -0.686, 0.069, Emphasis::Other),
         ],
         references: vec![
             reference("keep the training rows (copy of A)", -0.030),
@@ -311,7 +311,7 @@ fn the_dark_theme_uses_only_dark_tokens() {
 fn the_budget_is_a_line_not_a_filter() {
     let mut hero = fixture();
     hero.points.retain(|p| p.bytes > 2048.0);
-    hero.points[0].tier = Tier::Highlight;
+    hero.points[0].tier = Emphasis::Highlight;
     let svg = render(&hero, Theme::Light);
     well_formed(&svg).unwrap();
     assert_eq!(
@@ -322,7 +322,7 @@ fn the_budget_is_a_line_not_a_filter() {
     assert_eq!(count(&svg, "class=\"budget\""), 1);
     assert!(svg.contains(">100 KiB</text>") && svg.contains(">1 KiB</text>"));
     // No highlight, no previous release and no controls: the key shrinks.
-    hero.points[0].tier = Tier::Other;
+    hero.points[0].tier = Emphasis::Other;
     hero.references.clear();
     let svg = render(&hero, Theme::Light);
     assert!(!svg.contains(">controls</text>") && !svg.contains(">previous release</text>"));

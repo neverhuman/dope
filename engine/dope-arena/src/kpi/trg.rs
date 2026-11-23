@@ -192,7 +192,7 @@ pub struct CellScore {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum CellState {
+pub enum TrgCellState {
     /// A control that cannot exist for the cell; `in_statistic` when a
     /// statistic auditor is informative there (else only the held-out one is).
     NotApplicable {
@@ -201,19 +201,19 @@ pub enum CellState {
     Scored(CellScore),
 }
 
-impl CellState {
+impl TrgCellState {
     pub fn score(&self) -> Option<&CellScore> {
         match self {
-            CellState::Scored(score) => Some(score),
-            CellState::NotApplicable { .. } => None,
+            TrgCellState::Scored(score) => Some(score),
+            TrgCellState::NotApplicable { .. } => None,
         }
     }
 
     /// A cell of the statistic: some statistic auditor is informative.
     pub fn in_statistic(&self) -> bool {
         match self {
-            CellState::Scored(score) => score.trg.is_some(),
-            CellState::NotApplicable { in_statistic } => *in_statistic,
+            TrgCellState::Scored(score) => score.trg.is_some(),
+            TrgCellState::NotApplicable { in_statistic } => *in_statistic,
         }
     }
 }
@@ -225,7 +225,7 @@ pub fn cell_states(
     arm: &Arm,
     multiplier: u32,
     keep: &dyn Fn(&str) -> bool,
-) -> BTreeMap<String, CellState> {
+) -> BTreeMap<String, TrgCellState> {
     let mut out = BTreeMap::new();
     let rows = &arm.rows;
     let control = is_control_arm(&arm.id);
@@ -260,7 +260,7 @@ pub fn cell_states(
             continue;
         }
         let state = if stat.iter().chain(&mlp).any(|u| u.not_applicable > 0) {
-            CellState::NotApplicable {
+            TrgCellState::NotApplicable {
                 in_statistic: !stat.is_empty(),
             }
         } else {
@@ -270,7 +270,7 @@ pub fn cell_states(
                     .fold(Tally::default(), Tally::merge)
                     .share()
             };
-            CellState::Scored(CellScore {
+            TrgCellState::Scored(CellScore {
                 family_id: first.family_id.clone(),
                 task,
                 trg: stat.iter().map(|u| u.value).reduce(f64::min),
@@ -359,11 +359,11 @@ impl Families {
 }
 
 /// Families of the TRG values of the scored cells.
-pub fn trg_families(cells: &BTreeMap<String, CellState>) -> Families {
+pub fn trg_families(cells: &BTreeMap<String, TrgCellState>) -> Families {
     Families::from_cells(
         cells
             .values()
-            .filter_map(CellState::score)
+            .filter_map(TrgCellState::score)
             .filter_map(|c| c.trg.map(|value| (c.task, c.family_id.as_str(), value))),
     )
 }

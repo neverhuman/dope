@@ -41,7 +41,7 @@ pub struct RunArgs {
     /// Table hashes, one per line, defining the DEV families.
     #[arg(long)]
     pub dev_tables: Option<PathBuf>,
-    /// Contract to apply (default: the compiled `contracts/dope-kpi-v2.json`).
+    /// Contract to apply (default: the compiled `contracts/dope-kpi.json`).
     #[arg(long)]
     pub contract: Option<PathBuf>,
     /// Bootstrap seed (default: the contract's).

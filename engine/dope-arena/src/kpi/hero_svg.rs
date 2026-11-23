@@ -17,7 +17,9 @@ use super::hero_labels::{place, Guides, Label, Mark};
 use super::hero_layout::{
     baseline, byte_domain, text_width, trg_steps, wrap, Anchor, Axis, Rect, BYTE_TICKS, TRG_STEP,
 };
-use super::hero_model::{coord, describe, esc, point_title, tick_text, Hero, Theme, Tier, Tokens};
+use super::hero_model::{
+    coord, describe, esc, point_title, tick_text, Emphasis, Hero, Theme, Tokens,
+};
 
 pub const WIDTH: f64 = 960.0;
 pub const HEIGHT: f64 = 540.0;
@@ -161,14 +163,14 @@ impl KeyMark {
 /// The key: highlight, earlier releases, other methods, controls (those present).
 fn key_items(hero: &Hero, t: &Tokens) -> Vec<(KeyMark, String)> {
     let mut items = Vec::new();
-    if let Some(p) = hero.points.iter().find(|p| p.tier == Tier::Highlight) {
+    if let Some(p) = hero.points.iter().find(|p| p.tier == Emphasis::Highlight) {
         items.push((KeyMark::Dot(t.accent, 5.0), p.label.clone()));
     }
-    if hero.points.iter().any(|p| p.tier == Tier::Previous) {
+    if hero.points.iter().any(|p| p.tier == Emphasis::Previous) {
         let text = "previous release".to_string();
         items.push((KeyMark::Dot(t.accent_light, 4.0), text));
     }
-    if hero.points.iter().any(|p| p.tier == Tier::Other) {
+    if hero.points.iter().any(|p| p.tier == Emphasis::Other) {
         items.push((KeyMark::Dot(t.gray, 4.0), "other methods".to_string()));
     }
     if !hero.references.is_empty() {
@@ -291,7 +293,11 @@ fn axes(svg: &mut Svg, f: &Frame, t: &Tokens) {
 
 fn marks(hero: &Hero, f: &Frame) -> Vec<Mark> {
     let mark = |p: &super::hero_model::Point| {
-        let r = if p.tier == Tier::Highlight { 5.0 } else { 4.0 };
+        let r = if p.tier == Emphasis::Highlight {
+            5.0
+        } else {
+            4.0
+        };
         let cy = f.ys.at(p.trg);
         Mark {
             cx: f.xs.at(p.bytes.log10()),

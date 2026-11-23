@@ -25,7 +25,7 @@ use super::boot::BootPlan;
 use super::receipt::{write_receipt, Context, RunArgs};
 use super::rundir::{Arm, KpiRow, STATUS_OK, STATUS_OVER_BUDGET, TASKS};
 use super::trg::{
-    cell_states, mean, scored, task_index, trg_families, CellScore, CellState, Families,
+    cell_states, mean, scored, task_index, trg_families, CellScore, Families, TrgCellState,
 };
 use dope_arena::ArenaResult;
 use serde::{Deserialize, Serialize};
@@ -202,7 +202,7 @@ pub fn statistic(ctx: &Context, arm: &Arm, multiplier: u32) -> Statistic {
     let boot = bootstrap(ctx, &families);
     let scored_cells: Vec<_> = states
         .values()
-        .filter_map(CellState::score)
+        .filter_map(TrgCellState::score)
         .filter(|c| c.trg.is_some())
         .collect();
     let in_statistic = states.values().filter(|s| s.in_statistic()).count();
@@ -300,12 +300,12 @@ pub fn scored_above_budget(ctx: &Context, arm: &Arm, keep: &dyn Fn(&str) -> bool
 /// A guard share of the cells in the statistic, aggregated like the TRG;
 /// absent when some cell lacks it.
 fn coverage(
-    states: &BTreeMap<String, CellState>,
+    states: &BTreeMap<String, TrgCellState>,
     pick: fn(&CellScore) -> Option<f64>,
 ) -> Option<f64> {
     let cells: Option<Vec<(usize, &str, f64)>> = states
         .values()
-        .filter_map(CellState::score)
+        .filter_map(TrgCellState::score)
         .filter(|c| c.trg.is_some())
         .map(|c| pick(c).map(|share| (c.task, c.family_id.as_str(), share)))
         .collect();
@@ -372,14 +372,14 @@ pub fn summarize(ctx: &Context, arm: &Arm) -> ArmSummary {
     let mlp = Families::from_cells(
         states
             .values()
-            .filter_map(CellState::score)
+            .filter_map(TrgCellState::score)
             .filter_map(|c| c.mlp.map(|v| (c.task, c.family_id.as_str(), v))),
     );
     let files = headline_files(ctx, arm, s.primary_multiplier);
     let in_statistic = |cell: &str| {
         states
             .get(cell)
-            .and_then(CellState::score)
+            .and_then(TrgCellState::score)
             .is_some_and(|c| c.trg.is_some())
     };
     let c2st: Vec<f64> = files
