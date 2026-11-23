@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 from research.levels import s3_episode_factory as ef
-from research.levels.s3_v8_feed import FactoryFeed
+from research.levels.s3_v8_feed import FactoryFeed, feed_start_step
 from research.levels.s3_view_builder import ViewConfig
 from research.levels.tests.s3_view_fixtures import NARROW
 
@@ -53,3 +53,11 @@ def test_v8_trainer_steps_on_factory_episodes(tmp_path):
     assert [r["step"] for r in rows] == [1, 2, 3]
     assert all(np.isfinite(r["grad_norm"]) for r in rows)
     assert result["steps_done"] == 3 and (tmp_path / "latest.pt").is_file()
+
+
+def test_resume_start_counts_accumulated_micro_batches():
+    assert feed_start_step(0, 1) == 1 and feed_start_step(0, 4) == 1
+    assert feed_start_step(250, 1) == 251
+    # 250 optimizer steps of 4 micro-batches used feed steps 1..1000
+    assert feed_start_step(250, 4) == 1001
+    assert feed_start_step(250, None) == 251

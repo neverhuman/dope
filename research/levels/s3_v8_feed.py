@@ -124,6 +124,12 @@ class FactoryFeed:
         self.close()
 
 
+def feed_start_step(done_steps: int, grad_accum: int | None = 1) -> int:
+    """First feed step after ``done_steps`` optimizer steps: the trainer asks for feed step
+    ``(step - 1) * grad_accum + ga + 1``, so a resumed ring skips every micro-batch already used."""
+    return max(0, done_steps) * max(1, int(grad_accum or 1)) + 1
+
+
 def v8_factory_spec(arena: str, seed: int, episodes_per_step: int, budget: int = 2048,
                     normalized_only: bool = False, **sampler: Any) -> ef.FactorySpec:
     """The v3 preset (``ef.V3_SAMPLER``), planning ``episodes_per_step`` slots, with the ``native_v8`` stage."""
@@ -148,11 +154,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     targs = tr.parse_args(argv[split + 1:])
     out = Path(targs.out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    start = 1
+    done = 0
     if getattr(targs, "resume", False) and (out / "latest.pt").is_file():
         import torch
 
-        start = int(torch.load(out / "latest.pt", map_location="cpu", weights_only=False)["step"]) + 1
+        done = int(torch.load(out / "latest.pt", map_location="cpu", weights_only=False)["step"])
+    start = feed_start_step(done, getattr(targs, "grad_accum_steps", 1))
     cpus = [int(c) for c in a.producer_cpus.split(",") if c != ""] or None
     spec = v8_factory_spec(a.arena, targs.seed, targs.episodes_per_step, budget=targs.budget_bytes,
                            normalized_only=a.normalized_only)
