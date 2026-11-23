@@ -46,7 +46,7 @@
     },
     "engine/dope-arena/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
-      "purpose": "verify unified Rust Arena splits, sealed panel checks, methods registry, swap ladder (--given), and dope-fidelity/v3 reduction"
+      "purpose": "verify unified Rust Arena splits, sealed panel checks, methods registry, swap ladder (--given), dope-fidelity/v3 reduction, and the dope_fleet_macro campaign aggregator"
     },
     "engine/dope-core/src/dvs/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test dvs --test dvs_v3",

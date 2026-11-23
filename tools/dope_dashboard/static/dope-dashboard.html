@@ -86,6 +86,20 @@ tr:hover td{background:#1b2433}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.55rem;margin-top:.55rem}
 .fact{background:#111824;border:1px solid #243043;border-radius:.5rem;padding:7px 9px}
 .fact dt{color:var(--muted);font-size:.72rem}.fact dd{margin:2px 0 0;font:650 .92rem var(--numbers)}
+.macro{margin-bottom:.85rem;display:grid;gap:.85rem}
+.macro .inner{background:var(--panel-raised)}
+.macro-tiles{display:grid;grid-template-columns:1.5fr repeat(5,minmax(0,1fr));gap:.65rem}
+.tile{min-width:0;border:1px solid #2a3647;border-radius:.6rem;background:#131b27;padding:.7rem .85rem;display:grid;align-content:start;gap:.2rem}
+.tile .stat-value{font-size:clamp(1.05rem,2vw,1.45rem)}
+.tile-hero{border-color:#2e6f5b;background:#122520}
+.tile-hero .stat-value{font-size:clamp(1.5rem,3vw,2.3rem)}
+.macro-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
+.macro-charts h3{margin-bottom:.35rem}
+.macro-cards{margin-bottom:0}
+.topo-text{line-height:1.5;margin-bottom:.5rem}
+.runs-scroll{max-height:26rem;overflow-y:auto}
+@media(max-width:1280px){.macro-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.macro-tiles,.macro-charts{grid-template-columns:1fr}}
 @media(max-width:1080px){.stats{grid-template-columns:repeat(2,1fr)}.grid2,.run-charts,.node-layout{grid-template-columns:1fr}}
 </style>
 </head>
@@ -96,7 +110,7 @@ tr:hover td{background:#1b2433}
       <span class="brandmark">DOPE</span>
       <div>
         <h1>DOPE v2.0.0 · Live Fleet &amp; Fidelity KPI Dashboard</h1>
-        <p class="secondary">S3 v250 + SCM Priors · 100% Unique Splits/Batch · Empirical Privacy Only (Formal DP Not Claimed)</p>
+        <p class="secondary">S3 v250 + SCM priors · Empirical privacy only (formal DP not claimed)</p>
       </div>
     </div>
     <div class="segmented" role="tablist" id="main-tabs">
@@ -115,9 +129,71 @@ tr:hover td{background:#1b2433}
 <main>
   <!-- TAB 1: FLEET TRAINING -->
   <div id="tab-fleet">
+    <section class="card macro" aria-labelledby="macro-title">
+      <div class="card-header">
+        <div>
+          <h2 id="macro-title">Whole campaign · all nodes</h2>
+          <p class="secondary">Every mirrored training run on every host, on one clock (5-minute buckets, UTC). Tables per second are tables completed, from each trainer's cumulative counter.</p>
+        </div>
+        <span class="badge" id="m-age">waiting for /api/macro</span>
+      </div>
+      <div class="macro-tiles">
+        <article class="tile tile-hero">
+          <p class="stat-label">Fleet tables / s · now</p>
+          <p class="stat-value kpi" id="m-tps">—</p>
+          <p class="secondary numeric" id="m-tps-sub">—</p>
+          <p class="secondary numeric" id="m-guard"></p>
+        </article>
+        <article class="tile"><p class="stat-label">Last hour</p><p class="stat-value" id="m-1h">—</p><p class="secondary numeric">mean tables / s</p></article>
+        <article class="tile"><p class="stat-label">Campaign peak</p><p class="stat-value" id="m-peak">—</p><p class="secondary numeric" id="m-peak-sub">—</p></article>
+        <article class="tile"><p class="stat-label">Tables trained</p><p class="stat-value" id="m-total">—</p><p class="secondary numeric" id="m-total-sub">—</p></article>
+        <article class="tile"><p class="stat-label">Active now</p><p class="stat-value" id="m-active">—</p><p class="secondary numeric" id="m-active-sub">—</p></article>
+        <article class="tile"><p class="stat-label">Checkpoints</p><p class="stat-value" id="m-ckpt">—</p><p class="secondary numeric" id="m-ckpt-sub">—</p></article>
+      </div>
+      <div class="macro-charts">
+        <div><h3>Fleet throughput, tables / s by host</h3>
+          <div class="chart" id="mc-tps"><canvas tabindex="0" aria-label="Fleet throughput by host over time"></canvas><p class="chart-note">No data</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-tps-legend"></div></div>
+        <div><h3>Tables trained, cumulative</h3>
+          <div class="chart" id="mc-cum"><canvas tabindex="0" aria-label="Cumulative tables trained"></canvas><p class="chart-note">No data</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-cum-legend"></div></div>
+        <div><h3>Learning: training loss relative to each run's start</h3>
+          <div class="chart" id="mc-loss"><canvas tabindex="0" aria-label="Median relative training loss"></canvas><p class="chart-note">No data</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-loss-legend"></div></div>
+        <div><h3>Checkpoints vs the untrained model (dope_kpi DEV ΔTRG)</h3>
+          <div class="chart" id="mc-ckq"><canvas tabindex="0" aria-label="Scored checkpoints against step 0"></canvas><p class="chart-note">No scored checkpoints</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-ckq-legend"></div></div>
+        <div><h3>Active runs and hosts</h3>
+          <div class="chart" id="mc-act"><canvas tabindex="0" aria-label="Active runs and hosts"></canvas><p class="chart-note">No data</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-act-legend"></div></div>
+        <div><h3>Checkpoints saved, cumulative</h3>
+          <div class="chart" id="mc-cks"><canvas tabindex="0" aria-label="Cumulative checkpoints saved"></canvas><p class="chart-note">No data</p><span class="chart-cursor"></span><div class="chart-tip"></div></div>
+          <div class="legend" id="mc-cks-legend"></div></div>
+      </div>
+      <div class="grid2 macro-cards">
+        <article class="card inner">
+          <div class="card-header"><h3>Topology and weight sharing</h3><span class="badge" id="m-topo-badge">—</span></div>
+          <p id="m-topo-text" class="topo-text">—</p>
+          <div class="table-wrap"><table><thead><tr><th class="left">Host</th><th>Runs</th><th>Data-parallel</th><th>Weight-synced</th><th>Families</th></tr></thead><tbody id="m-topo-body"></tbody></table></div>
+          <p class="secondary" id="m-topo-note"></p>
+        </article>
+        <article class="card inner">
+          <div class="card-header"><h3>Data uniqueness</h3><span class="badge" id="m-uniq-badge">—</span></div>
+          <dl class="facts" id="m-uniq-facts"></dl>
+          <p class="secondary" id="m-uniq-note"></p>
+        </article>
+      </div>
+      <article class="card inner">
+        <div class="card-header"><h3>Runs across the campaign</h3><span class="secondary" id="m-runs-count">—</span></div>
+        <div class="table-wrap runs-scroll"><table><thead><tr>
+          <th class="left">Run</th><th class="left">Host</th><th>Ranks</th><th class="left">Sync</th><th>Steps</th><th>Tables</th><th>Tables/s mean</th><th>Loss change</th><th>Ckpts</th><th>Best ΔTRG</th><th>Last row</th><th class="left">Synthetic share</th>
+        </tr></thead><tbody id="m-runs-body"></tbody></table></div>
+      </article>
+    </section>
+
     <section class="stats">
       <article class="card stat">
-        <p class="stat-label">MAIN KPI · Held-Out Unclipped Retention</p>
+        <p class="stat-label">In-run retention · trainer's DEV eval (not the release TRG)</p>
         <p class="stat-value kpi" id="kpi-ret">—</p>
         <p class="secondary numeric" id="kpi-tasks">Waiting for held-out eval…</p>
       </article>
@@ -127,9 +203,9 @@ tr:hover td{background:#1b2433}
         <p class="secondary numeric" id="kpi-gates-sub">Parity · C2ST · MargAUC · DCR · MIA</p>
       </article>
       <article class="card stat">
-        <p class="stat-label">Throughput · Unique Splits · Encoding Size</p>
+        <p class="stat-label">Live probe · Throughput · Episodes · Encoding Size</p>
         <p class="stat-value violet" id="kpi-rate">—</p>
-        <p class="secondary numeric" id="kpi-aug">Splits · Noise/Derived · Encoding Z</p>
+        <p class="secondary numeric" id="kpi-aug">Episodes · Noise/Derived · Encoding Z</p>
       </article>
       <article class="card stat">
         <p class="stat-label">10-Node Fleet &amp; Co-Host Safety</p>
@@ -244,11 +320,11 @@ tr:hover td{background:#1b2433}
   <div id="tab-diag" hidden>
     <section class="grid2">
       <article class="card">
-        <div class="card-header"><h2>Gradient Smoothing, Curriculum &amp; Unique-Batch Proof</h2></div>
+        <div class="card-header"><h2>Gradient Smoothing &amp; Curriculum</h2></div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th class="left">Run (Host)</th><th>Arch</th><th>Stage</th><th>Step</th><th>Rate</th><th>Unique Splits</th><th>Avg N_fit</th><th>Cols</th><th>Noise/Der</th><th>GradNorm</th><th>Spikes</th><th>Yields</th><th>Regret×</th><th>Enc Z</th></tr>
+              <tr><th class="left">Run (Host)</th><th>Arch</th><th>Stage</th><th>Step</th><th>Rate</th><th>Episodes</th><th>Avg N_fit</th><th>Cols</th><th>Noise/Der</th><th>GradNorm</th><th>Spikes</th><th>Yields</th><th>Regret×</th><th>Enc Z</th></tr>
             </thead>
             <tbody id="diag-train-body"></tbody>
           </table>
@@ -376,7 +452,7 @@ class CanvasChart {
 const fleetChart = new CanvasChart('fleet-chart');
 const runTrChart = new CanvasChart('run-train-chart');
 const runEvChart = new CanvasChart('run-eval-chart');
-const state = { hosts: {}, order: [], fleet: null, selectedHost: null, selectedRun: null, paused: false, tab: 'fleet', fleetMode: 'kpi', runTrMode: 'losses', runEvMode: 'tasks' };
+const state = { macro: null, macroErr: null, hosts: {}, order: [], fleet: null, selectedHost: null, selectedRun: null, paused: false, tab: 'fleet', fleetMode: 'kpi', runTrMode: 'losses', runEvMode: 'tasks' };
 
 function setLegend(id, items) {
   $(id).innerHTML = items.map(s => `<span><i class="sw" style="background:${s.color}"></i>${s.name}</span>`).join('');
@@ -396,7 +472,7 @@ function renderAll() {
   $('kpi-gates-sub').textContent = be ? `Parity ${pct(be.parity_coverage)} · C2ST ${f2(be.c2st_auc_median)} · Marg ${f2(be.marg_auc_median)} · DCR ${f2(be.dcr_share_median)} · MIA ${f2(be.mia_auc_median)}` : 'Parity · C2ST · MargAUC · DCR · MIA';
   const tps = f.tables_per_s || 0;
   $('kpi-rate').textContent = tps > 0 ? `${f2(tps)} tbl/s` : (f.active_dope_procs > 0 ? `0.00 tbl/s (warmup)` : `0.00 tbl/s (idle)`);
-  $('kpi-aug').textContent = `${(f.unique_splits_seen||0).toLocaleString()} unique splits · Enc Z ${bytesFmt(f.encoding_bytes_median)} · Grad ${f2(f.median_grad_norm)}`;
+  $('kpi-aug').textContent = `${(f.unique_splits_seen||0).toLocaleString()} episodes (trainer counter) · Enc Z ${bytesFmt(f.encoding_bytes_median)} · Grad ${f2(f.median_grad_norm)}`;
   $('kpi-nodes').textContent = `${f.live_nodes}/${f.total_nodes} live · ${f.active_dope_procs} procs`;
   $('kpi-vram').textContent = `DOPE ${f2(f.dope_vram_gib)}G · JSR ${f2(f.other_vram_gib)}G · Free ${f2(f.free_vram_gib)}G`;
 
@@ -491,7 +567,7 @@ function renderSelectedNode() {
     ['Loss / TSTR', lt ? `${f4(lt.loss)} / ${f4(lt.tstr_loss)}` : '—'],
     ['MMD / Driver', lt ? `${f4(lt.mmd_loss)} / ${f4(lt.driver_loss)}` : '—'],
     ['Grad / LR', lt ? `${f2(lt.grad_norm)} · ${lt.lr ? lt.lr.toExponential(1) : '—'}` : '—'],
-    ['Rate / Splits', lt ? `${f2(lt.tables_per_s)}/s · ${(lt.unique_splits_seen||0).toLocaleString()}` : '—'],
+    ['Rate / Episodes', lt ? `${f2(lt.tables_per_s)}/s · ${(lt.unique_splits_seen||0).toLocaleString()}` : '—'],
     ['Encoding Z', bytesFmt(lt?.encoding_bytes_avg || le?.encoding_bytes_median)],
     ['Best Main KPI', le ? f4(le.main_kpi_retention_median) : '—'],
   ].map(([k,v]) => `<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`).join('') : '';
@@ -605,6 +681,7 @@ wireGroup('main-tabs', 'aria-selected', (b) => {
   $('tab-ckpts').hidden = state.tab !== 'ckpts';
   $('tab-diag').hidden = state.tab !== 'diag';
   renderAll();
+  renderMacro();
 });
 wireGroup('fleet-tabs', 'aria-pressed', (b) => { state.fleetMode = b.dataset.mode; renderAll(); });
 wireGroup('run-tr-tabs', 'aria-pressed', (b) => { state.runTrMode = b.dataset.mode; renderSelectedNode(); });
@@ -613,8 +690,264 @@ $('pause').onclick = () => {
   state.paused = !state.paused;
   $('pause').setAttribute('aria-pressed', String(state.paused));
   $('pause').textContent = state.paused ? 'Resume updates' : 'Pause updates';
-  if (!state.paused) renderAll();
+  if (!state.paused) { renderAll(); renderMacro(); }
 };
+
+// ---- Whole campaign (dope.fleet-macro/v1 from /api/macro) ----
+const HOST_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181'];
+const OTHER_COLOR = '#8fa0b8';
+const SURFACE = '#101722';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const big = (v) => !num(v) ? '—' : v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e4 ? (v/1e3).toFixed(1)+'k' : Math.round(v).toLocaleString();
+const utc = (t, withDate) => {
+  if (!num(t)) return '—';
+  const d = new Date(t * 1000), p = (n) => String(n).padStart(2, '0');
+  const hm = `${p(d.getUTCHours())}:${p(d.getUTCMinutes())}Z`;
+  return withDate ? `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${hm}` : hm;
+};
+const ago = (t) => {
+  if (!num(t)) return '—';
+  const s = Math.max(0, Date.now() / 1000 - t);
+  return s < 120 ? `${Math.round(s)} s` : s < 7200 ? `${Math.round(s/60)} min` : s < 172800 ? `${(s/3600).toFixed(1)} h` : `${(s/86400).toFixed(1)} d`;
+};
+const signed = (v, d = 3) => !num(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+
+class MacroChart {
+  constructor(id, yFmt) {
+    this.root = $(id); this.canvas = this.root.querySelector('canvas'); this.note = this.root.querySelector('.chart-note');
+    this.cursor = this.root.querySelector('.chart-cursor'); this.tip = this.root.querySelector('.chart-tip');
+    this.yFmt = yFmt || ((v) => Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
+    this.pad = {l: 54, r: 12, t: 12, b: 24}; this.m = null; this.idx = -1;
+    this.canvas.addEventListener('mousemove', (e) => this.onMove(e));
+    this.canvas.addEventListener('mouseleave', () => { this.idx = -1; this.hideTip(); });
+    this.canvas.addEventListener('keydown', (e) => {
+      if (!this.m || !this.m.x.length) return;
+      if (e.key === 'ArrowRight') this.idx = Math.min(this.m.x.length - 1, this.idx + 1);
+      else if (e.key === 'ArrowLeft') this.idx = Math.max(0, this.idx < 0 ? this.m.x.length - 1 : this.idx - 1);
+      else return;
+      e.preventDefault(); this.showIdx(this.idx);
+    });
+  }
+  hideTip() { this.cursor.style.display = 'none'; this.tip.style.display = 'none'; }
+  // m = {x, layers:[{name,color,values}], lines:[{name,color,values,dash}], band:{lo,hi,color,name}, points:[{x,y,color,label}], refs:[{y,label}], marks:[{x,label}], zero}
+  draw(m) {
+    this.m = m;
+    const rect = this.root.getBoundingClientRect();
+    const w = Math.max(240, rect.width), h = Math.max(150, rect.height), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (this.canvas.width !== Math.round(w * dpr) || this.canvas.height !== Math.round(h * dpr)) { this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr); }
+    const ctx = this.canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    const has = m.x.length > 1 || (m.points || []).length > 0;
+    this.note.style.display = has ? 'none' : 'grid';
+    if (!has) { this.bounds = null; return; }
+    const stack = (m.layers || []).reduce((acc, L) => { const prev = acc.length ? acc[acc.length-1].top : m.x.map(() => 0); acc.push({...L, base: prev, top: prev.map((v, i) => v + (num(L.values[i]) ? L.values[i] : 0))}); return acc; }, []);
+    const ys = [...stack.flatMap(L => L.top), ...(m.lines || []).flatMap(L => L.values), ...(m.band ? [...m.band.lo, ...m.band.hi] : []), ...(m.points || []).map(p => p.y), ...(m.refs || []).map(r => r.y)].filter(num);
+    const xs = [...m.x, ...(m.points || []).map(p => p.x)].filter(num);
+    let xMin = Math.min(...xs), xMax = Math.max(...xs), yMin = Math.min(...ys), yMax = Math.max(...ys);
+    if (m.zero) { yMin = Math.min(0, yMin); yMax = Math.max(0, yMax); }
+    if (xMax <= xMin) xMax = xMin + 1;
+    if (yMax <= yMin) { yMin -= 1; yMax += 1; }
+    const span = yMax - yMin; if (!m.zero || yMin < 0) yMin -= span * 0.06; yMax += span * 0.08;
+    const {l, r, t, b} = this.pad;
+    const sx = (x) => l + ((x - xMin) / (xMax - xMin)) * (w - l - r);
+    const sy = (y) => h - b - ((y - yMin) / (yMax - yMin)) * (h - t - b);
+    this.bounds = {w, h, xMin, xMax, sx, sy};
+    ctx.font = '10.5px ui-monospace,monospace'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const yv = yMin + (i / 4) * (yMax - yMin), yy = sy(yv);
+      ctx.strokeStyle = '#1f2b3d'; ctx.beginPath(); ctx.moveTo(l, yy); ctx.lineTo(w - r, yy); ctx.stroke();
+      ctx.fillStyle = '#8fa0b8'; ctx.fillText(this.yFmt(yv), 4, yy + 3);
+    }
+    const days = (xMax - xMin) > 86400;
+    for (let i = 0; i <= 4; i++) {
+      const xv = xMin + (i / 4) * (xMax - xMin), lbl = utc(xv, days && i === 0);
+      const tw = ctx.measureText(lbl).width, px = Math.min(w - r - tw, Math.max(l, sx(xv) - tw / 2));
+      ctx.fillStyle = '#8fa0b8'; ctx.fillText(lbl, px, h - 7);
+    }
+    for (const mk of (m.marks || [])) {
+      if (!num(mk.x) || mk.x < xMin || mk.x > xMax) continue;
+      ctx.strokeStyle = '#6e5028'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(sx(mk.x), t); ctx.lineTo(sx(mk.x), h - b); ctx.stroke(); ctx.setLineDash([]);
+    }
+    for (const L of stack) {
+      ctx.fillStyle = L.color; ctx.beginPath();
+      m.x.forEach((x, i) => { const px = sx(x), py = sy(L.top[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+      for (let i = m.x.length - 1; i >= 0; i--) ctx.lineTo(sx(m.x[i]), sy(L.base[i]));
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = SURFACE; ctx.lineWidth = 1.5; ctx.beginPath();
+      m.x.forEach((x, i) => { const px = sx(x), py = sy(L.top[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke();
+    }
+    if (m.band) {
+      // One polygon per run of consecutive buckets with a band, so idle gaps stay empty.
+      ctx.fillStyle = m.band.color; ctx.globalAlpha = 0.25;
+      let i = 0;
+      while (i < m.x.length) {
+        if (!num(m.band.lo[i]) || !num(m.band.hi[i])) { i++; continue; }
+        let j = i; while (j + 1 < m.x.length && num(m.band.lo[j + 1]) && num(m.band.hi[j + 1])) j++;
+        ctx.beginPath();
+        for (let k = i; k <= j; k++) k === i ? ctx.moveTo(sx(m.x[k]), sy(m.band.hi[k])) : ctx.lineTo(sx(m.x[k]), sy(m.band.hi[k]));
+        for (let k = j; k >= i; k--) ctx.lineTo(sx(m.x[k]), sy(m.band.lo[k]));
+        ctx.closePath(); ctx.fill(); i = j + 1;
+      }
+      ctx.globalAlpha = 1;
+    }
+    (m.refs || []).forEach((rf, ri) => {
+      const yy = sy(rf.y); ctx.strokeStyle = '#7d90ab'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(l, yy); ctx.lineTo(w - r, yy); ctx.stroke(); ctx.setLineDash([]);
+      // Alternate labels above and below their lines so close references stay legible.
+      ctx.fillStyle = '#aab8cb'; const tw = ctx.measureText(rf.label).width;
+      ctx.fillText(rf.label, w - r - tw - 2, ri % 2 ? yy + 12 : yy - 4);
+    });
+    for (const L of (m.lines || [])) {
+      ctx.strokeStyle = L.color; ctx.lineWidth = 2; ctx.setLineDash(L.dash || []); ctx.beginPath(); let pen = false;
+      m.x.forEach((x, i) => { const v = L.values[i]; if (!num(v)) { pen = false; return; } const px = sx(x), py = sy(v); pen ? ctx.lineTo(px, py) : ctx.moveTo(px, py); pen = true; });
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    for (const p of (m.points || [])) {
+      ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), 4, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
+      ctx.lineWidth = 1.5; ctx.strokeStyle = SURFACE; ctx.stroke();
+    }
+    if (this.idx >= 0) this.showIdx(this.idx);
+  }
+  onMove(e) {
+    if (!this.bounds || !this.m) return;
+    const rect = this.canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    if ((this.m.points || []).length) {
+      let best = null, bd = 144;
+      for (const p of this.m.points) { const dx = this.bounds.sx(p.x) - mx, dy = this.bounds.sy(p.y) - my, d = dx*dx + dy*dy; if (d < bd) { bd = d; best = p; } }
+      if (best) { this.cursor.style.display = 'none'; this.tip.textContent = best.label; this.tip.style.display = 'block'; return; }
+    }
+    if (!this.m.x.length) { this.hideTip(); return; }
+    let best = 0, bd = Infinity;
+    this.m.x.forEach((x, i) => { const d = Math.abs(this.bounds.sx(x) - mx); if (d < bd) { bd = d; best = i; } });
+    this.idx = best; this.showIdx(best);
+  }
+  showIdx(i) {
+    const m = this.m; if (!this.bounds || !m.x.length) return;
+    this.cursor.style.left = this.bounds.sx(m.x[i]) + 'px'; this.cursor.style.display = 'block';
+    const parts = [utc(m.x[i], true)];
+    const layers = m.layers || [];
+    if (layers.length) { let tot = 0; for (const L of layers) { const v = L.values[i] || 0; tot += v; if (v > 0) parts.push(`${L.name} ${this.yFmt(v)}`); } parts.push(`total ${this.yFmt(tot)}`); }
+    for (const L of (m.lines || [])) if (num(L.values[i])) parts.push(`${L.name} ${this.yFmt(L.values[i])}`);
+    if (m.band && num(m.band.lo[i])) parts.push(`${m.band.name} ${this.yFmt(m.band.lo[i])}–${this.yFmt(m.band.hi[i])}`);
+    for (const mk of (m.marks || [])) if (Math.abs(mk.x - m.x[i]) < (m.step || 300)) parts.push(mk.label);
+    this.tip.textContent = parts.join('  ·  '); this.tip.style.display = 'block';
+  }
+}
+
+const macroCharts = {
+  tps: new MacroChart('mc-tps', (v) => v >= 100 ? v.toFixed(0) : v.toFixed(1)),
+  cum: new MacroChart('mc-cum', (v) => big(v)),
+  loss: new MacroChart('mc-loss', (v) => v.toFixed(2)),
+  ckq: new MacroChart('mc-ckq', (v) => signed(v, 3)),
+  act: new MacroChart('mc-act', (v) => v.toFixed(0)),
+  cks: new MacroChart('mc-cks', (v) => big(v)),
+};
+
+async function loadMacro() {
+  try {
+    const r = await fetch('/api/macro', {cache: 'no-store'});
+    if (!r.ok) { state.macroErr = r.status === 404 ? 'not generated yet (run dope_fleet_macro)' : `error ${r.status}`; }
+    else { state.macro = await r.json(); state.macroErr = null; }
+  } catch (e) { state.macroErr = 'unreachable'; }
+  renderMacro();
+}
+
+function renderMacro() {
+  if (state.paused || state.tab !== 'fleet') return;
+  const d = state.macro;
+  $('m-age').textContent = d ? `built ${ago(d.generated_at)} ago · ${d.inputs.runs} runs · ${d.inputs.rows.toLocaleString()} rows` : `macro ${state.macroErr || 'loading'}`;
+  if (!d) return;
+  const h = d.headline, g = d.guard;
+  $('m-tps').textContent = `${f2(h.tables_per_s_now)} tbl/s`;
+  $('m-tps-sub').textContent = h.active_runs > 0
+    ? `completed in the last ${Math.round(h.tables_per_s_now_window_s / 60)} min · trainer-reported ${f2(h.tables_per_s_reported)}`
+    : `no active runs · last training row ${ago(h.last_row_at)} ago (${utc(h.last_row_at)})`;
+  if (g && g.levels) {
+    const lv = Object.entries(g.levels).map(([k, v]) => `${k} level ${v}`).join(' · ');
+    const ev = g.last_event ? ` · last ${g.last_event.event} ${utc(g.last_event.at)} (${g.last_event.job}${Array.isArray(g.last_event.hosts) ? ' on ' + g.last_event.hosts.join(',') : ''})` : '';
+    $('m-guard').textContent = `ASR guard: ${lv}${ev}`;
+  } else $('m-guard').textContent = '';
+  $('m-1h').textContent = f2(h.tables_per_s_1h);
+  $('m-peak').textContent = h.peak ? `${f2(h.peak.tables_per_s)}` : '—';
+  $('m-peak-sub').textContent = h.peak ? `tables / s in the 5 min from ${utc(h.peak.t, true)}` : '—';
+  $('m-total').textContent = big(h.tables_total);
+  $('m-total-sub').textContent = `${h.runs_total} runs · ${h.hosts_total} hosts · ${h.run_hours} run-hours`;
+  $('m-active').textContent = `${h.active_runs} / ${h.active_hosts}`;
+  $('m-active-sub').textContent = `runs / hosts with a row in the last ${Math.round(d.active_window_s)} s`;
+  const ck = d.checkpoint_kpi, cs = ck && ck.summary && ck.summary.full;
+  $('m-ckpt').textContent = big(h.checkpoints_saved);
+  $('m-ckpt-sub').textContent = cs ? `saved · ${cs.n} scored · ${cs.above_noise} above step 0 by > ${ck.noise} · best ${signed(cs.best && cs.best.value)}` : 'saved · none scored';
+
+  const S = d.series || [], x = S.map(p => p.t), hosts = d.hosts || [];
+  const hostColor = (hst) => { const i = hosts.indexOf(hst); return i >= 0 && i < HOST_COLORS.length ? HOST_COLORS[i] : OTHER_COLOR; };
+  const marks = ((g && g.events) || []).filter(e => ['PAUSE', 'CONFIRMED_IMPACT', 'STOP'].includes(e.event)).map(e => ({x: e.at, label: `guard ${e.event} ${e.job || ''}`}));
+  const shown = hosts.slice(0, HOST_COLORS.length), rest = hosts.slice(HOST_COLORS.length);
+  const layers = shown.map(hst => ({name: hst, color: hostColor(hst), values: S.map(p => p.by_host[hst] || 0)}));
+  if (rest.length) layers.push({name: 'other hosts', color: OTHER_COLOR, values: S.map(p => rest.reduce((a, hst) => a + (p.by_host[hst] || 0), 0))});
+  macroCharts.tps.draw({x, layers, marks, zero: true, step: d.bucket_s});
+  setLegend('mc-tps-legend', [...layers, ...(marks.length ? [{name: 'ASR guard pause (dotted)', color: '#6e5028'}] : [])]);
+  macroCharts.cum.draw({x, lines: [{name: 'tables trained', color: HOST_COLORS[0], values: S.map(p => p.cum_tables)}], zero: true});
+  setLegend('mc-cum-legend', [{name: 'tables trained (episodes), all runs', color: HOST_COLORS[0]}]);
+  macroCharts.loss.draw({x, lines: [{name: 'median', color: HOST_COLORS[0], values: S.map(p => p.loss_rel_median)}], band: {name: 'p25–p75', color: HOST_COLORS[0], lo: S.map(p => p.loss_rel_p25), hi: S.map(p => p.loss_rel_p75)}, refs: [{y: 1, label: 'run start = 1.0'}]});
+  setLegend('mc-loss-legend', [{name: 'median over active runs', color: HOST_COLORS[0]}, {name: 'middle half of runs', color: '#24436d'}]);
+
+  const pts = ((ck && ck.points) || []).filter(p => p.variant === 'full' && num(p.at));
+  const fams = Array.from(new Set(pts.map(p => p.family))).sort();
+  const famColor = (f) => { const i = fams.indexOf(f); return i >= 0 && i < HOST_COLORS.length ? HOST_COLORS[i] : OTHER_COLOR; };
+  let bestSoFar = -Infinity;
+  const bestLine = pts.map(p => (bestSoFar = Math.max(bestSoFar, p.value)));
+  macroCharts.ckq.draw({
+    x: pts.map(p => p.at), lines: pts.length > 1 ? [{name: 'best so far', color: '#c3c2b7', values: bestLine, dash: [6, 3]}] : [],
+    points: pts.map(p => ({x: p.at, y: p.value, color: famColor(p.family), label: `${p.run} step ${p.step} (${p.host || '?'}) · ΔTRG ${signed(p.value)} · ${utc(p.at, true)}`})),
+    refs: ck ? [{y: ck.noise, label: `noise floor +${ck.noise}`}, {y: 0, label: 'untrained step 0'}] : [],
+  });
+  setLegend('mc-ckq-legend', [...fams.map(f => ({name: f, color: famColor(f)})), ...(pts.length > 1 ? [{name: 'best so far (dashed)', color: '#c3c2b7'}] : [])]);
+  macroCharts.act.draw({x, lines: [{name: 'runs', color: HOST_COLORS[0], values: S.map(p => p.active_runs)}, {name: 'hosts', color: HOST_COLORS[1], values: S.map(p => p.active_hosts)}], zero: true});
+  setLegend('mc-act-legend', [{name: 'active runs', color: HOST_COLORS[0]}, {name: 'active hosts', color: HOST_COLORS[1]}]);
+  macroCharts.cks.draw({x, lines: [{name: 'checkpoints', color: HOST_COLORS[2], values: S.map(p => p.cum_checkpoints)}], zero: true});
+  setLegend('mc-cks-legend', [{name: 'checkpoint files saved, all runs', color: HOST_COLORS[2]}]);
+
+  const tp = d.topology;
+  const dp = tp.data_parallel_runs || [], warm = tp.warm_started_runs || [], sg = tp.sync_groups || [];
+  $('m-topo-badge').textContent = tp.cross_run_weight_sharing ? 'some runs share weights' : 'no sharing between runs';
+  $('m-topo-badge').className = 'badge' + (tp.cross_run_weight_sharing ? ' best' : ' warn');
+  const synced = sg.reduce((a, g) => a + g.runs, 0);
+  $('m-topo-text').textContent = `${tp.independent_runs} of ${tp.runs} runs are independent models: one process, their own seed, trained from scratch. ` +
+    (dp.length ? `${dp.length} run${dp.length > 1 ? 's' : ''} used data-parallel ranks of a single model (${dp.map(r => `${r.run} ×${r.world_size}`).join(', ')}). ` : '') +
+    (sg.length ? `${synced} run${synced > 1 ? 's' : ''} exchange weights in ${sg.length} sync group${sg.length > 1 ? 's' : ''} (${sg.map(g => `${g.mode}: ${g.runs} runs on ${g.hosts} host${g.hosts > 1 ? 's' : ''}, round ${g.max_round}`).join('; ')}). ` : 'No run is in a weight-sync group. ') +
+    (warm.length ? `${warm.length} run(s) started from another run's weights.` : (sg.length ? 'No run started from another run’s weights.' : 'No run started from another run’s weights, so nothing learned on one node reaches another.'));
+  $('m-topo-body').innerHTML = (tp.hosts || []).map(r => `<tr><td class="left"><i class="sw" style="background:${hostColor(r.host)}"></i> ${esc(r.host)}</td><td class="numeric">${r.runs}</td><td class="numeric">${r.multi_rank_runs}</td><td class="numeric">${r.synced_runs ?? 0}</td><td class="numeric">${r.families}</td></tr>`).join('');
+  $('m-topo-note').textContent = tp.note || '';
+
+  const u = d.uniqueness, ex = u.exposure;
+  const exact = ex && ex.fleet;
+  $('m-uniq-badge').textContent = exact ? `exact for ${exact.runs} run(s)` : 'not deduplicated';
+  $('m-uniq-badge').className = 'badge' + (exact ? (exact.split_repeats > 0 ? ' warn' : ' best') : ' warn');
+  const facts = [
+    ['Episodes trained (trainer counter)', big(u.episodes_total)],
+    ['Real-table episodes (estimate)', big(u.real_episodes_est)],
+    ['Training tables in corpus', u.corpus_train_tables != null ? u.corpus_train_tables.toLocaleString() : '—'],
+    ['Uses per training table (estimate)', u.max_run_avg_uses_per_train_table_est != null ? `${Math.round(u.max_run_avg_uses_per_train_table_est)}× top run · ${Math.round(u.fleet_avg_uses_per_train_table_est).toLocaleString()}× fleet` : '—'],
+    ['Distinct datasets', exact ? `${exact.distinct_datasets.toLocaleString()} of ${exact.dataset_entries.toLocaleString()} uses` : 'not logged'],
+    ['Split repeats', exact ? `<span class="${exact.split_repeats > 0 ? 'bad' : 'good'}">${exact.split_repeats.toLocaleString()}</span> of ${exact.split_entries.toLocaleString()}` : 'not logged'],
+  ];
+  $('m-uniq-facts').innerHTML = facts.map(([k, v]) => `<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  const basis = Object.entries(u.synth_basis_runs || {}).map(([k, v]) => `${v} ${k.replace('_', ' ')}`).join(', ');
+  $('m-uniq-note').textContent = `The trainer counter (unique_splits_seen, now episodes_seen) counts training episodes; it is not deduplicated, and runs without exposure.jsonl do not log which dataset an episode used, so their distinct datasets and splits cannot be counted. With ${u.corpus_train_tables ?? '?'} training tables, datasets necessarily recur. Synthetic-prior share per run: ${basis}. Exact counts appear here once runs write exposure.jsonl (dataset and split hashes per step).`;
+
+  const best = {};
+  for (const p of ((ck && ck.points) || [])) if (p.variant === 'full' && (!(p.run in best) || p.value > best[p.run])) best[p.run] = p.value;
+  const runs = (d.runs || []).slice().sort((a, b) => (b.last_at || 0) - (a.last_at || 0));
+  $('m-runs-count').textContent = `${runs.length} runs, newest first`;
+  $('m-runs-body').innerHTML = runs.map(r => {
+    const share = r.synth_est != null && r.tables > 0 ? `${(100 * r.synth_est / r.tables).toFixed(0)}% (${r.synth_basis.replace('_', ' ')})` : r.synth_basis.replace('_', ' ');
+    const lc = num(r.loss_change_pct) ? `${r.loss_change_pct > 0 ? '+' : r.loss_change_pct < 0 ? '−' : ''}${Math.abs(r.loss_change_pct).toFixed(1)}%` : '—';
+    const bt = r.run in best ? `<span class="${best[r.run] > (ck.noise || 0.01) ? 'good' : best[r.run] < 0 ? 'bad' : ''}">${signed(best[r.run])}</span>` : '—';
+    return `<tr><td class="left"><strong>${esc(r.run)}</strong>${r.active ? ' <span class="badge best">LIVE</span>' : ''}</td><td class="left"><i class="sw" style="background:${hostColor(r.host)}"></i> ${esc(r.host)}</td>
+      <td class="numeric">${r.world_size}</td><td class="left muted">${esc(r.sync_mode || '—')}${r.sync_rounds ? ` · round ${r.sync_rounds}` : ''}</td><td class="numeric">${(r.last_step ?? 0).toLocaleString()}</td><td class="numeric">${big(r.tables)}</td>
+      <td class="numeric">${f2(r.tables_per_s_mean)}</td><td class="numeric">${lc}</td><td class="numeric">${r.checkpoints_saved}</td><td class="numeric">${bt}</td>
+      <td class="numeric">${ago(r.last_at)} ago</td><td class="left muted">${esc(share)}</td></tr>`;
+  }).join('');
+}
 
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -634,7 +967,9 @@ function connect() {
   };
 }
 connect();
-window.addEventListener('resize', () => renderAll());
+loadMacro();
+setInterval(loadMacro, 30000);
+window.addEventListener('resize', () => { renderAll(); renderMacro(); });
 </script>
 </body>
 </html>

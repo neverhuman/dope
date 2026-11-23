@@ -96,5 +96,28 @@ class TestDopeDashboardServer(AioHTTPTestCase):
         self.assertEqual(payload["fleet"]["total_nodes"], 2)
 
 
+class TestDopeDashboardMacro(AioHTTPTestCase):
+    async def get_application(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.macro = Path(self._tmp.name) / "fleet_macro.json"
+        self.macro.write_text(json.dumps({"schema": "dope.fleet-macro/v1", "headline": {"tables_per_s_now": 0.0}}), encoding="utf-8")
+        return build_app(DopeFleetState(("xbabe0",)), self.macro)
+
+    async def tearDownAsync(self) -> None:
+        self._tmp.cleanup()
+
+    async def test_macro_route_serves_and_reports_missing(self) -> None:
+        resp = await self.client.get("/api/macro")
+        self.assertEqual(resp.status, 200)
+        self.assertEqual((await resp.json())["schema"], "dope.fleet-macro/v1")
+        self.macro.write_text("{not json", encoding="utf-8")
+        self.assertEqual((await self.client.get("/api/macro")).status, 503)
+        self.macro.unlink()
+        self.assertEqual((await self.client.get("/api/macro")).status, 404)
+        body = await (await self.client.get("/")).text()
+        self.assertIn("Whole campaign", body)
+        self.assertIn("/api/macro", body)
+
+
 if __name__ == "__main__":
     unittest.main()
