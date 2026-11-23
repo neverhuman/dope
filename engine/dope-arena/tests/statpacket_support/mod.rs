@@ -166,7 +166,7 @@ pub fn binary_fixture() -> Fixture {
         for (j, slot) in x.iter_mut().enumerate().skip(6) {
             *slot = 0.4 * g[j % 2] + rng.normal();
         }
-        let logit = -2.75 + 1.1 * x[0] - 0.8 * x[2] + 0.9 * x[3] + 0.5 * x[6] - 0.4 * x[7];
+        let logit = -3.0 + 1.1 * x[0] - 0.8 * x[2] + 0.9 * x[3] + 0.5 * x[6] - 0.4 * x[7];
         all.y
             .push((rng.unit() < 1.0 / (1.0 + (-logit).exp())) as u8 as f64);
         x[1] = 50.0 + 8.0 * x[1];
