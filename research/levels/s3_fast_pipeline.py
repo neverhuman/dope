@@ -17,7 +17,6 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import hashlib
 import json
-import math
 from pathlib import Path
 import queue
 import threading

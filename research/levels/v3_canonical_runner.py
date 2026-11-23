@@ -26,7 +26,7 @@ from .v3_canonical_roster_eval import (
     unpack_copula_complete_wire, unpack_rows_complete_wire,
 )
 from .v3_ledger_replay import _load_single_mc_cell
-from .world_class_eval import DEFAULT_BUNDLE, DEFAULT_SOURCE_CACHE, compute_elo_ratings
+from .world_class_eval import DEFAULT_BUNDLE, DEFAULT_SOURCE_CACHE
 from . import v3_canonical_summary as _canonical_summary
 
 

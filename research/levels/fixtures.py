@@ -1,12 +1,11 @@
 """Generate tiny synthetic operator-parity fixtures, not a production model."""
 from dataclasses import replace
-import json
 from pathlib import Path
 import torch
 from safetensors.torch import save_file
 from .checkpoints import private_json, save_checkpoint
 from .cli import source_fingerprint
-from .contracts import ModelConfig, TrainConfig, digest, LAYOUT_V2, V2_GRAPHS, LANDMARK_GRAPHS, level_widths
+from .contracts import ModelConfig, TrainConfig, LAYOUT_V2, V2_GRAPHS, LANDMARK_GRAPHS, level_widths
 from .data import episode
 from .losses import objective
 from .model import SharedModel,tensors

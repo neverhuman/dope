@@ -20,17 +20,14 @@ import json
 import math
 from pathlib import Path
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 import numpy as np
 
 from .descriptors import (
     FINE_ADDED_INDICES,
     LANDMARK_NAMES,
-    LARGER_ADDED_INDICES,
     MACRO_INDICES,
-    compute_table_descriptors,
     extract_report_descriptors,
-    squash,
 )
 from .scaling import FitOnlyTableTransform
 
@@ -275,7 +272,7 @@ def run_experiment_0b(
     from catboost import CatBoostClassifier, CatBoostRegressor
     from lightgbm import LGBMClassifier, LGBMRegressor
     from sklearn.linear_model import LogisticRegression, Ridge
-    from sklearn.metrics import accuracy_score, r2_score, roc_auc_score
+    from sklearn.metrics import r2_score, roc_auc_score
     from scipy.stats import spearmanr
 
     t0 = time.time()
