@@ -144,27 +144,29 @@ Table~\ref{tab:v2-kpi} summarizes the receipt-bound comparison at the $\le 2\,\t
 
 \begin{table}[t]
   \centering
+  \small
   \caption{\textbf{Receipt-Bound Sub-2\,KiB Comparison (\texttt{dope\_kpi}, Scope: \texttt{\VTwo{KpiEvidenceState}}, \VTwo{KpiPanelCells} cells).}
   Values render directly from committed CONFIRM receipts (\texttt{[pending]} denotes receipts awaiting final frozen scoring).}
   \label{tab:v2-kpi}
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{@{}llll@{}}
     \toprule
-    Encoder / Artifact Class & Wire Cap & Checkpoint Size & Twin-Referenced Gain (TRG, 95\% CI) \\
+    Encoder / Artifact Class & Wire Cap & Checkpoint Size & TRG (95\% CI) \\
     \midrule
     Signed \texttt{\VTwo{PriorSignedTag}} (\texttt{small}) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiBaselineTrg} \\
     Format~2 v2.2.1 (Fidelity Engine 2.0) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiFormat2Trg} \\
     \texttt{DSE7} v2 Zero-Init (Step~0 Analytic) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiV7Step0Trg} \\
     \texttt{SingleEncV7} (\texttt{\VTwo{CkptId}}) & $\le 2{,}048\,\text{B}$ & \VTwo{CkptBytesMB} (\VTwo{CkptParams} params) & \VTwo{KpiV7WinnerTrg} \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 \section{Pure-Rust Runtime, Bit-Parity, and Signed Release Provenance}
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt]
-  \item \textbf{Zero-Python fail-closed SafeTensors inference:} \texttt{SingleEncV7Weights} (\texttt{engine/dope-core/src/single\_encoding/safetensors.rs}) validates a hard $16\,\text{MiB}$ byte cap, 8-byte header alignment, \texttt{dtype == "F32"}, \texttt{rank <= 2}, and finite weights with zero \texttt{unsafe} blocks and zero new crates. Cross-runtime verification (\texttt{engine/dope-core/tests/single\_encoding\_v7.rs}) confirms $< 10^{-4}$ maximum absolute deviation between PyTorch and pure Rust on live trained V7.0/V7.1 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV1}$) and V7.2 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV2}$) checkpoints.
-  \item \textbf{Drop-in \texttt{dope\_v7\_emit} CLI:} The standalone \texttt{1.1\,MB} Rust binary \texttt{dope\_v7\_emit} executes end-to-end \texttt{fit} (producing self-contained \texttt{m.bin <= budget}) and \texttt{sample} (producing raw-unit \texttt{DOPEMAT1} tables) in milliseconds per table on CPU.
-  \item \textbf{JopeDime compatibility invariance:} Downstream JopeDime contracts remain 100\% bit-identical (\texttt{gbdt::Params::default().group\_duplicates = false} for \texttt{landmarks-native-v1}, zero-byte diff on \texttt{landmark/*}, \texttt{mlc\_v3/*}, \texttt{prepare/*}, and pinned \texttt{v1.0.0} weights).
-  \item \textbf{Sigstore OIDC supply-chain signing:} Tagging \texttt{\VTwo{ReleaseTag}} invokes \texttt{.github/workflows/engine-release.yml} to build deterministic Linux x86-64 binaries, emit GitHub OIDC Sigstore attestations (\texttt{dope.sigstore.json}), verify via \texttt{scripts/verify-engine-release.sh}, and distribute via \texttt{scripts/install.sh --require-attestation}.
+  \item \textbf{Zero-Python fail-closed SafeTensors inference:} \texttt{SingleEncV7Weights} (\path{engine/dope-core/src/single_encoding/safetensors.rs}) validates a hard $16\,\text{MiB}$ byte cap, 8-byte header alignment, \texttt{dtype == "F32"}, \texttt{rank <= 2}, and finite weights with zero \texttt{unsafe} blocks and zero new crates. Cross-runtime verification (\path{engine/dope-core/tests/single_encoding_v7.rs}) confirms $< 10^{-4}$ maximum absolute deviation between PyTorch and pure Rust on live trained V7.0/V7.1 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV1}$) and V7.2 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV2}$) checkpoints.
+  \item \textbf{Drop-in \texttt{dope\_v7\_emit} CLI:} The standalone $1.1\,\text{MB}$ Rust binary \texttt{dope\_v7\_emit} executes end-to-end \texttt{fit} (producing self-contained \texttt{m.bin <= budget}) and \texttt{sample} (producing raw-unit \texttt{DOPEMAT1} tables) in milliseconds per table on CPU.
+  \item \textbf{JopeDime compatibility invariance:} Downstream JopeDime contracts remain 100\% bit-identical (\path{gbdt::Params::default().group_duplicates = false} for \texttt{landmarks-native-v1}, zero-byte diff on \path{landmark/*}, \path{mlc_v3/*}, \path{prepare/*}, and pinned \texttt{v1.0.0} weights).
+  \item \textbf{Sigstore OIDC supply-chain signing:} Tagging \texttt{\VTwo{ReleaseTag}} invokes \path{.github/workflows/engine-release.yml} to build deterministic Linux x86-64 binaries, emit GitHub OIDC Sigstore attestations (\path{dope.sigstore.json}), verify via \path{scripts/verify-engine-release.sh}, and distribute via \texttt{scripts/install.sh -{}-require-attestation}.
 \end{itemize}
 
 \section{Limitations, Privacy Boundaries, and Reproducibility}
@@ -172,7 +174,7 @@ DOPE~\VTwo{ReleaseVersion} is subject to four explicit scope boundaries:
 (1)~\emph{No formal differential privacy or HIPAA claim.} Empirical diagnostics (\texttt{mia\_auc}, \texttt{dcr\_share}, exact-copy excess, and support-gated $k \ge 10$ knots) measure observed memorization risk only and are never equivalent to $(\varepsilon,\delta)$-DP or statutory HIPAA Safe Harbor / Expert Determination de-identification.
 (2)~\emph{Multiclass ceiling.} \texttt{SingleEncV7} natively encodes up to \VTwo{MaxClasses} classes per packet (gracefully retaining the top-\VTwo{MaxClasses} classes by frequency on wider label spaces).
 (3)~\emph{Training telemetry vs.\ scientific claims.} Loss curves and DEV medians in Figure~\ref{fig:v2-telemetry} document training convergence and diagnostic dynamics only; release promotion relies exclusively on frozen single-look CONFIRM receipts in Table~\ref{tab:v2-kpi}.
-(4)~\emph{Reproducibility.} Regenerate macros and verify zero drift via \texttt{python3 docs/whitepaper-v2/scripts/render\_v2\_paper.py --check}, rebuild the PDF with \texttt{latexmk -pdf dope-v2.tex}, and audit all Rust tests with \texttt{just check}. The historical T-111 manuscript (\texttt{docs/whitepaper/dope-mfs.tex}) remains frozen and untouched.
+(4)~\emph{Reproducibility.} Regenerate macros and verify zero drift via \texttt{python3} \path{docs/whitepaper-v2/scripts/render_v2_paper.py} \texttt{-{}-check}, rebuild the PDF with \texttt{latexmk -pdf dope-v2.tex}, and audit all Rust tests with \texttt{just check}. The historical T-111 manuscript (\path{docs/whitepaper/dope-mfs.tex}) remains frozen and untouched.
 
 \bibliographystyle{plainnat}
 \bibliography{references-v2}
