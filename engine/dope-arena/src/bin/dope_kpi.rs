@@ -41,6 +41,8 @@ enum Command {
     Primary(kpi::primary::PrimaryArgs),
     /// Paired comparison of candidates with one baseline under the promotion rule.
     Compare(kpi::compare::CompareArgs),
+    /// Audit a primary or compare receipt's input identities, denominators and point estimates.
+    Audit(kpi::audit::AuditArgs),
     /// Sign-flip null of one comparison: the false-PROMOTE rate of the full rule.
     Null(kpi::null::NullArgs),
     /// README scoreboard block from primary, compare and null receipts.
@@ -60,6 +62,7 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
         Command::Guards(args) => kpi::guards::run(args),
         Command::Primary(args) => kpi::primary::run(args),
         Command::Compare(args) => kpi::compare::run(args),
+        Command::Audit(args) => kpi::audit::run(args),
         Command::Null(args) => kpi::null::run(args),
         Command::RenderReadme(args) => kpi::render::run(args),
         Command::RenderHero(args) => kpi::hero::run(args),
