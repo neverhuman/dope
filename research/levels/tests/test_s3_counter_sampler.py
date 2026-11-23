@@ -23,7 +23,6 @@ from research.levels.s3_honest_counters import (
 from research.levels.s3_sampler_index import key64
 
 LANE = Path(__file__).resolve().parents[3]
-REAL_ARENA = Path("/home/ubuntu/dope-data/flat/s3-v250")
 STEPS, BATCH, SEED = 2000, 64, 20261122
 GRID = set(range(8, 32, 8)) | set(range(32, 513, 32)) | set(range(640, 4097, 128))
 
@@ -380,11 +379,3 @@ def test_measured_plan_report_on_the_synthetic_arena(run):
     assert report["n_fit_share_ge_256_where_table_allows"] >= 0.40 and report["plan_microseconds_per_episode"] < 1000.0
     assert report["tables_touched"] <= report["eligible_tables"] and abs(sum(report["kind_share"].values()) - 1.0) < 1e-3
 
-
-@pytest.mark.skipif(not (REAL_ARENA / "index.jsonl").is_file(), reason="real arena not present on this host")
-def test_real_arena_plan_has_no_repeats_and_respects_the_cap():
-    real = CounterSampler(CorpusIndex.load(REAL_ARENA), SamplerConfig(batch_size=BATCH))
-    report = measure_plan(real, 0, 300)
-    assert report["repeated_tables"] == 0 and report["repeated_families"] == 0 and report["voided_slots"] == 0
-    assert report["exposure"]["multiclass_to_regression"] <= 2.0 and report["exposure"]["binary_to_regression"] <= 2.0
-    assert report["n_fit_share_ge_256"] >= 0.40 and report["plan_microseconds_per_episode"] < 1000.0

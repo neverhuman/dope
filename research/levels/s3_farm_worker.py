@@ -46,7 +46,7 @@ import torch
 from .s3_counter_sampler import shard
 from .s3_farm_shm import (
     RETRY, SCALARS, THREAD_ENV, FarmError, Slab, attach_segment, bind_model, checksum_model, episode_seed,
-    fault_code, model_layout, reduce_rows, resolve, unlink_segment,
+    COMMAND_FAULTS, EPISODE_FAULTS, fault_code, model_layout, reduce_rows, resolve, unlink_segment,
 )
 
 _PR_SET_PDEATHSIG = 1
@@ -158,7 +158,7 @@ class _Worker:
                 grads = torch.autograd.grad(loss, self.params, allow_unused=True)
                 td = clock()
                 t_backward += td - tc
-            except Exception as exc:  # one bad episode is a counted failure, never a crash
+            except EPISODE_FAULTS as exc:  # a data-dependent fault fails this episode, counted by type
                 n["fail"] += weight
                 self.fail_step[fault_code(stage, exc)] += weight
                 continue
@@ -178,7 +178,7 @@ class _Worker:
                     ix = self.diag_ix.get(key)
                     try:
                         val = float(val) if ix is not None else math.nan
-                    except Exception:
+                    except (TypeError, ValueError, OverflowError):
                         val = math.nan
                     if math.isfinite(val):
                         block[ix] += val
@@ -231,7 +231,7 @@ class _Worker:
             return checksum_model(self.model, self.layout)
         if cmd == "collect":
             return self.collect(str(args[0]))
-        if cmd == "debug_detach":  # test hook: read from a private, from now on stale, copy
+        if cmd == "debug_detach":  # test hook: read from a private copy that is no longer updated
             for p in self.params:
                 p.data = p.data.clone()
             return None
@@ -247,13 +247,13 @@ class _Worker:
                 return
             try:
                 reply = ("ok", self.dispatch(msg[0], msg[1:]))
-            except Exception as exc:
+            except COMMAND_FAULTS as exc:
                 reply = ("err", _describe(exc))
             try:
                 self.conn.send(reply)
             except (BrokenPipeError, ConnectionError):
                 self._abandon()
-            except Exception as exc:  # the answer could not be pickled
+            except COMMAND_FAULTS as exc:  # the answer could not be pickled
                 self.conn.send(("err", _describe(exc)))
 
 
@@ -268,7 +268,7 @@ def main(fd: int) -> None:
     try:
         worker = _Worker(conn, json.loads(conn.recv_bytes()))
         conn.send(("ok", worker.info()))
-    except Exception as exc:
+    except COMMAND_FAULTS as exc:
         try:
             conn.send(("err", _describe(exc)))
         except OSError:

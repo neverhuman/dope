@@ -30,6 +30,7 @@ import json
 import mmap
 import os
 from pathlib import Path
+import pickle
 from typing import Any, Callable, Sequence
 
 import numpy as np
@@ -91,6 +92,20 @@ def fault_code(stage: str, exc: BaseException) -> str:
         where = f"@{os.path.basename(tb.tb_frame.f_code.co_filename)}:{tb.tb_lineno}"
         tb = tb.tb_next
     return f"{stage}:{type(exc).__name__}{where}"
+
+
+# Exceptions that fail one episode (counted by `fault_code`) instead of the step: data-dependent
+# faults. Torch raises RuntimeError and its subclasses; bad shapes or values raise ValueError,
+# LookupError or ArithmeticError. Anything else, such as a TypeError from a coding mistake, is not
+# an episode fault and reaches the leader as a worker error.
+EPISODE_FAULTS: tuple[type[BaseException], ...] = (RuntimeError, ValueError, LookupError, ArithmeticError)
+
+# Exceptions a worker reports to the leader as ("err", code) and survives: episode and farm faults
+# (FarmError is a RuntimeError), I/O, a module or name that does not resolve, and the type and
+# pickling errors of a bad command or answer. Any other exception ends the worker; the leader sees
+# its socket close and raises FarmError with the worker's exit status.
+COMMAND_FAULTS: tuple[type[BaseException], ...] = EPISODE_FAULTS + (
+    OSError, ImportError, TypeError, AttributeError, pickle.PicklingError)
 
 
 # -- CPUs -----------------------------------------------------------------------------------

@@ -421,7 +421,7 @@ class Farm:
     def param_checksum(self) -> str:
         """Digest of the shared tensors as the leader's model and every worker's model hold them.
 
-        Raises when any process reads different parameters (a worker on a stale private copy, a
+        Raises when any process reads different parameters (a worker on an out-of-date private copy, a
         leader tensor re-bound away from the shared vector). Costs one pass over the vector per
         process; meant for every few hundred steps.
         """
@@ -445,7 +445,7 @@ class Farm:
         return self._call(["collect", str(name)], f"collect {name}", fatal=False)
 
     def _debug_detach(self, worker: int) -> None:
-        """Test hook: one worker switches to a private copy of the parameters (stale from now on)."""
+        """Test hook: one worker switches to a private copy of the parameters (no longer updated)."""
         self._call(["debug_detach"], "debug_detach", [worker])
 
     def close(self) -> None:
