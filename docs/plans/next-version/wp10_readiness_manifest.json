@@ -1,10 +1,10 @@
 {
   "schema": "dope.wp10-readiness/v1",
   "status": "gated_awaiting_dedicated_cluster",
+  "g0_gate_status": "hold_underpowered_panel_mde_0.060",
   "completed_prerequisites": [
     "WP00",
     "WP01",
-    "WP02",
     "WP03",
     "WP04",
     "WP05",
@@ -16,6 +16,9 @@
     "transfer_jx_heads",
     "counterfactual_suite"
   ],
+  "blocked_prerequisites": [
+    "WP02"
+  ],
   "storage_arithmetic_bytes": {
     "fp32_10m_512x65": 1331200000000,
     "fp32_global512_10m": 20480000000
@@ -24,7 +27,8 @@
     "min_free_scratch_bytes": 2000000000000,
     "dedicated_uncontested_gpu": true,
     "downstream_panel_mde_max": 0.01,
+    "observed_h470_panel_mde": 0.060,
     "s2_100k_and_s3_1m_positive_scaling": true
   },
-  "note": "WP10 full-scale training remains gated until dedicated cluster storage, uncontested GPU capacity, panel MDE <= 0.01, and positive S2-100k / S3-1M scaling receipts are verified."
+  "note": "G0/H470 remains on HOLD (observed panel MDE 0.060 exceeds the 0.01 launch floor, keeping WP02 blocked). WP10 full-scale training remains gated until dedicated cluster storage, uncontested GPU capacity, panel MDE <= 0.01, and positive S2-100k / S3-1M scaling receipts are verified."
 }

@@ -69,13 +69,23 @@ impl Format2Program {
                     crate::target::Head::Binary => (rows.div_ceil(2), false),
                     crate::target::Head::Multiclass(k) => ((rows / k.max(2)).max(1), false),
                 };
-                let xs = self.catf.sample_x(n_base, opts.seed, opts.table_id);
+                let xs = self.catf.sample_x_with_opts(
+                    n_base,
+                    opts.seed,
+                    opts.table_id,
+                    opts.row_offset,
+                    &opts.namespace_128,
+                );
                 let pred = self.student.predict_expectations(&xs);
                 if is_reg {
                     return Ok(EmittedSamples {
                         samples: Samples { x: xs, y: pred },
                         weights: Some(vec![1.0; n_base]),
-                        pair_ids: Some((0..n_base as u64).collect()),
+                        pair_ids: Some(
+                            (0..n_base as u64)
+                                .map(|r| opts.row_offset.wrapping_add(r))
+                                .collect(),
+                        ),
                         mode: EmissionMode::Distill,
                         table_id: opts.table_id,
                     });
@@ -110,7 +120,7 @@ impl Format2Program {
                         }
                         y.push(lbl);
                         weights.push(w);
-                        pair_ids.push(r as u64);
+                        pair_ids.push(opts.row_offset.wrapping_add(r as u64));
                     }
                 }
                 Ok(EmittedSamples {
@@ -122,9 +132,14 @@ impl Format2Program {
                 })
             }
             EmissionMode::Faithful | EmissionMode::Matched | EmissionMode::Legacy => {
-                let samples =
-                    self.catf
-                        .sample_with_student(&self.student, rows, opts.seed, opts.table_id);
+                let samples = self.catf.sample_with_student_opts(
+                    &self.student,
+                    rows,
+                    opts.seed,
+                    opts.table_id,
+                    opts.row_offset,
+                    &opts.namespace_128,
+                );
                 Ok(EmittedSamples {
                     samples,
                     weights: None,

@@ -243,21 +243,23 @@ def save_v7_resume_state(
     opt: Any,
     step: int,
     opt_steps: int,
-    total_unique: int,
+    episodes_seen: int,
     best_dev_kpi: float,
     meta: dict[str, Any],
+    seen_splits: set[str] | None = None,
 ) -> None:
-    """Atomically save full training state (model + EMA + AdamW + RNG + step) for clean extension."""
+    """Atomically save full training state (model + EMA + AdamW + RNG + seen_splits) for clean extension."""
     import torch
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "step": int(step),
         "opt_steps": int(opt_steps),
-        "total_unique": int(total_unique),
+        "episodes_seen": int(episodes_seen),
         "best_dev_kpi": float(best_dev_kpi),
         "meta": dict(meta),
+        "seen_splits": sorted(seen_splits) if seen_splits else [],
         "base_model": {k: v.detach().cpu() for k, v in base_model.state_dict().items()},
         "ema_model": {k: v.detach().cpu() for k, v in ema_model.state_dict().items()},
         "optimizer": opt.state_dict(),
@@ -276,8 +278,8 @@ def load_v7_resume_state(
     ema_model: Any,
     opt: Any,
     expected_arch: tuple[int, int, int, int],
-) -> tuple[int, int, int, float]:
-    """Load full training state (model + EMA + AdamW + RNG + step) with architecture guard."""
+) -> tuple[int, int, int, float, set[str]]:
+    """Load full training state (model + EMA + AdamW + RNG + seen_splits) with architecture guard."""
     import torch
 
     state = torch.load(resume_path, map_location="cpu", weights_only=False)
@@ -299,9 +301,124 @@ def load_v7_resume_state(
         np.random.set_state(state["numpy_rng"])
     if "python_rng" in state:
         random.setstate(state["python_rng"])
+    ep_count = int(state.get("episodes_seen", state.get("total_unique", 0)))
     return (
         int(state["step"]),
         int(state.get("opt_steps", state["step"])),
-        int(state.get("total_unique", 0)),
+        ep_count,
         float(state.get("best_dev_kpi", -999.0)),
+        set(state.get("seen_splits", [])),
     )
+
+
+def compute_lr_factor(step: int, total_steps: int, warmup_steps: int, schedule: str = "cosine") -> float:
+    """Learning-rate multiplier supporting `cosine` and Warmup-Stable-Decay (`wsd`) schedules."""
+    if step <= warmup_steps:
+        return step / max(1, warmup_steps)
+    if schedule == "wsd":
+        decay_start = max(warmup_steps + 1, int(round(total_steps * 0.80)))
+        if step <= decay_start:
+            return 1.0
+        frac = min(1.0, (step - decay_start) / max(1, total_steps - decay_start))
+        return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * frac))
+    frac = min(1.0, (step - warmup_steps) / max(1, total_steps - warmup_steps))
+    return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * frac))
+
+
+def freeze_target_heads(model: Any) -> int:
+    """Freeze target-side residual heads (`delta_W`, `hyper_*`) for V7.3 x-heads-only training."""
+    frozen = 0
+    for attr in ("delta_W", "hyper_w1", "hyper_b1", "hyper_w2", "hyper_temp"):
+        mod = getattr(model, attr, None)
+        if mod is not None:
+            for p in mod.parameters():
+                p.requires_grad_(False)
+                frozen += p.numel()
+    return frozen
+
+
+def _load_f32_safetensors(path: Path) -> dict[str, np.ndarray]:
+    raw = path.read_bytes()
+    hdr_len = struct.unpack("<Q", raw[:8])[0]
+    hdr = json.loads(raw[8 : 8 + hdr_len].decode("utf-8"))
+    body = raw[8 + hdr_len :]
+    out: dict[str, np.ndarray] = {}
+    for k, meta in hdr.items():
+        if k == "__metadata__":
+            continue
+        s0, s1 = meta["data_offsets"]
+        out[k] = np.frombuffer(body[s0:s1], dtype=np.float32).reshape(meta["shape"]).copy()
+    return out
+
+
+def split_dev_table_abt(
+    X_raw: np.ndarray, y_raw: np.ndarray, dg: np.ndarray, task: str, rng: np.random.Generator, scale_fn: Any, max_cols: int = 48, max_classes: int = 8,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, int, int] | None:
+    """Duplicate-grouped (A, B, T) DEV-only split & target canonicalization."""
+    task_map = {"regression": 0, "binary": 1, "multiclass": 2}
+    if task not in task_map or len(y_raw) < 90:
+        return None
+    X_raw = X_raw[:, : min(X_raw.shape[1], max_cols)]
+    uniq_g = np.unique(dg)
+    if len(uniq_g) < 12:
+        perm = rng.permutation(len(y_raw))
+        c1, c2 = int(len(y_raw) * 0.40), int(len(y_raw) * 0.75)
+        a_idx, b_idx, t_idx = perm[:c1][:384], perm[c1:c2][:384], perm[c2:][:256]
+    else:
+        gp = rng.permutation(uniq_g)
+        c1, c2 = max(4, int(len(gp) * 0.40)), max(8, int(len(gp) * 0.75))
+        a_idx, b_idx, t_idx = np.flatnonzero(np.isin(dg, gp[:c1]))[:384], np.flatnonzero(np.isin(dg, gp[c1:c2]))[:384], np.flatnonzero(np.isin(dg, gp[c2:]))[:256]
+    if len(a_idx) < 24 or len(b_idx) < 24 or len(t_idx) < 16:
+        return None
+    Xa, Xt = scale_fn(X_raw[a_idx], X_raw[t_idx])
+    _, Xb = scale_fn(X_raw[a_idx], X_raw[b_idx])
+    ya, yb, yt = y_raw[a_idx].copy(), y_raw[b_idx].copy(), y_raw[t_idx].copy()
+    task_id = task_map[task]
+    if task_id == 0:
+        mu, sd = float(np.mean(ya)), max(float(np.std(ya)), 1e-5)
+        ya, yb, yt = (np.clip((arr - mu) / sd, -6.0, 6.0).astype(np.float32) for arr in (ya, yb, yt))
+        k_cls = 1
+    elif task_id == 1:
+        u = np.unique(ya)
+        if len(u) < 2:
+            return None
+        hi = float(u[-1])
+        ya, yb, yt = ((arr == hi).astype(np.float32) for arr in (ya, yb, yt))
+        if len(np.unique(ya)) < 2 or len(np.unique(yt)) < 2:
+            return None
+        k_cls = 2
+    else:
+        u = np.unique(np.rint(ya).astype(int))
+        if len(u) < 3 or len(u) > max_classes:
+            return None
+        k_cls, mp = len(u), {int(c): i for i, c in enumerate(u)}
+        ya, yb, yt = (np.array([mp.get(int(round(float(v))), 0) for v in arr], dtype=np.float32) for arr in (ya, yb, yt))
+    return Xa, ya, Xb, yb, Xt, yt, task_id, k_cls
+
+
+def save_v7_valley_soup(
+    ckpt_paths: list[Path], out_path: Path
+) -> tuple[int, str] | None:
+    """Uniform Polyak soup across top-k DEV SafeTensors checkpoints (zero extra deps)."""
+    valid = [p for p in ckpt_paths if p.is_file()]
+    if len(valid) < 2:
+        return None
+    sds = [_load_f32_safetensors(p) for p in valid]
+    keys = sorted(sds[0].keys())
+    header: dict[str, Any] = {}
+    blobs: list[bytes] = []
+    offset = 0
+    inv_k = np.float32(1.0 / len(sds))
+    for k in keys:
+        avg = sum(sd[k] for sd in sds) * inv_k
+        raw = np.ascontiguousarray(avg, dtype=np.float32).tobytes()
+        header[k] = {"dtype": "F32", "shape": list(avg.shape), "data_offsets": [offset, offset + len(raw)]}
+        blobs.append(raw)
+        offset += len(raw)
+    hdr_bytes = json.dumps(header, separators=(",", ":")).encode("utf-8")
+    hdr_bytes += b" " * ((8 - (len(hdr_bytes) % 8)) % 8)
+    payload = struct.pack("<Q", len(hdr_bytes)) + hdr_bytes + b"".join(blobs)
+    part = out_path.with_suffix(".safetensors.part")
+    part.write_bytes(payload)
+    part.replace(out_path)
+    return len(payload), hashlib.sha256(payload).hexdigest()

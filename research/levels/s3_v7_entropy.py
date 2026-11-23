@@ -119,15 +119,15 @@ def sample_synthetic_prior_table(
     if task == "regression":
         y = (f_out[:, 0] + snr * rng.standard_normal(n_tot)).astype(np.float32)
     elif task == "binary":
-        temp = float(rng.uniform(1.2, 3.0))
+        logit_gain = float(rng.uniform(1.2, 3.0))
         bias = float(rng.uniform(-0.6, 0.6))
-        p1 = 1.0 / (1.0 + np.exp(-np.clip(temp * f_out[:, 0] + bias, -10.0, 10.0)))
+        p1 = 1.0 / (1.0 + np.exp(-np.clip(logit_gain * f_out[:, 0] + bias, -10.0, 10.0)))
         y = (rng.random(n_tot) < p1).astype(np.float32)
         if len(np.unique(y[:n_fit])) < 2 or len(np.unique(y[n_fit:])) < 2:
             y = (f_out[:, 0] > float(np.median(f_out[:n_fit, 0]))).astype(np.float32)
     else:
-        temp = float(rng.uniform(1.4, 3.2))
-        lg = temp * f_out
+        logit_gain = float(rng.uniform(1.4, 3.2))
+        lg = logit_gain * f_out
         lg -= lg.max(axis=1, keepdims=True)
         pr = np.exp(lg)
         pr /= pr.sum(axis=1, keepdims=True)

@@ -86,9 +86,10 @@ def render_macros(repo_root: Path) -> str:
     kpi_path = repo_root / "bench/real-world/results/v2.0.0/dope-kpi-summary.json"
     kpi = json.loads(kpi_path.read_text(encoding="utf-8")) if kpi_path.is_file() else {}
 
+    ep_total = tel.get("total_episodes_seen", tel.get("total_unique_splits_seen"))
     splits_m = (
-        f"{float(tel['total_unique_splits_seen']) / 1e6:.2f}M"
-        if isinstance(tel.get("total_unique_splits_seen"), (int, float))
+        f"{float(ep_total) / 1e6:.2f}M"
+        if isinstance(ep_total, (int, float))
         else r"\PendingVal"
     )
     within_pct = (
@@ -143,6 +144,9 @@ def render_macros(repo_root: Path) -> str:
         ("KpiIndepTrg", _fmt_str(kpi.get("indep_marginals_trg"))),
         ("KpiVerdict", _fmt_str(kpi.get("verdict"))),
         ("KpiDeltaAuto", _fmt_str(kpi.get("delta_auto_vs_1_3_0"))),
+        ("KpiAutoPHolm", _fmt_float(kpi.get("p_holm_auto_vs_1_3_0"), 4) if isinstance(kpi.get("p_holm_auto_vs_1_3_0"), (int, float)) else _fmt_str(kpi.get("p_holm_auto_vs_1_3_0"))),
+        ("KpiHolmM", _fmt_int(kpi.get("holm_m"))),
+        ("KpiProvenance", _fmt_str(kpi.get("provenance"))),
         ("KpiAutoBytes", _fmt_bytes_pair(kpi, "dope_2_0_0_auto")),
         ("KpiSmallV2Bytes", _fmt_bytes_pair(kpi, "dope_2_0_0_small")),
         ("KpiBaselineBytes", _fmt_bytes_pair(kpi, "dope_1_3_0_small")),

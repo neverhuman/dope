@@ -340,13 +340,16 @@ class BaselineInventoryTests(unittest.TestCase):
         _root, wp10 = self._load("wp10_readiness_manifest.json")
         self.assertEqual(wp10["schema"], "dope.wp10-readiness/v1")
         self.assertEqual(wp10["status"], "gated_awaiting_dedicated_cluster")
+        self.assertEqual(wp10["g0_gate_status"], "hold_underpowered_panel_mde_0.060")
         expected_prereqs = {
-            *(f"WP0{i}" for i in range(10)),
+            *(f"WP0{i}" for i in range(10) if i != 2),
             "transfer_schemas",
             "transfer_jx_heads",
             "counterfactual_suite",
         }
         self.assertTrue(expected_prereqs.issubset(set(wp10["completed_prerequisites"])))
+        self.assertNotIn("WP02", wp10["completed_prerequisites"])
+        self.assertIn("WP02", wp10["blocked_prerequisites"])
         storage = wp10["storage_arithmetic_bytes"]
         self.assertEqual(storage["fp32_10m_512x65"], 10_000_000 * 512 * 65 * 4)
         self.assertEqual(storage["fp32_10m_512x65"], 1_331_200_000_000)
@@ -356,6 +359,7 @@ class BaselineInventoryTests(unittest.TestCase):
         self.assertEqual(gates["min_free_scratch_bytes"], 2_000_000_000_000)
         self.assertTrue(gates["dedicated_uncontested_gpu"])
         self.assertEqual(gates["downstream_panel_mde_max"], 0.01)
+        self.assertEqual(gates["observed_h470_panel_mde"], 0.06)
         self.assertTrue(gates["s2_100k_and_s3_1m_positive_scaling"])
 
 

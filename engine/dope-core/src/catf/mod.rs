@@ -9,12 +9,13 @@ use crate::copula::calibrate_latent_correlation_matrix;
 use crate::distil::DistilledStudent;
 use crate::marginal::atoms::DEFAULT_SUPPORT_K;
 use crate::marginal::v2::ColumnMarginalV2;
+use crate::rng::DEFAULT_NAMESPACE_128;
 use crate::sample::Samples;
 use crate::stats::norm_ppf;
 use crate::structure::{RuleMode, RuleSet};
 use fit::{copula_conditional_params, fit_catf_trees, standard_z_bins, CatfConditional, CATF_BINS};
 use order::least_predictable_order;
-use sample::{sample_catf_covariates, sample_post_rule_targets};
+use sample::{sample_catf_covariates_with_opts, sample_post_rule_targets_with_opts};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug)]
@@ -272,7 +273,18 @@ impl CatfModel {
     }
 
     pub fn sample_x(&self, n_rows: usize, seed: u64, table_id: u64) -> Vec<Vec<f64>> {
-        sample_catf_covariates(
+        self.sample_x_with_opts(n_rows, seed, table_id, 0, &DEFAULT_NAMESPACE_128)
+    }
+
+    pub fn sample_x_with_opts(
+        &self,
+        n_rows: usize,
+        seed: u64,
+        table_id: u64,
+        row_offset: u64,
+        namespace: &[u8; 16],
+    ) -> Vec<Vec<f64>> {
+        sample_catf_covariates_with_opts(
             &self.order,
             &self.conditionals,
             &self.marginals,
@@ -282,10 +294,12 @@ impl CatfModel {
             n_rows,
             seed,
             table_id,
+            row_offset,
+            namespace,
         )
     }
 
-    /// Sample full `(X, Y)` guaranteeing `Y` is evaluated strictly at post-rule `X` (`T32`).
+    /// Sample full `(X, Y)` evaluating `Y` strictly at post-rule `X` (`T32`).
     pub fn sample_with_student(
         &self,
         student: &DistilledStudent,
@@ -293,8 +307,28 @@ impl CatfModel {
         seed: u64,
         table_id: u64,
     ) -> Samples {
-        let post_rule_x = self.sample_x(n_rows, seed, table_id);
-        sample_post_rule_targets(student, &post_rule_x, seed, table_id)
+        self.sample_with_student_opts(student, n_rows, seed, table_id, 0, &DEFAULT_NAMESPACE_128)
+    }
+
+    /// Chunk-invariant full `(X, Y)` sampler honoring caller `row_offset` and `namespace`.
+    pub fn sample_with_student_opts(
+        &self,
+        student: &DistilledStudent,
+        n_rows: usize,
+        seed: u64,
+        table_id: u64,
+        row_offset: u64,
+        namespace: &[u8; 16],
+    ) -> Samples {
+        let post_rule_x = self.sample_x_with_opts(n_rows, seed, table_id, row_offset, namespace);
+        sample_post_rule_targets_with_opts(
+            student,
+            &post_rule_x,
+            seed,
+            table_id,
+            row_offset,
+            namespace,
+        )
     }
 }
 

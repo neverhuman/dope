@@ -9,6 +9,9 @@ use crate::copula::Dependence;
 use crate::error::Result;
 use crate::marginal::Marginal;
 use crate::sample::{sample_with_mode, EmissionMode, EmitOptions};
+use crate::single_encoding::{
+    sample_zero_init_rows, unpack_dse7_packet, COL_FEAT_DIM, DSE7_MAGIC, GLOB_FEAT_DIM, MAX_CLASSES,
+};
 use crate::target::Head;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -16,7 +19,7 @@ use sha2::{Digest, Sha256};
 pub const PACKET_FEATURES_V2_DIM: usize = 64;
 
 /// Deterministic fixed-width 64-coordinate structural embedding extracted strictly from
-/// a single `.dope` packet (Format 1 or Format 2) without opening any real dataset.
+/// a single `.dope` packet (Format 1, Format 2, or DSE7) without opening any real dataset.
 #[derive(Clone, Debug, Serialize)]
 pub struct PacketFeaturesV2 {
     pub protocol: &'static str,
@@ -38,11 +41,76 @@ pub struct Encoder629Bridge {
     pub target_std: f64,
 }
 
-/// Extract `PacketFeaturesV2` deterministically from a Format 1 or Format 2 `.dope` packet.
+/// Extract `PacketFeaturesV2` deterministically from a Format 1, Format 2, or DSE7 packet.
 pub fn embed_packet(bytes: &[u8]) -> Result<PacketFeaturesV2> {
     let sha = format!("{:x}", Sha256::digest(bytes));
     let mut vec = vec![0.0_f64; PACKET_FEATURES_V2_DIM];
     vec[0] = (bytes.len() as f64).max(1.0).ln();
+
+    if bytes.len() >= 4 && &bytes[..4] == DSE7_MAGIC {
+        let (pkt, hdr, _card) = unpack_dse7_packet(bytes)?;
+        let p_eff = hdr.p_eff as usize;
+        vec[1] = 7.0;
+        vec[2] = p_eff as f64;
+        vec[3] = (hdr.x_cols_raw as f64 + 1.0).ln();
+        vec[4] = hdr.task_id as f64;
+        vec[5] = hdr.k_eff as f64;
+        vec[6] = hdr.rank_use as f64;
+        vec[7] = hdr.knot_level as f64;
+        vec[8] = if hdr.has_q_nl { 1.0 } else { 0.0 };
+        vec[9] = hdr.z_max as f64;
+        vec[10] = hdr.resid_sd as f64;
+        for i in 0..GLOB_FEAT_DIM {
+            vec[11 + i] = pkt.glob_feats[i] as f64;
+        }
+        let mut l_norms: Vec<f64> = (0..p_eff)
+            .map(|j| {
+                pkt.loadings[j]
+                    .iter()
+                    .map(|&v| (v as f64).powi(2))
+                    .sum::<f64>()
+                    .sqrt()
+            })
+            .collect();
+        l_norms.sort_by(|a, b| b.total_cmp(a));
+        for (i, &rn) in l_norms.iter().take(16).enumerate() {
+            vec[27 + i] = rn;
+        }
+        let o_dim = if hdr.task_id == 2 {
+            (hdr.k_eff as usize).min(MAX_CLASSES)
+        } else {
+            1
+        };
+        let mut w_norms: Vec<f64> = (0..p_eff)
+            .map(|j| {
+                (0..o_dim)
+                    .map(|c| (pkt.w_base[c][j] as f64).powi(2))
+                    .sum::<f64>()
+                    .sqrt()
+            })
+            .collect();
+        w_norms.sort_by(|a, b| b.total_cmp(a));
+        for (i, &wn) in w_norms.iter().take(16).enumerate() {
+            vec[43 + i] = wn;
+        }
+        if p_eff > 0 {
+            for b in 0..4 {
+                let m = (0..p_eff).map(|j| pkt.q_nl[j][b].abs() as f64).sum::<f64>() / p_eff as f64;
+                vec[59 + b] = m;
+            }
+            let disc_cnt = (0..p_eff)
+                .filter(|&j| pkt.col_feats[j][COL_FEAT_DIM - 4] > 0.5)
+                .count();
+            vec[63] = disc_cnt as f64 / p_eff as f64;
+        }
+        return Ok(PacketFeaturesV2 {
+            protocol: "dope-packet-features-v2",
+            format_version: 7,
+            packet_bytes: bytes.len(),
+            packet_sha256: sha,
+            features: vec,
+        });
+    }
 
     if is_format2(bytes) {
         let pkt = decode_format2(bytes)?;
@@ -168,6 +236,49 @@ pub fn embed_packet(bytes: &[u8]) -> Result<PacketFeaturesV2> {
 /// Deterministic 4,096-row source-free bridge summary for JopeDime `DopeEncoder629` compatibility.
 pub fn embed_to_629_bridge(bytes: &[u8], seed: u64) -> Result<Encoder629Bridge> {
     let sha = format!("{:x}", Sha256::digest(bytes));
+    if bytes.len() >= 4 && &bytes[..4] == DSE7_MAGIC {
+        let (pkt, hdr, _card) = unpack_dse7_packet(bytes)?;
+        let d = hdr.p_eff as usize;
+        let rows = sample_zero_init_rows(&pkt, 4096, seed ^ 629);
+        let n = rows.len().max(1) as f64;
+        let mut col_means = Vec::with_capacity(d);
+        let mut col_stds = Vec::with_capacity(d);
+        for j in 0..d {
+            let m = rows.iter().map(|r| r.x[j] as f64).sum::<f64>() / n;
+            let sd = (rows
+                .iter()
+                .map(|r| (r.x[j] as f64 - m).powi(2))
+                .sum::<f64>()
+                / n)
+                .sqrt();
+            col_means.push(m);
+            col_stds.push(sd);
+        }
+        let ys: Vec<f64> = rows
+            .iter()
+            .map(|r| match hdr.task_id {
+                0 => r.y_reg as f64,
+                1 => 1.0 / (1.0 + (-r.logits[0] as f64).exp()),
+                _ => {
+                    let k = (hdr.k_eff as usize).clamp(1, MAX_CLASSES);
+                    (0..k)
+                        .max_by(|&a, &b| r.logits[a].total_cmp(&r.logits[b]))
+                        .unwrap_or(0) as f64
+                }
+            })
+            .collect();
+        let tm = ys.iter().sum::<f64>() / n;
+        let ts = (ys.iter().map(|&v| (v - tm).powi(2)).sum::<f64>() / n).sqrt();
+        return Ok(Encoder629Bridge {
+            packet_sha256: sha,
+            synthetic_rows: rows.len(),
+            feature_count: d,
+            col_means,
+            col_stds,
+            target_mean: tm,
+            target_std: ts,
+        });
+    }
     let opts = EmitOptions {
         mode: EmissionMode::Faithful,
         rows: 4096,
