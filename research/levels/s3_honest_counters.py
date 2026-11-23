@@ -323,3 +323,32 @@ def measure_plan(sampler: CounterSampler, seed: int = 0, steps: int = 2000) -> d
         "micro_batches_per_step": round(batches / steps, 2),
         "plan_microseconds_per_episode": round(plan_seconds / total * 1e6, 2),
     }
+
+
+def check_real_arena(arena_dir: str, steps: int = 300, batch: int = 64) -> dict[str, Any]:
+    """The sampler contract's measured claims (section 7) on a real flat arena; raises if one fails.
+
+    Evidence command, not a unit test (the arena is not in the repository):
+    ``python3 -m research.levels.s3_honest_counters /home/ubuntu/dope-data/flat/s3-v250``.
+    """
+    from .s3_counter_sampler import CorpusIndex, SamplerConfig
+
+    report = measure_plan(CounterSampler(CorpusIndex.load(arena_dir), SamplerConfig(batch_size=batch)), 0, steps)
+    failed = [name for name, ok in (
+        ("no repeated table, family or voided slot",
+         report["repeated_tables"] == report["repeated_families"] == report["voided_slots"] == 0),
+        ("exposure cap <= 2", max(report["exposure"]["multiclass_to_regression"],
+                                  report["exposure"]["binary_to_regression"]) <= 2.0),
+        ("share n_fit >= 256 at least 0.40", report["n_fit_share_ge_256"] >= 0.40),
+        ("planning under 1 ms per episode", report["plan_microseconds_per_episode"] < 1000.0),
+    ) if not ok]
+    if failed:
+        raise SamplerError("real-arena plan check failed: " + "; ".join(failed))
+    return report
+
+
+if __name__ == "__main__":
+    import json
+    import sys
+
+    print(json.dumps(check_real_arena(sys.argv[1]), indent=1, sort_keys=True, default=str))

@@ -115,6 +115,12 @@ sketching: a weak hash of consecutive integers tripled the error in testing.
 
 ## 7. Measured on `s3-v250` (stem families, 2,000 steps, batch 64, seed 0)
 
+The arena is not in the repository, so these claims are an evidence command,
+not a unit test: `python3 -m research.levels.s3_honest_counters
+/home/ubuntu/dope-data/flat/s3-v250` re-measures 300 steps and fails if a
+repeat, the exposure cap, the `n_fit >= 256` share or the planning time
+misses (2026-11-23: 0 repeats, exposure 1.79 / 1.95, share 0.585, 18 µs).
+
 | Quantity | Before (audit) | Now |
 |---|---|---|
 | Steps with a repeated table / family | about 21 % | 0 / 0 |

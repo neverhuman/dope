@@ -28,7 +28,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from .s3_farm_shm import RETRY, episode_seed, resolve
+from .s3_farm_shm import EPISODE_FAULTS, RETRY, episode_seed, resolve
 from .s3_grad_farm import FarmSpec
 from .s3_sampler_index import key64, unit
 
@@ -180,7 +180,7 @@ def single_process_step(spec: FarmSpec, step: int, flat: torch.Tensor | None = N
         out["n_planned"] += 1
         try:
             episode = episode_fn(item, state)
-        except Exception:
+        except EPISODE_FAULTS:
             out["n_fail"] += 1
             continue
         if episode is RETRY:
@@ -197,7 +197,7 @@ def single_process_step(spec: FarmSpec, step: int, flat: torch.Tensor | None = N
                 out["n_nonfinite"] += 1
                 continue
             loss.backward()
-        except Exception:
+        except EPISODE_FAULTS:
             out["n_fail"] += 1
             continue
         g = torch.cat([(torch.zeros_like(p) if p.grad is None else p.grad).reshape(-1) for p in params]).double()
