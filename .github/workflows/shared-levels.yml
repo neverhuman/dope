@@ -45,6 +45,12 @@ jobs:
           python-version: '3.12'
       - name: Install pinned CPU reference runtime
         run: bash ops/ci/shared-levels.sh prepare-torch
+      - name: Install pinned validation auditors
+        if: matrix.suite == 'test_validation'
+        run: >-
+          target/shared-python/bin/pip install
+          --constraint validation/requirements-v1.txt
+          catboost==1.2.10 lightgbm==4.6.0 scikit-learn==1.7.2 xgboost-cpu==2.1.4
       - name: Run the independent conformance shard
         env:
           SUITE: ${{ matrix.suite }}
