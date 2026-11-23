@@ -25,18 +25,24 @@ No number is typed into the manuscript. Every quantity is a `\VThree{...}` macro
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-results-table.tex` | Table 2: the README arm table, same rows, columns and values, wrapped into two panels |
 | `generated/v3-comparison-table.tex` | Table 3: the README comparison row with each condition and guard of the decision rule |
+| `generated/v3-methods-table.tex` | Table 4: each third-party generator against `auto-v8` (`compare-methods.json`) |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
 | `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
 | `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every cell equals the README block |
+| `scripts/v3_paper_methods.py` | Loads and checks the third-party receipts, writes their macros, checks the prose about them |
 | `scripts/test_render_v3_paper.py` | Unit tests |
 | `scripts/build_v3_pdf.sh` | Deterministic `latexmk` build in `target/paper-v3/` |
 
 ## Third-party baselines
 
-If `bench/real-world/results/scoreboard/v3.0.0/primary-methods.json` is committed (a `dope_kpi`
-receipt of the same run holding SDV GaussianCopula, CTGAN, TVAE or ARF arms), the renderer adds
-those arms to Table 2 between the DOPE arms and the controls. Without that file the table has no
-third-party rows.
+The scoreboard directory holds one run of four third-party generators (SDV GaussianCopula, CTGAN
+and TVAE; arfpy ARF) with library defaults and no byte cap: `primary-methods.json`,
+`compare-methods.json`, `MANIFEST.json` (versions, recipes, licences, commands) and
+`methods-report.md`. The renderer adds the four arms to Table 2 between the DOPE arms and the
+controls, writes Table 4 from `compare-methods.json`, and fails unless the three receipts are all
+present (or all absent), name the release receipts' schedule, real-data reference, panel, contract
+and bootstrap, and repeat every release arm of `primary.json` field for field. These rows are not
+in the README block.
 
 ## Build and verify
 

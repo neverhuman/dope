@@ -2,7 +2,7 @@
 
 \begin{table}[t]
   \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
-  \caption{Every arm of the report look (receipt \texttt{\VThree{PrimarySha}}), with the README's rows, columns and values; the columns are wrapped into panels (a) and (b). Bytes are whole-file sizes. TRG uses the \VThree{PrimaryMult}$\times$ sample; per-task values give the number of families in parentheses. Retention medians are unclipped. C2ST is the median two-sample AUC (chance level means indistinguishable). Realism and privacy are coverage shares, and copies the exact-copy excess, mean (maximum file). Controls carry no artifact.}
+  \caption{Every arm of the report look (receipt \texttt{\VThree{PrimarySha}}), with the README's rows, columns and values; the columns are wrapped into panels (a) and (b). The middle group holds the third-party generators from \texttt{primary-methods.json} (receipt \texttt{\VThree{MethodsPrimarySha}}) of the same run, which repeats every other row exactly; these rows are not in the README block. Bytes are whole-file sizes. TRG uses the \VThree{PrimaryMult}$\times$ sample; per-task values give the number of families in parentheses. Retention medians are unclipped. C2ST is the median two-sample AUC (chance level means indistinguishable). Realism and privacy are coverage shares, and copies the exact-copy excess, mean (maximum file). Controls carry no artifact.}
   \label{tab:arms}
   \input{generated/v3-results-table}
 \end{table}
@@ -14,7 +14,14 @@
   \input{generated/v3-comparison-table}
 \end{table}
 
-Figure~\ref{fig:hero} and Tables~\ref{tab:arms} and~\ref{tab:compare} report the single look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
+\begin{table}[t]
+  \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+  \caption{Each third-party generator against \cli{auto-v8} (receipt \texttt{\VThree{MethodsCompareSha}}) in the README's format, Holm-adjusted over the \VThree{MethodsHolmM} comparisons. $\Delta$ is the method minus \cli{auto-v8}. A guard value is the method's difference from \cli{auto-v8} (for tasks, the lowest per-task lower bound) or, for copies and bytes, the method's own exact-copy excess (largest file in parentheses) and largest file.}
+  \label{tab:methods}
+  \input{generated/v3-methods-table}
+\end{table}
+
+Figure~\ref{fig:hero} and Tables~\ref{tab:arms}--\ref{tab:methods} report the single look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
 
 \paragraph{Headline.}
 \cli{auto-v8} reaches a TRG of \VThree{CandTrg}, against \VThree{BaseTrg} for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{Delta} with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
@@ -29,6 +36,15 @@ At matched size the gain is not resolved; the headline rests on the \VThree{Prim
 The analytic packet used on every table, without selection (\VThree{AnalyticId}), scores \VThree{AnalyticTrg} at a median of \VThree{AnalyticBytesMed}~bytes: better than the baseline on regression (\VThree{AnalyticRegression}) but far worse on multiclass targets (\VThree{AnalyticMulticlass}).
 Used alone it is worse than the baseline; within \cli{auto-v8} it is written only where the check of \S\ref{sec:select} prefers it.
 The Format~1 \texttt{small} programs of releases \VThree{BaseVersion} and \VThree{OldVersion} score \VThree{PrevSmallTrg} and \VThree{OldSmallTrg} and fail \VThree{PrevSmallFailed} of \VThree{PrevSmallCells} cells, and the V7 packet with untrained decoder weights (\VThree{V7Id}) scores \VThree{V7Trg}.
+
+\paragraph{Third-party generators.}
+The look also scores four third-party generators, fitted on the same rows with their library defaults and no byte cap: the Gaussian copula, CTGAN and TVAE synthesizers of SDV~\VThree{SdvVersion} and ARF from arfpy~\VThree{ArfpyVersion} (configuration in Appendix~\ref{app:arms}).
+Each has a lower TRG than \cli{auto-v8} (Tables~\ref{tab:arms} and~\ref{tab:methods}).
+ARF comes closest: its TRG is \VThree{ArfTrg} and its paired difference \VThree{ArfVsDelta}, an interval that contains zero (\VThree{ArfVsOutcome}; Holm over $m=\VThree{MethodsHolmM}$).
+It is higher than \cli{auto-v8} on regression (\VThree{ArfRegression} against \VThree{CandRegression}) and lower on binary and multiclass targets, with a median file of \VThree{ArfBytesMed}~bytes.
+The Gaussian copula (\VThree{GcVsDelta}), TVAE (\VThree{TvaeVsDelta}) and CTGAN (\VThree{CtganVsDelta}) are REJECT, and CTGAN's TRG, \VThree{CtganTrgPoint}, is below that of independently permuted columns.
+No third-party file is within the budget, so all four fail the byte guard by construction; counted against the \VThree{BudgetBytes}-byte budget, each scores the floor of \VThree{FailedValue} (the note under Table~\ref{tab:arms}).
+CTGAN also fails the exact-copy guard (mean excess \VThree{CtganCopyMean} against a bound of \VThree{CopyLe}), and TVAE fails \VThree{TvaeFailed} of \VThree{TvaeCells} cells.
 
 \paragraph{Controls.}
 Training on $A$ itself (\VThree{CopyAId}) scores \VThree{CopyATrgPoint} rather than zero: its entry value is $1-R_B$, and the minimum over auditors falls below zero whenever the twin trains one auditor better than $A$ does. A bootstrap resample of $A$ scores \VThree{BootATrgPoint}.

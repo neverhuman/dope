@@ -29,16 +29,17 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import v3_paper_methods as methods_mod  # noqa: E402
 import v3_paper_tables as tables  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
 SCOREBOARD = "bench/real-world/results/scoreboard/v3.0.0"
-METHODS_RECEIPT = f"{SCOREBOARD}/primary-methods.json"
 HERO_SVG = "bench/real-world/figures/hero-v3-light.svg"
 HERO_PDF = "docs/whitepaper-v3/figures/hero-v3.pdf"
 GEN = "docs/whitepaper-v3/generated"
 OUT = {"macros": f"{GEN}/v3-macros.tex", "arms": f"{GEN}/v3-results-table.tex",
-       "comparison": f"{GEN}/v3-comparison-table.tex", "manifest": f"{GEN}/v3-render-manifest.json"}
+       "comparison": f"{GEN}/v3-comparison-table.tex", "methods": f"{GEN}/v3-methods-table.tex",
+       "manifest": f"{GEN}/v3-render-manifest.json"}
 HERO_EPOCH = "1795392000"  # 2026-11-23T00:00:00Z: fixes the PDF creation date of the conversion.
 V8 = "engine/dope-core/src/single_encoding/v8"
 RUST = {  # macro: (source, regex); the first group is the value.
@@ -239,7 +240,8 @@ def check_same_run(primary: dict[str, Any], other: dict[str, Any], name: str) ->
             raise RenderError(f"{name} and primary.json differ in inputs.{key}")
 
 
-def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str, str], third: list) -> list[str]:
+def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str, str],
+                 methods: dict[str, Any] | None, failed_value: float) -> list[str]:
     """The comparative wording of the sections, checked against the receipts.
 
     The sections cite every value through a macro, but words such as "fails", "below", "the same
@@ -280,8 +282,7 @@ def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str,
         ("binary has the fewest families", families["binary"] == min(families.values())),
         ("Holm covers a single comparison", comp["holm_m"] == 1),
         ("the contract is not frozen", primary["contract"]["protocol_frozen"] is False),
-        ("third-party generators have not yet been scored", not third),
-    ]
+    ] + methods_mod.claims(methods, arm, failed_value)
     return [f"prose claim no longer holds for the receipts: {text}" for text, ok in claims if not ok]
 
 
@@ -296,11 +297,9 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     comp = compare["comparisons"][0]
     if kpi["contract_id"] != primary["contract"]["id"] or sha256("contracts/dope-kpi.json") != primary["contract"]["sha256"]:
         raise RenderError("contracts/dope-kpi.json is not the contract the receipts were scored under")
-    methods = read_json(METHODS_RECEIPT) if (REPO / METHODS_RECEIPT).is_file() else None
-    known = {a["arm_id"] for a in primary["arms"]}
-    third = [a for a in (methods or {}).get("arms", []) if a["arm_id"] not in known]
-    if methods:
-        check_same_run(primary, methods, "primary-methods.json")
+    methods = methods_mod.load(SCOREBOARD, read_json, lambda rel: (REPO / rel).is_file(), primary,
+                               sha256(f"{SCOREBOARD}/primary.json"), check_same_run)
+    third = methods["third"] if methods else []
     readme = (REPO / f"{SCOREBOARD}/readme-block.md").read_text(encoding="utf-8")
     tables.cross_check(readme, primary["arms"] + third, compare["comparisons"], {a["arm_id"] for a in third})
     consts, rust_files = rust_constants()
@@ -324,6 +323,8 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     for role, arm_id in roles.items():
         entries += arm_macros(role, by_id[arm_id])
     entries += comparison_macros(comp, compare)
+    if methods:
+        entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256)
     if hero:
         entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
     names = [k for k, _ in entries]
@@ -335,15 +336,16 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     lines += [rf"\expandafter\newcommand\csname VThree@{k}\endcsname{{{v}}}" for k, v in entries]
     out = {"macros": "\n".join(lines) + "\n",
            "arms": tables.render_arm_table(primary["arms"], third, roles["Cand"]),
-           "comparison": tables.render_comparison_table(comp)}
+           "comparison": tables.render_comparison_table(comp),
+           "methods": tables.render_methods_table(methods["comparisons"] if methods else [])}
     inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
-                       "contracts/evidence-layout-v1.json"} | rust_files | ({METHODS_RECEIPT} if methods else set()))
+                       "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []))
     manifest = {"schema": "dope.whitepaper-v3-render/v1", "hero": hero,
                 "inputs": {rel: sha256(rel) for rel in inputs},
                 "outputs": {OUT[k]: hashlib.sha256(v.encode()).hexdigest() for k, v in out.items()}}
     out["manifest"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-    return out, prose_errors(primary, comp, roles, third)
+    return out, prose_errors(primary, comp, roles, methods, float(kpi["statistic"]["failed_value"]))
 
 
 def convert_hero() -> dict[str, Any]:
@@ -423,7 +425,7 @@ def main() -> int:
         hero = convert_hero() if args.figures and not args.check else old.get("hero")
         errors = hero_errors(hero)
         out, prose = render(hero)
-    except (RenderError, KeyError, subprocess.CalledProcessError, tables.TableError) as err:
+    except (RenderError, KeyError, subprocess.CalledProcessError, tables.TableError, methods_mod.MethodsError) as err:
         print(f"render_v3_paper: {err}", file=sys.stderr)
         return 1
     errors += prose + paper_errors(out["macros"])

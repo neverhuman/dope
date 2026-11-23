@@ -1,6 +1,6 @@
 \section{Arms of the report look}\label{app:arms}
 
-\begin{table}[h]
+\begin{table}[ht]
   \centering\small
   \begin{tabular}{@{}lp{0.68\linewidth}@{}}
     \toprule
@@ -18,6 +18,21 @@
     \VThree{BootAId} & $m\,|A|$ rows drawn from $A$ with replacement \\
     \VThree{IndepId} & every column of $A$ permuted on its own, target included \\
     \VThree{LabelShuffleId} & $A$ with only the target permuted \\
+    \midrule
+    \VThree{GcId} & SDV~\VThree{SdvVersion} \texttt{GaussianCopulaSynthesizer} (copulas~\VThree{CopulasVersion}) \\
+    \VThree{CtganId} & SDV~\VThree{SdvVersion} \texttt{CTGANSynthesizer} (CTGAN~\VThree{CtganVersion}) \\
+    \VThree{TvaeId} & SDV~\VThree{SdvVersion} \texttt{TVAESynthesizer} (CTGAN~\VThree{CtganVersion}) \\
+    \VThree{ArfId} & arfpy~\VThree{ArfpyVersion}: an adversarial random forest, its density estimate (\texttt{forde}) and sampler (\texttt{forge}) \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\paragraph{Third-party configuration.}
+Each method ran with its library defaults (no hyperparameter was passed or tuned) on CPU with one thread, through a wrapper that fits once per cell on $A$ and samples once per multiplier.
+SDV detects the feature types, and the target is declared categorical or numerical by task.
+A file is the pickled fitted object: SDV's own save, and for ARF the fitted object without its copy of the fitting rows and its forest, neither of which the sampler reads.
+No byte cap was applied, and the files were scored with a byte limit of \VThree{MethodsScoreBudget}.
+The run manifest (\path{MANIFEST.json}, SHA-256 prefix \texttt{\VThree{MethodsManifestSha}}) records the software: Python~\VThree{MethodsPythonVersion}, SDV~\VThree{SdvVersion} with CTGAN~\VThree{CtganVersion}, copulas~\VThree{CopulasVersion} and RDT~\VThree{RdtVersion}, arfpy~\VThree{ArfpyVersion}, PyTorch~\VThree{TorchVersion} and scikit-learn~\VThree{SklearnVersion}, with every recipe and command.
+SDV and its libraries are licensed \VThree{SdvLicense}; arfpy is licensed \VThree{ArfpyLicense}.
+The run labels these arms \texttt{source\_free} after an audit found no stored table of fitting rows and no copy of a fitting column in any file.
+The files do keep per-column ranges, category values and fitted transformer parameters (SDV) and per-leaf means, deviations, bounds and class probabilities (ARF).

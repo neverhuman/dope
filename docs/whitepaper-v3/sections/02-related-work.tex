@@ -5,7 +5,7 @@ Gaussian-copula synthesizers combine per-column marginals with a dependence mode
 CTGAN and TVAE fit conditional adversarial and variational models with mode-specific normalization~\citep{xu2019ctgan}; adversarial random forests alternate between a forest discriminator and a density estimate on its leaves~\citep{watson2023arf}; TabDDPM and TabSyn are diffusion models, the latter in a learned latent space~\citep{kotelnikov2023tabddpm,zhang2024tabsyn}.
 These methods are designed for fidelity at whatever model size the data needs.
 DOPE fixes the artifact size instead and asks how much downstream utility survives at that size.
-Third-party baselines scored under the same protocol are pending; Table~\ref{tab:arms} gains their rows when their receipts are committed (\S\ref{sec:repro}).
+We score SDV's Gaussian copula, CTGAN and TVAE and the ARF of arfpy under the same protocol, with their library defaults and no byte budget (\S\ref{sec:results}).
 
 \paragraph{Dataset distillation and coresets.}
 Dataset distillation learns a few synthetic examples on which a model trains well~\citep{wang2018distillation}, and coresets select weighted subsets whose loss approximates the full data's~\citep{bachem2017coresets,mirzasoleiman2020craig}.

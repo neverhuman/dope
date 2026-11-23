@@ -12,6 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import render_v3_paper as rp  # noqa: E402
+import v3_paper_methods as methods_mod  # noqa: E402
 import v3_paper_tables as tables  # noqa: E402
 
 SCOREBOARD = rp.REPO / rp.SCOREBOARD
@@ -156,26 +157,92 @@ class DigitLint(unittest.TestCase):
         self.assertTrue(errors[0].startswith("x.tex:2:"))
 
 
+def methods_info(primary: dict, files: dict | None = None) -> dict | None:
+    """The committed third-party receipts, with any of them replaced or removed (None) via `files`."""
+    files = files or {}
+
+    def read(rel: str) -> dict:
+        name = rel.rsplit("/", 1)[1]
+        return files[name] if name in files else load(name)
+
+    def exists(rel: str) -> bool:
+        name = rel.rsplit("/", 1)[1]
+        return files[name] is not None if name in files else (SCOREBOARD / name).is_file()
+    return methods_mod.load(rp.SCOREBOARD, read, exists, primary, rp.sha256(f"{rp.SCOREBOARD}/primary.json"),
+                            rp.check_same_run)
+
+
 class ProseClaims(unittest.TestCase):
     def setUp(self):
         self.primary, compare = load("primary.json"), load("compare.json")
         self.comp = compare["comparisons"][0]
         self.roles = rp.role_ids(self.primary, self.comp)
+        self.methods = methods_info(self.primary)
+
+    def errors(self, comp=None, methods="committed") -> list[str]:
+        info = self.methods if methods == "committed" else methods
+        return rp.prose_errors(self.primary, comp or self.comp, self.roles, info, -1.0)
 
     def test_committed_receipts_support_every_claim(self):
-        self.assertEqual(rp.prose_errors(self.primary, self.comp, self.roles, []), [])
+        self.assertEqual(self.errors(), [])
 
-    def test_a_promote_or_a_third_party_receipt_invalidates_the_prose(self):
+    def test_a_promote_or_absent_third_party_receipts_invalidate_the_prose(self):
         comp = copy.deepcopy(self.comp)
         comp["decision"]["outcome"] = "PROMOTE"
-        self.assertIn("outcome is HOLD", " ".join(rp.prose_errors(self.primary, comp, self.roles, [])))
-        errors = rp.prose_errors(self.primary, self.comp, self.roles, [{"arm_id": "sdv-ctgan"}])
-        self.assertTrue(any("third-party" in e for e in errors))
+        self.assertIn("outcome is HOLD", " ".join(self.errors(comp)))
+        self.assertTrue(any("third-party receipts are committed" in e for e in self.errors(methods=None)))
 
     def test_a_passing_guard_invalidates_the_list_of_failures(self):
         comp = copy.deepcopy(self.comp)
         next(g for g in comp["decision"]["guards"] if g["name"] == "mlp_delta")["check"] = "pass"
-        self.assertTrue(any("failing guards" in e for e in rp.prose_errors(self.primary, comp, self.roles, [])))
+        self.assertTrue(any("failing guards" in e for e in self.errors(comp)))
+
+    def test_a_changed_third_party_outcome_invalidates_the_prose(self):
+        info = copy.deepcopy(self.methods)
+        next(c for c in info["comparisons"] if c["id"] == "arfpy-arf")["decision"]["outcome"] = "REJECT"
+        self.assertTrue(any("ARF is HOLD" in e for e in self.errors(methods=info)))
+
+
+class ThirdPartyReceipts(unittest.TestCase):
+    def setUp(self):
+        self.primary = load("primary.json")
+
+    def test_committed_receipts_are_one_run_with_four_methods(self):
+        info = methods_info(self.primary)
+        self.assertEqual(sorted(a["arm_id"] for a in info["third"]), sorted(methods_mod.ROLES))
+        self.assertTrue(all(c["holm_m"] == len(info["comparisons"]) for c in info["comparisons"]))
+
+    def test_no_receipts_means_no_rows_but_a_partial_set_is_an_error(self):
+        none = {n: None for n in (methods_mod.PRIMARY, methods_mod.COMPARE, methods_mod.MANIFEST)}
+        self.assertIsNone(methods_info(self.primary, none))
+        with self.assertRaisesRegex(methods_mod.MethodsError, "committed together"):
+            methods_info(self.primary, {methods_mod.COMPARE: None})
+
+    def test_a_release_arm_that_differs_from_primary_json_is_an_error(self):
+        methods = load(methods_mod.PRIMARY)
+        methods["arms"][0]["primary"]["trg"] += 0.001
+        with self.assertRaisesRegex(methods_mod.MethodsError, "field for field"):
+            methods_info(self.primary, {methods_mod.PRIMARY: methods})
+
+    def test_another_run_is_an_error(self):
+        compare = load(methods_mod.COMPARE)
+        compare["inputs"]["schedule_sha256"] = "0" * 64
+        with self.assertRaises(rp.RenderError):
+            methods_info(self.primary, {methods_mod.COMPARE: compare})
+        manifest = load(methods_mod.MANIFEST)
+        manifest["sanity"]["committed_primary_sha256"] = "0" * 64
+        with self.assertRaisesRegex(methods_mod.MethodsError, "sanity"):
+            methods_info(self.primary, {methods_mod.MANIFEST: manifest})
+
+    def test_methods_table_and_dagger_note(self):
+        info = methods_info(self.primary)
+        text = tables.render_methods_table(info["comparisons"])
+        self.assertEqual(text.count(r"\textbf{REJECT}") + text.count(r"\textbf{HOLD}"), len(info["comparisons"]))
+        self.assertIn("none (compare-methods.json absent)", tables.render_methods_table([]))
+        note = tables.above_budget_note(info["third"])
+        self.assertTrue(note.startswith("\u2020 Scored with packets above 2048 B"))
+        self.assertEqual(note.count(" files, TRG at 2048 B -1.000"), len(info["third"]))
+        self.assertEqual(tables.above_budget_note(self.primary["arms"]), "")
 
 
 class CommittedPaper(unittest.TestCase):

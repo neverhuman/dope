@@ -1,0 +1,1040 @@
+{
+ "schema": "dope.baselines-manifest/v1",
+ "generated_utc": "2026-11-23T21:51:03Z",
+ "host": "xbabe0",
+ "run_dir": "/home/ubuntu/dope-data/kpi-runs/v3-dev-report",
+ "schedule": {
+  "file": "schedule-report-dev.jsonl",
+  "sha256": "14238f1d5b9ef7182f862d4aae63d06f3d512a29e6dfebfdb02896735bd20570"
+ },
+ "realref_sha256": "7d377b8ab47f7fb550c4a76491b9ed58ce4e8b704302524d34d2ae037657da16",
+ "dope_kpi": {
+  "path": "/home/ubuntu/dope-data/kpi-runs/v3-bin/dope_kpi",
+  "sha256": "c01fd919e189a79cd9a913cbfbfdaf099ba56381f55ab49e163e6f1fff78d153"
+ },
+ "wrapper": {
+  "path": "/home/ubuntu/dope-runtime-claude/baselines/baselines.py",
+  "sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+  "driver": "/home/ubuntu/dope-runtime-claude/baselines/run_method.sh",
+  "driver_sha256": "482aa936963166d014181edfd97fbc1798835371d84037e294728054acd37cad"
+ },
+ "commands": {
+  "emit": "dope_kpi emit-cli --arena ~/dope-data/flat/s3-v250 --schedule SCHED --out . --arm-file arms.json --arm ARM --threads T --timeout-s 3600 --resume (a second --resume pass only if a command timed out)",
+  "score": "dope_kpi score --arena ~/dope-data/flat/s3-v250 --schedule SCHED --realref realref.jsonl --emit-dir . --arm ARM --out score/ARM --budget-bytes 1000000000 --privacy-rows 1024 --threads T",
+  "guards": "dope_kpi guards --run-dir . --arm ARM --threads T"
+ },
+ "runtime": {
+  "python": "3.12.3",
+  "interpreter": "/home/ubuntu/dope-runtime-claude/venv-baselines/bin/python3 -EP (venv --system-site-packages; user site ~/.local supplies torch)",
+  "venv_packages": [
+   {
+    "name": "sdv",
+    "version": "2.2.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "12fd19971393ba7773a9ea19929d761089b104400adcc62889136feca6d37b18"
+   },
+   {
+    "name": "ctgan",
+    "version": "0.13.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "9efe4f0f47385b600965907e539547109fdde81e24af30307dad2d2e17c074b9"
+   },
+   {
+    "name": "copulas",
+    "version": "0.15.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "879689b8ffeb730edb0eb34e77a4a07583f44e836a2454c594d8fd9d5b40987e"
+   },
+   {
+    "name": "rdt",
+    "version": "2.1.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "daafa0280d51b683644fd485e763f993263c99df0a20df4d572227be13594439"
+   },
+   {
+    "name": "deepecho",
+    "version": "0.9.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "a717add67a1c1c722e665ad5cb954fbb5f66650c63808f0ef38ce5295202143a"
+   },
+   {
+    "name": "sdmetrics",
+    "version": "0.33.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "01761ccd055bf4ec0ea2258e1dc865c0f5024d68bbeb80ab62d0c0be227e5706"
+   },
+   {
+    "name": "Faker",
+    "version": "40.63.0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "af42420317ac56da120d4632365552dbb98bee2e8db741ad10148050cc32893c"
+   },
+   {
+    "name": "platformdirs",
+    "version": "4.14.8",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "8359f23a27c6dd0863c10e2ccb7f92b84207b2c94f8ff0188d184b6c60fb10e0"
+   },
+   {
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "0c26b4b1542dbd1ebd8d2babdd501aed583d6ada9595517f936f00fe4ff9d254"
+   },
+   {
+    "name": "arfpy",
+    "version": "0.1.1",
+    "location": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "3d14b97adc6c15d3b6aa3bbb93f06b5b9c2adc87369b2bbf847508a8e54c9535"
+   }
+  ],
+  "wheels": [
+   {
+    "file": "arfpy-0.1.1.tar.gz",
+    "sha256": "88170d5e72638b0dbfec28cfbdfee02e97bd6a06d5a636e960acd5d90d480707"
+   },
+   {
+    "file": "copulas-0.15.0-py3-none-any.whl",
+    "sha256": "fca5f4fed6197f43320f46b4d4c16c86f8d99fac98cbd6ed7395051ab982ede2"
+   },
+   {
+    "file": "ctgan-0.13.0-py3-none-any.whl",
+    "sha256": "98de5a420a1248cb1ae99a0604770e58244d43cc04a595706f9edb42852d5e0d"
+   },
+   {
+    "file": "deepecho-0.9.0-py3-none-any.whl",
+    "sha256": "186ff82cadc7f7c85cad680ef85bcb00b00749e766b89d9c9949380936f3a074"
+   },
+   {
+    "file": "faker-40.63.0-py3-none-any.whl",
+    "sha256": "36627c20b575b4138f54b6c21f8703e9ab122fd487aca11319beec2aa6ca7232"
+   },
+   {
+    "file": "platformdirs-4.14.8-py3-none-any.whl",
+    "sha256": "1e34af590de4d978631b751eb2202f2fee4497537a17c1720b12fcf57b331392"
+   },
+   {
+    "file": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+    "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+   },
+   {
+    "file": "rdt-2.1.0-py3-none-any.whl",
+    "sha256": "a9cab491d73964e105170b9d5344db087a94572efd57a23e56d5b252543f0c63"
+   },
+   {
+    "file": "sdmetrics-0.33.0-py3-none-any.whl",
+    "sha256": "d7ffc7b532954cf922ae87f383339a6a8b43e7308e7d1396fcb259ad03814e68"
+   },
+   {
+    "file": "sdv-2.2.0-py3-none-any.whl",
+    "sha256": "4ed249844ad5040986cca98ceacb2521d01d4ab252d5141575acce9c6f6eef73"
+   },
+   {
+    "file": "arfpy-0.1.1-py3-none-any.whl",
+    "sha256": "ca23ad711291f7a1415956c3d1859d054e269ffb700e31173ea8b6f25e321de7",
+    "note": "built locally by pip from the sdist above"
+   }
+  ],
+  "shared_packages": [
+   {
+    "name": "torch",
+    "version": "2.10.0",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "5caad9e97650501c031e682371c0bf10a99137924e3514670de60ac77e06284e"
+   },
+   {
+    "name": "numpy",
+    "version": "1.26.4",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "32cb6a19574cd1592c5bdcc2756d78842beeaab5e84dfdde34acd4c84ffa9548"
+   },
+   {
+    "name": "pandas",
+    "version": "2.1.4+dfsg",
+    "location": "/usr/lib/python3/dist-packages",
+    "dist_info_record_sha256": null
+   },
+   {
+    "name": "scikit-learn",
+    "version": "1.7.2",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "a74e3f68a32d8c2249182222a95c6754927c15dd5e4e1826d219e63c41d2fcfa"
+   },
+   {
+    "name": "scipy",
+    "version": "1.16.3",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "3dd39a618f201211e867b7c06b2a5a1e651febdb9aa89f5f75e692b3563ceac5"
+   },
+   {
+    "name": "cloudpickle",
+    "version": "3.1.2",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "97862f8046fccbf72f48a774dca47e17e45361306c7696a66e9977d10e57f5ed"
+   },
+   {
+    "name": "graphviz",
+    "version": "0.21",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "a7d76c79d08f3d3f19e5345f7c1e7c62f10a55632a600f2a78dc2363d43d3770"
+   },
+   {
+    "name": "tqdm",
+    "version": "4.67.2",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "493edc0216f9ed7bbe47acec3e6230f1d632aae4032b39d6bf3409e1613e6c36"
+   },
+   {
+    "name": "plotly",
+    "version": "6.5.2",
+    "location": "/home/ubuntu/.local/lib/python3.12/site-packages",
+    "dist_info_record_sha256": "6a0eefe19b7cb19ea8b4f511a9bc2c51d345838b2203a44e1594c822a576abcf"
+   },
+   {
+    "name": "joblib",
+    "version": "1.3.2",
+    "location": "/usr/lib/python3/dist-packages",
+    "dist_info_record_sha256": null
+   }
+  ],
+  "env": "CUDA_VISIBLE_DEVICES='', OMP/MKL/OPENBLAS/NUMEXPR/RAYON_NUM_THREADS=1; run_job.sh: CPUs 104-119, nice 19, SCHED_IDLE, ionice idle, budget guard 0.60, xbabe0 gate2",
+  "imported_modules": {
+   "torch": {
+    "__version__": "2.10.0+cu128",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/torch/__init__.py"
+   },
+   "numpy": {
+    "__version__": "1.26.4",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/numpy/__init__.py"
+   },
+   "pandas": {
+    "__version__": "2.1.4",
+    "file": "/usr/lib/python3/dist-packages/pandas/__init__.py"
+   },
+   "sklearn": {
+    "__version__": "1.7.2",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/sklearn/__init__.py"
+   },
+   "scipy": {
+    "__version__": "1.16.3",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/scipy/__init__.py"
+   },
+   "cloudpickle": {
+    "__version__": "3.1.2",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/cloudpickle/__init__.py"
+   },
+   "graphviz": {
+    "__version__": "0.21",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/graphviz/__init__.py"
+   },
+   "tqdm": {
+    "__version__": "4.67.1",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/tqdm/__init__.py"
+   },
+   "plotly": {
+    "__version__": "6.5.2",
+    "file": "/home/ubuntu/.local/lib/python3.12/site-packages/plotly/__init__.py"
+   },
+   "joblib": {
+    "__version__": "1.3.2",
+    "file": "/usr/lib/python3/dist-packages/joblib/__init__.py"
+   },
+   "copulas": {
+    "__version__": "0.15.0",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/copulas/__init__.py"
+   },
+   "rdt": {
+    "__version__": "2.1.0",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/rdt/__init__.py"
+   },
+   "ctgan": {
+    "__version__": "0.13.0",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/ctgan/__init__.py"
+   },
+   "sdv": {
+    "__version__": "2.2.0",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/sdv/__init__.py"
+   },
+   "sdmetrics": {
+    "__version__": "0.33.0",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/sdmetrics/__init__.py"
+   },
+   "platformdirs": {
+    "__version__": "4.14.8",
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/platformdirs/__init__.py"
+   },
+   "faker": {
+    "__version__": null,
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/faker/__init__.py"
+   },
+   "arfpy": {
+    "__version__": null,
+    "file": "/home/ubuntu/dope-runtime-claude/venv-baselines/lib/python3.12/site-packages/arfpy/__init__.py"
+   }
+  },
+  "note": "~/.local holds two dist-info directories each for tqdm (4.67.1, 4.67.2) and plotly (6.5.2, 6.6.0), dated 2026-02 and 2026-11, unchanged during this run; importlib.metadata reports one, the imported modules are listed in imported_modules. Neither is used by the results (progress bars, unused)."
+ },
+ "methods": [
+  {
+   "arm_id": "sdv-gaussian-copula",
+   "package": "sdv",
+   "version": "2.2.0",
+   "class": "sdv.single_table.GaussianCopulaSynthesizer",
+   "recipe": {
+    "hyperparameters": "library defaults (none passed)",
+    "defaults_as_installed": {
+     "constructor": {
+      "enforce_min_max_values": true,
+      "enforce_rounding": true,
+      "locales": [
+       "en_US"
+      ],
+      "numerical_distributions": null,
+      "default_distribution": null
+     },
+     "effective": {
+      "default_distribution": "beta (None resolves to beta)"
+     }
+    },
+    "typing": "Metadata.detect_from_dataframes({'t': A}, infer_keys=None); a feature detected with an sdtype other than numerical/categorical/ordinal/boolean is declared numerical; target declared categorical (binary, multiclass) or numerical (regression)",
+    "packet": "synthesizer.save(packet): cloudpickle of the fitted synthesizer; sample loads it with sdv.utils.load_synthesizer",
+    "seeds": "fit: random, numpy and torch seeded with {fit_seed}; sample: the same with {seed} and synthesizer._set_random_state({seed}) (emit-cli: crn_seed streams 'ext-fit' / 'ext-sample' mod 2^31)",
+    "threads": "1 (torch.set_num_threads(1), set_num_interop_threads(1); OMP/MKL/OpenBLAS=1)",
+    "device": "cpu"
+   },
+   "arm": {
+    "arm_id": "sdv-gaussian-copula",
+    "note": "SDV 2.2.0 GaussianCopulaSynthesizer (copulas 0.15.0, rdt 2.1.0); library defaults, not byte-capped; packet = synthesizer.save (cloudpickle); SDV-detected feature sdtypes (no key inference, non-statistical sdtypes -> numerical), target typed by task; CPU, 1 thread; wrapper baselines.py sha256 b091e0ddd7dd",
+    "artifact_class": "source_free",
+    "io": "csv",
+    "binary": "/home/ubuntu/dope-runtime-claude/baselines/baselines.py",
+    "binary_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+    "fit": [
+     "{bin}",
+     "fit",
+     "--method",
+     "sdv-gaussian-copula",
+     "--in",
+     "{fit_rows}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--seed",
+     "{fit_seed}",
+     "--out",
+     "{packet}"
+    ],
+    "sample": [
+     "{bin}",
+     "sample",
+     "--method",
+     "sdv-gaussian-copula",
+     "--model",
+     "{packet}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--rows",
+     "{rows}",
+     "--seed",
+     "{seed}",
+     "--out",
+     "{out}"
+    ]
+   },
+   "cells": {
+    "scheduled": 108,
+    "ok": 108,
+    "failed": 0,
+    "unsupported": 0,
+    "rows_failed_by_reason": {},
+    "timeout_rows": 0
+   },
+   "emit_summary": {
+    "arch_id": "ext-cli/v1",
+    "arm_id": "sdv-gaussian-copula",
+    "artifact_class": "source_free",
+    "budget_bytes": null,
+    "cells": 108,
+    "cells_failed": 0,
+    "cells_failed_by_reason": {},
+    "cells_kept": 0,
+    "cells_ok": 108,
+    "cells_run": 108,
+    "cells_unsupported": 0,
+    "cold_bytes": 13289,
+    "command": "emit-cli",
+    "decode_ms_median": 6135.671,
+    "emit_file": "sdv-gaussian-copula/emit.jsonl",
+    "encode_ms_median": 8446.908500000001,
+    "io": "csv",
+    "limit_cells": null,
+    "packet_bytes_max": 2103746,
+    "packet_bytes_median": 131539.0,
+    "rows": 216,
+    "rows_failed": 0,
+    "rows_failed_by_reason": {},
+    "rows_ok": 216,
+    "rows_unsupported": 0,
+    "schedule_cells": 108,
+    "weights_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1"
+   },
+   "wall": {
+    "fit_wall_s_sum": 1794.7,
+    "sample_wall_s_sum": 1501.2,
+    "fit_wall_s_median": 8.45,
+    "note": "per-command wall clock from emit.jsonl (includes time frozen by the xbabe0 gate and the budget guard's duty cycle)",
+    "job": "bl-fast",
+    "emit_start": "2026-11-23T21:07:02Z",
+    "threads": 3,
+    "emit_end": "2026-11-23T21:25:25Z",
+    "done": "2026-11-23T21:26:24Z",
+    "emit_elapsed_s": 1103,
+    "elapsed": "0h18m emit (0h03m gate-held)",
+    "gate_held_s_during_emit": 213,
+    "job_elapsed_s": 1162
+   },
+   "cpu_seconds": {
+    "final_logs": {
+     "cell_logs": 108,
+     "fit_commands_ok": 108,
+     "sample_commands_ok": 216,
+     "fit_cpu_s": 742.6,
+     "sample_cpu_s": 905.0,
+     "cpu_s": 1647.6,
+     "max_rss_mb": 721
+    },
+    "passes": {
+     "_logs.pass1": {
+      "cell_logs": 108,
+      "fit_commands_ok": 108,
+      "sample_commands_ok": 216,
+      "fit_cpu_s": 742.6,
+      "sample_cpu_s": 905.0,
+      "cpu_s": 1647.6,
+      "max_rss_mb": 721
+     }
+    }
+   },
+   "packet_bytes": {
+    "cells": 108,
+    "median": 131539.0,
+    "max": 2103746,
+    "min": 47370
+   }
+  },
+  {
+   "arm_id": "sdv-ctgan",
+   "package": "sdv",
+   "version": "2.2.0",
+   "class": "sdv.single_table.CTGANSynthesizer",
+   "recipe": {
+    "hyperparameters": "library defaults (none passed)",
+    "defaults_as_installed": {
+     "constructor": {
+      "enforce_min_max_values": true,
+      "enforce_rounding": true,
+      "locales": [
+       "en_US"
+      ],
+      "embedding_dim": 128,
+      "generator_dim": [
+       256,
+       256
+      ],
+      "discriminator_dim": [
+       256,
+       256
+      ],
+      "generator_lr": 0.0002,
+      "generator_decay": 1e-06,
+      "discriminator_lr": 0.0002,
+      "discriminator_decay": 1e-06,
+      "batch_size": 500,
+      "discriminator_steps": 1,
+      "log_frequency": true,
+      "verbose": false,
+      "epochs": 300,
+      "pac": 10,
+      "enable_gpu": true
+     },
+     "effective": {
+      "device": "cpu (CUDA_VISIBLE_DEVICES empty; enable_gpu default falls back)"
+     }
+    },
+    "typing": "Metadata.detect_from_dataframes({'t': A}, infer_keys=None); a feature detected with an sdtype other than numerical/categorical/ordinal/boolean is declared numerical; target declared categorical (binary, multiclass) or numerical (regression)",
+    "packet": "synthesizer.save(packet): cloudpickle of the fitted synthesizer; sample loads it with sdv.utils.load_synthesizer",
+    "seeds": "fit: random, numpy and torch seeded with {fit_seed}; sample: the same with {seed} and synthesizer._set_random_state({seed}) (emit-cli: crn_seed streams 'ext-fit' / 'ext-sample' mod 2^31)",
+    "threads": "1 (torch.set_num_threads(1), set_num_interop_threads(1); OMP/MKL/OpenBLAS=1)",
+    "device": "cpu"
+   },
+   "arm": {
+    "arm_id": "sdv-ctgan",
+    "note": "SDV 2.2.0 CTGANSynthesizer (ctgan 0.13.0, rdt 2.1.0, torch 2.10.0 CPU); library defaults, not byte-capped; packet = synthesizer.save (cloudpickle); SDV-detected feature sdtypes (no key inference, non-statistical sdtypes -> numerical), target typed by task; CPU, 1 thread; wrapper baselines.py sha256 b091e0ddd7dd",
+    "artifact_class": "source_free",
+    "io": "csv",
+    "binary": "/home/ubuntu/dope-runtime-claude/baselines/baselines.py",
+    "binary_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+    "fit": [
+     "{bin}",
+     "fit",
+     "--method",
+     "sdv-ctgan",
+     "--in",
+     "{fit_rows}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--seed",
+     "{fit_seed}",
+     "--out",
+     "{packet}"
+    ],
+    "sample": [
+     "{bin}",
+     "sample",
+     "--method",
+     "sdv-ctgan",
+     "--model",
+     "{packet}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--rows",
+     "{rows}",
+     "--seed",
+     "{seed}",
+     "--out",
+     "{out}"
+    ]
+   },
+   "cells": {
+    "scheduled": 108,
+    "ok": 108,
+    "failed": 0,
+    "unsupported": 0,
+    "rows_failed_by_reason": {},
+    "timeout_rows": 0
+   },
+   "emit_summary": {
+    "arch_id": "ext-cli/v1",
+    "arm_id": "sdv-ctgan",
+    "artifact_class": "source_free",
+    "budget_bytes": null,
+    "cells": 108,
+    "cells_failed": 0,
+    "cells_failed_by_reason": {},
+    "cells_kept": 0,
+    "cells_ok": 108,
+    "cells_run": 108,
+    "cells_unsupported": 0,
+    "cold_bytes": 13289,
+    "command": "emit-cli",
+    "decode_ms_median": 5885.0665,
+    "emit_file": "sdv-ctgan/emit.jsonl",
+    "encode_ms_median": 50330.0545,
+    "io": "csv",
+    "limit_cells": null,
+    "packet_bytes_max": 7195115,
+    "packet_bytes_median": 1018143.5,
+    "rows": 216,
+    "rows_failed": 0,
+    "rows_failed_by_reason": {},
+    "rows_ok": 216,
+    "rows_unsupported": 0,
+    "schedule_cells": 108,
+    "weights_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1"
+   },
+   "wall": {
+    "fit_wall_s_sum": 14957.6,
+    "sample_wall_s_sum": 1409.9,
+    "fit_wall_s_median": 50.33,
+    "note": "per-command wall clock from emit.jsonl (includes time frozen by the xbabe0 gate and the budget guard's duty cycle)",
+    "job": "bl-ctgan",
+    "emit_start": "2026-11-23T21:07:00Z",
+    "threads": 7,
+    "emit_end": "2026-11-23T21:46:12Z",
+    "done": "2026-11-23T21:46:36Z",
+    "emit_elapsed_s": 2352,
+    "elapsed": "0h39m emit (0h16m gate-held)",
+    "gate_held_s_during_emit": 1002,
+    "job_elapsed_s": 2376
+   },
+   "cpu_seconds": {
+    "final_logs": {
+     "cell_logs": 108,
+     "fit_commands_ok": 108,
+     "sample_commands_ok": 216,
+     "fit_cpu_s": 6373.4,
+     "sample_cpu_s": 907.5,
+     "cpu_s": 7280.9,
+     "max_rss_mb": 962
+    },
+    "passes": {
+     "_logs.pass1": {
+      "cell_logs": 108,
+      "fit_commands_ok": 108,
+      "sample_commands_ok": 216,
+      "fit_cpu_s": 6373.4,
+      "sample_cpu_s": 907.5,
+      "cpu_s": 7280.9,
+      "max_rss_mb": 962
+     }
+    }
+   },
+   "packet_bytes": {
+    "cells": 108,
+    "median": 1018143.5,
+    "max": 7195115,
+    "min": 632711
+   }
+  },
+  {
+   "arm_id": "sdv-tvae",
+   "package": "sdv",
+   "version": "2.2.0",
+   "class": "sdv.single_table.TVAESynthesizer",
+   "recipe": {
+    "hyperparameters": "library defaults (none passed)",
+    "defaults_as_installed": {
+     "constructor": {
+      "enforce_min_max_values": true,
+      "enforce_rounding": true,
+      "embedding_dim": 128,
+      "compress_dims": [
+       128,
+       128
+      ],
+      "decompress_dims": [
+       128,
+       128
+      ],
+      "l2scale": 1e-05,
+      "batch_size": 500,
+      "verbose": false,
+      "epochs": 300,
+      "loss_factor": 2,
+      "enable_gpu": true
+     },
+     "effective": {
+      "device": "cpu (CUDA_VISIBLE_DEVICES empty; enable_gpu default falls back)"
+     }
+    },
+    "typing": "Metadata.detect_from_dataframes({'t': A}, infer_keys=None); a feature detected with an sdtype other than numerical/categorical/ordinal/boolean is declared numerical; target declared categorical (binary, multiclass) or numerical (regression)",
+    "packet": "synthesizer.save(packet): cloudpickle of the fitted synthesizer; sample loads it with sdv.utils.load_synthesizer",
+    "seeds": "fit: random, numpy and torch seeded with {fit_seed}; sample: the same with {seed} and synthesizer._set_random_state({seed}) (emit-cli: crn_seed streams 'ext-fit' / 'ext-sample' mod 2^31)",
+    "threads": "1 (torch.set_num_threads(1), set_num_interop_threads(1); OMP/MKL/OpenBLAS=1)",
+    "device": "cpu"
+   },
+   "arm": {
+    "arm_id": "sdv-tvae",
+    "note": "SDV 2.2.0 TVAESynthesizer (ctgan 0.13.0, rdt 2.1.0, torch 2.10.0 CPU); library defaults, not byte-capped; packet = synthesizer.save (cloudpickle); SDV-detected feature sdtypes (no key inference, non-statistical sdtypes -> numerical), target typed by task; CPU, 1 thread; wrapper baselines.py sha256 b091e0ddd7dd",
+    "artifact_class": "source_free",
+    "io": "csv",
+    "binary": "/home/ubuntu/dope-runtime-claude/baselines/baselines.py",
+    "binary_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+    "fit": [
+     "{bin}",
+     "fit",
+     "--method",
+     "sdv-tvae",
+     "--in",
+     "{fit_rows}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--seed",
+     "{fit_seed}",
+     "--out",
+     "{packet}"
+    ],
+    "sample": [
+     "{bin}",
+     "sample",
+     "--method",
+     "sdv-tvae",
+     "--model",
+     "{packet}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--rows",
+     "{rows}",
+     "--seed",
+     "{seed}",
+     "--out",
+     "{out}"
+    ]
+   },
+   "cells": {
+    "scheduled": 108,
+    "ok": 108,
+    "failed": 0,
+    "unsupported": 0,
+    "rows_failed_by_reason": {},
+    "timeout_rows": 0
+   },
+   "emit_summary": {
+    "arch_id": "ext-cli/v1",
+    "arm_id": "sdv-tvae",
+    "artifact_class": "source_free",
+    "budget_bytes": null,
+    "cells": 108,
+    "cells_failed": 0,
+    "cells_failed_by_reason": {},
+    "cells_kept": 0,
+    "cells_ok": 108,
+    "cells_run": 108,
+    "cells_unsupported": 0,
+    "cold_bytes": 13289,
+    "command": "emit-cli",
+    "decode_ms_median": 6174.8225,
+    "emit_file": "sdv-tvae/emit.jsonl",
+    "encode_ms_median": 16021.875,
+    "io": "csv",
+    "limit_cells": null,
+    "packet_bytes_max": 4892096,
+    "packet_bytes_median": 447998.5,
+    "rows": 216,
+    "rows_failed": 0,
+    "rows_failed_by_reason": {},
+    "rows_ok": 216,
+    "rows_unsupported": 0,
+    "schedule_cells": 108,
+    "weights_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1"
+   },
+   "wall": {
+    "fit_wall_s_sum": 7394.5,
+    "sample_wall_s_sum": 1423.1,
+    "fit_wall_s_median": 16.02,
+    "note": "per-command wall clock from emit.jsonl (includes time frozen by the xbabe0 gate and the budget guard's duty cycle)",
+    "job": "bl-tvae",
+    "emit_start": "2026-11-23T21:07:01Z",
+    "threads": 4,
+    "emit_end": "2026-11-23T21:43:54Z",
+    "done": "2026-11-23T21:44:30Z",
+    "emit_elapsed_s": 2213,
+    "elapsed": "0h36m emit (0h16m gate-held)",
+    "gate_held_s_during_emit": 1001,
+    "job_elapsed_s": 2249
+   },
+   "cpu_seconds": {
+    "final_logs": {
+     "cell_logs": 108,
+     "fit_commands_ok": 108,
+     "sample_commands_ok": 216,
+     "fit_cpu_s": 2361.6,
+     "sample_cpu_s": 930.7,
+     "cpu_s": 3292.4,
+     "max_rss_mb": 851
+    },
+    "passes": {
+     "_logs.pass1": {
+      "cell_logs": 108,
+      "fit_commands_ok": 108,
+      "sample_commands_ok": 216,
+      "fit_cpu_s": 2361.6,
+      "sample_cpu_s": 930.7,
+      "cpu_s": 3292.4,
+      "max_rss_mb": 851
+     }
+    }
+   },
+   "packet_bytes": {
+    "cells": 108,
+    "median": 447998.5,
+    "max": 4892096,
+    "min": 206651
+   }
+  },
+  {
+   "arm_id": "arfpy-arf",
+   "package": "arfpy",
+   "version": "0.1.1",
+   "class": "arfpy.arf.arf + forde() + forge()",
+   "recipe": {
+    "hyperparameters": "library defaults (none passed)",
+    "defaults_as_installed": {
+     "constructor": {
+      "num_trees": 30,
+      "delta": 0,
+      "max_iters": 10,
+      "early_stop": true,
+      "verbose": true,
+      "min_node_size": 5
+     },
+     "forde": {
+      "dist": "truncnorm",
+      "oob": false,
+      "alpha": 0
+     },
+     "effective": {
+      "RandomForestClassifier": "sklearn defaults except those arfpy sets (oob_score=True, n_estimators=num_trees, min_samples_leaf=min_node_size); n_jobs=None (1)"
+     }
+    },
+    "typing": "features float64 (arfpy: continuous); target category dtype for binary and multiclass, float64 for regression",
+    "packet": "pickle (highest protocol) of the arf object after forde(), with x_real (a copy of the fit rows) and clf (the forest) removed; forge() reads neither (strip check in the smoke: identical rows)",
+    "seeds": "fit: random, numpy and torch seeded with {fit_seed}; sample: the same with {seed} (emit-cli: crn_seed streams 'ext-fit' / 'ext-sample' mod 2^31)",
+    "threads": "1 (torch.set_num_threads(1), set_num_interop_threads(1); OMP/MKL/OpenBLAS=1)",
+    "device": "cpu"
+   },
+   "arm": {
+    "arm_id": "arfpy-arf",
+    "note": "arfpy 0.1.1 adversarial random forest arf()+forde()+forge() (scikit-learn 1.7.2, scipy 1.16.3); library defaults, not byte-capped; packet = pickled arf after forde() without x_real (fit rows) and clf (forest), which forge() never reads; target categorical for classification; CPU, 1 thread; wrapper baselines.py sha256 b091e0ddd7dd",
+    "artifact_class": "source_free",
+    "io": "csv",
+    "binary": "/home/ubuntu/dope-runtime-claude/baselines/baselines.py",
+    "binary_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+    "fit": [
+     "{bin}",
+     "fit",
+     "--method",
+     "arfpy-arf",
+     "--in",
+     "{fit_rows}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--seed",
+     "{fit_seed}",
+     "--out",
+     "{packet}"
+    ],
+    "sample": [
+     "{bin}",
+     "sample",
+     "--method",
+     "arfpy-arf",
+     "--model",
+     "{packet}",
+     "--task",
+     "{task}",
+     "--classes",
+     "{classes}",
+     "--rows",
+     "{rows}",
+     "--seed",
+     "{seed}",
+     "--out",
+     "{out}"
+    ]
+   },
+   "cells": {
+    "scheduled": 108,
+    "ok": 108,
+    "failed": 0,
+    "unsupported": 0,
+    "rows_failed_by_reason": {},
+    "timeout_rows": 0
+   },
+   "emit_summary": {
+    "arch_id": "ext-cli/v1",
+    "arm_id": "arfpy-arf",
+    "artifact_class": "source_free",
+    "budget_bytes": null,
+    "cells": 108,
+    "cells_failed": 0,
+    "cells_failed_by_reason": {},
+    "cells_kept": 0,
+    "cells_ok": 108,
+    "cells_run": 108,
+    "cells_unsupported": 0,
+    "cold_bytes": 13289,
+    "command": "emit-cli",
+    "decode_ms_median": 1565.3285,
+    "emit_file": "arfpy-arf/emit.jsonl",
+    "encode_ms_median": 3369.5505000000003,
+    "io": "csv",
+    "limit_cells": null,
+    "packet_bytes_max": 24068428,
+    "packet_bytes_median": 1358942.5,
+    "rows": 216,
+    "rows_failed": 0,
+    "rows_failed_by_reason": {},
+    "rows_ok": 216,
+    "rows_unsupported": 0,
+    "schedule_cells": 108,
+    "weights_sha256": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1"
+   },
+   "wall": {
+    "fit_wall_s_sum": 2067.0,
+    "sample_wall_s_sum": 2065.7,
+    "fit_wall_s_median": 3.37,
+    "note": "per-command wall clock from emit.jsonl (includes time frozen by the xbabe0 gate and the budget guard's duty cycle)",
+    "job": "bl-fast",
+    "emit_start": "2026-11-23T21:26:24Z",
+    "threads": 3,
+    "emit_end": "2026-11-23T21:49:25Z",
+    "done": "2026-11-23T21:50:03Z",
+    "emit_elapsed_s": 1381,
+    "elapsed": "0h23m emit (0h13m gate-held)",
+    "gate_held_s_during_emit": 787,
+    "job_elapsed_s": 1419
+   },
+   "cpu_seconds": {
+    "final_logs": {
+     "cell_logs": 108,
+     "fit_commands_ok": 108,
+     "sample_commands_ok": 216,
+     "fit_cpu_s": 1116.8,
+     "sample_cpu_s": 402.2,
+     "cpu_s": 1519.0,
+     "max_rss_mb": 283
+    },
+    "passes": {
+     "_logs.pass1": {
+      "cell_logs": 108,
+      "fit_commands_ok": 108,
+      "sample_commands_ok": 216,
+      "fit_cpu_s": 1116.8,
+      "sample_cpu_s": 402.2,
+      "cpu_s": 1519.0,
+      "max_rss_mb": 283
+     }
+    }
+   },
+   "packet_bytes": {
+    "cells": 108,
+    "median": 1358942.5,
+    "max": 24068428,
+    "min": 60045
+   }
+  }
+ ],
+ "artifact_class_evidence": {
+  "rule": "ext-arms.md: a generator whose packet holds fit rows is not source_free",
+  "choice": "source_free for all four",
+  "audit": "fit --audit reloads the packet and walks every reachable object (modules, types and functions skipped): containers with as many rows as the fit table, and float vectors equal as multisets to a fit column. A positive control (a pickled DataFrame of the rows) is flagged, and so is the full arfpy object (with x_real).",
+  "smoke_run": "/home/ubuntu/dope-runtime-claude/baselines/smoke-run",
+  "smoke_cells": [
+   "baseline-v250:009662904881da54:full:d5",
+   "baseline-v250:02ce36e8cae6b90f:full:d5",
+   "baseline-v250:0b01bd8849b4bacb:full:d5"
+  ],
+  "per_method": {
+   "sdv-gaussian-copula": [
+    {
+     "p": 132,
+     "rows": 350,
+     "packet_bytes": 971470,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 18,
+     "rows": 350,
+     "packet_bytes": 149766,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 11,
+     "rows": 350,
+     "packet_bytes": 106591,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    }
+   ],
+   "sdv-ctgan": [
+    {
+     "p": 132,
+     "rows": 350,
+     "packet_bytes": 4520303,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 18,
+     "rows": 350,
+     "packet_bytes": 1091893,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 11,
+     "rows": 350,
+     "packet_bytes": 936192,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    }
+   ],
+   "sdv-tvae": [
+    {
+     "p": 132,
+     "rows": 350,
+     "packet_bytes": 2807358,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 18,
+     "rows": 350,
+     "packet_bytes": 503304,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    },
+    {
+     "p": 11,
+     "rows": 350,
+     "packet_bytes": 402684,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0
+    }
+   ],
+   "arfpy-arf": [
+    {
+     "p": 132,
+     "rows": 350,
+     "packet_bytes": 15455104,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0,
+     "strip_check": "identical"
+    },
+    {
+     "p": 18,
+     "rows": 350,
+     "packet_bytes": 2557126,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0,
+     "strip_check": "identical"
+    },
+    {
+     "p": 11,
+     "rows": 350,
+     "packet_bytes": 1208159,
+     "audit_row_containers": 0,
+     "audit_column_copies": 0,
+     "strip_check": "identical"
+    }
+   ]
+  },
+  "in_packet_but_not_rows": "SDV metadata keeps per-column range_min/range_max/decimal_places/category values and fitted transformer parameters (extrema, category frequencies, mixture parameters); arfpy keeps per-leaf mean, sd, bounds and class probabilities of leaves with >= 5 fit rows. No row is stored."
+ },
+ "sanity": {
+  "command": "dope_kpi primary over the 11 committed arms, run dir v3-dev-report, on xbabe0",
+  "receipt": "primary-sanity-x0.json",
+  "sha256": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
+  "committed_primary_sha256": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
+  "identical": true
+ },
+ "licenses": {
+  "sdv": "BUSL-1.1",
+  "ctgan": "BUSL-1.1",
+  "copulas": "BUSL-1.1",
+  "rdt": "BUSL-1.1",
+  "arfpy": "MIT"
+ },
+ "reuse": {
+  "arms_file": "/home/ubuntu/dope-runtime-claude/baselines/arms-baselines.json",
+  "driver": "/home/ubuntu/dope-runtime-claude/baselines/run_method.sh RUNDIR SCHEDULE ARM THREADS [TIMEOUT_S]",
+  "merge": "python3 /home/ubuntu/dope-runtime-claude/baselines/make_arms.py RUNDIR (backs up RUNDIR/arms.json to arms.json.before-baselines, appends the four arms)",
+  "note": "arms hold only absolute, run-independent paths (wrapper pinned by binary_sha256, venv interpreter in its shebang); re-running on another schedule changes no arm field"
+ }
+}

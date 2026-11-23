@@ -8,7 +8,10 @@
     "tool": "rsvg-convert version 2.58.0"
   },
   "inputs": {
+    "bench/real-world/results/scoreboard/v3.0.0/MANIFEST.json": "c44db0cc0178fab281ff2e9eceb5215be638b598e21c84cf907b15049262b143",
+    "bench/real-world/results/scoreboard/v3.0.0/compare-methods.json": "36f00d467dcb56b79d10993fae8a8c226d8a9441624b7925ad53b1fc3427f112",
     "bench/real-world/results/scoreboard/v3.0.0/compare.json": "5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49",
+    "bench/real-world/results/scoreboard/v3.0.0/primary-methods.json": "47ff73b1e35b8b29210de6df55538d60c65b59486c405d641027aff2124deda2",
     "bench/real-world/results/scoreboard/v3.0.0/primary.json": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
     "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "8242c987c320b4c773859d168ed091eabd95283c68fbbf7a4482733571fed96d",
     "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "faabcc1546131c21792fd37db9473a7409fb31a688eb8fa0ed29f22e7e5a4dd6",
@@ -30,8 +33,9 @@
   },
   "outputs": {
     "docs/whitepaper-v3/generated/v3-comparison-table.tex": "cc0c57336ff4a2f8ccb8de3a79172f2fb6c3a0187da948755f1ad4457ce18ff9",
-    "docs/whitepaper-v3/generated/v3-macros.tex": "2aed8f9cb62c5364d993672997b6709bbb2697f836750bab1ada5237b314b8db",
-    "docs/whitepaper-v3/generated/v3-results-table.tex": "8668bba5e49ca355c837a9da171820cb12f3a5fcfa4ee220b4eb986d6e04a150"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "bde916c3a2e3c79c7e6002ee2eadcd4ab4d78ecb29f756e08bee146108624ad2",
+    "docs/whitepaper-v3/generated/v3-methods-table.tex": "84c80ca0adca609f99ea66ad4e1422fadbefdb532eb999be1c73f50758b148c3",
+    "docs/whitepaper-v3/generated/v3-results-table.tex": "b439bf1ba0dd882b1e5e18ae42e4fb6c687ad7b8192daaceb3384cb34cdf16c7"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }

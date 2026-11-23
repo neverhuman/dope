@@ -27,7 +27,13 @@ The look has \VThree{Families} informative families, as few as \VThree{BinaryFam
 The sign-flip null shows that the percentile interval is anti-conservative at this size (\S\ref{sec:results}), Holm's adjustment covers a single comparison, and the matched-size gain is not resolved.
 The contract is a candidate and not frozen, so the rule itself may change before a confirmatory look.
 
-\paragraph{Baselines and provenance.}
-Third-party generators have not yet been scored under this protocol.
+\paragraph{Third-party baselines.}
+Each third-party generator was fitted once per cell on this one development look, with library defaults, no tuning and no byte cap (its files were scored up to \VThree{MethodsScoreBudget}~bytes).
+It therefore fails the byte guard by construction, and its TRG describes it at its own file sizes, not at the budget.
+Entries whose sample holds a single class score \VThree{FailedValue} by protocol; the run's report (\path{methods-report.md}) attributes TVAE's failed cells to such samples.
+The comparisons are between these configurations on these splits, not between the methods in general.
+SDV and its libraries are licensed \VThree{SdvLicense} and arfpy \VThree{ArfpyLicense}.
+
+\paragraph{Provenance.}
 The receipts record \texttt{dope\_kpi} version \VThree{ToolVersion} with build commit ``\VThree{ToolGitSha}'', and the scored packets and run directory are not in the repository, so the scores cannot be recomputed from committed files alone.
 The scoreboard's README states that the released binary was re-run on every scheduled cell before the tag; no committed receipt records that re-run, so this paper does not claim that the released binary reproduces every scored packet.
