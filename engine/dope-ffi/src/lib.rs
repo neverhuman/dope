@@ -22,8 +22,10 @@ use dope_core::single_encoding::{
     fit_dse7_packet, unpack_dse7_packet, COL_FEAT_DIM, KNOT_COUNT, MAX_CLASSES, MAX_COLS, MAX_RANK,
 };
 
-/// Bumped on any change of a signature or of [`layout`].
-pub const ABI_VERSION: u32 = 2;
+/// Bumped on any change of a signature or of [`layout`] / [`v8::offsets`].
+pub const ABI_VERSION: u32 = 3;
+
+pub mod v8;
 /// Largest packet budget accepted (the 64 KiB development frontier).
 pub const MAX_BUDGET: u32 = 65_536;
 
@@ -80,7 +82,7 @@ pub struct Dse7Episode {
     pub floats: Vec<f32>,
 }
 
-fn columns(x: &[f32], n: usize, p: usize) -> Vec<Vec<f64>> {
+pub(crate) fn columns(x: &[f32], n: usize, p: usize) -> Vec<Vec<f64>> {
     (0..p)
         .map(|j| (0..n).map(|i| x[i * p + j] as f64).collect())
         .collect()
