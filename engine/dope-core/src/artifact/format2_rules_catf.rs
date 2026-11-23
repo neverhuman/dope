@@ -392,7 +392,8 @@ pub(crate) fn decode_catf_section(
                 || standard_z_bins(k_bins.max(2)),
                 |m| recompute_z_bins(m, k_bins),
             );
-            (preds, weights, sd, pm, k_bins, ze, zc)
+            let k_eff = ze.len().saturating_sub(1).max(1);
+            (preds, weights, sd, pm, k_eff, ze, zc)
         } else {
             // Legacy v2.0 layout fallback (kept for clean error/format safety).
             let preds = r.usize_vec()?;

@@ -1,0 +1,498 @@
+"""Screaming multi-node CPU-DDP trainer for SingleEncV7 (V7.2: Max-Entropy S3 + Q_nl + Full Disk Telemetry).
+
+Reads the memory-mapped flat corpus (`/dev/shm/dope-flat/s3-v250`), synthesizes exact per-step
+shuffled tri-task batches (6 reg / 5 bin / 5 mc) mixing ALL 4,145 S3 tables (including >8-class
+cropped multiclass) + 20% infinite synthetic nonlinear SCM/tree priors + full row/col/class
+cropping + target swaps + missingness/warps, logs EVERY step loss-decomposition & entropy telemetry
+to disk (`train.jsonl`), saves canonical F32 rank-<=2 SafeTensors checkpoints, and evaluates strictly
+on the isolated 30-table DEV list (never touching CONFIRM).
+"""
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+import copy
+import datetime
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import struct
+import time
+from typing import Any
+
+import numpy as np
+import torch
+import torch.distributed as dist
+
+from .s3_v7_batch_ops import (
+    FlatArenaView, TASK_TO_ID, _fit_only_scale, _hash_u64,
+    build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss,
+)
+from .s3_v7_entropy import task_quota_for_step
+from .s3_v7_eval import eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression
+from .v7_single_encoding import (
+    MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
+    SingleEncV7, extract_dse_packet_numpy,
+)
+
+
+def _atomic_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    part = path.with_suffix(path.suffix + ".part")
+    part.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
+    part.replace(path)
+
+
+def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(payload, sort_keys=True) + "\n")
+        fh.flush()
+
+
+def _save_v7_safetensors(model: SingleEncV7, out_path: Path) -> tuple[int, str]:
+    """Write canonical HF safetensors v1 (F32, rank <= 2, 8-byte aligned JSON header, zero deps)."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    header: dict[str, Any] = {}
+    blobs: list[bytes] = []
+    offset = 0
+    sd = model.state_dict()
+    for name in sorted(sd):
+        t = sd[name].detach().cpu().to(torch.float32).contiguous()
+        if t.ndim > 2:
+            raise ValueError(f"v7_tensor_rank_violation:{name}:ndim={t.ndim}")
+        raw = t.numpy().tobytes()
+        header[name] = {"dtype": "F32", "shape": list(t.shape), "data_offsets": [offset, offset + len(raw)]}
+        blobs.append(raw)
+        offset += len(raw)
+    hdr_bytes = json.dumps(header, separators=(",", ":")).encode("utf-8")
+    hdr_bytes += b" " * ((8 - (len(hdr_bytes) % 8)) % 8)
+    payload = struct.pack("<Q", len(hdr_bytes)) + hdr_bytes + b"".join(blobs)
+    part = out_path.with_suffix(".safetensors.part")
+    part.write_bytes(payload)
+    part.replace(out_path)
+    return len(payload), hashlib.sha256(payload).hexdigest()
+
+
+@torch.no_grad()
+def evaluate_v7_dev_only(
+    model: SingleEncV7,
+    val_arena: FlatArenaView,
+    dev_hashes: list[str],
+    step: int,
+    seed: int = 20261122,
+) -> dict[str, Any]:
+    """Held-out evaluation strictly restricted to `dev_hashes` (NEVER touches CONFIRM!)."""
+    model.eval()
+    t0 = time.time()
+    rng = np.random.default_rng(seed)
+    rets, by_t = [], {"regression": [], "binary": [], "multiclass": []}
+    parities, realisms, privs, drvs, c2sts, margs, dcrs, mias, copies, b_sizes, within_caps = (
+        [], [], [], [], [], [], [], [], [], [], []
+    )
+    for dh in dev_hashes:
+        idx = val_arena.by_hash.get(dh)
+        if idx is None:
+            continue
+        X_raw, y_raw, dg, rec = val_arena.load_slice(idx)
+        task = str(rec["task"])
+        if task not in TASK_TO_ID or len(y_raw) < 90:
+            continue
+        X_raw = X_raw[:, : min(X_raw.shape[1], MAX_COLS)]
+        uniq_g = np.unique(dg)
+        if len(uniq_g) < 12:
+            perm = rng.permutation(len(y_raw))
+            c1, c2 = int(len(y_raw) * 0.40), int(len(y_raw) * 0.75)
+            a_idx, b_idx, t_idx = perm[:c1][:384], perm[c1:c2][:384], perm[c2:][:256]
+        else:
+            gp = rng.permutation(uniq_g)
+            c1, c2 = max(4, int(len(gp) * 0.40)), max(8, int(len(gp) * 0.75))
+            a_idx = np.flatnonzero(np.isin(dg, gp[:c1]))[:384]
+            b_idx = np.flatnonzero(np.isin(dg, gp[c1:c2]))[:384]
+            t_idx = np.flatnonzero(np.isin(dg, gp[c2:]))[:256]
+        if len(a_idx) < 24 or len(b_idx) < 24 or len(t_idx) < 16:
+            continue
+        Xa, Xt = _fit_only_scale(X_raw[a_idx], X_raw[t_idx])
+        _, Xb = _fit_only_scale(X_raw[a_idx], X_raw[b_idx])
+        ya, yb, yt = y_raw[a_idx].copy(), y_raw[b_idx].copy(), y_raw[t_idx].copy()
+        task_id = TASK_TO_ID[task]
+        if task_id == 0:
+            mu, sd = float(np.mean(ya)), max(float(np.std(ya)), 1e-5)
+            ya = np.clip((ya - mu) / sd, -6.0, 6.0).astype(np.float32)
+            yb = np.clip((yb - mu) / sd, -6.0, 6.0).astype(np.float32)
+            yt = np.clip((yt - mu) / sd, -6.0, 6.0).astype(np.float32)
+            k_cls = 1
+        elif task_id == 1:
+            u = np.unique(ya)
+            if len(u) < 2:
+                continue
+            hi = float(u[-1])
+            ya, yb, yt = (ya == hi).astype(np.float32), (yb == hi).astype(np.float32), (yt == hi).astype(np.float32)
+            if len(np.unique(ya)) < 2 or len(np.unique(yt)) < 2:
+                continue
+            k_cls = 2
+        else:
+            u = np.unique(np.rint(ya).astype(int))
+            if len(u) < 3 or len(u) > MAX_CLASSES:
+                continue
+            k_cls = len(u)
+            mp = {int(c): i for i, c in enumerate(u)}
+            ya = np.array([mp.get(int(round(float(v))), 0) for v in ya], dtype=np.float32)
+            yb = np.array([mp.get(int(round(float(v))), 0) for v in yb], dtype=np.float32)
+            yt = np.array([mp.get(int(round(float(v))), 0) for v in yt], dtype=np.float32)
+
+        pkt = extract_dse_packet_numpy(Xa, ya, task_id, k_cls, max_bytes=PACKET_BUDGET_BYTES)
+        p_eff = pkt["p_eff"]
+        n_syn = max(len(Xa) * 2, 256)
+        pkt["X_qry"] = np.zeros((16, MAX_COLS), dtype=np.float32)
+        pkt["y_qry"] = np.zeros((16,), dtype=np.float32)
+        pkt["q_mask"] = np.ones((16,), dtype=np.float32)
+        pkt["n_fit"] = len(Xa)
+        pkt["n_noise"] = 0
+        batch = collate_v7_batch([pkt])
+        gen = torch.Generator().manual_seed(seed ^ (idx * 7919))
+        zf = torch.randn((1, n_syn, MAX_RANK), generator=gen)
+        zn = torch.randn((1, n_syn, MAX_COLS), generator=gen)
+        yn = torch.randn((1, n_syn), generator=gen)
+        x_s, lg_s, y_r = model.sample_batch(batch, n_syn, zf, zn, yn)
+        Xs = x_s[0, :, :p_eff].numpy()
+        if task_id == 0:
+            res = eval_regression(Xa[:, :p_eff], ya, Xb[:, :p_eff], yb, Xs, y_r[0].numpy(), Xt[:, :p_eff], yt)
+        elif task_id == 1:
+            p1 = torch.sigmoid(lg_s[0, :, 0]).numpy()
+            ys = (torch.rand((n_syn,), generator=gen).numpy() < p1).astype(np.float32)
+            res = eval_binary(Xa[:, :p_eff], ya, Xb[:, :p_eff], yb, Xs, ys, Xt[:, :p_eff], yt)
+        else:
+            probs = torch.softmax(lg_s[0, :, :k_cls], dim=-1).numpy()
+            ys = (np.cumsum(probs, axis=-1) < torch.rand((n_syn, 1), generator=gen).numpy()).sum(axis=-1).clip(0, k_cls - 1).astype(np.float32)
+            res = eval_multiclass(Xa[:, :p_eff], ya, Xb[:, :p_eff], yb, Xs, ys, Xt[:, :p_eff], yt, k_cls)
+        rp = eval_realism_and_privacy(Xa[:, :p_eff], Xb[:, :p_eff], Xs, Xt[:, :p_eff])
+        b_sizes.append(pkt["packet_bytes"])
+        within_caps.append(1.0 if pkt["packet_bytes"] <= PACKET_BUDGET_BYTES else 0.0)
+        if math.isfinite(res["retention"]):
+            rets.append(res["retention"])
+            by_t[task].append(res["retention"])
+        if math.isfinite(res["parity"]):
+            parities.append(res["parity"])
+        if math.isfinite(res["driver_spearman"]):
+            drvs.append(res["driver_spearman"])
+        realisms.append(rp["realism_pass"])
+        privs.append(rp["privacy_pass"])
+        c2sts.append(rp["c2st_auc"])
+        margs.append(rp["marg_auc"])
+        dcrs.append(rp["dcr_share"])
+        mias.append(rp["mia_auc"])
+        copies.append(rp["exact_copy_excess"])
+
+    model.train()
+    med = lambda xs: round(float(np.median(xs)), 4) if xs else None
+    mean = lambda xs: round(float(np.mean(xs)), 4) if xs else None
+    return {
+        "time": round(time.time(), 3),
+        "step": int(step),
+        "arch": "single_enc_v7",
+        "recipe": "v7.2_max_entropy_qnl",
+        "artifact_class": "source_free",
+        "eval_role": "dev_only_ema_unconfirmed",
+        "eval_wall_s": round(time.time() - t0, 2),
+        "tables_evaluated": len(rets),
+        "tables_total": len(b_sizes),
+        "within_cap_rate": mean(within_caps),
+        "encoding_bytes_median": med(b_sizes),
+        "encoding_bytes_max": max(b_sizes, default=0),
+        "main_kpi_retention_median": med(rets),
+        "main_kpi_retention_mean": mean(rets),
+        "regression_retention": med(by_t["regression"]),
+        "binary_retention": med(by_t["binary"]),
+        "multiclass_retention": med(by_t["multiclass"]),
+        "multilabel_retention": None,
+        "parity_coverage": mean(parities),
+        "realism_coverage": mean(realisms),
+        "privacy_pass_coverage": mean(privs),
+        "driver_spearman_median": med(drvs),
+        "c2st_auc_median": med(c2sts),
+        "marg_auc_median": med(margs),
+        "dcr_share_median": med(dcrs),
+        "mia_auc_median": med(mias),
+        "exact_copy_excess_median": med(copies),
+        "formal_dp_state": "not_claimed",
+    }
+
+
+def _fetch_microbatch(
+    arena: FlatArenaView,
+    seed: int,
+    step: int,
+    rank: int,
+    world_size: int,
+    micro_bsz: int,
+    n_fit_cap: int,
+) -> dict[str, torch.Tensor] | None:
+    """Enforce exact shuffled per-batch tri-task quota (6 reg / 5 bin / 5 mc for B=16)."""
+    quota = task_quota_for_step(micro_bsz, _hash_u64(seed, step, rank))
+    eps: list[dict[str, Any]] = []
+    base_slot = rank * micro_bsz
+    for qi, want_task in enumerate(quota):
+        for retry in range(5):
+            slot = base_slot + qi + retry * (world_size * micro_bsz)
+            ep = build_unique_v7_episode(
+                arena, seed, step, slot, n_fit_cap=n_fit_cap, n_qry_cap=128, desired_task=want_task
+            )
+            if ep is not None:
+                eps.append(ep)
+                break
+    return collate_v7_batch(eps) if len(eps) >= 2 else None
+
+
+def parse_args() -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="Screaming CPU-DDP SingleEncV7 V7.2 Trainer (Max-Entropy + Q_nl)")
+    ap.add_argument("--arena-dir", type=str, default="/dev/shm/dope-flat/s3-v250")
+    ap.add_argument("--run-dir", type=str, required=True)
+    ap.add_argument("--run-name", type=str, default="v72_run")
+    ap.add_argument("--dev-hashes-file", type=str, default="")
+    ap.add_argument("--steps", type=int, default=12000)
+    ap.add_argument("--micro-batch", type=int, default=16)
+    ap.add_argument("--grad-accum", type=int, default=1)
+    ap.add_argument("--n-syn", type=int, default=192)
+    ap.add_argument("--d-model", type=int, default=128)
+    ap.add_argument("--n-layers", type=int, default=2)
+    ap.add_argument("--h-target", type=int, default=24)
+    ap.add_argument("--n-heads", type=int, default=4)
+    ap.add_argument("--device", type=str, default="cpu")
+    ap.add_argument("--lr", type=float, default=2e-4)
+    ap.add_argument("--weight-decay", type=float, default=1e-2)
+    ap.add_argument("--grad-clip", type=float, default=1.0)
+    ap.add_argument("--warmup-steps", type=int, default=100)
+    ap.add_argument("--ema-decay", type=float, default=0.992)
+    ap.add_argument("--eval-every", type=int, default=150)
+    ap.add_argument("--ckpt-every", type=int, default=150)
+    ap.add_argument("--log-every", type=int, default=1)
+    ap.add_argument("--torch-threads", type=int, default=1)
+    ap.add_argument("--prefetch-workers", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=2026)
+    return ap.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    torch.set_num_threads(max(1, args.torch_threads))
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass
+
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    rank = int(os.environ.get("RANK", "0"))
+    if world_size > 1:
+        dist.init_process_group(backend="gloo", timeout=datetime.timedelta(minutes=15))
+
+    torch.manual_seed(args.seed)
+    run_dir = Path(args.run_dir)
+    if rank == 0:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        _atomic_json(run_dir / "config.json", {
+            "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "col_in_dim": 46,
+            "artifact_class": "source_free", "run_name": args.run_name,
+            "world_size": world_size, "micro_batch": args.micro_batch, "grad_accum": args.grad_accum,
+            "global_batch": world_size * args.micro_batch * args.grad_accum,
+            "d_model": args.d_model, "n_layers": args.n_layers, "n_heads": args.n_heads,
+            "h_target": args.h_target, "lr": args.lr, "seed": args.seed,
+            "budget_bytes": PACKET_BUDGET_BYTES, "scheduler": "SCHED_IDLE_CPU_FLEET",
+        })
+
+    train_arena = FlatArenaView(args.arena_dir, split="train")
+    val_arena = FlatArenaView(args.arena_dir, split="val") if rank == 0 else None
+    dev_hashes: list[str] = []
+    if rank == 0 and args.dev_hashes_file and Path(args.dev_hashes_file).is_file():
+        dev_hashes = [l.strip() for l in Path(args.dev_hashes_file).read_text().splitlines() if l.strip()]
+
+    base_model = SingleEncV7(d_model=args.d_model, n_heads=args.n_heads, n_layers=args.n_layers, h_target=args.h_target)
+    if world_size > 1:
+        for p in base_model.parameters():
+            dist.broadcast(p.data, src=0)
+    ema_model = copy.deepcopy(base_model)
+    for p in ema_model.parameters():
+        p.requires_grad_(False)
+
+    opt = torch.optim.AdamW(base_model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
+    if rank == 0:
+        print(
+            f"[V7.2 Max-Entropy] world_size={world_size} global_batch={world_size * args.micro_batch * args.grad_accum} "
+            f"params={base_model.parameter_count():,} ({base_model.parameter_count() * 4 / 1e6:.2f} MB F32)",
+            flush=True,
+        )
+
+    best_dev_kpi = -999.0
+    if rank == 0 and val_arena is not None and dev_hashes:
+        ev0 = evaluate_v7_dev_only(ema_model, val_arena, dev_hashes, step=0)
+        _append_jsonl(run_dir / "eval.jsonl", ev0)
+        best_dev_kpi = float(ev0.get("main_kpi_retention_median") or -999.0)
+        print(
+            f"[V7.2 DEV step=0] kpi={ev0['main_kpi_retention_median']} reg={ev0['regression_retention']} "
+            f"bin={ev0['binary_retention']} mc={ev0['multiclass_retention']} c2st={ev0['c2st_auc_median']} "
+            f"bytes={ev0['encoding_bytes_median']}B",
+            flush=True,
+        )
+
+    pool = ThreadPoolExecutor(max_workers=args.prefetch_workers) if args.prefetch_workers > 0 else None
+    n_fit_cap = 256
+    fut_next = (
+        pool.submit(_fetch_microbatch, train_arena, args.seed, 1, rank, world_size, args.micro_batch, n_fit_cap)
+        if pool is not None else None
+    )
+
+    total_unique, zero_valid_streak, opt_steps, win_tables = 0, 0, 0, 0
+    run_t0 = time.time()
+    win_t0 = run_t0
+    m_keys = ("loss", "cond_loss", "tstr_loss", "mmd_loss", "marg_loss", "corr_loss", "swd_loss", "anchor_loss", "train_unclipped_retention")
+
+    try:
+        for step in range(1, args.steps + 1):
+            prog = min(1.0, step / max(1.0, args.steps * 0.5))
+            n_fit_cap = int(256 + 256 * prog)
+            opt.zero_grad(set_to_none=True)
+            acc = {k: 0.0 for k in m_keys}
+            acc_bytes, acc_nfit, acc_noise, acc_crop = [], [], [], []
+            c_reg = c_bin = c_mc = c_synth = c_swap = c_crop = 0
+            valid_micros = 0
+
+            for ga in range(args.grad_accum):
+                if pool is not None and fut_next is not None:
+                    batch = fut_next.result()
+                    next_s = step + (1 if ga + 1 == args.grad_accum else 0)
+                    fut_next = pool.submit(
+                        _fetch_microbatch, train_arena, args.seed + (ga + 1) * 10007,
+                        next_s, rank, world_size, args.micro_batch, n_fit_cap,
+                    )
+                else:
+                    batch = _fetch_microbatch(
+                        train_arena, args.seed + ga * 10007, step, rank, world_size, args.micro_batch, n_fit_cap
+                    )
+                if batch is None:
+                    continue
+                bsz = batch["col_mask"].shape[0]
+                zf = torch.randn((bsz, args.n_syn, MAX_RANK))
+                zn = torch.randn((bsz, args.n_syn, MAX_COLS))
+                yn = torch.randn((bsz, args.n_syn))
+                ref = base_model.refine_packet(batch["col_feats"], batch["glob_feats"], batch["col_mask"])
+                x_s, lg_s, y_r = base_model.sample_batch(batch, args.n_syn, zf, zn, yn, ref=ref)
+                lg_q, sd_q = base_model.predict_target_on_x(batch, ref, batch["X_qry"] * batch["col_mask"].unsqueeze(1))
+                loss, m = compute_v7_batch_loss(x_s, lg_s, y_r, batch, logits_qry=lg_q, sd_qry=sd_q, ref=ref)
+                if not torch.isfinite(loss):
+                    continue
+                (loss / float(args.grad_accum)).backward()
+                for k in m_keys:
+                    acc[k] += m[k]
+                acc_bytes.append(float(batch["packet_bytes"].mean().item()))
+                acc_nfit.append(float(batch["n_fit"].mean().item()))
+                acc_noise.append(float(batch["n_noise"].mean().item()))
+                acc_crop.append(float(batch["col_crop_ratio"].mean().item()))
+                tid = batch["task_id"]
+                c_reg += int((tid == 0).sum().item())
+                c_bin += int((tid == 1).sum().item())
+                c_mc += int((tid == 2).sum().item())
+                c_synth += int(batch["is_synth_prior"].sum().item())
+                c_swap += int(batch["is_swapped"].sum().item())
+                c_crop += int(batch["is_cropped"].sum().item())
+                valid_micros += 1
+
+            if valid_micros == 0:
+                zero_valid_streak += 1
+                if zero_valid_streak >= 3:
+                    raise RuntimeError("abort_3_consecutive_zero_valid_steps")
+                continue
+            zero_valid_streak = 0
+
+            if world_size > 1:
+                for p in base_model.parameters():
+                    if p.grad is not None:
+                        dist.all_reduce(p.grad, op=dist.ReduceOp.SUM)
+                        p.grad.div_(float(world_size))
+
+            if step <= args.warmup_steps:
+                lr_now = args.lr * (step / max(1, args.warmup_steps))
+            else:
+                frac = (step - args.warmup_steps) / max(1, args.steps - args.warmup_steps)
+                lr_now = args.lr * (0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * frac)))
+            for pg in opt.param_groups:
+                pg["lr"] = lr_now
+            gnorm = float(torch.nn.utils.clip_grad_norm_(base_model.parameters(), args.grad_clip).item())
+            opt.step()
+            opt_steps += 1
+
+            with torch.no_grad():
+                d_ema = min(args.ema_decay, (1.0 + opt_steps) / (10.0 + opt_steps))
+                for pe, pb in zip(ema_model.parameters(), base_model.parameters()):
+                    pe.data.mul_(d_ema).add_(pb.data, alpha=1.0 - d_ema)
+
+            step_tables = world_size * args.micro_batch * valid_micros
+            total_unique += step_tables
+            win_tables += step_tables
+
+            if rank == 0 and (step % args.log_every == 0 or step == 1):
+                now = time.time()
+                tbl_s = win_tables / max(now - win_t0, 1e-3)
+                win_tables, win_t0 = 0, now
+                row = {
+                    "time": round(now, 3), "wall_s": round(now - run_t0, 2),
+                    "step": step, "opt_steps": opt_steps,
+                    "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "artifact_class": "source_free",
+                    **{k: round(acc[k] / valid_micros, 4) for k in m_keys},
+                    "grad_norm": round(gnorm, 4), "lr": round(lr_now, 6),
+                    "tables_per_s": round(tbl_s, 2), "unique_splits_seen": total_unique,
+                    "encoding_bytes_avg": round(float(np.mean(acc_bytes)), 1),
+                    "avg_n_fit": round(float(np.mean(acc_nfit)), 1),
+                    "avg_noise_cols": round(float(np.mean(acc_noise)), 2),
+                    "avg_col_crop_ratio": round(float(np.mean(acc_crop)), 3),
+                    "n_reg": c_reg, "n_bin": c_bin, "n_mc": c_mc,
+                    "n_synth_prior": c_synth, "n_swapped": c_swap, "n_cropped": c_crop,
+                }
+                _append_jsonl(run_dir / "train.jsonl", row)
+                if step % max(args.log_every * 10, 10) == 0 or step == 1:
+                    print(
+                        f"step={step:4d} | {tbl_s:6.1f} tbl/s | loss={row['loss']:.4f} cond={row['cond_loss']:.4f} "
+                        f"tstr={row['tstr_loss']:.4f} mmd={row['mmd_loss']:.4f} anc={row['anchor_loss']:.4f} "
+                        f"mix={c_reg}/{c_bin}/{c_mc} syn={c_synth} swp={c_swap} crp={c_crop} bytes={row['encoding_bytes_avg']:.0f}B",
+                        flush=True,
+                    )
+
+            if rank == 0 and opt_steps > 0 and step % args.ckpt_every == 0:
+                ck_name = f"step_{step:06d}_ema.safetensors"
+                ck_bytes, ck_sha = _save_v7_safetensors(ema_model, run_dir / "checkpoints" / ck_name)
+                ev = evaluate_v7_dev_only(ema_model, val_arena, dev_hashes, step=step) if (val_arena and dev_hashes) else None
+                role = "step_ema"
+                if ev is not None:
+                    ev["checkpoint"] = ck_name
+                    _append_jsonl(run_dir / "eval.jsonl", ev)
+                    kpi_now = float(ev.get("main_kpi_retention_median") or -999.0)
+                    print(
+                        f"[V7.2 DEV step={step}] kpi={ev['main_kpi_retention_median']} reg={ev['regression_retention']} "
+                        f"bin={ev['binary_retention']} mc={ev['multiclass_retention']} c2st={ev['c2st_auc_median']} "
+                        f"priv={ev['privacy_pass_coverage']} bytes={ev['encoding_bytes_median']}B",
+                        flush=True,
+                    )
+                    if kpi_now > best_dev_kpi:
+                        best_dev_kpi, role = kpi_now, "best_main_kpi"
+                        _save_v7_safetensors(ema_model, run_dir / "checkpoints" / "dev_best_ema.safetensors")
+                _append_jsonl(run_dir / "checkpoints" / "ledger.jsonl", {
+                    **(ev or {}), "checkpoint": ck_name, "role": role, "arch": "single_enc_v7",
+                    "recipe": "v7.2_max_entropy_qnl", "step": step, "time": round(time.time(), 3),
+                    "bytes": ck_bytes, "sha256": ck_sha[:16],
+                })
+                _atomic_json(run_dir / "latest.json", {
+                    "step": step, "opt_steps": opt_steps, "checkpoint": ck_name, "bytes": ck_bytes,
+                    "sha256": ck_sha, "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl",
+                    "artifact_class": "source_free", "dev_best_unconfirmed_kpi": best_dev_kpi,
+                })
+                win_tables, win_t0 = 0, time.time()
+    finally:
+        if pool is not None:
+            pool.shutdown(wait=False)
+        if world_size > 1:
+            dist.destroy_process_group()
+
+
+if __name__ == "__main__":
+    main()

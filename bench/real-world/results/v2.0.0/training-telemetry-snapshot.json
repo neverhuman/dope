@@ -1,0 +1,208 @@
+{
+  "archive_file_count": 127,
+  "archive_total_bytes": 68306662,
+  "captured_utc": "2026-11-23T00:17:43Z",
+  "encoding_bytes_max": 808.9,
+  "encoding_bytes_median": 518.5,
+  "evidence_scope": "training_and_dev_telemetry_only_not_confirm_kpi",
+  "fleet_dope_vram_gib_max": 0.0,
+  "fleet_history_ticks": 553,
+  "fleet_throughput_tbl_s_max": 1357.65,
+  "fleet_throughput_tbl_s_median": 772.36,
+  "schema": "dope.v2-training-telemetry-snapshot/v1",
+  "total_eval_rows_persisted": 1519,
+  "total_runs": 42,
+  "total_train_rows_persisted": 180331,
+  "total_unique_splits_seen": 3795840,
+  "waves": {
+    "V7.0": {
+      "eval_rows": 603,
+      "loss_latest_median": 0.9909,
+      "loss_start_median": 1.0328,
+      "max_step": 12000,
+      "runs": 30,
+      "sampled_loss_curve": [
+        {
+          "loss_median": 1.0328,
+          "step": 0
+        },
+        {
+          "loss_median": 1.0179,
+          "step": 600
+        },
+        {
+          "loss_median": 1.0074,
+          "step": 1200
+        },
+        {
+          "loss_median": 1.0248,
+          "step": 1800
+        },
+        {
+          "loss_median": 1.0057,
+          "step": 2400
+        },
+        {
+          "loss_median": 0.9941,
+          "step": 3000
+        },
+        {
+          "loss_median": 1.0019,
+          "step": 3600
+        },
+        {
+          "loss_median": 1.001,
+          "step": 4200
+        },
+        {
+          "loss_median": 0.9989,
+          "step": 4800
+        },
+        {
+          "loss_median": 0.9824,
+          "step": 5400
+        },
+        {
+          "loss_median": 0.9942,
+          "step": 6000
+        },
+        {
+          "loss_median": 0.9994,
+          "step": 6600
+        },
+        {
+          "loss_median": 0.9746,
+          "step": 7200
+        },
+        {
+          "loss_median": 0.9709,
+          "step": 7800
+        },
+        {
+          "loss_median": 0.9908,
+          "step": 8400
+        },
+        {
+          "loss_median": 0.9776,
+          "step": 9000
+        },
+        {
+          "loss_median": 0.9978,
+          "step": 9600
+        },
+        {
+          "loss_median": 0.9677,
+          "step": 10200
+        },
+        {
+          "loss_median": 0.9848,
+          "step": 10800
+        },
+        {
+          "loss_median": 0.9667,
+          "step": 11400
+        },
+        {
+          "loss_median": 0.9909,
+          "step": 12000
+        }
+      ],
+      "train_rows": 43809
+    },
+    "V7.1": {
+      "eval_rows": 916,
+      "loss_latest_median": 0.9511,
+      "loss_start_median": 1.0232,
+      "max_step": 12000,
+      "runs": 12,
+      "sampled_loss_curve": [
+        {
+          "loss_median": 1.0232,
+          "step": 0
+        },
+        {
+          "loss_median": 1.0133,
+          "step": 600
+        },
+        {
+          "loss_median": 1.0095,
+          "step": 1200
+        },
+        {
+          "loss_median": 0.9992,
+          "step": 1800
+        },
+        {
+          "loss_median": 0.9929,
+          "step": 2400
+        },
+        {
+          "loss_median": 0.9947,
+          "step": 3000
+        },
+        {
+          "loss_median": 0.9938,
+          "step": 3600
+        },
+        {
+          "loss_median": 0.9919,
+          "step": 4200
+        },
+        {
+          "loss_median": 0.9899,
+          "step": 4800
+        },
+        {
+          "loss_median": 0.9819,
+          "step": 5400
+        },
+        {
+          "loss_median": 0.9782,
+          "step": 6000
+        },
+        {
+          "loss_median": 0.9758,
+          "step": 6600
+        },
+        {
+          "loss_median": 0.971,
+          "step": 7200
+        },
+        {
+          "loss_median": 0.9755,
+          "step": 7800
+        },
+        {
+          "loss_median": 0.9755,
+          "step": 8400
+        },
+        {
+          "loss_median": 0.9677,
+          "step": 9000
+        },
+        {
+          "loss_median": 0.9723,
+          "step": 9600
+        },
+        {
+          "loss_median": 0.9688,
+          "step": 10200
+        },
+        {
+          "loss_median": 0.972,
+          "step": 10800
+        },
+        {
+          "loss_median": 0.9604,
+          "step": 11400
+        },
+        {
+          "loss_median": 0.9511,
+          "step": 12000
+        }
+      ],
+      "train_rows": 136522
+    }
+  },
+  "within_2kib_cap_rate": 1.0
+}

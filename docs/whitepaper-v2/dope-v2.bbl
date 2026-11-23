@@ -1,0 +1,61 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
+Tilmann Gneiting and Adrian~E. Raftery.
+\newblock Strictly proper scoring rules, prediction, and estimation.
+\newblock \emph{Journal of the American Statistical Association}, 102\penalty0
+  (477):\penalty0 359--378, 2007.
+
+\bibitem[Hollmann et~al.(2025)Hollmann, M{\"u}ller, Purucker, Krishnakumar,
+  K{\"o}rfer, Hoo, Schirrmeister, and Hutter]{hollmann2025tabpfn}
+Noah Hollmann, Samuel M{\"u}ller, Lennart Purucker, Arjun Krishnakumar, Max
+  K{\"o}rfer, Shi~Bin Hoo, Robin~Tibor Schirrmeister, and Frank Hutter.
+\newblock Accurate predictions on small data with a tabular foundation model.
+\newblock volume 637, pages 319--326, 2025.
+
+\bibitem[Holm(1979)]{holm1979simple}
+Sture Holm.
+\newblock A simple sequentially rejective multiple test procedure.
+\newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
+  65--70, 1979.
+
+\bibitem[Rahimi and Recht(2007)]{rahimi2007random}
+Ali Rahimi and Benjamin Recht.
+\newblock Random features for large-scale kernel machines.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, volume~20, 2007.
+
+\bibitem[Sklar(1959)]{sklar1959fonctions}
+Abe Sklar.
+\newblock Fonctions de r{\'e}partition {\`a} {$n$} dimensions et leurs marges.
+\newblock \emph{Publications de l'Institut de Statistique de l'Universit{\'e}
+  de Paris}, 8:\penalty0 229--231, 1959.
+
+\bibitem[Taylor et~al.(2026)Taylor, Alexander, and Morrow]{dope2026v1}
+Jepson Taylor, Alton Alexander, and Jordan Morrow.
+\newblock {D.O.P.E.}: Downstream objective-preserving encoding --- learning to
+  compile tables into small generative programs that train real-world models.
+\newblock In \emph{NEVERHUMAN Research Technical Report (DOPE v1.0.0)}, 2026.
+
+\bibitem[Watson et~al.(2023)Watson, Blesch, Kapar, and Wright]{watson2023arf}
+David~S. Watson, Kristin Blesch, Jan Kapar, and Marvin~N. Wright.
+\newblock Adversarial random forests for density estimation and generative
+  modeling.
+\newblock In \emph{Proceedings of the 26th International Conference on
+  Artificial Intelligence and Statistics (AISTATS)}, 2023.
+
+\bibitem[Zhang et~al.(2024)Zhang, Zhang, Srinivasan, Shen, Qin, Faloutsos,
+  Rangwala, and Karypis]{zhang2024tabsyn}
+Hengrui Zhang, Jiani Zhang, Balasubramaniam Srinivasan, Zhengyuan Shen, Xiao
+  Qin, Christos Faloutsos, Huzefa Rangwala, and George Karypis.
+\newblock Mixed-type tabular data synthesis with score-based diffusion in
+  latent space.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+
+\end{thebibliography}

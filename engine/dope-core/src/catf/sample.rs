@@ -35,7 +35,14 @@ pub fn sample_catf_covariates(
         let mut nom_codes: Vec<Option<u8>> = vec![None; d];
         for (ord_pos, &col) in order.iter().enumerate() {
             let cond = &conditionals[ord_pos];
-            let n_states = cond.k_bins + 1;
+            let k_bins = cond.k_bins.min(cond.z_edges.len().saturating_sub(1));
+            if k_bins == 0 {
+                x_row[col] = f64::NAN;
+                z_row[col] = f64::NAN;
+                nom_codes[col] = None;
+                continue;
+            }
+            let n_states = k_bins + 1;
             let mut logits = vec![0.0; n_states];
             let mut mu = 0.0;
             for (p_i, &pf) in cond.predecessors.iter().enumerate() {
@@ -45,7 +52,7 @@ pub fn sample_catf_covariates(
                 }
             }
             copula_base_logits(
-                &cond.z_edges,
+                &cond.z_edges[..=k_bins],
                 mu,
                 cond.copula_cond_sd,
                 cond.base_missing_prob,
@@ -73,7 +80,7 @@ pub fn sample_catf_covariates(
                     break;
                 }
             }
-            if picked == cond.k_bins {
+            if picked >= k_bins {
                 x_row[col] = f64::NAN;
                 z_row[col] = f64::NAN;
                 nom_codes[col] = None;

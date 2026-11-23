@@ -1,0 +1,180 @@
+% DOPE v2.0.0 White Paper — receipt-bound LaTeX manuscript.
+% Every quantitative result is rendered into generated/v2-macros.tex by scripts/render_v2_paper.py;
+% missing or unconfirmed receipts typeset an explicit red [pending] marker.
+\documentclass[10pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[scaled=0.9]{helvet}
+\usepackage{courier}
+\usepackage[letterpaper,textwidth=6.2in,textheight=9.0in,centering]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{natbib}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+
+\input{generated/v2-macros}
+
+\hypersetup{
+  pdftitle={D.O.P.E. v2.0.0: Downstream Objective-Preserving Encoding},
+  pdfauthor={Jepson Taylor; Alton Alexander; Jordan Morrow},
+  pdfsubject={Fidelity Engine 2.0, Sub-2 KiB Source-Free Single-Encoding Neural Synthesis, and Twin-Referenced Multi-Auditor Evaluation}
+}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries D.O.P.E.\ \VTwo{ReleaseVersion}: Downstream Objective-Preserving Encoding\par}
+  \vspace{0.4em}
+  {\large\itshape Fidelity Engine 2.0, Sub-2\,KiB Source-Free Single-Encoding Neural Synthesis,\\
+  and Twin-Referenced Multi-Auditor Evaluation\par}
+  \vspace{0.9em}
+  {\normalsize Jepson Taylor \qquad Alton Alexander \qquad Jordan Morrow\par}
+  {\small NEVERHUMAN Research \quad (\texttt{\VTwo{ReleaseTag}})\par}
+\end{center}
+\vspace{0.4em}
+
+\begin{abstract}
+We present \textbf{DOPE~\VTwo{ReleaseVersion}}, a major architectural and empirical release of Downstream Objective-Preserving Encoding for compiling tabular datasets into tiny, source-free generative programs that preserve downstream predictive utility across regression, binary classification, and multiclass classification.
+Building upon DOPE~v1.0.0~\citep{dope2026v1}, version~\VTwo{ReleaseVersion} introduces four tightly verified advances:
+(i)~\textbf{Fidelity Engine~2.0 (Format~2~v2.2.1)}, upgrading pure-Rust conditional synthesis with spline-regularized monotone normal-score marginals, SP1 discrete tie disattenuation, bounded two-way interaction terms, and a deterministic byte-compaction ladder that strictly enforces $\le 2\,\text{KiB}$ and $\le 4\,\text{KiB}$ artifact budgets even on 24--48+ column mixed-type tables;
+(ii)~\textbf{SingleEncV7 and the self-contained \texttt{DSE7} wire protocol}, a compact ($< 8\,\text{MB}$ F32, rank~$\le 2$) split-QKV column-Transformer that consumes \emph{only} dequantized $\le 2\,\text{KiB}$ sufficient statistics---including Empirical-Bayes-shrunken 4-quartile nonlinear target residuals $Q_{\mathrm{nl}}\in\mathbb{R}^{p\times 4}$---and decodes synthetic rows strictly row-locally via counter-seeded noise with zero raw rows and zero batch statistics;
+(iii)~\textbf{Maximum-Entropy CPU-Only Fleet Pretraining}, combining all 4,145 S3 training tables (recovering all $>8$-class multiclass datasets via random class-subset/tail cropping) with infinite synthetic nonlinear SCM/tree priors, per-batch duplicate-grouped splits, row/column cropping, target swaps, and proper-scoring-rule conditional NLL + differentiable RFF-TSTR + Wasserstein/SWD losses across \VTwo{TelRuns} fleet runs (\VTwo{TelTrainRows} persisted step logs, \VTwo{TelUniqueSplitsM} unique splits at \VTwo{TelTpsMed}--\VTwo{TelTpsMax}\,tbl/s median/peak throughput and \VTwo{TelVramMax}\,GiB DOPE VRAM); and
+(iv)~\textbf{Twin-Referenced Multi-Auditor Evaluation (\texttt{dope\_kpi})} with preregistered DEV-to-CONFIRM single-look promotion, exact JopeDime \texttt{landmarks-native-v1} bit-identity preservation, and Sigstore OIDC-attested pure-Rust release binaries.
+We explicitly separate empirical privacy diagnostics from formal differential privacy or HIPAA de-identification claims, neither of which is claimed in this release.
+\end{abstract}
+
+\section{Introduction}
+Sharing tabular data across institutional, clinical, and federated boundaries faces a persistent tension: raw rows carry direct re-identification risk and storage overhead, whereas classical parametric summaries strip away the nonlinear, conditional, and mixed-type dependencies required by modern tabular learners such as gradient-boosted decision trees (GBDTs), neural networks, and tabular foundation models~\citep{hollmann2025tabpfn}.
+Deep generative models such as tabular diffusion~\citep{zhang2024tabsyn} and adversarial random forests~\citep{watson2023arf} improve joint realism but typically emit multi-megabyte checkpoints, require minutes of per-table GPU optimization, and violate strict kilobyte-scale transmission budgets.
+
+DOPE~\citep{dope2026v1} reframes tabular synthesis as \emph{lossy downstream-objective compression}: compile a source table $A$ once into a small self-contained program $m = \mathcal{E}(A)$ storing zero source rows, such that models trained solely on synthetic samples $S \sim \mathcal{D}(m)$ match models trained on $A$ when scored on unseen held-out real rows $T$.
+While DOPE~v1.0.0--v1.3.0 proved this principle in pure Rust, three engineering and scientific bottlenecks remained:
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Wide-table sub-2\,KiB budget overflow.} Earlier Format~2 fits exceeded $2{,}048\,\text{B}$ on high-width mixed tables when per-column metadata and correlation ranks competed for wire space.
+  \item \textbf{Linear-only sufficient statistics in ultra-compact neural packets.} Early packet-to-row residual models received only linear target slopes $W_{\mathrm{base}}$ inside the wire packet, leaving the column Transformer blind to quadratic, U-shaped, or threshold feature-target nonlinearities on unseen tables.
+  \item \textbf{Evaluation leakage and duplicate-row split optimism.} Standard ungrouped random splits leak duplicate records across train/validation boundaries, and uncalibrated single-table retention ratios fail to account for finite-sample twin variance between real draws $A$ and $B$.
+\end{enumerate}
+
+DOPE~\VTwo{ReleaseVersion} resolves all three bottlenecks inside a single zero-Python, fail-closed Rust runtime (\texttt{engine/dope-core}, \texttt{engine/dope-cli}, \texttt{engine/dope-arena}) while preserving 100\% bit-for-bit compatibility with historical \texttt{DPK3.2}, \texttt{v1} receipts, and the JopeDime \texttt{landmarks-native-v1} interface.
+
+\section{Fidelity Engine 2.0 (Format 2 v2.2.1)}
+Format~2 compiles a raw tabular dataset $(X_A, y_A)$ under an explicit target-last contract (never inferring the target from column position) into a CRC32-verified binary program strictly bounded by a caller-supplied byte cap $B$ (default $B=2{,}048\,\text{B}$).
+Version~2.2.1 upgrades four stages of the pure-Rust compiler (\texttt{engine/dope-core/src/compile/v2/}):
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Support-gated monotone normal-score marginals.} Continuous features are mapped to empirical normal-score quantiles~\citep{sklar1959fonctions} on $[-z_{\max}, z_{\max}]$ with support floor $u_{\mathrm{floor}} = \min(0.20, 10/(n_A+1))$ so singleton extremes are never echoed in wire bytes or error diagnostics. Discrete and zero-inflated features snap knots onto support-gated atoms ($k \ge 10$) and apply SP1 conditional-mean normal scores to prevent tie-induced correlation attenuation.
+  \item \textbf{Rank-budgeted Gaussian copula and bounded interactions.} Pairwise feature dependence is factored into int8 loadings $L \in \mathbb{R}^{p \times r}$ ($r \le \VTwo{MaxRank}$, row norm $\le 0.99$), paired with a ridge/Newton-IRLS/multiclass target model and bounded interaction terms when wire headroom permits.
+  \item \textbf{Deterministic compaction ladder (\texttt{trim\_extra}).} Whenever a serialized candidate exceeds $B$, Format~2 executes an ordered compaction ladder---progressively reducing knot resolution ($17 \to 9 \to 5$), latent rank ($12 \to 8 \to 4 \to 2 \to 0$), optional interaction metadata, and auxiliary extras---engaging only when $\mathrm{len}(m) > B$. Unit verification confirms strict $\le 2{,}048\,\text{B}$ compliance on 24-column and $\le 4{,}096\,\text{B}$ compliance on 48-column mixed spiky/discrete/continuous tables.
+  \item \textbf{Faithful counter-seeded emission.} Every synthetic row $i$ is decoded strictly from a counter-seeded deterministic PRNG state $s_i = \mathrm{seed} \oplus (i \cdot \mathrm{0x9E3779B97F4A7C15})$ with zero cross-row normalization, guaranteeing row-local invariance ($\mathcal{D}(m, N, s)_0 \equiv \mathcal{D}(m, 1, s)_0$).
+\end{itemize}
+
+\section{Sub-2\,KiB Source-Free Neural Synthesis: \texttt{DSE7} and \texttt{SingleEncV7}}
+\subsection{Self-Contained \texttt{DSE7} v2 Wire Format}
+To ensure strict, audit-proof accounting of every byte required to synthesize raw-unit rows (\texttt{bytes = len(m.bin)}), \texttt{DSE7} v2 embeds a compact raw-unit scale card directly inside the CRC32-verified wire blob (\texttt{engine/dope-core/src/single\_encoding/\{packet.rs,scale\_card.rs\}}):
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Header (20\,B):} magic \texttt{DSE7}, version \texttt{2}, task ID ($0{=}\text{reg}, 1{=}\text{bin}, 2{=}\text{mc}$), class count $k_{\mathrm{eff}} \le \VTwo{MaxClasses}$, active column width $p_{\mathrm{eff}} \le \VTwo{MaxCols}$, rank $r$, knot level $K \in \{5,9,17\}$, layout flags, normalized $\log_2(n_A)$, raw column count $p_{\mathrm{raw}} \le 65{,}535$, $z_{\max}$, $\sigma_{\mathrm{resid}}$, and class prior byte.
+  \item \textbf{Embedded scale card:} $y$-mean/std ($8\,\text{B}$ for regression) or non-canonical class IDs ($0\,\text{B}$ when classes are $0\dots k{-}1$); per-active-column \texttt{f32} median and \texttt{bf16} robust IQR/std scale ($6\,\text{B/col}$, preserving the full IEEE-754 dynamic range up to $3.4\times 10^{38}$ with zero round-trip error because quantization occurs prior to forward scaling); plus target-correlation-selected column indices and optional \texttt{bf16} medians for dropped columns when $p_{\mathrm{raw}} > \VTwo{MaxCols}$.
+  \item \textbf{Sufficient statistics and $Q_{\mathrm{nl}}$ residuals:} column flags, \texttt{f16} endpoints + 8-bit knot codes, int8 factor loadings, analytic target weights $(W_{\mathrm{base}}, b_{\mathrm{base}})$, and V7.2's \textbf{4-quartile Empirical-Bayes nonlinear target residuals} $Q_{\mathrm{nl}} \in \mathbb{R}^{p_{\mathrm{eff}} \times 4}$ ($4\,\text{B/col}$ int8, scale $0.015$).
+\end{itemize}
+
+\begin{definition}[Empirical-Bayes Nonlinear Quartile Residuals $Q_{\mathrm{nl}}$]
+Given linear target residuals $r_i$ on fit rows $A$ (standardized error for regression, $2(y_i - \hat{p}_i)$ for binary, centered surprise $2.5[(1-\hat{p}_{i,y_i}) - \overline{(1-\hat{p})}]$ for multiclass) and normal scores $z_{i,j}$ partitioned into standard normal quartiles $B_0=(-\infty,-0.6745)$, $B_1=[-0.6745,0)$, $B_2=[0,0.6745)$, $B_3=[0.6745,\infty)$, we define
+\begin{equation}
+  Q_{\mathrm{nl}}[j, b] \;=\; \operatorname{quant}_{\mathrm{int8},0.015}\!\left(\frac{\sum_{i : z_{i,j}\in B_b} r_i}{\lvert\{i : z_{i,j}\in B_b\}\rvert + 8}\right), \qquad b \in \{0,1,2,3\}.
+\end{equation}
+\end{definition}
+Adding $Q_{\mathrm{nl}}$ costs only $+48\,\text{B}$ on a median 12-column table while shrinking small quartiles toward zero (prior strength $8$ rows) and transmitting direct quadratic, threshold, and U-shaped residual signatures to the column Transformer.
+
+\subsection{\texttt{SingleEncV7} Residual Column-Transformer Architecture}
+\texttt{SingleEncV7} (\texttt{engine/dope-core/src/single\_encoding/mod.rs}) maps padded column descriptors ($\mathbb{R}^{\VTwo{MaxCols} \times d_{\mathrm{in}}}$, where $d_{\mathrm{in}} = \VTwo{ColFeatDimV1}$ for V7.0/V7.1 and $d_{\mathrm{in}} = \VTwo{ColFeatDimV2}$ for V7.2 with $Q_{\mathrm{nl}}$) and global descriptors ($\mathbb{R}^{\VTwo{GlobFeatDim}}$) through $L \in \{2,3\}$ pre-LayerNorm split-QKV attention blocks ($d_{\mathrm{model}} \in \{128,160\}$, $4$ heads, rank-$\le 2$ linear tensors only).
+All output heads---$\Delta\text{knots}$, $\Delta L$, $\Delta W$, hypernetwork target residual MLP $(W_1, b_1, W_2)$, and temperature/residual-scale head---are \textbf{zero-initialized} so step~0 equals the exact analytic \texttt{DSE7} decoder.
+Monotone knot refinement preserves exact endpoints and zero-inflated plateaus via normalized positive interval scaling:
+\begin{equation}
+  \tilde{\delta}_{j,k} = \frac{\delta_{j,k}\exp(0.25\tanh \Delta_{j,k})}{\sum_{\ell}\delta_{j,\ell}\exp(0.25\tanh \Delta_{j,\ell})} \cdot \sum_{\ell}\delta_{j,\ell}, \qquad \delta_{j,k} = \max(q_{j,k+1} - q_{j,k}, 0).
+\end{equation}
+Target logits combine the refined linear backbone with a packet-conditioned SiLU residual MLP:
+\begin{equation}
+  f(x) = \exp(\tau_0)\Bigl((W_{\mathrm{base}} + \Delta W)x + b_{\mathrm{base}} + W_2\,\mathrm{SiLU}(W_1 x + b_1)\Bigr).
+\end{equation}
+
+\subsection{Training Evolution: V7.0 $\to$ V7.1 Proper Scoring $\to$ V7.2 Maximum Entropy}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{V7.0 (Differentiable RFF-TSTR + Realism):} Optimizes a batched differentiable Random Fourier Feature~\citep{rahimi2007random} ridge TSTR surrogate on held-out real query rows $Q$ alongside 17-point 1D Wasserstein marginal matching, correlation Frobenius alignment, and 24-projection Sliced Wasserstein distance.
+  \item \textbf{V7.1 (Proper-Scoring-Rule Direct Conditional NLL):} Adds exact strictly proper scoring rules~\citep{gneiting2007strictly} on real $(X_Q, y_Q)$---Gaussian heteroscedastic NLL for regression, \texttt{BCEWithLogits} for binary, and masked \texttt{CrossEntropy} for multiclass---weighting $0.70\mathcal{L}_{\mathrm{cond}} + 0.30\mathcal{L}_{\mathrm{TSTR}} + \mathcal{L}_{\mathrm{realism}}$ with zero weight-schema change.
+  \item \textbf{V7.2 (Maximum-Entropy S3 + Synthetic Priors + $Q_{\mathrm{nl}}$ + Trust-Region Anchor):} Unlocks 100\% of the 4,145 S3 training corpus by recovering all 51 $>8$-class multiclass tables via random $K$-class subset/tail cropping, enforces exact shuffled tri-task quotas per step ($6\,\text{reg} / 5\,\text{bin} / 5\,\text{mc}$), mixes 20\% infinite synthetic nonlinear SCM/depth-3 tree/interaction tables, applies per-batch duplicate-grouped splits ($r\in[0.35,0.75]$), log-uniform $n_{\mathrm{fit}}\in[32,512]$, 65\% column cropping, multi-task target swaps, MCAR/MAR missingness, monotonic warps, and $K!$ class permutations, and adds a quadratic trust-region anchor on $(\Delta W, \Delta L, \Delta\text{knots}, \tau)$ to prevent early warmup drift below the analytic step-0 packet.
+\end{itemize}
+
+\section{Twin-Referenced Multi-Auditor Evaluation Protocol}
+Following the DOPE~\VTwo{ReleaseVersion} evaluation contract (\texttt{dope\_kpi}), every candidate encoder is judged on held-out tables partitioned into duplicate-grouped disjoint splits $(A, B, T)$:
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Twin-Referenced Gain (TRG):} Downstream learners trained on synthetic rows $S \sim \mathcal{D}(\mathcal{E}(A))$ are scored on held-out real test split $T$ and calibrated against real twin splits $A$ and $B$ (measuring how closely synthetic training matches an independent real draw from the same population rather than an uncalibrated ratio).
+  \item \textbf{Family-Clustered Bootstrap \& Single-Look CONFIRM Discipline:} Hyperparameters, architectures, and checkpoint steps are selected strictly on a frozen 30-table DEV partition (\texttt{ag-dev-tables.txt}). Once selection rules are preregistered, CONFIRM is evaluated \emph{once} with family-clustered 95\% bootstrap confidence intervals and Holm--Bonferroni multiplicity control~\citep{holm1979simple}.
+  \item \textbf{Strict Single-File Byte Accounting:} Wire bytes are measured literally as $\mathrm{len}(\texttt{m.bin})$ on disk, including all scaling parameters needed to emit raw-unit rows, with a hard ceiling of $2{,}048\,\text{B}$ for the sub-2\,KiB tier.
+\end{enumerate}
+
+\section{Large-Scale CPU-Only Fleet Training \& Empirical Results}
+\subsection{Lossless Training Telemetry and CPU Throughput Scaling}
+Because \texttt{SingleEncV7} requires only $1.24$--$2.7\,\text{MB}$ in F32 and operates over padded $\le 48$-column packet tensors, training runs entirely on spare CPU cores under \texttt{SCHED\_IDLE} without touching any GPU (\texttt{0.0\,GiB} DOPE VRAM) and without disturbing co-located production workloads (monitored by an automated throughput guard).
+All per-step training metrics (\texttt{train.jsonl}), DEV evaluations (\texttt{eval.jsonl}), checkpoints, and dashboard fleet snapshots (\texttt{fleet\_history.jsonl}) are persisted append-only to disk and archived under SHA-256 manifests.
+Across the \VTwo{ReleaseVersion} wave snapshot (\texttt{\VTwo{TelCapturedUtc}}), the fleet logged \textbf{\VTwo{TelRuns} runs}, \textbf{\VTwo{TelTrainRows} persisted optimizer steps}, and \textbf{\VTwo{TelUniqueSplitsM} unique train/query splits} at \textbf{\VTwo{TelTpsMed}\,tbl/s median} (\textbf{\VTwo{TelTpsMax}\,tbl/s peak}) throughput, maintaining a median wire size of \textbf{\VTwo{TelBytesMed}\,B} (max \VTwo{TelBytesMax}\,B, \VTwo{TelWithinCapPct} within the $2{,}048\,\text{B}$ cap).
+Figure~\ref{fig:v2-telemetry} displays the multi-seed loss convergence, objective decomposition, live fleet throughput, and DEV-only trajectories rendered directly from these persisted logs.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/v2-loss-and-throughput.pdf}
+  \caption{\textbf{DOPE~\VTwo{ReleaseVersion} Training Wave Telemetry (Training \& DEV-Only, Unconfirmed).}
+  Rendered strictly from persisted fleet logs (\VTwo{TelTrainRows} step records across \VTwo{TelRuns} runs, \VTwo{TelVramMax}\,GiB DOPE VRAM):
+  (a)~Multi-seed median and IQR total training loss across V7.0/V7.1/V7.2;
+  (b)~Objective decomposition separating differentiable RFF-TSTR, proper-scoring conditional NLL, and joint realism (1D-W1 + correlation + SWD);
+  (c)~Live CPU-only fleet throughput (\VTwo{TelTpsMed}\,tbl/s median, \VTwo{TelTpsMax}\,tbl/s peak vs.\ 403\,tbl/s baseline target) and cumulative unique splits;
+  (d)~Held-out DEV-only per-task trajectory (explicitly separated from frozen CONFIRM scoring).}
+  \label{fig:v2-telemetry}
+\end{figure}
+
+\subsection{Frozen Comparison Against Signed \texttt{dope-engine-v1.3.0}}
+Table~\ref{tab:v2-kpi} summarizes the receipt-bound comparison at the $\le 2\,\text{KiB}$ budget tier against the prior signed release \texttt{\VTwo{PriorSignedTag}} and the zero-training analytic \texttt{DSE7} step-0 baseline. All cells bind exclusively to frozen \texttt{dope\_kpi} receipts (\texttt{\VTwo{KpiEvidenceState}}).
+
+\begin{table}[t]
+  \centering
+  \caption{\textbf{Receipt-Bound Sub-2\,KiB Comparison (\texttt{dope\_kpi}, Scope: \texttt{\VTwo{KpiEvidenceState}}, \VTwo{KpiPanelCells} cells).}
+  Values render directly from committed CONFIRM receipts (\texttt{[pending]} denotes receipts awaiting final frozen scoring).}
+  \label{tab:v2-kpi}
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Encoder / Artifact Class & Wire Cap & Checkpoint Size & Twin-Referenced Gain (TRG, 95\% CI) \\
+    \midrule
+    Signed \texttt{\VTwo{PriorSignedTag}} (\texttt{small}) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiBaselineTrg} \\
+    Format~2 v2.2.1 (Fidelity Engine 2.0) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiFormat2Trg} \\
+    \texttt{DSE7} v2 Zero-Init (Step~0 Analytic) & $\le 2{,}048\,\text{B}$ & Pure Rust (0\,B neural) & \VTwo{KpiV7Step0Trg} \\
+    \texttt{SingleEncV7} (\texttt{\VTwo{CkptId}}) & $\le 2{,}048\,\text{B}$ & \VTwo{CkptBytesMB} (\VTwo{CkptParams} params) & \VTwo{KpiV7WinnerTrg} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Pure-Rust Runtime, Bit-Parity, and Signed Release Provenance}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Zero-Python fail-closed SafeTensors inference:} \texttt{SingleEncV7Weights} (\texttt{engine/dope-core/src/single\_encoding/safetensors.rs}) validates a hard $16\,\text{MiB}$ byte cap, 8-byte header alignment, \texttt{dtype == "F32"}, \texttt{rank <= 2}, and finite weights with zero \texttt{unsafe} blocks and zero new crates. Cross-runtime verification (\texttt{engine/dope-core/tests/single\_encoding\_v7.rs}) confirms $< 10^{-4}$ maximum absolute deviation between PyTorch and pure Rust on live trained V7.0/V7.1 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV1}$) and V7.2 ($d_{\mathrm{in}}=\VTwo{ColFeatDimV2}$) checkpoints.
+  \item \textbf{Drop-in \texttt{dope\_v7\_emit} CLI:} The standalone \texttt{1.1\,MB} Rust binary \texttt{dope\_v7\_emit} executes end-to-end \texttt{fit} (producing self-contained \texttt{m.bin <= budget}) and \texttt{sample} (producing raw-unit \texttt{DOPEMAT1} tables) in milliseconds per table on CPU.
+  \item \textbf{JopeDime compatibility invariance:} Downstream JopeDime contracts remain 100\% bit-identical (\texttt{gbdt::Params::default().group\_duplicates = false} for \texttt{landmarks-native-v1}, zero-byte diff on \texttt{landmark/*}, \texttt{mlc\_v3/*}, \texttt{prepare/*}, and pinned \texttt{v1.0.0} weights).
+  \item \textbf{Sigstore OIDC supply-chain signing:} Tagging \texttt{\VTwo{ReleaseTag}} invokes \texttt{.github/workflows/engine-release.yml} to build deterministic Linux x86-64 binaries, emit GitHub OIDC Sigstore attestations (\texttt{dope.sigstore.json}), verify via \texttt{scripts/verify-engine-release.sh}, and distribute via \texttt{scripts/install.sh --require-attestation}.
+\end{itemize}
+
+\section{Limitations, Privacy Boundaries, and Reproducibility}
+DOPE~\VTwo{ReleaseVersion} is subject to four explicit scope boundaries:
+(1)~\emph{No formal differential privacy or HIPAA claim.} Empirical diagnostics (\texttt{mia\_auc}, \texttt{dcr\_share}, exact-copy excess, and support-gated $k \ge 10$ knots) measure observed memorization risk only and are never equivalent to $(\varepsilon,\delta)$-DP or statutory HIPAA Safe Harbor / Expert Determination de-identification.
+(2)~\emph{Multiclass ceiling.} \texttt{SingleEncV7} natively encodes up to \VTwo{MaxClasses} classes per packet (gracefully retaining the top-\VTwo{MaxClasses} classes by frequency on wider label spaces).
+(3)~\emph{Training telemetry vs.\ scientific claims.} Loss curves and DEV medians in Figure~\ref{fig:v2-telemetry} document training convergence and diagnostic dynamics only; release promotion relies exclusively on frozen single-look CONFIRM receipts in Table~\ref{tab:v2-kpi}.
+(4)~\emph{Reproducibility.} Regenerate macros and verify zero drift via \texttt{python3 docs/whitepaper-v2/scripts/render\_v2\_paper.py --check}, rebuild the PDF with \texttt{latexmk -pdf dope-v2.tex}, and audit all Rust tests with \texttt{just check}. The historical T-111 manuscript (\texttt{docs/whitepaper/dope-mfs.tex}) remains frozen and untouched.
+
+\bibliographystyle{plainnat}
+\bibliography{references-v2}
+
+\end{document}

@@ -394,7 +394,14 @@ pub fn fit_v2(table: &RawTable, target: usize, opts: &FitV2Options) -> Result<Fi
         }
     }
 
-    // 7. Mandatory exact-artifact decode round-trip check before returning!
+    // 7. Strict fail-closed budget enforcement + mandatory exact-artifact decode round-trip check!
+    if (opts.budget.is_some() || opts.size.is_some()) && bytes.len() > budget_bytes {
+        return Err(crate::error::DopeError::Budget(format!(
+            "format2 artifact ({} B) exceeds requested budget ({} B)",
+            bytes.len(),
+            budget_bytes
+        )));
+    }
     let decoded = decode_format2_program(&bytes)?;
     let packet_sha256 = format!("{:x}", Sha256::digest(&bytes));
     let catf_trees: usize = decoded

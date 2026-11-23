@@ -121,7 +121,7 @@ pub(crate) fn compact_marginals(catf: &mut CatfModel, max_k: usize, trim_extra: 
     if trim_extra {
         catf.rules.rules.clear();
     }
-    for m in &mut catf.marginals {
+    for (col_idx, m) in catf.marginals.iter_mut().enumerate() {
         match m {
             crate::marginal::v2::ColumnMarginalV2::Continuous {
                 atoms,
@@ -169,8 +169,13 @@ pub(crate) fn compact_marginals(catf: &mut CatfModel, max_k: usize, trim_extra: 
                     for p in &mut np {
                         *p /= sum;
                     }
+                    let new_k = nv.len();
                     *values = nv;
                     *probs = np;
+                    if let Some(cond) = catf.conditionals.iter_mut().find(|c| c.col_idx == col_idx) {
+                        cond.k_bins = new_k;
+                        cond.trees.clear();
+                    }
                 }
             }
         }
