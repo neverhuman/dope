@@ -69,7 +69,7 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "n_heads": args.n_heads,
         "n_enc_layers": args.n_enc_layers,
         "n_dec_layers": args.n_dec_layers,
-        "code_dim": DEC_CODE_DIM,
+        "code_dim": int(getattr(args, "code_dim", DEC_CODE_DIM)),
         "with_owner_encoder": not args.decoder_only,
     }
     model = SingleEncV8(**cfg).to(device)
@@ -392,6 +392,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--n-enc-layers", type=int, default=4)
     ap.add_argument("--n-dec-layers", type=int, default=2)
     ap.add_argument("--decoder-only", action="store_true")
+    ap.add_argument(
+        "--code-dim",
+        type=int,
+        default=DEC_CODE_DIM,
+        help="learned FSQ code width; the wire and the Rust receiver use the default (64 values = 32 B), "
+        "other widths are research-only capacity/channel probes",
+    )
     ap.add_argument("--use-rust-packet", action="store_true")
     ap.add_argument("--budget-bytes", type=int, default=2048)
     ap.add_argument("--prior-mix-prob", type=float, default=0.0)

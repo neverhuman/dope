@@ -4312,6 +4312,10 @@
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery_select.py",
       "purpose": "unit tests for the consistent-selection V7 -> V8 decoder surgery that produced the v8-s7/v8-s7w init files"
     },
+    "research/levels/tests/test_v8_code_dim.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_code_dim.py",
+      "purpose": "pin the 64-value wire default of the SingleEncV8 learned code and the analytic step-0 start of wider research codes and models (capacity x channel probe)"
+    },
     "research/levels/tests/test_v8_surgery.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery.py",
       "purpose": "unit and native Rust round-trip test suite for SingleEncV8 model surgery and v8-r3 trainer hooks"

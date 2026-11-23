@@ -182,7 +182,9 @@ class SingleEncV8(nn.Module):
 
         self.dec_col_in = nn.Linear(DEC_COL_DIM, d_model)
         self.dec_glob_in = nn.Linear(DEC_GLOB_DIM, d_model)
-        self.dec_code_in = nn.Linear(DEC_CODE_DIM, d_model)
+        # The learned code width the decoder reads. The wire format and the Rust receiver read DEC_CODE_DIM (64
+        # FSQ values = 32 B); any other width is a research-only probe whose export Rust refuses on shape.
+        self.dec_code_in = nn.Linear(code_dim, d_model)
         self.dec_blocks = nn.ModuleList(
             [PairSplitAttnBlock(d_model, n_heads, DEC_EDGE_DIM) for _ in range(n_dec_layers)]
         )
@@ -231,11 +233,11 @@ class SingleEncV8(nn.Module):
         col_mask: torch.Tensor | None = None,
         tier_dropout: bool = False,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Run Owner Evidence Encoder -> `(z_fsq [B, 64], g_pool [B, D])`."""
+        """Run Owner Evidence Encoder -> `(z_fsq [B, code_dim], g_pool [B, D])` (code_dim 64 on the wire)."""
         if not self.with_owner_encoder:
             B = ev_col.shape[0]
             return (
-                torch.zeros(B, DEC_CODE_DIM, device=ev_col.device, dtype=ev_col.dtype),
+                torch.zeros(B, self.code_dim, device=ev_col.device, dtype=ev_col.dtype),
                 torch.zeros(B, self.d_model, device=ev_col.device, dtype=ev_col.dtype),
             )
         g_tok = self.enc_glob_in(ev_glob)  # [B, D]
@@ -256,7 +258,7 @@ class SingleEncV8(nn.Module):
             # Nested code dropout: randomly zero all (tier 0) or suffix halves for prefix resilience!
             u = torch.rand(z_fsq.shape[0], 1, device=z_fsq.device)
             z_fsq = torch.where(u < 0.25, torch.zeros_like(z_fsq), z_fsq)
-        return z_fsq[:, :DEC_CODE_DIM], g_pool
+        return z_fsq[:, : self.code_dim], g_pool
 
     def decode_plan(
         self,
