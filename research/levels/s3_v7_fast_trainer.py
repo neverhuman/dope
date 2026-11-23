@@ -25,14 +25,15 @@ import torch
 import torch.distributed as dist
 
 from .s3_v7_batch_ops import (
-    FlatArenaView, TASK_TO_ID, _fit_only_scale, _hash_u64,
+    FlatArenaView, _fit_only_scale, _hash_u64,
     build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss,
 )
 from .s3_v7_entropy import task_quota_for_step
 from .s3_v7_eval import (
     append_jsonl as _append_jsonl, atomic_json as _atomic_json,
-    eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
-    load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
+    compute_lr_factor, eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
+    freeze_target_heads, load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
+    save_v7_valley_soup, split_dev_table_abt,
 )
 from .v7_single_encoding import (
     MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
@@ -62,50 +63,10 @@ def evaluate_v7_dev_only(
             continue
         X_raw, y_raw, dg, rec = val_arena.load_slice(idx)
         task = str(rec["task"])
-        if task not in TASK_TO_ID or len(y_raw) < 90:
+        spl = split_dev_table_abt(X_raw, y_raw, dg, task, rng, _fit_only_scale, MAX_COLS, MAX_CLASSES)
+        if spl is None:
             continue
-        X_raw = X_raw[:, : min(X_raw.shape[1], MAX_COLS)]
-        uniq_g = np.unique(dg)
-        if len(uniq_g) < 12:
-            perm = rng.permutation(len(y_raw))
-            c1, c2 = int(len(y_raw) * 0.40), int(len(y_raw) * 0.75)
-            a_idx, b_idx, t_idx = perm[:c1][:384], perm[c1:c2][:384], perm[c2:][:256]
-        else:
-            gp = rng.permutation(uniq_g)
-            c1, c2 = max(4, int(len(gp) * 0.40)), max(8, int(len(gp) * 0.75))
-            a_idx = np.flatnonzero(np.isin(dg, gp[:c1]))[:384]
-            b_idx = np.flatnonzero(np.isin(dg, gp[c1:c2]))[:384]
-            t_idx = np.flatnonzero(np.isin(dg, gp[c2:]))[:256]
-        if len(a_idx) < 24 or len(b_idx) < 24 or len(t_idx) < 16:
-            continue
-        Xa, Xt = _fit_only_scale(X_raw[a_idx], X_raw[t_idx])
-        _, Xb = _fit_only_scale(X_raw[a_idx], X_raw[b_idx])
-        ya, yb, yt = y_raw[a_idx].copy(), y_raw[b_idx].copy(), y_raw[t_idx].copy()
-        task_id = TASK_TO_ID[task]
-        if task_id == 0:
-            mu, sd = float(np.mean(ya)), max(float(np.std(ya)), 1e-5)
-            ya = np.clip((ya - mu) / sd, -6.0, 6.0).astype(np.float32)
-            yb = np.clip((yb - mu) / sd, -6.0, 6.0).astype(np.float32)
-            yt = np.clip((yt - mu) / sd, -6.0, 6.0).astype(np.float32)
-            k_cls = 1
-        elif task_id == 1:
-            u = np.unique(ya)
-            if len(u) < 2:
-                continue
-            hi = float(u[-1])
-            ya, yb, yt = (ya == hi).astype(np.float32), (yb == hi).astype(np.float32), (yt == hi).astype(np.float32)
-            if len(np.unique(ya)) < 2 or len(np.unique(yt)) < 2:
-                continue
-            k_cls = 2
-        else:
-            u = np.unique(np.rint(ya).astype(int))
-            if len(u) < 3 or len(u) > MAX_CLASSES:
-                continue
-            k_cls = len(u)
-            mp = {int(c): i for i, c in enumerate(u)}
-            ya = np.array([mp.get(int(round(float(v))), 0) for v in ya], dtype=np.float32)
-            yb = np.array([mp.get(int(round(float(v))), 0) for v in yb], dtype=np.float32)
-            yt = np.array([mp.get(int(round(float(v))), 0) for v in yt], dtype=np.float32)
+        Xa, ya, Xb, yb, Xt, yt, task_id, k_cls = spl
 
         pkt = extract_dse_packet_numpy(Xa, ya, task_id, k_cls, max_bytes=PACKET_BUDGET_BYTES)
         p_eff = pkt["p_eff"]
@@ -211,32 +172,39 @@ def _fetch_microbatch(
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Screaming CPU-DDP SingleEncV7 V7.2 Trainer (Max-Entropy + Q_nl)")
-    ap.add_argument("--arena-dir", type=str, default="/dev/shm/dope-flat/s3-v250")
-    ap.add_argument("--run-dir", type=str, required=True)
-    ap.add_argument("--run-name", type=str, default="v72_run")
-    ap.add_argument("--dev-hashes-file", type=str, default="")
-    ap.add_argument("--steps", type=int, default=12000)
-    ap.add_argument("--micro-batch", type=int, default=16)
-    ap.add_argument("--grad-accum", type=int, default=1)
-    ap.add_argument("--n-syn", type=int, default=192)
-    ap.add_argument("--d-model", type=int, default=128)
-    ap.add_argument("--n-layers", type=int, default=2)
-    ap.add_argument("--h-target", type=int, default=24)
-    ap.add_argument("--n-heads", type=int, default=4)
-    ap.add_argument("--device", type=str, default="cpu")
-    ap.add_argument("--lr", type=float, default=2e-4)
-    ap.add_argument("--weight-decay", type=float, default=1e-2)
-    ap.add_argument("--grad-clip", type=float, default=1.0)
-    ap.add_argument("--warmup-steps", type=int, default=100)
-    ap.add_argument("--ema-decay", type=float, default=0.992)
-    ap.add_argument("--eval-every", type=int, default=150)
-    ap.add_argument("--ckpt-every", type=int, default=150)
-    ap.add_argument("--log-every", type=int, default=1)
-    ap.add_argument("--torch-threads", type=int, default=1)
-    ap.add_argument("--prefetch-workers", type=int, default=0)
-    ap.add_argument("--seed", type=int, default=2026)
-    ap.add_argument("--resume", type=str, default="", help="Path to latest_resume.pt or 'auto'")
+    ap = argparse.ArgumentParser(description="CPU-DDP SingleEncV7 Trainer (V7.2/V7.3 Max-Entropy + Q_nl)")
+    for flag, kw in (
+        ("--arena-dir", dict(type=str, default="/dev/shm/dope-flat/s3-v250")),
+        ("--run-dir", dict(type=str, required=True)),
+        ("--run-name", dict(type=str, default="v72_run")),
+        ("--dev-hashes-file", dict(type=str, default="")),
+        ("--steps", dict(type=int, default=12000)),
+        ("--micro-batch", dict(type=int, default=16)),
+        ("--grad-accum", dict(type=int, default=1)),
+        ("--n-syn", dict(type=int, default=192)),
+        ("--d-model", dict(type=int, default=128)),
+        ("--n-layers", dict(type=int, default=2)),
+        ("--h-target", dict(type=int, default=24)),
+        ("--n-heads", dict(type=int, default=4)),
+        ("--device", dict(type=str, default="cpu")),
+        ("--lr", dict(type=float, default=2e-4)),
+        ("--weight-decay", dict(type=float, default=1e-2)),
+        ("--grad-clip", dict(type=float, default=1.0)),
+        ("--warmup-steps", dict(type=int, default=100)),
+        ("--ema-decay", dict(type=float, default=0.992)),
+        ("--eval-every", dict(type=int, default=150)),
+        ("--ckpt-every", dict(type=int, default=150)),
+        ("--log-every", dict(type=int, default=1)),
+        ("--torch-threads", dict(type=int, default=1)),
+        ("--prefetch-workers", dict(type=int, default=0)),
+        ("--seed", dict(type=int, default=2026)),
+        ("--resume", dict(type=str, default="")),
+        ("--lr-schedule", dict(type=str, default="cosine", choices=["cosine", "wsd"])),
+        ("--soup-k", dict(type=int, default=3)),
+        ("--hard-tstr-v73", dict(action="store_true")),
+        ("--freeze-target-heads", dict(action="store_true")),
+    ):
+        ap.add_argument(flag, **kw)
     return ap.parse_args()
 
 
@@ -274,6 +242,8 @@ def main() -> None:
         dev_hashes = [l.strip() for l in Path(args.dev_hashes_file).read_text().splitlines() if l.strip()]
 
     base_model = SingleEncV7(d_model=args.d_model, n_heads=args.n_heads, n_layers=args.n_layers, h_target=args.h_target)
+    if args.freeze_target_heads:
+        freeze_target_heads(base_model)
     if world_size > 1:
         for p in base_model.parameters():
             dist.broadcast(p.data, src=0)
@@ -281,7 +251,11 @@ def main() -> None:
     for p in ema_model.parameters():
         p.requires_grad_(False)
 
-    opt = torch.optim.AdamW(base_model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
+    opt = torch.optim.AdamW(
+        [p for p in base_model.parameters() if p.requires_grad],
+        lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98),
+    )
+    top_dev_ckpts: list[tuple[float, str]] = []
     arch_sig = (args.d_model, args.n_layers, args.n_heads, args.h_target)
     resume_meta = {
         "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "d_model": args.d_model,
@@ -369,7 +343,9 @@ def main() -> None:
                 ref = base_model.refine_packet(batch["col_feats"], batch["glob_feats"], batch["col_mask"])
                 x_s, lg_s, y_r = base_model.sample_batch(batch, args.n_syn, zf, zn, yn, ref=ref)
                 lg_q, sd_q = base_model.predict_target_on_x(batch, ref, batch["X_qry"] * batch["col_mask"].unsqueeze(1))
-                loss, m = compute_v7_batch_loss(x_s, lg_s, y_r, batch, logits_qry=lg_q, sd_qry=sd_q, ref=ref)
+                loss, m = compute_v7_batch_loss(
+                    x_s, lg_s, y_r, batch, logits_qry=lg_q, sd_qry=sd_q, ref=ref, hard_tstr_v73=args.hard_tstr_v73
+                )
                 if not torch.isfinite(loss):
                     continue
                 (loss / float(args.grad_accum)).backward()
@@ -401,11 +377,7 @@ def main() -> None:
                         dist.all_reduce(p.grad, op=dist.ReduceOp.SUM)
                         p.grad.div_(float(world_size))
 
-            if step <= args.warmup_steps:
-                lr_now = args.lr * (step / max(1, args.warmup_steps))
-            else:
-                frac = (step - args.warmup_steps) / max(1, args.steps - args.warmup_steps)
-                lr_now = args.lr * (0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * frac)))
+            lr_now = args.lr * compute_lr_factor(step, args.steps, args.warmup_steps, args.lr_schedule)
             for pg in opt.param_groups:
                 pg["lr"] = lr_now
             gnorm = float(torch.nn.utils.clip_grad_norm_(base_model.parameters(), args.grad_clip).item())
@@ -466,6 +438,15 @@ def main() -> None:
                     if kpi_now > best_dev_kpi:
                         best_dev_kpi, role = kpi_now, "best_main_kpi"
                         save_v7_safetensors(ema_model, run_dir / "checkpoints" / "dev_best_ema.safetensors")
+                    if args.soup_k >= 2 and math.isfinite(kpi_now):
+                        top_dev_ckpts.append((kpi_now, ck_name))
+                        top_dev_ckpts.sort(key=lambda x: x[0], reverse=True)
+                        del top_dev_ckpts[args.soup_k :]
+                        if len(top_dev_ckpts) >= 2:
+                            save_v7_valley_soup(
+                                [run_dir / "checkpoints" / nm for _, nm in top_dev_ckpts],
+                                run_dir / "checkpoints" / f"dev_soup_k{args.soup_k}_ema.safetensors",
+                            )
                 save_v7_resume_state(
                     run_dir / "checkpoints" / "latest_resume.pt",
                     base_model, ema_model, opt, step, opt_steps, total_unique, best_dev_kpi, resume_meta,

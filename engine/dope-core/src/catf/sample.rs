@@ -27,10 +27,40 @@ pub fn sample_catf_covariates(
     seed: u64,
     table_id: u64,
 ) -> Vec<Vec<f64>> {
+    sample_catf_covariates_with_opts(
+        order,
+        conditionals,
+        marginals,
+        is_nominal,
+        nom_levels,
+        rules,
+        n_rows,
+        seed,
+        table_id,
+        0,
+        &DEFAULT_NAMESPACE_128,
+    )
+}
+
+/// Chunk-invariant stateless CATF covariate sampler honoring caller `row_offset` and `namespace`.
+#[allow(clippy::too_many_arguments)]
+pub fn sample_catf_covariates_with_opts(
+    order: &[usize],
+    conditionals: &[CatfConditional],
+    marginals: &[ColumnMarginalV2],
+    is_nominal: &[bool],
+    nom_levels: &[Vec<f64>],
+    rules: &RuleSet,
+    n_rows: usize,
+    seed: u64,
+    table_id: u64,
+    row_offset: u64,
+    namespace: &[u8; 16],
+) -> Vec<Vec<f64>> {
     let d = marginals.len();
     let mut flat = vec![0.0; n_rows * d];
     flat.par_chunks_mut(d).enumerate().for_each(|(r, x_row)| {
-        let rid = r as u64;
+        let rid = row_offset.wrapping_add(r as u64);
         let mut z_row = vec![0.0_f64; d];
         let mut nom_codes: Vec<Option<u8>> = vec![None; d];
         for (ord_pos, &col) in order.iter().enumerate() {
@@ -63,7 +93,7 @@ pub fn sample_catf_covariates(
             }
             let lse = log_sum_exp(&logits);
             let u_bin = row_keyed_uniform(
-                &DEFAULT_NAMESPACE_128,
+                namespace,
                 seed,
                 table_id,
                 rid,
@@ -87,7 +117,7 @@ pub fn sample_catf_covariates(
                 continue;
             }
             let u_in = row_keyed_uniform(
-                &DEFAULT_NAMESPACE_128,
+                namespace,
                 seed,
                 table_id,
                 rid,
@@ -96,7 +126,7 @@ pub fn sample_catf_covariates(
                 (col * 3 + 1) as u32,
             );
             let u_mix = row_keyed_uniform(
-                &DEFAULT_NAMESPACE_128,
+                namespace,
                 seed,
                 table_id,
                 rid,
@@ -142,24 +172,8 @@ pub fn sample_catf_covariates(
             }
         }
         // Apply mined structural rules strictly AFTER covariate transport (`T32`).
-        let u_exc = row_keyed_uniform(
-            &DEFAULT_NAMESPACE_128,
-            seed,
-            table_id,
-            rid,
-            0,
-            PURPOSE_RULE,
-            0,
-        );
-        let u_renorm = row_keyed_uniform(
-            &DEFAULT_NAMESPACE_128,
-            seed,
-            table_id,
-            rid,
-            0,
-            PURPOSE_RULE,
-            1,
-        );
+        let u_exc = row_keyed_uniform(namespace, seed, table_id, rid, 0, PURPOSE_RULE, 0);
+        let u_renorm = row_keyed_uniform(namespace, seed, table_id, rid, 0, PURPOSE_RULE, 1);
         rules.apply_row(x_row, u_exc, u_renorm);
     });
 
@@ -177,25 +191,36 @@ pub fn sample_post_rule_targets(
     seed: u64,
     table_id: u64,
 ) -> Samples {
+    sample_post_rule_targets_with_opts(
+        student,
+        post_rule_x,
+        seed,
+        table_id,
+        0,
+        &DEFAULT_NAMESPACE_128,
+    )
+}
+
+/// Chunk-invariant post-rule target sampler honoring caller `row_offset` and `namespace`.
+pub fn sample_post_rule_targets_with_opts(
+    student: &DistilledStudent,
+    post_rule_x: &[Vec<f64>],
+    seed: u64,
+    table_id: u64,
+    row_offset: u64,
+    namespace: &[u8; 16],
+) -> Samples {
     let n = post_rule_x.first().map_or(0, Vec::len);
     let logits = student.predict_logits(post_rule_x);
     let o = student.head.outputs();
     let y: Vec<f64> = (0..n)
         .into_par_iter()
         .map(|r| {
-            let rid = r as u64;
+            let rid = row_offset.wrapping_add(r as u64);
             match student.head {
                 Head::Regression => {
                     let mu = logits[r];
-                    let z = row_keyed_normal(
-                        &DEFAULT_NAMESPACE_128,
-                        seed,
-                        table_id,
-                        rid,
-                        0,
-                        PURPOSE_NOISE,
-                        0,
-                    );
+                    let z = row_keyed_normal(namespace, seed, table_id, rid, 0, PURPOSE_NOISE, 0);
                     let eps = student
                         .residual_model
                         .as_ref()
@@ -204,15 +229,7 @@ pub fn sample_post_rule_targets(
                 }
                 Head::Binary => {
                     let prob = 1.0 / (1.0 + (-logits[r] / student.temperature).exp());
-                    let u = row_keyed_uniform(
-                        &DEFAULT_NAMESPACE_128,
-                        seed,
-                        table_id,
-                        rid,
-                        0,
-                        PURPOSE_LABEL,
-                        0,
-                    );
+                    let u = row_keyed_uniform(namespace, seed, table_id, rid, 0, PURPOSE_LABEL, 0);
                     (u < prob) as u8 as f64
                 }
                 Head::Multiclass(k) => {
@@ -220,7 +237,7 @@ pub fn sample_post_rule_targets(
                     (0..k)
                         .map(|c| {
                             let u = row_keyed_uniform(
-                                &DEFAULT_NAMESPACE_128,
+                                namespace,
                                 seed,
                                 table_id,
                                 rid,

@@ -305,6 +305,7 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
     ax.set_title(f"(b) Objective Decomposition ({active_wave}, Source-Free <= 2 KiB)")
     ax.set_xlabel("Optimizer Step")
     ax.set_ylabel("Component Loss")
+    ax.set_ylim(0.24, 1.12)
     ax.grid(True)
     ax.legend(loc="upper right")
 
@@ -317,6 +318,7 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
         ax.plot(mins, tps, color="#0072B2", lw=1.8, label="Persisted Fleet Rate (tbl/s)")
         if med_tps > 0.0:
             ax.axhline(med_tps, color="#666666", ls="--", lw=1.0, label=f"Active Median ({med_tps:.0f} tbl/s)")
+        ax.set_ylim(0.0, max(2350.0, float(np.max(tps)) * 1.22))
         ax.set_xlabel("Elapsed Wave Time (minutes)")
         ax.set_ylabel("Unique Tables / Second (0.0 GiB VRAM)", color="#0072B2")
         ax2 = ax.twinx()

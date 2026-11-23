@@ -310,6 +310,7 @@ def compute_v7_batch_loss(
     logits_qry: torch.Tensor | None = None,
     sd_qry: torch.Tensor | None = None,
     ref: dict[str, torch.Tensor] | None = None,
+    hard_tstr_v73: bool = False,
 ) -> tuple[torch.Tensor, dict[str, float]]:
     """Differentiable multi-auditor loss + proper-scoring-rule NLL + trust-region residual anchor."""
     bsz, n_syn, p_dim = x_syn.shape
@@ -334,20 +335,34 @@ def compute_v7_batch_loss(
         dim=-1,
     )
     f_dim = phi_syn.shape[-1]
-    eye = torch.eye(f_dim, device=device, dtype=torch.float32).unsqueeze(0)
-    gram_s = torch.matmul(phi_syn.transpose(1, 2), phi_syn) + 2.0 * eye
+    reg_diag = torch.full((f_dim,), 2.0, device=device, dtype=torch.float32)
+    if hard_tstr_v73:
+        reg_diag[-1] = 1e-4
+    gram_s = torch.matmul(phi_syn.transpose(1, 2), phi_syn) + torch.diag(reg_diag).unsqueeze(0)
 
     y_soft = torch.zeros((bsz, n_syn, MAX_CLASSES), device=device, dtype=torch.float32)
     reg_m, bin_m, mc_m = task_id == 0, task_id == 1, task_id == 2
     if reg_m.any():
         y_soft[reg_m, :, 0] = y_reg_syn[reg_m]
     if bin_m.any():
-        y_soft[bin_m, :, 0] = torch.sigmoid(logits_syn[bin_m, :, 0].clamp(-8.0, 8.0))
+        p_b = torch.sigmoid(logits_syn[bin_m, :, 0].clamp(-8.0, 8.0))
+        if hard_tstr_v73:
+            y_h = (torch.rand_like(p_b) < p_b).float()
+            y_soft[bin_m, :, 0] = y_h - p_b.detach() + p_b
+        else:
+            y_soft[bin_m, :, 0] = p_b
     if mc_m.any():
         c_idx = torch.arange(MAX_CLASSES, device=device).unsqueeze(0)
         valid_c = c_idx < k_eff[mc_m].unsqueeze(1)
         lg_mc = logits_syn[mc_m].clamp(-8.0, 8.0).masked_fill(~valid_c.unsqueeze(1), -1e4)
-        y_soft[mc_m] = torch.softmax(lg_mc, dim=-1)
+        p_mc = torch.softmax(lg_mc, dim=-1)
+        if hard_tstr_v73:
+            u_g = torch.rand_like(lg_mc).clamp(1e-5, 1.0 - 1e-5)
+            g_idx = (lg_mc - torch.log(-torch.log(u_g))).argmax(dim=-1)
+            y_oh = torch.nn.functional.one_hot(g_idx, num_classes=MAX_CLASSES).float()
+            y_soft[mc_m] = y_oh - p_mc.detach() + p_mc
+        else:
+            y_soft[mc_m] = p_mc
 
     beta_s = torch.linalg.solve(gram_s, torch.matmul(phi_syn.transpose(1, 2), y_soft))
     pred_q = torch.matmul(phi_qry, beta_s)
@@ -433,6 +448,11 @@ def compute_v7_batch_loss(
             + 0.05 * (ref["d_knots"] ** 2).mean()
             + 0.02 * (ref["temp_sd"] ** 2).mean()
         )
+        if hard_tstr_v73:
+            anchor_loss = anchor_loss + 0.12 * (ref["w2"] ** 2).mean() + 0.04 * (ref["w1"] ** 2).mean()
+            if bin_m.any():
+                tau_scale = torch.exp(ref["temp_sd"][bin_m, 0])
+                anchor_loss = anchor_loss + 0.50 * (torch.relu(0.90 - tau_scale) ** 2).mean()
 
     mmd_proxy = marg_loss + 0.5 * corr_loss + 0.5 * swd_loss
     total_loss = 0.70 * cond_loss + 0.30 * tstr_loss + 1.0 * marg_loss + 1.2 * corr_loss + 0.9 * swd_loss + anchor_loss
