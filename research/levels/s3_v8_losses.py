@@ -1,63 +1,28 @@
-"""KPI-aligned differentiable training objectives, PCGrad-Lite, and Periodic-ASAM for `SingleEncV8`.
-
-Strictly aligned with `dope-kpi/v2` (`TRG` = twin-referenced retention gap) while keeping the
-`mlp` auditor strictly held out from training!
-Components:
-- `l_ret`: Twin-referenced smooth-worst retention gap over 3 differentiable auditors:
-    1. `A_lin` (Ridge / 3-step damped Newton logistic / softmax IRLS)
-    2. `A_tree` (64 soft oblivious depth-3 trees fitted on synthetic/real rows)
-    3. `A_rff` (fixed-bank multi-bandwidth Random Fourier Features ridge/logit)
-- `l_pit`: Closed-form 1D marginal Cramér-von Mises (sorted quantile L2) per episode
-- `l_cop`: Closed-form correlation/Woodbury Gaussian copula divergence
-- `l_tree`: 64 random oblivious-tree leaf occupancy + leaf target-mean matching (C2ST surrogate!)
-- `l_drv`: Grouped permutation importance TV + top-8 pairwise rank + 1D 8-bin ALE L1
-- `l_cond`: Proper NLL + 0.1/0.9 pinball calibration + 15-bin Soft-ECE
-- `l_priv`: Smooth DCR hinge (penalizes synthetic rows closer to FIT than to QRY twin!)
-- `l_aux`: Masked evidence reconstruction loss (pre-bottleneck representation grounding)
-- `l_twin`: Split-half InfoNCE embedding stability loss (aligns JopeDime `Z` space!)
-- Optional `PCGradLite` and `PeriodicASAM` wrappers with per-term gradient-norm & cosine logging.
-"""
+"""KPI-aligned differentiable objectives and PCGrad-Lite for `SingleEncV8` (mlp held out)."""
 from __future__ import annotations
 
 import math
-from typing import Any
-
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 from research.levels.v8_single_encoding import gumbel_rao_ste
 
 
 def _fit_ridge_eval(
-    Xs: torch.Tensor,
-    ys: torch.Tensor,
-    Xq: torch.Tensor,
-    yq: torch.Tensor,
-    lam: float = 2.0,
+    Xs: torch.Tensor, ys: torch.Tensor, Xq: torch.Tensor, yq: torch.Tensor, lam: float = 2.0,
 ) -> torch.Tensor:
     """Closed-form differentiable ridge regression MSE on query `(Xq, yq)`."""
     n, p = Xs.shape
-    ones_s = torch.ones(n, 1, device=Xs.device, dtype=Xs.dtype)
-    ones_q = torch.ones(Xq.shape[0], 1, device=Xq.device, dtype=Xq.dtype)
-    Xa = torch.cat([Xs, ones_s], dim=1)
-    Xqa = torch.cat([Xq, ones_q], dim=1)
+    Xa = torch.cat([Xs, torch.ones(n, 1, device=Xs.device, dtype=Xs.dtype)], dim=1)
+    Xqa = torch.cat([Xq, torch.ones(Xq.shape[0], 1, device=Xq.device, dtype=Xq.dtype)], dim=1)
     reg = torch.eye(p + 1, device=Xs.device, dtype=Xs.dtype) * lam
     reg[-1, -1] = 1e-2
-    A = Xa.T @ Xa + reg
-    b = Xa.T @ ys.unsqueeze(-1)
-    w = torch.linalg.solve(A, b)
-    pred = (Xqa @ w).squeeze(-1)
-    return F.mse_loss(pred, yq)
+    w = torch.linalg.solve(Xa.T @ Xa + reg, Xa.T @ ys.unsqueeze(-1))
+    return F.mse_loss((Xqa @ w).squeeze(-1), yq)
 
 
 def _fit_logit_irls_eval(
-    Xs: torch.Tensor,
-    ps: torch.Tensor,  # soft/hard probabilities in [0, 1]
-    Xq: torch.Tensor,
-    yq: torch.Tensor,  # binary {0, 1}
-    lam: float = 2.0,
-    steps: int = 3,
+    Xs: torch.Tensor, ps: torch.Tensor, Xq: torch.Tensor, yq: torch.Tensor, lam: float = 2.0, steps: int = 3,
 ) -> torch.Tensor:
     """3-step differentiable Newton-IRLS binary logistic regression NLL on `(Xq, yq)`."""
     n, p = Xs.shape
@@ -416,13 +381,14 @@ def compute_v8_episode_loss(
         ys_stat = (oh_s * cls_grid[None, :]).sum(dim=-1)
         y_stat_q = cls_grid[yq_idx]
 
-    # Twin-referenced smooth-worst retention gap across [A_lin, A_tree, A_rff] (mlp held out!)
+    # Twin-referenced smooth-worst retention gap across [A_lin, A_tree, A_rff] (mlp held out!).
+    # Smooth tanh saturation bounds gradients on noisy low-signal real episodes (prevents 100+ grad spikes).
     def _gap(ls: torch.Tensor, lr: torch.Tensor) -> torch.Tensor:
-        denom = (l0 - lr).clamp(min=0.05)
-        return ((ls - lr) / denom).clamp(-0.5, 4.0)
+        denom = (l0 - lr).clamp(min=0.08)
+        return 2.0 * torch.tanh(((ls - lr) / denom) / 2.0)
 
     gaps = torch.stack([_gap(l_lin_s, l_lin_r), _gap(l_tr_s, l_tr_r), _gap(l_rff_s, l_rff_r)])
-    l_ret = (1.0 / 4.0) * torch.logsumexp(4.0 * gaps, dim=0)
+    l_ret = (1.0 / 3.0) * torch.logsumexp(3.0 * gaps, dim=0)
 
     l_pit = loss_pit_cvm(Xs, Xq_all)
     l_cop = loss_copula_corr(Xs, Xq_all)

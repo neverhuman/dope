@@ -64,49 +64,63 @@ pub fn choose_base_layout(
     };
 
     let p_max = x_cols_raw.min(V8_MAX_COLS);
-    // Reserve some budget for enhancement sections when budget >= 1024 B!
-    let target_enh = if budget_bytes >= 2048 {
-        (budget_bytes / 3).min(768)
+    let max_r = if budget_bytes >= 4096 {
+        12
+    } else if budget_bytes >= 2048 {
+        8
     } else if budget_bytes >= 1024 {
-        220
+        6
     } else {
-        64
+        4
+    };
+    let build_plan = |p: usize, kl: usize, r: usize| -> Dse8LayoutPlan {
+        let rem = budget_bytes.saturating_sub(base_est(p, kl, r));
+        let code_tier = match want_code_tier {
+            3 if rem >= 256 => 3,
+            2..=3 if rem >= 128 => 2,
+            1..=3 if rem >= 64 => 1,
+            _ => 0,
+        };
+        Dse8LayoutPlan {
+            p_eff: p,
+            knot_level: kl,
+            rank_use: r.min(p),
+            max_effects: (rem / 48).clamp(2, 24),
+            max_pairs: (rem / 48).clamp(2, 24),
+            max_trees: (rem / (V8_TREE_WIRE_BYTES + 2)).min(V8_MAX_TREES),
+            max_regimes: if rem >= 48 { 8 } else { 0 },
+            allow_nominal: rem >= 16,
+            allow_resid: task_id == 0 && rem >= 24,
+            code_tier,
+        }
     };
 
-    // First try keeping good room for enhancements; fall back to pure base fit if tight.
-    for reserve in [target_enh, 0] {
-        for &kl in &[9usize, 17, 5] {
-            let max_r = if budget_bytes >= 4096 {
-                12
-            } else if budget_bytes >= 2048 {
-                8
-            } else if budget_bytes >= 1024 {
-                6
-            } else {
-                4
-            };
+    // Priority 1: KEEP ALL p_max columns before dropping any column (trim reserve/rank/knots first!).
+    let enh_hi = if budget_bytes >= 2048 {
+        (budget_bytes / 4).min(512)
+    } else if budget_bytes >= 1024 {
+        180
+    } else {
+        48
+    };
+    let enh_lo = (enh_hi / 3).min(128);
+    for reserve in [enh_hi, enh_lo, 0] {
+        for &kl in &[9usize, 5] {
             for r in (1..=max_r.min(p_max)).rev() {
-                for p in (1..=p_max).rev() {
+                if base_est(p_max, kl, r) + reserve <= budget_bytes {
+                    return Some(build_plan(p_max, kl, r));
+                }
+            }
+        }
+    }
+
+    // Priority 2: Only drop columns when p_max cannot fit even at (kl=5, r=1, reserve=0).
+    for reserve in [enh_lo, 0] {
+        for &kl in &[9usize, 5] {
+            for r in (1..=max_r.min(p_max)).rev() {
+                for p in (1..p_max).rev() {
                     if base_est(p, kl, r) + reserve <= budget_bytes {
-                        let rem = budget_bytes.saturating_sub(base_est(p, kl, r));
-                        let code_tier = match want_code_tier {
-                            3 if rem >= 256 => 3,
-                            2..=3 if rem >= 128 => 2,
-                            1..=3 if rem >= 64 => 1,
-                            _ => 0,
-                        };
-                        return Some(Dse8LayoutPlan {
-                            p_eff: p,
-                            knot_level: kl,
-                            rank_use: r.min(p),
-                            max_effects: (rem / 48).clamp(2, 24),
-                            max_pairs: (rem / 48).clamp(2, 24),
-                            max_trees: (rem / (V8_TREE_WIRE_BYTES + 2)).min(V8_MAX_TREES),
-                            max_regimes: if rem >= 48 { 8 } else { 0 },
-                            allow_nominal: rem >= 16,
-                            allow_resid: task_id == 0 && rem >= 24,
-                            code_tier,
-                        });
+                        return Some(build_plan(p, kl, r));
                     }
                 }
             }

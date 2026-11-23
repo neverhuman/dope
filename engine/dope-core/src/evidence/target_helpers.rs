@@ -317,3 +317,86 @@ pub(crate) fn fill_alignment_and_stability(
         set_mask_bit(out_glob_mask, 94);
     }
 }
+
+pub(crate) fn select_interaction_pairs(p: usize, signal: &[f64]) -> Vec<(usize, usize)> {
+    if p <= 48 {
+        let mut pairs = Vec::with_capacity(p * p.saturating_sub(1) / 2);
+        for i in 0..p {
+            for j in (i + 1)..p {
+                pairs.push((i, j));
+            }
+        }
+        return pairs;
+    }
+    let mut order: Vec<usize> = (0..p).collect();
+    order.sort_by(|&a, &b| signal[b].total_cmp(&signal[a]));
+    let top_k = 32.min(p);
+    let mut pairs = Vec::with_capacity(768);
+    for a in 0..top_k {
+        for b in (a + 1)..top_k {
+            let (i, j) = if order[a] < order[b] {
+                (order[a], order[b])
+            } else {
+                (order[b], order[a])
+            };
+            pairs.push((i, j));
+        }
+    }
+    let exp_budget = (pairs.len() / 3).max(128);
+    for k in 0..exp_budget {
+        let i = (k * 37 + 13) % p;
+        let j = (k * 59 + 29) % p;
+        if i != j {
+            pairs.push(if i < j { (i, j) } else { (j, i) });
+        }
+    }
+    pairs.sort_unstable();
+    pairs.dedup();
+    pairs
+}
+
+pub(crate) fn xor_quadrant_z(zi: &[f64], zj: &[f64], e: &[f64]) -> f64 {
+    let mut sums = [0.0f64; 4];
+    let mut cnts = [0usize; 4];
+    for r in 0..e.len() {
+        let q = (usize::from(zi[r] > 0.0) << 1) | usize::from(zj[r] > 0.0);
+        sums[q] += e[r];
+        cnts[q] += 1;
+    }
+    if cnts.iter().any(|&c| c < SUPPORT_FLOOR_K) {
+        return 0.0;
+    }
+    let m00 = sums[0] / cnts[0] as f64;
+    let m01 = sums[1] / cnts[1] as f64;
+    let m10 = sums[2] / cnts[2] as f64;
+    let m11 = sums[3] / cnts[3] as f64;
+    let contrast = (m11 + m00) - (m10 + m01);
+    let se = cnts
+        .iter()
+        .map(|&c| 1.0 / c as f64)
+        .sum::<f64>()
+        .sqrt()
+        .max(1e-6);
+    (contrast / se).clamp(-12.0, 12.0)
+}
+
+pub(crate) fn eb_8bin_residual(e: &[f64], b8: &[u8]) -> ([f64; 8], f64) {
+    let mut sums = [0.0f64; 8];
+    let mut cnts = [0usize; 8];
+    for (&ev, &b) in e.iter().zip(b8) {
+        if (b as usize) < 8 && ev.is_finite() {
+            sums[b as usize] += ev;
+            cnts[b as usize] += 1;
+        }
+    }
+    let mut out = [0.0f64; 8];
+    let mut chi2 = 0.0;
+    for b in 0..8 {
+        if cnts[b] >= SUPPORT_FLOOR_K {
+            let mu = sums[b] / cnts[b] as f64;
+            chi2 += cnts[b] as f64 * mu * mu;
+            out[b] = sums[b] / (cnts[b] as f64 + 8.0);
+        }
+    }
+    (out, chi2)
+}

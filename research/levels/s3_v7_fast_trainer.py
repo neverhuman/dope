@@ -1,77 +1,44 @@
-"""Screaming multi-node CPU-DDP trainer for SingleEncV7 (V7.2: Max-Entropy S3 + Q_nl + Full Disk Telemetry).
-
-Reads the memory-mapped flat corpus (`/dev/shm/dope-flat/s3-v250`), synthesizes exact per-step
-shuffled tri-task batches (6 reg / 5 bin / 5 mc) mixing ALL 4,145 S3 tables (including >8-class
-cropped multiclass) + 20% infinite synthetic nonlinear SCM/tree priors + full row/col/class
-cropping + target swaps + missingness/warps, logs EVERY step loss-decomposition & entropy telemetry
-to disk (`train.jsonl`), saves canonical F32 rank-<=2 SafeTensors checkpoints, and evaluates strictly
-on the isolated 30-table DEV list (never touching CONFIRM).
-"""
+"""Multi-node CPU-DDP/GPU-DiLoCo trainer for SingleEncV7 (V7.2/V7.3, DEV-only eval)."""
 from __future__ import annotations
 
-import argparse
+import argparse, copy, datetime, json, math, multiprocessing, os, time
 from collections import deque
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-import copy, datetime, json, math, multiprocessing, os, time
 from pathlib import Path
 from typing import Any
-
 import numpy as np
-import torch
-import torch.distributed as dist
+import torch, torch.distributed as dist
 
-from .s3_v7_batch_ops import (
-    FlatArenaView, _fit_only_scale, _hash_u64,
-    build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss,
-)
+from .s3_v7_batch_ops import FlatArenaView, _fit_only_scale, _hash_u64, build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss
 from .s3_v7_entropy import RealDatasetOnePassQueue, diloco_sync_step, task_quota_for_step
 from .s3_v7_eval import (
-    append_jsonl as _append_jsonl, atomic_json as _atomic_json,
-    compute_lr_factor, eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
-    freeze_target_heads, load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
-    save_v7_valley_soup, split_dev_table_abt, tree_visible_joint_loss,
+    append_jsonl as _append_jsonl, atomic_json as _atomic_json, compute_lr_factor, eval_binary,
+    eval_multiclass, eval_realism_and_privacy, eval_regression, freeze_target_heads, load_v7_resume_state,
+    save_v7_resume_state, save_v7_safetensors, save_v7_valley_soup, split_dev_table_abt, tree_visible_joint_loss,
 )
-from .v7_single_encoding import (
-    MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
-    SingleEncV7, extract_dse_packet_numpy,
-)
+from .v7_single_encoding import MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES, SingleEncV7, extract_dse_packet_numpy
 
 
 @torch.no_grad()
 def evaluate_v7_dev_only(
-    model: SingleEncV7,
-    val_arena: FlatArenaView,
-    dev_hashes: list[str],
-    step: int,
-    seed: int = 20261122,
+    model: SingleEncV7, val_arena: FlatArenaView, dev_hashes: list[str], step: int, seed: int = 20261122,
 ) -> dict[str, Any]:
     """Held-out evaluation strictly restricted to `dev_hashes` (NEVER touches CONFIRM!)."""
-    model.eval()
-    t0 = time.time()
-    rng = np.random.default_rng(seed)
+    model.eval(); t0 = time.time(); rng = np.random.default_rng(seed)
     rets, by_t = [], {"regression": [], "binary": [], "multiclass": []}
-    parities, realisms, privs, drvs, c2sts, margs, dcrs, mias, copies, b_sizes, within_caps, disc_shares = (
-        [], [], [], [], [], [], [], [], [], [], [], []
-    )
+    parities, realisms, privs, drvs, c2sts, margs, dcrs, mias, copies, b_sizes, within_caps, disc_shares = ([] for _ in range(12))
     for dh in dev_hashes:
         idx = val_arena.by_hash.get(dh)
-        if idx is None:
-            continue
+        if idx is None: continue
         X_raw, y_raw, dg, rec = val_arena.load_slice(idx)
         task = str(rec["task"])
         spl = split_dev_table_abt(X_raw, y_raw, dg, task, rng, _fit_only_scale, MAX_COLS, MAX_CLASSES)
-        if spl is None:
-            continue
+        if spl is None: continue
         Xa, ya, Xb, yb, Xt, yt, task_id, k_cls = spl
-
         pkt = extract_dse_packet_numpy(Xa, ya, task_id, k_cls, max_bytes=PACKET_BUDGET_BYTES)
-        p_eff = pkt["p_eff"]
-        n_syn = max(len(Xa) * 2, 256)
-        pkt["X_qry"] = np.zeros((16, MAX_COLS), dtype=np.float32)
-        pkt["y_qry"] = np.zeros((16,), dtype=np.float32)
-        pkt["q_mask"] = np.ones((16,), dtype=np.float32)
-        pkt["n_fit"] = len(Xa)
-        pkt["n_noise"] = 0
+        p_eff, n_syn = pkt["p_eff"], max(len(Xa) * 2, 256)
+        pkt.update(X_qry=np.zeros((16, MAX_COLS), dtype=np.float32), y_qry=np.zeros((16,), dtype=np.float32),
+                   q_mask=np.ones((16,), dtype=np.float32), n_fit=len(Xa), n_noise=0)
         ev_dev = next(model.parameters()).device
         batch = {k: (v.to(ev_dev) if torch.is_tensor(v) else v) for k, v in collate_v7_batch([pkt]).items()}
         gen = torch.Generator().manual_seed(seed ^ (idx * 7919))
@@ -91,16 +58,13 @@ def evaluate_v7_dev_only(
             ys = (np.cumsum(probs, axis=-1) < torch.rand((n_syn, 1), generator=gen).numpy()).sum(axis=-1).clip(0, k_cls - 1).astype(np.float32)
             res = eval_multiclass(Xa[:, :p_eff], ya, Xb[:, :p_eff], yb, Xs, ys, Xt[:, :p_eff], yt, k_cls)
         rp = eval_realism_and_privacy(Xa[:, :p_eff], Xb[:, :p_eff], Xs, Xt[:, :p_eff])
-        b_sizes.append(pkt["packet_bytes"])
-        within_caps.append(1.0 if pkt["packet_bytes"] <= PACKET_BUDGET_BYTES else 0.0)
+        b_sizes.append(pkt["packet_bytes"]); within_caps.append(1.0 if pkt["packet_bytes"] <= PACKET_BUDGET_BYTES else 0.0)
         disc_shares.append(float(np.mean(pkt["col_feats"][:p_eff, 38])) if p_eff > 0 else 0.0)
-        if math.isfinite(res["retention"]):
-            rets.append(res["retention"]); by_t[task].append(res["retention"])
+        if math.isfinite(res["retention"]): rets.append(res["retention"]); by_t[task].append(res["retention"])
         if math.isfinite(res["parity"]): parities.append(res["parity"])
         if math.isfinite(res["driver_spearman"]): drvs.append(res["driver_spearman"])
-        realisms.append(rp["realism_pass"]); privs.append(rp["privacy_pass"])
-        c2sts.append(rp["c2st_auc"]); margs.append(rp["marg_auc"])
-        dcrs.append(rp["dcr_share"]); mias.append(rp["mia_auc"]); copies.append(rp["exact_copy_excess"])
+        realisms.append(rp["realism_pass"]); privs.append(rp["privacy_pass"]); c2sts.append(rp["c2st_auc"])
+        margs.append(rp["marg_auc"]); dcrs.append(rp["dcr_share"]); mias.append(rp["mia_auc"]); copies.append(rp["exact_copy_excess"])
 
     model.train()
     med = lambda xs: round(float(np.median(xs)), 4) if xs else None

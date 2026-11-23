@@ -18,8 +18,8 @@ use super::v8::{fit_auto_v8, AutoV8Options, V8Choice};
 use crate::error::{DopeError, Result};
 use crate::schema::{infer, IntakeOptions, Kind, Schema};
 use crate::single_encoding::v8::{
-    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, unpack_dse8_packet,
-    Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
+    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta,
+    unpack_dse8_packet, Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
 };
 use crate::table::{is_missing, parse_number, RawTable};
 use serde::Serialize;
@@ -179,9 +179,6 @@ pub fn fit_dpa1_v8(
     let schema = infer(raw, target, &intake)?;
     let v7s = V7Schema::from_schema(&schema);
     let section = encode_section(&v7s, opts.format1.anonymize)?;
-    let packet_room = room.checked_sub(section.len()).ok_or_else(|| {
-        DopeError::Budget("the V8 column schema alone exceeds the budget (try --anonymize)".into())
-    })?;
     let (x_raw, y_raw) = packet_inputs(raw, target, &schema)?;
     let tid = task_id_for(v7s.classes());
     let active_model = match mode {
@@ -191,6 +188,12 @@ pub fn fit_dpa1_v8(
 
     let (encoder, choice, fp, payload, sf1, sp0, snn, note) = match mode {
         V8DpaMode::V8Analytic | V8DpaMode::V8 => {
+            let packet_room = room.checked_sub(section.len()).ok_or_else(|| {
+                DopeError::Budget(
+                    "the V8 column schema alone exceeds the budget (try --anonymize)".into(),
+                )
+            })?;
+            let unit_meta = fit_unit_meta(&x_raw, &y_raw, tid, opts.normalized_only).ok();
             let dse8_opts = Dse8FitOptions {
                 task_id: tid,
                 budget_bytes: packet_room,
@@ -205,7 +208,7 @@ pub fn fit_dpa1_v8(
                 } else {
                     0
                 },
-                col_meta: None,
+                col_meta: unit_meta.as_deref(),
                 seed: opts.format1.seed,
             };
             let (pkt, ch, fp) = match active_model {
@@ -233,49 +236,70 @@ pub fn fit_dpa1_v8(
             )
         }
         V8DpaMode::AutoV8 => {
-            // Fit Format 1 inside `room`, DSE8 inside `packet_room`, using the 3-way guard!
-            let mut inner_opts = opts.clone();
-            inner_opts.budget = packet_room;
-            inner_opts.format1.budget = Some(room);
-            let fitted = fit_auto_v8(raw, target, &inner_opts, active_model.map(|m| m.weights()))?;
-            let r = fitted.report;
-            match fitted.choice {
-                V8Choice::Format1 => (
+            // If the V8 schema section leaves too little room for a DSE8 packet, fall back
+            // directly to Format 1 inside `room` instead of failing over_budget!
+            let packet_room = room.saturating_sub(section.len());
+            if packet_room < 96 {
+                let mut f1_opts = opts.format1.clone();
+                f1_opts.budget = Some(room);
+                f1_opts.task = Some(schema.task);
+                let f1 = crate::compile::fit(raw, target, &f1_opts)?;
+                (
                     Encoder::Format1,
                     V8Choice::Format1,
                     NO_FINGERPRINT,
-                    fitted.bytes,
-                    r.score_format1,
-                    r.score_dse8_analytic,
-                    r.score_dse8_neural,
-                    r.note,
-                ),
-                V8Choice::Dse8Analytic => {
-                    let pl = [&section[..], &fitted.bytes[..]].concat();
-                    (
-                        Encoder::V8,
-                        V8Choice::Dse8Analytic,
+                    f1.bytes,
+                    None,
+                    None,
+                    None,
+                    "format1_fallback: schema_exceeds_v8_room".into(),
+                )
+            } else {
+                // Fit Format 1 inside `room`, DSE8 inside `packet_room`, using the 3-way guard!
+                let mut inner_opts = opts.clone();
+                inner_opts.budget = packet_room;
+                inner_opts.format1.budget = Some(room);
+                let fitted =
+                    fit_auto_v8(raw, target, &inner_opts, active_model.map(|m| m.weights()))?;
+                let r = fitted.report;
+                match fitted.choice {
+                    V8Choice::Format1 => (
+                        Encoder::Format1,
+                        V8Choice::Format1,
                         NO_FINGERPRINT,
-                        pl,
+                        fitted.bytes,
                         r.score_format1,
                         r.score_dse8_analytic,
                         r.score_dse8_neural,
                         r.note,
-                    )
-                }
-                V8Choice::Dse8Neural => {
-                    let fp = active_model.map_or(NO_FINGERPRINT, V8Model::fingerprint);
-                    let pl = [&section[..], &fitted.bytes[..]].concat();
-                    (
-                        Encoder::V8,
-                        V8Choice::Dse8Neural,
-                        fp,
-                        pl,
-                        r.score_format1,
-                        r.score_dse8_analytic,
-                        r.score_dse8_neural,
-                        r.note,
-                    )
+                    ),
+                    V8Choice::Dse8Analytic => {
+                        let pl = [&section[..], &fitted.bytes[..]].concat();
+                        (
+                            Encoder::V8,
+                            V8Choice::Dse8Analytic,
+                            NO_FINGERPRINT,
+                            pl,
+                            r.score_format1,
+                            r.score_dse8_analytic,
+                            r.score_dse8_neural,
+                            r.note,
+                        )
+                    }
+                    V8Choice::Dse8Neural => {
+                        let fp = active_model.map_or(NO_FINGERPRINT, V8Model::fingerprint);
+                        let pl = [&section[..], &fitted.bytes[..]].concat();
+                        (
+                            Encoder::V8,
+                            V8Choice::Dse8Neural,
+                            fp,
+                            pl,
+                            r.score_format1,
+                            r.score_dse8_analytic,
+                            r.score_dse8_neural,
+                            r.note,
+                        )
+                    }
                 }
             }
         }

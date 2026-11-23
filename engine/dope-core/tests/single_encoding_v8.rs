@@ -498,3 +498,146 @@ fn dse8_malformed_wire_vectors_and_admission_refusals() {
     assert!(build_decode_plan_v8(&pkt, Some(&w1)).is_ok());
     assert!(build_decode_plan_v8(&pkt, Some(&w2)).is_err());
 }
+
+#[test]
+fn dse8_calibrated_priors_collinear_precision_and_discrete_trees() {
+    // 1. Imbalanced 5-class table (13/29/44/66/198): decoded class shares MUST match FIT!
+    let mut rng = Rng::new(4201);
+    let counts = [13usize, 29, 44, 66, 198];
+    let n_mc: usize = counts.iter().sum();
+    let mut x_mc = vec![vec![0.0f64; n_mc]; 8];
+    let mut y_mc = Vec::with_capacity(n_mc);
+    let mut row = 0usize;
+    for (cls, &cnt) in counts.iter().enumerate() {
+        for _ in 0..cnt {
+            let mu = (cls as f64 - 2.0) * 0.65;
+            x_mc[0][row] = mu + rng.normal();
+            x_mc[1][row] = -0.5 * mu + rng.normal();
+            x_mc[2][row] = if rng.uniform() < (0.15 + 0.15 * cls as f64) {
+                1.0
+            } else {
+                0.0
+            };
+            x_mc[3][row] = ((cls % 3) as f64) + if rng.uniform() < 0.2 { 1.0 } else { 0.0 };
+            for x_col in x_mc.iter_mut().take(8).skip(4) {
+                x_col[row] = rng.normal();
+            }
+            y_mc.push(cls as f64);
+            row += 1;
+        }
+    }
+    let b_mc = fit_dse8_packet(
+        &x_mc,
+        &y_mc,
+        &Dse8FitOptions {
+            task_id: 2,
+            budget_bytes: 2048,
+            seed: 1,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let pkt_mc = unpack_dse8_packet(&b_mc).unwrap();
+    let dec_mc = decode_dse8_rows(&pkt_mc, None, 2000, 77).unwrap();
+    let mut syn_cnt = [0usize; 5];
+    for &yv in &dec_mc.y {
+        let c = (yv.round() as usize).min(4);
+        syn_cnt[c] += 1;
+    }
+    for c in 0..5 {
+        let p_fit = counts[c] as f64 / n_mc as f64;
+        let p_syn = syn_cnt[c] as f64 / 2000.0;
+        assert!(
+            (p_syn - p_fit).abs() < 0.045,
+            "class {c} prior drift: fit={p_fit:.3} syn={p_syn:.3}"
+        );
+    }
+
+    // 2. Near-deterministic collinear regression: resid_sd MUST stay tight & syn R^2 > 0.98!
+    let n_reg = 350;
+    let mut x_reg = vec![vec![0.0f64; n_reg]; 10];
+    let mut y_reg = vec![0.0f64; n_reg];
+    for (r, yr) in y_reg.iter_mut().enumerate().take(n_reg) {
+        let base = rng.normal();
+        let diff = 0.08 * rng.normal();
+        x_reg[0][r] = base;
+        x_reg[1][r] = base + diff;
+        for col in x_reg.iter_mut().take(10).skip(2) {
+            col[r] = rng.normal();
+        }
+        *yr = 1.5 * x_reg[0][r] - 1.2 * x_reg[1][r] + 0.8 * x_reg[2][r] + 0.02 * rng.normal();
+    }
+    let b_reg = fit_dse8_packet(
+        &x_reg,
+        &y_reg,
+        &Dse8FitOptions {
+            task_id: 0,
+            budget_bytes: 2048,
+            seed: 2,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let pkt_reg = unpack_dse8_packet(&b_reg).unwrap();
+    assert!(
+        pkt_reg.header.resid_sd < 0.06,
+        "near-deterministic resid_sd exploded to {}",
+        pkt_reg.header.resid_sd
+    );
+    let dec_reg = decode_dse8_rows(&pkt_reg, None, 1000, 88).unwrap();
+    let mut err2 = 0.0;
+    let y_bar = dec_reg.y.iter().sum::<f64>() / 1000.0;
+    let y_var = dec_reg.y.iter().map(|v| (v - y_bar).powi(2)).sum::<f64>() / 1000.0;
+    for r in 0..1000 {
+        let pred = 1.5 * dec_reg.x[0][r] - 1.2 * dec_reg.x[1][r] + 0.8 * dec_reg.x[2][r];
+        err2 += (dec_reg.y[r] - pred).powi(2);
+    }
+    let syn_r2 = 1.0 - (err2 / 1000.0) / y_var.max(1e-6);
+    assert!(
+        syn_r2 > 0.97,
+        "near-deterministic syn_r2={syn_r2:.4} (resid_sd={})",
+        pkt_reg.header.resid_sd
+    );
+
+    // 3. Nonlinear discrete-column interaction (binary 65/35 * binary 70/30): decode-aligned trees!
+    let n_disc = 600;
+    let mut x_d = vec![vec![0.0f64; n_disc]; 4];
+    let mut y_d = vec![0.0f64; n_disc];
+    for (r, yd) in y_d.iter_mut().enumerate().take(n_disc) {
+        let b0 = if rng.uniform() < 0.35 { 1.0 } else { 0.0 };
+        let b1 = if rng.uniform() < 0.30 { 1.0 } else { 0.0 };
+        x_d[0][r] = b0;
+        x_d[1][r] = b1;
+        x_d[2][r] = rng.normal();
+        x_d[3][r] = rng.normal();
+        *yd = if (b0 > 0.5) ^ (b1 > 0.5) { 2.0 } else { -1.0 } + 0.25 * rng.normal();
+    }
+    let b_d = fit_dse8_packet(
+        &x_d,
+        &y_d,
+        &Dse8FitOptions {
+            task_id: 0,
+            budget_bytes: 2048,
+            seed: 3,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let pkt_d = unpack_dse8_packet(&b_d).unwrap();
+    let dec_d = decode_dse8_rows(&pkt_d, None, 2000, 99).unwrap();
+    let (mut s_xor, mut n_xor, mut s_eq, mut n_eq) = (0.0, 0usize, 0.0, 0usize);
+    for r in 0..2000 {
+        if (dec_d.x[0][r] > 0.5) ^ (dec_d.x[1][r] > 0.5) {
+            s_xor += dec_d.y[r];
+            n_xor += 1;
+        } else {
+            s_eq += dec_d.y[r];
+            n_eq += 1;
+        }
+    }
+    let gap = (s_xor / n_xor.max(1) as f64) - (s_eq / n_eq.max(1) as f64);
+    assert!(
+        gap > 1.8,
+        "discrete XOR gap collapsed to {gap:.3} (expected > 1.8)"
+    );
+}

@@ -1,13 +1,12 @@
-//! Target conditional sections for `DSE8` v1 (`W` Newton-IRLS linear, `E` gated S8 8-bin
-//! main effects, `Pr` gated S10 product + XOR quadrant pairs, `Rs` heteroscedastic residual
-//! model, and `Z` nested FSQ neural code + JopeDime embedding export).
-//!
-//! Every packed section (`W`, `E`, `Pr`, `Rs`) is **analytically decoded** in Step-0!
+//! Target conditional sections for `DSE8` v1 (`W` OOF-CV Newton-IRLS linear, `Rs`
+//! zero-centered variance-preserving residual model, and `Z` nested FSQ neural code).
 
-use crate::evidence::irls::{fit_irls_subset, predict_irls_rows};
-use crate::evidence::primitives::{value_consistent_bins, SUPPORT_FLOOR_K};
-use crate::single_encoding::math::{f16_bits_to_f32, f32_to_f16_bits};
+use super::calibrate::{eval_true_loss, linear_syn_to_fit_sd_ratio};
+use crate::evidence::irls::{finite_f64, fit_irls_subset_lam, fit_ridge_grid_subset};
+use crate::evidence::primitives::SUPPORT_FLOOR_K;
 use crate::stats::{pearson, quantile_sorted};
+
+pub use super::effects_v8::{eval_effects_and_pairs, fit_effects_v8, fit_pairs_v8};
 
 pub const V8_MAX_EFFECTS: usize = 24;
 pub const V8_MAX_PAIRS: usize = 24;
@@ -18,10 +17,10 @@ pub const V8_MAX_RESID_COLS: usize = 8;
 pub struct LinearSectionV8 {
     pub o_dim: usize,
     pub p_eff: usize,
-    pub w: Vec<Vec<f32>>,   // [o_dim][p_eff]
-    pub b: Vec<f32>,        // [o_dim]
-    pub w_scales: Vec<f32>, // [o_dim]
-    pub temp: f32,          // OOF temperature calibration for cls (1.0 for reg)
+    pub w: Vec<Vec<f32>>,
+    pub b: Vec<f32>,
+    pub w_scales: Vec<f32>,
+    pub temp: f32,
     pub resid_sd: f32,
 }
 
@@ -35,7 +34,7 @@ pub struct Effect1DV8 {
     pub utility: f64,
 }
 
-/// One gated pairwise product + depth-2 XOR quadrant interaction (`6 B` on wire; analytically decoded!).
+/// One gated pairwise product + depth-2 XOR quadrant interaction (`5 B` on wire; analytically decoded!).
 #[derive(Clone, Debug)]
 pub struct PairIntV8 {
     pub col_i: u8,
@@ -46,16 +45,15 @@ pub struct PairIntV8 {
     pub utility: f64,
 }
 
-/// Heteroscedastic residual log-scale + 5 residual quantile-residual knots (`TAG_RESID`).
+/// Heteroscedastic residual log-scale + 5 zero-centered residual quantile shifts (`TAG_RESID`).
 #[derive(Clone, Debug, Default)]
 pub struct ResidSectionV8 {
-    pub cols: Vec<u8>,      // <= 8 active cols
-    pub log_sd_w: Vec<f32>, // weight on z_j for log(sd(e|x))
-    pub q5_resid: [f32; 5], // residual non-Gaussian quantile shifts at u = [0.1, 0.3, 0.5, 0.7, 0.9]
+    pub cols: Vec<u8>,
+    pub log_sd_w: Vec<f32>,
+    pub q5_resid: [f32; 5],
 }
 
-/// Nested FSQ neural code (`TAG_CODE`): Tier 0 (0 B), Tier 1 (32 B = 64 syms),
-/// Tier 2 (64 B = 128 syms), Tier 3 (128 B = 256 syms), packed 2 4-bit symbols per byte.
+/// Nested FSQ neural code (`TAG_CODE`): Tier 0 (0 B), Tier 1 (32 B), Tier 2 (64 B), Tier 3 (128 B).
 #[derive(Clone, Debug, Default)]
 pub struct CodeSectionV8 {
     pub tier: u8,
@@ -77,16 +75,14 @@ impl CodeSectionV8 {
         if n_bytes == 0 {
             return Self::default();
         }
-        let n_syms = n_bytes * 2;
         let mut packed = vec![0u8; n_bytes];
-        for b in 0..n_bytes {
+        for (b, slot) in packed.iter_mut().enumerate() {
             let v0 = vals.get(2 * b).copied().unwrap_or(0.0).clamp(-1.0, 1.0);
             let v1 = vals.get(2 * b + 1).copied().unwrap_or(0.0).clamp(-1.0, 1.0);
             let q0 = ((v0 + 1.0) * 7.5).round().clamp(0.0, 15.0) as u8;
             let q1 = ((v1 + 1.0) * 7.5).round().clamp(0.0, 15.0) as u8;
-            packed[b] = (q0 & 0x0F) | ((q1 & 0x0F) << 4);
+            *slot = (q0 & 0x0F) | ((q1 & 0x0F) << 4);
         }
-        let _ = n_syms;
         Self { tier, packed }
     }
 
@@ -120,35 +116,138 @@ impl CodeSectionV8 {
     }
 }
 
-/// Fit `LinearSectionV8` with 3-fold OOF temperature calibration and quantized `i8` weights.
+/// Fit `LinearSectionV8` with 3-fold OOF `lam` selection, collinear synthetic-X stability guard,
+/// and OOF temperature calibration. Returns `(LinearSectionV8, oof_logits[o_dim][n])`.
 pub fn fit_linear_v8(
     x_unit: &[Vec<f32>],
     y_sc: &[f64],
     task_id: u8,
     k_eff: usize,
+    x_syn_probe: &[Vec<f32>],
 ) -> (LinearSectionV8, Vec<Vec<f64>>) {
     let p = x_unit.len();
     let n = y_sc.len();
     let o_dim = if task_id == 2 { k_eff.max(2) } else { 1 };
     let all_rows: Vec<usize> = (0..n).collect();
-    let (w_f64, b_f64) = fit_irls_subset(x_unit, y_sc, &all_rows, task_id, k_eff);
-
-    // 3-fold OOF predictions for calibrated temperature + unbiased residuals for E / Pr / Tr!
     let n_folds = if n >= 30 { 3 } else { 2 };
-    let mut oof_pred = vec![vec![0.0f64; n]; o_dim];
-    for f in 0..n_folds {
-        let tr: Vec<usize> = (0..n).filter(|r| r % n_folds != f).collect();
-        let va: Vec<usize> = (0..n).filter(|r| r % n_folds == f).collect();
-        let (wf, bf) = fit_irls_subset(x_unit, y_sc, &tr, task_id, k_eff);
-        let pv = predict_irls_rows(x_unit, &va, &wf, &bf, task_id);
-        for c in 0..o_dim {
-            for (vi, &r) in va.iter().enumerate() {
-                oof_pred[c][r] = pv[c][vi];
+    let folds: Vec<(Vec<usize>, Vec<usize>)> = (0..n_folds)
+        .map(|f| {
+            let tr = (0..n).filter(|r| r % n_folds != f).collect();
+            let va = (0..n).filter(|r| r % n_folds == f).collect();
+            (tr, va)
+        })
+        .collect();
+
+    let reg_lams: &[f64] = &[1e-3, 1e-2, 0.1, 1.0, 5.0, 20.0];
+    let cls_lams: &[f64] = if p <= 24 {
+        &[1e-3, 1e-2, 0.1, 1.0, 5.0, 20.0]
+    } else {
+        &[1e-2, 0.1, 1.0, 5.0, 20.0]
+    };
+
+    let quantize_rows_f64 = |w: &[Vec<f64>]| -> Vec<Vec<f64>> {
+        w.iter()
+            .map(|row| {
+                let max_w = row.iter().map(|v| v.abs()).fold(0.0f64, f64::max).max(1e-5);
+                let sc = (max_w / 127.0) as f32 as f64;
+                row.iter()
+                    .map(|&v| ((v / sc).round().clamp(-127.0, 127.0) as i8) as f64 * sc)
+                    .collect()
+            })
+            .collect()
+    };
+
+    let (best_lam, oof_logits) = if task_id == 0 {
+        let mut oof_by_lam = vec![vec![vec![0.0f64; n]; 1]; reg_lams.len()];
+        for (tr, va) in &folds {
+            let sols = fit_ridge_grid_subset(x_unit, y_sc, tr, reg_lams);
+            for (li, (wf, bf)) in sols.iter().enumerate() {
+                for &r in va {
+                    let mut z = *bf;
+                    for j in 0..p {
+                        z += finite_f64(x_unit[j][r]) * wf[j];
+                    }
+                    oof_by_lam[li][0][r] = z;
+                }
             }
         }
-    }
+        let full_sols = fit_ridge_grid_subset(x_unit, y_sc, &all_rows, reg_lams);
+        let mut best_idx = reg_lams.len() - 1;
+        let mut best_loss = f64::INFINITY;
+        for (li, lg) in oof_by_lam.iter().enumerate() {
+            let wq = quantize_rows_f64(&[full_sols[li].0.clone()]);
+            let ratio = linear_syn_to_fit_sd_ratio(&wq, x_unit, x_syn_probe);
+            let loss = eval_true_loss(lg, y_sc, &all_rows, 0, 1.0);
+            if ratio <= 1.80 && loss < best_loss {
+                best_loss = loss;
+                best_idx = li;
+            }
+        }
+        if !best_loss.is_finite() {
+            best_idx = reg_lams.len() - 1;
+        }
+        (reg_lams[best_idx], oof_by_lam.swap_remove(best_idx))
+    } else {
+        let max_it = if task_id == 1 { 12 } else { 10 };
+        let w_clip = if task_id == 1 { 32.0 } else { 24.0 };
+        let mut best_lam = *cls_lams.last().unwrap();
+        let mut best_loss = f64::INFINITY;
+        let mut best_oof = vec![vec![0.0f64; n]; o_dim];
+        let mut fallback_oof = vec![vec![0.0f64; n]; o_dim];
+        for &lam in cls_lams {
+            let mut oof_lg = vec![vec![0.0f64; n]; o_dim];
+            for (tr, va) in &folds {
+                let (wf, bf) = fit_irls_subset_lam(
+                    x_unit, y_sc, tr, task_id, k_eff, lam, max_it, w_clip, 1e-4, 1e-3,
+                );
+                for &r in va {
+                    for c in 0..o_dim {
+                        let mut z = bf[c];
+                        for j in 0..p {
+                            z += finite_f64(x_unit[j][r]) * wf[c][j];
+                        }
+                        oof_lg[c][r] = z.clamp(-12.0, 12.0);
+                    }
+                }
+            }
+            let (wf_full, _) = fit_irls_subset_lam(
+                x_unit, y_sc, &all_rows, task_id, k_eff, lam, max_it, w_clip, 1e-4, 1e-3,
+            );
+            // Measure stability on the EXACT i8-quantized weights that will be decoded on X_syn!
+            let wq = quantize_rows_f64(&wf_full);
+            let ratio = linear_syn_to_fit_sd_ratio(&wq, x_unit, x_syn_probe);
+            let loss = eval_true_loss(&oof_lg, y_sc, &all_rows, task_id, 1.0);
+            fallback_oof = oof_lg.clone();
+            if ratio <= 1.35 && loss < best_loss {
+                best_loss = loss;
+                best_lam = lam;
+                best_oof = oof_lg;
+            }
+        }
+        if !best_loss.is_finite() {
+            best_oof = fallback_oof;
+        }
+        (best_lam, best_oof)
+    };
 
-    // Quantize weights cleanly to i8 so residual fitting sees the exact quantized linear head!
+    let (max_it_full, w_clip_full) = match task_id {
+        0 => (1, 64.0),
+        1 => (12, 64.0),
+        _ => (10, 32.0),
+    };
+    let (w_f64, b_f64) = fit_irls_subset_lam(
+        x_unit,
+        y_sc,
+        &all_rows,
+        task_id,
+        k_eff,
+        best_lam,
+        max_it_full,
+        w_clip_full,
+        1e-4,
+        1e-3,
+    );
+
     let mut w_q = vec![vec![0.0f32; p]; o_dim];
     let mut w_scales = vec![0.0f32; o_dim];
     let mut b_f32 = vec![0.0f32; o_dim];
@@ -167,38 +266,13 @@ pub fn fit_linear_v8(
         }
     }
 
-    // Compute OOF residuals [o_dim][n] (in prediction/logit units!) and regression resid_sd.
-    let mut oof_resid = vec![vec![0.0f64; n]; o_dim];
     let (resid_sd, temp) = if task_id == 0 {
-        let mut sse = 0.0;
-        for r in 0..n {
-            let e = y_sc[r] - oof_pred[0][r];
-            oof_resid[0][r] = e;
-            sse += e * e;
-        }
-        (
-            ((sse / n.max(1) as f64).sqrt().clamp(0.02, 5.0)) as f32,
-            1.0f32,
-        )
-    } else if task_id == 1 {
-        let temp = fit_binary_temp_oof(&oof_pred[0], y_sc);
-        for r in 0..n {
-            let yr = if y_sc[r] > 0.5 { 1.0 } else { 0.0 };
-            let pr = oof_pred[0][r].clamp(0.02, 0.98);
-            // Newton-step logit residual (y - p) / max(p(1-p), 0.12), clamped for stability
-            oof_resid[0][r] = ((yr - pr) / (pr * (1.0 - pr)).max(0.12)).clamp(-3.0, 3.0);
-        }
-        (0.5f32, temp)
+        // Compute OOF RMSE so near-deterministic fits stay sharp.
+        let oof_mse = eval_true_loss(&oof_logits, y_sc, &all_rows, 0, 1.0);
+        (oof_mse.sqrt().clamp(0.002, 5.0) as f32, 1.0f32)
     } else {
-        for r in 0..n {
-            let yi = (y_sc[r].round() as isize).clamp(0, (o_dim - 1) as isize) as usize;
-            for c in 0..o_dim {
-                let yc = if yi == c { 1.0 } else { 0.0 };
-                let pc = oof_pred[c][r].clamp(0.02, 0.98);
-                oof_resid[c][r] = ((yc - pc) / (pc * (1.0 - pc)).max(0.12)).clamp(-3.0, 3.0);
-            }
-        }
-        (0.5f32, 1.0f32)
+        let temp = fit_cls_temp_oof(&oof_logits, y_sc, &all_rows, task_id);
+        (0.5f32, temp)
     };
 
     (
@@ -211,202 +285,38 @@ pub fn fit_linear_v8(
             temp,
             resid_sd,
         },
-        oof_resid,
+        oof_logits,
     )
 }
 
-fn fit_binary_temp_oof(oof_p: &[f64], y: &[f64]) -> f32 {
-    let n = oof_p.len();
-    if n < 20 {
+fn fit_cls_temp_oof(oof_logits: &[Vec<f64>], y_sc: &[f64], rows: &[usize], task_id: u8) -> f32 {
+    if rows.len() < 20 {
         return 1.0;
     }
-    let logits: Vec<f64> = oof_p
-        .iter()
-        .map(|&p| {
-            let pc = p.clamp(1e-4, 1.0 - 1e-4);
-            (pc / (1.0 - pc)).ln()
-        })
-        .collect();
-    let mut best_t = 1.0f64;
+    let mut best_t = 1.0f32;
     let mut best_ll = f64::INFINITY;
     for step in 0..17 {
-        let t = 0.50 + 0.10 * step as f64; // [0.50 .. 2.10]
-        let mut ll = 0.0;
-        for (&l, &yv) in logits.iter().zip(y) {
-            let pr = 1.0 / (1.0 + (-(l * t).clamp(-12.0, 12.0)).exp());
-            let yr = if yv > 0.5 { 1.0 } else { 0.0 };
-            ll -= yr * pr.max(1e-6).ln() + (1.0 - yr) * (1.0 - pr).max(1e-6).ln();
-        }
+        let t = 0.50 + 0.10 * step as f32;
+        let ll = eval_true_loss(oof_logits, y_sc, rows, task_id, t);
         if ll < best_ll {
             best_ll = ll;
             best_t = t;
         }
     }
-    best_t as f32
+    best_t
 }
 
-/// Fit gated 8-bin nonlinear S8 main effects (`E`) on OOF residuals (`chi^2 > 14.067` & `k >= 10`).
-pub fn fit_effects_v8(
+/// Fit zero-centered residual shape & variance-preserving heteroscedastic log-scale (`TAG_RESID`).
+/// Returns `(ResidSectionV8, resid_sd_scale_multiplier)`.
+pub fn fit_resid_model_v8(
     z_tie: &[Vec<f64>],
-    oof_resid: &[Vec<f64>],
-    max_effects: usize,
-) -> Vec<Effect1DV8> {
-    let p = z_tie.len();
-    let o_dim = oof_resid.len();
-    let n = z_tie.first().map(|c| c.len()).unwrap_or(0);
-    if p == 0 || n < 4 * SUPPORT_FLOOR_K || max_effects == 0 {
-        return Vec::new();
-    }
-    let mut out = Vec::new();
-    for j in 0..p {
-        let (b8, _) = value_consistent_bins(&z_tie[j], 8);
-        for c in 0..o_dim {
-            let e = &oof_resid[c];
-            let sd_e = (e.iter().map(|v| v * v).sum::<f64>() / n as f64)
-                .sqrt()
-                .max(1e-4);
-            let mut sums = [0.0f64; 8];
-            let mut cnts = [0usize; 8];
-            for (&ev, &b) in e.iter().zip(&b8) {
-                if (b as usize) < 8 && ev.is_finite() {
-                    sums[b as usize] += ev;
-                    cnts[b as usize] += 1;
-                }
-            }
-            let mut bins = [0.0f32; 8];
-            let mut chi2 = 0.0;
-            let mut var_red = 0.0;
-            for b in 0..8 {
-                if cnts[b] >= SUPPORT_FLOOR_K {
-                    let mu = sums[b] / cnts[b] as f64;
-                    chi2 += cnts[b] as f64 * (mu / sd_e).powi(2);
-                    // Empirical-Bayes shrunk bin mean (exact logit/y scale).
-                    let eb = sums[b] / (cnts[b] as f64 + 8.0);
-                    bins[b] = eb.clamp(-2.5, 2.5) as f32;
-                    var_red += cnts[b] as f64 * eb * eb;
-                }
-            }
-            if chi2 > 14.067 {
-                let max_a = bins
-                    .iter()
-                    .map(|v| v.abs())
-                    .fold(0.0f32, f32::max)
-                    .max(1e-4);
-                let scale = f16_bits_to_f32(f32_to_f16_bits(max_a / 127.0)).max(1e-5);
-                for slot in &mut bins {
-                    let q = (*slot / scale).round().clamp(-127.0, 127.0) as i8;
-                    *slot = q as f32 * scale;
-                }
-                out.push(Effect1DV8 {
-                    col_idx: j as u8,
-                    cls_idx: c as u8,
-                    scale,
-                    bins8: bins,
-                    utility: var_red / n as f64,
-                });
-            }
-        }
-    }
-    out.sort_by(|a, b| b.utility.total_cmp(&a.utility));
-    out.truncate(max_effects.min(V8_MAX_EFFECTS));
-    out
-}
-
-/// Fit gated pairwise product + depth-2 XOR quadrant interactions (`Pr`) on OOF residuals (`|z| > 3.0`).
-pub fn fit_pairs_v8(
-    z_tie: &[Vec<f64>],
-    oof_resid: &[Vec<f64>],
-    max_pairs: usize,
-) -> Vec<PairIntV8> {
-    let p = z_tie.len();
-    let o_dim = oof_resid.len();
-    let n = z_tie.first().map(|c| c.len()).unwrap_or(0);
-    if p < 2 || n < 4 * SUPPORT_FLOOR_K || max_pairs == 0 {
-        return Vec::new();
-    }
-    let mut cands = Vec::new();
-    let p_scan = p.min(48);
-    for i in 0..p_scan {
-        for j in (i + 1)..p_scan {
-            let r_ij = pearson(&z_tie[i], &z_tie[j]);
-            let prod: Vec<f64> = (0..n)
-                .map(|r| (z_tie[i][r] * z_tie[j][r] - r_ij).clamp(-6.0, 6.0))
-                .collect();
-            let prod_var = (prod.iter().map(|v| v * v).sum::<f64>() / n as f64).max(1e-4);
-            for c in 0..o_dim {
-                let e = &oof_resid[c];
-                let sd_e = (e.iter().map(|v| v * v).sum::<f64>() / n as f64)
-                    .sqrt()
-                    .max(1e-4);
-                let rp = pearson(&prod, e);
-                let zp = rp * (n as f64).sqrt();
-
-                // Depth-2 XOR quadrant contrast on z_i > 0, z_j > 0 (k >= 10 per quadrant!)
-                let mut q_sum = [0.0f64; 4];
-                let mut q_cnt = [0usize; 4];
-                for r in 0..n {
-                    let q = (usize::from(z_tie[i][r] > 0.0) << 1) | usize::from(z_tie[j][r] > 0.0);
-                    q_sum[q] += e[r];
-                    q_cnt[q] += 1;
-                }
-                let (zx, w_xor_raw) = if q_cnt.iter().all(|&cnt| cnt >= SUPPORT_FLOOR_K) {
-                    let m00 = q_sum[0] / q_cnt[0] as f64;
-                    let m01 = q_sum[1] / q_cnt[1] as f64;
-                    let m10 = q_sum[2] / q_cnt[2] as f64;
-                    let m11 = q_sum[3] / q_cnt[3] as f64;
-                    let contrast = 0.25 * ((m11 + m00) - (m10 + m01));
-                    let se = (sd_e * 0.25)
-                        * q_cnt
-                            .iter()
-                            .map(|&cnt| 1.0 / cnt as f64)
-                            .sum::<f64>()
-                            .sqrt();
-                    (contrast / se.max(1e-6), contrast)
-                } else {
-                    (0.0, 0.0)
-                };
-
-                if zp.abs() > 3.0 || zx.abs() > 3.0 {
-                    let w_p = if zp.abs() > 3.0 {
-                        let cov: f64 =
-                            prod.iter().zip(e).map(|(a, b)| a * b).sum::<f64>() / n as f64;
-                        (0.65 * cov / prod_var).clamp(-1.25, 1.25)
-                    } else {
-                        0.0
-                    };
-                    let w_x = if zx.abs() > 3.0 {
-                        (0.75 * w_xor_raw).clamp(-1.25, 1.25)
-                    } else {
-                        0.0
-                    };
-                    // Quantize to i8 in [-1.25, 1.25] (step 0.01)
-                    let qp = (w_p * 100.0).round().clamp(-125.0, 125.0) as i8;
-                    let qx = (w_x * 100.0).round().clamp(-125.0, 125.0) as i8;
-                    if qp != 0 || qx != 0 {
-                        cands.push(PairIntV8 {
-                            col_i: i as u8,
-                            col_j: j as u8,
-                            cls_idx: c as u8,
-                            w_prod: qp as f32 / 100.0,
-                            w_xor: qx as f32 / 100.0,
-                            utility: zp * zp + zx * zx,
-                        });
-                    }
-                }
-            }
-        }
-    }
-    cands.sort_by(|a, b| b.utility.total_cmp(&a.utility));
-    cands.truncate(max_pairs.min(V8_MAX_PAIRS));
-    cands
-}
-
-/// Fit heteroscedastic residual log-scale & 5-knot non-Gaussian residual shape (`TAG_RESID`, reg only).
-pub fn fit_resid_model_v8(z_tie: &[Vec<f64>], resid: &[f64], resid_sd: f32) -> ResidSectionV8 {
+    resid: &[f64],
+    resid_sd: f32,
+) -> (ResidSectionV8, f32) {
     let p = z_tie.len();
     let n = resid.len();
-    if p == 0 || n < 4 * SUPPORT_FLOOR_K || resid_sd <= 1e-5 {
-        return ResidSectionV8::default();
+    if p == 0 || n < 4 * SUPPORT_FLOOR_K || resid_sd < 0.08 {
+        return (ResidSectionV8::default(), 1.0);
     }
     let sd = resid_sd as f64;
     let std_e: Vec<f64> = resid.iter().map(|&e| (e / sd).clamp(-5.0, 5.0)).collect();
@@ -416,72 +326,49 @@ pub fn fit_resid_model_v8(z_tie: &[Vec<f64>], resid: &[f64], resid_sd: f32) -> R
 
     let mut ranked: Vec<(usize, f64)> = (0..p)
         .map(|j| (j, pearson(&z_tie[j], &centered)))
-        .filter(|&(_, r)| r.abs() * (n as f64).sqrt() > 2.5)
+        .filter(|&(_, r)| r.abs() * (n as f64).sqrt() > 3.0)
         .collect();
     ranked.sort_by(|a, b| b.1.abs().total_cmp(&a.1.abs()));
-    ranked.truncate(V8_MAX_RESID_COLS);
+    ranked.truncate(V8_MAX_RESID_COLS.min(4));
 
     let cols: Vec<u8> = ranked.iter().map(|&(j, _)| j as u8).collect();
     let log_sd_w: Vec<f32> = ranked
         .iter()
         .map(|&(_, r)| {
-            let w = (0.45 * r).clamp(-0.60, 0.60);
-            ((w * 100.0).round().clamp(-60.0, 60.0) as i8) as f32 / 100.0
+            let w = (0.35 * r).clamp(-0.45, 0.45);
+            ((w * 100.0).round().clamp(-45.0, 45.0) as i8) as f32 / 100.0
         })
         .collect();
+
+    // Variance normalization factor so E[(resid_sd * exp(w^T z))^2] matches target variance!
+    let w2_sum: f32 = log_sd_w.iter().map(|w| w * w).sum();
+    let sd_mult = (-w2_sum).exp().clamp(0.65, 1.0);
 
     let mut sorted_e = std_e;
     sorted_e.sort_by(f64::total_cmp);
     let us = [0.10, 0.30, 0.50, 0.70, 0.90];
     let z_ref = [-1.28155, -0.52440, 0.0, 0.52440, 1.28155];
+    let mut raw_q5 = [0.0f64; 5];
+    for k in 0..5 {
+        raw_q5[k] = (quantile_sorted(&sorted_e, us[k]) - z_ref[k]).clamp(-1.0, 1.0);
+    }
+    // Zero-center q5 so non-Gaussian residual quantiles NEVER shift E[y]!
+    let mean_q5 = raw_q5.iter().sum::<f64>() / 5.0;
     let mut q5 = [0.0f32; 5];
     for k in 0..5 {
-        let diff = (quantile_sorted(&sorted_e, us[k]) - z_ref[k]).clamp(-1.25, 1.25);
-        let q = (diff * 100.0).round().clamp(-125.0, 125.0) as i8;
+        let diff = (raw_q5[k] - mean_q5).clamp(-0.90, 0.90);
+        let q = (diff * 100.0).round().clamp(-90.0, 90.0) as i8;
         q5[k] = q as f32 / 100.0;
     }
     if cols.is_empty() && q5.iter().all(|v| v.abs() < 0.08) {
-        return ResidSectionV8::default();
+        return (ResidSectionV8::default(), 1.0);
     }
-    ResidSectionV8 {
-        cols,
-        log_sd_w,
-        q5_resid: q5,
-    }
-}
-
-/// Evaluate analytic effects `E` + pairs `Pr` delta at a single row `z_lat`.
-#[inline]
-pub fn eval_effects_and_pairs(
-    effects: &[Effect1DV8],
-    pairs: &[PairIntV8],
-    z_lat: &[f32],
-    out_delta: &mut [f32],
-) {
-    let p = z_lat.len();
-    for ef in effects {
-        let j = ef.col_idx as usize;
-        let c = ef.cls_idx as usize;
-        if j < p && c < out_delta.len() {
-            // Map latent Gaussian z_lat into 8 equal-probability bins via Phi(z_lat).
-            let u = crate::stats::norm_cdf(z_lat[j] as f64);
-            let b = ((u * 8.0).floor() as usize).min(7);
-            out_delta[c] += ef.bins8[b];
-        }
-    }
-    for pr in pairs {
-        let i = pr.col_i as usize;
-        let j = pr.col_j as usize;
-        let c = pr.cls_idx as usize;
-        if i < p && j < p && c < out_delta.len() {
-            let zi = z_lat[i].clamp(-3.0, 3.0);
-            let zj = z_lat[j].clamp(-3.0, 3.0);
-            let xor_sign = if (zi > 0.0) == (zj > 0.0) {
-                1.0f32
-            } else {
-                -1.0f32
-            };
-            out_delta[c] += pr.w_prod * (zi * zj).clamp(-6.0, 6.0) + pr.w_xor * xor_sign;
-        }
-    }
+    (
+        ResidSectionV8 {
+            cols,
+            log_sd_w,
+            q5_resid: q5,
+        },
+        sd_mult,
+    )
 }

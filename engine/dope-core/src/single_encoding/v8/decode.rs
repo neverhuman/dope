@@ -73,14 +73,14 @@ pub fn build_decode_plan_v8(
 
     if let Some(ref np) = neural {
         if !np.is_identity {
-            resid_sd_eff = (resid_sd_eff * np.resid_sd_mult).clamp(0.01, 6.0);
+            resid_sd_eff = (resid_sd_eff * np.resid_sd_mult).clamp(0.002, 6.0);
             for j in 0..p {
                 let mut sq = 0.0f32;
                 for r in 0..V8_MAX_RANK {
                     l_eff[j][r] += np.delta_l[j][r];
                     sq += l_eff[j][r] * l_eff[j][r];
                 }
-                let sc = (sq.sqrt() / 0.99).max(1.0);
+                let sc = (sq.sqrt() / 0.999).max(1.0);
                 for r in 0..V8_MAX_RANK {
                     l_eff[j][r] /= sc;
                 }
@@ -117,7 +117,7 @@ pub fn build_decode_plan_v8(
 
     for j in 0..p {
         let sq: f32 = l_eff[j].iter().map(|v| v * v).sum();
-        noise_sd[j] = (1.0 - sq).max(0.02).sqrt();
+        noise_sd[j] = (1.0 - sq).max(1e-4).sqrt();
     }
 
     Ok(DecodePlanV8 {
@@ -154,7 +154,7 @@ pub fn decode_dse8_row_at(plan: &DecodePlanV8, seed: u64, row_idx: u64) -> Decod
         let chosen = sample_categorical(&weights, u_rg);
         let reg = &pkt.regimes.regimes[chosen];
         for (r, &mu) in reg.mean_f.iter().enumerate().take(r_use) {
-            let shr = (1.0 - 0.25 * (mu * mu).min(0.8)).max(0.5).sqrt();
+            let shr = (1.0 - (mu * mu).min(0.75)).max(0.25).sqrt();
             z_factor[r] = mu + shr * z_factor[r];
         }
     }

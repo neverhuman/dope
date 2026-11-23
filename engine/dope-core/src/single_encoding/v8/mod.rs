@@ -10,8 +10,11 @@
 //! - `decode_dse8_rows(packet, weights, n_rows, seed) -> Result<DecodedV8Table>`
 //! - `extract_jopedime_embedding(packet) -> Vec<f32>`
 
+pub mod calibrate;
 pub mod copula_regimes;
 pub mod decode;
+pub mod effects_v8;
+pub mod fit_meta;
 pub mod marginals;
 pub mod model;
 pub mod model_ops;
@@ -29,6 +32,7 @@ pub use decode::{
     build_decode_plan_v8, decode_dse8_row_at, decode_dse8_rows, extract_jopedime_embedding,
     DecodePlanV8, DecodedV8Row, DecodedV8Table,
 };
+pub use fit_meta::{fit_unit_meta, fit_unit_meta_v2};
 pub use marginals::{
     MarginalColV8, MARG_ATOMS, MARG_CONST, MARG_CONT, MARG_LATTICE, MARG_ZERO_INFLATED,
 };
@@ -47,16 +51,18 @@ pub use target_v8::{CodeSectionV8, Effect1DV8, LinearSectionV8, PairIntV8, Resid
 pub use trees_v8::{OblivTreeV8, TreesSectionV8};
 
 use crate::error::{DopeError, Result};
+use crate::evidence::primitives::canonical_row_order;
 use crate::evidence::{
     extract as extract_evidence, ColumnMeta as EvColMeta, EvidenceInput, EvidenceTier,
 };
 use crate::stats::norm_ppf;
+use calibrate::{
+    calibrate_intercepts_on_packet, eval_true_loss, sample_synthetic_x_probe, CdfIntervals,
+};
 use copula_regimes::{fit_copula_loadings_v8, fit_regimes_v8};
 use nominal::fit_nominal_groups;
 use planner::choose_base_layout;
-use target_v8::{
-    eval_effects_and_pairs, fit_effects_v8, fit_linear_v8, fit_pairs_v8, fit_resid_model_v8,
-};
+use target_v8::{fit_effects_v8, fit_linear_v8, fit_pairs_v8, fit_resid_model_v8};
 
 /// Options controlling `DSE8` v1 fitting, section ablations, and byte budget (`512..65536 B`).
 #[derive(Clone, Debug)]
@@ -119,6 +125,28 @@ fn fit_dse8_internal(
     opts: &Dse8FitOptions<'_>,
     weights: Option<&SingleEncV8Weights>,
 ) -> Result<Vec<u8>> {
+    let mut plan_budget = opts.budget_bytes;
+    let mut last_err = DopeError::Budget("over_budget".into());
+    for _ in 0..6 {
+        match fit_dse8_attempt(x_raw, y_raw, opts, weights, plan_budget) {
+            Ok(bytes) => return Ok(bytes),
+            Err(DopeError::Budget(msg)) if !opts.normalized_only && plan_budget >= 192 => {
+                last_err = DopeError::Budget(msg);
+                plan_budget = (plan_budget * 82 / 100).max(128);
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last_err)
+}
+
+fn fit_dse8_attempt(
+    x_raw: &[Vec<f64>],
+    y_raw: &[f64],
+    opts: &Dse8FitOptions<'_>,
+    weights: Option<&SingleEncV8Weights>,
+    plan_budget: usize,
+) -> Result<Vec<u8>> {
     let x_cols_raw = x_raw.len();
     if x_cols_raw == 0 || x_cols_raw > u16::MAX as usize {
         return Err(DopeError::Input("dse8_invalid_col_count".into()));
@@ -174,7 +202,7 @@ fn fit_dse8_internal(
         opts.task_id,
         k_eff,
         opts.normalized_only,
-        opts.budget_bytes,
+        plan_budget,
         want_code,
     )
     .ok_or_else(|| DopeError::Budget("over_budget".into()))?;
@@ -238,64 +266,90 @@ fn fit_dse8_internal(
         RegimesSectionV8::default()
     };
 
-    // 3. Exact Newton-IRLS linear head (`W`), OOF residuals, gated S8 `E`, gated S10/XOR `Pr`.
-    let (linear, mut oof_resid) = fit_linear_v8(&x_unit, &y_sc, opts.task_id, k_eff);
+    // 3. OOF-CV Newton-IRLS linear head (`W`) with collinear synthetic-X stability guard,
+    // decode-aligned CDF intervals, and 80/20 inner split.
+    let x_syn_probe = sample_synthetic_x_probe(
+        &marginals,
+        &loadings,
+        &nominal_groups,
+        &regimes,
+        plan.rank_use,
+        z_max,
+    );
+    let (linear, mut cur_logits) = fit_linear_v8(&x_unit, &y_sc, opts.task_id, k_eff, &x_syn_probe);
+    let cdf = CdfIntervals::build(&x_unit);
+    let row_ord = canonical_row_order(&x_unit);
+    let mut tr_rows = Vec::with_capacity(n_fit);
+    let mut va_rows = Vec::with_capacity(n_fit / 4 + 1);
+    for (pos, &r) in row_ord.iter().enumerate() {
+        if pos % 5 == 0 {
+            va_rows.push(r);
+        } else {
+            tr_rows.push(r);
+        }
+    }
+
+    // Sequential inner-val-gated boosting: Effects (`E`) -> Pairs (`Pr`) -> Oblivious Trees (`Tr`).
     let effects = if opts.enable_effects && plan.max_effects > 0 {
-        fit_effects_v8(&z_tie, &oof_resid, plan.max_effects)
+        fit_effects_v8(
+            &cdf,
+            &mut cur_logits,
+            &y_sc,
+            &tr_rows,
+            &va_rows,
+            opts.task_id,
+            linear.temp,
+            plan.max_effects,
+        )
     } else {
         Vec::new()
     };
     let pairs = if opts.enable_effects && plan.max_pairs > 0 {
-        fit_pairs_v8(&z_tie, &oof_resid, plan.max_pairs)
+        fit_pairs_v8(
+            &cdf,
+            &mut cur_logits,
+            &y_sc,
+            &tr_rows,
+            &va_rows,
+            opts.task_id,
+            linear.temp,
+            plan.max_pairs,
+        )
     } else {
         Vec::new()
     };
-
-    // Subtract E + Pr from OOF residuals before distilling residual oblivious trees (`Tr`)!
-    let o_dim = linear.o_dim;
-    if !effects.is_empty() || !pairs.is_empty() {
-        let mut z_row = vec![0.0f32; p_eff];
-        let mut delta = vec![0.0f32; o_dim];
-        for r in 0..n_fit {
-            for j in 0..p_eff {
-                z_row[j] = z_tie[j][r] as f32;
-            }
-            delta.fill(0.0);
-            eval_effects_and_pairs(&effects, &pairs, &z_row, &mut delta);
-            for c in 0..o_dim {
-                oof_resid[c][r] -= delta[c] as f64;
-            }
-        }
-    }
-
-    // 4. Distilled depth-3 oblivious residual forest (`Tr`) + heteroscedastic residual model (`Rs`).
     let trees = if opts.enable_trees && plan.max_trees > 0 {
-        TreesSectionV8::fit(&z_tie, &oof_resid, plan.max_trees)
+        TreesSectionV8::fit(
+            &cdf,
+            &mut cur_logits,
+            &y_sc,
+            &tr_rows,
+            &va_rows,
+            opts.task_id,
+            linear.temp,
+            plan.max_trees,
+        )
     } else {
         TreesSectionV8::default()
     };
 
-    // Update regression resid_sd & residual model after E + Pr + Tr!
+    // Recompute regression resid_sd on held-out va_rows (or all rows if no nonlinear terms) + ResidSection.
     let mut final_resid_sd = linear.resid_sd;
     let mut resid_model = ResidSectionV8::default();
     if opts.task_id == 0 {
-        let mut rem_e = vec![0.0f64; n_fit];
-        let mut z_row = vec![0.0f32; p_eff];
-        let mut t_delta = [0.0f32; 1];
-        let mut sse = 0.0;
-        for r in 0..n_fit {
-            for j in 0..p_eff {
-                z_row[j] = z_tie[j][r] as f32;
-            }
-            t_delta[0] = 0.0;
-            trees.eval_row(&z_row, &mut t_delta);
-            let e = oof_resid[0][r] - t_delta[0] as f64;
-            rem_e[r] = e;
-            sse += e * e;
-        }
-        final_resid_sd = ((sse / n_fit.max(1) as f64).sqrt().clamp(0.02, 5.0)) as f32;
+        let eval_rows: &[usize] =
+            if !effects.is_empty() || !pairs.is_empty() || !trees.trees.is_empty() {
+                &va_rows
+            } else {
+                &row_ord
+            };
+        let va_mse = eval_true_loss(&cur_logits, &y_sc, eval_rows, 0, 1.0);
+        final_resid_sd = va_mse.sqrt().clamp(0.002, 5.0) as f32;
         if opts.enable_residual_model && plan.allow_resid {
-            resid_model = fit_resid_model_v8(&z_tie, &rem_e, final_resid_sd);
+            let rem_e: Vec<f64> = (0..n_fit).map(|r| y_sc[r] - cur_logits[0][r]).collect();
+            let (rm, sd_mult) = fit_resid_model_v8(&z_tie, &rem_e, final_resid_sd);
+            resid_model = rm;
+            final_resid_sd = (final_resid_sd * sd_mult).clamp(0.002, 5.0);
         }
     }
 
@@ -404,6 +458,10 @@ fn fit_dse8_internal(
         weights_fp: weights.map(|w| w.fingerprint()),
     };
 
-    // Pack strictly within budget; if actual variable-length marginals slightly exceed budget, retry cleanly!
-    pack_dse8_packet(&pkt, opts.budget_bytes)
+    // Pack strictly within budget, then calibrate intercepts `b` against the EXACT
+    // budget-surviving X/E/Pr/Tr sections via 512 deterministic synthetic rows!
+    let packed = pack_dse8_packet(&pkt, opts.budget_bytes)?;
+    let mut final_pkt = unpack_dse8_packet(&packed)?;
+    calibrate_intercepts_on_packet(&mut final_pkt, &y_sc);
+    pack_dse8_packet(&final_pkt, opts.budget_bytes)
 }
