@@ -1014,7 +1014,9 @@
     "research/levels/s3_v7_fast_trainer.py": "external-evidence",
     "research/levels/v7_single_encoding.py": "external-evidence",
     "tools/dope_dashboard/": "governance",
-    "docs/whitepaper-v2/": "governance"
+    "docs/whitepaper-v2/": "governance",
+    "H1/": "external-evidence",
+    "H2/": "external-evidence"
   },
   "workspace": "dope"
 }

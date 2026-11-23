@@ -4119,6 +4119,14 @@
     "docs/whitepaper-v2/": {
       "command": "python3 -B docs/whitepaper-v2/scripts/render_v2_paper.py --check",
       "purpose": "verify DOPE v2.0.0 white paper receipt-bound macros stay strictly synchronized with committed receipts and Rust constants"
+    },
+    "H1/": {
+      "command": "python3 -m json.tool H1/metrics.json >/dev/null",
+      "purpose": "verify H1 (V7.1/V7.2 wave) DEV-only experiment record JSON syntax and S3 provenance references"
+    },
+    "H2/": {
+      "command": "python3 -m json.tool H2/metrics.json >/dev/null",
+      "purpose": "verify H2 (V7.3 DiLoCo + zero-repeat + tree-realism wave) DEV-only experiment record JSON syntax"
     }
   },
   "workspace": "dope"

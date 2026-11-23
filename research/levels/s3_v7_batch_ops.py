@@ -465,7 +465,13 @@ def compute_v7_batch_loss(
             + 0.02 * (ref["temp_sd"] ** 2).mean()
         )
         if hard_tstr_v73:
-            anchor_loss = anchor_loss + 0.12 * (ref["w2"] ** 2).mean() + 0.04 * (ref["w1"] ** 2).mean()
+            anchor_loss = (
+                anchor_loss
+                + 1.50 * (ref["d_W"] ** 2).mean()
+                + 2.50 * (ref["w2"] ** 2).mean()
+                + 0.50 * (ref["w1"] ** 2).mean()
+                + 1.00 * (ref["temp_sd"] ** 2).mean()
+            )
             if bin_m.any():
                 tau_scale = torch.exp(ref["temp_sd"][bin_m, 0])
                 anchor_loss = anchor_loss + 0.50 * (torch.relu(0.90 - tau_scale) ** 2).mean()
