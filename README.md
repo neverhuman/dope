@@ -11,7 +11,7 @@ Recorded hosted full-audit report: **88/100 (pass)** with the pinned auditor at 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v2-dark.svg">
-  <img alt="DOPE v2.0.0 scoreboard: twin-referenced gap (TRG) against artifact bytes on a log axis for DOPE v2.0.0, SDV GaussianCopula, CTGAN, TVAE, Format-2, the V7 single encoding and the copy, bootstrap and independent-marginals controls; every point comes from the committed confirmation receipt." src="bench/real-world/figures/hero-v2-light.svg">
+  <img alt="DOPE v2.0.0 scoreboard: twin-referenced gap (TRG) against artifact bytes on a log axis for DOPE v2.0.0, SDV GaussianCopula, SDV TVAE, Format-2, the V7 single encoding and the copy, bootstrap and independent-marginals controls; every point comes from the committed confirmation receipt." src="bench/real-world/figures/hero-v2-light.svg">
 </picture>
 
 DOPE reads a table and writes a few-kilobyte **program**: a standard
@@ -311,8 +311,10 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 
 ## Results: v2.0.0 Scoreboard
 
-*Validation estimate:* one pre-registered look at fresh row splits of the CONFIRM families only,
-scored by `dope_kpi`; [TRG](bench/real-world/results/scoreboard/v2.0.0/README.md#trg-the-twin-referenced-gap)
+*Selection-exposed validation estimate:* one pre-registered look at fresh row splits of the
+CONFIRM families only, scored by `dope_kpi`. The same tables, on other row splits, informed the
+design of `--format auto`, so this is not a sealed test.
+[TRG](bench/real-world/results/scoreboard/v2.0.0/README.md#trg-the-twin-referenced-gap)
 is the twin-referenced gap.
 
 <!-- BEGIN DOPE1 SCOREBOARD -->
@@ -543,8 +545,9 @@ program = json.loads(blob[4:4 + n])      # schema, structure, bit widths, sectio
 
 ## Scope
 
-The v2.0.0 scoreboard is a validation estimate from one pre-registered look, and the v1.0.0
-results are selection-exposed development validation, all on public tables; none is a sealed
+The v2.0.0 scoreboard is a selection-exposed validation estimate from one pre-registered look
+at fresh row splits, and the v1.0.0 results are selection-exposed development validation, all on
+public tables; none is a sealed
 test or TDL result, and the TDL driver gate is not part of the standalone engine benchmark
 (cross-model feature-driver preservation: not yet measured; per-learner Driver Fidelity in the
 multi-level study is reported separately above).
