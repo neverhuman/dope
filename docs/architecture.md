@@ -15,8 +15,14 @@ safetensors file; `dope-cli` is the `dope` command. Intake and ML-ready encoding
 conditional model in `target.rs`, `train*.rs`, `forest.rs` and `noise.rs`; bytes in
 `quant.rs` and `artifact.rs`; the search and its self-audit in `compile.rs` and `eval/`;
 sampling in `sample.rs` (candle tensors on CPU, CUDA or Metal) and `sample_cpu.rs` (native
-row-parallel CPU path). Python is used only by the benchmark harness in
-`bench/real-world/`, never by fitting or sampling. `ops/ci/engine.sh` is its CI gate.
+row-parallel CPU path). For DOPE v3.0, `dope-core` also owns the pure-Rust FIT-only,
+zero-cache Evidence Bank (`evidence/`, frozen by `contracts/evidence-layout-v1.json`), the
+nested-prefix `DSE8` v1 codec and row-local `SingleEncV8` neural runtime
+(`single_encoding/v8/`), and the 3-way grouped `auto::v8` acceptance guard (`auto/v8.rs`);
+`dope-arena` ships the pure-Rust `dope_v8_emit` CLI and `dope-ffi` provides the C ABI for
+per-episode parallel CPU training feeds. Python is used only for offline PyTorch training,
+parity checks, and the legacy benchmark harness in `bench/real-world/`, never by product
+fitting or sampling. `ops/ci/engine.sh` is its CI gate.
 
 `research/landmark_cache/` is a private offline orchestration boundary around
 the existing native landmark CLI. It schedules only declared official TRAIN
