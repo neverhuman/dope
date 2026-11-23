@@ -4232,6 +4232,10 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
       "purpose": "integration contract suite for DSE8 v1 codec, malformed wire refusals, nominal legality, and auto::v8"
     },
+    "engine/dope-arena/src/bin/dope_v8_replay.rs": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_replay && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
+      "purpose": "verify the native fixed-counter replay tool and fingerprint-bound V8 decoder behavior"
+    },
     "engine/dope-arena/src/bin/dope_v8_emit.rs": {
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
       "purpose": "verify pure-Rust dope_v8_emit CLI fit/sample/evidence/embed/truncate/inspect and <=1e-4 parity across 12 fixtures"

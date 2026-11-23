@@ -53,16 +53,18 @@ pub fn build_decode_plan_v8(
     packet: &Dse8Packet,
     weights: Option<&SingleEncV8Weights>,
 ) -> Result<DecodePlanV8> {
-    if let (Some(pkt_fp), Some(w)) = (packet.weights_fp, weights) {
-        if pkt_fp != w.fingerprint() {
-            return Err(DopeError::Artifact(
-                "dse8_weights_fingerprint_mismatch".into(),
-            ));
-        }
+    if weights.is_some_and(|w| {
+        (w.active_rank_mask || packet.weights_fp.is_some())
+            && packet.weights_fp != Some(w.fingerprint())
+    }) {
+        return Err(DopeError::Artifact(
+            "dse8_weights_fingerprint_mismatch".into(),
+        ));
     }
     let p = packet.header.p_eff as usize;
     let o_dim = packet.linear.o_dim;
     let neural = weights.map(|w| w.build_neural_plan(packet));
+    let rank = weights.map_or(V8_MAX_RANK, |w| w.loading_rank(packet));
 
     let mut l_eff = packet.loadings.clone();
     let mut noise_sd = vec![1.0f32; p];
@@ -71,19 +73,14 @@ pub fn build_decode_plan_v8(
     let mut w_eff = packet.linear.w.clone();
     let mut resid_sd_eff = packet.header.resid_sd;
 
+    for loading in &mut l_eff {
+        loading[rank..].fill(0.0);
+    }
     if let Some(ref np) = neural {
         if !np.is_identity {
             resid_sd_eff = (resid_sd_eff * np.resid_sd_mult).clamp(0.002, 6.0);
             for j in 0..p {
-                let mut sq = 0.0f32;
-                for r in 0..V8_MAX_RANK {
-                    l_eff[j][r] += np.delta_l[j][r];
-                    sq += l_eff[j][r] * l_eff[j][r];
-                }
-                let sc = (sq.sqrt() / 0.999).max(1.0);
-                for r in 0..V8_MAX_RANK {
-                    l_eff[j][r] /= sc;
-                }
+                apply_loading_delta(&mut l_eff[j], &np.delta_l[j], rank);
                 if packet.marginals[j].kind == MARG_CONT {
                     let base = &packet.marginals[j].knots17;
                     let mut w_raw = [0.0f32; KNOT_COUNT - 1];
@@ -131,8 +128,37 @@ pub fn build_decode_plan_v8(
     })
 }
 
+pub(super) fn apply_loading_delta(
+    loading: &mut [f32; V8_MAX_RANK],
+    delta: &[f32; V8_MAX_RANK],
+    rank: usize,
+) {
+    let (active, inactive) = loading.split_at_mut(rank);
+    inactive.fill(0.0);
+    let mut square_sum = 0.0f32;
+    for (value, correction) in active.iter_mut().zip(delta) {
+        *value += correction;
+        square_sum += *value * *value;
+    }
+    let scale = (square_sum.sqrt() / 0.999).max(1.0);
+    for value in active {
+        *value /= scale;
+    }
+}
+
 /// Strictly row-local decode of synthetic row `row_idx` from `(plan, seed, row_idx)`.
 pub fn decode_dse8_row_at(plan: &DecodePlanV8, seed: u64, row_idx: u64) -> DecodedV8Row {
+    decode_row(plan, seed, row_idx, true, true, |_, _| {})
+}
+
+pub(super) fn decode_row(
+    plan: &DecodePlanV8,
+    seed: u64,
+    row_idx: u64,
+    flow: bool,
+    head: bool,
+    observe_latents: impl FnOnce([f32; V8_MAX_RANK], Vec<f32>),
+) -> DecodedV8Row {
     let pkt = &plan.pkt;
     let p = pkt.header.p_eff as usize;
     let r_use = pkt.header.rank_use as usize;
@@ -168,7 +194,7 @@ pub fn decode_dse8_row_at(plan: &DecodePlanV8, seed: u64, row_idx: u64) -> Decod
         }
         z_lat[j] = z;
     }
-    if let Some(ref np) = plan.neural {
+    if let Some(np) = plan.neural.as_ref().filter(|_| flow) {
         apply_row_local_flow(np, &mut z_lat);
     }
 
@@ -211,7 +237,7 @@ pub fn decode_dse8_row_at(plan: &DecodePlanV8, seed: u64, row_idx: u64) -> Decod
     }
     eval_effects_and_pairs(&pkt.effects, &pkt.pairs, &z_lat, &mut logits[..o_dim]);
     pkt.trees.eval_row(&z_lat, &mut logits[..o_dim]);
-    if let Some(ref np) = plan.neural {
+    if let Some(np) = plan.neural.as_ref().filter(|_| head) {
         let x_clean: Vec<f32> = x_unit
             .iter()
             .zip(&missing_active)
@@ -268,6 +294,7 @@ pub fn decode_dse8_row_at(plan: &DecodePlanV8, seed: u64, row_idx: u64) -> Decod
     };
 
     let x_raw = pkt.card.inverse_row_x(&x_unit, &missing_active);
+    observe_latents(z_factor, z_lat);
     DecodedV8Row {
         x_unit,
         missing_active,

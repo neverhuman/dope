@@ -72,7 +72,7 @@ fn write_mixed(dir: &Path, n: usize) {
 }
 
 /// Build a valid zero-initialized canonical F32 `rank <= 2` SingleEncV8 SafeTensors checkpoint.
-fn build_zero_v8_safetensors(d_model: usize, seed_bias: f32) -> Vec<u8> {
+fn build_zero_v8_safetensors(d_model: usize, seed_bias: f32, owner: bool) -> Vec<u8> {
     let mut tensors: BTreeMap<String, (Vec<usize>, Vec<f32>)> = BTreeMap::new();
     let add_lin = |m: &mut BTreeMap<String, (Vec<usize>, Vec<f32>)>,
                    name: &str,
@@ -160,6 +160,9 @@ fn build_zero_v8_safetensors(d_model: usize, seed_bias: f32) -> Vec<u8> {
     add_lin(&mut tensors, "flow_scale_head", d_model, 2, 0.0);
     add_lin(&mut tensors, "flow_shift_head", d_model, 2, 0.0);
     add_lin(&mut tensors, "gate_head", d_model, 2, 0.0);
+    if !owner {
+        tensors.retain(|name, _| !name.starts_with("enc_"));
+    }
 
     let mut body = Vec::new();
     let mut header_map = serde_json::Map::new();
@@ -275,8 +278,8 @@ fn v8_analytic_and_auto_v8_round_trip_within_2kib_and_deterministic() {
 fn v8_neural_weights_fingerprint_round_trip_and_fail_closed_refusals() {
     let dir = workdir("neural");
     write_mixed(&dir, 260);
-    let w1 = build_zero_v8_safetensors(16, 0.0);
-    let w2 = build_zero_v8_safetensors(16, 0.01);
+    let w1 = build_zero_v8_safetensors(16, 0.0, true);
+    let w2 = build_zero_v8_safetensors(16, 0.01, true);
     std::fs::write(dir.join("w1.safetensors"), &w1).unwrap();
     std::fs::write(dir.join("w2.safetensors"), &w2).unwrap();
 
@@ -391,4 +394,69 @@ fn v8_neural_weights_fingerprint_round_trip_and_fail_closed_refusals() {
     assert!(e_flag.contains("--v8-weights applies"), "{e_flag}");
 
     std::fs::remove_dir_all(dir).ok();
+}
+
+#[test]
+fn weighted_auto_keeps_the_complete_budget_comparator_when_code_is_absent() {
+    let dir = workdir("code-required");
+    write_mixed(&dir, 200);
+    std::fs::write(
+        dir.join("decoder-only.st"),
+        build_zero_v8_safetensors(16, 0.0, false),
+    )
+    .unwrap();
+    let base = [
+        "fit",
+        "mixed.csv",
+        "--target",
+        "label",
+        "--task",
+        "classification",
+        "--budget",
+        "2048",
+        "--seed",
+        "31",
+    ];
+    let fit = |args: &[&str]| {
+        let command: Vec<_> = base.iter().chain(args).copied().collect();
+        ok(&dir, &command);
+    };
+    fit(&["--format", "auto-v8", "-o", "fallback.dope"]);
+    fit(&[
+        "--format",
+        "auto-v8",
+        "--v8-weights",
+        "decoder-only.st",
+        "-o",
+        "weighted.dope",
+    ]);
+    fit(&[
+        "--format",
+        "v8",
+        "--v8-weights",
+        "decoder-only.st",
+        "-o",
+        "direct.dope",
+    ]);
+
+    let read = |name| std::fs::read(dir.join(name)).unwrap();
+    let direct = read("direct.dope");
+    let dpa = dope_core::auto::parse_dpa1(&direct).unwrap();
+    let model = dope_core::auto::V8Model::from_safetensors(&read("decoder-only.st"), 4).unwrap();
+    let decoder = dope_core::auto::V8Decoder::open(&dpa, Some(&model), false).unwrap();
+    assert!(decoder.is_neural());
+    assert_eq!(decoder.packet().code.tier, 0);
+    assert_eq!(read("weighted.dope"), read("fallback.dope"));
+    assert!(read("weighted.dope").len() <= 2048);
+    ok(
+        &dir,
+        &[
+            "sample",
+            "direct.dope",
+            "--v8-weights",
+            "decoder-only.st",
+            "-n",
+            "20",
+        ],
+    );
 }

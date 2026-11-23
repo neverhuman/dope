@@ -5,19 +5,17 @@
 //! 50/50 cross-fitting (`MIN_CHECK_GROUPS = 80`) with a single-fold drop veto (`<= 0.05`) and
 //! `SELECTION_MARGIN = 0.02`, never leaking raw cell values, headers, or extrema.
 
-use super::auditors::{fit_predict, null_predictions, Featurizer, AUDITORS};
-use super::check::{duplicate_groups, retention, CHECK_SYNTH_FACTOR, MIN_CHECK_GROUPS};
+mod folds;
+
+use super::check::{duplicate_groups, MIN_CHECK_GROUPS};
 use super::SELECTION_MARGIN;
 use crate::compile::{fit as fit_f1, FitOptions};
 use crate::error::{DopeError, Result};
-use crate::eval::{prediction_loss, Matrix};
-use crate::program::Program;
 use crate::rng::Rng;
-use crate::sample::{sample as sample_f1, SampleOptions};
 use crate::schema::{infer, IntakeOptions, Kind, Schema, Task};
 use crate::single_encoding::v8::{
-    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta,
-    unpack_dse8_packet, Dse8FitOptions, SingleEncV8Weights,
+    fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta, unpack_dse8_packet,
+    Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
 };
 use crate::table::{is_missing, parse_number, RawTable};
 use serde::Serialize;
@@ -25,6 +23,8 @@ use serde::Serialize;
 const TRAIN_CAP: usize = 8192;
 const TEST_CAP: usize = 4096;
 const MIN_GAIN: f64 = 1e-9;
+// The r2 recipe only trained on views up to this active width.
+const VALIDATED_NEURAL_WIDTH: usize = 48;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum V8Choice {
@@ -189,6 +189,16 @@ pub fn fit_auto_v8(
     opts: &AutoV8Options,
     weights: Option<&SingleEncV8Weights>,
 ) -> Result<AutoV8Fitted> {
+    fit_auto_v8_with_payload_room(raw, target, opts, weights, None)
+}
+
+pub(super) fn fit_auto_v8_with_payload_room(
+    raw: &RawTable,
+    target: usize,
+    opts: &AutoV8Options,
+    weights: Option<&SingleEncV8Weights>,
+    dpa_payload_room: Option<usize>,
+) -> Result<AutoV8Fitted> {
     let intake = IntakeOptions {
         task: opts.format1.task,
         ..Default::default()
@@ -218,18 +228,21 @@ pub fn fit_auto_v8(
     let cand_p0 = super::guarded("dse8_analytic", || {
         fit_dse8_packet(&x_full, &y_full, &dse8_opts)
     });
-    let cand_nn = weights.map(|w| {
+    let cand_nn = weights.and_then(|w| {
         super::guarded("dse8_neural", || {
-            fit_dse8_packet_with_encoder(&x_full, &y_full, &dse8_opts, w)
+            let bytes = fit_dse8_packet_with_encoder(&x_full, &y_full, &dse8_opts, w)?;
+            admit_neural_packet(&bytes, w.fingerprint())?;
+            Ok(bytes)
         })
+        .ok()
     });
 
-    // If only one fits, return it immediately.
     let f1_ok = cand_f1.as_ref().ok();
     let p0_ok = cand_p0.as_ref().ok();
-    let nn_ok = cand_nn.as_ref().and_then(|r| r.as_ref().ok());
+    let nn_ok = cand_nn.as_ref();
+    let fold_weights = weights.filter(|_| nn_ok.is_some());
 
-    if f1_ok.is_none() && p0_ok.is_none() && nn_ok.is_none() {
+    if f1_ok.is_none() && p0_ok.is_none() {
         return Err(cand_p0.unwrap_err());
     }
 
@@ -247,10 +260,8 @@ pub fn fit_auto_v8(
     let n_groups = groups.len();
 
     let (choice, sf1, sp0, snn, note) = if n_groups >= MIN_CHECK_GROUPS
-        && (usize::from(f1_ok.is_some())
-            + usize::from(p0_ok.is_some())
-            + usize::from(nn_ok.is_some())
-            >= 2)
+        && f1_ok.is_some()
+        && (p0_ok.is_some() || nn_ok.is_some())
     {
         // Stratified 2-fold grouped 50/50 cross-fitting tests 100% of FIT rows (4x held-out rows
         // vs 75/25) and blocks noisy single-fold regressions > 0.05 below Format 1 on either fold.
@@ -258,8 +269,17 @@ pub fn fit_auto_v8(
         let (half_a, half_b) =
             grouped_two_fold_split(raw, target, strat, groups, opts.format1.seed);
         let run_fold = |tr: &[usize], te: &[usize], sd: u64| {
-            score_three_way(
-                raw, target, &schema, tr, te, &f1_opts, &dse8_opts, weights, sd,
+            folds::score_three_way(
+                raw,
+                target,
+                &schema,
+                tr,
+                te,
+                &f1_opts,
+                &dse8_opts,
+                fold_weights,
+                dpa_payload_room,
+                sd,
             )
             .unwrap_or((None, None, None))
         };
@@ -286,21 +306,13 @@ pub fn fit_auto_v8(
             None,
             format!("skipped: groups={n_groups} < {MIN_CHECK_GROUPS}"),
         )
-    } else if p0_ok.is_some() {
+    } else {
         (
             V8Choice::Dse8Analytic,
             None,
             None,
             None,
             "only_dse8_analytic_fit".to_string(),
-        )
-    } else {
-        (
-            V8Choice::Dse8Neural,
-            None,
-            None,
-            None,
-            "only_dse8_neural_fit".to_string(),
         )
     };
 
@@ -309,7 +321,6 @@ pub fn fit_auto_v8(
         (V8Choice::Dse8Analytic, _, Some(b), _) => (V8Choice::Dse8Analytic, b.clone()),
         (_, Some(b), _, _) => (V8Choice::Format1, b.clone()),
         (_, _, Some(b), _) => (V8Choice::Dse8Analytic, b.clone()),
-        (_, _, _, Some(b)) => (V8Choice::Dse8Neural, b.clone()),
         _ => return Err(DopeError::Budget("no_candidate_fit".into())),
     };
 
@@ -328,6 +339,19 @@ pub fn fit_auto_v8(
             note,
         },
     })
+}
+
+fn admit_neural_packet(bytes: &[u8], fingerprint: [u8; 8]) -> Result<Dse8Packet> {
+    let packet = unpack_dse8_packet(bytes)?;
+    if usize::from(packet.header.p_eff) > VALIDATED_NEURAL_WIDTH
+        || packet.code.tier == 0
+        || packet.weights_fp != Some(fingerprint)
+    {
+        return Err(DopeError::Artifact(
+            "auto_v8_neural_packet_outside_support".into(),
+        ));
+    }
+    Ok(packet)
 }
 
 fn grouped_two_fold_split(
@@ -359,117 +383,38 @@ fn grouped_two_fold_split(
     (a, b)
 }
 
-#[allow(clippy::too_many_arguments)]
-fn score_three_way(
-    raw: &RawTable,
-    target: usize,
-    whole_schema: &Schema,
-    train_idx: &[usize],
-    test_idx: &[usize],
-    f1_opts: &FitOptions,
-    dse8_opts: &Dse8FitOptions<'_>,
-    weights: Option<&SingleEncV8Weights>,
-    seed: u64,
-) -> Result<(Option<f64>, Option<f64>, Option<f64>)> {
-    let train_tbl = raw.select_rows(train_idx);
-    let test_tbl = raw.select_rows(test_idx);
-    let intake = IntakeOptions {
-        task: Some(whole_schema.task),
-        ..Default::default()
-    };
-    let schema = infer(&train_tbl, target, &intake)?;
-    let real = schema.to_model(&train_tbl)?;
-    let featurizer = Featurizer::fit(&schema, &real);
-    let head = Program::head_for(&schema);
-    let (xr, yr) = featurizer.matrix(&real, TRAIN_CAP);
-    let (xt, yt) = featurizer.matrix(&schema.to_model(&test_tbl)?, TEST_CAP);
-    if yr.len() < 20 || yt.len() < 10 {
-        return Ok((None, None, None));
-    }
-    // For classification, require >= 5 test rows per active class so a tiny 2-row minority
-    // test fold cannot flip the Format 1 vs DSE8 choice on sampling noise!
-    if schema.task == Task::Classification {
-        let mut cnts = std::collections::BTreeMap::<i32, usize>::new();
-        for &v in &yt {
-            if v.is_finite() {
-                *cnts.entry(v.round() as i32).or_default() += 1;
-            }
-        }
-        if cnts.len() < 2 || cnts.values().any(|&c| c < 5) {
-            return Ok((None, None, None));
-        }
-    }
-    let n_syn = CHECK_SYNTH_FACTOR * train_tbl.rows();
-    let as_mat = |tbl: Result<RawTable>| -> Option<(Matrix, Vec<f64>)> {
-        let data = schema.to_model(&tbl.ok()?).ok()?;
-        let (x, y) = featurizer.matrix(&data, TRAIN_CAP);
-        (!y.is_empty()).then_some((x, y))
-    };
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::single_encoding::v8::{pack_dse8_packet, CodeSectionV8};
 
-    let syn_f1 = as_mat(super::guarded("f1_chk", || {
-        let fitted = fit_f1(&train_tbl, target, f1_opts)?;
-        let s = sample_f1(
-            &fitted.program,
-            &SampleOptions {
-                rows: n_syn,
-                seed: seed ^ 0xF101,
+    #[test]
+    fn verified_width_and_code_are_read_from_the_wire() {
+        for width in [48, 49, 64] {
+            let x: Vec<Vec<f64>> = (0..width)
+                .map(|j| (0..24).map(|r| ((r + j) % 13) as f64 / 13.0).collect())
+                .collect();
+            let y: Vec<_> = (0..24).map(|r| r as f64 / 24.0).collect();
+            let opts = Dse8FitOptions {
+                normalized_only: true,
+                budget_bytes: 4096,
                 ..Default::default()
-            },
-        )?;
-        Ok(decoded_v8_to_raw(&schema, &s.x, &s.y))
-    }));
+            };
+            let mut packet = unpack_dse8_packet(&fit_dse8_packet(&x, &y, &opts).unwrap()).unwrap();
+            let fingerprint = [7; 8];
+            packet.weights_fp = Some(fingerprint);
+            assert_eq!(usize::from(packet.header.p_eff), width);
+            let code_free = pack_dse8_packet(&packet, 4096).unwrap();
+            assert!(admit_neural_packet(&code_free, fingerprint).is_err());
 
-    let (x_tr, y_tr, tr_tid) = raw_to_numeric_inputs(&train_tbl, target, &schema)?;
-    let tr_meta = fit_unit_meta(&x_tr, &y_tr, tr_tid, dse8_opts.normalized_only).ok();
-    let tr_dse8_opts = Dse8FitOptions {
-        task_id: tr_tid,
-        col_meta: tr_meta.as_deref(),
-        ..*dse8_opts
-    };
-    let syn_p0 = as_mat(super::guarded("p0_chk", || {
-        let bytes = fit_dse8_packet(&x_tr, &y_tr, &tr_dse8_opts)?;
-        let pkt = unpack_dse8_packet(&bytes)?;
-        let dec = decode_dse8_rows(&pkt, None, n_syn, seed ^ 0xD5E8_0000)?;
-        Ok(decoded_v8_to_raw(&schema, &dec.x, &dec.y))
-    }));
-    let syn_nn = weights.and_then(|w| {
-        as_mat(super::guarded("nn_chk", || {
-            let bytes = fit_dse8_packet_with_encoder(&x_tr, &y_tr, &tr_dse8_opts, w)?;
-            let pkt = unpack_dse8_packet(&bytes)?;
-            let dec = decode_dse8_rows(&pkt, Some(w), n_syn, seed ^ 0xD5E8_0001)?;
-            Ok(decoded_v8_to_raw(&schema, &dec.x, &dec.y))
-        }))
-    });
-
-    let l0 = prediction_loss(head, &null_predictions(head, &yr, yt.len()), &yt);
-    let mut s_f1 = f64::INFINITY;
-    let mut s_p0 = f64::INFINITY;
-    let mut s_nn = f64::INFINITY;
-    let mut any_usable = false;
-    for name in AUDITORS {
-        let s = seed ^ 0xA0D1_8888;
-        let l_real = prediction_loss(head, &fit_predict(name, head, &xr, &yr, &xt, s), &yt);
-        if !l_real.is_finite() || l0 - l_real <= MIN_GAIN {
-            continue;
-        }
-        any_usable = true;
-        let eval_syn = |syn: &Option<(Matrix, Vec<f64>)>| -> f64 {
-            match syn {
-                Some((xs, ys)) => {
-                    let ls = prediction_loss(head, &fit_predict(name, head, xs, ys, &xt, s), &yt);
-                    retention(l0, l_real, ls)
-                }
-                None => -1.0,
-            }
-        };
-        s_f1 = s_f1.min(eval_syn(&syn_f1));
-        s_p0 = s_p0.min(eval_syn(&syn_p0));
-        if weights.is_some() {
-            s_nn = s_nn.min(eval_syn(&syn_nn));
+            packet.code = CodeSectionV8::from_unit_vec(&[0.0; 64], 1);
+            let coded = pack_dse8_packet(&packet, 4096).unwrap();
+            assert_eq!(unpack_dse8_packet(&coded).unwrap().code.tier, 1);
+            assert_eq!(
+                admit_neural_packet(&coded, fingerprint).is_ok(),
+                width == 48
+            );
+            assert!(admit_neural_packet(&coded, [8; 8]).is_err());
         }
     }
-    if !any_usable {
-        return Ok((None, None, None));
-    }
-    Ok((Some(s_f1), Some(s_p0), weights.map(|_| s_nn)))
 }
