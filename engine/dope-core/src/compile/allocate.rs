@@ -57,7 +57,12 @@ pub(super) fn allocate(
             match (pick, &opts.dependence, d >= 2) {
                 (Some(p), _, _) => p,
                 (None, None, true) => (Regimes::single(d), Dependence::fit_factor(r_fit, d, 1)),
-                _ => deps[deps.len() - 1].1.clone(),
+                // Too few fitting rows for any regime leaves no ranked candidate: reserve
+                // the independent model instead of indexing an empty list.
+                _ => deps.last().map_or_else(
+                    || (Regimes::single(d), Dependence::Independent),
+                    |dep| dep.1.clone(),
+                ),
             }
         };
     let plans: Vec<(usize, usize, usize)> = opts.plan.map_or_else(|| PLANS.to_vec(), |p| vec![p]);

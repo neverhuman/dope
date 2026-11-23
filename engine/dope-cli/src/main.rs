@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod args;
+mod auto_fit;
 mod dvs;
 mod format2_cli;
 mod landmarks;
@@ -25,6 +26,7 @@ mod runtime;
 mod safe_io;
 mod style;
 mod tiers;
+mod v7_weights;
 use args::*;
 use style::{
     print_eval_report, print_fit_report, print_frontier_report, print_inspect_report,
@@ -100,11 +102,13 @@ fn run(cli: Cli) -> Result<(), String> {
                 }
             };
             let budget = a.budget.as_deref().map(parse_bytes).transpose()?;
-            if a.format == 2 {
+            let dpa1 = a.format == "auto" || a.format == "v7";
+            if a.v7_weights.is_some() && !dpa1 {
+                return Err("--v7-weights applies to --format auto or v7".into());
+            }
+            if a.format == "2" {
                 format2_cli::run_fit_v2(&a, &table, target, task, budget)?;
                 return Ok(());
-            } else if a.format != 1 {
-                return Err("--format must be 1 or 2".into());
             }
             let opts = FitOptions {
                 budget,
@@ -122,6 +126,9 @@ fn run(cli: Cli) -> Result<(), String> {
                 audit: !a.no_audit,
                 ..Default::default()
             };
+            if dpa1 {
+                return auto_fit::run_fit_auto(&a, &table, target, opts);
+            }
             let fitted = fit(&table, target, &opts).map_err(e)?;
             std::fs::write(&a.out, &fitted.bytes).map_err(|x| x.to_string())?;
             if let Some(p) = &a.report {
@@ -149,6 +156,9 @@ fn run(cli: Cli) -> Result<(), String> {
         Command::FitTiers(a) => tiers::fit_tiers(a)?,
         Command::Sample(a) => {
             let raw_bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
+            let Some(raw_bytes) = auto_fit::sample_dpa1(&a, raw_bytes, style)? else {
+                return Ok(());
+            };
             if dope_core::is_format2(&raw_bytes) {
                 let w = writer(&a.out)?;
                 format2_cli::run_sample_v2(&a, &raw_bytes, w, style)?;

@@ -194,9 +194,15 @@ pub(crate) struct FitArgs {
     /// small (2 KiB), medium (4 KiB), large (16 KiB), max (1 MiB); --budget overrides this cap.
     #[arg(long)]
     pub(crate) size: Option<dope_core::ModelSize>,
-    /// Artifact wire format: 1 (Format 1 legacy safetensors) or 2 (Fidelity Engine 2.0 Format 2).
-    #[arg(long, default_value_t = 1)]
-    pub(crate) format: u8,
+    /// Artifact wire format: 1 (Format 1 legacy safetensors), 2 (Fidelity Engine 2.0 Format 2),
+    /// auto (per table, Format 1 or the SingleEncV7 packet in a DPA1 file) or v7 (the V7
+    /// packet only, in a DPA1 file). DPA1 files stay within --budget, default 2048 bytes.
+    #[arg(long, default_value = "1", value_parser = ["1", "2", "auto", "v7"])]
+    pub(crate) format: String,
+    /// SingleEncV7 F32 SafeTensors (4 heads) for --format auto|v7 instead of the weights
+    /// compiled into dope; sampling the artifact then needs the same --v7-weights.
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v7_weights: Option<PathBuf>,
     /// Teacher mode for --format 2: native | external:<DIR>.
     #[arg(long, default_value = "native")]
     pub(crate) teacher: String,
@@ -313,6 +319,13 @@ pub(crate) struct SampleArgs {
     pub(crate) scaling: String,
     #[arg(long, default_value = "auto")]
     pub(crate) device: String,
+    /// SingleEncV7 SafeTensors a V7 DPA1 artifact was fitted with, when not the compiled set.
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v7_weights: Option<PathBuf>,
+    /// Decode a V7 DPA1 artifact with the analytic zero-init decoder (no neural weights;
+    /// the step-0 baseline) instead of the SingleEncV7 network.
+    #[arg(long, conflicts_with = "v7_weights")]
+    pub(crate) v7_zero_init: bool,
 }
 
 #[derive(Args)]

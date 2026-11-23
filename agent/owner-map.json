@@ -1018,7 +1018,13 @@
     "tools/dope_dashboard/": "governance",
     "docs/whitepaper-v2/": "governance",
     "H1/": "external-evidence",
-    "H2/": "external-evidence"
+    "H2/": "external-evidence",
+    "engine/dope-core/src/auto/": "rust-core",
+    "engine/dope-core/tests/auto_encoder.rs": "rust-core",
+    "engine/dope-cli/src/auto_fit.rs": "rust-core",
+    "engine/dope-cli/src/v7_weights.rs": "rust-core",
+    "engine/dope-cli/tests/auto_cli.rs": "rust-core",
+    "models/single-enc-v7/": "rust-core"
   },
   "workspace": "dope"
 }
