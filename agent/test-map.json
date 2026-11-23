@@ -228,6 +228,10 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
       "purpose": "bind the compiled dope-kpi/v2 contract to the repository file and verify the TRG statistic, family bootstrap, promotion rule, sign-flip null and receipts of dope_kpi primary/compare/null/render-readme"
     },
+    "docs/plans/v2-gap-closure/ext-arms.example.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena",
+      "purpose": "parse the documented external-arm example with the dope_kpi external-arm loader so the example and the ext-arm schema cannot drift"
+    },
     "contracts/tdl-contract-v1.json": {
       "command": "cargo test --locked --lib metrics::",
       "purpose": "validate the pre-freeze TDL v1 contract against its schema and reject protocol_frozen=true while any field is TBD"

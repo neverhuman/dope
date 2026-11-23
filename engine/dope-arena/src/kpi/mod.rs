@@ -22,6 +22,7 @@ pub mod ext_scratch;
 pub mod ext_summary;
 pub mod ext_template;
 pub mod families;
+pub mod flip;
 pub mod format2;
 pub mod guard_eval;
 pub mod guard_merge;
@@ -60,6 +61,8 @@ mod guard_tests;
 pub mod stat_testing;
 #[cfg(test)]
 mod stat_tests;
+#[cfg(test)]
+mod trg_tests;
 
 /// Scratch directory for unit tests, inside the build tree and never in the sources.
 #[cfg(test)]

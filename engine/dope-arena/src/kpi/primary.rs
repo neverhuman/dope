@@ -7,14 +7,26 @@
 //! share within the headline budget, over the files that carry a packet);
 //! the unclipped median retention of each auditor over the scored
 //! informative headline entries; the median C2ST AUC over the scored files
-//! of the cells in the statistic; failed and not-applicable cell counts; and
-//! the inputs of the realism, privacy and exact-copy guards on the cells in
-//! the statistic (absent when a needed guard field is absent).
+//! of the cells in the statistic; the cell accounting (scheduled =
+//! uninformative + cells + not applicable, failed cells among the cells, and
+//! cells informative for the held-out auditor only); and the inputs of the
+//! realism, privacy and exact-copy guards on the cells in the statistic
+//! (absent when a needed guard field is absent).
+//!
+//! The statistic reads the rows as `score` wrote them. An arm scored with a
+//! byte cap above the headline budget also reports how many scored packets
+//! exceed it and `trg_at_budget`, its TRG with those files over budget.
+//! Diagnostics, never decided on: the exact-copy maximum and share of files
+//! over the bound beside the mean the guard reads, over-budget files without
+//! a measured size, and `trg_failed_at_floor` (a failed entry at
+//! `clip_low - r_b` instead of the constant of record).
 
 use super::boot::BootPlan;
 use super::receipt::{write_receipt, Context, RunArgs};
-use super::rundir::{Arm, KpiRow, STATUS_OK, TASKS};
-use super::trg::{cell_states, mean, scored, trg_families, CellScore, CellState, Families};
+use super::rundir::{Arm, KpiRow, STATUS_OK, STATUS_OVER_BUDGET, TASKS};
+use super::trg::{
+    cell_states, mean, scored, task_index, trg_families, CellScore, CellState, Families,
+};
 use dope_arena::ArenaResult;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -49,10 +61,21 @@ pub struct Statistic {
     pub ci_low: Option<f64>,
     pub ci_high: Option<f64>,
     pub families: usize,
+    /// Headline cells of the panel scheduled at this multiplier.
+    #[serde(default)]
+    pub scheduled_cells: usize,
+    /// Scheduled cells where no statistic auditor is informative.
+    #[serde(default)]
+    pub uninformative_cells: usize,
+    /// Of those, cells where only the held-out auditor is informative.
+    #[serde(default)]
+    pub mlp_only_cells: usize,
     /// Applicable informative cells in the statistic.
     pub cells: usize,
     /// Of those, cells with an informative entry that was not scored.
     pub failed_cells: usize,
+    /// Cells of the statistic a control cannot exist for:
+    /// `scheduled = uninformative + cells + not_applicable`.
     pub not_applicable_cells: usize,
     pub tasks: Vec<TaskStat>,
 }
@@ -65,7 +88,16 @@ pub struct Bytes {
     pub median: Option<f64>,
     pub max: u64,
     pub within_budget: usize,
+    /// `within_budget` over the files with a packet or over budget without one.
     pub share_within_budget: Option<f64>,
+    /// Files `score` marked over budget, and those of them without a measured size.
+    #[serde(default)]
+    pub over_budget: usize,
+    #[serde(default)]
+    pub over_budget_unmeasured: usize,
+    /// Scored files whose packet exceeds `budget` (scored with a larger cap).
+    #[serde(default)]
+    pub scored_above_budget: usize,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -81,6 +113,10 @@ pub struct ArmSummary {
     pub artifact_class: String,
     pub primary: Statistic,
     pub matched: Statistic,
+    /// Primary TRG with every scored packet above the headline budget over
+    /// budget; present when some scored headline packet exceeds it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trg_at_budget: Option<f64>,
     /// Held-out auditor, aggregated like the statistic.
     pub mlp_trg: Option<f64>,
     pub bytes: Bytes,
@@ -92,9 +128,29 @@ pub struct ArmSummary {
     pub realism_coverage: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub privacy_coverage: Option<f64>,
-    /// Mean exact-copy excess of the scored headline files of the cells in the statistic.
+    /// Mean exact-copy excess of the scored headline files of the cells in
+    /// the statistic (the value `promotion.exact_copy` defines).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub exact_copy_excess: Option<f64>,
+    /// The same files: mean, maximum and share over the bound (diagnostic).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exact_copy: Option<ExactCopy>,
+    /// Primary TRG with a failed entry at `clip_low - r_b` instead of the
+    /// constant of record (diagnostic, never decided on).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trg_failed_at_floor: Option<f64>,
+}
+
+/// Exact-copy excess over a set of scored headline files.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct ExactCopy {
+    pub files: usize,
+    /// The guard's value (`promotion.exact_copy`).
+    pub mean: f64,
+    pub max: f64,
+    /// Files above `promotion.exact_copy_excess_le`, and their share.
+    pub over_bound: usize,
+    pub share_over_bound: f64,
 }
 
 pub fn median(mut values: Vec<f64>) -> Option<f64> {
@@ -123,6 +179,22 @@ pub fn bootstrap(ctx: &Context, families: &Families) -> Option<super::boot::Boot
     Some(plan.run(&values))
 }
 
+/// Headline cells of the panel scheduled at `multiplier`.
+fn scheduled_cells(ctx: &Context, multiplier: u32) -> usize {
+    let stratum = &ctx.contract.statistic.stratum;
+    ctx.run
+        .schedule
+        .cells
+        .values()
+        .filter(|c| {
+            &c.stratum == stratum
+                && c.multipliers.contains(&multiplier)
+                && task_index(&c.task).is_some()
+                && ctx.panel.contains(&c.family_id)
+        })
+        .count()
+}
+
 pub fn statistic(ctx: &Context, arm: &Arm, multiplier: u32) -> Statistic {
     let protocol = ctx.contract.protocol();
     let states = cell_states(&protocol, arm, multiplier, &|f| ctx.panel.contains(f));
@@ -133,6 +205,8 @@ pub fn statistic(ctx: &Context, arm: &Arm, multiplier: u32) -> Statistic {
         .filter_map(CellState::score)
         .filter(|c| c.trg.is_some())
         .collect();
+    let in_statistic = states.values().filter(|s| s.in_statistic()).count();
+    let scheduled = scheduled_cells(ctx, multiplier);
     let tasks = families
         .present()
         .into_iter()
@@ -151,12 +225,12 @@ pub fn statistic(ctx: &Context, arm: &Arm, multiplier: u32) -> Statistic {
         ci_low: boot.as_ref().map(|b| b.overall.ci_low),
         ci_high: boot.as_ref().map(|b| b.overall.ci_high),
         families: families.count(),
+        scheduled_cells: scheduled,
+        uninformative_cells: scheduled.saturating_sub(in_statistic),
+        mlp_only_cells: states.len() - in_statistic,
         cells: scored_cells.len(),
         failed_cells: scored_cells.iter().filter(|c| c.failed).count(),
-        not_applicable_cells: states
-            .values()
-            .filter(|s| **s == CellState::NotApplicable)
-            .count(),
+        not_applicable_cells: in_statistic - scored_cells.len(),
         tasks,
     }
 }
@@ -187,10 +261,11 @@ pub fn headline_files<'a>(
     files
 }
 
-/// Mean `exact_copy_excess` over the scored headline files of `arms` whose
-/// cell `keep` accepts; absent when there is none or one lacks the value.
-pub fn exact_copy_excess(ctx: &Context, arms: &[&Arm], keep: &dyn Fn(&str) -> bool) -> Option<f64> {
+/// `exact_copy_excess` of the scored headline files of `arms` whose cell
+/// `keep` accepts; absent when there is none or one lacks the value.
+pub fn exact_copy(ctx: &Context, arms: &[&Arm], keep: &dyn Fn(&str) -> bool) -> Option<ExactCopy> {
     let multiplier = ctx.contract.statistic.primary_multiplier;
+    let bound = ctx.contract.promotion.exact_copy_excess_le;
     let mut values = Vec::new();
     for arm in arms {
         for ((cell, _), row) in headline_files(ctx, arm, multiplier) {
@@ -199,7 +274,27 @@ pub fn exact_copy_excess(ctx: &Context, arms: &[&Arm], keep: &dyn Fn(&str) -> bo
             }
         }
     }
-    mean(values)
+    let over_bound = values.iter().filter(|&&v| v > bound).count();
+    Some(ExactCopy {
+        files: values.len(),
+        max: values.iter().copied().reduce(f64::max)?,
+        share_over_bound: over_bound as f64 / values.len() as f64,
+        over_bound,
+        mean: mean(values)?,
+    })
+}
+
+/// Scored headline files of `arm` whose cell `keep` accepts and whose packet
+/// exceeds the headline budget.
+pub fn scored_above_budget(ctx: &Context, arm: &Arm, keep: &dyn Fn(&str) -> bool) -> usize {
+    let budget = ctx.contract.bytes.headline;
+    let multiplier = ctx.contract.statistic.primary_multiplier;
+    headline_files(ctx, arm, multiplier)
+        .into_iter()
+        .filter(|((cell, _), row)| {
+            keep(cell) && row.status == STATUS_OK && row.packet_bytes > budget
+        })
+        .count()
 }
 
 /// A guard share of the cells in the statistic, aggregated like the TRG;
@@ -225,6 +320,13 @@ fn bytes(ctx: &Context, files: &BTreeMap<(&str, u64), &KpiRow>) -> Bytes {
         .filter(|&b| b > 0)
         .collect();
     let within = sizes.iter().filter(|&&b| b <= budget).count();
+    let over = |r: &&&KpiRow| r.status == STATUS_OVER_BUDGET;
+    let unmeasured = files
+        .values()
+        .filter(over)
+        .filter(|r| r.packet_bytes == 0)
+        .count();
+    let considered = sizes.len() + unmeasured;
     Bytes {
         budget,
         files: files.len(),
@@ -232,7 +334,13 @@ fn bytes(ctx: &Context, files: &BTreeMap<(&str, u64), &KpiRow>) -> Bytes {
         median: median(sizes.iter().map(|&b| b as f64).collect()),
         max: sizes.iter().copied().max().unwrap_or(0),
         within_budget: within,
-        share_within_budget: (!sizes.is_empty()).then(|| within as f64 / sizes.len() as f64),
+        share_within_budget: (considered > 0).then(|| within as f64 / considered as f64),
+        over_budget: files.values().filter(over).count(),
+        over_budget_unmeasured: unmeasured,
+        scored_above_budget: files
+            .values()
+            .filter(|r| r.status == STATUS_OK && r.packet_bytes > budget)
+            .count(),
     }
 }
 
@@ -304,19 +412,31 @@ pub fn summarize(ctx: &Context, arm: &Arm) -> ArmSummary {
             }
         })
         .collect();
+    let bytes = bytes(ctx, &files);
+    let at_budget = || {
+        let capped = ctx.contract.protocol_at_headline();
+        trg_families(&cell_states(&capped, arm, s.primary_multiplier, &keep)).point()
+    };
+    let copies = exact_copy(ctx, &[arm], &in_statistic);
+    let floor = ctx.contract.protocol_failed_at_floor();
+    let trg_failed_at_floor =
+        trg_families(&cell_states(&floor, arm, s.primary_multiplier, &keep)).point();
     ArmSummary {
         arm_id: arm.id.clone(),
         artifact_class: artifact_class(&files),
         primary: statistic(ctx, arm, s.primary_multiplier),
         matched: statistic(ctx, arm, s.matched_multiplier),
+        trg_at_budget: (bytes.scored_above_budget > 0).then(at_budget).flatten(),
         mlp_trg: mlp.point(),
-        bytes: bytes(ctx, &files),
+        bytes,
         median_retention,
         c2st_files: c2st.len(),
         c2st_median: median(c2st),
         realism_coverage: coverage(&states, |c| c.realism),
         privacy_coverage: coverage(&states, |c| c.privacy),
-        exact_copy_excess: exact_copy_excess(ctx, &[arm], &in_statistic),
+        exact_copy_excess: copies.as_ref().map(|c| c.mean),
+        exact_copy: copies,
+        trg_failed_at_floor,
     }
 }
 

@@ -67,6 +67,8 @@ pub struct Diffs {
     /// `None` when a common cell lacks the realism flag in some arm.
     pub realism: Option<Families>,
     pub privacy: Option<Families>,
+    /// Each member's own TRG differences on the common cells.
+    pub members: Vec<Families>,
 }
 
 impl Diffs {
@@ -85,7 +87,16 @@ impl Diffs {
             mlp: self.mlp.flipped(sign),
             realism: self.realism.as_ref().map(|f| f.flipped(sign)),
             privacy: self.privacy.as_ref().map(|f| f.flipped(sign)),
+            members: self.members.iter().map(|f| f.flipped(sign)).collect(),
         }
+    }
+
+    /// Each member's delta on the common cells.
+    pub fn member_deltas(&self) -> Vec<f64> {
+        self.members
+            .iter()
+            .map(|f| f.point().unwrap_or(0.0))
+            .collect()
     }
 }
 
@@ -100,8 +111,6 @@ pub struct Paired {
     pub diffs: Diffs,
     pub candidate: Families,
     pub baseline: Families,
-    /// Each member's own delta on the common cells.
-    pub member_deltas: Vec<f64>,
 }
 
 /// Pair `members` (pooled by their mean) with `baseline` cell by cell.
@@ -161,13 +170,10 @@ pub fn pair(members: &[&States], baseline: &States) -> Paired {
             mlp: Families::from_cells(mlp),
             realism: realism.map(Families::from_cells),
             privacy: privacy.map(Families::from_cells),
+            members: per_member.into_iter().map(Families::from_cells).collect(),
         },
         candidate: Families::from_cells(cand),
         baseline: Families::from_cells(base),
-        member_deltas: per_member
-            .into_iter()
-            .map(|cells| Families::from_cells(cells).point().unwrap_or(0.0))
-            .collect(),
     }
 }
 
@@ -196,8 +202,12 @@ mod tests {
         let paired = pair(&[&s0, &s1], &base);
         assert_eq!(paired.common.iter().collect::<Vec<_>>(), ["p:t1:full:d0"]);
         assert!((paired.diffs.trg.point().unwrap() - 0.3).abs() < 1e-12);
-        assert!((paired.member_deltas[0] - 0.2).abs() < 1e-12);
-        assert!((paired.member_deltas[1] - 0.4).abs() < 1e-12);
+        let members = paired.diffs.member_deltas();
+        assert!((members[0] - 0.2).abs() < 1e-12);
+        assert!((members[1] - 0.4).abs() < 1e-12);
+        // A flip moves every member with its family.
+        let flipped = paired.diffs.flipped(&|_| -1.0).member_deltas();
+        assert!((flipped[0] + 0.2).abs() < 1e-12 && (flipped[1] + 0.4).abs() < 1e-12);
         assert_eq!(
             (paired.mlp_cells, paired.diffs.realism.is_none()),
             (1, true)

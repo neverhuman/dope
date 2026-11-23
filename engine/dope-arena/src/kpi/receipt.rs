@@ -31,7 +31,8 @@ pub struct RunArgs {
     /// Run directory holding `realref.jsonl`, the schedule and `score/<arm>/rows.jsonl`.
     #[arg(long)]
     pub run_dir: PathBuf,
-    /// Schedule the arms were scored on (default: the run directory's one `schedule*.jsonl`).
+    /// Schedule the arms were scored on (default: the run directory's only
+    /// `schedule*.jsonl`; required when it holds several).
     #[arg(long)]
     pub schedule: Option<PathBuf>,
     /// Families read: `all`, `dev` (families holding a `--dev-tables` table) or `confirm` (the rest).
@@ -62,6 +63,9 @@ pub struct Inputs {
     pub schedule_sha256: String,
     pub schedule_panel_sha256: String,
     pub realref_sha256: String,
+    /// Auditors of the real reference (each of the contract's statistic auditors is required).
+    #[serde(default)]
+    pub realref_auditors: Vec<String>,
     /// SHA-256 of every `rows.jsonl` read, by arm.
     pub rows_sha256: BTreeMap<String, String>,
     /// SHA-256 of `guards.jsonl` and of `guards-summary.json` of every arm whose guards were merged.
@@ -131,6 +135,15 @@ impl Context {
     pub fn open(args: &RunArgs, arm_ids: &[&str]) -> ArenaResult<Context> {
         let (contract, contract_ref) = Contract::load(args.contract.as_deref())?;
         let run = RunDir::open(&args.run_dir, args.schedule.as_deref())?;
+        // A statistic auditor absent from the reference would leave the minimum
+        // over the auditors silently taken over the others.
+        if let Some(missing) =
+            (contract.statistic.auditors.iter()).find(|a| !run.auditors.contains(a))
+        {
+            return super::rundir::contract(format!(
+                "the real reference has no entry for the contract's auditor {missing}"
+            ));
+        }
         let panel = resolve(args.panel, args.dev_tables.as_deref(), &run)?;
         let mut arms = BTreeMap::new();
         for id in arm_ids {
@@ -191,6 +204,7 @@ impl Context {
                 schedule_sha256: self.run.schedule.sha256.clone(),
                 schedule_panel_sha256: self.run.schedule.panel_sha256.clone(),
                 realref_sha256: self.run.realref_sha256.clone(),
+                realref_auditors: self.run.auditors.clone(),
                 rows_sha256: self
                     .arms
                     .values()

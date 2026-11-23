@@ -25,7 +25,8 @@ pub const ROWS_FILE: &str = "rows.jsonl";
 pub const TASKS: [&str; 3] = ["regression", "binary", "multiclass"];
 pub const STATUS_OK: &str = "ok";
 pub const STATUS_UNSUPPORTED: &str = "unsupported";
-const STATUSES: [&str; 4] = ["ok", "failed", "over_budget", "unsupported"];
+pub const STATUS_OVER_BUDGET: &str = "over_budget";
+const STATUSES: [&str; 4] = [STATUS_OK, "failed", STATUS_OVER_BUDGET, STATUS_UNSUPPORTED];
 
 pub fn contract<T>(message: impl Into<String>) -> ArenaResult<T> {
     Err(ArenaError::Contract(message.into()))

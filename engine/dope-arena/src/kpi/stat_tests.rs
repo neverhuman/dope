@@ -163,7 +163,8 @@ fn inapplicable_cells_leave_the_arm_and_every_comparison() {
         ("t4", "f4", "binary", 0.6),
     ];
     let base = arm_of("base", &cells);
-    let mut twin = arm_of("twin", &cells.map(|(t, f, task, _)| (t, f, task, 1.0)));
+    // A native control id: only those can have cells that cannot exist.
+    let mut twin = arm_of("twin_c", &cells.map(|(t, f, task, _)| (t, f, task, 1.0)));
     for row in &mut twin.rows {
         row.artifact_class = "control".into();
         row.packet_bytes = 0;
@@ -174,7 +175,7 @@ fn inapplicable_cells_leave_the_arm_and_every_comparison() {
     };
     let twin = edit(edit(twin, "t3", unsupported), "t4", unsupported);
     let ctx = context("stat-inapplicable", &[base, twin]);
-    let s = summarize(&ctx, ctx.arm("twin"));
+    let s = summarize(&ctx, ctx.arm("twin_c"));
     assert_eq!(
         (
             s.primary.trg,
@@ -184,7 +185,7 @@ fn inapplicable_cells_leave_the_arm_and_every_comparison() {
         (Some(0.0), 2, 2)
     );
     assert_eq!(s.primary.tasks.len(), 1);
-    let c = &compare(&ctx, &["twin"], &[], "base", 0.01)[0];
+    let c = &compare(&ctx, &["twin_c"], &[], "base", 0.01)[0];
     // Common cells t1, t2: differences 0.1 and 0.3.
     assert_eq!((c.cells, c.families), (2, 2));
     close(c.delta, 0.2);
@@ -192,8 +193,15 @@ fn inapplicable_cells_leave_the_arm_and_every_comparison() {
     // A control carries no packet: the byte guard cannot pass.
     assert!(not_passing(c).contains(&"bytes"));
     assert_ne!(c.decision.outcome, Outcome::Promote);
-    let states = super::trg::cell_states(&ctx.contract.protocol(), ctx.arm("twin"), 4, &|_| true);
-    assert_eq!(states["p:t3:full:d0"], CellState::NotApplicable);
+    let states = super::trg::cell_states(&ctx.contract.protocol(), ctx.arm("twin_c"), 4, &|_| true);
+    assert_eq!(
+        states["p:t3:full:d0"],
+        CellState::NotApplicable { in_statistic: true }
+    );
+    assert_eq!(
+        (s.primary.scheduled_cells, s.primary.uninformative_cells),
+        (4, 0)
+    );
 }
 
 #[test]
@@ -352,18 +360,16 @@ fn the_sign_flip_null_catches_a_three_family_panel() {
     let mut lines = Vec::new();
     let null = sign_flip_null(&ctx, "cand", "base", 2000, 7, 0.01, &mut lines).unwrap();
     assert_eq!((null.families, lines.len()), (3, 2000));
-    assert!(
-        (null.false_promote.rate - 0.125).abs() < 0.03,
-        "{:?}",
-        null.false_promote
-    );
+    let full = null.false_promote.as_ref().unwrap();
+    assert!((full.rate - 0.125).abs() < 0.03, "{full:?}");
     assert!(
         (null.statistical_pass.rate - 0.5).abs() < 0.05,
         "{:?}",
         null.statistical_pass
     );
-    assert!(!null.false_promote.acceptable && null.not_evaluated_guards.is_empty());
-    assert_eq!(null.flip_guard_rule, null.false_promote);
+    assert!(!null.acceptable && null.not_evaluated_guards.is_empty());
+    assert!(null.failing_fixed_guards.is_empty());
+    assert_eq!(Some(&null.flip_guard_rule), null.false_promote.as_ref());
     assert_eq!(null.observed.decision.outcome, Outcome::Promote);
     let line: serde_json::Value = serde_json::from_str(&lines[0]).unwrap();
     assert_eq!(line["replicate"], 0);
@@ -376,8 +382,34 @@ fn the_sign_flip_null_catches_a_three_family_panel() {
         &[three("base", [0.8; 3]), three("cand", [0.9; 3])],
     );
     let unflagged = sign_flip_null(&ctx, "cand", "base", 2000, 7, 0.01, &mut Vec::new()).unwrap();
-    assert_eq!(unflagged.false_promote.count, 0);
+    // The full rule's 0 of 2000 is vacuous, not acceptable: the flip rule reads 1/8.
+    assert_eq!(unflagged.false_promote, None);
+    assert!(!unflagged.acceptable);
     assert_eq!(unflagged.not_evaluated_guards.len(), 3);
     assert_eq!(unflagged.flip_guard_rule, null.flip_guard_rule);
     assert_eq!(unflagged.statistical_pass, null.statistical_pass);
+}
+
+#[test]
+fn compare_reports_its_sign_flip_rate_beside_an_unchanged_decision() {
+    // Three families (one per task): the rule promotes 1/8 of the sign flips.
+    let arms = [
+        with_guard_fields(three("base", [0.8; 3])),
+        with_guard_fields(three("cand", [0.9; 3])),
+    ];
+    let ctx = context("stat-calibration", &arms);
+    let c = &compare(&ctx, &["cand"], &[], "base", 0.01)[0];
+    assert_eq!((c.decision.outcome, c.holm_m), (Outcome::Promote, 1));
+    let cal = c.null_calibration.as_ref().unwrap();
+    assert_eq!((cal.replicates, cal.families), (2000, 3));
+    let rate = &cal.flip_guard_rule;
+    assert!(
+        (rate.rate - 0.125).abs() < 0.03 && !rate.acceptable,
+        "{rate:?}"
+    );
+    assert!(c
+        .decision
+        .guards
+        .iter()
+        .all(|g| g.name != "null_calibration"));
 }

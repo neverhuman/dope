@@ -10,7 +10,8 @@
 //! | `label_shuffle` | A with only the target permuted |
 //!
 //! `rust_format2[_b<bytes>]` (see `format2.rs`) is generated here too, as a
-//! source-free arm with a measured packet.
+//! source-free arm with a measured packet; an artifact over the arm's budget
+//! is logged `over_budget` with its length and no file.
 //!
 //! Streams follow formats.md section 4. A column's permutation is keyed by
 //! its arena column index, so the `full` and `p48` views of a table agree on
@@ -127,12 +128,15 @@ enum Outcome<'a> {
     },
 }
 
+/// `packet` is the cell's Format 2 artifact; `refused_bytes` the length of
+/// one refused as over budget (0 when unknown or for any other arm).
 fn emit_row(
     arm_id: &str,
     cell: &Cell,
     (sample_seed, multiplier): (u64, u32),
     outcome: Outcome,
     packet: Option<&[u8]>,
+    refused_bytes: u64,
 ) -> EmitRow {
     let (status, reason, rows, file) = match outcome {
         Outcome::Written { rows, file } => (EMIT_OK, "", rows, file),
@@ -153,7 +157,7 @@ fn emit_row(
             CLASS_CONTROL
         }
         .to_string(),
-        packet_bytes: packet.map_or(0, |bytes| bytes.len() as u64),
+        packet_bytes: packet.map_or(refused_bytes, |bytes| bytes.len() as u64),
         packet_sha256: packet.map_or_else(String::new, sha256_hex),
         cold_bytes: 0,
         rows,
@@ -180,13 +184,17 @@ fn emit_cell(
         _ => None,
     };
     let bytes = packet.as_ref().and_then(|p| p.as_deref().ok());
+    let refused_bytes = match &packet {
+        Some(Err(refusal)) => refusal.bytes.unwrap_or(0),
+        _ => 0,
+    };
     let mut rows = Vec::new();
     for &sample_seed in &cell.sample_seeds {
         for &multiplier in &cell.multipliers {
             let refused = |status, reason| Err(Outcome::Refused { status, reason });
             let generated = match (&data, &packet) {
                 (Err(reason), _) => refused(EMIT_UNSUPPORTED, reason),
-                (Ok(_), Some(Err(reason))) => refused(EMIT_FAILED, reason),
+                (Ok(_), Some(Err(refusal))) => refused(refusal.status, refusal.reason),
                 (Ok(data), Some(Ok(packet))) => {
                     let count = data.a.n * multiplier as usize;
                     format2::sample(packet, cell, data.a.p, count, sample_seed, multiplier)
@@ -207,7 +215,7 @@ fn emit_cell(
                 Err(outcome) => outcome,
             };
             let key = (sample_seed, multiplier);
-            rows.push(emit_row(arm_id, cell, key, outcome, bytes));
+            rows.push(emit_row(arm_id, cell, key, outcome, bytes, refused_bytes));
         }
     }
     Ok(rows)
@@ -233,6 +241,7 @@ pub fn emit_cells(
 mod tests {
     use super::*;
     use crate::kpi::celldata::ScaleCard;
+    use crate::kpi::emitlog::EMIT_OVER_BUDGET;
     use dope_core::target::Head;
     use std::collections::BTreeMap;
 
@@ -370,7 +379,7 @@ mod tests {
             status: EMIT_UNSUPPORTED,
             reason: REASON_NO_TWIN,
         };
-        let refused = emit_row(TWIN_C, &wide, (0, 4), refusal, None);
+        let refused = emit_row(TWIN_C, &wide, (0, 4), refusal, None, 0);
         assert_eq!(
             (refused.status.as_str(), refused.rows, refused.file.as_str()),
             ("unsupported", 0, "")
@@ -380,7 +389,7 @@ mod tests {
                 rows: 40,
                 file: format!("{arm}/x.mat"),
             };
-            emit_row(arm, &wide, (2, 1), outcome, packet)
+            emit_row(arm, &wide, (2, 1), outcome, packet, 0)
         };
         let copy = written(COPY_A, None);
         assert_eq!(
@@ -392,5 +401,16 @@ mod tests {
         assert_eq!(packed.artifact_class, "source_free");
         assert_eq!((packed.packet_bytes, packed.packet_sha256.len()), (3, 64));
         assert_eq!(packed.min_emitted_support, Some(10));
+        // An artifact refused as over budget is logged with its length and no file.
+        let over = Outcome::Refused {
+            status: EMIT_OVER_BUDGET,
+            reason: format2::REASON_OVER_BUDGET,
+        };
+        let over = emit_row("rust_format2_b2048", &wide, (0, 4), over, None, 4084);
+        assert_eq!(
+            (over.status.as_str(), over.packet_bytes, over.file.as_str()),
+            ("over_budget", 4084, "")
+        );
+        assert!(over.packet_sha256.is_empty());
     }
 }

@@ -6,7 +6,11 @@
 //! arms, i.e. a bootstrap of the per-family differences), the one-sided p
 //! for `delta <= 0`, the Holm adjustment across every comparison of the
 //! receipt, the per-task deltas with intervals, the matched-multiplier delta
-//! (reported, not decided on), the guards and the outcome.
+//! (reported, not decided on), the guards and the outcome. Beside the
+//! decision, and never read by it: the comparison's own sign-flip
+//! false-PROMOTE rate (`flip::sign_flips` with the contract's null
+//! replicates and seed) and the exact-copy maximum and share of files over
+//! the bound (the guard reads the mean, as the contract defines it).
 //!
 //! A `--seed-group NAME=A,B,C` pools the training seeds of one model: per
 //! cell the candidate value is the mean over the seeds, on cells applicable
@@ -15,8 +19,9 @@
 
 use super::boot::{holm, BootPlan, BootStats};
 use super::emitlog::check_arm_id;
+use super::flip::{sign_flips, Calibration};
 use super::pairing::{pair, parse_specs, Diffs, Paired, Spec, States};
-use super::primary::{exact_copy_excess, headline_files, summarize};
+use super::primary::{exact_copy, headline_files, scored_above_budget, summarize, ExactCopy};
 use super::receipt::{write_receipt, Context, RunArgs};
 use super::rule::{decide, BytesEvidence, Decision, Evidence, SeedEvidence};
 use super::rundir::{contract, Arm, STATUS_OK, TASKS};
@@ -52,10 +57,14 @@ pub struct CompareArgs {
 pub struct Fixed {
     pub exact_copy_excess: Option<f64>,
     pub bytes: BytesEvidence,
-    pub seed_group: Option<SeedEvidence>,
+    /// The comparison pools training seeds (each seed's sign is read from `Diffs`).
+    pub seed_group: bool,
 }
 
 pub fn evidence(stats: &BootStats, p_holm: f64, diffs: &Diffs, fixed: &Fixed) -> Evidence {
+    let pooled = stats.overall.value;
+    let same_sign = |d: &f64| *d != 0.0 && pooled != 0.0 && d.signum() == pooled.signum();
+    let members = diffs.member_deltas();
     Evidence {
         delta: stats.overall,
         p_holm,
@@ -65,7 +74,10 @@ pub fn evidence(stats: &BootStats, p_holm: f64, diffs: &Diffs, fixed: &Fixed) ->
         privacy_delta: diffs.privacy.as_ref().and_then(Families::point),
         exact_copy_excess: fixed.exact_copy_excess,
         bytes: fixed.bytes,
-        seed_group: fixed.seed_group,
+        seed_group: fixed.seed_group.then(|| SeedEvidence {
+            seeds: members.len(),
+            same_sign: members.iter().filter(|d| same_sign(d)).count(),
+        }),
     }
 }
 
@@ -114,10 +126,24 @@ pub struct ComparisonResult {
     pub ci_high: f64,
     pub p_one_sided: f64,
     pub p_holm: f64,
+    /// Comparisons in the Holm family of `p_holm` (those of the receipt).
+    #[serde(default)]
+    pub holm_m: usize,
     pub tasks: Vec<TaskDelta>,
     pub member_deltas: Vec<MemberDelta>,
     pub matched: Option<Matched>,
     pub decision: Decision,
+    /// Exact-copy excess of the candidate's scored headline files on the
+    /// common cells: the guard reads the mean; max and share over the bound are diagnostics.
+    #[serde(default)]
+    pub exact_copy: Option<ExactCopy>,
+    /// The comparison's sign-flip false-PROMOTE rate (diagnostic, not decided on).
+    #[serde(default)]
+    pub null_calibration: Option<Calibration>,
+    /// The baseline's scored headline packets above the headline budget on
+    /// the common cells (scored with a larger cap; diagnostic).
+    #[serde(default)]
+    pub baseline_above_budget: usize,
 }
 
 /// A comparison with its paired evidence and bootstrap, before Holm.
@@ -128,6 +154,8 @@ pub struct Prepared {
     pub plan: BootPlan,
     pub stats: BootStats,
     pub matched: Option<Matched>,
+    pub exact_copy: Option<ExactCopy>,
+    pub baseline_above_budget: usize,
 }
 
 fn plan_for(ctx: &Context, families: &Families) -> Option<BootPlan> {
@@ -194,20 +222,14 @@ pub fn prepare(ctx: &Context, spec: &Spec, baseline: &str) -> ArenaResult<Prepar
             p_one_sided: overall.p_one_sided,
         }
     });
-    let pooled = stats.overall.value;
-    let same_sign = |d: f64| d != 0.0 && pooled != 0.0 && d.signum() == pooled.signum();
+    // The candidate's scored headline files on the common cells.
+    let common = |cell: &str| paired.common.contains(cell);
+    let copies = exact_copy(ctx, &members, &common);
+    let baseline_above_budget = scored_above_budget(ctx, ctx.arm(baseline), &common);
     let fixed = Fixed {
-        // The candidate's scored headline files on the common cells.
-        exact_copy_excess: exact_copy_excess(ctx, &members, &|cell| paired.common.contains(cell)),
+        exact_copy_excess: copies.as_ref().map(|c| c.mean),
         bytes: bytes(ctx, &members),
-        seed_group: spec.seed_group.then(|| SeedEvidence {
-            seeds: members.len(),
-            same_sign: paired
-                .member_deltas
-                .iter()
-                .filter(|d| same_sign(**d))
-                .count(),
-        }),
+        seed_group: spec.seed_group,
     };
     Ok(Prepared {
         spec: spec.clone(),
@@ -216,14 +238,17 @@ pub fn prepare(ctx: &Context, spec: &Spec, baseline: &str) -> ArenaResult<Prepar
         plan,
         stats,
         matched,
+        exact_copy: copies,
+        baseline_above_budget,
     })
 }
 
 pub fn result(
     prepared: &Prepared,
     baseline: &str,
-    p_holm: f64,
+    (p_holm, holm_m): (f64, usize),
     decision: Decision,
+    null_calibration: Option<Calibration>,
 ) -> ComparisonResult {
     let (spec, paired, stats) = (&prepared.spec, &prepared.paired, &prepared.stats);
     let tasks = paired
@@ -260,11 +285,12 @@ pub fn result(
         ci_high: stats.overall.ci_high,
         p_one_sided: stats.overall.p_one_sided,
         p_holm,
+        holm_m,
         tasks,
         member_deltas: if spec.seed_group {
             spec.members
                 .iter()
-                .zip(&paired.member_deltas)
+                .zip(&paired.diffs.member_deltas())
                 .map(|(arm, delta)| MemberDelta {
                     arm: arm.clone(),
                     delta: *delta,
@@ -275,6 +301,9 @@ pub fn result(
         },
         matched: prepared.matched.clone(),
         decision,
+        exact_copy: prepared.exact_copy.clone(),
+        null_calibration,
+        baseline_above_budget: prepared.baseline_above_budget,
     }
 }
 
@@ -294,19 +323,21 @@ pub fn compare_all(
         .map(|p| p.stats.overall.p_one_sided)
         .collect();
     let (rule, budget) = (&ctx.contract.promotion, ctx.contract.bytes.headline);
-    Ok(prepared
-        .iter()
-        .zip(holm(&raw))
-        .map(|(p, p_holm)| {
-            let decision = decide(
-                rule,
-                budget,
-                noise_sd,
-                &evidence(&p.stats, p_holm, &p.paired.diffs, &p.fixed),
-            );
-            result(p, baseline, p_holm, decision)
-        })
-        .collect())
+    let null = &ctx.contract.null;
+    let mut out = Vec::new();
+    for (p, p_holm) in prepared.iter().zip(holm(&raw)) {
+        let decision = decide(
+            rule,
+            budget,
+            noise_sd,
+            &evidence(&p.stats, p_holm, &p.paired.diffs, &p.fixed),
+        );
+        let flips = sign_flips(ctx, p, null.min_replicates, null.seed, noise_sd, None)?;
+        let calibration = Calibration::of(&flips, null.max_false_promote_rate);
+        let holm = (p_holm, prepared.len());
+        out.push(result(p, baseline, holm, decision, Some(calibration)));
+    }
+    Ok(out)
 }
 
 #[derive(Serialize)]
