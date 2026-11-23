@@ -1,14 +1,20 @@
 //! `dope_kpi render-readme`: the README block `DOPE1 SCOREBOARD` from receipts.
 //!
 //! One table row per arm (arm id, artifact class, packet bytes median / max /
-//! share within the headline budget, TRG with its 95% interval, per-task TRG
-//! with family counts, unclipped median retention of the three auditors,
-//! median C2ST, failed / applicable cells), one line per comparison (delta
-//! with its interval, Holm p, guards, outcome), the sign-flip null when a
-//! receipt holds one, and a footer with the contract SHA-256, the panel and
-//! the SHA-256 of every receipt. Numbers have 3 decimals; the block is a pure
-//! function of the receipt bytes. Several receipts of one run (same
-//! contract, schedule, real reference and panel) render as one block.
+//! share within the headline budget, TRG with its 95% interval (`†`: some
+//! scored packet exceeds the headline budget, see the note under the table),
+//! per-task TRG with family counts, unclipped median retention of the three
+//! auditors, median C2ST, realism / privacy coverage and exact-copy excess
+//! (mean, with the maximum file in parentheses), failed / applicable cells),
+//! one line per comparison (delta with its interval, Holm p with the number
+//! of comparisons it covers, each guard with its value, the comparison's
+//! sign-flip false-PROMOTE rate, outcome), the sign-flip null when a receipt
+//! holds one, and a footer with the contract (source, status, SHA-256), the
+//! panel and the SHA-256 of every receipt. The sign-flip rate and the copy
+//! maximum are diagnostics: the outcome is the contract's rule alone.
+//! Numbers have 3 decimals; the block is a pure function of the receipt
+//! bytes. Several receipts of one run (same contract, schedule, real
+//! reference and panel) render as one block.
 
 use super::jsonl::{parse_json, read_file, sha256_hex};
 use super::primary::ArmSummary;
@@ -72,14 +78,30 @@ fn bytes_cell(arm: &ArmSummary) -> String {
     format!("{median} / {} / {}", b.max, fixed3(share))
 }
 
+/// Realism / privacy coverage and exact-copy excess mean (max).
+fn guard_cell(arm: &ArmSummary) -> String {
+    let copies = arm.exact_copy.as_ref().map_or_else(
+        || opt3(arm.exact_copy_excess),
+        |c| format!("{} ({})", fixed3(c.mean), fixed3(c.max)),
+    );
+    format!(
+        "{} / {} / {copies}",
+        opt3(arm.realism_coverage),
+        opt3(arm.privacy_coverage)
+    )
+}
+
 fn arm_row(arm: &ArmSummary) -> String {
     let p = &arm.primary;
-    let trg = match (p.trg, p.ci_low, p.ci_high) {
+    let mut trg = match (p.trg, p.ci_low, p.ci_high) {
         (Some(t), Some(low), Some(high)) => {
             format!("{} [{}, {}]", fixed3(t), fixed3(low), fixed3(high))
         }
         _ => "-".to_string(),
     };
+    if arm.bytes.scored_above_budget > 0 {
+        trg.push_str(" †");
+    }
     let tasks: Vec<String> = TASKS
         .iter()
         .map(|task| {
@@ -99,7 +121,7 @@ fn arm_row(arm: &ArmSummary) -> String {
         cells.push_str(&format!(" ({} n/a)", p.not_applicable_cells));
     }
     format!(
-        "| `{}` | {} | {} | {} | {} | {} | {} | {} |",
+        "| `{}` | {} | {} | {} | {} | {} | {} | {} | {} |",
         arm.arm_id,
         arm.artifact_class,
         bytes_cell(arm),
@@ -107,6 +129,7 @@ fn arm_row(arm: &ArmSummary) -> String {
         tasks.join(" | "),
         retention.join(" / "),
         opt3(arm.c2st_median),
+        guard_cell(arm),
         cells
     )
 }
@@ -122,17 +145,40 @@ fn guard_name(name: &str) -> &str {
     }
 }
 
-fn guard_word(item: &Item) -> String {
+/// A guard with its value: deltas signed, bytes whole, copies as mean (max).
+fn guard_word(item: &Item, c: &super::compare::ComparisonResult) -> String {
     let check = match item.check {
         Check::Pass => "pass",
         Check::Fail => "FAIL",
         Check::NotEvaluated => "n/e",
     };
-    format!("{} {check}", guard_name(&item.name))
+    let value = match (item.name.as_str(), item.value) {
+        (_, None) => String::new(),
+        ("bytes", Some(v)) => format!(" {v:.0}"),
+        ("exact_copy_excess", Some(v)) => match &c.exact_copy {
+            Some(copies) => format!(" {} ({})", fixed3(v), fixed3(copies.max)),
+            None => format!(" {}", fixed3(v)),
+        },
+        (_, Some(v)) => format!(" {}", signed3(v)),
+    };
+    format!("{}{value} {check}", guard_name(&item.name))
+}
+
+/// The comparison's sign-flip false-PROMOTE rate (a diagnostic).
+fn calibration_cell(c: &super::compare::ComparisonResult) -> String {
+    match &c.null_calibration {
+        None => "-".to_string(),
+        Some(cal) if cal.flip_guard_rule.acceptable => fixed3(cal.flip_guard_rule.rate),
+        Some(cal) => format!(
+            "{} (> {})",
+            fixed3(cal.flip_guard_rule.rate),
+            fixed3(cal.max_false_promote_rate)
+        ),
+    }
 }
 
 fn comparison_row(c: &super::compare::ComparisonResult) -> String {
-    let mut guards: Vec<String> = c.decision.guards.iter().map(guard_word).collect();
+    let mut guards: Vec<String> = c.decision.guards.iter().map(|g| guard_word(g, c)).collect();
     if c.kind == "seed_group" {
         let signs = c
             .decision
@@ -142,15 +188,20 @@ fn comparison_row(c: &super::compare::ComparisonResult) -> String {
         let same = signs.and_then(|i| i.value).unwrap_or(0.0);
         guards.push(format!("seeds {same:.0}/{}", c.members.len()));
     }
+    if c.baseline_above_budget > 0 {
+        guards.push(format!("baseline above budget {}", c.baseline_above_budget));
+    }
     format!(
-        "| `{}` vs `{}` | {} [{}, {}] | {} | {} | **{}** |",
+        "| `{}` vs `{}` | {} [{}, {}] | {} ({}) | {} | {} | **{}** |",
         c.id,
         c.baseline,
         signed3(c.delta),
         signed3(c.ci_low),
         signed3(c.ci_high),
         p_value(c.p_holm),
+        c.holm_m,
         guards.join("; "),
+        calibration_cell(c),
         c.decision.outcome.word()
     )
 }
@@ -197,31 +248,42 @@ pub fn render(receipts: &[Vec<u8>]) -> ArenaResult<String> {
     ];
     if !arms.is_empty() {
         out.push(format!(
-            "| Arm | Class | Bytes median / max / share <= {budget} B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Failed / cells |"
+            "| Arm | Class | Bytes median / max / share <= {budget} B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Realism / privacy / copies mean (max) | Failed / cells |"
         ));
-        out.push("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|".to_string());
+        out.push("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|".to_string());
         out.extend(arms.iter().map(|arm| arm_row(arm)));
+        let above: Vec<String> = arms
+            .iter()
+            .filter(|a| a.bytes.scored_above_budget > 0)
+            .map(|a| {
+                format!(
+                    "`{}` {} files, TRG at {budget} B {}",
+                    a.arm_id,
+                    a.bytes.scored_above_budget,
+                    opt3(a.trg_at_budget)
+                )
+            })
+            .collect();
+        if !above.is_empty() {
+            out.push(String::new());
+            out.push(format!(
+                "† Scored with packets above {budget} B (the TRG reads the rows as scored): {}.",
+                above.join("; ")
+            ));
+        }
     }
     let comparisons: Vec<_> = parsed.iter().flat_map(|(r, _)| &r.comparisons).collect();
     if !comparisons.is_empty() {
         out.push(String::new());
-        out.push("| Comparison | Delta TRG [95% CI] | Holm p | Guards | Outcome |".to_string());
-        out.push("|---|---:|---:|---|---|".to_string());
+        out.push(
+            "| Comparison | Delta TRG [95% CI] | Holm p (m) | Guards | Sign-flip PROMOTE | Outcome |"
+                .to_string(),
+        );
+        out.push("|---|---:|---:|---|---:|---|".to_string());
         out.extend(comparisons.iter().map(|c| comparison_row(c)));
     }
     for null in parsed.iter().filter_map(|(r, _)| r.null.as_ref()) {
-        let blocked: Vec<&str> = null
-            .not_evaluated_guards
-            .iter()
-            .map(|g| guard_name(g))
-            .collect();
-        let blocked = if blocked.is_empty() {
-            String::new()
-        } else {
-            format!(" (not evaluated: {})", blocked.join(", "))
-        };
-        out.push(String::new());
-        let rate = |r: &super::null::Rate| {
+        let rate = |r: &super::flip::Rate| {
             format!(
                 "{} [{}, {}]",
                 fixed3(r.rate),
@@ -229,21 +291,35 @@ pub fn render(receipts: &[Vec<u8>]) -> ArenaResult<String> {
                 fixed3(r.wilson95_high)
             )
         };
+        let blocked: Vec<&str> = null
+            .not_evaluated_guards
+            .iter()
+            .chain(&null.failing_fixed_guards)
+            .map(|g| guard_name(g))
+            .collect();
+        let full = match &null.false_promote {
+            Some(r) => rate(r),
+            None => format!("not informative (blocked by {})", blocked.join(", ")),
+        };
+        let verdict = if null.acceptable { "within" } else { "ABOVE" };
+        out.push(String::new());
         out.push(format!(
-            "Sign-flip null, `{}` vs `{}`, {} replicates (Wilson 95%): false PROMOTE {}{blocked}; with bytes, copies and unevaluated guards passing {}; conditions (1)-(3) alone {}.",
+            "Sign-flip null, `{}` vs `{}`, {} replicates (Wilson 95%): false PROMOTE with bytes, copies and unevaluated guards passing {} ({verdict} the {} maximum); full rule {full}; conditions (1)-(3) alone {}.",
             null.candidate,
             null.baseline,
             null.replicates,
-            rate(&null.false_promote),
             rate(&null.flip_guard_rule),
+            fixed3(null.max_false_promote_rate),
             rate(&null.statistical_pass)
         ));
     }
     let shas: Vec<String> = parsed.iter().map(|(_, sha)| format!("`{sha}`")).collect();
     out.push(String::new());
     out.push(format!(
-        "Contract `{}` sha256 `{}`; panel `{}`; receipt sha256 {}.",
+        "Contract `{}` ({}, {}) sha256 `{}`; panel `{}`; receipt sha256 {}.",
         first.contract.id,
+        first.contract.source,
+        first.contract.status,
         first.contract.sha256,
         first.panel.id,
         shas.join(", ")

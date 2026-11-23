@@ -50,6 +50,7 @@
     "crates/dope-service/": "rust-core",
     "deploy/": "rust-core",
     "docs/": "governance",
+    "docs/plans/v2-gap-closure/ext-arms.example.json": "rust-core",
     "docs/REPO_MAP.md": "governance",
     "docs/audit-remediation-20261021.md": "governance",
     "docs/compiler-development.md": "governance",

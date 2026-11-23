@@ -4,7 +4,14 @@
 //! The contract is compiled into the binary; `--contract FILE` reads another
 //! one instead. Either way its SHA-256 goes into every receipt. A contract
 //! this binary does not implement (another schema, task list, cell reduction,
-//! auditor roster shape or inconsistent bounds) is refused without quoting it.
+//! auditor roster shape or inconsistent bounds) is refused without quoting
+//! it. A `--contract` file may change numbers (thresholds,
+//! draws, seeds, quantiles, the byte grid, the auditor roster) but not the
+//! texts that describe the method: those must be the compiled contract's,
+//! so a receipt never names a method the binary did not run. Only a
+//! contract whose SHA-256 is compiled in as frozen (an owner decision; none
+//! yet) may declare `protocol_frozen: true` or a status other than
+//! `candidate`.
 
 use super::jsonl::{parse_json, read_file, sha256_hex};
 use super::rundir::{contract, TASKS};
@@ -15,6 +22,9 @@ use std::path::Path;
 
 pub const CONTRACT_SCHEMA: &str = "dope.kpi-contract/v2";
 const EMBEDDED: &[u8] = include_bytes!("../../../../contracts/dope-kpi-v2.json");
+/// SHA-256 of the contracts an owner decision froze (none yet).
+const FROZEN: [&str; 0] = [];
+const CANDIDATE: &str = "candidate";
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -153,11 +163,54 @@ impl Contract {
         Ok(c)
     }
 
+    /// The texts that describe the method, by field name.
+    fn method_texts(&self) -> [(&'static str, &str); 16] {
+        let (s, b, p) = (&self.statistic, &self.bootstrap, &self.promotion);
+        [
+            ("contract_id", &self.contract_id),
+            ("statistic.id", &s.id),
+            ("statistic.name", &s.name),
+            ("statistic.retention", &s.retention),
+            ("statistic.entry_value", &s.entry_value),
+            ("statistic.aggregation", &s.aggregation),
+            ("statistic.informative", &s.informative),
+            ("statistic.not_applicable", &s.not_applicable),
+            ("bootstrap.kind", &b.kind),
+            ("bootstrap.rank", &b.rank),
+            ("bootstrap.p_value", &b.p_value),
+            ("promotion.multiplicity", &p.multiplicity),
+            ("promotion.coverage", &p.coverage),
+            ("promotion.exact_copy", &p.exact_copy),
+            ("bytes.guard", &self.bytes.guard),
+            ("null.kind", &self.null.kind),
+        ]
+    }
+
+    /// Refuse a method text other than the compiled one, and a frozen or
+    /// non-candidate status the binary does not know as frozen.
+    fn check_binding(&self, label: &str, sha256: &str, embedded: &Contract) -> ArenaResult<()> {
+        let texts = self.method_texts().into_iter().zip(embedded.method_texts());
+        for ((field, own), (_, compiled)) in texts {
+            if own != compiled {
+                return contract(format!(
+                    "{label}: {field} describes a method this binary does not implement"
+                ));
+            }
+        }
+        let frozen = FROZEN.contains(&sha256);
+        if (self.protocol_frozen || self.status != CANDIDATE) && !frozen {
+            return contract(format!(
+                "{label} declares a frozen or non-candidate status; only a contract frozen by an owner decision and compiled into dope_kpi may"
+            ));
+        }
+        Ok(())
+    }
+
     pub fn embedded() -> ArenaResult<(Contract, String)> {
-        Ok((
-            Contract::parse("embedded contract", EMBEDDED)?,
-            sha256_hex(EMBEDDED),
-        ))
+        let label = "embedded contract";
+        let (contract, sha256) = (Contract::parse(label, EMBEDDED)?, sha256_hex(EMBEDDED));
+        contract.check_binding(label, &sha256, &contract)?;
+        Ok((contract, sha256))
     }
 
     /// The contract at `path`, else the embedded one.
@@ -166,7 +219,9 @@ impl Contract {
             Some(path) => {
                 let bytes = read_file(path)?;
                 let label = path.display().to_string();
-                (Contract::parse(&label, &bytes)?, sha256_hex(&bytes), "file")
+                let (contract, sha256) = (Contract::parse(&label, &bytes)?, sha256_hex(&bytes));
+                contract.check_binding(&label, &sha256, &Contract::embedded()?.0)?;
+                (contract, sha256, "file")
             }
             None => {
                 let (contract, sha256) = Contract::embedded()?;
@@ -183,14 +238,35 @@ impl Contract {
         Ok((contract, reference))
     }
 
+    /// The statistic of record: rows as `score` wrote them.
     pub fn protocol(&self) -> Protocol {
         Protocol {
             clip_low: self.statistic.clip_low,
             clip_high: self.statistic.clip_high,
             failed_value: self.statistic.failed_value,
+            failed_at_floor: false,
             auditors: self.statistic.auditors.clone(),
             held_out: self.statistic.held_out_auditor.clone(),
             stratum: self.statistic.stratum.clone(),
+            budget_cap: None,
+        }
+    }
+
+    /// The statistic with every packet above the headline budget over budget
+    /// (a diagnostic for arms scored with a larger budget).
+    pub fn protocol_at_headline(&self) -> Protocol {
+        Protocol {
+            budget_cap: Some(self.bytes.headline),
+            ..self.protocol()
+        }
+    }
+
+    /// The statistic with a failed entry at `clip_low - r_b` instead of
+    /// `failed_value` (a diagnostic; the protocol of record keeps the constant).
+    pub fn protocol_failed_at_floor(&self) -> Protocol {
+        Protocol {
+            failed_at_floor: true,
+            ..self.protocol()
         }
     }
 
@@ -240,5 +316,35 @@ mod tests {
             .unwrap_err()
             .to_string();
         assert!(!err.contains("SECRET"), "{err}");
+    }
+
+    #[test]
+    fn a_contract_file_may_change_numbers_but_not_the_method_or_its_status() {
+        let dir = super::super::unit_test_dir("spec-binding");
+        let text = String::from_utf8(EMBEDDED.to_vec()).unwrap();
+        let load = |name: &str, body: &str| {
+            let path = dir.join(name);
+            std::fs::write(&path, body).unwrap();
+            Contract::load(Some(&path)).map(|(c, r)| (c, r.source))
+        };
+        let numbers = text.replace("\"draws\": 10000", "\"draws\": 2000");
+        let (c, source) = load("numbers.json", &numbers).unwrap();
+        assert_eq!((c.bootstrap.draws, source.as_str()), (2000, "file"));
+        let edits = [
+            (
+                "\"exact_copy\": \"mean over",
+                "\"exact_copy\": \"SECRET maximum over",
+            ),
+            ("\"protocol_frozen\": false", "\"protocol_frozen\": true"),
+            ("\"status\": \"candidate\"", "\"status\": \"frozen\""),
+        ];
+        for (index, (from, to)) in edits.into_iter().enumerate() {
+            let body = text.replace(from, to);
+            assert_ne!(body, text, "{from}");
+            let err = load(&format!("edit-{index}.json"), &body)
+                .unwrap_err()
+                .to_string();
+            assert!(!err.contains("SECRET"), "{err}");
+        }
     }
 }

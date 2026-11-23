@@ -8,22 +8,75 @@
 //!
 //! Arm ids: `rust_format2` (the engine's default byte budget) or
 //! `rust_format2_b<bytes>` for an explicit budget.
+//!
+//! An artifact longer than the arm's budget is not sampled: its files are
+//! logged `over_budget` with the artifact length, whether the engine returned
+//! the artifact or refused it with a budget error (it does once its fit is
+//! fail-closed, #390); the length a refusal names is kept, and a refusal that
+//! names none leaves the size unmeasured. Any other fit error is `failed`.
 
 use super::celldata::CellData;
 use super::cellplan::Cell;
+use super::emitlog::{EMIT_FAILED, EMIT_OVER_BUDGET};
 use super::mat::Mat;
 use super::seeds::{crn_seed, STRUCTURAL_SAMPLE_SEED};
 use dope_core::marginal::atoms::DEFAULT_SUPPORT_K;
 use dope_core::table::parse_number;
 use dope_core::target::Head;
 use dope_core::{
-    decode_format2_program, fit_v2, EmissionMode, EmitOptions, FitV2Options, RawTable, Task,
+    decode_format2_program, fit_v2, DopeError, EmissionMode, EmitOptions, FitV2Options, RawTable,
+    Task,
 };
 
 pub const ARM: &str = "rust_format2";
 pub const ARCH_ID: &str = concat!("dope-core-format2@", env!("CARGO_PKG_VERSION"));
 pub const REASON_FIT: &str = "format2_fit_failed";
+pub const REASON_OVER_BUDGET: &str = "format2_over_budget";
 pub const REASON_SAMPLE: &str = "format2_sample_failed";
+
+/// Why `encode` produced no artifact: the emit status and reason, and the
+/// artifact length when it is known.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Refusal {
+    pub status: &'static str,
+    pub reason: &'static str,
+    pub bytes: Option<u64>,
+}
+
+fn over_budget(bytes: Option<u64>) -> Refusal {
+    Refusal {
+        status: EMIT_OVER_BUDGET,
+        reason: REASON_OVER_BUDGET,
+        bytes,
+    }
+}
+
+/// The artifact length named by the engine's budget refusal
+/// (`format2 artifact (<bytes> B) exceeds requested budget (<budget> B)`).
+pub fn refused_size(message: &str) -> Option<u64> {
+    let rest = message.strip_prefix("format2 artifact (")?;
+    let (digits, _) = rest.split_once(" B)")?;
+    digits.parse().ok()
+}
+
+/// The outcome of one fit against the arm's budget.
+pub fn fit_outcome(
+    fitted: dope_core::Result<Vec<u8>>,
+    budget: Option<usize>,
+) -> Result<Vec<u8>, Refusal> {
+    match fitted {
+        Ok(bytes) if budget.is_some_and(|cap| bytes.len() > cap) => {
+            Err(over_budget(Some(bytes.len() as u64)))
+        }
+        Ok(bytes) => Ok(bytes),
+        Err(DopeError::Budget(message)) => Err(over_budget(refused_size(&message))),
+        Err(_) => Err(Refusal {
+            status: EMIT_FAILED,
+            reason: REASON_FIT,
+            bytes: None,
+        }),
+    }
+}
 /// Smallest fit-row support the engine keeps behind a discrete level.
 pub const SUPPORT_FLOOR: u64 = DEFAULT_SUPPORT_K as u64;
 
@@ -65,11 +118,7 @@ fn fit_table(data: &CellData) -> RawTable {
 }
 
 /// Fit the artifact on the cell's A rows; the bytes are the whole encoding.
-pub fn encode(
-    cell: &Cell,
-    data: &CellData,
-    budget: Option<usize>,
-) -> Result<Vec<u8>, &'static str> {
+pub fn encode(cell: &Cell, data: &CellData, budget: Option<usize>) -> Result<Vec<u8>, Refusal> {
     let seed = crn_seed(
         &cell.panel_sha256,
         &cell.dataset_hash,
@@ -86,9 +135,8 @@ pub fn encode(
         }),
         ..Default::default()
     };
-    fit_v2(&fit_table(data), data.a.p, &options)
-        .map(|fitted| fitted.bytes)
-        .map_err(|_| REASON_FIT)
+    let fitted = fit_v2(&fit_table(data), data.a.p, &options).map(|fitted| fitted.bytes);
+    fit_outcome(fitted, budget)
 }
 
 /// Decode `packet` and draw `rows` rows; nothing but the bytes and seeds is read.
@@ -268,5 +316,41 @@ mod tests {
             sample(&packet[..packet.len() / 2], &cell, 3, 8, 0, 4),
             Err(REASON_SAMPLE)
         );
+    }
+
+    #[test]
+    fn a_budget_the_artifact_cannot_meet_is_over_budget_with_its_length() {
+        let refusal = encode(&cell(), &data(), Some(64)).unwrap_err();
+        assert_eq!(
+            (refusal.status, refusal.reason),
+            (EMIT_OVER_BUDGET, REASON_OVER_BUDGET)
+        );
+        assert!(refusal.bytes.is_some_and(|bytes| bytes > 64), "{refusal:?}");
+    }
+
+    #[test]
+    fn an_engine_budget_refusal_keeps_the_length_it_names() {
+        let message = "format2 artifact (4084 B) exceeds requested budget (2048 B)";
+        assert_eq!(refused_size(message), Some(4084));
+        let refused =
+            |message: &str| fit_outcome(Err(DopeError::Budget(message.into())), Some(2048));
+        assert_eq!(refused(message).unwrap_err(), over_budget(Some(4084)));
+        assert_eq!(refused("budget too small").unwrap_err(), over_budget(None));
+        let other = fit_outcome(Err(DopeError::Budget(String::new())), None).unwrap_err();
+        assert_eq!(other.status, EMIT_OVER_BUDGET);
+        let failed = fit_outcome(Err(DopeError::Artifact("x".into())), Some(2048)).unwrap_err();
+        assert_eq!(
+            (failed.status, failed.reason, failed.bytes),
+            (EMIT_FAILED, REASON_FIT, None)
+        );
+        assert_eq!(
+            fit_outcome(Ok(vec![0; 2048]), Some(2048)),
+            Ok(vec![0; 2048])
+        );
+        assert_eq!(
+            fit_outcome(Ok(vec![0; 2049]), Some(2048)).unwrap_err(),
+            over_budget(Some(2049))
+        );
+        assert_eq!(fit_outcome(Ok(vec![0; 9000]), None), Ok(vec![0; 9000]));
     }
 }

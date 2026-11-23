@@ -8,7 +8,7 @@
 //!   (b1: linear failed, -1), famC1 (c1 -0.3): TRG (-0.225 - 1 - 0.3) / 3.
 //! * `cand`: famR1 (-0.15, -0.2), famR2 (+0.05, `R_S` 1.4 clipped to 1.25),
 //!   famB1 -0.1, famC1 -0.15: TRG -0.3125 / 3, paired delta 1.2125 / 3.
-//! * `twin`: a control that cannot exist on c1 (multiclass leaves its
+//! * `twin_c`: a native control that cannot exist on c1 (multiclass leaves its
 //!   statistic and every comparison it is in): TRG (-0.05 - 0.1) / 2.
 //! * `noise`: retention -0.5 everywhere.
 
@@ -45,7 +45,7 @@ fn arm<'a>(receipt: &'a Value, id: &str) -> &'a Value {
 }
 
 const ARMS: [&str; 8] = [
-    "--arm", "base", "--arm", "cand", "--arm", "twin", "--arm", "noise",
+    "--arm", "base", "--arm", "cand", "--arm", "twin_c", "--arm", "noise",
 ];
 
 #[test]
@@ -84,7 +84,7 @@ fn primary_reports_hand_computed_values_and_repeats_byte_for_byte() {
     close(&base["c2st_median"], 0.7);
     close(&base["median_retention"][0]["median"], 0.75);
     close(&arm(&r, "cand")["primary"]["trg"], -0.3125 / 3.0);
-    let twin = arm(&r, "twin");
+    let twin = arm(&r, "twin_c");
     close(&twin["primary"]["trg"], -0.075);
     assert_eq!(twin["primary"]["not_applicable_cells"], 1);
     assert_eq!(twin["primary"]["families"], 3);
@@ -105,7 +105,7 @@ fn compare_promotes_holds_and_rejects_with_holm_over_the_receipt() {
         "--candidate",
         "cand",
         "--candidate",
-        "twin",
+        "twin_c",
         "--candidate",
         "noise",
         "--baseline",
@@ -113,7 +113,7 @@ fn compare_promotes_holds_and_rejects_with_holm_over_the_receipt() {
     ];
     let (bytes, summary) = receipt(&dir, "compare.json", "compare", &args);
     assert_eq!(summary["outcomes"]["cand"], "PROMOTE");
-    assert_eq!(summary["outcomes"]["twin"], "HOLD");
+    assert_eq!(summary["outcomes"]["twin_c"], "HOLD");
     assert_eq!(summary["outcomes"]["noise"], "REJECT");
     let r: Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(r["noise_sd"]["source"], "default");
@@ -263,7 +263,7 @@ fn null_and_readme_block_are_deterministic() {
             "--candidate",
             "cand",
             "--candidate",
-            "twin",
+            "twin_c",
             "--baseline",
             "base",
         ],
@@ -284,17 +284,20 @@ fn null_and_readme_block_are_deterministic() {
     assert_eq!(lines.first(), Some(&"<!-- BEGIN DOPE1 SCOREBOARD -->"));
     assert_eq!(lines.last(), Some(&"<!-- END DOPE1 SCOREBOARD -->"));
     assert!(lines.contains(
-        &"| `base` | source_free | 1500 / 1500 / 1.000 | -0.508 [-0.550, -0.467] | -0.225 (2) | -1.000 (1) | -0.300 (1) | 0.750 / 0.750 / 0.800 | 0.700 | 1 / 5 |"
+        &"| `base` | source_free | 1500 / 1500 / 1.000 | -0.508 [-0.550, -0.467] | -0.225 (2) | -1.000 (1) | -0.300 (1) | 0.750 / 0.750 / 0.800 | 0.700 | 0.833 / 0.833 / 0.000 (0.000) | 1 / 5 |"
     ), "{block}");
-    assert!(lines.contains(&"| `twin` | control | - | -0.075 [-0.075, -0.075] | -0.050 (2) | -0.100 (1) | - | 0.950 / 0.900 / 0.925 | 0.550 | 0 / 4 (1 n/a) |"), "{block}");
-    assert!(lines.contains(&"| `cand` vs `base` | +0.404 [+0.400, +0.408] | <0.001 | tasks pass; mlp pass; realism pass; privacy pass; copies pass; bytes pass | **PROMOTE** |"), "{block}");
+    assert!(lines.contains(&"| `twin_c` | control | - | -0.075 [-0.075, -0.075] | -0.050 (2) | -0.100 (1) | - | 0.950 / 0.900 / 0.925 | 0.550 | - / - / - | 0 / 4 (1 n/a) |"), "{block}");
+    // Four families: no sign-flip PROMOTE rate can be below 1/16, which the
+    // diagnostic shows beside the contract's decision (still PROMOTE).
+    assert!(lines.contains(&"| `cand` vs `base` | +0.404 [+0.400, +0.408] | <0.001 (2) | tasks +0.150 pass; mlp +0.163 pass; realism +0.167 pass; privacy +0.167 pass; copies 0.000 (0.000) pass; bytes 1800 pass | 0.062 (> 0.050) | **PROMOTE** |"), "{block}");
     assert!(
-        block.contains("Sign-flip null, `cand` vs `base`, 2000 replicates"),
+        block.contains("Sign-flip null, `cand` vs `base`, 2000 replicates (Wilson 95%): false PROMOTE with bytes, copies and unevaluated guards passing 0.062 [0.052, 0.073] (ABOVE the 0.050 maximum); full rule 0.062"),
         "{block}"
     );
     let footer = lines[lines.len() - 2];
     assert!(
-        footer.starts_with("Contract `dope-kpi/v2` sha256 `") && footer.contains("panel `all`"),
+        footer.starts_with("Contract `dope-kpi/v2` (embedded, candidate) sha256 `")
+            && footer.contains("panel `all`"),
         "{footer}"
     );
     for path in &paths {
