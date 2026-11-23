@@ -1,0 +1,8 @@
+# Gitleaks false positives, one exact finding per line (commit:file:rule:line).
+# docs/plans/v2-gap-closure/tips-gap-matrix.json once named a topic-slug field `source_key`
+# (e.g. "v2-truth-repairs-replication"), which generic-api-key reads as a key. The field is now
+# `source_topic`. 55213972 is the commit on main; fecf6207 is the pre-merge copy still on the pr396 branch.
+55213972a757fda3de6900ab6d5fcf151e62e704:docs/plans/v2-gap-closure/tips-gap-matrix.json:generic-api-key:5612
+55213972a757fda3de6900ab6d5fcf151e62e704:docs/plans/v2-gap-closure/tips-gap-matrix.json:generic-api-key:5877
+fecf6207fe6a54cba55084a492ef6c5829692bac:docs/plans/v2-gap-closure/tips-gap-matrix.json:generic-api-key:5612
+fecf6207fe6a54cba55084a492ef6c5829692bac:docs/plans/v2-gap-closure/tips-gap-matrix.json:generic-api-key:5877
