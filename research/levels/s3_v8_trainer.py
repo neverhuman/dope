@@ -20,7 +20,11 @@ from typing import Any
 import numpy as np
 import torch
 
-from research.levels.s3_v8_losses import compute_v8_episode_loss, pcgrad_lite_combine
+from research.levels.s3_v8_losses import (
+    compute_v8_episode_loss,
+    loss_direct_conditional_nll,
+    pcgrad_lite_combine,
+)
 from research.levels.s3_v8_priors import sample_contrastive_xor_pair, sample_v8_prior_episode
 from research.levels.s3_v8_trainer_io import (
     _episode_to_tensors,
@@ -82,8 +86,16 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             if any(name.startswith(pfx) for pfx in ("delta_knots.", "delta_L.", "flow_")):
                 p.requires_grad_(False)
 
-    trainable_params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
+    bb_mult = float(getattr(args, "backbone_lr_mult", 1.0) or 1.0)
+    bb_warm = int(getattr(args, "backbone_warmup_steps", 500) or 500)
+    bb_prefixes = ("dec_blocks.", "dec_col_in.", "dec_glob_in.", "dec_final_norm.")
+    if bb_mult < 0.999:
+        bb_params = [p for n, p in model.named_parameters() if p.requires_grad and n.startswith(bb_prefixes)]
+        hd_params = [p for n, p in model.named_parameters() if p.requires_grad and not n.startswith(bb_prefixes)]
+        param_groups = [{"params": hd_params}, {"params": bb_params}]
+    else:
+        param_groups = [{"params": [p for p in model.parameters() if p.requires_grad]}]
+    optimizer = torch.optim.AdamW(param_groups, lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
     warmup_steps = int(getattr(args, "warmup_steps", 0) or 0)
     lr_sched_kind = str(getattr(args, "lr_schedule", "cosine") or "cosine")
 
@@ -98,7 +110,15 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * (prog - 0.80) / 0.20))
         return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * prog))
 
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=_lr_lambda)
+    def _bb_lr_lambda(st: int) -> float:
+        base = _lr_lambda(st)
+        if bb_warm <= 0 or st >= bb_warm:
+            return base
+        ramp = bb_mult + (1.0 - bb_mult) * (float(st) / float(bb_warm))
+        return base * ramp
+
+    lr_lambdas: Any = [_lr_lambda, _bb_lr_lambda] if len(param_groups) == 2 else _lr_lambda
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambdas)
     emas: dict[str, dict[str, torch.Tensor]] = {
         "0.99": copy.deepcopy(model.state_dict()),
         "0.999": copy.deepcopy(model.state_dict()),
@@ -147,6 +167,10 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     prior_mix_prob = float(getattr(args, "prior_mix_prob", 0.0) or 0.0)
     max_p_cur = int(getattr(args, "max_p_curriculum", 0) or 0)
     cur_steps = int(getattr(args, "curriculum_steps", 1000) or 1000)
+    alpha_floor = float(getattr(args, "alpha_floor", 0.0) or 0.0)
+    alpha_floor_steps = int(getattr(args, "alpha_floor_steps", 1000) or 1000)
+    alpha_floor_w = float(getattr(args, "alpha_floor_weight", 0.05) or 0.05)
+    resid_cond_w = float(getattr(args, "resid_cond_weight", 0.0) or 0.0)
 
     for step in range(start_step + 1, args.steps + 1):
         if args.max_wall_s > 0 and (time.monotonic() - t0) >= args.max_wall_s:
@@ -192,6 +216,19 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                         td["dec_col"][None], td["dec_edge"][None], td["dec_glob"][None],
                         z_fsq, col_mask=col_mask,
                     )
+                raw_alpha = plan["alpha_table"]
+                cur_a_floor = 0.0
+                if alpha_floor > 0.0:
+                    half = max(alpha_floor_steps // 2, 1)
+                    if step <= half:
+                        cur_a_floor = alpha_floor
+                    elif step <= alpha_floor_steps:
+                        t_lin = float(step - half) / float(max(alpha_floor_steps - half, 1))
+                        cur_a_floor = alpha_floor * (1.0 - 0.8 * t_lin)
+                    else:
+                        cur_a_floor = 0.2 * alpha_floor
+                    plan = dict(plan)
+                    plan["alpha_table"] = torch.clamp(raw_alpha, min=cur_a_floor)
                 dec = model.decode_batch_differentiable(
                     plan,
                     td["knots"][None], td["loadings"][None], td["W_base"][None], td["b_base"][None],
@@ -213,7 +250,23 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                     weights=loss_w, logits_qry=logits_qry, plan=plan,
                 )
                 l_aux = 0.05 * torch.nn.functional.mse_loss(model.aux_ev_head(plan["h_dec"][0]), td["ev_col"])
-                ep_tot = ld["total"] + l_aux
+                l_a_pen = (
+                    alpha_floor_w * (torch.relu(cur_a_floor - raw_alpha) ** 2).mean()
+                    if cur_a_floor > 0.0
+                    else l_aux.new_tensor(0.0)
+                )
+                if resid_cond_w > 0.0:
+                    plan_nl = dict(plan)
+                    plan_nl["delta_W"] = torch.zeros_like(plan["delta_W"])
+                    logits_nl = model.predict_target_on_x(
+                        plan_nl, td["W_base"][None].detach(), td["b_base"][None].detach(), xq_clean[None]
+                    )[0]
+                    l_resid_nl = loss_direct_conditional_nll(
+                        logits_nl, dec["resid_sd_eff"][0].detach(), td["y_qry"], td["task_id"], td["n_classes"]
+                    )
+                else:
+                    l_resid_nl = l_aux.new_tensor(0.0)
+                ep_tot = ld["total"] + l_aux + l_a_pen + resid_cond_w * l_resid_nl
                 if max_p_cur > 0 and step <= cur_steps and p_ep > max_p_cur:
                     ep_tot = ep_tot * 0.25
                 ep_losses.append(ep_tot)
@@ -221,7 +274,8 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                 for k, v in ld.items():
                     loss_terms_accum[k] = loss_terms_accum.get(k, 0.0) + float(v.detach().item())
                 loss_terms_accum["l_aux"] = loss_terms_accum.get("l_aux", 0.0) + float(l_aux.detach().item())
-                loss_terms_accum["alpha_gate"] = loss_terms_accum.get("alpha_gate", 0.0) + float(plan["alpha_table"][0].detach().item())
+                loss_terms_accum["l_resid_nl"] = loss_terms_accum.get("l_resid_nl", 0.0) + float(l_resid_nl.detach().item())
+                loss_terms_accum["alpha_gate"] = loss_terms_accum.get("alpha_gate", 0.0) + float(raw_alpha[0].detach().item())
 
             micro_loss = torch.stack(ep_losses).mean()
             step_loss_sum += float(micro_loss.detach().item()) / float(grad_accum)
@@ -275,6 +329,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             )
             emas["0.999"] = copy.deepcopy(ema_proxy.state_dict())
 
+        bilin_norm = float(
+            (model.bilin_u.weight.norm() + model.bilin_v.weight.norm() + model.bilin_w.weight.norm()).detach().item()
+        )
         inv_ep = 1.0 / float(max(total_eps, 1))
         rec = {
             "step": step,
@@ -284,6 +341,7 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             "wall_s": round(time.monotonic() - t0, 3),
             "sync_round": sync_round,
             "eff_batch": total_eps,
+            "bilin_norm": round(bilin_norm, 5),
             **{k: round(v * inv_ep, 5) for k, v in loss_terms_accum.items()},
             **{k: round(v, 5) for k, v in pcgrad_info.items()},
         }
@@ -344,6 +402,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--grad-clip", type=float, default=1.0)
     ap.add_argument("--direct-cond-weight", type=float, default=0.60)
     ap.add_argument("--anchor-weight", type=float, default=0.15)
+    ap.add_argument("--alpha-floor", type=float, default=0.0)
+    ap.add_argument("--alpha-floor-steps", type=int, default=1000)
+    ap.add_argument("--alpha-floor-weight", type=float, default=0.05)
+    ap.add_argument("--resid-cond-weight", type=float, default=0.0)
+    ap.add_argument("--backbone-lr-mult", type=float, default=1.0)
+    ap.add_argument("--backbone-warmup-steps", type=int, default=500)
     ap.add_argument("--init-from", type=str, default="")
     ap.add_argument("--freeze-target-heads", action="store_true")
     ap.add_argument("--freeze-x-heads", action="store_true")
