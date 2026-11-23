@@ -65,8 +65,8 @@ def test_equal_width_surgery_reproduces_the_v7_trunk_exactly():
     torch.testing.assert_close(h8, h7, rtol=1e-5, atol=1e-5)
 
 
-@pytest.mark.skipif(not RELEASE_V7.is_file(), reason="release V7 weights are committed with the repository")
 def test_release_surgery_keeps_the_analytic_packet_at_step_zero():
+    assert RELEASE_V7.is_file(), f"missing committed release V7 weights: {RELEASE_V7}"
     from safetensors.torch import load_file
 
     tensors, report = sg.transplant(load_file(str(RELEASE_V7)), SingleEncV8())
@@ -96,8 +96,8 @@ def test_selection_rules():
         sg.even(4, 8)
 
 
-@pytest.mark.skipif(not RELEASE_V7.is_file(), reason="release V7 weights are committed with the repository")
 def test_cli_is_deterministic_and_reports_sources(tmp_path: Path):
+    assert RELEASE_V7.is_file(), f"missing committed release V7 weights: {RELEASE_V7}"
     shas = []
     for i in range(2):
         out, rep = tmp_path / f"s{i}.safetensors", tmp_path / f"s{i}.json"
