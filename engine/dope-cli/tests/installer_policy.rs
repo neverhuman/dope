@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-const ENGINE: &str = "dope-engine-v1.3.0";
+const ENGINE: &str = "dope-engine-v3.0.0";
 const MODEL: &str = "v1.0.0";
 const SOURCE: &str = "0123456789abcdef0123456789abcdef01234567";
 const MEMBERS: [&str; 3] = [
@@ -69,7 +69,7 @@ impl Fixture {
             r#"#!/bin/bash
 case "$*" in
   --version) printf 'gh version %s (policy fixture)\n' "${GH_FIXTURE_VERSION:-2.102.0}"; exit 0 ;;
-  'api repos/neverhuman/dope/commits/dope-engine-v1.3.0 --jq .sha')
+  'api repos/neverhuman/dope/commits/dope-engine-v3.0.0 --jq .sha')
     printf '%s\n' "$@" >> "$GH_FIXTURE_LOG"
     printf '%s\n' "$GH_FIXTURE_SOURCE_SHA"; exit 0 ;;
   'attestation verify --help')
@@ -94,7 +94,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 case "$url" in
-  https://github.com/neverhuman/dope/releases/download/dope-engine-v1.3.0/*) source="$ENGINE_FIXTURE_SOURCE/${url##*/}" ;;
+  https://github.com/neverhuman/dope/releases/download/dope-engine-v3.0.0/*) source="$ENGINE_FIXTURE_SOURCE/${url##*/}" ;;
   https://github.com/neverhuman/dope/releases/download/v1.0.0/*) source="$MODEL_FIXTURE_SOURCE/${url##*/}" ;;
   *) exit 98 ;;
 esac

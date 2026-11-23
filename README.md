@@ -1,207 +1,128 @@
-# D.O.P.E.: Downstream Objective-Preserving Encoding
+# D.O.P.E. · Downstream Objective-Preserving Encoding
 
-**Compile a table into a tiny generative program that keeps what models learn from it.**
+**Compile a table into a compact program that preserves predictive structure.**
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai full-audit score snapshot](docs/readme/jankurai.svg)](https://github.com/neverhuman/dope/actions/workflows/jankurai.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Engine: pure Rust](https://img.shields.io/badge/engine-pure%20Rust-orange.svg)](engine/)
-
-Recorded hosted full-audit report: **88/100 (pass)** with the pinned auditor at [source `bb6069c9`](https://github.com/neverhuman/dope/commit/bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93), with a clean source tree and zero caps, HIGH or critical findings ([hash-only witness](docs/plans/next-version/dope/receipts/hosted-audit-bb-snapshot.json)). The [audit job](https://github.com/neverhuman/dope/actions/runs/41699460421/job/126138603944) failed its final check against the previous 87-point badge; this snapshot copies the genuine generated 88-point artifact. Later commits require their own fresh exact-head check. Historical [earlier hosted](docs/plans/next-version/dope/receipts/hosted-audit-1811-snapshot.json) and [earlier local](docs/plans/next-version/dope/receipts/jankurai-451-snapshot.json) witnesses remain preserved.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v3-dark.svg">
-  <img alt="DOPE v3.0.0 scoreboard: twin-referenced gap (TRG) against artifact bytes on a log axis for DOPE v3.0.0 auto-v8, the DOPE v2.0.0 and v1.3.0 encoders, the V7 single encoding, the analytic DSE8 packet and the copy and bootstrap controls; every point comes from the committed DEV report receipt." src="bench/real-world/figures/hero-v3-light.svg">
+  <img alt="DEV scoreboard showing transfer with uncertainty against artifact bytes for auto-v8, earlier encoders and real-row controls." src="bench/real-world/figures/hero-v3-light.svg">
 </picture>
 
-DOPE reads a table and writes a few-kilobyte **program**: a standard
-[safetensors](https://github.com/huggingface/safetensors) (`Format 1`) program, a `Format 2` program or a
-V7 single-encoding packet that summarises each column's distribution, how the columns move
-together, and how the declared target depends on them. It stores no source rows. Train
-downstream learners only on rows sampled from the program, score them on held-out *real* rows,
-and across public regression, binary, and multiclass tables the sampled rows preserve the
-predictive structure that learners need.
+DOPE `v3.0.0` adds `dope fit --format auto-v8`. It fits the calibrated analytic DSE8
+packet and the `Format 1` program, compares them on a grouped two-fold split of
+the fit rows, then packs the selected program within the complete byte budget.
+The artifact contains zero source rows. `dope sample` generates synthetic rows
+from the artifact on a recipient CPU.
 
-**New in v2.0.0**
+- `v3.0.0` adds typed DSE8 distributions, calibrated conditionals and grouped route selection with `auto-v8`.
+- `v2.0.0` introduced `auto` selection between `Format 1` and a V7 packet. The current CLI reads V7 artifacts.
+- `v1.3.0` and earlier use `Format 1` and historical artifact readers. Plain `dope fit` still defaults to `Format 1`.
 
-- **`dope fit --format auto`.** Per table, DOPE fits both the `Format 1` program and the V7 single
-  encoding within one byte budget, scores each on an internal duplicate-grouped split of your
-  rows, and keeps V7 only when its internal retention is higher by a fixed margin (otherwise
-  `Format 1`); when only one fits, it keeps that one. The stored artifact is the candidate fitted
-  on all rows, and `dope sample` reads either kind by its file magic.
-- **Rust-only V7 inference.** The trained V7 `SafeTensors` checkpoint is compiled into the `dope`
-  binary, so fitting and sampling a V7 packet need no Python and no LibTorch.
-- **Byte budgets that hold.** `--format auto` keeps the whole file, header included, within
-  `--budget` (default `--budget 2k`); `--format 2` refuses an artifact over its requested budget
-  instead of writing it.
-- **The `dope_kpi` scoreboard.** Every arm is scored on the same cells by the twin-referenced gap
-  (TRG), with a stratified family bootstrap, Holm-adjusted comparisons, guards (per-task bounds,
-  held-out MLP, realism and empirical privacy coverage, exact copies, bytes) and a pre-registered
-  selection and one-look confirmation ([results](#results-v200-scoreboard)).
+## Results
 
-<details>
-<summary><strong>Earlier highlights (v1.0.0 models, landmarks, TDL and the pure-Rust CLI)</strong></summary>
+The frozen DEV report shows higher twin-referenced gap (TRG) for `auto-v8`
+than `v2.0.0` `auto`. The figure and table show the paired lift, uncertainty
+and complete artifact sizes. Higher TRG means better downstream transfer.
 
-- **Top-ranked across diverse learners.** Across regression and classification tables
-  (`CatBoost`, local gated attention, `LightGBM`, `XGBoost`, `MLP`, and linear/logistic
-  auditors), **`DOPE-MLC-v2`** ranks first overall in Bradley–Terry Elo and beats both
-  parametric generators and raw row subsampling at compact byte caps.
-- **Multi-level byte-budgeted capacity (`DOPE-MLC-v2` & `DOPE-MLC-v3`).** One forward pass
-  emits nested tiers (`Small`, `Medium`, `High`, `Ultra`) conditioned on train-only CV
-  landmarks and inter-landmark attention ([study](docs/multilevel-landmark-dl-study.md)).
-- **Optional and progressive landmarks.** `dope mlc-v3 encode --landmark-mode none|fast|progressive|full`
-  feeds the pinned `High` encoder with no landmarks (`fast` aliases `none`), progressive groups on a stratified subsample (`zero → macro → larger` updating the eighteen `High` slots, then `fine` completing native spectrum verification while keeping the five fine slots masked at `High`), or full conditioning. Missing landmarks are masked, never synthesized ([qualification record](docs/optional-landmarks-qualification.md)); `dope_core::mlc_v3` also exposes level-verified `Ultra` encodings and `PacketFeaturesV1`.
-- **One number to chase: TDL.** *Transfer Description Length* is the smallest tested
-  artifact whose samples keep a target share of the predictive gain for every model family.
-- **Pure-Rust single binary, `SafeTensors` weight cache & colorful CLI.** Fitting, inspection,
-  evaluation, and `SafeTensors` sampling run natively on CPU in pure Rust, with TTY-aware ANSI
-  styling (`--color auto|always|never`) and SHA-verified `SafeTensors` weight caching
-  (`dope mlc-v3 fetch-weights`).
+**Promotion decision is HOLD.** The regression lower bound, held-out MLP,
+realism coverage and empirical privacy coverage missed their thresholds.
+The report measures fresh row splits of families used in development. This is
+an uncertified engine release.
+[Scoreboard protocol and receipts](bench/real-world/results/scoreboard/v3.0.0/README.md)
 
-</details>
+<!-- BEGIN DOPE1 SCOREBOARD -->
+<!-- Generated by dope_kpi render-readme from dope.kpi-receipt/v2 receipts; do not edit. -->
+| Arm | Class | Bytes median / max / share <= 2048 B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Realism / privacy / copies mean (max) | Failed / cells |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `dope-v3b-auto-v8` | source_free | 1787 / 2048 / 1.000 | -0.121 [-0.189, -0.049] | -0.137 (4) | -0.136 (3) | -0.089 (4) | 0.942 / 0.916 / 0.792 | 0.967 | 0.194 / 0.688 / 0.000 (0.000) | 0 / 44 |
+| `dope-2.0.0-auto` | source_free | 1817.5 / 2048 / 1.000 | -0.181 [-0.280, -0.085] | -0.118 (4) | -0.278 (3) | -0.146 (4) | 0.939 / 0.917 / 0.792 | 0.958 | 0.306 / 0.719 / 0.000 (0.001) | 0 / 44 |
+| `dope-2.0.0-small` | source_free | 1508 / 2043 / 1.000 | -0.267 [-0.402, -0.133] | -0.250 (4) | -0.438 (3) | -0.112 (4) | 0.918 / 0.915 / 0.865 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
+| `dope-1.3.0-small` | source_free | 1508 / 2043 / 1.000 | -0.266 [-0.399, -0.133] | -0.249 (4) | -0.438 (3) | -0.109 (4) | 0.912 / 0.915 / 0.798 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
+| `pr390-v7-step0` | source_free | 782.5 / 2026 / 1.000 | -0.432 [-0.585, -0.273] | -0.102 (4) | -0.545 (3) | -0.648 (4) | 0.896 / 0.840 / 0.728 | 0.986 | 0.194 / 0.774 / 0.000 (0.001) | 0 / 44 |
+| `dse8-p0-v3b` | source_free | 867.5 / 2048 / 1.000 | -0.342 [-0.652, -0.103] | -0.094 (4) | -0.276 (3) | -0.655 (4) | 0.950 / 0.942 / 0.741 | 0.977 | 0.194 / 0.753 / 0.000 (0.000) | 0 / 44 |
+| `twin_c` | control | - | -0.060 [-0.060, -0.060] | -0.074 (1) | - | -0.046 (1) | 0.997 / 0.993 / 0.974 | 0.522 | - / - / - | 0 / 8 (36 n/a) |
+| `copy_a` | control | - | -0.039 [-0.069, -0.014] | -0.017 (4) | -0.056 (3) | -0.045 (4) | 1.000 / 1.000 / 1.000 | 0.530 | - / - / - | 0 / 44 |
+| `bootstrap_a` | control | - | -0.088 [-0.147, -0.036] | -0.085 (4) | -0.039 (3) | -0.139 (4) | 0.995 / 0.995 / 0.991 | 0.572 | - / - / - | 0 / 44 |
+| `indep_marginals` | control | - | -1.222 [-1.387, -1.095] | -1.135 (4) | -1.381 (3) | -1.149 (4) | -0.157 / -0.011 / -0.334 | 0.967 | - / - / - | 0 / 44 |
+| `label_shuffle` | control | - | -1.164 [-1.269, -1.063] | -1.235 (4) | -1.004 (3) | -1.251 (4) | -0.105 / -0.004 / -0.208 | 0.687 | - / - / - | 0 / 44 |
 
-Each generated block below is a byte-for-byte copy of its renderer's output
-([`dope_kpi render-readme`](bench/real-world/results/scoreboard/v3.0.0/README.md),
-[`bench/real-world/render.py`](bench/real-world/render.py),
-[`examples/adult/walkthrough.py`](examples/adult/walkthrough.py)), checked by
-[`tools/claims/dope1.py`](tools/claims/dope1.py).
+| Comparison | Delta TRG [95% CI] | Holm p (m) | Guards | Sign-flip PROMOTE | Outcome |
+|---|---:|---:|---|---:|---|
+| `dope-v3b-auto-v8` vs `dope-2.0.0-auto` | +0.060 [+0.009, +0.114] | 0.009 (1) | tasks -0.053 FAIL; mlp -0.007 FAIL; realism -0.111 FAIL; privacy -0.031 FAIL; copies 0.000 (0.000) pass; bytes 2048 pass | 0.000 | **HOLD** |
 
-<details>
-<summary><strong>Choose Your DOPE Surface: CLI, Rust SDK, Normalize-Once Intake & Downstream Embeddings</strong></summary>
+Contract `dope-kpi/v2` (embedded, candidate) sha256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623`; panel `all`; receipt sha256 `55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba`, `5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49`.
+<!-- END DOPE1 SCOREBOARD -->
 
-| Goal | Recommended Surface | Key Property |
-| :--- | :--- | :--- |
-| **Compile any CSV into a compact synthetic-row generator** | `dope fit` (`--format 1`, `--format 2`, `--format auto` or `--format auto-v8`) / `dope sample` / `dope mlc-v3` ([`engine/dope-cli`](engine/dope-cli/)) | Pure Rust, explicit `--target`, zero source rows stored; the binary embeds the V7 weights for `--format auto` |
-| **Score generators on the v3.0.0 scoreboard** | `dope_kpi` ([`engine/dope-arena`](engine/dope-arena/)) and [the scoreboard receipts](bench/real-world/results/scoreboard/v3.0.0/README.md) | TRG with a family bootstrap, Holm-adjusted comparisons, guards and a pre-registered promotion rule |
-| **Embed fit tables into downstream meta-learners / routers** | `dope_core::mlc_v3` (`encode_features_629`, `encode_research_view_629`, `packet_features_v1_from_encoding`) & [`docs/jopedime-integration.md`](docs/jopedime-integration.md) | Pinned `High` (`d0b69603…`) + level-verified `Ultra` & `PacketFeaturesV1` with Rust/Python parity |
-| **Normalize external CSVs once under target-last FIT custody** | [`engine/dope-sdk/`](engine/dope-sdk/) (`dope-sdk`) & [`engine/dope-norm`](engine/dope-norm/) (`NC1`) | Single canonical intake; rejects downstream schema/header drift |
-| **Reproduce the multi-learner paper & Elo tournament** | [`bench/real-world/`](bench/real-world/) & `bash paper/build.sh` ([`paper/dope1.tex`](paper/dope1.tex)) | Regenerated directly from committed SHA-verified receipts |
+## Quick start
 
-</details>
-
-## Quick start: Install, Get Weights & Run Inference
-
-<!-- BEGIN DOPE1 QUICKSTART -->
-### Step One — Install `dope` (Pure-Rust Single Binary)
+Install the [signed Linux x86-64 engine](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0)
+with `gh v2.102.0` or newer. The installer verifies `SHA256SUMS` and the
+GitHub/Sigstore signer, tag and source commit before installing.
 
 ```bash
-# Option A: Verified installer (default signed Engine 1.3.0, gh >= 2.102.0, independent v1.0.0 models,
-#           installs ~/.local/bin/dope and caches verified SafeTensors weights in ~/.cache/dope/weights/)
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash
-# Signed engine plus independently pinned models (requires gh >= 2.102.0):
-# curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --tag dope-engine-v1.3.0 --model-tag v1.0.0
-# Add --no-weights for engine-only installation.
-
-# Option B: Legacy v1.0.0 Linux x86-64 binary + SHA256SUMS content-integrity check
-curl -fsSLO https://github.com/neverhuman/dope/releases/download/v1.0.0/dope-linux-x86_64
-curl -fsSLO https://github.com/neverhuman/dope/releases/download/v1.0.0/SHA256SUMS
-grep " dope-linux-x86_64$" SHA256SUMS | sha256sum -c -
-chmod +x dope-linux-x86_64 && install -Dm755 dope-linux-x86_64 ~/.local/bin/dope
-
-# Option C: Build from source (includes the v2.0.0 dope fit --format auto and the latest interactive TTY summaries on main)
-cargo install --locked --path engine/dope-cli
-```
-
-```shell
-● DOPE Installer · concrete release tag dope-engine-v1.3.0 · repo neverhuman/dope
-✓ Installed ~/.local/bin/dope (sha256: 9f8562a16ebffbd2…)
-  notices       ~/.local/share/dope-engine/{LICENSE,THIRD_PARTY_NOTICES,BUILDINFO.json}
-  weights       ~/.cache/dope/weights/dope_mlc_v3_multitask_best.safetensors (1781800 B, sha256: d0b6960328d19553…)
-  sample wire   ~/.cache/dope/weights/packet_high_regression.dml3 (2327 B, sha256: 975d3504e01f526c…)
-  model verification  tag v1.0.0 · sha256-content-integrity-only (independent model inventory; no model attestation claimed)
-  verification  sigstore-oidc-attestation + sha256-content-integrity (verified against neverhuman/dope/.github/workflows/engine-release.yml @ refs/tags/dope-engine-v1.3.0 [cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b])
-```
-
-*Release & attestation provenance:* [`scripts/install.sh`](scripts/install.sh) defaults
-the binary to `dope-engine-v1.3.0` (`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`) and models independently to `v1.0.0`. The previous signed tag `dope-engine-v1.2.0` remains `5fc96f2819a97ed313658c336a9a46e637299352`. The installer keeps `dope-engine-v1.3.0`, which has no `--format auto`, until a signed `dope-engine-v2.0.0` release exists; build from source (Option C) to use the v2.0.0 encoder. Explicit
-`--tag v1.0.0` remains supported. Signed `dope-engine-v*` tags require `gh >= 2.102.0`
-and the repository, signer-workflow, source-ref, source-digest and format policy flags;
-unsupported clients fail before any download or installation. Upgrade from the
-[GitHub CLI releases](https://github.com/cli/cli/releases/tag/v2.102.0). Engine verification
-has no unsigned fallback. Models have an independent `--model-tag` (default `v1.0.0`
-for signed engine tags, otherwise the binary tag), checksum inventory and matching
-`MODEL_MANIFEST.json.release_tag`. Model content-integrity checks do not claim OIDC
-attestation. Offline split installation uses `--from-dir ENGINE_DIR --model-from-dir
-MODEL_DIR`; no download or tag relabeling fills a missing offline model release.
-A legacy one-directory offline package with no model members remains engine-only
-unless models were explicitly requested. Partial model packages fail. `--no-weights`
-skips all model access. All integrity, required engine attestation and staged smoke
-checks finish before installation creates destinations.
-
-### Step Two — Get Pre-Trained `SafeTensors` Weights (Zero Python/LibTorch)
-
-If you installed only the binary (Option B or Option C, or `install.sh --no-weights`), fetch and SHA-256 verify the pinned `DOPE-MLC-v3` `SafeTensors` hypernetwork and companion `DML3+CSC1` wire fixture in one command:
-
-```bash
-dope mlc-v3 fetch-weights --preset multitask --tag v1.0.0   # or: --preset maxtrain97 | all
-dope mlc-v3 inspect-weights --preset multitask   # resolves automatically from ~/.cache/dope/weights/
-```
-
-```shell
-✓ verified 2 asset(s) for release tag v1.0.0 -> ~/.cache/dope/weights
-  • dope_mlc_v3_multitask_best.safetensors       1781800 B  sha256:d0b6960328d19553…
-  • packet_high_regression.dml3                     2327 B  sha256:975d3504e01f526c…
-  verification: sha256-content-integrity + SafeTensors/DML3 structural check (not a cryptographic signature/attestation)
-
-● ~/.cache/dope/weights/dope_mlc_v3_multitask_best.safetensors  1,781,800 bytes (56 tensors · 444,168 parameters)
-  format       dope-mlc-v3-safetensors
-  runtime      rust-candle-cpu · 0 Python/LibTorch deps
-  sha256       d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c
-```
-
-### Step Three — Run Inference: Compile, Inspect, Sample & Audit (`--color auto|always|never`)
-
-```bash
-# Workflow A — Any CSV table -> .dope program (explicit --target declaration required; 0 source rows stored):
-awk 'BEGIN{print "x1,x2,y";for(i=0;i<300;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a","b","2*a+b*b}}' > train.csv
-awk 'BEGIN{print "x1,x2,y";for(i=300;i<400;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a","b","2*a+b*b}}' > test.csv
-dope fit train.csv --target y -o model.dope
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --no-weights
+dope doctor
+dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
 dope inspect model.dope
 dope sample model.dope -n 1000 -o synthetic.csv
-dope eval -m model.dope --train train.csv --test test.csv
-
-# Workflow B — Pre-trained DOPE-MLC-v3 SafeTensors + DML3+CSC1 wire packet -> synthetic CSV in 100% Rust:
-dope mlc-v3 inspect-wire --wire ~/.cache/dope/weights/packet_high_regression.dml3
-dope mlc-v3 sample --preset multitask \
-  --wire ~/.cache/dope/weights/packet_high_regression.dml3 -n 1024 --seed 42 -o syn_v3.csv
-
-# Workflow C — Any CSV table -> pinned 629-D DOPE-MLC-v3 encoding, with optional landmarks (JSON lines):
-dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode none --json        # no landmark probes (alias: fast)
-dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode progressive --json # one record per landmark stage
-dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode full --json        # released full-report conditioning
 ```
 
-```shell
-✓ compiled train.csv -> model.dope  (764 / 4,096 bytes) [██░░░░░░░░░░] 18.7%
-  task         regression · 300 rows × 2 features · 0 source rows stored
-  self-audit   robust retention 0.996 (≥T90) (linear and tree auditors trained on samples, scored on held-out training rows)
-✓ sampled 1,000 synthetic rows (2 features, target `y`, raw space) from model.dope -> synthetic.csv
+Use a CSV with an explicitly declared target and follow the
+[target-last data contract](docs/data-contract.md). One CPU Rust executable
+fits, inspects and samples the program. The analytic path requires no external
+weights, Python or LibTorch at runtime. The native `--v8-weights` interface loads
+an explicit SafeTensors checkpoint for a compatible neural artifact. Historical
+MLC SafeTensors assets have an [independent model tag](https://github.com/neverhuman/dope/releases/tag/v1.0.0).
 
-● ~/.cache/dope/weights/packet_high_regression.dml3  2,327 / 16,384 bytes (DML3 · tier `high`) [██░░░░░░░░░░] 14.2%
-  task         regression (continuous target) · 96 train rows × 8 features · 0 source rows stored
-  encoding     code_width = 8192 · v3_primitives = true · csc1_scaler = true
-  integrity    within_tier_cap = true · crc32 = 0x10c35674 · flags = 0x01
-✓ sampled 1,024 synthetic rows (8 features + target, raw space) from packet_high_regression.dml3 (DML3 · high · 2,327 B) -> syn_v3.csv
-```
+[Verify a downloaded package](docs/signed-engine-release.md#verify-before-install)
+· [Build from source](docs/signed-engine-release.md#build-and-package)
 
-*v3.0.0 release encoder* (`--format auto-v8`; `--format auto` is the v2.0.0 encoder):
+## Qualify a packet for your table
 
-```bash
-# Workflow D — Format 1 or the analytic DSE8 packet, whichever wins the internal grouped two-fold check;
-# the whole file, header included, stays within --budget (default 2k = 2048 bytes):
-dope fit train.csv --target y --format auto-v8 -o auto.dope
-dope sample auto.dope -n 1000 -o synthetic_auto.csv   # reads the DPA1 container by its file magic
-```
+Choose the target before splitting the table. Keep physical duplicates in the
+same split so the downstream evaluation measures transfer to new rows. Reserve
+real evaluation rows and fit the packet on the remaining rows. To choose a byte
+budget for your workload, `dope frontier` fits candidates at declared budgets and
+reports their held-out retention. `dope eval` measures a chosen artifact against
+real training and test tables. It reports linear and boosted-tree auditor results
+so you can see which learner benefits from the encoding.
 
-*Terminal & contract behavior:* In an interactive terminal (`stdout` is a TTY) or with `--color always`, `dope` renders ANSI color badges (`≥T90`, `≥D80`), byte-budget bars (`[██░░░░░░░░░░]`), and file-write confirmations (building from `main` includes the interactive `inspect-weights`, `inspect-wire`, `sample -o`, and `frontier` summaries above; the prebuilt `v1.0.0` binary always emits JSON on `inspect-weights` and `inspect-wire`). When `stdout` is piped/redirected, or with `--color never`, `NO_COLOR=1`, or `--json`, `dope` emits plain text or exact JSON and **never** prints status notices onto CSV/JSON `stdout`. All tables require an explicit `--target <COLUMN>` declaration (`dope mlc-v3` supports up to `p_use <= 64` features and regression, binary, or multiclass `K <= 16` targets); storing zero source rows is an architectural property, not formal-DP and not HIPAA de-identification.
-<!-- END DOPE1 QUICKSTART -->
+Read the scoreboard comparison together with the arm rows. TRG compares a learner
+trained on synthetic rows with one trained on a separate real sample. The
+per-task columns show how that gap varies across regression and classification.
+The held-out MLP column checks transfer to a learner outside the primary score.
+C2ST measures how easily a classifier distinguishes synthetic rows from real
+ones. The copy and coverage columns describe the empirical checks on the same
+split. The evidence status for the joint driver gate is **cross-model feature-driver
+preservation: not yet measured**. Per-learner driver results from the earlier
+multilevel study have their own evaluation and receipts.
 
-### Real-World Example: UCI Adult Census Income & Head-to-Head Comparison
+Use `dope inspect` to check the format and complete artifact size before handing
+it to a recipient. The recipient can set a sampling seed and choose a row count
+from that file on a compatible runtime. Keep the installed engine version and
+any required weight identity with the artifact. Schema and fitted summaries can
+carry information about the input. Treat artifacts as derived data and apply
+your normal data-handling rules to them.
 
-A real public table (UCI Adult, `CC-BY-4.0`, eight categorical columns, binary target
-`income`), from download to holdout retention (`v1.0.0`) and a head-to-head comparison against raw rows,
-adversarial random forests, Gaussian copula, and bootstrap
-([`examples/adult/walkthrough.py`](examples/adult/walkthrough.py)):
+## Documentation
+
+- [Current white paper](docs/whitepaper-v3/) and [independent verification](docs/plans/v3-major/verification/).
+- [Rust SDK](engine/dope-sdk/), [native CLI](engine/dope-cli/), and [downstream integrations](docs/jopedime-integration.md).
+- [Benchmark](docs/benchmark.md), [metric definitions](docs/metric.md), and [claims policy](docs/claims-policy.md).
+- [Previous scoreboard](bench/real-world/results/scoreboard/v2.0.0/README.md) and [changelog](CHANGELOG.md).
+- [Historical manuscript](paper/dope1.tex), [supplement](paper/dope1-supplement.tex), and [result archive](HISTORY.md).
+
+The [release procedure](docs/release.md) describes the scientific certification
+and publication gates. The signed package documentation explains the verification
+commands and the deliverable inventory.
+
+<details>
+<summary>Historical examples and benchmark results</summary>
+
+The following recorded experiments are from earlier versions.
 
 <!-- BEGIN DOPE1 WALKTHROUGH -->
 <!-- Generated by examples/adult/walkthrough.py --record; do not edit. -->
@@ -309,47 +230,6 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 *Aggregation & auditor disclosure:* The first row reports the standalone Rust `dope eval` command above (`--factor 4.0`, capped at `50,000` synthetic rows, using `dope-core`'s built-in Rust logistic, histogram-GBDT, and candle-MLP auditors). All remaining rows come directly from `bench/real-world/results/confirm/summary.json` and `records.jsonl` using the external Python benchmark auditors (`LogisticRegression`, `CatBoostClassifier`, `MLPClassifier`), where 3-seed rows report the per-column median across `seed = 0, 1, 2` and `robust` reports $\text{median}_s(\min_f R_{s,f})$ (alongside the seed range and $\min_f(\text{median}_s R_{s,f})$ when they differ, as on `arf@-`: `0.866` vs. `0.874`).
 <!-- END DOPE1 WALKTHROUGH -->
 
-## Results: v3.0.0 Scoreboard
-
-*DEV estimate, not a sealed test:* one pre-registered look at fresh row splits of the DEV
-tables, scored by `dope_kpi` after the encoder was selected on other splits of the same tables;
-no CONFIRM look was taken. Read the guard columns with the headline: TRG improves over
-`--format auto`, the promotion rule's outcome is HOLD, and each failing guard is listed.
-[TRG](bench/real-world/results/scoreboard/v3.0.0/README.md#trg-the-twin-referenced-gap)
-is the twin-referenced gap; the [v2.0.0 scoreboard](bench/real-world/results/scoreboard/v2.0.0/README.md) is kept.
-
-<!-- BEGIN DOPE1 SCOREBOARD -->
-<!-- Generated by dope_kpi render-readme from dope.kpi-receipt/v2 receipts; do not edit. -->
-| Arm | Class | Bytes median / max / share <= 2048 B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Realism / privacy / copies mean (max) | Failed / cells |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `dope-v3b-auto-v8` | source_free | 1787 / 2048 / 1.000 | -0.121 [-0.189, -0.049] | -0.137 (4) | -0.136 (3) | -0.089 (4) | 0.942 / 0.916 / 0.792 | 0.967 | 0.194 / 0.688 / 0.000 (0.000) | 0 / 44 |
-| `dope-2.0.0-auto` | source_free | 1817.5 / 2048 / 1.000 | -0.181 [-0.280, -0.085] | -0.118 (4) | -0.278 (3) | -0.146 (4) | 0.939 / 0.917 / 0.792 | 0.958 | 0.306 / 0.719 / 0.000 (0.001) | 0 / 44 |
-| `dope-2.0.0-small` | source_free | 1508 / 2043 / 1.000 | -0.267 [-0.402, -0.133] | -0.250 (4) | -0.438 (3) | -0.112 (4) | 0.918 / 0.915 / 0.865 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
-| `dope-1.3.0-small` | source_free | 1508 / 2043 / 1.000 | -0.266 [-0.399, -0.133] | -0.249 (4) | -0.438 (3) | -0.109 (4) | 0.912 / 0.915 / 0.798 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
-| `pr390-v7-step0` | source_free | 782.5 / 2026 / 1.000 | -0.432 [-0.585, -0.273] | -0.102 (4) | -0.545 (3) | -0.648 (4) | 0.896 / 0.840 / 0.728 | 0.986 | 0.194 / 0.774 / 0.000 (0.001) | 0 / 44 |
-| `dse8-p0-v3b` | source_free | 867.5 / 2048 / 1.000 | -0.342 [-0.652, -0.103] | -0.094 (4) | -0.276 (3) | -0.655 (4) | 0.950 / 0.942 / 0.741 | 0.977 | 0.194 / 0.753 / 0.000 (0.000) | 0 / 44 |
-| `twin_c` | control | - | -0.060 [-0.060, -0.060] | -0.074 (1) | - | -0.046 (1) | 0.997 / 0.993 / 0.974 | 0.522 | - / - / - | 0 / 8 (36 n/a) |
-| `copy_a` | control | - | -0.039 [-0.069, -0.014] | -0.017 (4) | -0.056 (3) | -0.045 (4) | 1.000 / 1.000 / 1.000 | 0.530 | - / - / - | 0 / 44 |
-| `bootstrap_a` | control | - | -0.088 [-0.147, -0.036] | -0.085 (4) | -0.039 (3) | -0.139 (4) | 0.995 / 0.995 / 0.991 | 0.572 | - / - / - | 0 / 44 |
-| `indep_marginals` | control | - | -1.222 [-1.387, -1.095] | -1.135 (4) | -1.381 (3) | -1.149 (4) | -0.157 / -0.011 / -0.334 | 0.967 | - / - / - | 0 / 44 |
-| `label_shuffle` | control | - | -1.164 [-1.269, -1.063] | -1.235 (4) | -1.004 (3) | -1.251 (4) | -0.105 / -0.004 / -0.208 | 0.687 | - / - / - | 0 / 44 |
-
-| Comparison | Delta TRG [95% CI] | Holm p (m) | Guards | Sign-flip PROMOTE | Outcome |
-|---|---:|---:|---|---:|---|
-| `dope-v3b-auto-v8` vs `dope-2.0.0-auto` | +0.060 [+0.009, +0.114] | 0.009 (1) | tasks -0.053 FAIL; mlp -0.007 FAIL; realism -0.111 FAIL; privacy -0.031 FAIL; copies 0.000 (0.000) pass; bytes 2048 pass | 0.000 | **HOLD** |
-
-Contract `dope-kpi/v2` (embedded, candidate) sha256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623`; panel `all`; receipt sha256 `55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba`, `5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49`.
-<!-- END DOPE1 SCOREBOARD -->
-
-## Historical v1.0.0 Study: `DOPE-MLC-v2` & `DOPE-MLC-v3`
-
-<details>
-<summary><strong>Historical v1.0.0 hero figure</strong></summary>
-
-![Historical v1.0.0 hero: overall multi-auditor tournament Elo and holdout retention by byte-budget tier across the thousand-dataset benchmark, DOPE (v1.0.0) against raw row subsampling, Gaussian copula, tabular diffusion, and adversarial random forests.](bench/real-world/figures/hero.png)
-
-</details>
-
 <!-- BEGIN DOPE1 RESULTS -->
 <!-- Generated by bench/real-world/render.py from results/multilevel-convergence-snapshot.json; do not edit. -->
 ### 1,000-Dataset Method Comparison (`DOPE-MLC-v2`, `v1.0.0`) & 1,069-Dataset Multi-Task Expansion (`DOPE-MLC-v3`, `v1.0.0`)
@@ -395,194 +275,8 @@ Contract `dope-kpi/v2` (embedded, candidate) sha256 `200ea0ed1ba23a25be89de2dac2
 *Scope & provenance:* All `1,000`-dataset `DOPE-MLC-v2` (`65,874` auditor fits) and `1,069`-dataset `DOPE-MLC-v3` (`4,276` cells) benchmarks are selection-exposed development/reconciliation evaluations (`untouched_sealed_confirmatory_test = false`) measured on the preserved `dope_mlc_v2_s3_best.pt`, `dope_mlc_v2_disjoint1000_best.pt`, and `dope_mlc_v3_multitask_best.pt` checkpoints (local gated attention nets `_TabularKumoAttentionNet` / `_LocalGatedAttentionNet` are trained from scratch per table; official pretrained KumoTabular/TabPFN is not evaluated). Full round-by-round `R0..R8` tables, cohort breakdowns, and SHA-256 receipts: [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md) and [bench/real-world/results/multilevel-convergence-snapshot.json](bench/real-world/results/multilevel-convergence-snapshot.json).
 <!-- END DOPE1 RESULTS -->
 
-Protocol, datasets, baselines and every per-table record: [bench/real-world](bench/real-world/) and [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md).
-The v1.0.0 white paper is [paper/dope1.tex](paper/dope1.tex) (`bash paper/build.sh` builds `target/paper/dope1.pdf` and `target/paper/dope1-supplement.pdf`); the v2.0.0 white paper is [docs/whitepaper-v2/](docs/whitepaper-v2/).
-
-<details>
-<summary><strong>Pre-Trained Model Zoo (`v1.0.0` Release), Built-In SafeTensors Fetch & CLI Options</strong></summary>
-
-All pre-trained `DOPE-MLC-v3` and `DOPE-MLC-v2` neural checkpoints, the sample `High`-tier `DML3+CSC1` wire packet (`packet_high_regression.dml3`), `MODEL_MANIFEST.json`, and `SHA256SUMS` are published on [GitHub Release `v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0). The `dope` binary includes pinned `SHA-256` digests for both `SafeTensors` hypernetworks and can fetch and verify them directly:
-
-```bash
-# 1. Fetch & verify pinned DOPE-MLC-v3 SafeTensors weights into ~/.cache/dope/weights/
-dope mlc-v3 fetch-weights --preset multitask
-
-# 2. Inspect weights & sample synthetic CSV rows in 100% pure Rust (--weights resolves automatically from cache!)
-dope mlc-v3 inspect-weights --preset multitask
-dope mlc-v3 inspect-wire --wire ~/.cache/dope/weights/packet_high_regression.dml3
-dope mlc-v3 sample --preset multitask \
-  --wire ~/.cache/dope/weights/packet_high_regression.dml3 -n 1024 --seed 42 -o syn.csv
-
-# 3. Pre-trained model catalog on https://github.com/neverhuman/dope/releases/download/v1.0.0/<Asset>:
-# - dope_mlc_v3_multitask_best.safetensors  (1.70 MiB, sha256 d0b6960328d1...): Primary DOPE-MLC-v3 (A3, 56 F32 tensors, 444,168 params, 256-d router); pure-Rust `dope mlc-v3` & Python `MultiLevelLandmarkModel`; verified 0.8184 mean val score on 288 canonical 6-auditor cells.
-# - dope_mlc_v3_maxtrain97_best.safetensors (1.70 MiB, sha256 9f7b5560e930...): DOPE-MLC-v3 <5%-Val MaxTrain (R8*, 2,229/2,304 train cells, 3.26% val, 0 eval overlap); pure-Rust `dope mlc-v3` & Python `MultiLevelLandmarkModel`; verified 0.8407 val retention.
-# - dope_mlc_v3_multitask_best.pt           (1.72 MiB, sha256 a36510b9e630...): PyTorch state_dict for DOPE-MLC-v3 (A3, 256-d router `MultiLevelLandmarkModel`).
-# - dope_mlc_v3_maxtrain97_best.pt          (1.73 MiB, sha256 77ffb94f5006...): PyTorch state_dict for DOPE-MLC-v3 <5%-Val MaxTrain (R8*, 256-d router `MultiLevelLandmarkModel`).
-# - dope_mlc_v2_disjoint1000_maxtrain97_best.pt (1.74 MiB, sha256 3886676a1f86...): DOPE-MLC-v2 Disjoint-1,000 <5%-Val (R5*, 256-d router `MultiLevelLandmarkModel`, 1,930 train / 71 val DS, 0 eval overlap); verified 0.8698 val retention.
-# - dope_mlc_v2_s3_maxtrain97_best.pt       (1.74 MiB, sha256 11e64c63270a...): DOPE-MLC-v2 Full-Corpus <5%-Val (R8*, 256-d router `MultiLevelLandmarkModel`, 2,980 train / 93 val DS); verified 0.8926 val retention.
-# - dope_mlc_v2_disjoint1000_best.pt        (1.05 MiB, sha256 6fcc191a244f...): DOPE-MLC-v2 Strictly Disjoint-1,000 (legacy 3-level 140-d router / 145-d col_gate_head, 275,929 params); independently verified v2 exact-wire DML2 replay: 1629.5 Elo (#1), 98.27% retention across 1,000 DS (historical v1 descriptor-replay: 1650.7 Elo, 98.80% retention).
-# - dope_mlc_v2_s3_best.pt                  (1.05 MiB, sha256 1d5db98ffa43...): DOPE-MLC-v2 Pooled-1,000 Ep 7 (legacy 3-level 140-d router / 145-d col_gate_head, 275,929 params); independently verified v2 exact-wire DML2 replay: 1629.5 Elo (#1), 98.27% retention across 1,000 DS (historical v1 descriptor-replay: 1651.3 Elo, 98.81% retention).
-
-# 4. Additional engine subcommands & terminal color control
-dope --color always inspect adult.dope                                   # force ANSI color in pipes
-dope sample adult.dope -n 10000 --space ml -o ml.csv                     # one-hot + [0,1], ML-ready
-dope frontier --train train.csv --test test.csv -t income                # bytes vs retention, and TDL
-```
-
-`--budget 16k` buys a larger program; `--anonymize` replaces column names and labels
-with positional codes; `--device cuda` runs on a GPU. `--size small|medium|large` picks a
-preset cap; `--max-parameters N` caps stored values; `dope fit-tiers` builds all three sizes
-([details, Elo ranking](docs/model-sizes-and-elo.md)). Downstream `[B, 256] + [B, 64, 17] -> [B, 629]`
-embeddings (`dope_core::mlc_v3::{encode_features_629, encode_research_view_629}`, `PacketFeaturesV1`, and Python `DopeEncoder629`), `v1.0.0` SHA-256 weight pinning, and composite GPU/CPU runtime guide:
-[docs/jopedime-integration.md](docs/jopedime-integration.md). Scripting flags and signed Linux
-binaries: [engine/README.md](engine/README.md#recipes),
-[docs/signed-engine-release.md](docs/signed-engine-release.md).
 </details>
-
-<details>
-<summary><strong>Why DOPE: The "So What" & Comparison to Best Practices</strong></summary>
-
-| Practice | What Crosses the Wire | Primary Limitation Under Tight Byte Caps | How DOPE Compares |
-| :--- | :--- | :--- | :--- |
-| **Raw-Row Subsampling / Coresets** | Actual training records (`xz` / `zlib` compressed) | Estimation error scales as `O(1/k)` with stored row count; starves learners at compact budgets | Ships **zero source rows**; receiver draws unlimited synthetic rows (`N >> n`) from a smooth + tree teacher, beating compressed rows at tight budgets |
-| **Parametric Copulas & Graphical Models** | Marginal knots + correlation matrix | Elliptical score-space dependence misses nonlinear thresholds and multi-way feature interactions | Pairs a **regime mixture of Gaussian copulas** (exact marginals) with a **variable-projection residual network + boosted oblivious trees** for `P(Y|X)` |
-| **Deep Tabular Generators** (`TabSyn`, `TabDDPM`, `CTGAN`, `ARF`) | Megabytes of neural or forest parameters | Spends vast byte budgets modeling high-dimensional covariate noise `P(X)` with uncounted artifact size | **Target-first byte allocation**: theory proves `P(Y|X)` distortion enters holdout retention directly while `P(X)` error is suppressed by `N` |
-| **Single Fitted Predictor** | Weights for one specific model family | Locks the receiver to one architecture; prevents retraining, feature engineering, or multi-model ensembling | Emits a **generative sampling program** that trains *any* downstream learner (`CatBoost`, `LightGBM`, `XGBoost`, `MLP`, linear, local attention, foundation models) |
-
-</details>
-
-## How it works
-
-<details>
-<summary><strong>Program data flow: sender, trust boundary and receiver</strong></summary>
-
-```mermaid
-flowchart LR
-  subgraph SENDER["Sender / Compiler (reads D_fit once)"]
-    T[(table D_fit)] --> I[intake & CSC1]
-    I --> L[landmarks & xi]
-    L --> C[covariates Q_X: marginals + regime copula]
-    L --> Y[target Q_Y|X: net + oblivious trees + noise]
-    C & Y --> Q[bits: rate-distortion + self-audit split]
-  end
-  Q ==> B{{"TRUST BOUNDARY (receiver sees only program A)"}}
-  subgraph RECEIVER["Receiver / Sampler (zero raw rows)"]
-    A[[model.dope: Small/Med/High/Ultra]] --> S[Pure-Rust sampler]
-    S --> R[synthetic rows N]
-    R --> M[learners on D_test]
-  end
-  B ==> A
-```
-
-</details>
-
-A **`Format 1` program** has four parts:
-
-- **Intake & Landmarks** infer types, order categorical levels by target link, pool rare levels, scale numbers onto `[0, 1]`, and compute cross-validation landmarks and rank dependence (`xi`).
-- **Covariates (`Q_X`).** Quantile functions on a normal-score grid, joined by a regime mixture of Gaussian copulas that reproduces every marginal.
-- **Target (`Q_Y|X`).** A residual tanh network for smooth structure, boosted byte-coded *oblivious trees* for interactions, then calibrated noise or labels.
-- **Bytes.** A rate–distortion search sets bit depths; a *self-audit* picks the dependence/target split across nested `Small`, `Medium`, `High`, and `Ultra` envelopes.
-
-A **V7 single encoding** is a packet of quantized table statistics with its own scale card. The
-`SingleEncV7` network compiled into `dope` refines those statistics with column attention and
-decodes each synthetic row on its own from the packet, with seeded noise and no source rows.
-
-Details: [engine/README.md](engine/README.md), [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md), the [v2.0.0 white paper](docs/whitepaper-v2/) and the manuscript.
-
-## The KPI: Transfer Description Length
-
-Retention compares a model trained on synthetic rows with the same model trained on the
-real rows, both scored on untouched real rows:
-`R = (L_null − L_synthetic) / (L_null − L_real)`; the robust score keeps the worst model
-family. **TDL** is the smallest tested artifact (`KiB@T90/D80`) whose samples recover
-nine-tenths of the real-trained lift in every family (T90) and four-fifths of the
-real-trained feature-attribution agreement (D80). The multi-level study above reports both
-T90 retention and per-learner D80 Driver Fidelity, whereas standalone `dope eval` scores T90
-retention only ([docs/metric.md](docs/metric.md)).
-
-**Why this KPI.** For learners that converge on the synthetic distribution, retention
-under log-loss *is* the share of the predictive information `I(X;Y)` the program keeps
-(under squared loss, the share of `Var E[Y|X]`). TDL then estimates, on a grid of tested budgets,
-how many bytes a table's predictive information needs, and DOPE spends its bytes on the
-target model first. The v3.0.0 scoreboard ranks arms by
-[TRG](bench/real-world/results/scoreboard/v3.0.0/README.md#trg-the-twin-referenced-gap), the
-twin-referenced retention gap, rather than by TDL.
-
-## Use a DOPE artifact from Python
-
-<details>
-<summary><strong>Read a safetensors program (one tensor, a brotli stream)</strong></summary>
-
-A `Format 1` program is standard safetensors with one tensor, a brotli stream ([format](engine/README.md#the-artifact)):
-
-```python
-import json, brotli                      # pip install brotli safetensors
-from safetensors.numpy import load_file
-
-blob = brotli.decompress(load_file("model.dope")["dope"].tobytes())
-n = int.from_bytes(blob[:4], "little")
-program = json.loads(blob[4:4 + n])      # schema, structure, bit widths, section list
-```
-
-</details>
-
-## Repository map
-
-<details>
-<summary><strong>Top-level paths: engine, benchmark and scoreboard, papers, examples, research, docs</strong></summary>
-
-| Path | What it is |
-| --- | --- |
-| [`engine/`](engine/) | Pure-Rust `dope-core` (`MLC-v3`/`DML4`, `DVS`, research & `PacketFeaturesV1` views), `dope-norm` (`NC1`), `dope-arena` (`dope_kpi`), and `dope-cli` (`dope`) |
-| [`engine/dope-sdk/`](engine/dope-sdk/) | Versioned pure-Rust `dope-sdk` preparation and conditioning APIs |
-| [`bench/real-world/`](bench/real-world/) | Public-table benchmark: datasets, baselines, auditors, records, figures |
-| [`bench/real-world/results/scoreboard/`](bench/real-world/results/scoreboard/v3.0.0/README.md) | The v3.0.0 and v2.0.0 scoreboard receipts, README blocks and render manifests |
-| [`docs/whitepaper-v2/`](docs/whitepaper-v2/) | **The DOPE v2.0.0 White Paper** ([`dope-v2.tex`](docs/whitepaper-v2/dope-v2.tex)) and its generated macros |
-| [`paper/`](paper/) | **The DOPE v1.0.0 White Paper** ([`dope1.tex`](paper/dope1.tex) and [`dope1-supplement.tex`](paper/dope1-supplement.tex)) and generated benchmark macros/figures |
-| [`examples/`](examples/) | End-to-end walkthroughs ([`examples/adult/`](examples/adult/), [`examples/quickstart/`](examples/quickstart/)) |
-| [`rust/`](rust/), [`src/`](src/), [`research/`](research/) | Multi-level landmark study (`research/levels/`), transfer metric library (`research/transfer/`), and native kernel (`rust/`) |
-| [`docs/`](docs/) | Metric, claims policy, architecture, model sizes & Elo, audit and release notes |
-| [`AGENTS.md`](AGENTS.md) | Contributor and agent entrypoint |
-
-</details>
-
-## Scope
-
-The v2.0.0 scoreboard is a selection-exposed validation estimate from one pre-registered look
-at fresh row splits, and the v1.0.0 results are selection-exposed development validation, all on
-public tables; none is a sealed
-test or TDL result, and the TDL driver gate is not part of the standalone engine benchmark
-(cross-model feature-driver preservation: not yet measured; per-learner Driver Fidelity in the
-multi-level study is reported separately above).
-
-- Retention is measured on held-out real rows of public tables; your table may differ,
-  so measure it with `dope eval` before relying on a program.
-- Copy, membership and attribute checks, and the scoreboard's privacy coverage, are empirical
-  diagnostics, not formal differential privacy and not HIPAA de-identification. An engine
-  artifact keeps column names, category labels and quantiles unless you pass `--anonymize`;
-  treat it as derived private data.
-- Each program is conditioned on one declared target; other targets get their own program.
-
-## White Paper & Documentation
-
-- **The DOPE v2.0.0 White Paper:** [docs/whitepaper-v2/](docs/whitepaper-v2/) ([`dope-v2.tex`](docs/whitepaper-v2/dope-v2.tex) and its [compiled PDF](docs/whitepaper-v2/dope-v2.pdf)).
-- **The DOPE v1.0.0 White Paper:** [paper/dope1.tex](paper/dope1.tex) ([compiled PDF](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1.pdf)) and its [supplement](paper/dope1-supplement.tex) ([compiled supplement PDF](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1-supplement.pdf); `bash paper/build.sh` builds `target/paper/dope1.pdf` and `target/paper/dope1-supplement.pdf` directly from committed receipts).
-- **Multi-Level Deep Learning Study & Model Zoo:** [docs/multilevel-landmark-dl-study.md](docs/multilevel-landmark-dl-study.md)
-  and [docs/model-sizes-and-elo.md](docs/model-sizes-and-elo.md).
-- **Rules & Governance:** [metric](docs/metric.md), [claims policy](docs/claims-policy.md),
-  [benchmark](docs/benchmark.md) and [status](STATUS.md).
-- **Engineering & Verified Releases:** [AGENTS.md](AGENTS.md), [architecture](docs/architecture.md),
-  [testing](docs/testing.md), and [signed engine releases](docs/signed-engine-release.md).
 
 ## Citation
 
-```bibtex
-@misc{taylor2026dope,
-  title  = {{D.O.P.E.}: Downstream Objective-Preserving Encoding -- Generative Compression of Predictive Structure},
-  author = {Taylor, Jepson and Alexander, Alton and Morrow, Jordan},
-  year   = {2026},
-  note   = {NEVERHUMAN Research. Source and receipts: https://github.com/neverhuman/dope}
-}
-```
-
-Licensed under [MIT](LICENSE); see [CITATION.cff](CITATION.cff).
+See [CITATION.cff](CITATION.cff). Licensed under [MIT](LICENSE).

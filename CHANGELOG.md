@@ -8,8 +8,11 @@
 - **v3.0.0 scoreboard** ([`bench/real-world/results/scoreboard/v3.0.0/`](bench/real-world/results/scoreboard/v3.0.0/README.md)): one pre-registered DEV look at fresh row splits,
   after DEV-only selection. TRG improves over v2.0.0 `--format auto` with a 95 % interval above zero;
   the `dope-kpi/v2` outcome is HOLD because the regression bound, held-out MLP, realism-coverage and
-  privacy-coverage guards fail. No CONFIRM look was taken. The release binary reproduces every scored
-  packet byte for byte.
+  privacy-coverage guards fail. The frozen report used fresh DEV row splits. A local static-pie
+  build of `3fb802fd` reproduced all 108 scheduled packets byte for byte. Verify the same packet
+  hashes with the signed draft binary before publication.
+- This is an uncertified engine release (`dope-engine-v3.0.0`). See the
+  [release procedure](docs/release.md) for scientific certification.
 - **Stable FIT row identity** (`evidence::extract_with_rows`, `RowIdentity`): with distinct physical row ids
   the evidence bank is the same for any row order and cross-fits on duplicate-group folds;
   `extract` keeps the previous bytes. `dope-ffi` ABI 4 passes the ids (`dope_ffi_v8_episode`).

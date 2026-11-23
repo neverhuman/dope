@@ -24,6 +24,15 @@ native inspect "$work/model.dope" --json > "$work/inspect.json"
 jq -e '.budget == 2048 and .bytes <= 2048 and .parameters.total <= 200' "$work/fit.json" > /dev/null
 native sample "$work/model.dope" -n 11 --device cpu -o "$work/raw.csv"
 native sample "$work/model.dope" -n 11 --space ml --device cpu -o "$work/ml.csv"
+for format in auto-v8 v8-analytic; do
+  artifact="$work/$format.dope"
+  native fit "$work/train.csv" --target y --task regression --format "$format" \
+    --budget 2048 --device cpu -o "$artifact"
+  bytes=$(wc -c < "$artifact")
+  (( bytes > 0 && bytes <= 2048 ))
+  native sample "$artifact" -n 11 --device cpu -o "$work/$format.csv"
+  [[ $(wc -l < "$work/$format.csv") == 12 ]]
+done
 native predict "$work/model.dope" "$work/unlabelled.csv" -o "$work/predictions.csv"
 native encode "$work/test.csv" --model "$work/model.dope" -o "$work/encoded.csv"
 [[ $(wc -l < "$work/raw.csv") == 12 && $(wc -l < "$work/ml.csv") == 12 ]]

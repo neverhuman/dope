@@ -1,6 +1,6 @@
 # DOPE v3 DEV decision ledger
 
-Single canonical `tips/v3/*.md` decision table for DOPE v3 (strict superset of Codex `0575fe76`, updated at `2026-11-23T17:00Z` on `feat/v3-dse8-major` off `main 7810eed1` with all measured DEV-lite, Wide-DEV `v3b`, Fresh DEV Report seeds 5–8, `4c7b16a0` ABI-4 `RowIdentity`, and `v8-r2` `k1000`/`k1500`/`k2000` receipts). The two Dataset Features tips are distinct (`Catalog` supplies `F001`–`F144` and `RichStats` supplies the bounded layout proposal; see the [six-tip crosswalk](verification/evidence-crosswalk.md)). **DEV-SELECT ONLY: zero CONFIRM, HOLDOUT, SEALED, or FMGAP B/C data.**
+This is the canonical `tips/v3/*.md` decision table. It includes the pinned DEV report and the paired DEV-lite screens for `v8-s7w` w1 k1500 and `v8-r2` k3000. The two Dataset Features tips are distinct. `Catalog` supplies `F001`–`F144` and `RichStats` supplies the bounded layout proposal. See the [six-tip crosswalk](verification/evidence-crosswalk.md). This closeout uses DEV evidence only.
 
 ## Executive Summary & Status Totals
 
@@ -14,7 +14,7 @@ Single canonical `tips/v3/*.md` decision table for DOPE v3 (strict superset of C
 
 - **`KEPT`**: Verified by a cited measured run (run ID / commit SHA, receipt/test name + SHA-256 prefix, metric, and 95% CI or exact pass/fail measurement). Every `KEPT` row cites a measured run.
 - **`REJECTED`**: Disproved or superseded by a cited measured run (run ID / commit SHA, receipt/test name + SHA-256 prefix, metric, and 95% CI or exact failure/interference measurement). Every `REJECTED` row cites a measured run.
-- **`TESTING`**: Implemented and/or under active DEV screening or awaiting a final promotion decision (includes `V3-22` `auto::v8`, which passed the pre-registered DEV comparison at `+0.060 [+0.009, +0.114]` / Holm `p = 0.0091` while its `dope-kpi/v2` contract outcome is `HOLD` pending Jepson's (a)/(b) call, and `v8-r2-k001000` pending paired Wide-DEV evaluation).
+- **`TESTING`**: Implemented and under DEV screening, or awaiting promotion evidence. `V3-22` `auto::v8` passed release-route selection at `+0.060 [+0.009, +0.114]` over v2.0.0 `auto` on the fresh DEV report (Holm `p = 0.0091`). Its scientific promotion decision is **`HOLD`**. Jepson authorized publishing the analytic package after release verification, with the four DEV guard misses disclosed. The [release closeout](RELEASE_CLOSEOUT.md) records the final candidate decision process.
 - **`NOT STARTED`**: Not yet executed on DEV (including policy-excluded sealed CONFIRM/protected-panel items and superseded draft ABIs that were never run).
 - Source locators use physical lines in the six SHA-pinned `tips/v3/*.md` files listed in [Source register](#source-register). Empirical privacy diagnostics reported in DEV receipts are neither formal differential privacy nor HIPAA de-identification.
 
@@ -34,7 +34,7 @@ Single canonical `tips/v3/*.md` decision table for DOPE v3 (strict superset of C
 | `v8-r1` neural checkpoints (`k6000`, `k10000`) on pre-fix DSE8 packets as release candidate | Claude | REJECTED | Run `v3-dev-wide` (`compare-v8r1-vs-dse8-p0.json` `baca818c`, 46 informative cells / 11 families): `k10000` −0.39357 (ΔTRG −0.01142 [−0.06422, +0.02764], HOLD), `k6000` −0.41223 (ΔTRG −0.03008 [−0.07049, +0.00002], HOLD) vs `dse8-p0` −0.38216; archived on S3 as training record only. [DEV receipts](#dev-select-receipts) |
 | Explicit stable physical row and group IDs for extraction and fold assignment | Claude | TESTING | Commit `4c7b16a0` (`dope-ffi` ABI 4 + `evidence::extract_with_rows`): 12/12 `dope-ffi` tied-pair permutation, duplicate-ID refusal, grouped-fold, and query-poison tests pass; DSE8 packet-fit row order (`single_encoding/v8/mod.rs:281`) queued post-release. [Extraction identity](#extraction-identity) |
 | Strict little-endian DSE8 wire v1 framing and stable analytic decoder identity | Antigravity | TESTING | Run `single_encoding_v8@7968ea7f` (5/5 passed, 12 malformed vectors rejected) + `v3-report-dev-s5-8@3fb802fd` (`55974867`: 0/44 failed, 868/2,048 B, 4× TRG −0.342 [−0.652, −0.103]). [Packet bytes and layout](#packet-bytes-and-layout) |
-| Exact hard training-reference parity | Codex | KEPT | Run `codex-hard-parity@8f4b4b92` (12/12 synthetic fixtures passed max abs float diff ≤ 1e-5 & 100% exact label equality) + Run `ag-pytest-parity@7968ea7f` (`test_v8_rust_parity.py`: 13/13 passed ≤ 1e-4). [Hard forward](#hard-forward) |
+| Strict hard training-reference parity on the pinned candidate | Codex | KEPT | Independent replay `codex-hard-parity@8f4b4b92` tightened a generated test copy and measured 12/12 within 1e-5 with exact labels. The committed suite allows 1e-4 and ≥95% neural classification agreement. [Hard forward](#hard-forward) |
 | Source-free narrow binary sampling and per-row seed prefix | Codex | KEPT | Run `codex-recipient-replay@7c1f4598` (797 B fixture reproduced fit & row 0 after input removal; 339/339 root Rust tests pass) + Run `v3-report-dev-s5-8@3fb802fd` (`58314f0a`: 108/108 release packets SHA-identical). [Recipient behavior](#recipient-behavior) |
 | Complete DSE8 recipient scope, including range/chunk and restricted package | Codex | TESTING | Native row-local & `auto_v8_cli` tests pass (`ops/ci/engine.sh@3fb802fd`: 655/655 passed); restricted bubblewrap package verification pending suitable runner. [Recipient behavior](#recipient-behavior) |
 | Fresh group-aware episode splits, FIT-only production and parallel feed | Claude | TESTING | Run `c6-factory-bench@075b6752` (97/167/256 eps/s at 1/2/4 producers, 0/1,440 failures, 842 B med) + `4c7b16a0`/`7bdd58f4` (`dope-ffi` 12/12, factory/feed pytest 23/23); native V8 matched exposure/resume audit continues via `v8-r2`. [Episode stream](#episode-stream) |
@@ -54,7 +54,7 @@ The frozen evidence ABI is `contracts/evidence-layout-v1.json` (`COL=128`, `EDGE
 
 | ID | Tips | Proposal | Owner | State | Measured run, metric, 95% CI and DEV test |
 | --- | --- | --- | --- | --- | --- |
-| V3-01 | RichStats §3, Catalog §3, Evidence §1.2 | FP-0 lattice-safe jitter, per-episode masked marginal/correlation/SWD without 26-row truncation, duplicate-group splits and unseen multiclass refusal | Antigravity | TESTING | `s3_v7_batch_ops.py`, `s3_v7_losses.py`, `s3_v7_fast_trainer.py`, `test_fp0_loop.py` (21/21 pytest passed at `7968ea7f`). Matched-exposure repaired-vs-prior V7 DEV ablation open. [Repaired V7](#repaired-v7) |
+| V3-01 | RichStats §3, Catalog §3, Evidence §1.2 | FP-0 lattice-safe jitter, per-episode masked marginal/correlation/SWD without 26-row truncation, duplicate-group splits and unseen multiclass refusal | Antigravity | TESTING | Focused `test_fp0_loop.py` 2/2 passed on `b8a0037c` (`fp0-v8-losses.log` `42eea45c`, 7 cases combined with the V8 loss suite). Matched-exposure repaired-vs-prior V7 DEV ablation open. [Repaired V7](#repaired-v7) |
 | V3-02 | Evidence §3, DFP1 §3, RichStats §5 | FIT-only `EvidenceInput` with no query fields, stable `RowIdentity`, grouped folds and zero per-table cache | Claude | TESTING | `engine/dope-core/src/evidence/` + `engine/dope-ffi` ABI 4 (`4c7b16a0`): 12/12 `dope-ffi` query-poison, tied-pair permutation, and grouped-fold tests pass; DSE8 packet-fit row order queued post-release; matched native V8 evidence ablation open. [Extraction identity](#extraction-identity) |
 | V3-03 | Evidence §4.1, Catalog §4.3, RichStats §8.3 | Value/mask pairs, finite-sample support and uncertainty with `k >= 10` floor | Antigravity | TESTING | `contracts/evidence-layout-v1.json` (`e99647eb`) & `evidence_v8` (5/5 passed at `7968ea7f`); mask-only vs full-evidence DEV ablation open. [Evidence bundles](#evidence-bundles) |
 | V3-04 | DFP1 §4.3, Evidence §4.2, Compiler §2.1 | FIT-only typed metadata in `Nc2ColumnMetaV2`, `Dse8ColumnMeta` and `fit_unit_meta` | Claude | TESTING | DEV-lite E2 (`primary-dse8-p0.json` vs `primary-dse8-p0-nometa.json`): −0.55546 vs −0.55687 (+0.00142, both 1,496 B med); Wide DEV pre-fix (`primary-dse8-p0.json` `d79f5cbf` vs `primary-dse8-p0-nometa.json` `9aff70e8`): −0.38216 vs −0.38024 (neutral at Step-0); wired identically into `auto/v8.rs` & `auto/v8_dpa.rs` at `7968ea7f`. [DEV receipts](#dev-select-receipts) |
@@ -69,13 +69,13 @@ The frozen evidence ABI is `contracts/evidence-layout-v1.json` (`COL=128`, `EDGE
 | V3-13 | Evidence §5.1, Compiler §4.3–4.4, Runbook §4 | Calibrated analytic Step-0 (`calibrate.rs`, `effects_v8.rs`, `target_v8.rs`, `trees_v8.rs`, `copula_regimes.rs`, `irls.rs`): tie-interval binning, OOF-CV IRLS, deflated sequential boosting, 512-row synthetic-X intercept calibration, unit-variance regimes | Antigravity | TESTING | Calibrated `dse8-p0-v3b` (`7968ea7f`): DEV-lite `7e01e049` −0.27758 [−0.46536, −0.12647] (+0.27788 over pre-fix −0.55546); Wide DEV `c63b2fd2` −0.18968 [−0.36193, −0.04685] (+0.19248 over pre-fix −0.38216; beats `2.0.0-auto` −0.20726 on point); Fresh DEV Report `55974867` −0.342 [−0.652, −0.103] (868/2,048 B, 0/44 failed). Section-level ablation (`no_trees`/`no_regimes`) and v3.1 Ledoit-Wolf + sparse-tail MLP fixes open. [DEV receipts](#dev-select-receipts) |
 | V3-14 | Runbook §5.4–5.5, Compiler §4.3 | Optional skew-t copula and target-tail noise (`FLAG_HAS_SKEW_T`) | Antigravity | TESTING | `Dse8FitOptions::enable_skew_t` defaults off (`false`); equal-byte opt-in DEV ablation open. [Dependence and regimes](#dependence-and-regimes) |
 | V3-15 | Evidence §6, DFP1 §5, Runbook §5, Compiler §4 | Pre-bottleneck `SingleEncV8`, split-QKV `PairSplitAttnBlock`, nested 4-bit FSQ, row-local RealNVP, entmax Soft-NODE, rank-4 bilinear and trust gate | Antigravity | TESTING | Parity: `codex-hard-parity@8f4b4b92` (12/12 ≤ 1e-5) & `test_v8_rust_parity@7968ea7f` (13/13 ≤ 1e-4). `v8-r1` rejected on Wide DEV (`baca818c`: −0.01142 / −0.03008 vs `dse8-p0`). **`v8-r2-k001000`** (`w0 EMA` sha `99210221`, emitted via `dope_v8_emit-4b68275e`, `primary-v8-r2-k001000.json` `27074a87`, 12-cell DEV-lite screen only): 4× TRG **−0.25367 [−0.42798, −0.11669]** (+0.02391 4× & +0.12250 1× over `dse8-p0-v3b` −0.27758, MLP −0.224, C2ST 0.960, 834 B med, 0 failed); decision requires paired Wide-DEV (`≥ +0.010` over `dse8-p0-v3b` with 2.5% bound `> 0`, Addendum B). [DEV receipts](#dev-select-receipts) · [Hard forward](#hard-forward) |
-| V3-16 | Evidence §7, Compiler §6, Runbook §6 | Twin-referenced smooth tanh-saturated linear/tree/RFF retention gap, direct conditional NLL, anchor, PIT, copula, tree, driver, DCR privacy hinge, Gumbel-Rao K=4 STE, `--grad-accum-steps`, width curriculum, optional PCGrad/ASAM | Claude | TESTING | `s3_v8_losses.py`, `s3_v8_trainer.py`, `s3_v8_feed.py`: 21/21 AG + 23/23 Claude pytest pass; 8-ep overfit control passed (`l_ret 0.87 -> 0.51`); `v8-r2` (`7bdd58f4`, eff_batch=32) stable (`grad_norm 1–13`) and `k1000` scored −0.25367 on DEV-lite (`27074a87`); full objective ablations & Wide-DEV pairing open. [Hard-transfer objective](#hard-transfer-objective) · [Gradient methods](#gradient-methods) |
+| V3-16 | Evidence §7, Compiler §6, Runbook §6 | Twin-referenced smooth tanh-saturated linear/tree/RFF retention gap, direct conditional NLL, anchor, PIT, copula, tree, driver, DCR privacy hinge, Gumbel-Rao K=4 STE, `--grad-accum-steps`, width curriculum, optional PCGrad/ASAM | Claude | TESTING | Focused `test_v8_losses.py` 5/5 parametrized cases passed on `b8a0037c` (`fp0-v8-losses.log` `42eea45c`). The 8-episode overfit control reduced `l_ret` from 0.87 to 0.51. `v8-r2` k1000 scored −0.25367 on DEV-lite (`27074a87`). Full objective ablations and wide-DEV pairing remain open. [Hard-transfer objective](#hard-transfer-objective) · [Gradient methods](#gradient-methods) |
 | V3-17 | Evidence §6.4, RichStats §7.12 | Owner-side per-table test-time gradient code refinement (TT-Opt at `fit`) | Claude | NOT STARTED | Deferred post-v3.0 until amortized `SingleEncV8` clears paired Wide-DEV lift; not run. [Closed-loop evidence](#closed-loop-evidence) |
 | V3-18 | DFP1 §4.6, Catalog §6.10 | Expanding core v3 to temporal/panel autocorrelation shifts and permutation recipes F133–F144 | Owner | NOT STARTED | Out of v3 scope (standard `dope-kpi/v2` tables lack universal time keys; permutation p-values exceed <25 ms/ep budget) — never run. [Catalog](#catalog) |
 | V3-19 | Earlier caching proposals in the tips | Per-table caches for landmarks, evidence, column metadata or teacher outputs | Owner | REJECTED | Run `c6-factory-bench@075b6752` (256 eps/s, 10–12 ms/ep, 0/1,440 failures) + Run `dope-ffi@4c7b16a0` (12/12 query-poison & permutation tests passed with 0 byte diff), proving uncached FIT-only extraction satisfies throughput without split leakage (09:50Z binding rule). [Extraction identity](#extraction-identity) |
 | V3-20 | Earlier product and objective proposals | Python, ONNX or LibTorch in native product serving, or training against the held-out MLP auditor | Owner | REJECTED | Run `ops/ci/engine.sh@3fb802fd` (655/655 passed) + static Rust binary `58314f0a` (108/108 packets, zero Python linkage) + Run `compare-v3b-guards.json` (`782376d3`: independent held-out MLP caught Δ = −0.211 on `0a64bb31` missed by linear/GBDT, proving holdout diagnostic necessity). [Recipient behavior](#recipient-behavior) · [Hard-transfer objective](#hard-transfer-objective) |
 | V3-21 | Evidence §2.2, C1 | Native E0 marginal, copula and conditional attribution oracles (`oracle_*` arms) | Claude | TESTING | #400 (`a3e9a986`) added 8 `oracle_*` arms + factorial reducer tests; full native DEV factorial sweep open. [E0 attribution](#e0-attribution) |
-| V3-22 | Compiler §5, `auto::v8` guard | Target-stratified 2-fold grouped 3-way `auto::v8` guard, `DPA1` tag 8, and `--format auto-v8` / `v8-analytic` / `v8` CLI routes | Antigravity | TESTING | **Pre-reg DEV PASS, contract HOLD (stays TESTING until Jepson's (a)/(b) call):** DEV-lite `fda33820` −0.11872 [−0.18782, −0.05313] (1,651 B, 0 fail); Wide DEV `72a5347d`/`782376d3` −0.17048 vs `2.0.0-auto` −0.20726 (Δ **+0.03678 [+0.00839, +0.06234]**, Holm p = 0.0047, contract HOLD: reg CI −0.034, MLP −0.211, privacy −0.066); Fresh DEV Report (`primary.json` `55974867`, `compare.json` `5ac5a9bd`, seeds 5–8, 44 informative headline cells / 11 families): **−0.121 [−0.189, −0.049]** vs `2.0.0-auto` −0.181 [−0.280, −0.085] (Δ **+0.060 [+0.009, +0.114]**, Holm p = 0.0091, 1,787/2,048 B, 0/44 failed, 108/108 SHA-identical; contract HOLD: task −0.053, MLP −0.007, realism −0.111, privacy −0.031). [DEV receipts](#dev-select-receipts) |
+| V3-22 | Compiler §5, `auto::v8` guard | Target-stratified 2-fold grouped 3-way `auto::v8` guard, `DPA1` tag 8, and `--format auto-v8` / `v8-analytic` / `v8` CLI routes | Antigravity | TESTING | **Pre-reg DEV PASS, contract HOLD (analytic fallback approved with HOLD disclosed):** DEV-lite `fda33820` −0.11872 [−0.18782, −0.05313] (1,651 B, 0 fail); Wide DEV `72a5347d`/`782376d3` −0.17048 vs `2.0.0-auto` −0.20726 (Δ **+0.03678 [+0.00839, +0.06234]**, Holm p = 0.0047, contract HOLD: reg CI −0.034, MLP −0.211, privacy −0.066); Fresh DEV Report (`primary.json` `55974867`, `compare.json` `5ac5a9bd`, seeds 5–8, 44 informative headline cells / 11 families): **−0.121 [−0.189, −0.049]** vs `2.0.0-auto` −0.181 [−0.280, −0.085] (Δ **+0.060 [+0.009, +0.114]**, Holm p = 0.0091, 1,787/2,048 B, 0/44 failed, 108/108 SHA-identical; contract HOLD: task −0.053, MLP −0.007, realism −0.111, privacy −0.031). [DEV receipts](#dev-select-receipts) |
 
 ### DEV-SELECT receipts
 
@@ -97,9 +97,9 @@ Unseen data seeds 5–8 on the 22 DEV tables (108 total scheduled cells; 64 head
 | `indep_marginals` / `label_shuffle` (nulls) | control | — | −1.222 [−1.387, −1.095] / −1.164 [−1.269, −1.063] | — | −1.406 / — | 0.967 / 0.687 | 0 / 44 |
 
 - **Paired comparison (`compare.json` `5ac5a9bd`, `dope-v3b-auto-v8` vs `dope-2.0.0-auto`):**
-  - **4× ΔTRG:** **+0.060 [+0.009, +0.114]**, Holm `p = 0.0091` (m=1); **1× matched ΔTRG:** +0.024 [−0.020, +0.071]; sign-flip false-PROMOTE rate: `0.000`.
+  - **4× ΔTRG** **+0.060 [+0.009, +0.114]**, Holm `p = 0.0091` (m=1). **1× matched ΔTRG** +0.024 [−0.020, +0.071]. In the sign-flip calibration, 0/2,000 passed the full guarded rule and 260/2,000 (13%) passed the statistical conditions alone, above the 5% tolerance.
   - **Per-task ΔTRG:** binary `+0.141 [+0.000, +0.287]`, multiclass `+0.057 [+0.000, +0.154]`, regression `−0.019 [−0.053, +0.000]`.
-  - **Contract outcome: `HOLD`** (escalated to Jepson for (a)/(b) call): passed `ci_low`, `holm_p`, `min_delta`, `exact_copy_excess = 0.0000` (≤ 0.005), `bytes = 2,048 B` (≤ 2,048 B); failed `task_ci_low = −0.053` (> −0.02), `mlp_delta = −0.007` (> 0.0), `realism_coverage_delta = −0.111` (> −0.03), `privacy_coverage_delta = −0.031` (> −0.03).
+  - **Contract outcome: `HOLD`** (disclosed in the authorized analytic fallback): passed `ci_low`, `holm_p`, `min_delta`, `exact_copy_excess = 0.0000` (≤ 0.005), `bytes = 2,048 B` (≤ 2,048 B); failed `task_ci_low = −0.053` (> −0.02), `mlp_delta = −0.007` (> 0.0), `realism_coverage_delta = −0.111` (> −0.03), `privacy_coverage_delta = −0.031` (> −0.03).
 
 #### 2. Wide DEV Selection Runs (`xbabe6:~/dope-data/kpi-runs/v3-dev-wide/`, seeds 1–4, 46 informative / 11 families)
 
@@ -129,6 +129,13 @@ Unseen data seeds 5–8 on the 22 DEV tables (108 total scheduled cells; 64 head
 | **`v8-r2-k001000`** (`w0 EMA` `99210221`, `dope_v8_emit-4b68275e`, MLP −0.224, C2ST 0.960) | source_free | 834 | **−0.25367 [−0.42798, −0.11669]** | **−0.41327** | 0 | `primary-v8-r2-k001000.json` (`27074a87`, 12-cell screen only; paired Δ +0.02392 [−0.00738, +0.05805] HOLD) |
 | **`v8-r2-k001500`** (`w0 EMA` `0b4f1889`, Codex paired DEV-lite vs `dse8-p0-v3b`) | source_free | 834 | **−0.25065** (paired Δ **+0.02694 [+0.00949, +0.04570]**, Holm p=0.00010, HOLD on task −0.031 / MLP −0.028) | — | 0 | `daa73595` / paired `ced92a36` (12-cell screen only) |
 | `v8-r2-k002000` (`w0 EMA`, Claude DEV-lite screen) | source_free | 834 | −0.285 [−0.446, −0.155] (regressed below `dse8-p0-v3b` −0.278 under gate collapse + dead `bilin`) | — | 0 | Claude `16:50Z` DEV-lite screen |
+| `v8-r2-k003000` (`w0 EMA` `b2020dfe`, Codex) | source_free | 834 | −0.27431 [−0.43568, −0.14776] | −0.53288 | 0 | `0ec3d846` / paired `64041c43`, **HOLD**. Δ +0.00327 [−0.04380, +0.03293] vs `dse8-p0-v3b`, Holm p=0.35286, task bound −0.15630 and MLP Δ −0.02109. |
+| `v8-s7w-k001500` (`w1 EMA` `c8718c46`, Codex) | source_free | 834 | −0.45945 [−0.70110, −0.25290] | −0.63114 | 0 | `f5d1b5c9` / paired `8fdcd6ea6`, **REJECT**. Δ −0.18186 [−0.39764, −0.01582] vs `dse8-p0-v3b`, Holm p=0.99900, task bound −1.04380 and MLP Δ −0.30980. The declared surgery finalist rule uses w0. |
+
+The k3000 and w1 k1500 comparisons share the frozen DEV-lite schedule, real
+reference and analytic baseline from the r2 k1500 comparison. Both passed the
+2,048 B maximum. The paired screen leaves realism, empirical privacy and exact-copy
+guards unevaluated. Full receipt digests are recorded in `agent_chat.md` at 19:08 UTC.
 
 ## Measured DEV tests and outstanding comparisons
 
@@ -138,7 +145,7 @@ Use the same declared target, canonical view, row roles, physical families, rows
 
 ### E0 attribution
 
-Pair packet X / packet Y, real FIT X / packet Y, packet X / FIT small-tree Y, and real FIT X / FIT small-tree Y. Report both main effects and their interaction by task and at 1× and 4×. Include exact-marginal rank-12 and full-rank arms, real twin, GAM and a stronger FIT teacher on the same rows and seeds. The eight oracle generators and the factorial reducer have fixture tests. The native DEV matrix is open. Prior Python screening measured +0.045 for real features alone, +0.079 for the small-tree conditional on packet features, and +0.264 for both. That study sets priorities for native replay. [E0 run and oracle identities](verification/README.md#native-receipt-audit)
+Pair packet X / packet Y, real FIT X / packet Y, packet X / FIT small-tree Y, and real FIT X / FIT small-tree Y. Report both main effects and their interaction by task and at 1× and 4×. Include exact-marginal rank-12 and full-rank arms, real twin, GAM and a stronger FIT teacher on the same rows and seeds. The 12-cell native DEV-lite screen used schedule `9207d157` and four oracle arms on the same splits. The 4× TRGs were −0.40436 for packet X/packet Y, −0.48115 for real FIT X/packet Y, −0.28845 for packet X/tree Y and −0.13637 for real FIT X/tree Y. Independent factorial audit `593624da54974f8b5ecc2e7dac12d4a2b200d23560b45a05aa213448837dfe69` measured X main +0.03764, Y main +0.23035 and interaction +0.22887 at 4×. The corresponding 1× effects are +0.15219, +0.28025 and +0.06390. Real FIT X supplied to the sampler is an oracle input. These joint effects motivate comparison of X and conditional representations under the complete-byte cap. The full wide-DEV matrix stays TESTING. [E0 run and oracle identities](verification/README.md#native-receipt-audit)
 
 ### Failure-floor analysis
 
@@ -154,7 +161,22 @@ Use declared target-last intake, stable physical row/group IDs, FIT-only transfo
 
 ### Packet bytes and layout
 
-Measure complete wire, framing, decoder identity, mandatory typed/group sections, optional sections, unused bytes, refusals, checksum and sidecars at 512, 1,024, 2,048 and 4,096 B. Exercise 9/10 support, 48/49 slots, eight/nine classes, maliciously valid CRC, exact bytes and truncation from one legal base. Compare fixed order against FIT-estimated utility per serialized byte at equal complete bytes. Candidate `8f4b4b92` passed 11 malformed probes, emitted 3,157 B at the 4 KiB wide-eight-class point, had a 2,119 B legal base, refused 2 KiB on that fixture and emitted 3,199 B for 49 slots where the shape should refuse. 16/64 KiB are DEV representation probes. Antigravity commit `7968ea7f` resolved the 2,048 B budget planner and 49-slot refusal defects (`single_encoding_v8` 5/5 passed; `v3-report-dev-s5-8@3fb802fd` `55974867`: 108/108 `auto-v8` and `dse8-p0-v3b` packets ≤ 2,048 B with 0/44 failures). [Exact byte evidence](verification/README.md#candidate-replay-at-8f4b4b92)
+Measure complete wire, framing, decoder identity, mandatory typed/group sections, optional sections, unused bytes, refusals, checksum and sidecars at 512, 1,024, 2,048 and 4,096 B. Exercise 9/10 support, 48/49 slots, eight/nine classes, maliciously valid CRC, exact bytes and truncation from one legal base. Compare fixed order against FIT-estimated utility per serialized byte at equal complete bytes. Candidate `8f4b4b92` passed 11 malformed probes, emitted 3,157 B at the 4 KiB wide-eight-class point, had a 2,119 B legal base, refused 2 KiB on that fixture and emitted 3,199 B for 49 slots where the shape should refuse. 16/64 KiB are DEV representation probes. Antigravity commit `7968ea7f` corrected headline-budget planning (`single_encoding_v8` 5/5 passed; `v3-report-dev-s5-8@3fb802fd` `55974867`: 108/108 `auto-v8` and `dse8-p0-v3b` packets ≤ 2,048 B with 0/44 failures). The exact-main `b8a0037c` research emitter fit the 48-slot, eight-class fixture at 2,046 B. It still accepted 49 slots at a 4,096 B cap, and truncation of the 4 KiB fixture to 2 KiB refused because its legal base took 2,119 B. [Closeout evidence](RELEASE_CLOSEOUT.md#evidence-currently-staged) [Exact byte evidence](verification/README.md#candidate-replay-at-8f4b4b92)
+
+#### DSE8 fit ablations on DEV-lite
+
+Antigravity evaluated the variants on the 12 informative cells in `schedule-lite-dev.jsonl` (`9207d157`). The analytic `dse8-p0-v3b` control scored −0.27758 at 4× with 788 B median. The decisions apply to the proposed default changes. Receipt values are paired against that control.
+
+| Proposed change | Owner | State | ΔTRG [95% CI] | Held-out MLP Δ | Evidence |
+| --- | --- | --- | ---: | ---: | --- |
+| Remove trees | Antigravity | REJECTED | −0.03603 [−0.08239, +0.00349] | −0.05224 | `compare-dse8-no-trees.json` `0b1467a0`, HOLD; 724 B median |
+| Remove residual quantiles | Antigravity | REJECTED | −0.00197 [−0.00569, −0.00001] | −0.00546 | `compare-dse8-no-resid.json` `c4b2e788`, REJECT; 779.5 B median |
+| Remove FIT column metadata | Antigravity | REJECTED | −0.00074 [−0.00231, +0.00010] | −0.01773 | `compare-dse8-no-meta.json` `96fdc3fc`, HOLD; same 788 B median |
+| Remove fitted effects | Antigravity | TESTING | −0.00053 [−0.01579, +0.01389] | −0.00316 | `compare-dse8-no-effects.json` `a8cfb533`, HOLD; 856.5 B median |
+| Remove regimes | Antigravity | REJECTED | +0.01716 [−0.00067, +0.03692] | −0.06831 | `compare-dse8-no-regimes.json` `7e8286ea`, HOLD; 762 B median |
+| Use skew-t by default | Antigravity | REJECTED | +0.00219 [−0.00707, +0.01128] | −0.02004 | `compare-dse8-skew-t.json` `13842a30`, HOLD; Holm p = 0.31757 |
+
+The measured frontier scored −0.48726 at a 512 B cap (`2feb3149`), −0.31158 at 1,024 B (`9df05828`), −0.27758 at the 2,048 B control and −0.29114 at 4,096 B (`33c80378`). The three alternative cap comparisons were HOLD. These are DEV-lite frontier points.
 
 ### Typed rows and marginals
 
@@ -171,6 +193,43 @@ Pair analytic ridge, logistic and multinomial conditionals with calibrated suppo
 ### Evidence bundles
 
 Use the [stable recipe crosswalk](verification/evidence-crosswalk.md) and the approved 128/16/16/8/160 blocks plus a separate class-column block. Compare equal-capacity packet-only, FIT T0–T1, then T2/T3 one at a time with leave-one-family-out, mask-only, within-task shuffle, equal-width noise and matched owner-compute controls. Report rank/null calibration, support, presence, uncertainty validity, consumed coordinates, wall time and hard native gain. The draft layout passes dimension/mask fixtures. It still needs complete per-value support and uncertainty semantics. Individual recipe DEV admission remains open.
+
+#### Input-feature screen F0
+
+F0 `da813445` used the training producer to draw 2,000 distinct TRAIN-split FIT views across 1,834 families. Every episode recomputed its features from its own FIT rows. Replacing QRY features and labels with noise left all computed blocks bit-identical. The diagnostic is family-grouped five-fold out-of-fold ΔR² for predicting eight analytic step-zero loss components beyond the existing decoder inputs. Its 95% intervals use 1,000 family resamples of fixed out-of-fold predictions. The 48-feature noise control measured −0.01218 [−0.02041, −0.00205]. This measures TRAIN-split loss prediction. Feature admission for the release requires a separate native DEV transfer result.
+
+The preregistered screen rejects a block if the CI upper bound is below 0.01, absolute redundancy with a baseline coordinate reaches 0.95, CPU time exceeds 2 ms per episode with ΔR² below 0.03, or the poison check fails. The baseline is retained. Of the added blocks, one advances to conditional testing, 21 are rejected and three await an extractor. The retained `f0_blocks.jsonl` is SHA-256 `36fd2535114bb36a9dea4b79bb438691888fdbce496325897deb00510d9e4946` and `f0_report.json` is SHA-256 `7507be70dc63ae6e906080c537982775923319b1bcb20eec6c47a194f29fe11e`. See the Claude F0 handoff in `agent_chat.md` for receipt locations.
+
+| Feature block | Owner | State | ΔR² [95% CI] | CPU ms per episode | Max abs. ρ | F0 reason or dependency |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| `BASELINE_DSE8_DECODER_INPUTS` | Claude | KEPT | +0.31391 [+0.28655, +0.35334] | 97.05 | 1.000 | Existing decoder inputs. This is absolute out-of-fold R² against an intercept. |
+| `EV_COL.S_SUPPORT` | Claude | REJECTED | +0.00297 [-0.00424, +0.01045] | 3.49 | 0.954 | baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.M_QF_RESID` | Claude | REJECTED | -0.00743 [-0.01521, +0.00140] | 3.49 | 0.948 | CI upper bound +0.00140 < 0.01, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.M_SHAPE_TAIL` | Claude | REJECTED | +0.00987 [-0.00001, +0.02178] | 3.49 | 0.848 | cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.M_MISS_UNC` | Claude | REJECTED | -0.00035 [-0.00788, +0.00796] | 3.49 | 1.000 | CI upper bound +0.00796 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.M_PACKET_PIT` | Antigravity | NOT STARTED | — | — | — | The native extractor needs the T3 `packet_probe` input. Measurement is pending. |
+| `EV_COL.D_DEP_PREC` | Claude | REJECTED | +0.00024 [-0.00815, +0.00998] | 65.96 | 0.975 | CI upper bound +0.00998 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.R_UNIV_TARGET` | Claude | REJECTED | +0.03458 [+0.02521, +0.04621] | 65.96 | 0.992 | baseline redundancy ≥ 0.95 |
+| `EV_COL.R_OOF_RESID_T03` | Claude | REJECTED | +0.00602 [-0.00255, +0.01587] | 65.96 | 1.000 | baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.W_GBDT_WITNESS` | Claude | REJECTED | +0.00039 [-0.00651, +0.00776] | 72.04 | 0.821 | CI upper bound +0.00776 < 0.01, cost > 2 ms with ΔR² < 0.03 |
+| `EV_COL.W_CLOSED_LOOP_COL` | Antigravity | NOT STARTED | — | — | — | The native extractor needs the T3 `packet_probe` input. Measurement is pending. |
+| `EV_EDGE.T0T1` | Claude | REJECTED | +0.00385 [-0.00478, +0.01300] | 65.96 | 0.833 | cost > 2 ms with ΔR² < 0.03 |
+| `EV_EDGE.T2` | Claude | REJECTED | -0.00399 [-0.01011, +0.00254] | 72.04 | 0.588 | CI upper bound +0.00254 < 0.01, cost > 2 ms with ΔR² < 0.03 |
+| `EV_GLOB.G_META_TASK` | Claude | REJECTED | -0.00808 [-0.01398, -0.00140] | 3.49 | 1.000 | CI upper bound -0.00140 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_GLOB.G_SPEC_MP` | Claude | REJECTED | -0.00524 [-0.01207, +0.00289] | 65.96 | 0.909 | CI upper bound +0.00289 < 0.01, cost > 2 ms with ΔR² < 0.03 |
+| `EV_GLOB.G_GEOM_PRIV` | Claude | REJECTED | +0.00744 [-0.00222, +0.01895] | 65.96 | 1.000 | baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_GLOB.G_TARGET_RESID_T03` | Claude | REJECTED | +0.02763 [+0.01876, +0.03882] | 65.96 | 0.805 | cost > 2 ms with ΔR² < 0.03. The owner encoder already consumes the T2 inputs. |
+| `EV_GLOB.G_ALIGN_TWIN_STAB` | Claude | REJECTED | +0.01141 [+0.00328, +0.01985] | 65.96 | 0.877 | cost > 2 ms with ΔR² < 0.03. The owner encoder already consumes the T2 inputs. |
+| `EV_GLOB.G_WITNESS_FANOVA_CAL_LC` | Claude | REJECTED | +0.02323 [+0.01509, +0.03139] | 72.04 | 0.906 | cost > 2 ms with ΔR² < 0.03. The owner encoder already consumes the T2 inputs. |
+| `EV_GLOB.G_CLOSED_LOOP` | Antigravity | NOT STARTED | — | — | — | The native extractor needs the T3 `packet_probe` input. Measurement is pending. |
+| `EV_CLASS_TOK` | Claude | REJECTED | +0.00063 [-0.00492, +0.00650] | 65.96 | 0.983 | CI upper bound +0.00650 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_CLASS_COL` | Claude | REJECTED | +0.00001 [-0.00572, +0.00635] | 65.96 | 0.981 | CI upper bound +0.00635 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `EV_GROUP_TOK` | Claude | REJECTED | -0.00283 [-0.00846, +0.00245] | 3.49 | 1.000 | CI upper bound +0.00245 < 0.01, baseline redundancy ≥ 0.95, cost > 2 ms with ΔR² < 0.03 |
+| `NC2_COLUMN_META_V2` | Claude | REJECTED | -0.00497 [-0.01380, +0.00317] | 1.23 | 1.000 | CI upper bound +0.00317 < 0.01, baseline redundancy ≥ 0.95 |
+| `LANDMARK_NATIVE23` | Claude | REJECTED | +0.02230 [+0.01450, +0.03256] | 248.67 | 0.733 | cost > 2 ms with ΔR² < 0.03 |
+| `LANDMARK_BUILDING_BLOCKS` | Claude | TESTING | +0.05045 [+0.03963, +0.06534] | 8.19 | 0.874 | Passed all F0 rules. F1 requires an eligible neural arm and a matched three-seed native DEV ablation. |
+
+`EV_COL.R_UNIV_TARGET` missed the block redundancy rule despite a positive interval. A coordinate-level redundancy screen remains a future experiment. `LANDMARK_BUILDING_BLOCKS` stays **TESTING** until the F1 transfer evidence exists.
 
 ### Shape and nonlinear statistics
 
@@ -220,6 +279,20 @@ Use per-step atomic weights/EMA/optimizer/RNG/cursor/exposure/distributed checkp
 
 Use marginal-only, feature-joint and joint-with-label boosted-tree C2ST plus twin reference, typed illegal-row checks, per-auditor calibration and class/minority losses. Track exact copy excess, DCR, membership/attribute attacks and empirical coverage with baseline controls and no raw sidecar values. Report whether lowered C2ST harms conditional/dependence fidelity. The historical public validation and synthetic fixtures are context. New matched DEV guard coverage is open.
 
+#### Reused wide DEV tests for v3c
+
+The ten guard comparisons for the four changes and `v3c-cand1` independently re-reduced from the retained score and guard ledgers. The shared schedule (`97439e8a`) has 46 informative 4× cells across 11 families. State reflects the component decision. A selected component still needs end-to-end release evidence.
+
+| Proposal | Owner | State | ΔTRG versus v3b [95% CI] | ΔTRG versus v2.0.0 auto | Measured guard evidence |
+| --- | --- | --- | ---: | ---: | --- |
+| `fix1` OAS covariance shrinkage, tie damping and EB regimes | Antigravity | KEPT | +0.03856 [−0.00305, +0.11909] | +0.07534 [+0.00896, +0.16355] | `06d5bcb6` / `563bea8d`; all guards pass against v3b. Against v2, task −0.03356, MLP −0.18818 and privacy −0.05556 fail. Both comparisons are HOLD. |
+| `fix2` sparse, zero-inflated and lattice marginal corrections | Antigravity | KEPT | +0.00011 [−0.00123, +0.00152] | +0.03689 [+0.00891, +0.06207] | `33892e65` / `4f596b0d`; held-out MLP improves +0.16554 versus v3b. Its delta against v2 is −0.04564. Both comparisons are HOLD. |
+| `fix3` refit temperature on a narrow validation fold | Antigravity | REJECTED | −0.00654 [−0.01619, −0.00057] | +0.03024 [+0.00228, +0.05616] | `fcf884ec` / `ce5d67fe`; REJECT against v3b, with task lower bound −0.04286 and MLP +0.03233. |
+| `fix4` increase the regression-only selection margin | Antigravity | REJECTED | −0.00123 [−0.00368, 0.00000] | +0.03555 [+0.00640, +0.06191] | `72de31cc` / `46ce6563`; HOLD. Task lower bound versus v2 is −0.04461 and the change misses incremental lift over v3b. |
+| `cand1` combine fixes 1 and 2 with fit-size support scaling | Antigravity | TESTING | +0.03766 [−0.01232, +0.12228] | +0.07444 [+0.00835, +0.16766] | `37d347e9` / `25a45025`; HOLD against both. Versus v3b the task lower bound is −0.04147. Versus v2 the task, MLP and privacy guards fail at −0.03356, −0.17726 and −0.07639. |
+
+The cand1 executable SHA-256 is `b6965c13a05cc7ac773d5798ada71f633d10829da326bc14f08053a91c044ee3`. Its artifact audit checked 108 complete packets per arm for cand1 and v3b, all at or below 2,048 B, with cand1 at 1,751.5 B median on the headline cells. The audit receipt is `064a5d18de3303f701b0b9b2266c3f88acaa26bd0a92b232bc430968b92fdf77`. Exact clean source and the fresh DEV decision are pending for a replacement RC.
+
 ### Published generators
 
 Use authentic implementations for SDV/CTGAN, ARF, TabSyn, TabDDPM and TabDiff, with native-budget and valid byte-matched points, verified environment/recipe and full saved-state accounting. Preserve unsupported/timeouts in the ledger. Apply the same FIT teacher to qualified competitor features. The historical SDV native point measured GaussianCopula 105,848 B median and TVAE 404,722 B median. Three CTGAN smoke cells and a historical TabSyn comparison are narrower. The rest of the common DEV roster is open. [Source and recipe inventory](verification/published-method-benchmark.md#next-public-dev-roster)
@@ -227,6 +300,10 @@ Use authentic implementations for SDV/CTGAN, ARF, TabSyn, TabDDPM and TabDiff, w
 ### Power and promotion
 
 Use physical family units within task, native failures, 10,000 paired family draws, Holm adjustment, 2,000 or more sign flips, task/MLP/privacy/realism/legality/byte guards and seed agreement. Confirm family-level noise and task power with a DEV simulation before selecting a recipe. The staged wide DEV schedule has 108 cells and 22 physical families overall, with 46 informative headline cells across 3 binary, 4 multiclass and 4 regression task-family units. At least 80% simulated power is the target. No current V8 keep or promotion receipt is available.
+
+| Release gate | Owner | State | Evidence and remaining work |
+| --- | --- | --- | --- |
+| G10 formal protocol freeze | Jepson and custodian | NOT STARTED | Reserved for certification. The seeds 9–12 DEV look will bind the embedded candidate contract SHA-256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623` in `PREREG_LOG` before scoring, with the schedule, DEV table set and scorer digest. The final-look receipt check requires that exact contract hash and `source: embedded`. The final look is pending. |
 
 ### T90 and D80
 

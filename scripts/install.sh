@@ -10,7 +10,7 @@ set -euo pipefail
 
 REPO_SLUG="neverhuman/dope"
 SIGNER_WORKFLOW="neverhuman/dope/.github/workflows/engine-release.yml"
-TAG="${DOPE_RELEASE_TAG:-dope-engine-v1.3.0}"
+TAG="${DOPE_RELEASE_TAG:-dope-engine-v3.0.0}"
 SOURCE_COMMIT="${DOPE_SOURCE_COMMIT:-}"
 FROM_DIR=""
 MODEL_TAG="${DOPE_MODEL_TAG:-}"
@@ -29,7 +29,7 @@ usage() {
 Usage: install.sh [OPTIONS]
 
 Options:
-  --tag <TAG>               Engine/binary release tag (default: dope-engine-v1.3.0)
+  --tag <TAG>               Engine/binary release tag (default: dope-engine-v3.0.0)
   --model-tag <TAG>         Independent model release (engine tag default: v1.0.0; otherwise same as --tag)
   --model-from-dir <DIR>    Independent offline model release, including its SHA256SUMS
   --source-digest <SHA40>   Expected 40-char git commit SHA for OIDC attestation verification
@@ -44,8 +44,8 @@ Options:
 
 Signed engine tags require gh >= 2.102.0 and all attestation policy flags before fetching.
 The engine tag selects the binary; --model-tag selects models independently:
-  ./scripts/install.sh --tag dope-engine-v1.3.0 --model-tag v1.0.0
-  ./scripts/install.sh --tag dope-engine-v1.3.0 --no-weights
+  ./scripts/install.sh --tag dope-engine-v3.0.0 --model-tag v1.0.0
+  ./scripts/install.sh --tag dope-engine-v3.0.0 --no-weights
 For an offline split, supply --from-dir ENGINE_DIR --model-from-dir MODEL_DIR.
 A one-directory offline release with no model members remains engine-only unless
 models were explicitly requested. Partial models are refused, never relabeled.
