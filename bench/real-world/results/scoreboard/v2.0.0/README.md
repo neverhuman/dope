@@ -43,24 +43,27 @@ stratified family bootstrap, and comparisons are Holm-adjusted. The full protoco
 
 Run this one command from the repository root, with `FINAL` set to the directory that
 holds the receipts of the one confirmation look and `KPI` to the `dope_kpi` binary named
-in the pre-registration. It stops at the first failing step, and it refuses every
-receipt set unless each receipt was scored on the CONFIRM families (`panel.id` is
-`confirm`) before it copies anything.
+in the pre-registration. It refuses every receipt set unless each receipt was scored on
+the CONFIRM families (`panel.id` is `confirm`), renders the block and both hero files into
+a fresh staging directory under `target/`, and changes the tree only after every output
+exists and is non-empty; a failure before that point leaves the tree as it was.
 
 ```bash
 FINAL=/path/to/confirm/receipts KPI=/path/to/dope_kpi bash -euo pipefail <<'SWAP'
-D=bench/real-world/results/scoreboard/v2.0.0
+D=bench/real-world/results/scoreboard/v2.0.0; F=bench/real-world/figures
 NAMES="primary.json compare.json null.json"   # every receipt of the look, in render order
-for n in $NAMES; do jq -e '.panel.id == "confirm"' "$FINAL/$n" > /dev/null; done
-for n in $NAMES; do cp "$FINAL/$n" "$D/$n"; done
-ARGS=$(for n in $NAMES; do printf -- '--receipt %s ' "$D/$n"; done)
-"$KPI" render-readme $ARGS < /dev/null > "$D/readme-block.md"
+mkdir -p target; S=$(mktemp -d target/scoreboard-swap.XXXXXX); args=()
+for n in $NAMES; do jq -e '.panel.id == "confirm"' "$FINAL/$n" > /dev/null; cp "$FINAL/$n" "$S/$n"; args+=(--receipt "$S/$n"); done
+"$KPI" render-readme "${args[@]}" < /dev/null > "$S/readme-block.md"
 # render-hero is not merged yet: keep these two outputs and adjust the flags to its --help.
-"$KPI" render-hero $ARGS --theme light < /dev/null > bench/real-world/figures/hero-v2-light.svg
-"$KPI" render-hero $ARGS --theme dark < /dev/null > bench/real-world/figures/hero-v2-dark.svg
+"$KPI" render-hero "${args[@]}" --theme light < /dev/null > "$S/hero-v2-light.svg"
+"$KPI" render-hero "${args[@]}" --theme dark < /dev/null > "$S/hero-v2-dark.svg"
+for f in "$S"/*; do test -s "$f"; done
+for n in $NAMES; do cp "$S/$n" "$D/$n"; done
+cp "$S/readme-block.md" "$D/"; cp "$S/hero-v2-light.svg" "$S/hero-v2-dark.svg" "$F/"
 sums() { sha256sum "$@" | jq -R 'capture("^(?<d>[0-9a-f]{64})  (?<p>.+)$") | {(.p): .d}' | jq -s add; }
 jq -n -S --argjson receipts "$(sums $(for n in $NAMES; do echo "$D/$n"; done))" \
-  --argjson files "$(sums "$D/readme-block.md" bench/real-world/figures/hero-v2-dark.svg bench/real-world/figures/hero-v2-light.svg)" \
+  --argjson files "$(sums "$D/readme-block.md" "$F/hero-v2-dark.svg" "$F/hero-v2-light.svg")" \
   '{schema: "dope.scoreboard-render-manifest/v1", renderer: "dope_kpi render-readme", receipts: $receipts, files: $files}' \
   > "$D/render-manifest.json"
 python3 tools/claims/dope1.py --write
@@ -71,5 +74,6 @@ SWAP
 
 The script itself is read from standard input, so the `dope_kpi` calls read `/dev/null`
 and cannot swallow its later lines. Leave `null.json` out of `NAMES` if the look has no
-null receipt, and add any other receipt of the same run (for example a guards receipt). Remove receipts of an earlier
-render that the new `NAMES` no longer lists, with `git rm`.
+null receipt, and add any other receipt of the same run (for example a guards receipt).
+Remove receipts of an earlier render that the new `NAMES` no longer lists, with `git rm`.
+The staging directory (`target/scoreboard-swap.*`, ignored by git) is kept for inspection.
