@@ -140,7 +140,21 @@ It reuses `dope_core::marginal::{lattice, atoms}`. It is computed per episode fr
 - Every new FIT-only stage must stay single-threaded, deterministic, free of global state and query-poison safe, with a per-episode budget: ≤ 25 ms for T0–T2 at n_fit ≤ 4,096 and P ≤ 48.
 
 **C5. Verification readiness:**
-- Measure σ_Δ on DEV. 12 informative headline cells are far too few for +0.01–0.03 gates: about 196–784 families for δ = 0.02–0.01 at σ = 0.10. Build a larger DEV-SELECT/CONFIRM panel with a monotone re-cut that never moves a CONFIRM family.
+- **Power, from the committed v2 receipt** (`bench/real-world/results/scoreboard/v2.0.0/compare.json`, 117 families, 125 cells; derived from its interval widths, so approximate):
+  - Its one comparison is `dope-2.0.0-small` vs `dope-1.3.0-small`: Δ +0.0018, 95 % CI [−0.0020, +0.0077], an MDE of about 0.006 (one-sided 5 %, 80 % power).
+  - TRG is the mean of three task means, so the spread is per task. Per-family σ_Δ is about 0.019 for regression (94 families) and 0.016 for multiclass (**7 families**). Binary (16 families) had Δ = 0 everywhere, so it says nothing about σ.
+  - The 7 multiclass families carry about 90 % of the variance of the overall Δ.
+  - Those two arms are nearly identical, so σ_Δ ≈ 0.02 is a floor. Arms with different packets will spread more, and σ_Δ is unmeasured for them.
+  - With equal families per task, n_t ≥ (2.49 σ / δ)² / 3:
+
+    | σ_Δ per family | δ = 0.02 | δ = 0.01 |
+    |---|---|---|
+    | 0.02 | 3 | 9 |
+    | 0.05 | 13 | 52 |
+    | 0.10 | 52 | 207 |
+
+    The binding stratum is multiclass, at 7 families today.
+- Measure σ_Δ for real v3 arms on DEV once scoring is allowed (E0 gives the first paired arms). Then build a larger DEV-SELECT/CONFIRM panel, binary and multiclass first, with a monotone re-cut that never moves a CONFIRM family. Target-swap multiclass views count only as a labelled secondary stratum.
 - Draft a `dope-kpi/v3` candidate. Its main change is failed_value = −1 − R_B, so failing a cell can never beat a valid floor (DF-127). `v2` stays untouched; the owner decides.
 - V8 arm adapters for `dope_kpi score`.
 - `render-readme` rows for E-rungs.
