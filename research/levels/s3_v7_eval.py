@@ -243,21 +243,23 @@ def save_v7_resume_state(
     opt: Any,
     step: int,
     opt_steps: int,
-    total_unique: int,
+    episodes_seen: int,
     best_dev_kpi: float,
     meta: dict[str, Any],
+    seen_splits: set[str] | None = None,
 ) -> None:
-    """Atomically save full training state (model + EMA + AdamW + RNG + step) for clean extension."""
+    """Atomically save full training state (model + EMA + AdamW + RNG + seen_splits) for clean extension."""
     import torch
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "step": int(step),
         "opt_steps": int(opt_steps),
-        "total_unique": int(total_unique),
+        "episodes_seen": int(episodes_seen),
         "best_dev_kpi": float(best_dev_kpi),
         "meta": dict(meta),
+        "seen_splits": sorted(seen_splits) if seen_splits else [],
         "base_model": {k: v.detach().cpu() for k, v in base_model.state_dict().items()},
         "ema_model": {k: v.detach().cpu() for k, v in ema_model.state_dict().items()},
         "optimizer": opt.state_dict(),
@@ -276,8 +278,8 @@ def load_v7_resume_state(
     ema_model: Any,
     opt: Any,
     expected_arch: tuple[int, int, int, int],
-) -> tuple[int, int, int, float]:
-    """Load full training state (model + EMA + AdamW + RNG + step) with architecture guard."""
+) -> tuple[int, int, int, float, set[str]]:
+    """Load full training state (model + EMA + AdamW + RNG + seen_splits) with architecture guard."""
     import torch
 
     state = torch.load(resume_path, map_location="cpu", weights_only=False)
@@ -299,11 +301,13 @@ def load_v7_resume_state(
         np.random.set_state(state["numpy_rng"])
     if "python_rng" in state:
         random.setstate(state["python_rng"])
+    ep_count = int(state.get("episodes_seen", state.get("total_unique", 0)))
     return (
         int(state["step"]),
         int(state.get("opt_steps", state["step"])),
-        int(state.get("total_unique", 0)),
+        ep_count,
         float(state.get("best_dev_kpi", -999.0)),
+        set(state.get("seen_splits", [])),
     )
 
 

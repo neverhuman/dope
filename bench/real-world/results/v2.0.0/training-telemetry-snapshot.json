@@ -1,19 +1,19 @@
 {
   "archive_file_count": 0,
   "archive_total_bytes": 0,
-  "captured_utc": "2026-11-23T02:50:28Z",
+  "captured_utc": "2026-11-23T02:56:55Z",
   "encoding_bytes_max": 1218.8,
   "encoding_bytes_median": 575.5,
   "evidence_scope": "training_and_dev_telemetry_only_not_confirm_kpi",
   "fleet_dope_vram_gib_max": 0.0,
-  "fleet_history_ticks": 2449,
+  "fleet_history_ticks": 2529,
   "fleet_throughput_tbl_s_max": 2013.33,
   "fleet_throughput_tbl_s_median": 482.13,
   "schema": "dope.v2-training-telemetry-snapshot/v1",
+  "total_episodes_seen": 5854832,
   "total_eval_rows_persisted": 2367,
   "total_runs": 64,
   "total_train_rows_persisted": 303189,
-  "total_unique_splits_seen": 5854832,
   "waves": {
     "V7.0": {
       "eval_rows": 615,

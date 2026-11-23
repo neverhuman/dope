@@ -154,20 +154,30 @@ def _fetch_microbatch(
     world_size: int,
     micro_bsz: int,
     n_fit_cap: int,
-) -> dict[str, torch.Tensor] | None:
-    """Enforce exact shuffled per-batch tri-task quota (6 reg / 5 bin / 5 mc for B=16)."""
+    seen_splits: set[str] | None = None,
+) -> dict[str, Any] | None:
+    """Enforce exact tri-task quota, contiguous family traversal, and 0 split repeats by construction."""
     quota = task_quota_for_step(micro_bsz, _hash_u64(seed, step, rank))
     eps: list[dict[str, Any]] = []
+    slots_per_step = world_size * micro_bsz
     base_slot = rank * micro_bsz
     for qi, want_task in enumerate(quota):
-        for retry in range(5):
-            slot = base_slot + qi + retry * (world_size * micro_bsz)
+        for retry in range(12):
+            slot = base_slot + qi
+            ep_seed = seed + retry * 1_000_003
             ep = build_unique_v7_episode(
-                arena, seed, step, slot, n_fit_cap=n_fit_cap, n_qry_cap=128, desired_task=want_task
+                arena, ep_seed, step, slot, n_fit_cap=n_fit_cap, n_qry_cap=128,
+                desired_task=want_task, slots_per_step=slots_per_step,
             )
-            if ep is not None:
-                eps.append(ep)
-                break
+            if ep is None:
+                continue
+            sh = str(ep["split_hash"])
+            if seen_splits is not None and sh in seen_splits:
+                continue
+            if seen_splits is not None:
+                seen_splits.add(sh)
+            eps.append(ep)
+            break
     return collate_v7_batch(eps) if len(eps) >= 2 else None
 
 
@@ -261,7 +271,8 @@ def main() -> None:
         "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "d_model": args.d_model,
         "n_layers": args.n_layers, "n_heads": args.n_heads, "h_target": args.h_target, "seed": args.seed,
     }
-    start_step, opt_steps, total_unique, best_dev_kpi = 0, 0, 0, -999.0
+    start_step, opt_steps, episodes_seen, best_dev_kpi = 0, 0, 0, -999.0
+    seen_splits: set[str] = set()
     resume_p: Path | None = None
     if args.resume == "auto":
         cand = run_dir / "checkpoints" / "latest_resume.pt"
@@ -270,14 +281,14 @@ def main() -> None:
     elif args.resume:
         resume_p = Path(args.resume)
     if resume_p is not None and rank == 0:
-        start_step, opt_steps, total_unique, best_dev_kpi = load_v7_resume_state(
+        start_step, opt_steps, episodes_seen, best_dev_kpi, seen_splits = load_v7_resume_state(
             resume_p, base_model, ema_model, opt, arch_sig
         )
         print(f"[V7.2 RESUME] loaded {resume_p} at step={start_step} opt_steps={opt_steps} best_dev={best_dev_kpi:.4f}", flush=True)
     if world_size > 1:
-        st_t = torch.tensor([start_step, opt_steps, total_unique], dtype=torch.long)
+        st_t = torch.tensor([start_step, opt_steps, episodes_seen], dtype=torch.long)
         dist.broadcast(st_t, src=0)
-        start_step, opt_steps, total_unique = int(st_t[0].item()), int(st_t[1].item()), int(st_t[2].item())
+        start_step, opt_steps, episodes_seen = int(st_t[0].item()), int(st_t[1].item()), int(st_t[2].item())
         for p in base_model.parameters():
             dist.broadcast(p.data, src=0)
         for p in ema_model.parameters():
@@ -303,7 +314,7 @@ def main() -> None:
     pool = ThreadPoolExecutor(max_workers=args.prefetch_workers) if args.prefetch_workers > 0 else None
     n_fit_cap = int(256 + 256 * min(1.0, (start_step + 1) / max(1.0, args.steps * 0.5)))
     fut_next = (
-        pool.submit(_fetch_microbatch, train_arena, args.seed, start_step + 1, rank, world_size, args.micro_batch, n_fit_cap)
+        pool.submit(_fetch_microbatch, train_arena, args.seed, start_step + 1, rank, world_size, args.micro_batch, n_fit_cap, seen_splits)
         if (pool is not None and start_step < args.steps) else None
     )
 
@@ -319,6 +330,8 @@ def main() -> None:
             opt.zero_grad(set_to_none=True)
             acc = {k: 0.0 for k in m_keys}
             acc_bytes, acc_nfit, acc_noise, acc_crop = [], [], [], []
+            step_datasets: list[str] = []
+            step_splits: list[str] = []
             c_reg = c_bin = c_mc = c_synth = c_swap = c_crop = 0
             valid_micros = 0
 
@@ -328,11 +341,11 @@ def main() -> None:
                     next_s = step + (1 if ga + 1 == args.grad_accum else 0)
                     fut_next = pool.submit(
                         _fetch_microbatch, train_arena, args.seed + (ga + 1) * 10007,
-                        next_s, rank, world_size, args.micro_batch, n_fit_cap,
+                        next_s, rank, world_size, args.micro_batch, n_fit_cap, seen_splits,
                     )
                 else:
                     batch = _fetch_microbatch(
-                        train_arena, args.seed + ga * 10007, step, rank, world_size, args.micro_batch, n_fit_cap
+                        train_arena, args.seed + ga * 10007, step, rank, world_size, args.micro_batch, n_fit_cap, seen_splits
                     )
                 if batch is None:
                     continue
@@ -355,6 +368,8 @@ def main() -> None:
                 acc_nfit.append(float(batch["n_fit"].mean().item()))
                 acc_noise.append(float(batch["n_noise"].mean().item()))
                 acc_crop.append(float(batch["col_crop_ratio"].mean().item()))
+                step_datasets.extend(batch["dataset_hashes"])
+                step_splits.extend(batch["split_hashes"])
                 tid = batch["task_id"]
                 c_reg += int((tid == 0).sum().item())
                 c_bin += int((tid == 1).sum().item())
@@ -390,8 +405,13 @@ def main() -> None:
                     pe.data.mul_(d_ema).add_(pb.data, alpha=1.0 - d_ema)
 
             step_tables = world_size * args.micro_batch * valid_micros
-            total_unique += step_tables
+            episodes_seen += step_tables
             win_tables += step_tables
+            if rank == 0:
+                _append_jsonl(run_dir / "exposure.jsonl", {
+                    "step": step, "time": round(time.time(), 3),
+                    "datasets": step_datasets, "splits": step_splits,
+                })
 
             if rank == 0 and (step % args.log_every == 0 or step == 1):
                 now = time.time()
@@ -403,7 +423,7 @@ def main() -> None:
                     "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "artifact_class": "source_free",
                     **{k: round(acc[k] / valid_micros, 4) for k in m_keys},
                     "grad_norm": round(gnorm, 4), "lr": round(lr_now, 6),
-                    "tables_per_s": round(tbl_s, 2), "unique_splits_seen": total_unique,
+                    "tables_per_s": round(tbl_s, 2), "episodes_seen": episodes_seen,
                     "encoding_bytes_avg": round(float(np.mean(acc_bytes)), 1),
                     "avg_n_fit": round(float(np.mean(acc_nfit)), 1),
                     "avg_noise_cols": round(float(np.mean(acc_noise)), 2),
@@ -449,7 +469,7 @@ def main() -> None:
                             )
                 save_v7_resume_state(
                     run_dir / "checkpoints" / "latest_resume.pt",
-                    base_model, ema_model, opt, step, opt_steps, total_unique, best_dev_kpi, resume_meta,
+                    base_model, ema_model, opt, step, opt_steps, episodes_seen, best_dev_kpi, resume_meta, seen_splits=seen_splits,
                 )
                 _append_jsonl(run_dir / "checkpoints" / "ledger.jsonl", {
                     **(ev or {}), "checkpoint": ck_name, "role": role, "arch": "single_enc_v7",

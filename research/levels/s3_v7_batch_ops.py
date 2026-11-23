@@ -109,13 +109,15 @@ def _fit_only_scale(Xa: np.ndarray, Xq: np.ndarray) -> tuple[np.ndarray, np.ndar
     return _xform(Xa), _xform(Xq)
 
 
-def _pick_family_table(arena: FlatArenaView, task: str, seed: int, step: int, slot: int) -> int | None:
+def _pick_family_table(
+    arena: FlatArenaView, task: str, seed: int, step: int, slot: int, slots_per_step: int = 16
+) -> int | None:
     fams = arena.by_task_fams[task]
     if not fams:
         return None
     n_fams = len(fams)
-    epoch = (step * 1024 + slot) // max(n_fams, 1)
-    pos = (step * 1024 + slot) % n_fams
+    seq = step * max(slots_per_step, 1) + slot
+    epoch, pos = seq // max(n_fams, 1), seq % n_fams
     cand = int(_hash_u64(seed, epoch, TASK_TO_ID[task]) % max(n_fams - 1, 1)) + 1
     while math.gcd(cand, n_fams) != 1 and cand < n_fams:
         cand += 1
@@ -134,6 +136,7 @@ def build_unique_v7_episode(
     n_qry_cap: int = 128,
     max_bytes: int = PACKET_BUDGET_BYTES,
     desired_task: str | None = None,
+    slots_per_step: int = 16,
 ) -> dict[str, Any] | None:
     """Build one maximum-entropy counter-seeded episode (S3 real + synthetic prior + full cropping)."""
     ep_seed = _hash_u64(seed, step, global_slot)
@@ -148,7 +151,8 @@ def build_unique_v7_episode(
     is_swapped = False
     is_cropped = False
     crop_ratio = 1.0
-    dataset_hash = "synthetic_scm_prior"
+    dataset_hash = f"synth:{task}:{ep_seed:016x}"
+    split_h = hashlib.blake2b(digest_size=16)
 
     # Log-uniform sample-size cropping EVERY episode so model masters tiny (32) AND large (n_fit_cap) tables!
     n_fit_target = int(round(math.exp(rng.uniform(math.log(32.0), math.log(max(64.0, float(n_fit_cap)))))))
@@ -162,11 +166,12 @@ def build_unique_v7_episode(
         )
         Xa_raw, Xq_raw = apply_manifold_augmentations(rng, Xa_raw, Xq_raw)
         Xa, Xq = _fit_only_scale(Xa_raw, Xq_raw)
+        split_h.update(dataset_hash.encode("utf-8"))
     else:
         # 15% of binary/multiclass slots synthesize brand-new classification tasks from ALL 3,155 S3 reg tables!
         from_reg_synth = (task in ("binary", "multiclass")) and (rng.random() < 0.15)
         src_task = "regression" if from_reg_synth else task
-        tbl_idx = _pick_family_table(arena, src_task, seed, step, global_slot)
+        tbl_idx = _pick_family_table(arena, src_task, seed, step, global_slot, slots_per_step=slots_per_step)
         if tbl_idx is None:
             return None
         X_raw, y_raw, dg, rec = arena.load_slice(tbl_idx)
@@ -219,6 +224,10 @@ def build_unique_v7_episode(
             p_pick = max_real_p
         crop_ratio = float(p_pick) / float(max(nc, 1))
         col_perm = rng.choice(nc, size=p_pick, replace=False)
+        split_h.update(dataset_hash.encode("utf-8"))
+        split_h.update(np.sort(fit_idx.astype(np.int32)).tobytes())
+        split_h.update(np.sort(qry_idx.astype(np.int32)).tobytes())
+        split_h.update(col_perm.astype(np.int32).tobytes())
         Xa_raw, Xq_raw = apply_manifold_augmentations(rng, X_raw[fit_idx][:, col_perm], X_raw[qry_idx][:, col_perm])
         Xa, Xq = _fit_only_scale(Xa_raw, Xq_raw)
         ya, yq = y_raw[fit_idx].copy(), y_raw[qry_idx].copy()
@@ -229,6 +238,7 @@ def build_unique_v7_episode(
 
     # Target canonicalization + class-ID permutation / binary polarity flip EVERY episode!
     task_id = TASK_TO_ID[task]
+    split_h.update(f"|t={task_id}|sw={int(is_swapped)}".encode("utf-8"))
     if task_id == 0:
         if not (np.all(np.isfinite(ya)) and np.all(np.isfinite(yq))):
             return None
@@ -237,6 +247,7 @@ def build_unique_v7_episode(
         yq = np.clip((yq - mu) / sd, -6.0, 6.0).astype(np.float32)
         if rng.random() < 0.5:
             ya, yq = -ya, -yq
+            split_h.update(b"|neg")
         n_cls = 1
     elif task_id == 1:
         u_a = np.unique(ya[np.isfinite(ya)])
@@ -246,6 +257,7 @@ def build_unique_v7_episode(
         ya, yq = (ya == hi).astype(np.float32), (yq == hi).astype(np.float32)
         if rng.random() < 0.5:
             ya, yq = 1.0 - ya, 1.0 - yq
+            split_h.update(b"|flip")
         if len(np.unique(ya)) < 2 or len(np.unique(yq)) < 2:
             return None
         n_cls = 2
@@ -253,9 +265,9 @@ def build_unique_v7_episode(
         uniq_c = np.unique(np.rint(ya).astype(np.int64))
         if len(uniq_c) < 3 or len(uniq_c) > MAX_CLASSES:
             return None
-        # Random K! class-ID permutation so class slots stay 100% permutation-symmetric!
         perm_ids = rng.permutation(len(uniq_c))
         mp = {int(c): int(perm_ids[i]) for i, c in enumerate(uniq_c)}
+        split_h.update(json.dumps(mp, sort_keys=True).encode("utf-8"))
         ya = np.array([mp.get(int(round(float(v))), 0) for v in ya], dtype=np.float32)
         yq = np.array([mp.get(int(round(float(v))), 0) for v in yq], dtype=np.float32)
         n_cls = len(uniq_c)
@@ -269,36 +281,27 @@ def build_unique_v7_episode(
     Xq_pad[:nq, :p_eff] = Xq[:nq, :p_eff]
     yq_pad[:nq] = yq[:nq]
     q_mask[:nq] = 1.0
-
-    pkt["X_qry"] = Xq_pad
-    pkt["y_qry"] = yq_pad
-    pkt["q_mask"] = q_mask
-    pkt["n_fit"] = len(Xa)
-    pkt["n_noise"] = n_noise
-    pkt["is_synth_prior"] = int(is_synth)
-    pkt["is_swapped"] = int(is_swapped)
-    pkt["is_cropped"] = int(is_cropped)
-    pkt["col_crop_ratio"] = float(crop_ratio)
-    pkt["dataset_hash"] = dataset_hash
+    pkt.update(
+        X_qry=Xq_pad, y_qry=yq_pad, q_mask=q_mask, n_fit=len(Xa), n_noise=n_noise,
+        is_synth_prior=int(is_synth), is_swapped=int(is_swapped), is_cropped=int(is_cropped),
+        col_crop_ratio=float(crop_ratio), dataset_hash=dataset_hash, split_hash=split_h.hexdigest(),
+    )
     return pkt
 
 
-def collate_v7_batch(episodes: list[dict[str, Any]]) -> dict[str, torch.Tensor]:
+def collate_v7_batch(episodes: list[dict[str, Any]]) -> dict[str, Any]:
     keys = [
         "col_feats", "glob_feats", "knots", "L", "class_means",
         "W", "b", "prior", "resid_sd", "col_mask", "is_const",
         "X_qry", "y_qry", "q_mask",
     ]
-    out = {k: torch.from_numpy(np.stack([e[k] for e in episodes], axis=0)) for k in keys}
-    out["task_id"] = torch.tensor([e["task_id"] for e in episodes], dtype=torch.long)
-    out["k_eff"] = torch.tensor([e["k_eff"] for e in episodes], dtype=torch.long)
-    out["packet_bytes"] = torch.tensor([e["packet_bytes"] for e in episodes], dtype=torch.float32)
-    out["n_fit"] = torch.tensor([e["n_fit"] for e in episodes], dtype=torch.float32)
-    out["n_noise"] = torch.tensor([e["n_noise"] for e in episodes], dtype=torch.float32)
-    out["is_synth_prior"] = torch.tensor([e.get("is_synth_prior", 0) for e in episodes], dtype=torch.float32)
-    out["is_swapped"] = torch.tensor([e.get("is_swapped", 0) for e in episodes], dtype=torch.float32)
-    out["is_cropped"] = torch.tensor([e.get("is_cropped", 0) for e in episodes], dtype=torch.float32)
-    out["col_crop_ratio"] = torch.tensor([e.get("col_crop_ratio", 1.0) for e in episodes], dtype=torch.float32)
+    out: dict[str, Any] = {k: torch.from_numpy(np.stack([e[k] for e in episodes], axis=0)) for k in keys}
+    for k, dt in (("task_id", torch.long), ("k_eff", torch.long), ("packet_bytes", torch.float32), ("n_fit", torch.float32), ("n_noise", torch.float32)):
+        out[k] = torch.tensor([e[k] for e in episodes], dtype=dt)
+    for k, dv in (("is_synth_prior", 0), ("is_swapped", 0), ("is_cropped", 0), ("col_crop_ratio", 1.0)):
+        out[k] = torch.tensor([e.get(k, dv) for e in episodes], dtype=torch.float32)
+    out["dataset_hashes"] = [str(e.get("dataset_hash", "")) for e in episodes]
+    out["split_hashes"] = [str(e.get("split_hash", "")) for e in episodes]
     return out
 
 

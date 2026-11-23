@@ -104,7 +104,7 @@ def collect_wave_data(mirror_root: Path, history_log: Path) -> dict[str, Any]:
         total_eval_rows += len(ev_rows)
         if tr_rows:
             max_splits_by_run[f"{run_dir.parent.parent.name}/{run_dir.name}"] = max(
-                int(r.get("unique_splits_seen", 0)) for r in tr_rows
+                int(r.get("episodes_seen", r.get("unique_splits_seen", 0))) for r in tr_rows
             )
             for r in tr_rows[-20:]:
                 b = r.get("encoding_bytes_avg")
@@ -163,13 +163,14 @@ def archive_telemetry(data: dict[str, Any], archive_dir: Path, mirror_root: Path
 
 
 def _persisted_fleet_rate_bins(data: dict[str, Any], bin_s: float = 60.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Compute wall-clock fleet throughput (tbl/s) and monotonic cumulative splits (M) from train.jsonl."""
+    """Compute wall-clock fleet throughput (tbl/s) and monotonic cumulative training episodes (M) from train.jsonl."""
     ts_pairs: list[tuple[float, float]] = []
     for rlist in data["waves"].values():
         for run in rlist:
             prev_u = 0.0
             for row in run["train"]:
-                t_val, u_val = row.get("time"), row.get("unique_splits_seen")
+                t_val = row.get("time")
+                u_val = row.get("episodes_seen", row.get("unique_splits_seen"))
                 if isinstance(t_val, (int, float)) and isinstance(u_val, (int, float)):
                     du = max(0.0, float(u_val) - prev_u)
                     prev_u = float(u_val)
@@ -229,7 +230,7 @@ def build_snapshot_receipt(data: dict[str, Any], archive_manifest: dict[str, Any
         "total_runs": sum(len(v) for v in data["waves"].values()),
         "total_train_rows_persisted": data["total_train_rows"],
         "total_eval_rows_persisted": data["total_eval_rows"],
-        "total_unique_splits_seen": data["total_unique_splits"],
+        "total_episodes_seen": data["total_unique_splits"],
         "fleet_history_ticks": len(hist),
         "fleet_throughput_tbl_s_median": round(float(np.median(tps_vals)), 2) if tps_vals else None,
         "fleet_throughput_tbl_s_max": round(float(np.max(tps_vals)), 2) if tps_vals else None,
@@ -320,15 +321,15 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
             ax.axhline(med_tps, color="#666666", ls="--", lw=1.0, label=f"Active Median ({med_tps:.0f} tbl/s)")
         ax.set_ylim(0.0, max(2350.0, float(np.max(tps)) * 1.22))
         ax.set_xlabel("Elapsed Wave Time (minutes)")
-        ax.set_ylabel("Unique Tables / Second (0.0 GiB VRAM)", color="#0072B2")
+        ax.set_ylabel("Training Episodes / Second (0.0 GiB VRAM)", color="#0072B2")
         ax2 = ax.twinx()
         ax2.spines["top"].set_visible(False)
-        ax2.plot(mins, cum_m, color="#D55E00", lw=1.6, ls="-.", label="Cumulative Splits (M)")
-        ax2.set_ylabel("Cumulative Unique Splits (Millions)", color="#D55E00")
+        ax2.plot(mins, cum_m, color="#D55E00", lw=1.6, ls="-.", label="Cumulative Episodes (M)")
+        ax2.set_ylabel("Cumulative Training Episodes (Millions)", color="#D55E00")
         ax.legend(loc="upper left")
     else:
         ax.text(0.5, 0.5, "Awaiting persisted train.jsonl timestamps", ha="center", va="center")
-    ax.set_title("(c) CPU-Only Fleet Throughput & Cumulative Splits")
+    ax.set_title("(c) CPU-Only Training Throughput & Cumulative Episodes")
     ax.grid(True)
 
     # Panel (d): DEV-Only Per-Task Trajectory (clearly labeled unconfirmed DEV)
@@ -359,7 +360,7 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
     fig.suptitle(
         f"DOPE v2.0.0 SingleEncV7 Training Wave Telemetry "
         f"({data['total_train_rows']:,} Persisted Step Logs | "
-        f"{data['total_unique_splits'] / 1e6:.2f}M Unique Splits | 0.0 GiB VRAM)",
+        f"{data['total_unique_splits'] / 1e6:.2f}M Training Episodes | 0.0 GiB VRAM)",
         fontsize=11.5,
         fontweight="bold",
     )
@@ -391,7 +392,7 @@ def main() -> None:
         "status": "ok",
         "total_runs": receipt["total_runs"],
         "total_train_rows": receipt["total_train_rows_persisted"],
-        "total_unique_splits": receipt["total_unique_splits_seen"],
+        "total_episodes_seen": receipt["total_episodes_seen"],
         "fleet_tbl_s_med": receipt["fleet_throughput_tbl_s_median"],
         "fleet_tbl_s_max": receipt["fleet_throughput_tbl_s_max"],
         "receipt": str(args.receipt_out),
