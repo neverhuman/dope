@@ -4,17 +4,17 @@
 
 use super::codec::{fit_to_budget, pack, unpack, BudgetStep};
 use super::effects::gate;
-use super::fit::{fit_packet, Size, Target};
+use super::fit::{fit_packet, FitTarget, Size};
 use super::linpred::{
     effect_code, effect_value, noise_sd, ratio_code, ratio_value, resid_sd_code, resid_sd_value,
     temperature_code, temperature_value, TargetModel, PAIR_OFFSET_SLOT,
 };
-use super::packet::{Level, Packet, Task};
+use super::packet::{Packet, PacketLevel, PacketTask};
 use super::target::column_samplers;
 use super::testkit::{fit_full, n01, table, u01};
 
 /// Root mean square of `y - eta` on the FIT rows for the model of `level`.
-fn residual_rms(packet: &Packet, level: Level, unit: &[f64], y: &[f64]) -> f64 {
+fn residual_rms(packet: &Packet, level: PacketLevel, unit: &[f64], y: &[f64]) -> f64 {
     let samplers = column_samplers(packet);
     let eta = TargetModel::new(packet, level, &samplers).eta_rows(unit, packet.cols());
     let sse: f64 = y.iter().zip(&eta).map(|(y, e)| (y - e) * (y - e)).sum();
@@ -85,7 +85,7 @@ fn main_effects_and_pairs_find_planted_structure_and_ignore_a_linear_table() {
         .iter()
         .map(|y| {
             let (packet, card, unit) =
-                fit_full(&raw, Target::Regression(y), Task::Regression, 0, n);
+                fit_full(&raw, FitTarget::Regression(y), PacketTask::Regression, 0, n);
             let target = y.iter().map(|&v| card.target_to_unit(v)).collect();
             (packet, unit, target)
         })
@@ -101,11 +101,11 @@ fn main_effects_and_pairs_find_planted_structure_and_ignore_a_linear_table() {
         |packet: &Packet| -> Vec<usize> { (0..p).filter(|&j| packet.main_mask[j]).collect() };
     let mut report = Vec::new();
     for (name, (packet, unit, target)) in ["linear", "u-shape", "interaction"].iter().zip(&fits) {
-        let rms: Vec<f64> = [Level::A, Level::D, Level::E]
+        let rms: Vec<f64> = [PacketLevel::A, PacketLevel::D, PacketLevel::E]
             .iter()
             .map(|&l| residual_rms(packet, l, unit, target))
             .collect();
-        let sd: Vec<f64> = [Level::A, Level::D, Level::E]
+        let sd: Vec<f64> = [PacketLevel::A, PacketLevel::D, PacketLevel::E]
             .iter()
             .map(|&l| noise_sd(packet, l))
             .collect();
@@ -128,7 +128,7 @@ fn main_effects_and_pairs_find_planted_structure_and_ignore_a_linear_table() {
     assert!(main_cols(linear_fit).is_empty() && live_pairs(linear_fit).is_empty());
     assert!(linear_fit.pairs.iter().all(|t| (t.a, t.b) == (0, 0)));
     assert_eq!(linear_fit.temperature, 0);
-    let len = |packet: &Packet| pack(packet, Level::E).unwrap().len();
+    let len = |packet: &Packet| pack(packet, PacketLevel::E).unwrap().len();
     assert!(len(linear_fit) < len(u_fit));
     // The U shape is a main effect of column 3 alone: outer bins up, inner bins down.
     assert_eq!(main_cols(u_fit), vec![3]);
@@ -142,8 +142,8 @@ fn main_effects_and_pairs_find_planted_structure_and_ignore_a_linear_table() {
     );
     let u = &fits[1];
     let (a, d) = (
-        residual_rms(&u.0, Level::A, &u.1, &u.2),
-        residual_rms(&u.0, Level::D, &u.1, &u.2),
+        residual_rms(&u.0, PacketLevel::A, &u.1, &u.2),
+        residual_rms(&u.0, PacketLevel::D, &u.1, &u.2),
     );
     assert!(d < 0.85 * a, "{a} {d}");
     assert!(u_fit.temperature >> 4 >= 1);
@@ -152,14 +152,17 @@ fn main_effects_and_pairs_find_planted_structure_and_ignore_a_linear_table() {
     assert!(pair_fit.pairs[0].coef[0] > 0 && main_cols(pair_fit).is_empty());
     let f = &fits[2];
     let (d, e) = (
-        residual_rms(&f.0, Level::D, &f.1, &f.2),
-        residual_rms(&f.0, Level::E, &f.1, &f.2),
+        residual_rms(&f.0, PacketLevel::D, &f.1, &f.2),
+        residual_rms(&f.0, PacketLevel::E, &f.1, &f.2),
     );
     assert!(e < 0.6 * d, "{d} {e}");
     assert!(pair_fit.temperature & 15 >= 3);
     // Truncation removes the sections and the decoder falls back to the level-A noise.
-    let cut = unpack(&pack(pair_fit, Level::C).unwrap()).unwrap();
-    assert_eq!(noise_sd(&cut, Level::C), resid_sd_value(pair_fit.resid_sd));
+    let cut = unpack(&pack(pair_fit, PacketLevel::C).unwrap()).unwrap();
+    assert_eq!(
+        noise_sd(&cut, PacketLevel::C),
+        resid_sd_value(pair_fit.resid_sd)
+    );
 }
 
 #[test]
@@ -177,8 +180,8 @@ fn classification_effects_are_gated_too() {
     };
     let plain = label(|_| 0.0, 82);
     let crossed = label(|r| 1.4 * r[2] * r[3], 83);
-    let (linear_fit, ..) = fit_full(&raw, Target::Classes(&plain), Task::Binary, 2, n);
-    let (pair_fit, ..) = fit_full(&raw, Target::Classes(&crossed), Task::Binary, 2, n);
+    let (linear_fit, ..) = fit_full(&raw, FitTarget::Classes(&plain), PacketTask::Binary, 2, n);
+    let (pair_fit, ..) = fit_full(&raw, FitTarget::Classes(&crossed), PacketTask::Binary, 2, n);
     let live = |packet: &Packet| -> Vec<(u16, u16)> {
         packet.pairs[..PAIR_OFFSET_SLOT]
             .iter()
@@ -213,26 +216,37 @@ fn the_budget_step_refreshes_the_noise_of_the_final_shape() {
         })
         .collect();
     let fit = |size: Size| {
-        fit_packet(&raw, Target::Regression(&y), Task::Regression, 0, size, n).unwrap()
+        fit_packet(
+            &raw,
+            FitTarget::Regression(&y),
+            PacketTask::Regression,
+            0,
+            size,
+            n,
+        )
+        .unwrap()
     };
-    let full = fit(Size::level(Level::E));
+    let full = fit(Size::level(PacketLevel::E));
     let packet = unpack(&full.bytes).unwrap();
     let kept = packet.main_mask.iter().filter(|&&m| m).count();
     assert!(kept >= 6, "{kept}");
     // The budget is one S8 column short of the dense level-D packet.
-    let dense_d = pack(&packet, Level::D).unwrap().len();
+    let dense_d = pack(&packet, PacketLevel::D).unwrap().len();
     let tight = fit(Size::budget(dense_d - 1));
     assert_eq!(tight.budget.step, BudgetStep::PartialMainEffects);
     assert_eq!(
         (tight.budget.level, tight.budget.main_effect_cols),
-        (Level::D, kept - 1)
+        (PacketLevel::D, kept - 1)
     );
     assert!(tight.bytes.len() < dense_d && tight.budget.fits);
     let small = unpack(&tight.bytes).unwrap();
     // Without the refresh the packet would be the budget cut of the full one.
     let cut = fit_to_budget(&packet, dense_d - 1).packet;
     assert_eq!(small.main_effect, cut.main_effect);
-    let (with, without) = (noise_sd(&small, Level::D), noise_sd(&cut, Level::D));
+    let (with, without) = (
+        noise_sd(&small, PacketLevel::D),
+        noise_sd(&cut, PacketLevel::D),
+    );
     println!("partial S8 ({} of {kept} columns): level-D noise SD {with:.4} after the refresh, {without:.4} before", kept - 1);
     assert!(with >= without);
 }

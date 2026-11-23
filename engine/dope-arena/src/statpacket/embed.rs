@@ -19,7 +19,7 @@ use super::dependence::{LOADING_SCALE, MEAN_STEP};
 use super::linpred::{effect_value, importance, noise_sd, temperature_value, PAIR_OFFSET_SLOT};
 use super::marginals::{atom_masses, half_span_value, knot_plan, ColumnSampler};
 use super::packet::{
-    f16_to_f64, AtomValues, ColumnMarginal, Packet, Task, MAIN_BINS, MAX_RANK, PAIRS,
+    f16_to_f64, AtomValues, ColumnMarginal, Packet, PacketTask, MAIN_BINS, MAX_RANK, PAIRS,
 };
 use dope_core::rng::normal;
 use dope_core::stats::sym_eigen;
@@ -105,14 +105,14 @@ pub fn summary(packet: &Packet) -> [f64; EMBED_DIM] {
 
     // Class shares or label rates, sorted, and their entropy.
     let mut prior: Vec<f64> = packet.prior.iter().map(|&c| c as f64 / 255.0).collect();
-    if matches!(packet.task, Task::Binary | Task::Multiclass) {
+    if matches!(packet.task, PacketTask::Binary | PacketTask::Multiclass) {
         prior.push(1.0 - prior.iter().sum::<f64>());
     }
     let entropy = |q: &[f64]| -> f64 {
         let h: f64 = q.iter().filter(|&&v| v > 0.0).map(|v| -v * v.ln()).sum();
         h / (q.len().max(2) as f64).ln()
     };
-    let spread = if packet.task == Task::Multilabel {
+    let spread = if packet.task == PacketTask::Multilabel {
         0.0
     } else {
         entropy(&prior)
@@ -121,7 +121,7 @@ pub fn summary(packet: &Packet) -> [f64; EMBED_DIM] {
     let even = 1.0 / prior.len().max(1) as f64;
     let classes = prior.len().min(8);
     let mut sorted = top(prior, 8);
-    if packet.task != Task::Multilabel {
+    if packet.task != PacketTask::Multilabel {
         sorted[..classes].iter_mut().for_each(|q| *q -= even);
     }
     first.put(&sorted, 1.5);
@@ -210,7 +210,7 @@ pub fn summary(packet: &Packet) -> [f64; EMBED_DIM] {
         .iter()
         .map(|&h| f16_to_f64(h))
         .collect();
-    let noise = if packet.task == Task::Regression {
+    let noise = if packet.task == PacketTask::Regression {
         noise_sd(packet, packet.level)
     } else {
         let size: f64 = top(intercept.iter().map(|b| b.abs()).collect(), o)
@@ -281,7 +281,7 @@ pub fn summary(packet: &Packet) -> [f64; EMBED_DIM] {
                 .map(|&c| effect_value(c)),
         );
     }
-    let heat = if packet.task == Task::Regression {
+    let heat = if packet.task == PacketTask::Regression {
         0.0
     } else {
         temperature_value(packet.temperature) - 1.0

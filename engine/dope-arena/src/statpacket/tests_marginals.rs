@@ -7,7 +7,7 @@ use super::marginals::{
     atom_masses, atom_values, decoded_knots, fit_column, knot_plan, knot_probability,
     simplex_codes, ColumnSampler,
 };
-use super::packet::{AtomValues, ColumnMarginal, Level};
+use super::packet::{AtomValues, ColumnMarginal, PacketLevel};
 use super::testkit::{column, fit_regression, n01, quantile, sorted, table, to_unit, u01};
 
 #[test]
@@ -58,7 +58,11 @@ fn knots_are_exactly_nested_and_monotone() {
     }
     assert!(k17.windows(2).all(|w| w[0] <= w[1]));
     // The curve passes through its knots at every level.
-    for (level, knots) in [(Level::A, &k5), (Level::C, &k9), (Level::E, &k17)] {
+    for (level, knots) in [
+        (PacketLevel::A, &k5),
+        (PacketLevel::C, &k9),
+        (PacketLevel::E, &k17),
+    ] {
         let curve = ColumnSampler::new(&col, level, &plan);
         let last = knots.len() - 1;
         for (i, k) in knots.iter().enumerate() {
@@ -77,9 +81,12 @@ fn quantile_gap(fit: &[f64], decoded: &[f64]) -> f64 {
 }
 
 fn gaps_by_level(unit: &[f64], n: usize, p: usize) -> Vec<[f64; 3]> {
-    let bytes = pack(&fit_regression(unit, n, p), Level::E).unwrap();
+    let bytes = pack(&fit_regression(unit, n, p), PacketLevel::E).unwrap();
     let mut out = vec![[0.0; 3]; p];
-    for (slot, level) in [Level::B, Level::C, Level::E].into_iter().enumerate() {
+    for (slot, level) in [PacketLevel::B, PacketLevel::C, PacketLevel::E]
+        .into_iter()
+        .enumerate()
+    {
         let decoder = Decoder::new(&unpack(&truncate(&bytes, level).unwrap()).unwrap()).unwrap();
         let rows = decoder.rows_unit(77, 0, 100_000);
         for (j, gaps) in out.iter_mut().enumerate() {

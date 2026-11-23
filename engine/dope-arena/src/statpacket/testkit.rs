@@ -1,10 +1,10 @@
 //! Deterministic fixtures and small statistics shared by the unit tests.
 
 use super::codec::unpack;
-use super::fit::{fit_features, fit_packet, FitInput, Labels, Size, Target};
+use super::fit::{fit_features, fit_packet, FitInput, FitTarget, Labels, Size};
 use super::packet::{
-    f64_to_f16, AtomTable, AtomValues, ColumnMarginal, Packet, PairTerm, Task, MAIN_BINS, MAX_RANK,
-    PAIRS,
+    f64_to_f16, AtomTable, AtomValues, ColumnMarginal, Packet, PacketTask, PairTerm, MAIN_BINS,
+    MAX_RANK, PAIRS,
 };
 use super::scale::ScaleCard;
 use dope_core::rng::{hash3, normal, uniform};
@@ -37,7 +37,7 @@ pub fn fit_regression(unit: &[f64], n: usize, p: usize) -> Packet {
         x: unit,
         rows: n,
         cols: p,
-        task: Task::Regression,
+        task: PacketTask::Regression,
         k: 0,
         labels: Labels::None,
     })
@@ -48,12 +48,20 @@ pub fn fit_regression(unit: &[f64], n: usize, p: usize) -> Packet {
 /// unit-space FIT rows, from raw rows and their target.
 pub fn fit_full(
     raw: &[f64],
-    y: Target,
-    task: Task,
+    y: FitTarget,
+    task: PacketTask,
     k: u8,
     n: usize,
 ) -> (Packet, ScaleCard, Vec<f64>) {
-    let fitted = fit_packet(raw, y, task, k, Size::level(super::packet::Level::E), n).unwrap();
+    let fitted = fit_packet(
+        raw,
+        y,
+        task,
+        k,
+        Size::level(super::packet::PacketLevel::E),
+        n,
+    )
+    .unwrap();
     let unit = fitted.card.to_unit_rows(raw).unwrap();
     (unpack(&fitted.bytes).unwrap(), fitted.card, unit)
 }
@@ -109,7 +117,7 @@ pub fn max_corr_gap(a: &[f64], b: &[f64], p: usize) -> f64 {
 
 /// Column kinds for [`synthetic_packet`].
 #[derive(Clone, Copy)]
-pub enum Kind {
+pub enum SynthKind {
     Continuous,
     Constant,
     /// Explicit atoms.
@@ -124,31 +132,31 @@ fn byte(seed: u64, stream: u64, i: usize) -> u8 {
 
 /// A structurally valid level-E packet with pseudo-random codes in every field.
 pub fn synthetic_packet(
-    task: Task,
+    task: PacketTask,
     k: u8,
     p: usize,
-    kind: impl Fn(usize) -> Kind,
+    kind: impl Fn(usize) -> SynthKind,
     seed: u64,
 ) -> Packet {
     let columns = (0..p)
         .map(|j| {
             let code = |i: usize| byte(seed, 10 + j as u64, i) % 64;
             match kind(j) {
-                Kind::Constant => ColumnMarginal::Constant,
-                Kind::Continuous => ColumnMarginal::Continuous {
+                SynthKind::Constant => ColumnMarginal::Constant,
+                SynthKind::Continuous => ColumnMarginal::Continuous {
                     lo: (hash3(seed, 10 + j as u64, 90) % 4096) as u16,
                     hi: (hash3(seed, 10 + j as u64, 91) % 4096) as u16,
                     split: std::array::from_fn(|i| byte(seed, 10 + j as u64, 92 + i)),
                     mid9: std::array::from_fn(|i| code(4 + i)),
                     mid17: std::array::from_fn(|i| code(8 + i)),
                 },
-                Kind::Explicit(a) => ColumnMarginal::Discrete(AtomTable {
+                SynthKind::Explicit(a) => ColumnMarginal::Discrete(AtomTable {
                     values: AtomValues::Explicit(
                         (0..a).map(|i| f64_to_f16(-2.0 + 0.37 * i as f64)).collect(),
                     ),
                     prob: (0..a).map(|i| 1 + code(i) % 63).collect(),
                 }),
-                Kind::Lattice(a) => ColumnMarginal::Discrete(AtomTable {
+                SynthKind::Lattice(a) => ColumnMarginal::Discrete(AtomTable {
                     values: AtomValues::Lattice {
                         base: f64_to_f16(-1.5),
                         step: f64_to_f16(0.25),
@@ -163,14 +171,14 @@ pub fn synthetic_packet(
     let o = out.outputs();
     let prior_len = out.prior.len();
     for (i, c) in out.prior.iter_mut().enumerate() {
-        *c = if task == Task::Multilabel {
+        *c = if task == PacketTask::Multilabel {
             byte(seed, 1, i)
         } else {
             byte(seed, 1, i) % (255 / prior_len.max(1)) as u8
         };
     }
     // Regression: residual-SD code and ratio nibbles; other tasks: temperature only.
-    out.resid_sd = if task == Task::Regression {
+    out.resid_sd = if task == PacketTask::Regression {
         byte(seed, 2, 0)
     } else {
         0

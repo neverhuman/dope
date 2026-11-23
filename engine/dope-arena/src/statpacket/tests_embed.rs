@@ -4,9 +4,9 @@
 
 use super::codec::unpack;
 use super::embed::{cosine, embed, embed_summary, rotation, summary, EMBED_DIM, EMBED_PREFIX};
-use super::fit::{fit_packet, Size, Target};
+use super::fit::{fit_packet, FitTarget, Size};
 use super::glm::sigmoid;
-use super::packet::{Level, Packet, Task, MAIN_BINS, MAX_RANK};
+use super::packet::{Packet, PacketLevel, PacketTask, MAIN_BINS, MAX_RANK};
 use super::testkit::{n01, table, u01};
 
 /// One synthetic table: raw features, target and task.
@@ -14,7 +14,7 @@ struct Case {
     name: &'static str,
     raw: Vec<f64>,
     y: Vec<f64>,
-    task: Task,
+    task: PacketTask,
     k: u8,
     p: usize,
 }
@@ -46,7 +46,7 @@ fn cases() -> Vec<Case> {
         name: "regression/chain",
         raw,
         y,
-        task: Task::Regression,
+        task: PacketTask::Regression,
         k: 0,
         p: 14,
     });
@@ -65,7 +65,7 @@ fn cases() -> Vec<Case> {
         name: "regression/skewed",
         raw,
         y,
-        task: Task::Regression,
+        task: PacketTask::Regression,
         k: 0,
         p: 14,
     });
@@ -80,7 +80,7 @@ fn cases() -> Vec<Case> {
         name: "binary/factor",
         raw,
         y,
-        task: Task::Binary,
+        task: PacketTask::Binary,
         k: 2,
         p: 10,
     });
@@ -94,7 +94,7 @@ fn cases() -> Vec<Case> {
         name: "multiclass/separated",
         raw,
         y,
-        task: Task::Multiclass,
+        task: PacketTask::Multiclass,
         k: 4,
         p: 16,
     });
@@ -111,7 +111,7 @@ fn cases() -> Vec<Case> {
         name: "binary/heavy-tailed",
         raw,
         y,
-        task: Task::Binary,
+        task: PacketTask::Binary,
         k: 2,
         p: 10,
     });
@@ -126,17 +126,17 @@ fn fit_rows(case: &Case, from: usize, to: usize, order: &[usize]) -> Packet {
         .collect();
     let y = &case.y[from..to];
     let ids: Vec<u16> = y.iter().map(|&v| v as u16).collect();
-    let target = if case.task == Task::Regression {
-        Target::Regression(y)
+    let target = if case.task == PacketTask::Regression {
+        FitTarget::Regression(y)
     } else {
-        Target::Classes(&ids)
+        FitTarget::Classes(&ids)
     };
     let fitted = fit_packet(
         &raw,
         target,
         case.task,
         case.k,
-        Size::level(Level::E),
+        Size::level(PacketLevel::E),
         to - from,
     )
     .unwrap();
@@ -182,7 +182,10 @@ fn the_rotations_are_orthonormal_and_the_prefix_is_the_short_embedding() {
         .iter()
         .all(|&c| c == 0));
     // A lower level is another packet and has another embedding.
-    assert_ne!(embed(&packet.at_level(Level::A).unwrap())[..], full[..]);
+    assert_ne!(
+        embed(&packet.at_level(PacketLevel::A).unwrap())[..],
+        full[..]
+    );
     assert!(
         full.iter().filter(|&&c| c.abs() == 127).count() <= 2,
         "codes saturate"

@@ -15,7 +15,7 @@
 //! ```
 
 use super::marginals::ColumnSampler;
-use super::packet::{f16_to_f64, Level, Packet, Task, MAIN_BINS, PAIRS};
+use super::packet::{f16_to_f64, Packet, PacketLevel, PacketTask, MAIN_BINS, PAIRS};
 
 /// Weight value = scale * code / 127.
 pub const WEIGHT_SCALE: f64 = 127.0;
@@ -100,15 +100,15 @@ pub fn temperature_code(t: f64) -> u8 {
 }
 
 /// Noise SD of the standardised regression target at `level` (0 for other tasks).
-pub fn noise_sd(packet: &Packet, level: Level) -> f64 {
-    if packet.task != Task::Regression {
+pub fn noise_sd(packet: &Packet, level: PacketLevel) -> f64 {
+    if packet.task != PacketTask::Regression {
         return 0.0;
     }
     let mut sd = resid_sd_value(packet.resid_sd);
-    if level >= Level::D {
+    if level >= PacketLevel::D {
         sd *= ratio_value(packet.temperature >> 4);
     }
-    if level >= Level::E {
+    if level >= PacketLevel::E {
         sd *= ratio_value(packet.temperature & 15);
     }
     sd
@@ -116,7 +116,7 @@ pub fn noise_sd(packet: &Packet, level: Level) -> f64 {
 
 /// Label temperature (1 for regression, whose second noise byte holds ratios).
 pub fn temperature(packet: &Packet) -> f64 {
-    if packet.task == Task::Regression {
+    if packet.task == PacketTask::Regression {
         1.0
     } else {
         temperature_value(packet.temperature)
@@ -186,7 +186,7 @@ impl TargetModel {
     /// The model a decoder of `level` evaluates: S3 always, S8 from level D,
     /// S10 at level E. `columns` are the samplers of the packet's columns
     /// (17 knots from level D on, where the thresholds are needed).
-    pub fn new(packet: &Packet, level: Level, columns: &[ColumnSampler]) -> Self {
+    pub fn new(packet: &Packet, level: PacketLevel, columns: &[ColumnSampler]) -> Self {
         let (p, o) = (packet.cols(), packet.outputs());
         let intercept = packet
             .target_intercept
@@ -214,7 +214,7 @@ impl TargetModel {
             }
         }
         let width = o * MAIN_BINS;
-        if level >= Level::D && level <= packet.level {
+        if level >= PacketLevel::D && level <= packet.level {
             for j in (0..p).filter(|&j| packet.main_mask[j]) {
                 let cell = &packet.main_effect[j * width..(j + 1) * width];
                 if cell.iter().all(|&c| c == 0) {
@@ -225,7 +225,7 @@ impl TargetModel {
                 model.main.extend(cell.iter().map(|&c| effect_value(c)));
             }
         }
-        if level >= Level::E && packet.pairs.len() == PAIRS {
+        if level >= PacketLevel::E && packet.pairs.len() == PAIRS {
             for term in &packet.pairs[..PAIR_OFFSET_SLOT] {
                 if term.coef.iter().any(|&c| c != 0) {
                     model.pair_cols.push((term.a as usize, term.b as usize));

@@ -6,7 +6,7 @@
 use super::codec::{fit_to_budget, pack, packed_len, BudgetFit};
 use super::dependence::fit_dependence;
 use super::marginals::{fit_column, knot_plan, UNIT_CLIP};
-use super::packet::{Level, Packet, Task, LOG2_N_MAX, SUPPORT_K};
+use super::packet::{Packet, PacketLevel, PacketTask, LOG2_N_MAX, SUPPORT_K};
 use super::scale::ScaleCard;
 use super::target::{fit_target, refresh_noise, FitRows, Response, TargetPlan};
 use super::StatError;
@@ -34,7 +34,7 @@ pub struct FitInput<'a> {
     pub x: &'a [f64],
     pub rows: usize,
     pub cols: usize,
-    pub task: Task,
+    pub task: PacketTask,
     /// Header K: 0 regression, 2 binary, classes, or labels.
     pub k: u8,
     pub labels: Labels<'a>,
@@ -101,11 +101,11 @@ fn check(input: &FitInput) -> Result<(), StatError> {
     }
     let k = input.k as usize;
     let labels_ok = match (input.task, input.labels) {
-        (Task::Regression, Labels::None) => true,
-        (Task::Binary | Task::Multiclass, Labels::Classes(ids)) => {
+        (PacketTask::Regression, Labels::None) => true,
+        (PacketTask::Binary | PacketTask::Multiclass, Labels::Classes(ids)) => {
             ids.len() == input.rows && ids.iter().all(|&c| (c as usize) < k)
         }
-        (Task::Multilabel, Labels::Multilabel(cells)) => {
+        (PacketTask::Multilabel, Labels::Multilabel(cells)) => {
             cells.len() == input.rows * k && cells.iter().all(|&c| c <= 1)
         }
         _ => false,
@@ -172,7 +172,8 @@ fn fit(input: &FitInput, max_bytes: Option<usize>) -> Result<Packet, StatError> 
         }
         Labels::None => None,
     };
-    let dependence_fits = max_bytes.is_none_or(|max| fit_to_budget(&packet, max).level > Level::A);
+    let dependence_fits =
+        max_bytes.is_none_or(|max| fit_to_budget(&packet, max).level > PacketLevel::A);
     if dependence_fits && p <= MAX_DEPENDENCE_COLS {
         let dependence = fit_dependence(input.x, n, p, classes);
         packet.loading = dependence.loading;
@@ -183,7 +184,7 @@ fn fit(input: &FitInput, max_bytes: Option<usize>) -> Result<Packet, StatError> 
 
 /// Target of the FIT rows as the caller holds it.
 #[derive(Clone, Copy, Debug)]
-pub enum Target<'a> {
+pub enum FitTarget<'a> {
     /// Regression: one raw value per row.
     Regression(&'a [f64]),
     /// Binary or multiclass: one class id in `0..K` per row.
@@ -195,12 +196,12 @@ pub enum Target<'a> {
 /// Size request: the highest level to keep and an optional byte budget.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Size {
-    pub level: Level,
+    pub level: PacketLevel,
     pub max_bytes: Option<usize>,
 }
 
 impl Size {
-    pub fn level(level: Level) -> Self {
+    pub fn level(level: PacketLevel) -> Self {
         Self {
             level,
             max_bytes: None,
@@ -208,7 +209,7 @@ impl Size {
     }
     pub fn budget(max_bytes: usize) -> Self {
         Self {
-            level: Level::E,
+            level: PacketLevel::E,
             max_bytes: Some(max_bytes),
         }
     }
@@ -230,8 +231,8 @@ pub struct Fitted {
 /// (`codec::fit_to_budget`), noise codes of the final shape, pack.
 pub fn fit_packet(
     x: &[f64],
-    y: Target,
-    task: Task,
+    y: FitTarget,
+    task: PacketTask,
     k: u8,
     size: Size,
     n_fit: usize,
@@ -246,7 +247,7 @@ pub fn fit_packet(
     let unit = card.to_unit_rows(x)?;
     let standardised: Vec<f64>;
     let (labels, response) = match y {
-        Target::Regression(raw) => {
+        FitTarget::Regression(raw) => {
             if raw.len() != n_fit {
                 return Err(StatError::Invalid("labels do not match the task"));
             }
@@ -254,11 +255,11 @@ pub fn fit_packet(
             standardised = raw.iter().map(|&v| card.target_to_unit(v)).collect();
             (Labels::None, Response::Regression(&standardised))
         }
-        Target::Classes(ids) => {
+        FitTarget::Classes(ids) => {
             card = card.with_classes((0..k).map(f64::from).collect());
             (Labels::Classes(ids), Response::Classes(ids))
         }
-        Target::Multilabel(cells) => (Labels::Multilabel(cells), Response::Multilabel(cells)),
+        FitTarget::Multilabel(cells) => (Labels::Multilabel(cells), Response::Multilabel(cells)),
     };
     let input = FitInput {
         x: &unit,
@@ -273,10 +274,10 @@ pub fn fit_packet(
     // A residual section is fitted only if the budget could hold it when empty.
     let mut probe = packet.clone();
     probe.main_mask.fill(false);
-    let room = |level: Level| size.level >= level && packed_len(&probe, level) <= max_bytes;
+    let room = |level: PacketLevel| size.level >= level && packed_len(&probe, level) <= max_bytes;
     let plan = TargetPlan {
-        main_effects: room(Level::D),
-        pairs: room(Level::E),
+        main_effects: room(PacketLevel::D),
+        pairs: room(PacketLevel::E),
     };
     let rows = FitRows {
         x: &unit,

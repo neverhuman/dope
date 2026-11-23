@@ -4,27 +4,27 @@
 use super::codec::{
     decoder_sha8, fit_to_budget, ledger, pack, packed_len, truncate, unpack, BudgetStep,
 };
-use super::packet::{f16_to_f64, f64_to_f16, Level, Packet, Task, CRC_LEN, HEADER_LEN};
-use super::testkit::{synthetic_packet, Kind};
+use super::packet::{f16_to_f64, f64_to_f16, Packet, PacketLevel, PacketTask, CRC_LEN, HEADER_LEN};
+use super::testkit::{synthetic_packet, SynthKind};
 use super::StatError;
 
-fn mixed(j: usize) -> Kind {
+fn mixed(j: usize) -> SynthKind {
     match j % 7 {
-        2 => Kind::Explicit(2 + j % 5),
-        4 => Kind::Lattice(5 + j % 12),
-        6 => Kind::Constant,
-        _ => Kind::Continuous,
+        2 => SynthKind::Explicit(2 + j % 5),
+        4 => SynthKind::Lattice(5 + j % 12),
+        6 => SynthKind::Constant,
+        _ => SynthKind::Continuous,
     }
 }
 
-fn tasks() -> Vec<(Task, u8)> {
+fn tasks() -> Vec<(PacketTask, u8)> {
     vec![
-        (Task::Regression, 0),
-        (Task::Binary, 2),
-        (Task::Multiclass, 5),
-        (Task::Multiclass, 32),
-        (Task::Multilabel, 8),
-        (Task::Multilabel, 32),
+        (PacketTask::Regression, 0),
+        (PacketTask::Binary, 2),
+        (PacketTask::Multiclass, 5),
+        (PacketTask::Multiclass, 32),
+        (PacketTask::Multilabel, 8),
+        (PacketTask::Multilabel, 32),
     ]
 }
 
@@ -33,7 +33,7 @@ fn unpack_of_pack_is_the_quantised_packet() {
     for (t, (task, k)) in tasks().into_iter().enumerate() {
         for p in [1usize, 7, 24, 300] {
             let packet = synthetic_packet(task, k, p, mixed, 40 + t as u64);
-            for level in Level::ALL {
+            for level in PacketLevel::ALL {
                 let bytes = pack(&packet, level).unwrap();
                 let back = unpack(&bytes).unwrap();
                 assert_eq!(back, packet.at_level(level).unwrap());
@@ -45,9 +45,9 @@ fn unpack_of_pack_is_the_quantised_packet() {
 }
 
 /// Bytes at P = 8 / 24 / 48 / 64 for levels A..E, from the encoding design.
-const DESIGN_TABLE: [(Task, u8, [[usize; 4]; 5]); 3] = [
+const DESIGN_TABLE: [(PacketTask, u8, [[usize; 4]; 5]); 3] = [
     (
-        Task::Regression,
+        PacketTask::Regression,
         0,
         [
             [90, 202, 370, 482],
@@ -58,7 +58,7 @@ const DESIGN_TABLE: [(Task, u8, [[usize; 4]; 5]); 3] = [
         ],
     ),
     (
-        Task::Binary,
+        PacketTask::Binary,
         2,
         [
             [91, 203, 371, 483],
@@ -69,7 +69,7 @@ const DESIGN_TABLE: [(Task, u8, [[usize; 4]; 5]); 3] = [
         ],
     ),
     (
-        Task::Multiclass,
+        PacketTask::Multiclass,
         5,
         [
             [130, 290, 530, 690],
@@ -85,8 +85,8 @@ const DESIGN_TABLE: [(Task, u8, [[usize; 4]; 5]); 3] = [
 fn all_continuous_lengths_equal_the_design_byte_table() {
     for (task, k, rows) in DESIGN_TABLE {
         for (ci, p) in [8usize, 24, 48, 64].into_iter().enumerate() {
-            let packet = synthetic_packet(task, k, p, |_| Kind::Continuous, 7);
-            for level in Level::ALL {
+            let packet = synthetic_packet(task, k, p, |_| SynthKind::Continuous, 7);
+            for level in PacketLevel::ALL {
                 let bytes = pack(&packet, level).unwrap();
                 assert_eq!(
                     bytes.len(),
@@ -100,7 +100,7 @@ fn all_continuous_lengths_equal_the_design_byte_table() {
 }
 
 /// The byte formulas of the specification, written out independently of `sections`.
-fn formula(packet: &Packet, level: Level) -> usize {
+fn formula(packet: &Packet, level: PacketLevel) -> usize {
     let p = packet.cols();
     let (o, m) = (packet.outputs(), packet.regime_means());
     let pc = packet.continuous_cols();
@@ -120,9 +120,9 @@ fn formula(packet: &Packet, level: Level) -> usize {
         })
         .sum();
     let prior = match packet.task {
-        Task::Regression => 0,
-        Task::Binary | Task::Multiclass => packet.k as usize - 1,
-        Task::Multilabel => packet.k as usize,
+        PacketTask::Regression => 0,
+        PacketTask::Binary | PacketTask::Multiclass => packet.k as usize - 1,
+        PacketTask::Multilabel => packet.k as usize,
     };
     let s = [
         prior + 2,
@@ -144,7 +144,7 @@ fn measured_lengths_equal_the_documented_formulas() {
     for (task, k) in tasks() {
         for p in [3usize, 24, 48, 131, 300] {
             let packet = synthetic_packet(task, k, p, mixed, 3);
-            for level in Level::ALL {
+            for level in PacketLevel::ALL {
                 let bytes = pack(&packet, level).unwrap();
                 assert_eq!(bytes.len(), formula(&packet, level));
                 let led = ledger(&bytes).unwrap();
@@ -158,16 +158,16 @@ fn measured_lengths_equal_the_documented_formulas() {
         }
     }
     // Atom payload bytes per column: explicit 2A + ceil(6A/8), lattice 4 + A + ceil(6A/8).
-    let two = synthetic_packet(Task::Regression, 0, 1, |_| Kind::Explicit(2), 1);
-    let sixteen = synthetic_packet(Task::Regression, 0, 1, |_| Kind::Lattice(16), 1);
+    let two = synthetic_packet(PacketTask::Regression, 0, 1, |_| SynthKind::Explicit(2), 1);
+    let sixteen = synthetic_packet(PacketTask::Regression, 0, 1, |_| SynthKind::Lattice(16), 1);
     assert_eq!(
-        ledger(&pack(&two, Level::A).unwrap())
+        ledger(&pack(&two, PacketLevel::A).unwrap())
             .unwrap()
             .s2_atom_payload,
         6
     );
     assert_eq!(
-        ledger(&pack(&sixteen, Level::A).unwrap())
+        ledger(&pack(&sixteen, PacketLevel::A).unwrap())
             .unwrap()
             .s2_atom_payload,
         32
@@ -175,8 +175,14 @@ fn measured_lengths_equal_the_documented_formulas() {
     // Multilabel rows of the byte table (all continuous): level E at P = 24 / 48.
     for (labels, want) in [(8u8, [1841, 3452]), (32, [5225, 9716])] {
         for (p, bytes) in [24usize, 48].into_iter().zip(want) {
-            let packet = synthetic_packet(Task::Multilabel, labels, p, |_| Kind::Continuous, 9);
-            assert_eq!(pack(&packet, Level::E).unwrap().len(), bytes);
+            let packet = synthetic_packet(
+                PacketTask::Multilabel,
+                labels,
+                p,
+                |_| SynthKind::Continuous,
+                9,
+            );
+            assert_eq!(pack(&packet, PacketLevel::E).unwrap().len(), bytes);
         }
     }
 }
@@ -187,37 +193,37 @@ fn truncation_is_a_prefix_of_every_level() {
     for (task, k) in tasks() {
         let dense = synthetic_packet(task, k, 37, mixed, 11);
         // The two budget fallbacks must keep the property too.
-        variants.push(fit_to_budget(&dense, packed_len(&dense, Level::D) - 9).packet);
-        variants.push(fit_to_budget(&dense, packed_len(&dense, Level::A) - 9).packet);
+        variants.push(fit_to_budget(&dense, packed_len(&dense, PacketLevel::D) - 9).packet);
+        variants.push(fit_to_budget(&dense, packed_len(&dense, PacketLevel::A) - 9).packet);
         variants.push(dense);
     }
     for packet in variants {
         let top = packet.level;
         let full = pack(&packet, top).unwrap();
-        for level in Level::ALL.into_iter().filter(|&l| l <= top) {
+        for level in PacketLevel::ALL.into_iter().filter(|&l| l <= top) {
             let cut = truncate(&full, level).unwrap();
             assert_eq!(cut, pack(&packet, level).unwrap());
             assert_eq!(
                 full[HEADER_LEN..cut.len() - CRC_LEN],
                 cut[HEADER_LEN..cut.len() - CRC_LEN]
             );
-            for lower in Level::ALL.into_iter().filter(|&l| l <= level) {
+            for lower in PacketLevel::ALL.into_iter().filter(|&l| l <= level) {
                 assert_eq!(
                     truncate(&cut, lower).unwrap(),
                     pack(&packet, lower).unwrap()
                 );
             }
         }
-        if top < Level::E {
-            assert!(truncate(&full, Level::E).is_err());
+        if top < PacketLevel::E {
+            assert!(truncate(&full, PacketLevel::E).is_err());
         }
     }
 }
 
 #[test]
 fn corrupt_files_are_rejected() {
-    let packet = synthetic_packet(Task::Binary, 2, 24, mixed, 5);
-    let good = pack(&packet, Level::E).unwrap();
+    let packet = synthetic_packet(PacketTask::Binary, 2, 24, mixed, 5);
+    let good = pack(&packet, PacketLevel::E).unwrap();
     assert!(unpack(&good).is_ok());
     let with = |at: usize, value: u8| {
         let mut b = good.clone();
@@ -266,7 +272,7 @@ fn budget_fit_stays_within_two_kib_up_to_256_columns() {
     let mut report = Vec::new();
     for (task, k) in tasks() {
         for p in [8usize, 24, 48, 64, 128, 256] {
-            let packet = synthetic_packet(task, k, p, |_| Kind::Continuous, 13);
+            let packet = synthetic_packet(task, k, p, |_| SynthKind::Continuous, 13);
             let fit = fit_to_budget(&packet, 2048);
             assert!(fit.fits && fit.bytes <= 2048, "{task:?} K={k} P={p}");
             let bytes = pack(&fit.packet, fit.level).unwrap();
@@ -282,7 +288,10 @@ fn budget_fit_stays_within_two_kib_up_to_256_columns() {
     }
     println!("fit_to_budget(2048): {}", report.join(" "));
     let level_at = |task, k, p: usize, cap| {
-        let fit = fit_to_budget(&synthetic_packet(task, k, p, |_| Kind::Continuous, 13), cap);
+        let fit = fit_to_budget(
+            &synthetic_packet(task, k, p, |_| SynthKind::Continuous, 13),
+            cap,
+        );
         (
             fit.level,
             fit.bytes,
@@ -294,44 +303,44 @@ fn budget_fit_stays_within_two_kib_up_to_256_columns() {
     // The design's "what fits" rows.
     let dense = BudgetStep::Level;
     assert_eq!(
-        level_at(Task::Regression, 0, 24, 2048),
-        (Level::E, 853, dense, 24, 24)
+        level_at(PacketTask::Regression, 0, 24, 2048),
+        (PacketLevel::E, 853, dense, 24, 24)
     );
     assert_eq!(
-        level_at(Task::Regression, 0, 48, 2048),
-        (Level::E, 1624, dense, 48, 48)
+        level_at(PacketTask::Regression, 0, 48, 2048),
+        (PacketLevel::E, 1624, dense, 48, 48)
     );
     assert_eq!(
-        level_at(Task::Regression, 0, 64, 2048),
-        (Level::D, 1834, dense, 64, 64)
+        level_at(PacketTask::Regression, 0, 64, 2048),
+        (PacketLevel::D, 1834, dense, 64, 64)
     );
     assert_eq!(
-        level_at(Task::Regression, 0, 24, 512),
-        (Level::C, 466, dense, 0, 24)
+        level_at(PacketTask::Regression, 0, 24, 512),
+        (PacketLevel::C, 466, dense, 0, 24)
     );
     assert_eq!(
-        level_at(Task::Regression, 0, 24, 1024),
-        (Level::E, 853, dense, 24, 24)
+        level_at(PacketTask::Regression, 0, 24, 1024),
+        (PacketLevel::E, 853, dense, 24, 24)
     );
     assert_eq!(
-        level_at(Task::Regression, 0, 64, 4096),
-        (Level::E, 2138, dense, 64, 64)
+        level_at(PacketTask::Regression, 0, 64, 4096),
+        (PacketLevel::E, 2138, dense, 64, 64)
     );
     // Multiclass K = 5, P = 48: level D with S8 on the top 41 columns, exactly 2,048 B.
     let partial = BudgetStep::PartialMainEffects;
     assert_eq!(
-        level_at(Task::Multiclass, 5, 48, 2048),
-        (Level::D, 2048, partial, 41, 48)
+        level_at(PacketTask::Multiclass, 5, 48, 2048),
+        (PacketLevel::D, 2048, partial, 41, 48)
     );
     // Wide and many-class: level A with weights for the top 9 columns only.
     let sparse = BudgetStep::SparseTarget;
     assert_eq!(
-        level_at(Task::Multiclass, 32, 256, 2048),
-        (Level::A, 2032, sparse, 0, 9)
+        level_at(PacketTask::Multiclass, 32, 256, 2048),
+        (PacketLevel::A, 2032, sparse, 0, 9)
     );
     // Beyond the format's reach the result is flagged, never silently cut.
     let wide = fit_to_budget(
-        &synthetic_packet(Task::Regression, 0, 400, |_| Kind::Continuous, 1),
+        &synthetic_packet(PacketTask::Regression, 0, 400, |_| SynthKind::Continuous, 1),
         2048,
     );
     assert!(!wide.fits && wide.step == BudgetStep::OverBudget && wide.bytes > 2048);
@@ -340,7 +349,7 @@ fn budget_fit_stays_within_two_kib_up_to_256_columns() {
 
 #[test]
 fn budget_fallbacks_keep_the_most_important_columns() {
-    let packet = synthetic_packet(Task::Multiclass, 5, 48, |_| Kind::Continuous, 21);
+    let packet = synthetic_packet(PacketTask::Multiclass, 5, 48, |_| SynthKind::Continuous, 21);
     let (p, o) = (packet.cols(), packet.outputs());
     // Importance: the summed absolute dequantised weight, `sum_k scale_k * |code_kj|`.
     let weight = |j: usize| -> f64 {
@@ -373,7 +382,7 @@ fn budget_fallbacks_keep_the_most_important_columns() {
     assert_eq!(kept, want);
     assert!(sparse.packet.target_sparse && sparse.bytes <= 420);
     assert_eq!(
-        unpack(&pack(&sparse.packet, Level::A).unwrap()).unwrap(),
+        unpack(&pack(&sparse.packet, PacketLevel::A).unwrap()).unwrap(),
         sparse.packet
     );
 }

@@ -5,7 +5,7 @@
 use super::codec::pack;
 use super::decode::Decoder;
 use super::marginals::{atom_values, decoded_knots, fit_column, knot_plan, smoothed_knots};
-use super::packet::{ColumnMarginal, Level};
+use super::packet::{ColumnMarginal, PacketLevel};
 use super::testkit::{column, fit_regression, n01, sorted, table, to_unit, u01};
 
 const DECODED_ROWS: usize = 100_000;
@@ -48,7 +48,7 @@ fn a_planted_unique_extreme_never_appears() {
     });
     let (card, unit) = to_unit(&raw, n, p);
     let packet = fit_regression(&unit, n, p);
-    let bytes = pack(&packet, Level::E).unwrap();
+    let bytes = pack(&packet, PacketLevel::E).unwrap();
     let decoder = Decoder::new(&packet).unwrap();
     let raw_rows = decoder.rows_raw(&card, 4, 0, DECODED_ROWS).unwrap();
     let unit_rows = decoder.rows_unit(4, 0, DECODED_ROWS);
@@ -110,7 +110,7 @@ fn a_level_with_fewer_than_ten_rows_never_appears() {
     });
     let (card, unit) = to_unit(&raw, n, p);
     let packet = fit_regression(&unit, n, p);
-    let bytes = pack(&packet, Level::E).unwrap();
+    let bytes = pack(&packet, PacketLevel::E).unwrap();
     let decoder = Decoder::new(&packet).unwrap();
     let raw_rows = decoder.rows_raw(&card, 6, 0, DECODED_ROWS).unwrap();
     let unit_rows = decoder.rows_unit(6, 0, DECODED_ROWS);
@@ -171,7 +171,7 @@ fn the_packet_ignores_how_extreme_the_extremes_are() {
     let (n, p) = (1500usize, 5usize);
     let raw = table(n, p, |i, j| n01(33, j, i) + 0.5 * n01(33, 9, i));
     let (_, unit) = to_unit(&raw, n, p);
-    let baseline = pack(&fit_regression(&unit, n, p), Level::E).unwrap();
+    let baseline = pack(&fit_regression(&unit, n, p), PacketLevel::E).unwrap();
     // Push each column's smallest and largest cell to the clip: ranks are unchanged.
     let mut pushed = unit.clone();
     for j in 0..p {
@@ -183,7 +183,7 @@ fn the_packet_ignores_how_extreme_the_extremes_are() {
     }
     assert_ne!(pushed, unit);
     assert_eq!(
-        pack(&fit_regression(&pushed, n, p), Level::E).unwrap(),
+        pack(&fit_regression(&pushed, n, p), PacketLevel::E).unwrap(),
         baseline
     );
 }

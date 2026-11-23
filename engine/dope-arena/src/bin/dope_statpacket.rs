@@ -19,9 +19,9 @@ mod statpacket;
 use statpacket::codec::{decoder_sha8, ledger, truncate, unpack};
 use statpacket::decode::{Decoder, LabelRule};
 use statpacket::embed::{embed, EMBED_PREFIX};
-use statpacket::fit::{fit_packet, Size, Target};
+use statpacket::fit::{fit_packet, FitTarget, Size};
 use statpacket::matio::Mat;
-use statpacket::packet::{Level, Task};
+use statpacket::packet::{PacketLevel, PacketTask};
 use statpacket::scale::ScaleCard;
 use statpacket::StatError;
 
@@ -118,16 +118,16 @@ fn sha256_hex(bytes: &[u8]) -> String {
     hex(&Sha256::digest(bytes))
 }
 
-fn level_arg(name: &str) -> Result<Level, StatError> {
-    Level::from_name(name).ok_or(StatError::Invalid("level must be one of A, B, C, D, E"))
+fn level_arg(name: &str) -> Result<PacketLevel, StatError> {
+    PacketLevel::from_name(name).ok_or(StatError::Invalid("level must be one of A, B, C, D, E"))
 }
 
-fn task_arg(name: &str, classes: u8) -> Result<(Task, u8), StatError> {
+fn task_arg(name: &str, classes: u8) -> Result<(PacketTask, u8), StatError> {
     match name {
-        "regression" => Ok((Task::Regression, 0)),
-        "binary" => Ok((Task::Binary, 2)),
-        "multiclass" => Ok((Task::Multiclass, classes)),
-        "multilabel" => Ok((Task::Multilabel, classes)),
+        "regression" => Ok((PacketTask::Regression, 0)),
+        "binary" => Ok((PacketTask::Binary, 2)),
+        "multiclass" => Ok((PacketTask::Multiclass, classes)),
+        "multilabel" => Ok((PacketTask::Multilabel, classes)),
         _ => Err(StatError::Invalid(
             "task must be regression, binary, multiclass or multilabel",
         )),
@@ -183,7 +183,7 @@ fn fit(
 ) -> Result<serde_json::Value, StatError> {
     let mat = Mat::read(input)?;
     let (task, k) = task_arg(task, classes)?;
-    let want_y = if task == Task::Multilabel {
+    let want_y = if task == PacketTask::Multilabel {
         k as usize
     } else {
         1
@@ -196,15 +196,15 @@ fn fit(
     let raw = mat.features();
     let (values, ids, mut cells): (Vec<f64>, Vec<u16>, Vec<u8>);
     let target = match task {
-        Task::Regression => {
+        PacketTask::Regression => {
             values = mat.target(0);
-            Target::Regression(&values)
+            FitTarget::Regression(&values)
         }
-        Task::Binary | Task::Multiclass => {
+        PacketTask::Binary | PacketTask::Multiclass => {
             ids = integer_labels(&mat.target(0), k as usize)?;
-            Target::Classes(&ids)
+            FitTarget::Classes(&ids)
         }
-        Task::Multilabel => {
+        PacketTask::Multilabel => {
             cells = Vec::with_capacity(mat.rows * k as usize);
             for row in 0..mat.rows {
                 for label in 0..k as usize {
@@ -212,13 +212,13 @@ fn fit(
                     cells.push(integer_labels(&[cell], 2)?[0] as u8);
                 }
             }
-            Target::Multilabel(&cells)
+            FitTarget::Multilabel(&cells)
         }
     };
     let size = Size {
         level: match level {
             Some(name) => level_arg(name)?,
-            None => Level::E,
+            None => PacketLevel::E,
         },
         max_bytes: Some(budget),
     };
