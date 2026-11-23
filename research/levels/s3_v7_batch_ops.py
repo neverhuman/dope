@@ -127,17 +127,64 @@ def _pick_family_table(
     return members[(epoch + offset + slot) % len(members)]
 
 
+def _detect_discrete_or_lattice_mask(X: np.ndarray, probe_rows: int = 256) -> np.ndarray:
+    """Identify discrete (<= 16 unique values) or regular-lattice columns so jitter never corrupts them (FP-0 / F3)."""
+    nr, nc = X.shape
+    probe = X[: min(nr, probe_rows)]
+    mask = np.zeros((nc,), dtype=bool)
+    for j in range(nc):
+        col = probe[:, j]
+        fin = col[np.isfinite(col)]
+        if fin.size < 2:
+            mask[j] = True
+            continue
+        uniq = np.unique(fin.astype(np.float64))
+        if uniq.size <= 16:
+            mask[j] = True
+            continue
+        if uniq.size <= 128:
+            diffs = np.diff(uniq)
+            pos = diffs[diffs > 1e-5]
+            if pos.size >= 2:
+                d_min = float(np.min(pos))
+                step = float(np.median(pos[pos <= 1.25 * d_min]))
+                if step > 1e-5:
+                    # Subtract origin uniq[0] so shifted regular lattices (e.g., 48/100 levels) are detected!
+                    shifted = (uniq - uniq[0]) / step
+                    rem = np.abs(shifted - np.rint(shifted))
+                    if float(np.mean(rem <= 3e-2)) >= 0.98:
+                        mask[j] = True
+    return mask
+
+
+def apply_type_safe_fit_jitter(
+    rng: np.random.Generator,
+    Xa: np.ndarray,
+    jitter_prob: float = 0.30,
+    jitter_sd: float = 0.015,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Apply FIT-only Gaussian jitter strictly to continuous (non-discrete, non-lattice) columns (FP-0 / F3)."""
+    disc_mask = _detect_discrete_or_lattice_mask(Xa)
+    cont_idx = np.flatnonzero(~disc_mask)
+    if cont_idx.size > 0 and rng.random() < jitter_prob:
+        Xa = Xa.copy()
+        noise = rng.normal(0.0, jitter_sd, size=(Xa.shape[0], cont_idx.size)).astype(np.float32)
+        Xa[:, cont_idx] = np.clip(Xa[:, cont_idx] + noise, -6.0, 6.0)
+    return Xa, disc_mask
+
+
 def build_unique_v7_episode(
     arena: FlatArenaView,
     seed: int,
     step: int,
     global_slot: int,
     n_fit_cap: int = 384,
-    n_qry_cap: int = 128,
+    n_qry_cap: int = 256,
     max_bytes: int = PACKET_BUDGET_BYTES,
     desired_task: str | None = None,
     slots_per_step: int = 16,
     real_queue: Any | None = None,
+    allow_replay_on_exhaust: bool = False,
 ) -> dict[str, Any] | None:
     """Build one maximum-entropy counter-seeded episode (S3 real + synthetic prior + full cropping)."""
     sh_id = getattr(real_queue, "shard_id", 0) if real_queue is not None else 0
@@ -156,9 +203,10 @@ def build_unique_v7_episode(
     dataset_hash = f"synth:s{sh_id}:{task}:{ep_seed:016x}"
     split_h = hashlib.blake2b(digest_size=16)
 
-    # Log-uniform sample-size cropping EVERY episode so model masters tiny (32) AND large (n_fit_cap) tables!
+    # Eval-matched log-uniform sample-size cropping covering tiny (32) through headline (n_fit_cap up to 1024).
     n_fit_target = int(round(math.exp(rng.uniform(math.log(32.0), math.log(max(64.0, float(n_fit_cap)))))))
-    n_qry_target = int(round(math.exp(rng.uniform(math.log(24.0), math.log(max(32.0, float(n_qry_cap)))))))
+    n_qry_lo = min(64.0, max(24.0, float(n_qry_cap) * 0.25))
+    n_qry_target = int(round(math.exp(rng.uniform(math.log(n_qry_lo), math.log(max(n_qry_lo + 8.0, float(n_qry_cap)))))))
 
     use_synth = rng.random() < (0.75 if real_queue is not None else 0.20)
     tbl_idx: int | None = None
@@ -169,8 +217,13 @@ def build_unique_v7_episode(
         if real_queue is not None:
             tbl_idx = real_queue.pop_unseen(src_task)
             if tbl_idx is None:
-                use_synth = True
-                from_reg_synth = False
+                if allow_replay_on_exhaust:
+                    tbl_idx = _pick_family_table(
+                        arena, src_task, seed, step, global_slot, slots_per_step=slots_per_step
+                    )
+                if tbl_idx is None:
+                    use_synth = True
+                    from_reg_synth = False
         else:
             tbl_idx = _pick_family_table(arena, src_task, seed, step, global_slot, slots_per_step=slots_per_step)
             if tbl_idx is None:
@@ -207,18 +260,17 @@ def build_unique_v7_episode(
         nr, nc = X_raw.shape
         if nr < 48 or nc < 2:
             return None
-        # Fresh duplicate-grouped random train/test split EVERY batch (wide ratio [0.35, 0.75])!
+        # Strict duplicate-grouped split (FIX-08): NEVER fall back to row-random splitting across groups!
         uniq_g = np.unique(dg)
+        if len(uniq_g) < 4:
+            return None
         ratio = float(rng.uniform(0.35, 0.75))
-        if len(uniq_g) < 16:
-            perm = rng.permutation(nr)
-            cut = max(24, min(nr - 16, int(nr * ratio)))
-            fit_idx, qry_idx = perm[:cut], perm[cut:]
-        else:
-            g_perm = rng.permutation(uniq_g)
-            g_cut = max(8, min(len(g_perm) - 6, int(len(g_perm) * ratio)))
-            is_fit = np.isin(dg, g_perm[:g_cut])
-            fit_idx, qry_idx = np.flatnonzero(is_fit), np.flatnonzero(~is_fit)
+        g_perm = rng.permutation(uniq_g)
+        min_fit_g = 2 if len(uniq_g) < 16 else 8
+        min_qry_g = 2 if len(uniq_g) < 16 else 6
+        g_cut = max(min_fit_g, min(len(g_perm) - min_qry_g, int(round(len(g_perm) * ratio))))
+        is_fit = np.isin(dg, g_perm[:g_cut])
+        fit_idx, qry_idx = np.flatnonzero(is_fit), np.flatnonzero(~is_fit)
         if len(fit_idx) < 24 or len(qry_idx) < 16:
             return None
         if len(fit_idx) > n_fit_target:
@@ -245,9 +297,9 @@ def build_unique_v7_episode(
         Xa, Xq = _fit_only_scale(Xa_raw, Xq_raw)
         ya, yq = y_raw[fit_idx].copy(), y_raw[qry_idx].copy()
 
-    # Append nonlinear interactions + distractors, then mild FIT-only Gaussian jitter.
+    # Append nonlinear interactions + distractors, then type/lattice-safe FIT-only jitter (FP-0 / F3).
     Xa, Xq, n_noise = append_nonlinear_and_distractor_cols(rng, Xa, Xq, max_cols=MAX_COLS)
-    Xa = np.clip(Xa + rng.normal(0.0, 0.015, size=Xa.shape).astype(np.float32), -6.0, 6.0)
+    Xa, _ = apply_type_safe_fit_jitter(rng, Xa, jitter_prob=0.30, jitter_sd=0.015)
 
     # Target canonicalization + class-ID permutation / binary polarity flip EVERY episode!
     task_id = TASK_TO_ID[task]
@@ -275,18 +327,24 @@ def build_unique_v7_episode(
             return None
         n_cls = 2
     else:
-        uniq_c = np.unique(np.rint(ya).astype(np.int64))
+        ya_int = np.rint(ya).astype(np.int64)
+        yq_int = np.rint(yq).astype(np.int64)
+        uniq_c = np.unique(ya_int)
         if len(uniq_c) < 3 or len(uniq_c) > MAX_CLASSES:
+            return None
+        # FIX-07: Never silently remap unseen query classes or mutate the query denominator; refuse split cleanly.
+        if not bool(np.all(np.isin(yq_int, uniq_c))):
             return None
         perm_ids = rng.permutation(len(uniq_c))
         mp = {int(c): int(perm_ids[i]) for i, c in enumerate(uniq_c)}
         split_h.update(json.dumps(mp, sort_keys=True).encode("utf-8"))
-        ya = np.array([mp.get(int(round(float(v))), 0) for v in ya], dtype=np.float32)
-        yq = np.array([mp.get(int(round(float(v))), 0) for v in yq], dtype=np.float32)
+        ya = np.array([mp[int(v)] for v in ya_int], dtype=np.float32)
+        yq = np.array([mp[int(v)] for v in yq_int], dtype=np.float32)
         n_cls = len(uniq_c)
 
     pkt = extract_dse_packet_numpy(Xa, ya, task_id, n_cls, max_bytes=max_bytes)
     p_eff = pkt["p_eff"]
+    disc_col_share = float(np.mean(pkt["col_feats"][:p_eff, 38])) if p_eff > 0 else 0.0
     Xq_pad = np.zeros((n_qry_cap, MAX_COLS), dtype=np.float32)
     yq_pad = np.zeros((n_qry_cap,), dtype=np.float32)
     q_mask = np.zeros((n_qry_cap,), dtype=np.float32)
@@ -296,6 +354,7 @@ def build_unique_v7_episode(
     q_mask[:nq] = 1.0
     pkt.update(
         X_qry=Xq_pad, y_qry=yq_pad, q_mask=q_mask, n_fit=len(Xa), n_noise=n_noise,
+        disc_col_share=disc_col_share,
         is_synth_prior=int(is_synth), is_swapped=int(is_swapped), is_cropped=int(is_cropped),
         col_crop_ratio=float(crop_ratio), dataset_hash=dataset_hash, split_hash=split_h.hexdigest(),
     )
@@ -311,7 +370,10 @@ def collate_v7_batch(episodes: list[dict[str, Any]], as_numpy: bool = False) -> 
     out: dict[str, Any] = {k: np.stack([e[k] for e in episodes], axis=0) for k in keys}
     for k, dt in (("task_id", np.int64), ("k_eff", np.int64), ("packet_bytes", np.float32), ("n_fit", np.float32), ("n_noise", np.float32)):
         out[k] = np.array([e[k] for e in episodes], dtype=dt)
-    for k, dv in (("is_synth_prior", 0), ("is_swapped", 0), ("is_cropped", 0), ("col_crop_ratio", 1.0)):
+    for k, dv in (
+        ("is_synth_prior", 0), ("is_swapped", 0), ("is_cropped", 0),
+        ("col_crop_ratio", 1.0), ("disc_col_share", 0.0),
+    ):
         out[k] = np.array([e.get(k, dv) for e in episodes], dtype=np.float32)
     if not as_numpy:
         out = {k: torch.from_numpy(v) for k, v in out.items()}
@@ -409,28 +471,49 @@ def compute_v7_batch_loss(
         tstr_losses.append(((-torch.log(p_true) * q_mask[mc_m]).sum(dim=1) / q_denom[mc_m]).clamp(max=10.0).mean())
     tstr_loss = sum(tstr_losses) / max(len(tstr_losses), 1)
 
-    # 2. Marginal 1D-W1 + Correlation Frobenius + 24-projection Sliced Wasserstein
+    # 2. Per-episode Marginal 1D-W1 + Correlation Frobenius + 24-projection Sliced Wasserstein (FP-0 / F4)
+    # Strictly per-episode masked query rows: zero cross-episode min-truncation!
     q_grid = torch.linspace(0.05, 0.95, 17, device=device)
-    qs_syn = torch.quantile(x_syn, q_grid, dim=1)
-    n_q_use = max(16, min(int(q_mask.sum(dim=1).min().item()), X_qry.shape[1]))
-    qs_qry = torch.quantile(X_qry[:, :n_q_use, :], q_grid, dim=1)
-    marg_loss = ((qs_syn - qs_qry).abs().mean(dim=0) * col_mask).sum() / col_mask.sum().clamp_min(1.0)
-
-    xs_c = x_syn - x_syn.mean(dim=1, keepdim=True)
-    xq_c = X_qry[:, :n_q_use, :] - X_qry[:, :n_q_use, :].mean(dim=1, keepdim=True)
-    xs_n = xs_c / xs_c.std(dim=1, keepdim=True).clamp_min(0.05)
-    xq_n = xq_c / xq_c.std(dim=1, keepdim=True).clamp_min(0.05)
-    c_syn = torch.matmul(xs_n.transpose(1, 2), xs_n) / float(n_syn)
-    c_qry = torch.matmul(xq_n.transpose(1, 2), xq_n) / float(n_q_use)
-    pair_mask = col_mask.unsqueeze(2) * col_mask.unsqueeze(1)
-    corr_loss = (((c_syn - c_qry) ** 2) * pair_mask).sum() / pair_mask.sum().clamp_min(1.0)
-
     proj = torch.randn((p_dim, swd_projs), device=device, dtype=x_syn.dtype)
     proj = proj / proj.norm(dim=0, keepdim=True).clamp_min(1e-6)
-    swd_loss = (
-        torch.quantile(torch.matmul(x_syn, proj), q_grid, dim=1)
-        - torch.quantile(torch.matmul(X_qry[:, :n_q_use, :], proj), q_grid, dim=1)
-    ).abs().mean()
+    marg_terms: list[torch.Tensor] = []
+    corr_terms: list[torch.Tensor] = []
+    swd_terms: list[torch.Tensor] = []
+    for bi in range(bsz):
+        valid_rows = q_mask[bi] > 0.5
+        nq_i = int(valid_rows.sum().item())
+        cm_i = col_mask[bi]
+        p_sum = cm_i.sum().clamp_min(1.0)
+        if nq_i < 4:
+            continue
+        xq_i = X_qry[bi, valid_rows]  # [nq_i, p_dim]
+        xs_i = x_syn[bi]              # [n_syn, p_dim]
+
+        qs_syn_i = torch.quantile(xs_i, q_grid, dim=0)
+        qs_qry_i = torch.quantile(xq_i, q_grid, dim=0)
+        marg_terms.append(((qs_syn_i - qs_qry_i).abs().mean(dim=0) * cm_i).sum() / p_sum)
+
+        xs_c_i = xs_i - xs_i.mean(dim=0, keepdim=True)
+        xq_c_i = xq_i - xq_i.mean(dim=0, keepdim=True)
+        xs_n_i = xs_c_i / xs_c_i.std(dim=0, keepdim=True).clamp_min(0.05)
+        xq_n_i = xq_c_i / xq_c_i.std(dim=0, keepdim=True).clamp_min(0.05)
+        c_syn_i = torch.matmul(xs_n_i.transpose(0, 1), xs_n_i) / float(n_syn)
+        c_qry_i = torch.matmul(xq_n_i.transpose(0, 1), xq_n_i) / float(nq_i)
+        pm_i = cm_i.unsqueeze(1) * cm_i.unsqueeze(0)
+        corr_terms.append((((c_syn_i - c_qry_i) ** 2) * pm_i).sum() / pm_i.sum().clamp_min(1.0))
+
+        proj_i = proj * cm_i.unsqueeze(1)
+        proj_i = proj_i / proj_i.norm(dim=0, keepdim=True).clamp_min(1e-6)
+        swd_terms.append(
+            (
+                torch.quantile(torch.matmul(xs_i, proj_i), q_grid, dim=0)
+                - torch.quantile(torch.matmul(xq_i, proj_i), q_grid, dim=0)
+            ).abs().mean()
+        )
+    zero_t = torch.zeros((), device=device, dtype=torch.float32)
+    marg_loss = torch.stack(marg_terms).mean() if marg_terms else zero_t
+    corr_loss = torch.stack(corr_terms).mean() if corr_terms else zero_t
+    swd_loss = torch.stack(swd_terms).mean() if swd_terms else zero_t
 
     # 3. Direct proper-scoring-rule conditional NLL on real held-out (X_qry, y_qry)
     cond_losses = []
