@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 os.environ.setdefault("SOURCE_DATE_EPOCH", "1760000000")
@@ -218,9 +219,16 @@ def bootstrap_band(values, rng):
         chosen.append(steps - 1)
     lo[:] = np.nan
     hi[:] = np.nan
-    for step in chosen:
-        samples = np.median(values[:, step][index], axis=1)
-        lo[step], hi[step] = np.quantile(samples, [0.025, 0.975])
+
+    def interval(step):
+        return np.quantile(np.median(values[:, step][index], axis=1), [0.025, 0.975])
+
+    # Each step is the same pure NumPy expression over the one fixed index draw, so the
+    # bands are bit-identical to a serial loop; NumPy releases the GIL inside it.
+    workers = max(1, min(8, len(os.sched_getaffinity(0))))
+    with ThreadPoolExecutor(workers) as pool:
+        for step, (low, high) in zip(chosen, pool.map(interval, chosen)):
+            lo[step], hi[step] = low, high
     known = np.asarray(chosen)
     for slot in range(steps):
         if np.isfinite(lo[slot]):
