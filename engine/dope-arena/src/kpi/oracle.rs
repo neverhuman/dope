@@ -24,18 +24,19 @@
 //! every column through A's mid-rank empirical CDF, so real and decoded X share one input map.
 //! A model is fitted once per cell from a structural seed; sample seeds only change the draws.
 
+mod copula;
+
+use self::copula::copula_rows;
 use super::celldata::{CellData, Rows};
 use super::cellplan::Cell;
 use super::mat::Mat;
 use super::seeds::{crn_seed, KpiRng, STRUCTURAL_SAMPLE_SEED};
 use dope_arena::ArenaResult;
-use dope_core::copula::Dependence;
 use dope_core::forest::{boost, code, predict_columns, BoostOptions, Forest, Split};
 use dope_core::single_encoding::{
     fit_dse7_packet, sample_zero_init_rows, unpack_dse7_packet, Dse7Header, ScaleCardV7,
     SingleEncV7Packet, MAX_CLASSES,
 };
-use dope_core::stats::{norm_cdf, norm_ppf};
 use dope_core::target::Head;
 
 pub const PACKET: &str = "oracle_packet";
@@ -378,85 +379,6 @@ fn categorical(logits: &[f64], rng: &mut KpiRng) -> usize {
     w.len().saturating_sub(1)
 }
 
-// -- exact-marginal Gaussian copula ---------------------------------------------------------
-/// `m` rows (`p` features then the target) from a Gaussian copula fitted on A: exact empirical
-/// marginals per column, each X column missing at its A share, dependence of `rank` (or full).
-fn copula_rows(a: &Rows, rank: Option<usize>, m: usize, rng: &mut KpiRng) -> Vec<f32> {
-    let (n, p) = (a.n, a.p);
-    let d = p + 1;
-    let value = |i: usize, j: usize| {
-        if j < p {
-            f64::from(a.x[i * p + j])
-        } else {
-            f64::from(a.y[i])
-        }
-    };
-    let mut sorted: Vec<Vec<f64>> = Vec::with_capacity(d);
-    let mut miss = vec![0.0f64; d];
-    for (j, share) in miss.iter_mut().enumerate() {
-        let mut col: Vec<f64> = (0..n)
-            .map(|i| value(i, j))
-            .filter(|v| v.is_finite())
-            .collect();
-        *share = 1.0 - col.len() as f64 / n.max(1) as f64;
-        col.sort_by(f64::total_cmp);
-        sorted.push(col);
-    }
-    // Normal scores of A from mid-ranks; a missing cell scores 0.
-    let mut z = vec![0.0f64; n * d];
-    for j in 0..d {
-        let s = &sorted[j];
-        for i in 0..n {
-            let v = value(i, j);
-            if v.is_finite() && !s.is_empty() {
-                let lo = s.partition_point(|&w| w < v);
-                let hi = s.partition_point(|&w| w <= v);
-                z[i * d + j] = norm_ppf((lo + hi) as f64 / (2 * s.len()) as f64);
-            }
-        }
-    }
-    let mut r = vec![0.0f64; d * d];
-    let sd: Vec<f64> = (0..d)
-        .map(|j| ((0..n).map(|i| z[i * d + j].powi(2)).sum::<f64>() / n.max(1) as f64).sqrt())
-        .collect();
-    for j in 0..d {
-        for k in 0..d {
-            r[j * d + k] = if j == k {
-                1.0
-            } else if sd[j] > 0.0 && sd[k] > 0.0 {
-                (0..n).map(|i| z[i * d + j] * z[i * d + k]).sum::<f64>()
-                    / (n as f64 * sd[j] * sd[k])
-            } else {
-                0.0
-            };
-        }
-    }
-    let dep = match rank {
-        Some(rk) => Dependence::fit_factor(&r, d, rk),
-        None => Dependence::fit_full(&r, d),
-    };
-    let (mix, w) = dep.mixing(d);
-    let mut out = Vec::with_capacity(m * d);
-    let mut e = vec![0.0f64; w];
-    for _ in 0..m {
-        for v in e.iter_mut() {
-            *v = rng.normal();
-        }
-        for j in 0..d {
-            let zj: f64 = (0..w).map(|k| mix[j * w + k] * e[k]).sum();
-            let s = &sorted[j];
-            let x = if s.is_empty() || (j < p && rng.uniform() < miss[j]) {
-                f64::NAN
-            } else {
-                let u = norm_cdf(zj);
-                s[((u * s.len() as f64) as usize).min(s.len() - 1)]
-            };
-            out.push(x as f32);
-        }
-    }
-    out
-}
-
 // -- arms -----------------------------------------------------------------------------------
 /// The synthetic table of one oracle arm, or the reason the cell has none.
 pub fn generate(
@@ -547,165 +469,4 @@ pub fn generate(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::kpi::celldata::ScaleCard;
-
-    fn cell(task: &str, n_classes: u32) -> Cell {
-        Cell {
-            cell_id: "dev:h1:full:d0".into(),
-            panel_sha256: "p".into(),
-            dataset_hash: "h1".into(),
-            table_id: 0,
-            family_id: "lf-h1".into(),
-            task: task.into(),
-            n_classes,
-            view: "full".into(),
-            cols: vec![0, 1, 2, 3],
-            data_seed: 0,
-            stratum: "headline".into(),
-            a_idx: (0..400).collect(),
-            b_idx: Vec::new(),
-            c_idx: Vec::new(),
-            t_idx: Vec::new(),
-            sample_seeds: vec![0, 1],
-            multipliers: vec![1, 4],
-            status: "ok".into(),
-        }
-    }
-
-    /// 400 A rows, 4 columns (one a 5-level integer); the target depends on x0 and x1.
-    fn data(head: Head) -> CellData {
-        let mut rng = KpiRng::new(42);
-        let (n, p) = (400, 4);
-        let mut x = Vec::with_capacity(n * p);
-        let mut y = Vec::with_capacity(n);
-        for _ in 0..n {
-            let row = [
-                rng.normal(),
-                rng.normal(),
-                rng.normal(),
-                (rng.uniform() * 5.0).floor(),
-            ];
-            let s = 1.5 * row[0] - row[1] + 0.3 * rng.normal();
-            x.extend(row.iter().map(|&v| v as f32));
-            y.push(match head {
-                Head::Regression => s as f32,
-                Head::Binary => f32::from(u8::from(s > 0.0)),
-                Head::Multiclass(_) => {
-                    (if s < -0.7 {
-                        0
-                    } else if s < 0.7 {
-                        1
-                    } else {
-                        2
-                    }) as f32
-                }
-            });
-        }
-        let a = Rows { n, p, x, y };
-        let empty = Rows {
-            n: 0,
-            p,
-            x: Vec::new(),
-            y: Vec::new(),
-        };
-        CellData {
-            head,
-            card: ScaleCard::fit(&a, head),
-            b: empty.clone(),
-            c: empty.clone(),
-            t: empty,
-            t_donors: None,
-            a,
-        }
-    }
-
-    fn heads() -> [(Head, &'static str, u32); 3] {
-        [
-            (Head::Regression, "regression", 0),
-            (Head::Binary, "binary", 2),
-            (Head::Multiclass(3), "multiclass", 3),
-        ]
-    }
-
-    #[test]
-    fn every_arm_emits_valid_rows_deterministically() {
-        for (head, task, k) in heads() {
-            let (c, d) = (cell(task, k), data(head));
-            for arm in ARMS {
-                let mat = generate(arm, &c, &d, 0, 4).unwrap().unwrap();
-                assert_eq!((mat.rows, mat.x_cols), (1600, 4), "{arm} {task}");
-                assert_eq!(
-                    generate(arm, &c, &d, 0, 4).unwrap().unwrap(),
-                    mat,
-                    "{arm} {task}"
-                );
-                let other = generate(arm, &c, &d, 1, 4).unwrap().unwrap();
-                assert_ne!(
-                    other, mat,
-                    "{arm} {task}: sample seed must change the draws"
-                );
-                for r in 0..mat.rows {
-                    let row = mat.row(r).unwrap();
-                    assert!(row[..4].iter().all(|v| v.is_finite()), "{arm} {task}");
-                    let y = row[4];
-                    match head {
-                        Head::Regression => assert!(y.is_finite()),
-                        _ => assert!(
-                            y.fract() == 0.0 && y >= 0.0 && (y as u32) < k,
-                            "{arm} {task} {y}"
-                        ),
-                    }
-                }
-                if matches!(arm, EXACT_RANK12 | EXACT_FULL) {
-                    // exact marginals: every value is one of A's values in that column
-                    for r in 0..mat.rows {
-                        let row = mat.row(r).unwrap();
-                        for (j, v) in row[..4].iter().enumerate() {
-                            assert!((0..400).any(|i| d.a.row(i)[j] == *v), "{arm}: col {j}");
-                        }
-                    }
-                }
-                if matches!(arm, REAL_X_PACKET_Y | REAL_X_TREE_Y) {
-                    for r in 0..mat.rows {
-                        assert_eq!(
-                            &mat.row(r).unwrap()[..4],
-                            d.a.row(r % 400),
-                            "{arm}: real X rows"
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    /// Share of rows whose sampled binary label agrees with the planted sign of 1.5 x0 - x1.
-    fn agreement(mat: &Mat) -> f64 {
-        let hits = (0..mat.rows)
-            .filter(|&r| {
-                let row = mat.row(r).unwrap();
-                (1.5 * row[0] - row[1] > 0.0) == (row[4] > 0.5)
-            })
-            .count();
-        hits as f64 / mat.rows as f64
-    }
-
-    #[test]
-    fn oracles_carry_the_planted_conditional() {
-        let (c, d) = (cell("binary", 2), data(Head::Binary));
-        for arm in ARMS {
-            let got = agreement(&generate(arm, &c, &d, 0, 4).unwrap().unwrap());
-            // A Gaussian copula sees a binary target through attenuated (point-biserial) scores.
-            let bar = if matches!(arm, EXACT_RANK12 | EXACT_FULL) {
-                0.65
-            } else {
-                0.75
-            };
-            assert!(got > bar, "{arm}: label agreement {got:.3}");
-        }
-        // The tree ceiling on real X is at least as sharp as the packet's linear decoder there.
-        let tree = agreement(&generate(REAL_X_TREE_Y, &c, &d, 0, 4).unwrap().unwrap());
-        assert!(tree > 0.85, "{tree:.3}");
-    }
-}
+mod tests;

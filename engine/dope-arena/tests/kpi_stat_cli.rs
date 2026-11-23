@@ -49,6 +49,117 @@ const ARMS: [&str; 8] = [
 ];
 
 #[test]
+fn audit_reconstructs_partitioned_comparisons_and_rejects_altered_receipts() {
+    let dir = scratch("audit-receipt");
+    let dev = fixture().join("dev-tables.txt");
+    let (bytes, _) = receipt(
+        &dir,
+        "compare.json",
+        "compare",
+        &[
+            "--candidate",
+            "cand",
+            "--seed-group",
+            "two=cand,noise",
+            "--baseline",
+            "base",
+            "--panel",
+            "dev",
+            "--dev-tables",
+            path_str(&dev),
+        ],
+    );
+    let run_dir = fixture();
+    let path = dir.join("compare.json");
+    let args = [
+        "audit",
+        "--run-dir",
+        path_str(&run_dir),
+        "--receipt",
+        path_str(&path),
+        "--dev-tables",
+        path_str(&dev),
+    ];
+    let audit: Value = serde_json::from_str(&kpi_ok(&args)).unwrap();
+    assert_eq!(audit["schema"], "dope.kpi-audit/v1");
+    assert_eq!(audit["entries"]["base"], 36);
+    assert_eq!(audit["comparisons"]["cand"][0]["cells"], 3);
+    close(
+        &audit["arms"]["base"][0]["failed_at_floor"],
+        (-0.35 - 2.0) / 2.0,
+    );
+    close(
+        &audit["comparisons"]["cand"][0]["failed_at_floor"],
+        (0.175 + 1.9) / 2.0,
+    );
+    assert_eq!(audit["comparisons"]["two"][1]["multiplier"], 1);
+
+    for (pointer, value, reason) in [
+        (
+            "/inputs/realref_sha256",
+            Value::from("wrong"),
+            "input identities",
+        ),
+        (
+            "/arms/0/bytes/with_packet",
+            Value::from(0),
+            "byte accounting",
+        ),
+        (
+            "/comparisons/0/cells",
+            Value::from(10),
+            "comparison denominator",
+        ),
+        ("/comparisons/0/delta", Value::from(123.0), "paired point"),
+    ] {
+        let mut modified: Value = serde_json::from_slice(&bytes).unwrap();
+        *modified.pointer_mut(pointer).unwrap() = value;
+        std::fs::write(&path, serde_json::to_vec(&modified).unwrap()).unwrap();
+        assert!(kpi_err(&args).contains(reason));
+    }
+}
+
+#[test]
+fn audit_factorial_uses_the_same_applicable_cells_for_all_four_arms() {
+    let dir = scratch("audit-factorial");
+    receipt(&dir, "primary.json", "primary", &ARMS);
+    let source = fixture();
+    let path = dir.join("primary.json");
+    let output = kpi_ok(&[
+        "audit",
+        "--run-dir",
+        path_str(&source),
+        "--receipt",
+        path_str(&path),
+        "--factorial",
+        "base",
+        "cand",
+        "noise",
+        "twin_c",
+    ]);
+    let audit: Value = serde_json::from_str(&output).unwrap();
+    assert_eq!(audit["factorial"]["packet_packet"], "base");
+    assert_eq!(audit["factorial"]["real_tree"], "twin_c");
+    let headline = &audit["factorial"]["readouts"][0];
+    assert_eq!(headline["multiplier"], 4);
+    assert_eq!(headline["cells"], 4);
+    assert!(headline["interaction"]["tasks"]["multiclass"].is_null());
+    close(
+        &headline["x_main_effect"]["tasks"]["regression"]["value"],
+        0.79375,
+    );
+    close(
+        &headline["y_main_effect"]["tasks"]["regression"]["value"],
+        -0.61875,
+    );
+    close(
+        &headline["interaction"]["tasks"]["regression"]["value"],
+        1.2625,
+    );
+    assert_eq!(audit["factorial"]["readouts"][1]["multiplier"], 1);
+}
+
+#[test]
 fn primary_reports_hand_computed_values_and_repeats_byte_for_byte() {
     let dir = scratch("stat-primary");
     let (bytes, summary) = receipt(&dir, "primary.json", "primary", &ARMS);
