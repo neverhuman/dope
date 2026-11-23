@@ -1,6 +1,6 @@
 # Signed Rust engine and command-line deployment
 
-The deployable product in this PR is `engine/dope-cli`'s `dope` executable, backed by
+The deployable engine is `engine/dope-cli`'s `dope` executable, backed by
 `engine/dope-core`. Customer fitting, sampling, prediction, schema encoding, built-in
 retention evaluation and frontier search execute in Rust. No Python interpreter,
 libtorch, Python package environment, shell helper, network service or training framework
@@ -103,8 +103,8 @@ For maintainers, after merging and passing the applicable repository gates:
 
 ```bash
 # Set the engine version first, then create the matching tag from admitted main.
-git tag -a dope-engine-v1.3.0 -m 'DOPE engine 1.3.0'
-git push origin dope-engine-v1.3.0
+git tag -a dope-engine-v3.0.0 -m 'DOPE engine 3.0.0'
+git push origin dope-engine-v3.0.0
 # Review the generated signed draft, its source commit and all required checks.
 # Publish that draft through the normal release process.
 ```
@@ -116,10 +116,11 @@ failure propagation. They are not cryptographic signing evidence.
 
 ## Verify before install
 
-Install GitHub CLI from its official distribution. From this source checkout:
+Install GitHub CLI 2.102.0 or newer from its official distribution. Run these
+commands from this source checkout.
 
 ```bash
-release_tag=dope-engine-v1.3.0
+release_tag=dope-engine-v3.0.0
 gh release download "$release_tag" --repo neverhuman/dope --dir release
 release_commit=$(gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha)
 bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"

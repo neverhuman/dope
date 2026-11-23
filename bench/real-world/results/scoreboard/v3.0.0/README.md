@@ -31,8 +31,9 @@ The selection, all on DEV and in this order, was written down before each step w
    difference excludes zero.
 
 The arm `dope-v3b-auto-v8` is `dope fit --format auto-v8 --budget 2048` built from the v3
-integration branch. The released `dope 3.0.0` binary was re-run on every scheduled cell and
-wrote byte-identical packets (same SHA-256 for every cell) before the tag.
+integration branch. A local static-pie build of `dope 3.0.0` from `3fb802fd` reproduced
+all 108 scheduled packet SHA-256 digests. The signed draft binary must reproduce
+the same digests before publication.
 
 **Read the guards with the headline.** The comparison's outcome under the `dope-kpi/v2`
 promotion rule is HOLD, not PROMOTE. TRG improves, but four guards fail: the regression lower
