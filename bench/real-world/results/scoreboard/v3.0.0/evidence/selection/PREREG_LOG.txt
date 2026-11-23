@@ -1,0 +1,6 @@
+2026-11-23T15:42:24Z addendum D (surgery fleet arms v8-s7, v8-s7w) V3_SELECTION_PREREG.md sha256 b631216baa428b21fced0e0d4557f5d8d811aa7bf0091c6f3b4c1c6e23965ea8
+2026-11-23T15:45:02Z addendum D deviation (v8-s7w host xbabe3 -> xbabe2) V3_SELECTION_PREREG.md sha256 a260600a0e2d0799f26c1ebbc4aa03a8a4149f1bae85955e54b90d62da21d0f2
+2026-11-23T16:49:10Z addendum D deviation 2 (v8-s7 withdrawn: xbabe1 RAM, no checkpoint) V3_SELECTION_PREREG.md sha256 1fb7ee352c89ee8df2596389999dca1e75b7022da2ba4329a9634052533663f5
+2026-11-23T16:49:20Z deviation 2 timestamp corrected 16:55Z -> 16:49Z (text otherwise unchanged) V3_SELECTION_PREREG.md sha256 f3f7dc60bd6794d0418c363134e10659eff720c43fd59757fd76df528ed78b36
+2026-11-23T19:23:14Z addendum D deviation 3 (v8-s7w stopped for futility; Codex w1 k1500 screen logged as information only) V3_SELECTION_PREREG.md sha256 d7501ea1b8843e8966d5379a937fe14ca0bc60dde71d15d7b683f6aa94087679
+2026-11-23T19:33:59Z addendum E (v3c neural arms E1-E3 and the single seeds 9-12 final look) V3_SELECTION_PREREG.md sha256 d4820ca7192e0bc178830ee3e5bd900c62e7cc8438301cb7b4eac939c0cf72f7

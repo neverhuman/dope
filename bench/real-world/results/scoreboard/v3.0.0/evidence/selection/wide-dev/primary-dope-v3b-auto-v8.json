@@ -1,0 +1,161 @@
+{
+  "arms": [
+    {
+      "arm_id": "dope-v3b-auto-v8",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 64,
+        "max": 2048,
+        "median": 1814.0,
+        "over_budget": 0,
+        "over_budget_unmeasured": 0,
+        "scored_above_budget": 0,
+        "share_within_budget": 1.0,
+        "with_packet": 64,
+        "within_budget": 64
+      },
+      "c2st_files": 46,
+      "c2st_median": 0.966852996163,
+      "matched": {
+        "cells": 46,
+        "ci_high": -0.174863227555,
+        "ci_low": -0.397150307259,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.045238831161,
+            "ci_low": -0.294253230924,
+            "families": 4,
+            "task": "regression",
+            "value": -0.162201537216
+          },
+          {
+            "ci_high": -0.191167484959,
+            "ci_low": -0.447717617611,
+            "families": 3,
+            "task": "binary",
+            "value": -0.309952206191
+          },
+          {
+            "ci_high": -0.088264607398,
+            "ci_low": -0.666238628457,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.377251617928
+          }
+        ],
+        "trg": -0.283135120445,
+        "uninformative_cells": 18
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 34,
+          "median": 0.943022344074
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 36,
+          "median": 0.939967633835
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 25,
+          "median": 0.932925185351
+        }
+      ],
+      "mlp_trg": -0.359930179335,
+      "primary": {
+        "cells": 46,
+        "ci_high": -0.084352774123,
+        "ci_low": -0.265308860746,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": 0.024615384084,
+            "ci_low": -0.291702526361,
+            "families": 4,
+            "task": "regression",
+            "value": -0.111525723652
+          },
+          {
+            "ci_high": -0.113042146102,
+            "ci_low": -0.401750920658,
+            "families": 3,
+            "task": "binary",
+            "value": -0.279125928484
+          },
+          {
+            "ci_high": -0.015231522064,
+            "ci_low": -0.317679774647,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.120786892945
+          }
+        ],
+        "trg": -0.170479515027,
+        "uninformative_cells": 18
+      },
+      "trg_failed_at_floor": -0.170479515027
+    }
+  ],
+  "bootstrap": {
+    "draws": 10000,
+    "lower_quantile": 0.025,
+    "lower_rank": 249,
+    "seed": 20261123,
+    "upper_quantile": 0.975,
+    "upper_rank": 9750
+  },
+  "command": "primary",
+  "comparisons": [],
+  "contract": {
+    "id": "dope-kpi/v2",
+    "protocol_frozen": false,
+    "sha256": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
+    "source": "embedded",
+    "status": "candidate"
+  },
+  "inputs": {
+    "realref_auditors": [
+      "gbdt",
+      "linear-seeded-v1",
+      "mlp-seeded-v1"
+    ],
+    "realref_sha256": "bb9ec3bed13721f3ee946d8c2d9b99c460ef91d266b62cd660147b0e8a3cb721",
+    "rows_sha256": {
+      "dope-v3b-auto-v8": "3be771b2b78bb60ae5270ce4fe663583a7697478edffa1eda52c7516e83d4b1d"
+    },
+    "schedule_file": "schedule-wide-dev.jsonl",
+    "schedule_panel_sha256": "8d18e7837d6cc1bdf640f8e695045225a9c66d0d330ee4e835f8058cdcb7b29e",
+    "schedule_sha256": "97439e8a978bfb3502c96b19fccc0302063f8090877a39512b1d576b85e25658"
+  },
+  "panel": {
+    "dev_families": 0,
+    "dev_tables": 0,
+    "dev_tables_scheduled": 0,
+    "dev_tables_sha256": null,
+    "dev_tables_unmatched": 0,
+    "families": 22,
+    "families_sha256": null,
+    "family_set_sha256": "005cf45182c0966843f998fe63af6f054241af4bbe9e83bfe22367a0d34feaec",
+    "id": "all"
+  },
+  "schema": "dope.kpi-receipt/v2",
+  "tool": {
+    "git_sha": "unset",
+    "name": "dope_kpi",
+    "version": "2.0.0"
+  }
+}
