@@ -13,13 +13,11 @@ use dope_core::evidence::{
     extract, ColumnMeta as EvidenceMeta, EvidenceInput, EvidenceTier, COL_DIM, EDGE_DIM,
     GLOB_DIM as EV_GLOB_DIM,
 };
-use dope_core::marginal::column_meta::{
-    fit_columns, ColumnDecl, Nc2ColumnMetaV2, UnitSpace, META_FIELDS,
-};
+use dope_core::marginal::column_meta::META_FIELDS;
 use dope_core::single_encoding::v8::{
-    build_decoder_inputs, fit_dse8_packet, unpack_dse8_packet, Dse8ColumnMeta, Dse8FitOptions,
-    ScaleCardV8, DEC_CODE_DIM, DEC_COL_DIM, DEC_EDGE_DIM, DEC_GLOB_DIM, MARG_CONT, V8_MAX_CLASSES,
-    V8_MAX_COLS, V8_MAX_RANK,
+    build_decoder_inputs, fit_dse8_packet, fit_unit_meta_v2, unpack_dse8_packet, Dse8ColumnMeta,
+    Dse8FitOptions, ScaleCardV8, DEC_CODE_DIM, DEC_COL_DIM, DEC_EDGE_DIM, DEC_GLOB_DIM, MARG_CONT,
+    V8_MAX_CLASSES, V8_MAX_COLS, V8_MAX_RANK,
 };
 use dope_core::single_encoding::KNOT_COUNT;
 
@@ -107,23 +105,6 @@ pub struct V8Episode {
     pub floats: Vec<f32>,
 }
 
-fn to_dse8(m: &Nc2ColumnMetaV2) -> Dse8ColumnMeta {
-    Dse8ColumnMeta {
-        group_id: m.group_id,
-        group_kind: m.group_kind,
-        group_width: m.group_width,
-        parent_col_idx: m.parent_col_idx,
-        support_class: m.support_class,
-        skew_guard_active: m.skew_guard_active,
-        lattice_q0_unit: m.lattice_q0_unit,
-        lattice_origin_unit: m.lattice_origin_unit,
-        has_lower_bound: m.has_lower_bound,
-        has_upper_bound: m.has_upper_bound,
-        log_pre_tail_asym: m.log_pre_tail_asym,
-        log_unique_bucket: m.log_unique_bucket,
-    }
-}
-
 /// Target in the packet's coordinates: regression standardized by the card (clamped to +-6;
 /// `normalized_only` only clamps), classes as their index in the packet's class list, -1 for a
 /// class the packet does not carry (masked, never another class).
@@ -197,27 +178,9 @@ pub fn v8_episode(
     let x_raw = columns(x_fit, n_fit, p);
     let y_raw: Vec<f64> = y_fit.iter().map(|&v| v as f64).collect();
 
-    // Unit-free meta (kinds, support, bounds) decides the card; the lattice step and phase are
-    // then refitted in that card's unit space before DSE8 and the evidence bank read them.
-    let meta0 = fit_columns(&x_raw, None, None);
-    let dse8_meta0: Vec<Dse8ColumnMeta> = meta0.iter().map(to_dse8).collect();
-    let probe = fit_card(
-        &x_raw,
-        &y_raw,
-        task,
-        V8_MAX_COLS.min(p),
-        normalized_only,
-        &dse8_meta0,
-    )?;
-    let mut meta = meta0;
-    for (c, &j) in probe.col_indices.iter().enumerate() {
-        let unit = UnitSpace {
-            center: probe.center_active[c] as f64,
-            scale: probe.scale_active[c] as f64,
-        };
-        meta[j] = Nc2ColumnMetaV2::fit(&x_raw[j], ColumnDecl::single(j), Some(unit));
-    }
-    let dse8_meta: Vec<Dse8ColumnMeta> = meta.iter().map(to_dse8).collect();
+    // FIT-only meta in the packet's unit space, shared with every other DSE8 fit path.
+    let meta = fit_unit_meta_v2(&x_raw, &y_raw, task, normalized_only).map_err(|_| Code::Fit)?;
+    let dse8_meta: Vec<Dse8ColumnMeta> = meta.iter().map(Dse8ColumnMeta::from).collect();
 
     let opts = Dse8FitOptions {
         task_id: task,

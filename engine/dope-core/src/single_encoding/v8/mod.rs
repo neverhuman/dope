@@ -12,6 +12,7 @@
 
 pub mod copula_regimes;
 pub mod decode;
+pub mod fit_meta;
 pub mod marginals;
 pub mod model;
 pub mod model_ops;
@@ -29,6 +30,7 @@ pub use decode::{
     build_decode_plan_v8, decode_dse8_row_at, decode_dse8_rows, extract_jopedime_embedding,
     DecodePlanV8, DecodedV8Row, DecodedV8Table,
 };
+pub use fit_meta::{fit_unit_meta, fit_unit_meta_v2};
 pub use marginals::{
     MarginalColV8, MARG_ATOMS, MARG_CONST, MARG_CONT, MARG_LATTICE, MARG_ZERO_INFLATED,
 };

@@ -278,6 +278,28 @@ def test_native_v8_factory_matches_in_process_stage(corpus):
     assert compared >= 18, compared
 
 
+
+@needs_ffi
+def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
+    """Train/serve identity: `dope_v8_emit fit --fit-meta` on the FIT rows writes the training packet."""
+    import subprocess
+
+    from research.levels.v8_evidence import find_v8_emit_binary, write_dopemat
+
+    binary = find_v8_emit_binary()
+    if binary is None:
+        pytest.skip("dope_v8_emit not built")
+    sampler = make_sampler(corpus, **NATIVE)
+    for i, spec in enumerate(sampler.plan_step(SEED, 3)[:8]):
+        episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
+        packet, _, _ = ef.v8_arrays(episode["X_fit"], episode["y_fit"], episode["X_qry"], episode["y_qry"],
+                                    episode["task"], seed=1000 + i)
+        mat, out = tmp_path / f"a{i}.mat", tmp_path / f"a{i}.pkt"
+        write_dopemat(mat, episode["X_fit"], episode["y_fit"])
+        subprocess.run([str(binary), "fit", "--in", str(mat), "--task", episode["task"], "--budget", "2048",
+                        "--fit-meta", "--seed", str(1000 + i), "--out", str(out)], check=True, capture_output=True)
+        assert out.read_bytes() == packet, (i, episode["task"])
+
 # -- gradient-farm adapter ------------------------------------------------------------------
 def boom_stage(episode, **_):
     """A coding mistake in a stage: not an episode fault, so the producer dies."""

@@ -12,7 +12,8 @@ use clap::{Parser, Subcommand};
 use dope_core::evidence::{extract as extract_evidence, EvidenceInput, EvidenceTier};
 use dope_core::single_encoding::v8::{
     decode_dse8_rows, extract_jopedime_embedding, fit_dse8_packet, fit_dse8_packet_with_encoder,
-    truncate_dse8_packet, unpack_dse8_packet, Dse8ColumnMeta, Dse8FitOptions, SingleEncV8Weights,
+    fit_unit_meta, truncate_dse8_packet, unpack_dse8_packet, Dse8ColumnMeta, Dse8FitOptions,
+    SingleEncV8Weights,
 };
 use sha2::{Digest, Sha256};
 use std::fs;
@@ -62,6 +63,10 @@ enum Cmd {
         n_heads: usize,
         #[arg(long = "col-meta")]
         col_meta: Option<PathBuf>,
+        /// Without `--col-meta`: compute FIT-only column meta in the packet's unit space
+        /// (`fit_unit_meta`, the same meta the V8 training episodes use).
+        #[arg(long, default_value_t = false, conflicts_with = "col_meta")]
+        fit_meta: bool,
         #[arg(long, default_value_t = 0)]
         seed: u64,
         #[arg(long)]
@@ -225,12 +230,20 @@ fn main() {
             checkpoint,
             n_heads,
             col_meta,
+            fit_meta,
             seed,
             out,
         } => (|| -> Result<(), String> {
             let task_id = parse_task(&task)?;
             let (x, y) = read_dopemat(&input)?;
-            let meta = load_col_meta(col_meta.as_deref())?;
+            let meta = if fit_meta {
+                Some(
+                    fit_unit_meta(&x, &y, task_id, normalized_only)
+                        .map_err(|e| format!("fit_meta_failed: {e}"))?,
+                )
+            } else {
+                load_col_meta(col_meta.as_deref())?
+            };
             let opts = Dse8FitOptions {
                 task_id,
                 budget_bytes: budget,
