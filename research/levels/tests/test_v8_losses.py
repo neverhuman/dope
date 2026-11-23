@@ -87,3 +87,48 @@ def test_gumbel_rao_fsq_entmax_and_pcgrad() -> None:
     ep_a, ep_b = sample_contrastive_xor_pair(np.random.default_rng(5))
     assert np.array_equal(ep_a["X_fit"], ep_b["X_fit"])
     assert np.allclose(ep_a["y_fit"] + ep_b["y_fit"], 1.0)
+
+
+def test_multiclass_all_k_grads_and_unseen_query_mask_and_direct_cond() -> None:
+    torch.manual_seed(99)
+    rng = np.random.default_rng(99)
+    ep = sample_v8_prior_episode(rng, n_fit=160, n_qry=96, p=6, task_id=2)
+    k = ep["n_classes"]
+    assert k >= 3
+    Xf = torch.from_numpy(ep["X_fit"])
+    yf = torch.from_numpy(ep["y_fit"])
+    Xq = torch.from_numpy(ep["X_qry"])
+    yq = torch.from_numpy(ep["y_qry"]).clone()
+    # Inject -1.0 unseen query class mask (dope-ffi convention!) on 15% of query rows
+    yq[:14] = -1.0
+
+    x_syn = torch.randn(128, 6, requires_grad=True)
+    logits = torch.randn(128, k, requires_grad=True)
+    logits_qry = torch.randn(96, k, requires_grad=True)
+    y_reg = torch.randn(128, requires_grad=True)
+    resid_sd = torch.tensor(0.5, requires_grad=True)
+    plan = {
+        "delta_W": torch.full((1, 6, 8), 0.1, requires_grad=True),
+        "delta_L": torch.full((1, 6, 12), 0.05, requires_grad=True),
+        "delta_knots": torch.full((1, 6, 17), 0.02, requires_grad=True),
+        "node_leaves": torch.full((1, 8, 8, 8), 0.05, requires_grad=True),
+        "bilin_w": torch.full((1, 4, 8), 0.05, requires_grad=True),
+        "flow_s": torch.full((1, 6, 2), 0.05, requires_grad=True),
+        "flow_t": torch.full((1, 6, 2), 0.05, requires_grad=True),
+        "resid_sd_mult": torch.tensor([1.1], requires_grad=True),
+    }
+
+    ld = compute_v8_episode_loss(
+        x_syn, logits, y_reg, resid_sd, Xf, yf, Xq, yq, 2, k,
+        logits_qry=logits_qry, plan=plan,
+    )
+    assert float(ld["l_direct_cond"]) > 0.0 and float(ld["l_anchor"]) > 0.0
+    ld["total"].backward()
+    assert logits.grad is not None and torch.all(torch.isfinite(logits.grad))
+    # EVERY active class 0..k-1 MUST receive non-zero TSTR gradient (not just class 0!)
+    for c in range(k):
+        assert float(logits.grad[:, c].abs().sum()) > 1e-6, f"class {c} got zero grad!"
+    # Masked query rows (0..14) MUST receive ZERO direct conditional gradient!
+    assert logits_qry.grad is not None
+    assert float(logits_qry.grad[:14].abs().sum()) == 0.0
+    assert float(logits_qry.grad[14:].abs().sum()) > 1e-5

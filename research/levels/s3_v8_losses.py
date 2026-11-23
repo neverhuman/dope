@@ -80,40 +80,70 @@ def _fit_logit_irls_eval(
     return F.binary_cross_entropy_with_logits(z_q, yq.clamp(0.0, 1.0))
 
 
+def _leaf_weights_3d(X: torch.Tensor, cols: torch.Tensor, thrs: torch.Tensor) -> torch.Tensor:
+    """Vectorized depth-3 soft oblivious-tree leaf probabilities `[N, T, 8]`."""
+    vals = X[:, cols]  # [N, T, 3]
+    pr = torch.sigmoid(((vals - thrs[None, :, :]) * 3.0).clamp(-10.0, 10.0))
+    pl = 1.0 - pr
+    b0 = torch.stack([pl[..., 0], pr[..., 0]], dim=-1)
+    b1 = torch.stack([pl[..., 1], pr[..., 1]], dim=-1)
+    b2 = torch.stack([pl[..., 2], pr[..., 2]], dim=-1)
+    return (b2[..., :, None, None] * b1[..., None, :, None] * b0[..., None, None, :]).reshape(
+        X.shape[0], cols.shape[0], 8
+    )
+
+
+def _fit_multiclass_ridge_eval(
+    Xs: torch.Tensor,      # [Ns, P]
+    oh_s: torch.Tensor,    # [Ns, K] probabilities / Gumbel-Rao one-hot
+    Xq: torch.Tensor,      # [Nq, P]
+    yq_idx: torch.Tensor,  # [Nq] long in [0, K-1]
+    lam: float = 2.0,
+) -> torch.Tensor:
+    """Single-solve batched K-class ridge TSTR auditor with cross-entropy loss on `(Xq, yq_idx)`."""
+    n, p = Xs.shape
+    Xa = torch.cat([Xs, torch.ones(n, 1, device=Xs.device, dtype=Xs.dtype)], dim=1)
+    Xqa = torch.cat([Xq, torch.ones(Xq.shape[0], 1, device=Xq.device, dtype=Xq.dtype)], dim=1)
+    reg = torch.eye(p + 1, device=Xs.device, dtype=Xs.dtype) * lam
+    reg[-1, -1] = 1e-2
+    A = Xa.T @ Xa + reg
+    B = Xa.T @ oh_s  # [P+1, K]
+    W = torch.linalg.solve(A, B)
+    probs_q = (Xqa @ W).clamp(min=1e-4)
+    probs_q = probs_q / probs_q.sum(dim=-1, keepdim=True).clamp(min=1e-4)
+    p_true = torch.gather(probs_q, 1, yq_idx.unsqueeze(-1)).squeeze(-1).clamp(min=1e-4)
+    return (-torch.log(p_true)).mean()
+
+
 def _fit_soft_obliv_tree_auditor(
     Xs: torch.Tensor,
-    ys: torch.Tensor,
+    ys: torch.Tensor,      # [Ns] (reg/bin) or [Ns, K] (multiclass)
     Xq: torch.Tensor,
-    yq: torch.Tensor,
+    yq: torch.Tensor,      # [Nq] float (reg/bin) or long class idx (mc)
     task_id: int,
     n_trees: int = 32,
     seed: int = 17,
 ) -> torch.Tensor:
-    """Differentiable random depth-3 soft oblivious-tree ensemble auditor (`A_tree`)."""
-    n, p = Xs.shape
+    """Differentiable random depth-3 soft oblivious-tree ensemble auditor (`A_tree`), reg/bin/all-K mc."""
+    _, p = Xs.shape
     gen = torch.Generator(device=Xs.device)
     gen.manual_seed(seed + p * 31)
     cols = torch.randint(0, max(p, 1), (n_trees, 3), generator=gen, device=Xs.device)
     thrs = torch.empty((n_trees, 3), device=Xs.device, dtype=Xs.dtype).uniform_(-1.0, 1.0, generator=gen)
 
-    def _leaf_weights(X: torch.Tensor) -> torch.Tensor:
-        # [N, T, 3]
-        vals = X[:, cols]  # [N, T, 3]
-        pr = torch.sigmoid((vals - thrs[None, :, :]) * 3.0)
-        pl = 1.0 - pr
-        return torch.stack(
-            [
-                (pr[..., 0] if (l & 1) else pl[..., 0])
-                * (pr[..., 1] if (l & 2) else pl[..., 1])
-                * (pr[..., 2] if (l & 4) else pl[..., 2])
-                for l in range(8)
-            ],
-            dim=-1,
-        )  # [N, T, 8]
-
-    ws = _leaf_weights(Xs)  # [Ns, T, 8]
-    wq = _leaf_weights(Xq)  # [Nq, T, 8]
+    ws = _leaf_weights_3d(Xs, cols, thrs)  # [Ns, T, 8]
+    wq = _leaf_weights_3d(Xq, cols, thrs)  # [Nq, T, 8]
     denom = ws.sum(dim=0) + 4.0  # [T, 8]
+    if task_id == 2:
+        # Multiclass: ys is [Ns, K]
+        prior = ys.mean(dim=0)  # [K]
+        leaf_val = (torch.einsum("ntl,nk->tlk", ws, ys) + 4.0 * prior[None, None, :]) / denom[:, :, None]
+        pred_q = torch.einsum("ntl,tlk->nk", wq, leaf_val) / float(n_trees)
+        probs_q = pred_q.clamp(min=1e-4)
+        probs_q = probs_q / probs_q.sum(dim=-1, keepdim=True).clamp(min=1e-4)
+        p_true = torch.gather(probs_q, 1, yq.long().unsqueeze(-1)).squeeze(-1).clamp(min=1e-4)
+        return (-torch.log(p_true)).mean()
+
     prior = ys.mean()
     leaf_val = ((ws * ys[:, None, None]).sum(dim=0) + 4.0 * prior) / denom  # [T, 8]
     pred_q = (wq * leaf_val[None, :, :]).sum(dim=-1).mean(dim=-1)  # [Nq]
@@ -131,12 +161,11 @@ def _fit_rff_auditor(
     n_rff: int = 32,
     seed: int = 29,
 ) -> torch.Tensor:
-    """Fixed-bank multi-bandwidth Random Fourier Features nonlinear auditor (`A_rff`)."""
+    """Fixed-bank multi-bandwidth Random Fourier Features nonlinear auditor (`A_rff`), reg/bin/all-K mc."""
     _, p = Xs.shape
     gen = torch.Generator(device=Xs.device)
     gen.manual_seed(seed + p * 53)
     omega = torch.randn((p, n_rff), generator=gen, device=Xs.device, dtype=Xs.dtype) / math.sqrt(max(p, 1))
-    # Multi-bandwidth scaling (0.5x, 1.0x, 2.0x)
     scales = torch.tensor([0.5, 1.0, 2.0], device=Xs.device, dtype=Xs.dtype)
     omega = omega * scales[torch.arange(n_rff, device=Xs.device) % 3][None, :]
     phase = torch.empty((1, n_rff), device=Xs.device, dtype=Xs.dtype).uniform_(0.0, 2.0 * math.pi, generator=gen)
@@ -144,7 +173,9 @@ def _fit_rff_auditor(
     phi_q = math.sqrt(2.0 / n_rff) * torch.cos(Xq @ omega + phase)
     if task_id == 0:
         return _fit_ridge_eval(phi_s, ys, phi_q, yq, lam=3.0)
-    return _fit_logit_irls_eval(phi_s, ys, phi_q, yq, lam=3.0, steps=2)
+    if task_id == 1:
+        return _fit_logit_irls_eval(phi_s, ys, phi_q, yq, lam=3.0, steps=2)
+    return _fit_multiclass_ridge_eval(phi_s, ys, phi_q, yq.long(), lam=3.0)
 
 
 def loss_pit_cvm(Xs: torch.Tensor, Xq: torch.Tensor) -> torch.Tensor:
@@ -182,18 +213,7 @@ def loss_tree_occupancy(
     thrs = torch.empty((n_trees, 3), device=Xs.device, dtype=Xs.dtype).uniform_(-0.9, 0.9, generator=gen)
 
     def _stats(X: torch.Tensor, y: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        vals = X[:, cols]
-        pr = torch.sigmoid((vals - thrs[None, :, :]) * 3.0)
-        pl = 1.0 - pr
-        w = torch.stack(
-            [
-                (pr[..., 0] if (l & 1) else pl[..., 0])
-                * (pr[..., 1] if (l & 2) else pl[..., 1])
-                * (pr[..., 2] if (l & 4) else pl[..., 2])
-                for l in range(8)
-            ],
-            dim=-1,
-        )
+        w = _leaf_weights_3d(X, cols, thrs)
         occ = w.mean(dim=0)  # [T, 8]
         mu = (w * y[:, None, None]).sum(dim=0) / (w.sum(dim=0) + 1.0)
         return occ, mu
@@ -260,6 +280,42 @@ def loss_privacy_dcr_hinge(
     return F.relu((ds_qry - ds_fit) - margin).mean()
 
 
+def loss_direct_conditional_nll(
+    logits_qry: torch.Tensor,
+    resid_sd: torch.Tensor,
+    y_qry: torch.Tensor,
+    task_id: int,
+    n_classes: int,
+) -> torch.Tensor:
+    """Direct proper-scoring-rule conditional NLL on real held-out `(X_qry, y_qry)`."""
+    if task_id == 0:
+        mu_q = logits_qry[:, 0]
+        sd_v = resid_sd.clamp(0.05, 4.0)
+        mse_q = F.mse_loss(mu_q, y_qry).clamp(max=25.0)
+        nll_q = (0.5 * (((mu_q - y_qry) / sd_v) ** 2 + 2.0 * torch.log(sd_v))).mean().clamp(-2.0, 10.0)
+        return mse_q + 0.25 * nll_q
+    if task_id == 1:
+        return F.binary_cross_entropy_with_logits(
+            logits_qry[:, 0].clamp(-10.0, 10.0), y_qry.clamp(0.0, 1.0)
+        ).clamp(max=10.0)
+    k = max(2, min(int(n_classes), logits_qry.shape[-1]))
+    return F.cross_entropy(logits_qry[:, :k].clamp(-10.0, 10.0), y_qry.long().clamp(0, k - 1)).clamp(max=10.0)
+
+
+def loss_trust_region_anchor(plan: dict[str, torch.Tensor]) -> torch.Tensor:
+    """Trust-region L2 residual anchor preventing early warmup drift below Step-0 DSE8."""
+    return (
+        0.50 * (plan["delta_W"] ** 2).mean()
+        + 0.35 * (plan["delta_L"] ** 2).mean()
+        + 0.35 * (plan["delta_knots"] ** 2).mean()
+        + 0.40 * (plan["node_leaves"] ** 2).mean()
+        + 0.40 * (plan["bilin_w"] ** 2).mean()
+        + 0.25 * (plan["flow_s"] ** 2).mean()
+        + 0.25 * (plan["flow_t"] ** 2).mean()
+        + 0.20 * (torch.log(plan["resid_sd_mult"].clamp(min=0.1)) ** 2).mean()
+    )
+
+
 def compute_v8_episode_loss(
     x_syn: torch.Tensor,        # [Ns, P]
     logits_syn: torch.Tensor,   # [Ns, K]
@@ -272,10 +328,14 @@ def compute_v8_episode_loss(
     task_id: int,
     n_classes: int,
     weights: dict[str, float] | None = None,
+    logits_qry: torch.Tensor | None = None,
+    plan: dict[str, torch.Tensor] | None = None,
 ) -> dict[str, torch.Tensor]:
     """Compute complete multi-term KPI-aligned V8 loss dictionary for one episode."""
     w = {
         "ret": 1.0,
+        "direct_cond": 0.60,
+        "anchor": 0.15,
         "pit": 0.35,
         "cop": 0.25,
         "tree": 0.30,
@@ -286,48 +346,75 @@ def compute_v8_episode_loss(
     if weights:
         w.update(weights)
 
-    Xf = torch.nan_to_num(X_fit, nan=0.0)
-    Xq = torch.nan_to_num(X_qry, nan=0.0)
+    Xf_all = torch.nan_to_num(X_fit, nan=0.0)
+    Xq_all = torch.nan_to_num(X_qry, nan=0.0)
     Xs = torch.nan_to_num(x_syn, nan=0.0)
 
+    # Mask unseen/invalid target rows (e.g., dope-ffi sets unseen query classes to -1.0!)
+    # while keeping full Xq_all intact for covariate realism (PIT, copula, DCR).
     if task_id == 0:
-        ys = y_reg_syn
-        l_lin_s = _fit_ridge_eval(Xs, ys, Xq, y_qry)
-        l_lin_r = _fit_ridge_eval(Xf, y_fit, Xq, y_qry).detach()
-        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, ys, Xq, y_qry, 0)
-        l_tr_r = _fit_soft_obliv_tree_auditor(Xf, y_fit, Xq, y_qry, 0).detach()
-        l_rff_s = _fit_rff_auditor(Xs, ys, Xq, y_qry, 0)
-        l_rff_r = _fit_rff_auditor(Xf, y_fit, Xq, y_qry, 0).detach()
-        l0 = F.mse_loss(torch.full_like(y_qry, y_fit.mean()), y_qry).detach()
+        valid_f = torch.isfinite(y_fit)
+        valid_q = torch.isfinite(y_qry)
+    else:
+        k_lim = 2 if task_id == 1 else max(2, min(int(n_classes), logits_syn.shape[-1]))
+        valid_f = torch.isfinite(y_fit) & (y_fit >= 0.0) & (y_fit < float(k_lim))
+        valid_q = torch.isfinite(y_qry) & (y_qry >= 0.0) & (y_qry < float(k_lim))
+
+    Xf = Xf_all[valid_f] if int(valid_f.sum().item()) >= 4 else Xf_all
+    yf_v = y_fit[valid_f] if int(valid_f.sum().item()) >= 4 else torch.zeros_like(y_fit)
+    Xq = Xq_all[valid_q] if int(valid_q.sum().item()) >= 4 else Xq_all
+    yq_v = y_qry[valid_q] if int(valid_q.sum().item()) >= 4 else torch.zeros_like(y_qry)
+    lq_v = (
+        (logits_qry[valid_q] if int(valid_q.sum().item()) >= 4 else logits_qry)
+        if logits_qry is not None else None
+    )
+
+    if task_id == 0:
+        ys_aud = y_reg_syn
+        ys_stat = y_reg_syn
+        y_stat_q = yq_v
+        l_lin_s = _fit_ridge_eval(Xs, ys_aud, Xq, yq_v)
+        l_lin_r = _fit_ridge_eval(Xf, yf_v, Xq, yq_v).detach()
+        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, ys_aud, Xq, yq_v, 0)
+        l_tr_r = _fit_soft_obliv_tree_auditor(Xf, yf_v, Xq, yq_v, 0).detach()
+        l_rff_s = _fit_rff_auditor(Xs, ys_aud, Xq, yq_v, 0)
+        l_rff_r = _fit_rff_auditor(Xf, yf_v, Xq, yq_v, 0).detach()
+        l0 = F.mse_loss(torch.full_like(yq_v, yf_v.mean()), yq_v).detach()
     elif task_id == 1:
-        # Gumbel-Rao K=4 straight-through binary target sample!
         bin_logits = torch.stack([torch.zeros_like(logits_syn[:, 0]), logits_syn[:, 0]], dim=-1)
-        ys = gumbel_rao_ste(bin_logits, tau=0.8, k_mc=4)[:, 1]
-        yf = (y_fit > 0.5).float()
-        yq = (y_qry > 0.5).float()
-        l_lin_s = _fit_logit_irls_eval(Xs, ys, Xq, yq)
+        ys_aud = gumbel_rao_ste(bin_logits, tau=0.8, k_mc=4)[:, 1]
+        ys_stat = ys_aud
+        yf = (yf_v > 0.5).float()
+        yq = (yq_v > 0.5).float()
+        y_stat_q = yq
+        l_lin_s = _fit_logit_irls_eval(Xs, ys_aud, Xq, yq)
         l_lin_r = _fit_logit_irls_eval(Xf, yf, Xq, yq).detach()
-        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, ys, Xq, yq, 1)
+        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, ys_aud, Xq, yq, 1)
         l_tr_r = _fit_soft_obliv_tree_auditor(Xf, yf, Xq, yq, 1).detach()
-        l_rff_s = _fit_rff_auditor(Xs, ys, Xq, yq, 1)
+        l_rff_s = _fit_rff_auditor(Xs, ys_aud, Xq, yq, 1)
         l_rff_r = _fit_rff_auditor(Xf, yf, Xq, yq, 1).detach()
         p1 = yf.mean().clamp(0.02, 0.98)
         l0 = F.binary_cross_entropy(torch.full_like(yq, p1), yq).detach()
     else:
-        # Multiclass: One-vs-Rest Gumbel-Rao K=4 smooth worst across active classes!
+        # True ALL-K multiclass Gumbel-Rao K=4 TSTR across all active classes simultaneously!
         k = max(2, min(int(n_classes), logits_syn.shape[-1]))
-        oh_s = gumbel_rao_ste(logits_syn[:, :k], tau=0.8, k_mc=4)
-        ys = oh_s[:, 0]
-        yf = (y_fit.long() == 0).float()
-        yq = (y_qry.long() == 0).float()
-        l_lin_s = _fit_logit_irls_eval(Xs, ys, Xq, yq)
-        l_lin_r = _fit_logit_irls_eval(Xf, yf, Xq, yq).detach()
-        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, ys, Xq, yq, 1)
-        l_tr_r = _fit_soft_obliv_tree_auditor(Xf, yf, Xq, yq, 1).detach()
-        l_rff_s = _fit_rff_auditor(Xs, ys, Xq, yq, 1)
-        l_rff_r = _fit_rff_auditor(Xf, yf, Xq, yq, 1).detach()
-        p0 = yf.mean().clamp(0.02, 0.98)
-        l0 = F.binary_cross_entropy(torch.full_like(yq, p0), yq).detach()
+        oh_s = gumbel_rao_ste(logits_syn[:, :k], tau=0.8, k_mc=4)  # [Ns, K]
+        yf_idx = yf_v.long().clamp(0, k - 1)
+        yq_idx = yq_v.long().clamp(0, k - 1)
+        oh_f = F.one_hot(yf_idx, num_classes=k).float()
+        l_lin_s = _fit_multiclass_ridge_eval(Xs, oh_s, Xq, yq_idx)
+        l_lin_r = _fit_multiclass_ridge_eval(Xf, oh_f, Xq, yq_idx).detach()
+        l_tr_s = _fit_soft_obliv_tree_auditor(Xs, oh_s, Xq, yq_idx, 2)
+        l_tr_r = _fit_soft_obliv_tree_auditor(Xf, oh_f, Xq, yq_idx, 2).detach()
+        l_rff_s = _fit_rff_auditor(Xs, oh_s, Xq, yq_idx, 2)
+        l_rff_r = _fit_rff_auditor(Xf, oh_f, Xq, yq_idx, 2).detach()
+        priors = oh_f.mean(dim=0).clamp(min=0.01)
+        priors = priors / priors.sum()
+        l0 = (-torch.log(priors[yq_idx])).mean().detach()
+        # Expected class score proxy for tree occupancy / driver TV alignment
+        cls_grid = torch.linspace(0.0, 1.0, k, device=Xs.device, dtype=Xs.dtype)
+        ys_stat = (oh_s * cls_grid[None, :]).sum(dim=-1)
+        y_stat_q = cls_grid[yq_idx]
 
     # Twin-referenced smooth-worst retention gap across [A_lin, A_tree, A_rff] (mlp held out!)
     def _gap(ls: torch.Tensor, lr: torch.Tensor) -> torch.Tensor:
@@ -337,16 +424,22 @@ def compute_v8_episode_loss(
     gaps = torch.stack([_gap(l_lin_s, l_lin_r), _gap(l_tr_s, l_tr_r), _gap(l_rff_s, l_rff_r)])
     l_ret = (1.0 / 4.0) * torch.logsumexp(4.0 * gaps, dim=0)
 
-    y_stat_q = y_qry if task_id == 0 else (y_qry > 0.5).float()
-    l_pit = loss_pit_cvm(Xs, Xq)
-    l_cop = loss_copula_corr(Xs, Xq)
-    l_tree = loss_tree_occupancy(Xs, ys, Xq, y_stat_q)
-    l_drv = loss_driver_alignment(Xs, ys, Xq, y_stat_q)
-    l_cond = loss_cond_calibration(logits_syn[:, : max(n_classes, 1)], y_reg_syn, resid_sd, y_qry, task_id)
-    l_priv = loss_privacy_dcr_hinge(Xs, Xf, Xq)
+    l_pit = loss_pit_cvm(Xs, Xq_all)
+    l_cop = loss_copula_corr(Xs, Xq_all)
+    l_tree = loss_tree_occupancy(Xs, ys_stat, Xq, y_stat_q)
+    l_drv = loss_driver_alignment(Xs, ys_stat, Xq, y_stat_q)
+    l_cond = loss_cond_calibration(logits_syn[:, : max(n_classes, 1)], y_reg_syn, resid_sd, yq_v, task_id)
+    l_priv = loss_privacy_dcr_hinge(Xs, Xf_all, Xq_all)
+    l_direct_cond = (
+        loss_direct_conditional_nll(lq_v, resid_sd, yq_v, task_id, n_classes)
+        if lq_v is not None else Xs.new_tensor(0.0)
+    )
+    l_anchor = loss_trust_region_anchor(plan) if plan is not None else Xs.new_tensor(0.0)
 
     total = (
         w["ret"] * l_ret
+        + w["direct_cond"] * l_direct_cond
+        + w["anchor"] * l_anchor
         + w["pit"] * l_pit
         + w["cop"] * l_cop
         + w["tree"] * l_tree
@@ -357,6 +450,8 @@ def compute_v8_episode_loss(
     return {
         "total": total,
         "l_ret": l_ret,
+        "l_direct_cond": l_direct_cond,
+        "l_anchor": l_anchor,
         "l_pit": l_pit,
         "l_cop": l_cop,
         "l_tree": l_tree,

@@ -319,10 +319,39 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "with_owner_encoder": not args.decoder_only,
     }
     model = SingleEncV8(**cfg).to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=max(args.steps, 1), eta_min=args.lr * 0.05
-    )
+    init_from = str(getattr(args, "init_from", "") or "")
+    if init_from:
+        from safetensors.torch import load_file as _st_load
+        st_w = _st_load(init_from, device=str(device))
+        model.load_state_dict(st_w, strict=False)
+    if bool(getattr(args, "freeze_target_heads", False)):
+        for name, p in model.named_parameters():
+            if any(name.startswith(pfx) for pfx in ("delta_W.", "node_", "bilin_", "gate_head.")):
+                p.requires_grad_(False)
+    if bool(getattr(args, "freeze_x_heads", False)):
+        for name, p in model.named_parameters():
+            if any(name.startswith(pfx) for pfx in ("delta_knots.", "delta_L.", "flow_")):
+                p.requires_grad_(False)
+
+    trainable_params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
+    warmup_steps = int(getattr(args, "warmup_steps", 0) or 0)
+    lr_sched_kind = str(getattr(args, "lr_schedule", "cosine") or "cosine")
+
+    def _lr_lambda(st: int) -> float:
+        if warmup_steps > 0 and st < warmup_steps:
+            return float(st + 1) / float(warmup_steps)
+        rem = max(args.steps - warmup_steps, 1)
+        prog = min(1.0, max(0.0, float(st - warmup_steps) / float(rem)))
+        if lr_sched_kind == "wsd":
+            # Warmup -> Stable (80%) -> Cosine Decay (20%)
+            if prog < 0.80:
+                return 1.0
+            d_prog = (prog - 0.80) / 0.20
+            return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * d_prog))
+        return 0.05 + 0.95 * 0.5 * (1.0 + math.cos(math.pi * prog))
+
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=_lr_lambda)
     emas: dict[str, dict[str, torch.Tensor]] = {
         "0.99": copy.deepcopy(model.state_dict()),
         "0.999": copy.deepcopy(model.state_dict()),
@@ -414,10 +443,19 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                 td["resid_sd"][None], td["z_max"][None], td["is_cont"][None], col_mask,
                 n_rows=args.n_syn, antithetic=True,
             )
+            xq_clean = torch.nan_to_num(td["X_qry"], nan=0.0)
+            logits_qry = model.predict_target_on_x(
+                plan, td["W_base"][None], td["b_base"][None], xq_clean[None]
+            )[0]
+            loss_w = {
+                "direct_cond": float(getattr(args, "direct_cond_weight", 0.60)),
+                "anchor": float(getattr(args, "anchor_weight", 0.15)),
+            }
             ld = compute_v8_episode_loss(
                 dec["x_syn"][0], dec["logits"][0], dec["y_reg"][0], dec["resid_sd_eff"][0],
                 td["X_fit"], td["y_fit"], td["X_qry"], td["y_qry"],
                 td["task_id"], td["n_classes"],
+                weights=loss_w, logits_qry=logits_qry, plan=plan,
             )
             # Masked evidence reconstruction auxiliary loss (pre-bottleneck representation grounding)
             ev_rec = model.aux_ev_head(plan["h_dec"][0])
@@ -541,8 +579,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--use-rust-packet", action="store_true")
     ap.add_argument("--budget-bytes", type=int, default=2048)
     ap.add_argument("--lr", type=float, default=3e-4)
+    ap.add_argument("--lr-schedule", type=str, default="wsd", choices=["cosine", "wsd"])
+    ap.add_argument("--warmup-steps", type=int, default=200)
     ap.add_argument("--weight-decay", type=float, default=1e-2)
     ap.add_argument("--grad-clip", type=float, default=1.0)
+    ap.add_argument("--direct-cond-weight", type=float, default=0.60)
+    ap.add_argument("--anchor-weight", type=float, default=0.15)
+    ap.add_argument("--init-from", type=str, default="")
+    ap.add_argument("--freeze-target-heads", action="store_true")
+    ap.add_argument("--freeze-x-heads", action="store_true")
     ap.add_argument("--use-pcgrad", action="store_true")
     ap.add_argument("--use-asam", action="store_true")
     ap.add_argument("--asam-every", type=int, default=10)

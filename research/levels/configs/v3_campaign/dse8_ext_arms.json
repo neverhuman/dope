@@ -1,0 +1,128 @@
+{
+  "schema": "dope.kpi-ext-arms/v1",
+  "arms": [
+    {
+      "arm_id": "dse8_analytic_2k",
+      "artifact_class": "source_free",
+      "io": "mat",
+      "binary": "{dope_v8_emit}",
+      "budget_bytes": 2048,
+      "fit": [
+        "fit",
+        "--input", "{fit_rows}",
+        "--out", "{artifact}",
+        "--task", "{task}",
+        "--budget", "2048",
+        "--normalized-only",
+        "--seed", "{fit_seed}"
+      ],
+      "sample": [
+        "sample",
+        "--packet", "{artifact}",
+        "--out", "{out}",
+        "--rows", "{n_rows}",
+        "--seed", "{sample_seed}"
+      ],
+      "note": "E1: Pure-Rust DSE8 v1 analytic Step-0 (<=2048 B, normalized-only)"
+    },
+    {
+      "arm_id": "dse8_no_trees_2k",
+      "artifact_class": "source_free",
+      "io": "mat",
+      "binary": "{dope_v8_emit}",
+      "budget_bytes": 2048,
+      "fit": [
+        "fit",
+        "--input", "{fit_rows}",
+        "--out", "{artifact}",
+        "--task", "{task}",
+        "--budget", "2048",
+        "--normalized-only",
+        "--no-trees",
+        "--seed", "{fit_seed}"
+      ],
+      "sample": [
+        "sample",
+        "--packet", "{artifact}",
+        "--out", "{out}",
+        "--rows", "{n_rows}",
+        "--seed", "{sample_seed}"
+      ],
+      "note": "E1 ablation: DSE8 v1 without oblivious trees"
+    },
+    {
+      "arm_id": "dse8_no_regimes_2k",
+      "artifact_class": "source_free",
+      "io": "mat",
+      "binary": "{dope_v8_emit}",
+      "budget_bytes": 2048,
+      "fit": [
+        "fit",
+        "--input", "{fit_rows}",
+        "--out", "{artifact}",
+        "--task", "{task}",
+        "--budget", "2048",
+        "--normalized-only",
+        "--no-regimes",
+        "--seed", "{fit_seed}"
+      ],
+      "sample": [
+        "sample",
+        "--packet", "{artifact}",
+        "--out", "{out}",
+        "--rows", "{n_rows}",
+        "--seed", "{sample_seed}"
+      ],
+      "note": "E1 ablation: DSE8 v1 without multi-regime factor means"
+    },
+    {
+      "arm_id": "dse8_neural_2k",
+      "artifact_class": "source_free",
+      "io": "mat",
+      "binary": "{dope_v8_emit}",
+      "budget_bytes": 2048,
+      "fit": [
+        "fit",
+        "--input", "{fit_rows}",
+        "--out", "{artifact}",
+        "--task", "{task}",
+        "--budget", "2048",
+        "--normalized-only",
+        "--weights", "{v8_weights}",
+        "--seed", "{fit_seed}"
+      ],
+      "sample": [
+        "sample",
+        "--packet", "{artifact}",
+        "--out", "{out}",
+        "--rows", "{n_rows}",
+        "--weights", "{v8_weights}",
+        "--seed", "{sample_seed}"
+      ],
+      "note": "E6/E7: Pure-Rust DSE8 v1 + SingleEncV8 neural compiler (<=2048 B)"
+    },
+    {
+      "arm_id": "dope_auto_v8_2k",
+      "artifact_class": "source_free",
+      "io": "csv",
+      "binary": "{dope_cli}",
+      "budget_bytes": 2048,
+      "fit": [
+        "fit", "{fit_rows}",
+        "--target", "{target}",
+        "--format", "auto-v8",
+        "--budget", "2048",
+        "--seed", "{fit_seed}",
+        "--quiet",
+        "-o", "{artifact}"
+      ],
+      "sample": [
+        "sample", "{artifact}",
+        "-n", "{n_rows}",
+        "--seed", "{sample_seed}",
+        "-o", "{out}"
+      ],
+      "note": "E8: Pure-Rust 3-way grouped auto-v8 (Format 1 vs DSE8 analytic vs DSE8 neural, <=2048 B)"
+    }
+  ]
+}

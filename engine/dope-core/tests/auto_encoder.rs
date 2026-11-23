@@ -230,7 +230,7 @@ fn a_requested_encoder_is_the_only_one_fitted() {
         assert_eq!((fitted.encoder, fitted.bytes[4]), (e, e.tag()));
         let (asked, other) = match e {
             Encoder::V7 => (&r.v7, &r.format1),
-            Encoder::Format1 => (&r.format1, &r.v7),
+            Encoder::Format1 | Encoder::V8 => (&r.format1, &r.v7),
         };
         assert!(asked.requested && asked.fitted && !other.requested && !other.fitted);
         assert!(!r.check.ran && r.check.note.contains("requested"));

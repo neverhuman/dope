@@ -4200,6 +4200,22 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
       "purpose": "verify 3-way grouped acceptance guard across Format 1, DSE8 analytic Step-0, and DSE8 neural candidates"
     },
+    "engine/dope-core/src/auto/v8_dpa.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "verify DPA1 tag-8 V8 container encoding, target-last schema round-trip, and fail-closed fingerprint checks"
+    },
+    "engine/dope-cli/src/v8_weights.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope v8_weights && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "verify fail-closed SingleEncV8 F32 SafeTensors loader and DPA1 tag-8 CLI integration"
+    },
+    "engine/dope-cli/tests/auto_v8_cli.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "end-to-end CLI tests for --format v8|v8-analytic|auto-v8, --v8-weights, --v8-zero-init, --anonymize, and refusals"
+    },
+    "docs/plans/v3-major/TIPS_V3_KEEP_REJECT_TABLE.md": {
+      "command": "just fast",
+      "purpose": "keep canonical tips/v3 keep/reject/ablation ledger aligned with contracts/evidence-layout-v1.json and DSE8 implementation"
+    },
     "engine/dope-core/tests/single_encoding_v8.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
       "purpose": "integration contract suite for DSE8 v1 codec, malformed wire refusals, nominal legality, and auto::v8"

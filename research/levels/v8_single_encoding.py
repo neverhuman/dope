@@ -324,6 +324,37 @@ class SingleEncV8(nn.Module):
             "resid_sd_mult": resid_sd_mult,
         }
 
+    def predict_target_on_x(
+        self,
+        plan: dict[str, torch.Tensor],
+        base_W: torch.Tensor,  # [B, K, P]
+        base_b: torch.Tensor,  # [B, K]
+        x_in: torch.Tensor,    # [B, N, P]
+    ) -> torch.Tensor:
+        """Evaluate target conditional `Linear + alpha_table * (Soft-NODE + Rank-4 Bilinear)` on `x_in`."""
+        W_eff = base_W + plan["delta_W"].transpose(1, 2)  # [B, K, P]
+        logits = torch.einsum("bnp,bkp->bnk", x_in, W_eff) + base_b[:, None, :]
+
+        # Soft-NODE T=8, D=3 (vectorized 2x2x2 outer product for fast CPU execution)
+        feat = torch.einsum("btdp,bnp->bntd", plan["node_w"], x_in)  # [B, N, T, 3]
+        p_r = torch.sigmoid(((feat - plan["node_thr"][:, None, :, :]) * 2.0).clamp(-10.0, 10.0))
+        p_l = 1.0 - p_r
+        b0 = torch.stack([p_l[..., 0], p_r[..., 0]], dim=-1)  # [B, N, T, 2]
+        b1 = torch.stack([p_l[..., 1], p_r[..., 1]], dim=-1)
+        b2 = torch.stack([p_l[..., 2], p_r[..., 2]], dim=-1)
+        # Leaf index l = d0 + 2*d1 + 4*d2 -> outer order (d2, d1, d0) flattened to 8
+        w_leaf = (b2[..., :, None, None] * b1[..., None, :, None] * b0[..., None, None, :]).reshape(
+            x_in.shape[0], x_in.shape[1], NODE_TREES, NODE_LEAVES
+        )
+        y_node = torch.einsum("bntl,btlk->bnk", w_leaf, plan["node_leaves"])
+
+        # Rank-4 bilinear residual
+        du = torch.tanh(torch.einsum("brp,bnp->bnr", plan["bilin_u"], x_in))
+        dv = torch.tanh(torch.einsum("brp,bnp->bnr", plan["bilin_v"], x_in))
+        y_bilin = torch.einsum("bnr,brk->bnk", du * dv, plan["bilin_w"])
+
+        return logits + plan["alpha_table"][:, None, None] * (y_node + y_bilin)
+
     def decode_batch_differentiable(
         self,
         plan: dict[str, torch.Tensor],
@@ -407,31 +438,7 @@ class SingleEncV8(nn.Module):
         x_syn = torch.clamp(x_syn + tail_ext * is_cont_col[:, None, :], -6.0, 6.0) * col_mask[:, None, :]
 
         # 4. Target conditional: Linear W + alpha_table * (Soft-NODE + Rank-4 Bilinear)
-        W_eff = base_W + plan["delta_W"].transpose(1, 2)  # [B, K, P]
-        logits = torch.einsum("bnp,bkp->bnk", x_syn, W_eff) + base_b[:, None, :]
-
-        # Soft-NODE T=8, D=3
-        feat = torch.einsum("btdp,bnp->bntd", plan["node_w"], x_syn)  # [B, N, T, D]
-        p_r = torch.sigmoid(((feat - plan["node_thr"][:, None, :, :]) * 2.0).clamp(-10.0, 10.0))
-        p_l = 1.0 - p_r
-        # 8 leaf probabilities via Kronecker product across 3 depths
-        w_leaf = torch.stack(
-            [
-                (p_r[..., 0] if (l & 1) else p_l[..., 0])
-                * (p_r[..., 1] if (l & 2) else p_l[..., 1])
-                * (p_r[..., 2] if (l & 4) else p_l[..., 2])
-                for l in range(NODE_LEAVES)
-            ],
-            dim=-1,
-        )  # [B, N, T, 8]
-        y_node = torch.einsum("bntl,btlk->bnk", w_leaf, plan["node_leaves"])
-
-        # Rank-4 bilinear residual
-        du = torch.tanh(torch.einsum("brp,bnp->bnr", plan["bilin_u"], x_syn))
-        dv = torch.tanh(torch.einsum("brp,bnp->bnr", plan["bilin_v"], x_syn))
-        y_bilin = torch.einsum("bnr,brk->bnk", du * dv, plan["bilin_w"])
-
-        logits = logits + plan["alpha_table"][:, None, None] * (y_node + y_bilin)
+        logits = self.predict_target_on_x(plan, base_W, base_b, x_syn)
         resid_sd_eff = torch.clamp(resid_sd * plan["resid_sd_mult"], 0.01, 6.0)
         y_reg = logits[:, :, 0] + resid_sd_eff[:, None] * y_noise
 

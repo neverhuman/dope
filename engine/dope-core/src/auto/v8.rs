@@ -209,7 +209,7 @@ pub fn fit_auto_v8(
     let schema = infer(raw, target, &intake)?;
     let (x_full, y_full, task_id) = raw_to_numeric_inputs(raw, target, &schema)?;
     let mut f1_opts = opts.format1.clone();
-    f1_opts.budget = Some(opts.budget);
+    f1_opts.budget = Some(opts.format1.budget.unwrap_or(opts.budget));
     f1_opts.task = Some(schema.task);
 
     let dse8_opts = Dse8FitOptions {
