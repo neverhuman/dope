@@ -1,32 +1,45 @@
 {
   "schema": "dope.h-wave-record/v1",
   "wave": "H2",
-  "name": "SingleEncV7 V7.3 Cross-Host DiLoCo, Zero-Repeat & Tree-Visible Realism Wave",
+  "name": "SingleEncV7 V7.3 / V7.3c Cross-Host DiLoCo, Zero-Repeat, Tree-Visible Realism & GPU Wave",
   "status": "active",
   "scope": "DEV-only gate milestones (schedule-lite-dev.jsonl) and live training telemetry (not CONFIRM scoreboard KPIs)",
+  "s3_receipts": {
+    "best_checkpoints_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/best/",
+    "global_rounds_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/",
+    "retired_d192l4_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/retired-d192l4/"
+  },
   "config": {
     "cohorts": [
       {"sync_group": "ag-v73-diloco-d160l3", "d_model": 160, "n_layers": 3, "h_target": 32, "bytes": 2757948},
-      {"sync_group": "ag-v73-diloco-d192l4", "d_model": 192, "n_layers": 4, "h_target": 32, "bytes": 5087420}
+      {"sync_group": "ag-v73c-d160l3-fh-tree", "d_model": 160, "n_layers": 3, "h_target": 32, "freeze_target_heads": true, "tree_realism_weight": 0.50, "bytes": 2757948},
+      {"sync_group": "ag-v73c-d160l3-cal-full", "d_model": 160, "n_layers": 3, "h_target": 32, "binary_calibrated": true, "tree_realism_weight": 0.35, "bytes": 2757948}
     ],
-    "lr": 0.0001,
     "lr_schedule": "wsd",
     "hard_tstr_v73": true,
-    "tree_realism_weight": 0.25,
     "never_repeat_datasets": true,
-    "diloco_outer_lr": 0.2,
+    "diloco_outer_lr": 0.18,
     "diloco_outer_momentum": 0.7,
     "diloco_staleness_alpha": 0.15,
-    "sync_every_steps": 50,
-    "device": "cpu",
-    "dope_vram_gib": 0.0
+    "supports_cuda_and_mps": true,
+    "gpu_auditor_knobs": {"rff_dim": 64, "swd_projs": 64, "tree_shifts": 12}
   },
   "dev_gate_milestones": {
-    "panel": "schedule-lite-dev.jsonl (DEV-only, zero CONFIRM access)",
+    "panel": "schedule-lite-dev.jsonl (DEV-only, zero CONFIRM access; verified identical on main PR #391 and PR #390 emitters)",
     "v73_step0": {"trg": -0.3914, "c2st_median": 0.9553, "binary": -0.5761, "multiclass": -0.4368, "regression": -0.1614},
     "gate0_g0_httree_xh": {"trg": -0.3898, "delta_vs_step0": 0.0016, "c2st_median": 0.9533, "binary": -0.5838, "multiclass": -0.4217, "regression": -0.1639},
-    "gate0b_anchored_full": {"trg": -0.3979, "delta_vs_step0": -0.0065, "c2st_median": 0.965, "binary": -0.521, "multiclass": -0.4712, "regression": -0.2015},
-    "diloco_d160l3_r000108_full": {"trg": -0.377, "delta_vs_step0": 0.0144, "c2st_median": 0.96, "binary": -0.5107, "multiclass": -0.4611, "regression": -0.1591},
-    "diloco_d160l3_r000108_xh": {"trg": -0.3899, "delta_vs_step0": 0.0015, "c2st_median": 0.9571, "binary": -0.5777, "multiclass": -0.4354, "regression": -0.1565}
+    "diloco_d160l3_r000108_full": {"sha256_prefix": "ca115356ff51", "trg": -0.3770, "delta_vs_step0": 0.0144, "c2st_median": 0.9600, "binary": -0.5107, "multiclass": -0.4611, "regression": -0.1591},
+    "diloco_d160l3_r000679_xh": {"sha256_prefix": "0842a9bc8362", "trg": -0.3882, "delta_vs_step0": 0.0032, "c2st_median": 0.9623, "binary": -0.5982, "multiclass": -0.4198, "regression": -0.1467},
+    "diloco_d160l3_r001778_xh": {"sha256_prefix": "427222a4a37c", "trg": -0.3679, "delta_vs_step0": 0.0235, "c2st_median": 0.9586, "binary": -0.5762, "multiclass": -0.3841, "regression": -0.1435},
+    "diloco_d160l3_r002036_a025": {"trg": -0.3669, "delta_vs_step0": 0.0245, "c2st_median": 0.9650, "binary": -0.5424, "multiclass": -0.4193, "regression": -0.1389},
+    "diloco_d160l3_r002036_xh": {"trg": -0.3764, "delta_vs_step0": 0.0150, "c2st_median": 0.9587, "binary": -0.5627, "multiclass": -0.4174, "regression": -0.1492},
+    "diloco_d160l3_r002351_a025": {"sha256_prefix": "f4daafe070b9", "trg": -0.3665, "delta_vs_step0": 0.0249, "c2st_median": 0.9579, "binary": -0.5153, "multiclass": -0.4128, "regression": -0.1714},
+    "diloco_d160l3_r004244_xh": {"sha256_prefix": "269b3b67613a", "trg": -0.3774, "delta_vs_step0": 0.0140, "c2st_median": 0.9646, "binary": -0.5843, "multiclass": -0.4032, "regression": -0.1446},
+    "v73c_calfull_r000699_a0625": {"sha256_prefix": "c8fc92c70e1f", "trg": -0.3784, "delta_vs_step0": 0.0131, "c2st_median": 0.9607, "binary": -0.5976, "multiclass": -0.3787, "regression": -0.1587},
+    "v73c_calfull_r007787_a025": {"sha256_prefix": "00cf0a73f783", "trg": -0.3768, "delta_vs_step0": 0.0146, "c2st_median": 0.9593, "binary": -0.6023, "multiclass": -0.3796, "regression": -0.1484},
+    "v73c_d192l4_gpu_fh_r000031": {"sha256_prefix": "cb1e3ab790b0", "trg": -0.3970, "delta_vs_step0": -0.0056, "c2st_median": 0.9549, "binary": -0.6070, "multiclass": -0.4189, "regression": -0.1651},
+    "v73c_soup_2351_cal7787_5050": {"sha256_prefix": "1c7242604e28", "trg": -0.3640, "delta_vs_step0": 0.0274, "c2st_median": 0.9619, "binary": -0.5057, "multiclass": -0.4380, "regression": -0.1483},
+    "v73c_soup_3way_2351_2036_cal7787": {"sha256_prefix": "4ea569535ade", "trg": -0.3626, "delta_vs_step0": 0.0288, "c2st_median": 0.9561, "binary": -0.5131, "multiclass": -0.4206, "regression": -0.1541},
+    "v73c_soup_2351_cal7787_4060": {"sha256_prefix": "bebb4637927f", "trg": -0.3605, "delta_vs_step0": 0.0309, "c2st_median": 0.9619, "binary": -0.5211, "multiclass": -0.4149, "regression": -0.1456}
   }
 }

@@ -119,14 +119,17 @@ def sample_synthetic_prior_table(
     if task == "regression":
         y = (f_out[:, 0] + snr * rng.standard_normal(n_tot)).astype(np.float32)
     elif task == "binary":
-        logit_gain = float(rng.uniform(1.2, 3.0))
-        bias = float(rng.uniform(-0.6, 0.6))
+        logit_gain = float(rng.uniform(0.55, 1.55))
+        bias = float(rng.uniform(-1.1, 1.1))
         p1 = 1.0 / (1.0 + np.exp(-np.clip(logit_gain * f_out[:, 0] + bias, -10.0, 10.0)))
         y = (rng.random(n_tot) < p1).astype(np.float32)
+        flip_p = float(rng.uniform(0.0, 0.08))
+        if flip_p > 0.0:
+            y = np.where(rng.random(n_tot) < flip_p, 1.0 - y, y).astype(np.float32)
         if len(np.unique(y[:n_fit])) < 2 or len(np.unique(y[n_fit:])) < 2:
             y = (f_out[:, 0] > float(np.median(f_out[:n_fit, 0]))).astype(np.float32)
     else:
-        logit_gain = float(rng.uniform(1.4, 3.2))
+        logit_gain = float(rng.uniform(0.85, 2.05))
         lg = logit_gain * f_out
         lg -= lg.max(axis=1, keepdims=True)
         pr = np.exp(lg)
@@ -134,6 +137,9 @@ def sample_synthetic_prior_table(
         cdf = np.cumsum(pr, axis=1)
         u = rng.random((n_tot, 1))
         y = np.minimum((u >= cdf).sum(axis=1), n_cls - 1).astype(np.float32)
+        flip_p = float(rng.uniform(0.0, 0.05))
+        if flip_p > 0.0:
+            y = np.where(rng.random(n_tot) < flip_p, rng.integers(0, n_cls, size=n_tot), y).astype(np.float32)
         if len(np.unique(y[:n_fit])) < 3:
             y = np.argmax(f_out, axis=1).astype(np.float32)
 
@@ -357,6 +363,20 @@ class RealDatasetOnePassQueue:
     def remaining(self) -> int:
         return sum(len(q) for q in self.queues.values())
 
+    def take_slice(self, max_per_task: int) -> "SliceRealQueue":
+        """Pre-pop unseen real table IDs for a forked prefetch worker (0% real repeats)."""
+        sliced = {t: [i for i in (self.pop_unseen(t) for _ in range(max_per_task)) if i is not None] for t in ("regression", "binary", "multiclass")}
+        return SliceRealQueue(self.shard_id, sliced)
+
+
+class SliceRealQueue:
+    """Zero-copy picklable real-table slice for GIL-free multiprocess GPU prefetchers."""
+    def __init__(self, shard_id: int, items: dict[str, list[int]]) -> None:
+        self.shard_id, self.items = int(shard_id), items
+    def pop_unseen(self, task: str) -> int | None:
+        q = self.items.get(task)
+        return q.pop() if q else None
+
 
 def diloco_sync_step(
     sync_dir: Any,
@@ -404,12 +424,13 @@ def diloco_sync_step(
         }
 
     def _apply_global(new_g: dict[str, np.ndarray]) -> None:
+        dev = next(base_model.parameters()).device
         with torch.no_grad():
-            t_sd = {k: torch.from_numpy(v.copy()) for k, v in new_g.items()}
+            t_sd = {k: torch.from_numpy(v.copy()).to(dev) for k, v in new_g.items()}
             base_model.load_state_dict(t_sd, strict=True)
             for ke, pe in ema_model.state_dict().items():
                 if ke in t_sd and pe.is_floating_point():
-                    pe.mul_(0.5).add_(t_sd[ke].to(pe.dtype), alpha=0.5)
+                    pe.mul_(0.5).add_(t_sd[ke].to(device=pe.device, dtype=pe.dtype), alpha=0.5)
         anchor_state.clear()
         for k, v in new_g.items():
             anchor_state[k] = v.copy()
@@ -464,12 +485,12 @@ def diloco_sync_step(
             np.savez(mpart, **new_mom)
             mpart.replace(mom_p)
             s_round = int(meta.get("sync_round", 0)) + 1
-            m_tmp = meta_p.with_suffix(".json.part")
-            m_tmp.write_text(json.dumps({
+            meta_part = meta_p.with_suffix(".json.part")
+            meta_part.write_text(json.dumps({
                 "sync_mode": "diloco_outer_momentum", "sync_round": s_round, "global_sha256": sha,
                 "outer_lr": outer_lr, "outer_mom": outer_mom, "updated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             }, sort_keys=True) + "\n", encoding="utf-8")
-            m_tmp.replace(meta_p)
+            meta_part.replace(meta_p)
             _apply_global(new_g)
             return s_round, sha[:16]
         finally:

@@ -41,13 +41,13 @@ struct HttpRequest {
 
 fn read_http_request(stream: &mut TcpStream) -> Result<HttpRequest, String> {
     let mut buf = Vec::with_capacity(4096);
-    let mut tmp = [0u8; 4096];
+    let mut chunk = [0u8; 4096];
     let header_end = loop {
-        let n = stream.read(&mut tmp).map_err(|e| format!("read: {e}"))?;
+        let n = stream.read(&mut chunk).map_err(|e| format!("read: {e}"))?;
         if n == 0 {
             return Err("eof before headers".into());
         }
-        buf.extend_from_slice(&tmp[..n]);
+        buf.extend_from_slice(&chunk[..n]);
         if let Some(pos) = buf.windows(4).position(|w| w == b"\r\n\r\n") {
             break pos + 4;
         }
@@ -243,10 +243,10 @@ mod tests {
 
     #[test]
     fn roundtrip_and_nesterov_diloco_step() {
-        let tmp = std::env::temp_dir().join(format!("diloco_hub_t_{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&tmp);
+        let state_dir = std::env::temp_dir().join(format!("diloco_hub_t_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&state_dir);
         let cfg = HubConfig {
-            state_dir: tmp.clone(),
+            state_dir: state_dir.clone(),
             sync_group: "test-group".into(),
             outer_lr: 0.5,
             outer_momentum: 0.8,
@@ -271,10 +271,10 @@ mod tests {
         let parsed = parse_f32_safetensors(&b3).expect("parse");
         assert!((parsed["w"].1[0] - 0.82).abs() < 1e-5);
         assert!((parsed["w"].1[1] - 2.36).abs() < 1e-5);
-        assert!(tmp.join("global_round_000002.safetensors").is_file());
+        assert!(state_dir.join("global_round_000002.safetensors").is_file());
         assert!(st
             .apply_sync("bad", "delta", 2, &mk_st(&[f32::NAN, 0.0]))
             .is_err());
-        let _ = std::fs::remove_dir_all(&tmp);
+        let _ = std::fs::remove_dir_all(&state_dir);
     }
 }

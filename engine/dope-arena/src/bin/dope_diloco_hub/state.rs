@@ -147,9 +147,9 @@ fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
-    let tmp = path.with_extension("part");
-    fs::write(&tmp, data)?;
-    fs::rename(&tmp, path)
+    let part_path = path.with_extension("part");
+    fs::write(&part_path, data)?;
+    fs::rename(&part_path, path)
 }
 
 impl HubState {
