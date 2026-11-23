@@ -81,7 +81,7 @@ fn opts(budget: usize, seed: u64) -> AutoOptions {
     }
 }
 
-fn only(encoder: Encoder, seed: u64) -> AutoOptions {
+fn single_encoder(encoder: Encoder, seed: u64) -> AutoOptions {
     AutoOptions {
         encoder: Some(encoder),
         ..opts(2048, seed)
@@ -216,7 +216,7 @@ fn mixed_tables_run_the_internal_check_and_report_no_values() {
     let again = fit_auto(&t, 2, &opts(2048, 1), &m).unwrap();
     assert_eq!(fitted.bytes, again.bytes, "same seed, same bytes");
     // The chosen encoder alone writes the same file without the check.
-    let alone = fit_auto(&t, 2, &only(fitted.encoder, 1), &m).unwrap();
+    let alone = fit_auto(&t, 2, &single_encoder(fitted.encoder, 1), &m).unwrap();
     assert_eq!(alone.bytes, fitted.bytes);
     assert!(!alone.report.check.ran && alone.report.mode == fitted.encoder.name());
 }
@@ -225,7 +225,7 @@ fn mixed_tables_run_the_internal_check_and_report_no_values() {
 fn a_requested_encoder_is_the_only_one_fitted() {
     let (t, m) = (mixed(300, 6), model());
     for e in [Encoder::V7, Encoder::Format1] {
-        let fitted = fit_auto(&t, 2, &only(e, 2), &m).unwrap();
+        let fitted = fit_auto(&t, 2, &single_encoder(e, 2), &m).unwrap();
         let r = &fitted.report;
         assert_eq!((fitted.encoder, fitted.bytes[4]), (e, e.tag()));
         let (asked, other) = match e {
@@ -238,7 +238,7 @@ fn a_requested_encoder_is_the_only_one_fitted() {
     // A requested encoder that cannot fit returns its own error.
     let small = AutoOptions {
         budget: 64,
-        ..only(Encoder::Format1, 0)
+        ..single_encoder(Encoder::Format1, 0)
     };
     let err = fit_auto(&t, 2, &small, &m).err().expect("64 bytes");
     let text = err.to_string();
@@ -252,7 +252,7 @@ fn a_requested_encoder_is_the_only_one_fitted() {
 fn v7_payloads_refuse_foreign_weights_and_truncation() {
     let t = wide(40, 200, 4);
     let m = model();
-    let fitted = fit_auto(&t, 40, &only(Encoder::V7, 0), &m).unwrap();
+    let fitted = fit_auto(&t, 40, &single_encoder(Encoder::V7, 0), &m).unwrap();
     assert_eq!(fitted.encoder, Encoder::V7);
     let mut foreign = fitted.bytes.clone();
     foreign[DPA1_HEADER_BYTES - 1] ^= 0x5a;
