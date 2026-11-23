@@ -158,23 +158,36 @@ pub fn write_jsonl<T: Serialize>(path: &Path, records: &[T]) -> ArenaResult<Stri
     Ok(sha256_hex(&bytes))
 }
 
-/// Parse JSONL bytes; blank lines are skipped and errors cite `label` and the line number.
-pub fn parse_jsonl<T: DeserializeOwned>(label: &str, bytes: &[u8]) -> ArenaResult<Vec<T>> {
+/// Parse one JSONL record; an error cites `label` and line `number`, never the content.
+pub fn parse_line<T: DeserializeOwned>(label: &str, number: usize, line: &[u8]) -> ArenaResult<T> {
+    serde_json::from_slice(line).map_err(|e| {
+        ArenaError::Contract(format!(
+            "{label}: line {number}: malformed record ({:?})",
+            e.classify()
+        ))
+    })
+}
+
+/// Parse JSONL bytes into (line number, record) pairs; blank lines are
+/// skipped and errors cite `label` and the line number.
+pub fn parse_jsonl_numbered<T: DeserializeOwned>(
+    label: &str,
+    bytes: &[u8],
+) -> ArenaResult<Vec<(usize, T)>> {
     let mut records = Vec::new();
-    for (number, line) in bytes.split(|&b| b == b'\n').enumerate() {
+    for (index, line) in bytes.split(|&b| b == b'\n').enumerate() {
         if line.iter().all(u8::is_ascii_whitespace) {
             continue;
         }
-        let record = serde_json::from_slice(line).map_err(|e| {
-            ArenaError::Contract(format!(
-                "{label}: line {}: malformed record ({:?})",
-                number + 1,
-                e.classify()
-            ))
-        })?;
-        records.push(record);
+        records.push((index + 1, parse_line(label, index + 1, line)?));
     }
     Ok(records)
+}
+
+/// Parse JSONL bytes; blank lines are skipped and errors cite `label` and the line number.
+pub fn parse_jsonl<T: DeserializeOwned>(label: &str, bytes: &[u8]) -> ArenaResult<Vec<T>> {
+    let numbered = parse_jsonl_numbered(label, bytes)?;
+    Ok(numbered.into_iter().map(|(_, record)| record).collect())
 }
 
 pub fn read_jsonl<T: DeserializeOwned>(path: &Path) -> ArenaResult<Vec<T>> {

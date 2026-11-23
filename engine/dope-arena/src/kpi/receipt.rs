@@ -4,10 +4,12 @@
 //! A receipt is a pure function of its inputs and of the binary: no clock,
 //! no path, sorted keys, and every float written with 12 decimals, so the
 //! same inputs give the same bytes. It names the contract (SHA-256), the
-//! panel filter, the schedule, the real reference and every rows file read
-//! (SHA-256 each), the tool version and git commit, and the seeds.
+//! panel filter, the schedule, the real reference, every rows file read and
+//! the guard files merged into them (SHA-256 each), the tool version and git
+//! commit, and the seeds.
 
 use super::compare::ComparisonResult;
+use super::guard_merge::GuardsRef;
 use super::jsonl::{canonical_pretty, sha256_hex, write_atomic};
 use super::null::NullResult;
 use super::panelsel::{resolve, Panel, PanelInfo, PanelKind};
@@ -62,6 +64,11 @@ pub struct Inputs {
     pub realref_sha256: String,
     /// SHA-256 of every `rows.jsonl` read, by arm.
     pub rows_sha256: BTreeMap<String, String>,
+    /// SHA-256 of `guards.jsonl` and of `guards-summary.json` of every arm whose guards were merged.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub guards_sha256: BTreeMap<String, String>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub guards_summary_sha256: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -161,6 +168,14 @@ impl Context {
         }
     }
 
+    /// One SHA-256 of the merged guard files of every arm that has them.
+    fn guard_shas(&self, pick: fn(&GuardsRef) -> &String) -> BTreeMap<String, String> {
+        self.arms
+            .values()
+            .filter_map(|arm| Some((arm.id.clone(), pick(arm.guards.as_ref()?).clone())))
+            .collect()
+    }
+
     /// A receipt with every input recorded and no result yet.
     pub fn receipt(&self, command: &str) -> Receipt {
         let b = &self.contract.bootstrap;
@@ -181,6 +196,8 @@ impl Context {
                     .values()
                     .map(|arm| (arm.id.clone(), arm.rows_sha256.clone()))
                     .collect(),
+                guards_sha256: self.guard_shas(|g| &g.guards_sha256),
+                guards_summary_sha256: self.guard_shas(|g| &g.summary_sha256),
             },
             panel: self.panel.info.clone(),
             bootstrap: BootstrapInfo {

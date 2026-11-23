@@ -7,10 +7,12 @@
 //! real reference, carry the cell metadata of the schedule and repeat the
 //! real-only columns of the real reference. Arms read from one run directory
 //! are therefore paired on identical cells, splits and informative flags.
-//! Errors name files, lines and cell ids, never a value.
+//! When `score/<arm>/guards.jsonl` exists its guard fields are merged in
+//! (`guard_merge.rs`). Errors name files, lines and cell ids, never a value.
 
 use super::emitlog::check_arm_id;
-use super::jsonl::{parse_jsonl, read_file, sha256_hex};
+use super::guard_merge::{merge as merge_guards, GuardsRef};
+use super::jsonl::{parse_jsonl, parse_jsonl_numbered, read_file, sha256_hex};
 use dope_arena::{ArenaError, ArenaResult};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -30,8 +32,8 @@ pub fn contract<T>(message: impl Into<String>) -> ArenaResult<T> {
 }
 
 /// One entry of `rows.jsonl`: the `score::ScoreRow` fields the statistic
-/// reads, plus guard fields a later `score` may add (absent in every rows
-/// file so far; a guard that needs an absent field is not evaluated).
+/// reads, plus the guard fields `dope_kpi guards` writes beside the rows
+/// (`score` never writes them; a guard that needs an absent field is not evaluated).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct KpiRow {
     pub cell_id: String,
@@ -54,13 +56,17 @@ pub struct KpiRow {
     pub artifact_class: String,
     pub c2st_auc: Option<f64>,
     pub c2st_real_ref: Option<f64>,
+    /// `score`'s entry id, the key of `guards.jsonl`.
+    #[serde(default)]
+    pub ledger_id: Option<String>,
     /// `evaluate_v3` realism gate of the entry.
     #[serde(default)]
     pub realism_pass: Option<bool>,
     /// `evaluate_v3` empirical privacy gate of the entry.
     #[serde(default)]
     pub privacy_pass: Option<bool>,
-    /// `max(0, rate(S in A) - rate(B in A))` of the entry's file (`dvs::v3::privacy`).
+    /// `max(0, rate(S in A) - rate(B in A))` of the entry's file (`dvs::v3::privacy`),
+    /// pooled over the file's complete entries (`guards-summary.json`).
     #[serde(default)]
     pub exact_copy_excess: Option<f64>,
 }
@@ -177,6 +183,8 @@ pub struct Arm {
     pub rows_sha256: String,
     /// Sorted by (cell, auditor, multiplier, sample seed).
     pub rows: Vec<KpiRow>,
+    /// The guard files merged into `rows`, if any.
+    pub guards: Option<GuardsRef>,
 }
 
 impl Arm {
@@ -186,6 +194,7 @@ impl Arm {
             id: id.to_string(),
             rows_sha256,
             rows,
+            guards: None,
         }
     }
 }
@@ -286,9 +295,15 @@ impl RunDir {
         check_arm_id(arm_id)?;
         let bytes = read_file(&self.rows_path(arm_id))?;
         let label = format!("{SCORE_DIR}/{arm_id}/{ROWS_FILE}");
-        let rows: Vec<KpiRow> = parse_jsonl(&label, &bytes)?;
+        let (lines, mut rows): (Vec<usize>, Vec<KpiRow>) =
+            parse_jsonl_numbered(&label, &bytes)?.into_iter().unzip();
         self.check_rows(&label, &rows)?;
-        Ok(Arm::sorted(arm_id, sha256_hex(&bytes), rows))
+        let rows_sha256 = sha256_hex(&bytes);
+        let guards = merge_guards(&self.dir, arm_id, &rows_sha256, &lines, &mut rows)?;
+        Ok(Arm {
+            guards,
+            ..Arm::sorted(arm_id, rows_sha256, rows)
+        })
     }
 
     /// Require exactly one entry per scheduled file and auditor, each with the
