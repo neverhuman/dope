@@ -1,0 +1,14 @@
+[package]
+name = "dope-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "C ABI of the per-episode, FIT-only native stages that the training episode factory calls."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+dope-core = { path = "../dope-core" }

@@ -656,6 +656,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "dope-ffi"
+version = "2.0.0"
+dependencies = [
+ "dope-core",
+]
+
+[[package]]
 name = "dope-norm"
 version = "0.1.0"
 dependencies = [

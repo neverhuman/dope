@@ -56,6 +56,10 @@ class ViewConfig:
     """Plain data. Probabilities are per episode unless a name says otherwise."""
 
     scaler: str = "nc2_compat"  # or "robust_v2"
+    # "scaled": real columns leave scaled by the FIT statistics. "raw": real columns leave with their
+    # augmented raw values (non-finite -> NaN) for a native stage that fits its own FIT-only scale
+    # card, as serving does. Splits, targets, synthetic columns and RNG streams are the same in both.
+    emit: str = "scaled"
     dup_key: str = "features"  # Rule A-1 key on the view: "features", or "row" = features + target (see module doc)
     jitter_prob: float = 0.30
     jitter_lo: float = 0.002  # sigma as a share of the FIT IQR
@@ -231,6 +235,9 @@ def build_episode(corpus: ViewCorpus, spec: EpisodeSpec, cfg: ViewConfig = DEFAU
     # Values, column-major: (columns, rows) float64, FIT rows first.
     x = np.take(view, rows, axis=0).T.astype(np.float64, order="C")
     aug = raw_augment(x, n_fit, rng, cfg)
+    if cfg.emit not in ("scaled", "raw"):
+        raise ViewError("emit")
+    raw = np.where(np.isfinite(x), x, np.nan) if cfg.emit == "raw" else None
     miss, constant = scale_stacked(x, n_fit, cfg.scaler)
     p, kn, kd = x.shape[0], spec.n_noise, spec.n_derived
     total = p + kn + kd
@@ -256,6 +263,8 @@ def build_episode(corpus: ViewCorpus, spec: EpisodeSpec, cfg: ViewConfig = DEFAU
         if y_out is None:
             return RetryEpisode("constant_target", spec)
         task, n_classes = "multilabel", int(spec.n_classes)
+    if raw is not None:  # after every draw that reads the scaled values
+        out[place[:p]] = raw
 
     view_sig, split_sig = signatures(spec, cols, plan.fit, plan.qry, target_col)
     if plan.fit_counts is not None:  # class counts of the FIT pool and of the FIT half, by source class id

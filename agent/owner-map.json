@@ -1026,7 +1026,8 @@
     "engine/dope-cli/src/auto_fit.rs": "rust-core",
     "engine/dope-cli/src/v7_weights.rs": "rust-core",
     "engine/dope-cli/tests/auto_cli.rs": "rust-core",
-    "models/single-enc-v7/": "rust-core"
+    "models/single-enc-v7/": "rust-core",
+    "engine/dope-ffi/": "rust-core"
   },
   "workspace": "dope"
 }
