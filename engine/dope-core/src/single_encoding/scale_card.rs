@@ -150,11 +150,7 @@ impl ScaleCardV7 {
         } else {
             let mut counts: BTreeMap<i32, usize> = BTreeMap::new();
             for &v in y_raw {
-                let id = if task_id == 1 {
-                    i32::from(v > 0.5)
-                } else {
-                    v.round() as i32
-                };
+                let id = v.round() as i32;
                 *counts.entry(id).or_insert(0) += 1;
             }
             if counts.len() < 2 {
@@ -162,13 +158,10 @@ impl ScaleCardV7 {
                     "dse7 requires >= 2 classes for classification".into(),
                 ));
             }
+            let max_k = if task_id == 1 { 2 } else { MAX_CLASSES };
             let mut by_cnt: Vec<(usize, i32)> = counts.into_iter().map(|(id, c)| (c, id)).collect();
             by_cnt.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.cmp(&b.1)));
-            let mut cls: Vec<i32> = by_cnt
-                .into_iter()
-                .take(MAX_CLASSES)
-                .map(|(_, id)| id)
-                .collect();
+            let mut cls: Vec<i32> = by_cnt.into_iter().take(max_k).map(|(_, id)| id).collect();
             cls.sort_unstable();
             (0.0, 1.0, cls)
         };

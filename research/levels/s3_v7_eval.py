@@ -6,7 +6,12 @@ compliance under the 72-vCPU ASR safety envelope).
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+from pathlib import Path
+import random
+import struct
 from typing import Any
 
 import numpy as np
@@ -189,3 +194,114 @@ def eval_realism_and_privacy(
         "exact_copy_excess": ex_excess,
         "privacy_pass": 1.0 if (dcr_share <= 0.55 and mia_auc <= 0.55 and ex_excess <= 0.005) else 0.0,
     }
+
+
+def atomic_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    part = path.with_suffix(path.suffix + ".part")
+    part.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
+    part.replace(path)
+
+
+def append_jsonl(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(payload, sort_keys=True) + "\n")
+        fh.flush()
+
+
+def save_v7_safetensors(model: Any, out_path: Path) -> tuple[int, str]:
+    """Write canonical HF safetensors v1 (F32, rank <= 2, 8-byte aligned JSON header, zero deps)."""
+    import torch
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    header: dict[str, Any] = {}
+    blobs: list[bytes] = []
+    offset = 0
+    sd = model.state_dict()
+    for name in sorted(sd):
+        t = sd[name].detach().cpu().to(torch.float32).contiguous()
+        if t.ndim > 2:
+            raise ValueError(f"v7_tensor_rank_violation:{name}:ndim={t.ndim}")
+        raw = t.numpy().tobytes()
+        header[name] = {"dtype": "F32", "shape": list(t.shape), "data_offsets": [offset, offset + len(raw)]}
+        blobs.append(raw)
+        offset += len(raw)
+    hdr_bytes = json.dumps(header, separators=(",", ":")).encode("utf-8")
+    hdr_bytes += b" " * ((8 - (len(hdr_bytes) % 8)) % 8)
+    payload = struct.pack("<Q", len(hdr_bytes)) + hdr_bytes + b"".join(blobs)
+    part = out_path.with_suffix(".safetensors.part")
+    part.write_bytes(payload)
+    part.replace(out_path)
+    return len(payload), hashlib.sha256(payload).hexdigest()
+
+
+def save_v7_resume_state(
+    out_path: Path,
+    base_model: Any,
+    ema_model: Any,
+    opt: Any,
+    step: int,
+    opt_steps: int,
+    total_unique: int,
+    best_dev_kpi: float,
+    meta: dict[str, Any],
+) -> None:
+    """Atomically save full training state (model + EMA + AdamW + RNG + step) for clean extension."""
+    import torch
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": 1,
+        "step": int(step),
+        "opt_steps": int(opt_steps),
+        "total_unique": int(total_unique),
+        "best_dev_kpi": float(best_dev_kpi),
+        "meta": dict(meta),
+        "base_model": {k: v.detach().cpu() for k, v in base_model.state_dict().items()},
+        "ema_model": {k: v.detach().cpu() for k, v in ema_model.state_dict().items()},
+        "optimizer": opt.state_dict(),
+        "torch_rng": torch.get_rng_state(),
+        "numpy_rng": np.random.get_state(),
+        "python_rng": random.getstate(),
+    }
+    part = out_path.with_suffix(out_path.suffix + ".part")
+    torch.save(payload, part)
+    part.replace(out_path)
+
+
+def load_v7_resume_state(
+    resume_path: Path,
+    base_model: Any,
+    ema_model: Any,
+    opt: Any,
+    expected_arch: tuple[int, int, int, int],
+) -> tuple[int, int, int, float]:
+    """Load full training state (model + EMA + AdamW + RNG + step) with architecture guard."""
+    import torch
+
+    state = torch.load(resume_path, map_location="cpu", weights_only=False)
+    meta = state.get("meta") or {}
+    saved_arch = (
+        int(meta.get("d_model", -1)),
+        int(meta.get("n_layers", -1)),
+        int(meta.get("n_heads", -1)),
+        int(meta.get("h_target", -1)),
+    )
+    if saved_arch != expected_arch:
+        raise ValueError(f"resume_arch_mismatch:saved={saved_arch}:expected={expected_arch}")
+    base_model.load_state_dict(state["base_model"], strict=True)
+    ema_model.load_state_dict(state["ema_model"], strict=True)
+    opt.load_state_dict(state["optimizer"])
+    if "torch_rng" in state:
+        torch.set_rng_state(state["torch_rng"])
+    if "numpy_rng" in state:
+        np.random.set_state(state["numpy_rng"])
+    if "python_rng" in state:
+        random.setstate(state["python_rng"])
+    return (
+        int(state["step"]),
+        int(state.get("opt_steps", state["step"])),
+        int(state.get("total_unique", 0)),
+        float(state.get("best_dev_kpi", -999.0)),
+    )
