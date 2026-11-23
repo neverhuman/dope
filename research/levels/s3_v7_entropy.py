@@ -371,9 +371,11 @@ def diloco_sync_step(
     """Atomic LAN/HTTP DiLoCo outer-momentum weight sync across asynchronous nodes."""
     import fcntl
     import hashlib
+    import http.client
     import json
     from pathlib import Path
     import struct
+    import sys
     import time
     import urllib.request
     import torch
@@ -433,8 +435,9 @@ def diloco_sync_step(
                     sha = str(resp.headers.get("X-Diloco-Sha", hashlib.sha256(raw).hexdigest()[:16]))
                 _apply_global(_unpack_st(raw))
                 return s_round, sha[:16]
-            except Exception:
-                if attempt == 2:
+            except (OSError, ValueError, struct.error, http.client.HTTPException) as exc:  # network or payload failure only
+                if attempt == 2:  # typed outcome: this round is skipped, training continues on local weights
+                    print(f"[DiLoCo] hub sync skipped after 3 attempts: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
                     return base_round, ""
                 time.sleep(0.5 * (attempt + 1))
 
