@@ -36,6 +36,7 @@ pub mod io;
 pub mod jsonl;
 pub mod mat;
 pub mod null;
+pub mod oracle;
 pub mod pairing;
 pub mod panels_build;
 pub mod panelsel;

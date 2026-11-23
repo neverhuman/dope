@@ -9,6 +9,8 @@
 //! | `indep_marginals` | every A column permuted on its own, target included |
 //! | `label_shuffle` | A with only the target permuted |
 //!
+//! The E0 oracle arms (`oracle_*`, see `oracle.rs`) are generated here too, as controls.
+//!
 //! `rust_format2[_b<bytes>]` (see `format2.rs`) is generated here too, as a
 //! source-free arm with a measured packet; an artifact over the arm's budget
 //! is logged `over_budget` with its length and no file.
@@ -26,6 +28,7 @@ use super::format2;
 use super::io::Arena;
 use super::jsonl::sha256_hex;
 use super::mat::{mat_relpath, write_mat, Mat};
+use super::oracle;
 use super::roles::MIN_ROLE_ROWS;
 use super::seeds::{crn_seed, KpiRng};
 use dope_arena::{ArenaError, ArenaResult};
@@ -40,9 +43,9 @@ pub const ARMS: [&str; 5] = [TWIN_C, COPY_A, BOOTSTRAP_A, INDEP_MARGINALS, LABEL
 pub const ARCH_ID: &str = "native-control";
 pub const REASON_NO_TWIN: &str = "c_rows_below_minimum";
 
-/// Arms this binary generates itself: the controls and the engine's Format 2 arm.
+/// Arms this binary generates itself: the controls, the E0 oracles and the engine's Format 2 arm.
 pub fn is_native(arm_id: &str) -> bool {
-    ARMS.contains(&arm_id) || format2::budget_of(arm_id).is_some()
+    ARMS.contains(&arm_id) || oracle::is_oracle(arm_id) || format2::budget_of(arm_id).is_some()
 }
 
 fn permutation(cell: &Cell, sample_seed: u64, purpose: &str, n: usize) -> Vec<usize> {
@@ -74,6 +77,9 @@ pub fn generate(
     sample_seed: u64,
     multiplier: u32,
 ) -> ArenaResult<Result<Mat, &'static str>> {
+    if oracle::is_oracle(arm_id) {
+        return oracle::generate(arm_id, cell, data, sample_seed, multiplier);
+    }
     let a = &data.a;
     let all: Vec<usize> = (0..a.n).collect();
     let mat = match arm_id {
