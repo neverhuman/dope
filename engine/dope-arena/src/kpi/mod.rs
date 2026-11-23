@@ -6,8 +6,10 @@
 //! unseeded randomness, and the same bytes for any `--threads` value.
 
 pub mod auditors;
+pub mod boot;
 pub mod celldata;
 pub mod cellplan;
+pub mod compare;
 pub mod controls;
 pub mod emitlog;
 pub mod ext_arm;
@@ -24,19 +26,33 @@ pub mod format2;
 pub mod io;
 pub mod jsonl;
 pub mod mat;
+pub mod null;
+pub mod pairing;
 pub mod panels_build;
+pub mod panelsel;
 pub mod par;
+pub mod primary;
 pub mod realref;
+pub mod receipt;
 pub mod reduce;
+pub mod render;
 pub mod roles;
+pub mod rule;
+pub mod rundir;
 pub mod score;
 pub mod scorecell;
 pub mod seeds;
 pub mod shard;
 pub mod sketch;
+pub mod spec;
+pub mod trg;
 
 #[cfg(test)]
 pub mod fixture;
+#[cfg(test)]
+pub mod stat_testing;
+#[cfg(test)]
+mod stat_tests;
 
 /// Scratch directory for unit tests, inside the build tree and never in the sources.
 #[cfg(test)]

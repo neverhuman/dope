@@ -19,3 +19,11 @@ Rust-core also owns `contracts/dope-fidelity-v3-candidate.json`, the active unfr
 candidate contract registered in `agent/generated-zones.toml` (not a parked implementation).
 Migration plan: freeze into the v2 release contract once `dope_kpi` confirmation receipts pass
 (review expiry `2027-06-01`). Proof lane: `cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test fidelity_v2_e2e`.
+
+Rust-core also owns `contracts/dope-kpi-v2.json` (`dope.kpi-contract/v2`), the unfrozen candidate
+scoreboard protocol (TRG statistic, family bootstrap, promotion rule, byte grid, sign-flip null)
+that `dope_kpi primary/compare/null` compile in and hash into every receipt; registered in
+`agent/generated-zones.toml`. A change to it changes every receipt's contract SHA-256. Freeze
+(`protocol_frozen: true`) only by an owner-approved decision before any trained-model outcome is
+read. Proof lane: `cargo test --manifest-path engine/Cargo.toml --locked -p dope-arena`; reference
+in `engine/dope-arena/docs/kpi-v2.md`.

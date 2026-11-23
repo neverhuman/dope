@@ -1,0 +1,6 @@
+{"cell_id":"fx:a1:full:d0","data_seed":0,"dataset_hash":"a1","family_id":"famR1","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"headline","task":"regression","view":"full"}
+{"cell_id":"fx:a2:full:d0","data_seed":0,"dataset_hash":"a2","family_id":"famR1","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"headline","task":"regression","view":"full"}
+{"cell_id":"fx:a3:full:d0","data_seed":0,"dataset_hash":"a3","family_id":"famR2","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"headline","task":"regression","view":"full"}
+{"cell_id":"fx:b1:full:d0","data_seed":0,"dataset_hash":"b1","family_id":"famB1","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"headline","task":"binary","view":"full"}
+{"cell_id":"fx:c1:full:d0","data_seed":0,"dataset_hash":"c1","family_id":"famC1","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"headline","task":"multiclass","view":"full"}
+{"cell_id":"fx:d1:full:d0","data_seed":0,"dataset_hash":"d1","family_id":"famR3","multipliers":[4,1],"panel_sha256":"fixture-panel","sample_seeds":[0],"stratum":"small_n","task":"regression","view":"full"}

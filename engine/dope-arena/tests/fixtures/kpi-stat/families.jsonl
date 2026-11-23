@@ -1,0 +1,7 @@
+{"dataset_hash":"a1","family_id":"famR1","task":"regression"}
+{"dataset_hash":"a2","family_id":"famR1","task":"regression"}
+{"dataset_hash":"a3","family_id":"famR2","task":"regression"}
+{"dataset_hash":"b1","family_id":"famB1","task":"binary"}
+{"dataset_hash":"c1","family_id":"famC1","task":"multiclass"}
+{"dataset_hash":"d1","family_id":"famR3","task":"regression"}
+{"dataset_hash":"e9","family_id":"famB1","task":"binary"}
