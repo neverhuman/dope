@@ -162,6 +162,33 @@ def archive_telemetry(data: dict[str, Any], archive_dir: Path, mirror_root: Path
     return manifest
 
 
+def _persisted_fleet_rate_bins(data: dict[str, Any], bin_s: float = 60.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute wall-clock fleet throughput (tbl/s) and monotonic cumulative splits (M) from train.jsonl."""
+    ts_pairs: list[tuple[float, float]] = []
+    for rlist in data["waves"].values():
+        for run in rlist:
+            prev_u = 0.0
+            for row in run["train"]:
+                t_val, u_val = row.get("time"), row.get("unique_splits_seen")
+                if isinstance(t_val, (int, float)) and isinstance(u_val, (int, float)):
+                    du = max(0.0, float(u_val) - prev_u)
+                    prev_u = float(u_val)
+                    if du > 0.0:
+                        ts_pairs.append((float(t_val), du))
+    if not ts_pairs:
+        empty = np.array([], dtype=np.float64)
+        return empty, empty, empty
+    ts_pairs.sort(key=lambda x: x[0])
+    t_arr = np.array([p[0] for p in ts_pairs], dtype=np.float64)
+    du_arr = np.array([p[1] for p in ts_pairs], dtype=np.float64)
+    t0, t1 = float(t_arr[0]), float(t_arr[-1])
+    n_bins = max(1, int(math.ceil((t1 - t0) / bin_s)))
+    edges = t0 + np.arange(n_bins + 1, dtype=np.float64) * bin_s
+    counts, _ = np.histogram(t_arr, bins=edges, weights=du_arr)
+    mins = (edges[:-1] - t0 + 0.5 * bin_s) / 60.0
+    return mins, counts / bin_s, np.cumsum(counts) / 1e6
+
+
 def build_snapshot_receipt(data: dict[str, Any], archive_manifest: dict[str, Any] | None) -> dict[str, Any]:
     """Build compact committed JSON receipt summarizing persisted training & throughput telemetry."""
     waves_summary: dict[str, Any] = {}
@@ -190,7 +217,9 @@ def build_snapshot_receipt(data: dict[str, Any], archive_manifest: dict[str, Any
             ],
         }
     hist = data["history"]
-    tps_vals = [float(r["tables_per_s"]) for r in hist if float(r.get("tables_per_s", 0)) > 0]
+    _, bin_tps, _ = _persisted_fleet_rate_bins(data, bin_s=60.0)
+    active_tps = [float(v) for v in bin_tps if float(v) > 1.0]
+    tps_vals = active_tps or [float(r["tables_per_s"]) for r in hist if float(r.get("tables_per_s", 0)) > 0]
     vram_vals = [float(r.get("dope_vram_gib", 0.0)) for r in hist]
     bytes_arr = data["byte_samples"]
     return {
@@ -279,26 +308,25 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
     ax.grid(True)
     ax.legend(loc="upper right")
 
-    # Panel (c): Live Fleet Throughput (tbl/s) & Unique Splits over wall-clock time
+    # Panel (c): Wall-clock CPU-Only Fleet Throughput (tbl/s) & Monotonic Cumulative Splits
     ax = axes[1, 0]
-    hist = data["history"]
-    if hist:
-        t0 = float(hist[0]["at"])
-        mins = np.array([(float(r["at"]) - t0) / 60.0 for r in hist], dtype=np.float64)
-        tps = np.array([float(r.get("tables_per_s", 0.0)) for r in hist], dtype=np.float64)
-        splits_m = np.array([float(r.get("unique_splits", 0.0)) / 1e6 for r in hist], dtype=np.float64)
-        ax.plot(mins, tps, color="#0072B2", lw=1.8, label="Fleet Throughput (tbl/s)")
-        ax.axhline(403.0, color="#666666", ls="--", lw=1.0, label="403 tbl/s Baseline Target")
-        ax.set_xlabel("Elapsed Wall-Clock Time (minutes)")
+    mins, tps, cum_m = _persisted_fleet_rate_bins(data, bin_s=60.0)
+    if len(mins):
+        active_tps = tps[tps > 1.0]
+        med_tps = float(np.median(active_tps)) if len(active_tps) else 0.0
+        ax.plot(mins, tps, color="#0072B2", lw=1.8, label="Persisted Fleet Rate (tbl/s)")
+        if med_tps > 0.0:
+            ax.axhline(med_tps, color="#666666", ls="--", lw=1.0, label=f"Active Median ({med_tps:.0f} tbl/s)")
+        ax.set_xlabel("Elapsed Wave Time (minutes)")
         ax.set_ylabel("Unique Tables / Second (0.0 GiB VRAM)", color="#0072B2")
         ax2 = ax.twinx()
         ax2.spines["top"].set_visible(False)
-        ax2.plot(mins, splits_m, color="#D55E00", lw=1.5, ls="-.", label="Cumulative Splits (M)")
+        ax2.plot(mins, cum_m, color="#D55E00", lw=1.6, ls="-.", label="Cumulative Splits (M)")
         ax2.set_ylabel("Cumulative Unique Splits (Millions)", color="#D55E00")
-        ax.legend(loc="lower right")
+        ax.legend(loc="upper left")
     else:
-        ax.text(0.5, 0.5, "Awaiting fleet_history.jsonl samples", ha="center", va="center")
-    ax.set_title("(c) CPU-Only Fleet Throughput & Unique Splits Seen")
+        ax.text(0.5, 0.5, "Awaiting persisted train.jsonl timestamps", ha="center", va="center")
+    ax.set_title("(c) CPU-Only Fleet Throughput & Cumulative Splits")
     ax.grid(True)
 
     # Panel (d): DEV-Only Per-Task Trajectory (clearly labeled unconfirmed DEV)

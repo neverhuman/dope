@@ -80,10 +80,19 @@ pub fn fit_dse7_packet(
             .iter()
             .map(|&v| ((v - card.y_mean as f64) / card.y_sd as f64).clamp(-6.0, 6.0))
             .collect(),
-        1 => y_raw
-            .iter()
-            .map(|&v| if v > 0.5 { 1.0 } else { 0.0 })
-            .collect(),
+        1 => {
+            let hi_cls = card.classes.get(1).copied().unwrap_or(1);
+            y_raw
+                .iter()
+                .map(|&v| {
+                    if (v.round() as i32) == hi_cls {
+                        1.0
+                    } else {
+                        0.0
+                    }
+                })
+                .collect()
+        }
         _ => y_raw
             .iter()
             .map(|&v| {

@@ -13,12 +13,10 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 import copy
 import datetime
-import hashlib
 import json
 import math
 import os
 from pathlib import Path
-import struct
 import time
 from typing import Any
 
@@ -31,49 +29,15 @@ from .s3_v7_batch_ops import (
     build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss,
 )
 from .s3_v7_entropy import task_quota_for_step
-from .s3_v7_eval import eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression
+from .s3_v7_eval import (
+    append_jsonl as _append_jsonl, atomic_json as _atomic_json,
+    eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
+    load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
+)
 from .v7_single_encoding import (
     MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
     SingleEncV7, extract_dse_packet_numpy,
 )
-
-
-def _atomic_json(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    part = path.with_suffix(path.suffix + ".part")
-    part.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
-    part.replace(path)
-
-
-def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(payload, sort_keys=True) + "\n")
-        fh.flush()
-
-
-def _save_v7_safetensors(model: SingleEncV7, out_path: Path) -> tuple[int, str]:
-    """Write canonical HF safetensors v1 (F32, rank <= 2, 8-byte aligned JSON header, zero deps)."""
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    header: dict[str, Any] = {}
-    blobs: list[bytes] = []
-    offset = 0
-    sd = model.state_dict()
-    for name in sorted(sd):
-        t = sd[name].detach().cpu().to(torch.float32).contiguous()
-        if t.ndim > 2:
-            raise ValueError(f"v7_tensor_rank_violation:{name}:ndim={t.ndim}")
-        raw = t.numpy().tobytes()
-        header[name] = {"dtype": "F32", "shape": list(t.shape), "data_offsets": [offset, offset + len(raw)]}
-        blobs.append(raw)
-        offset += len(raw)
-    hdr_bytes = json.dumps(header, separators=(",", ":")).encode("utf-8")
-    hdr_bytes += b" " * ((8 - (len(hdr_bytes) % 8)) % 8)
-    payload = struct.pack("<Q", len(hdr_bytes)) + hdr_bytes + b"".join(blobs)
-    part = out_path.with_suffix(".safetensors.part")
-    part.write_bytes(payload)
-    part.replace(out_path)
-    return len(payload), hashlib.sha256(payload).hexdigest()
 
 
 @torch.no_grad()
@@ -272,6 +236,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--torch-threads", type=int, default=1)
     ap.add_argument("--prefetch-workers", type=int, default=0)
     ap.add_argument("--seed", type=int, default=2026)
+    ap.add_argument("--resume", type=str, default="", help="Path to latest_resume.pt or 'auto'")
     return ap.parse_args()
 
 
@@ -317,15 +282,40 @@ def main() -> None:
         p.requires_grad_(False)
 
     opt = torch.optim.AdamW(base_model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.98))
+    arch_sig = (args.d_model, args.n_layers, args.n_heads, args.h_target)
+    resume_meta = {
+        "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl", "d_model": args.d_model,
+        "n_layers": args.n_layers, "n_heads": args.n_heads, "h_target": args.h_target, "seed": args.seed,
+    }
+    start_step, opt_steps, total_unique, best_dev_kpi = 0, 0, 0, -999.0
+    resume_p: Path | None = None
+    if args.resume == "auto":
+        cand = run_dir / "checkpoints" / "latest_resume.pt"
+        if cand.is_file():
+            resume_p = cand
+    elif args.resume:
+        resume_p = Path(args.resume)
+    if resume_p is not None and rank == 0:
+        start_step, opt_steps, total_unique, best_dev_kpi = load_v7_resume_state(
+            resume_p, base_model, ema_model, opt, arch_sig
+        )
+        print(f"[V7.2 RESUME] loaded {resume_p} at step={start_step} opt_steps={opt_steps} best_dev={best_dev_kpi:.4f}", flush=True)
+    if world_size > 1:
+        st_t = torch.tensor([start_step, opt_steps, total_unique], dtype=torch.long)
+        dist.broadcast(st_t, src=0)
+        start_step, opt_steps, total_unique = int(st_t[0].item()), int(st_t[1].item()), int(st_t[2].item())
+        for p in base_model.parameters():
+            dist.broadcast(p.data, src=0)
+        for p in ema_model.parameters():
+            dist.broadcast(p.data, src=0)
     if rank == 0:
         print(
             f"[V7.2 Max-Entropy] world_size={world_size} global_batch={world_size * args.micro_batch * args.grad_accum} "
-            f"params={base_model.parameter_count():,} ({base_model.parameter_count() * 4 / 1e6:.2f} MB F32)",
+            f"params={base_model.parameter_count():,} ({base_model.parameter_count() * 4 / 1e6:.2f} MB F32) start_step={start_step}",
             flush=True,
         )
 
-    best_dev_kpi = -999.0
-    if rank == 0 and val_arena is not None and dev_hashes:
+    if start_step == 0 and rank == 0 and val_arena is not None and dev_hashes:
         ev0 = evaluate_v7_dev_only(ema_model, val_arena, dev_hashes, step=0)
         _append_jsonl(run_dir / "eval.jsonl", ev0)
         best_dev_kpi = float(ev0.get("main_kpi_retention_median") or -999.0)
@@ -337,19 +327,19 @@ def main() -> None:
         )
 
     pool = ThreadPoolExecutor(max_workers=args.prefetch_workers) if args.prefetch_workers > 0 else None
-    n_fit_cap = 256
+    n_fit_cap = int(256 + 256 * min(1.0, (start_step + 1) / max(1.0, args.steps * 0.5)))
     fut_next = (
-        pool.submit(_fetch_microbatch, train_arena, args.seed, 1, rank, world_size, args.micro_batch, n_fit_cap)
-        if pool is not None else None
+        pool.submit(_fetch_microbatch, train_arena, args.seed, start_step + 1, rank, world_size, args.micro_batch, n_fit_cap)
+        if (pool is not None and start_step < args.steps) else None
     )
 
-    total_unique, zero_valid_streak, opt_steps, win_tables = 0, 0, 0, 0
+    zero_valid_streak, win_tables = 0, 0
     run_t0 = time.time()
     win_t0 = run_t0
     m_keys = ("loss", "cond_loss", "tstr_loss", "mmd_loss", "marg_loss", "corr_loss", "swd_loss", "anchor_loss", "train_unclipped_retention")
 
     try:
-        for step in range(1, args.steps + 1):
+        for step in range(start_step + 1, args.steps + 1):
             prog = min(1.0, step / max(1.0, args.steps * 0.5))
             n_fit_cap = int(256 + 256 * prog)
             opt.zero_grad(set_to_none=True)
@@ -458,9 +448,9 @@ def main() -> None:
                         flush=True,
                     )
 
-            if rank == 0 and opt_steps > 0 and step % args.ckpt_every == 0:
+            if rank == 0 and opt_steps > 0 and (step % args.ckpt_every == 0 or step == args.steps):
                 ck_name = f"step_{step:06d}_ema.safetensors"
-                ck_bytes, ck_sha = _save_v7_safetensors(ema_model, run_dir / "checkpoints" / ck_name)
+                ck_bytes, ck_sha = save_v7_safetensors(ema_model, run_dir / "checkpoints" / ck_name)
                 ev = evaluate_v7_dev_only(ema_model, val_arena, dev_hashes, step=step) if (val_arena and dev_hashes) else None
                 role = "step_ema"
                 if ev is not None:
@@ -475,7 +465,11 @@ def main() -> None:
                     )
                     if kpi_now > best_dev_kpi:
                         best_dev_kpi, role = kpi_now, "best_main_kpi"
-                        _save_v7_safetensors(ema_model, run_dir / "checkpoints" / "dev_best_ema.safetensors")
+                        save_v7_safetensors(ema_model, run_dir / "checkpoints" / "dev_best_ema.safetensors")
+                save_v7_resume_state(
+                    run_dir / "checkpoints" / "latest_resume.pt",
+                    base_model, ema_model, opt, step, opt_steps, total_unique, best_dev_kpi, resume_meta,
+                )
                 _append_jsonl(run_dir / "checkpoints" / "ledger.jsonl", {
                     **(ev or {}), "checkpoint": ck_name, "role": role, "arch": "single_enc_v7",
                     "recipe": "v7.2_max_entropy_qnl", "step": step, "time": round(time.time(), 3),
@@ -483,8 +477,9 @@ def main() -> None:
                 })
                 _atomic_json(run_dir / "latest.json", {
                     "step": step, "opt_steps": opt_steps, "checkpoint": ck_name, "bytes": ck_bytes,
-                    "sha256": ck_sha, "arch": "single_enc_v7", "recipe": "v7.2_max_entropy_qnl",
-                    "artifact_class": "source_free", "dev_best_unconfirmed_kpi": best_dev_kpi,
+                    "sha256": ck_sha, "resume_checkpoint": "latest_resume.pt", "arch": "single_enc_v7",
+                    "recipe": "v7.2_max_entropy_qnl", "artifact_class": "source_free",
+                    "dev_best_unconfirmed_kpi": best_dev_kpi,
                 })
                 win_tables, win_t0 = 0, time.time()
     finally:

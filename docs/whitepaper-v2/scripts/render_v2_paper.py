@@ -22,7 +22,28 @@ def _tex_escape(s: str) -> str:
         .replace("%", "\\%")
         .replace("&", "\\&")
         .replace("#", "\\#")
+        .replace("\u2212", "$-$")
+        .replace("\u2013", "--")
+        .replace("\u2014", "---")
     )
+
+
+def _fmt_str(val: Any) -> str:
+    if isinstance(val, str) and val.strip():
+        return _tex_escape(val.strip())
+    return r"\PendingVal"
+
+
+def _fmt_bytes_pair(kpi: dict[str, Any], arm_key: str) -> str:
+    bm_map = kpi.get("bytes_median") if isinstance(kpi.get("bytes_median"), dict) else {}
+    bx_map = kpi.get("bytes_max") if isinstance(kpi.get("bytes_max"), dict) else {}
+    med = bm_map.get(arm_key, kpi.get(f"{arm_key}_bytes_median"))
+    mx = bx_map.get(arm_key, kpi.get(f"{arm_key}_bytes_max"))
+    if isinstance(med, (int, float)) and isinstance(mx, (int, float)):
+        return f"{int(round(med)):,}\\,B / {int(round(mx)):,}\\,B"
+    if isinstance(med, (int, float)):
+        return f"{int(round(med)):,}\\,B"
+    return r"\PendingVal"
 
 
 def _fmt_int(val: Any) -> str:
@@ -108,10 +129,29 @@ def render_macros(repo_root: Path) -> str:
         ("CkptParams", _fmt_int(ckpt.get("param_count"))),
         ("CkptShaShort", _tex_escape(str(ckpt.get("sha256", ""))[:16]) if ckpt.get("sha256") else r"\PendingVal"),
         ("KpiPanelCells", _fmt_int(kpi.get("panel_cells"))),
-        ("KpiBaselineTrg", _tex_escape(str(kpi.get("dope_1_3_0_small_trg", ""))) if kpi.get("dope_1_3_0_small_trg") else r"\PendingVal"),
-        ("KpiFormat2Trg", _tex_escape(str(kpi.get("format2_v2_2k_trg", ""))) if kpi.get("format2_v2_2k_trg") else r"\PendingVal"),
-        ("KpiV7Step0Trg", _tex_escape(str(kpi.get("v7_step0_trg", ""))) if kpi.get("v7_step0_trg") else r"\PendingVal"),
-        ("KpiV7WinnerTrg", _tex_escape(str(kpi.get("v7_winner_trg", ""))) if kpi.get("v7_winner_trg") else r"\PendingVal"),
+        ("KpiAutoTrg", _fmt_str(kpi.get("dope_2_0_0_auto_trg"))),
+        ("KpiSmallV2Trg", _fmt_str(kpi.get("dope_2_0_0_small_trg"))),
+        ("KpiBaselineTrg", _fmt_str(kpi.get("dope_1_3_0_small_trg"))),
+        ("KpiFormat2Trg", _fmt_str(kpi.get("format2_v2_2k_trg"))),
+        ("KpiV7Step0Trg", _fmt_str(kpi.get("v7_step0_trg"))),
+        ("KpiV7WinnerTrg", _fmt_str(kpi.get("v7_winner_trg"))),
+        ("KpiSdvGcTrg", _fmt_str(kpi.get("sdv_gaussian_copula_trg"))),
+        ("KpiSdvCtganTrg", _fmt_str(kpi.get("sdv_ctgan_trg"))),
+        ("KpiSdvTvaeTrg", _fmt_str(kpi.get("sdv_tvae_trg"))),
+        ("KpiCopyATrg", _fmt_str(kpi.get("copy_a_trg"))),
+        ("KpiBootstrapATrg", _fmt_str(kpi.get("bootstrap_a_trg"))),
+        ("KpiIndepTrg", _fmt_str(kpi.get("indep_marginals_trg"))),
+        ("KpiVerdict", _fmt_str(kpi.get("verdict"))),
+        ("KpiDeltaAuto", _fmt_str(kpi.get("delta_auto_vs_1_3_0"))),
+        ("KpiAutoBytes", _fmt_bytes_pair(kpi, "dope_2_0_0_auto")),
+        ("KpiSmallV2Bytes", _fmt_bytes_pair(kpi, "dope_2_0_0_small")),
+        ("KpiBaselineBytes", _fmt_bytes_pair(kpi, "dope_1_3_0_small")),
+        ("KpiFormat2Bytes", _fmt_bytes_pair(kpi, "format2_v2_2k")),
+        ("KpiV7Step0Bytes", _fmt_bytes_pair(kpi, "v7_step0")),
+        ("KpiV7WinnerBytes", _fmt_bytes_pair(kpi, "v7_winner")),
+        ("KpiSdvGcBytes", _fmt_bytes_pair(kpi, "sdv_gaussian_copula")),
+        ("KpiSdvCtganBytes", _fmt_bytes_pair(kpi, "sdv_ctgan")),
+        ("KpiSdvTvaeBytes", _fmt_bytes_pair(kpi, "sdv_tvae")),
         ("KpiEvidenceState", _tex_escape(str(kpi.get("evidence_state", "awaiting_confirm_receipt")))),
     ]
 
