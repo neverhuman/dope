@@ -9,6 +9,7 @@ mod math;
 pub mod packet;
 mod safetensors;
 pub mod scale_card;
+pub mod v8;
 
 use crate::error::{DopeError, Result};
 use crate::rng::Rng;

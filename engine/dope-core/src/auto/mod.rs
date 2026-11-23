@@ -18,6 +18,7 @@ mod check;
 mod container;
 mod v7;
 mod v7_schema;
+pub mod v8;
 
 pub use check::{
     AuditorRetention, CheckReport, CHECK_SYNTH_FACTOR, CHECK_TEST_SHARE, MAX_CHECK_ROWS,

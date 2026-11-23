@@ -1,0 +1,79 @@
+{
+  "schema": "dope.v3-campaign-preregistration/v1",
+  "release_target": "3.0.0",
+  "status": "PHASE_I_READY_WAITING_COMPUTE_UNLOCK",
+  "compute_pause_directive": "2026-11-23T07:23Z owner JSR yield — DO NOT launch fleet GPU/CPU training or multi-core dope_kpi scoring until explicitly lifted",
+  "primary_kpi_contract": "contracts/dope-kpi.json",
+  "evidence_layout_contract": "contracts/evidence-layout-v1.json",
+  "baseline_anchors": {
+    "dse7_step0_dev_trg": -0.3914,
+    "dse7_step0_dev_c2st": 0.9553,
+    "v73c_h2_soup_dev_trg": -0.3605,
+    "v73c_h2_soup_dev_c2st": 0.9619
+  },
+  "headline_budget_bytes": 2048,
+  "nested_budget_rungs_bytes": [512, 1024, 2048, 4096, 16384, 65536],
+  "held_out_auditor": "mlp",
+  "stages": [
+    {
+      "id": "E0",
+      "name": "Oracle Attribution Ceiling on Identical DEV Cells",
+      "owner": "claude_kpi_oracle + antigravity_dse8",
+      "arms": ["real_x_packet_y", "packet_x_gam_y", "packet_x_smalltree_y", "real_x_smalltree_y", "dse7_step0", "dse8_p0_analytic"],
+      "gate": "Order X vs Y vs interaction headroom; confirm DSE8 P0 zero-illegal nominal rows"
+    },
+    {
+      "id": "E1",
+      "name": "FP-0 Repaired V7 Loop Clean Baseline",
+      "gate": "Clean V7.4 baseline with type-safe jitter, per-episode masks, disc_col_share logged"
+    },
+    {
+      "id": "E2",
+      "name": "Analytic DSE8 P0 Section-by-Section Ablation (2048 B)",
+      "arms": [
+        "dse8_base_typed_nominal",
+        "dse8_plus_regimes",
+        "dse8_plus_effects_pairs",
+        "dse8_plus_trees",
+        "dse8_full_p0",
+        "dse8_full_p0_skew_t_ablation"
+      ],
+      "gate": "TRG_worst >= +0.10 over DSE7 step-0 (-0.3914 -> >= -0.29), C2ST <= 0.80, 0 illegal nominal rows, DCR <= 0.52"
+    },
+    {
+      "id": "E3",
+      "name": "Pre-bottleneck SingleEncV8 Decoder-Only vs Owner-Encoder (1k-step screening)",
+      "gate": "Incremental TRG lift over DSE8 P0 at equal 2048 B"
+    },
+    {
+      "id": "E4",
+      "name": "Loss-Term & Variance-Reduction Ablation (l_ret, l_tree, l_drv, Gumbel-Rao K=4, PCGrad-Lite)",
+      "gate": "Retain only terms improving worst-auditor TRG or C2ST without regressing held-out mlp"
+    },
+    {
+      "id": "E5",
+      "name": "Full 3-Phase SingleEncV8 Training (Real Arena v2 + Non-Gaussian/XOR Priors, 3 EMAs, Valley Soup)",
+      "gate": "Beat DSE8 P0 on DEV-SELECT at equal 2048 B on worst-auditor TRG, held-out mlp, C2ST, drivers, ECE15, privacy"
+    },
+    {
+      "id": "E6",
+      "name": "Budget-Curve & Nested-Prefix Truncation Qualification (512..65536 B)",
+      "gate": "Monotone TRG frontier; zero refit prefix truncation valid CRC32 at every rung"
+    },
+    {
+      "id": "E7",
+      "name": "3-Way Auto Acceptance Guard (Format 1 vs DSE8 P0 vs DSE8 Neural)",
+      "gate": "SELECTION_MARGIN = 0.02 enforced; zero regression on Format 1 strong cells"
+    },
+    {
+      "id": "E8",
+      "name": "Sealed CONFIRM Single-Shot Qualification (dope-kpi/v2 + candidate v3)",
+      "gate": "Zero prior CONFIRM peeks; paired bootstrap CI > 0 vs v2.0.0; DCR <= 0.52; MIA <= 0.55"
+    },
+    {
+      "id": "E9",
+      "name": "v3.0.0 Release Packaging, JopeDime Embedding Export & Audit Sign-off",
+      "gate": "just check, just security, just score >= 87/100, 0 blockers, 0 gitleaks, DPK3.2/v1/DSE7 intact"
+    }
+  ]
+}
