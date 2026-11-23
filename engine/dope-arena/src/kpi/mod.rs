@@ -27,6 +27,11 @@ pub mod format2;
 pub mod guard_eval;
 pub mod guard_merge;
 pub mod guards;
+pub mod hero;
+pub mod hero_labels;
+pub mod hero_layout;
+pub mod hero_model;
+pub mod hero_svg;
 pub mod io;
 pub mod jsonl;
 pub mod mat;
@@ -57,6 +62,8 @@ pub mod fixture;
 pub mod guard_fixture;
 #[cfg(test)]
 mod guard_tests;
+#[cfg(test)]
+mod hero_tests;
 #[cfg(test)]
 pub mod stat_testing;
 #[cfg(test)]
