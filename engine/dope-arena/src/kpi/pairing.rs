@@ -10,7 +10,7 @@
 
 use super::emitlog::check_arm_id;
 use super::rundir::contract;
-use super::trg::{mean, CellScore, CellState, Families};
+use super::trg::{mean, CellScore, Families, TrgCellState};
 use dope_arena::ArenaResult;
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -100,7 +100,7 @@ impl Diffs {
     }
 }
 
-pub type States = BTreeMap<String, CellState>;
+pub type States = BTreeMap<String, TrgCellState>;
 
 /// One comparison paired on its common cells.
 #[derive(Clone, Debug, PartialEq)]
@@ -125,7 +125,7 @@ pub fn pair(members: &[&States], baseline: &States) -> Paired {
         };
         let scores: Option<Vec<&CellScore>> = members
             .iter()
-            .map(|states| states.get(cell).and_then(CellState::score))
+            .map(|states| states.get(cell).and_then(TrgCellState::score))
             .collect();
         let Some(scores) = scores else {
             continue;

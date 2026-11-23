@@ -12,7 +12,7 @@
 //! below the highlight's. In `--note`, `{cells}`, `{families}` and `{panel}`
 //! take the highlight's (else the first point's) statistic and the panel id.
 
-use super::hero_model::{Hero, Point, Reference, Theme, Tier, DEFAULT_TITLE};
+use super::hero_model::{Emphasis, Hero, Point, Reference, Theme, DEFAULT_TITLE};
 use super::hero_svg::render;
 use super::jsonl::{canonical_json, parse_json, read_file, sha256_hex, write_atomic};
 use super::primary::ArmSummary;
@@ -194,13 +194,13 @@ fn hero(args: &HeroArgs, receipts: &[Vec<u8>]) -> ArenaResult<(Hero, Vec<String>
     let newest = highlight.and_then(release);
     let tier = |id: &str| {
         if Some(id) == highlight {
-            Tier::Highlight
+            Emphasis::Highlight
         } else if args.previous.iter().any(|p| p == id)
             || (args.previous.is_empty() && release(id).zip(newest).is_some_and(|(v, h)| v < h))
         {
-            Tier::Previous
+            Emphasis::Previous
         } else {
-            Tier::Other
+            Emphasis::Other
         }
     };
     let (mut points, mut unplotted) = (Vec::new(), Vec::new());

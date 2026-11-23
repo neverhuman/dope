@@ -44,7 +44,7 @@
     "build.rs": "rust-core",
     "contracts/": "rust-core",
     "contracts/dope-fidelity-v3-candidate.json": "rust-core",
-    "contracts/dope-kpi-v2.json": "rust-core",
+    "contracts/dope-kpi.json": "rust-core",
     "contracts/tdl-contract-v1.json": "rust-core",
     "contracts/tdl-contract-v2-candidate.json": "rust-core",
     "crates/dope-service/": "rust-core",

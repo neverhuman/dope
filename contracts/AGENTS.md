@@ -20,7 +20,7 @@ candidate contract registered in `agent/generated-zones.toml` (not a parked impl
 Migration plan: freeze into the v2 release contract once `dope_kpi` confirmation receipts pass
 (review expiry `2027-06-01`). Proof lane: `cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test fidelity_v2_e2e`.
 
-Rust-core also owns `contracts/dope-kpi-v2.json` (`dope.kpi-contract/v2`), the unfrozen candidate
+Rust-core also owns `contracts/dope-kpi.json` (`dope.kpi-contract/v2`), the unfrozen candidate
 scoreboard protocol (TRG statistic, family bootstrap, promotion rule, byte grid, sign-flip null)
 that `dope_kpi primary/compare/null` compile in and hash into every receipt; registered in
 `agent/generated-zones.toml`. A change to it changes every receipt's contract SHA-256. Freeze

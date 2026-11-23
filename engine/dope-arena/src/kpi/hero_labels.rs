@@ -10,7 +10,7 @@
 //! least.
 
 use super::hero_layout::{line_box, text_width, Anchor, Candidate, Placer, Rect};
-use super::hero_model::{budget_text, trg_text, Hero, Tier, Tokens};
+use super::hero_model::{budget_text, trg_text, Emphasis, Hero, Tokens};
 
 pub const HIGHLIGHT_SIZE: f64 = 13.0;
 pub const LABEL_SIZE: f64 = 12.0;
@@ -178,7 +178,7 @@ pub fn place(hero: &Hero, t: &Tokens, marks: &[Mark], guides: &Guides) -> Vec<La
     order.sort_by_key(|&i| std::cmp::Reverse(hero.points[i].tier));
     for i in order {
         let p = &hero.points[i];
-        let highlight = p.tier == Tier::Highlight;
+        let highlight = p.tier == Emphasis::Highlight;
         let (text, size) = if highlight {
             (
                 format!("{} \u{b7} TRG {}", p.label, trg_text(p.trg)),
@@ -194,7 +194,11 @@ pub fn place(hero: &Hero, t: &Tokens, marks: &[Mark], guides: &Guides) -> Vec<La
                 at,
                 size,
                 bold: highlight,
-                ink: if p.tier == Tier::Other { t.ink2 } else { t.ink },
+                ink: if p.tier == Emphasis::Other {
+                    t.ink2
+                } else {
+                    t.ink
+                },
                 class: if highlight { "label hl" } else { "label" },
             });
         }

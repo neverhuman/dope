@@ -1,4 +1,4 @@
-//! The canonical contract `contracts/dope-kpi-v2.json` (`dope.kpi-contract/v2`):
+//! The canonical contract `contracts/dope-kpi.json` (`dope.kpi-contract/v2`):
 //! the statistic, bootstrap, promotion thresholds, byte grid and null.
 //!
 //! The contract is compiled into the binary; `--contract FILE` reads another
@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 pub const CONTRACT_SCHEMA: &str = "dope.kpi-contract/v2";
-const EMBEDDED: &[u8] = include_bytes!("../../../../contracts/dope-kpi-v2.json");
+const EMBEDDED: &[u8] = include_bytes!("../../../../contracts/dope-kpi.json");
 /// SHA-256 of the contracts an owner decision froze (none yet).
 const FROZEN: [&str; 0] = [];
 const CANDIDATE: &str = "candidate";
@@ -116,7 +116,7 @@ pub struct Contract {
 pub struct ContractRef {
     pub id: String,
     pub sha256: String,
-    /// `embedded` (compiled from `contracts/dope-kpi-v2.json`) or `file`.
+    /// `embedded` (compiled from `contracts/dope-kpi.json`) or `file`.
     pub source: String,
     pub status: String,
     pub protocol_frozen: bool,
@@ -287,10 +287,7 @@ mod tests {
         assert_eq!(c.bytes.headline, 2048);
         assert_eq!(c.bytes.grid, [512, 1024, 2048, 4096]);
         assert_eq!((c.statistic.clip_low, c.statistic.clip_high), (-1.0, 1.25));
-        let path = concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../contracts/dope-kpi-v2.json"
-        );
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../contracts/dope-kpi.json");
         assert_eq!(sha, sha256_hex(&std::fs::read(path).unwrap()));
         let protocol = c.protocol();
         assert_eq!(protocol.auditors, ["linear-seeded-v1", "gbdt"]);

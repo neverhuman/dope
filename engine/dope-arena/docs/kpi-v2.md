@@ -6,9 +6,11 @@ statistic, paired comparisons, a sign-flip null and the README block;
 `guards` adds the realism and privacy gates and the exact-copy excess that
 the promotion rule's guards read, and `render-hero` draws the README hook
 graphic from the receipts. The
-protocol lives in [`contracts/dope-kpi-v2.json`](../../../contracts/dope-kpi-v2.json)
+protocol lives in [`contracts/dope-kpi.json`](../../../contracts/dope-kpi.json)
 (`dope.kpi-contract/v2`), is compiled into the binary, and its SHA-256 is
-written into every receipt. The contract is a **candidate** with
+written into every receipt. Until 2026-11-23 the file was named
+`contracts/dope-kpi-v2.json`; binaries built before then print that path, and
+the SHA-256 in their receipts identifies the same contract. The contract is a **candidate** with
 `protocol_frozen: false`; freezing it is a separate, owner-approved step.
 
 Code: `src/kpi/{rundir,trg,boot,spec,rule,pairing,primary,compare,null,receipt,render,panelsel}.rs`

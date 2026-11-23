@@ -68,26 +68,26 @@ impl Theme {
 
 /// Emphasis of a point, in drawing order (the highlight is drawn last).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Tier {
+pub enum Emphasis {
     Other,
     Previous,
     Highlight,
 }
 
-impl Tier {
+impl Emphasis {
     pub fn class(self) -> &'static str {
         match self {
-            Tier::Highlight => "hl",
-            Tier::Previous => "pv",
-            Tier::Other => "ot",
+            Emphasis::Highlight => "hl",
+            Emphasis::Previous => "pv",
+            Emphasis::Other => "ot",
         }
     }
 
     pub fn color(self, t: &Tokens) -> &'static str {
         match self {
-            Tier::Highlight => t.accent,
-            Tier::Previous => t.accent_light,
-            Tier::Other => t.gray,
+            Emphasis::Highlight => t.accent,
+            Emphasis::Previous => t.accent_light,
+            Emphasis::Other => t.gray,
         }
     }
 }
@@ -100,7 +100,7 @@ pub struct Point {
     pub trg: f64,
     pub ci_low: f64,
     pub ci_high: f64,
-    pub tier: Tier,
+    pub tier: Emphasis,
 }
 
 #[derive(Clone, Debug, PartialEq)]

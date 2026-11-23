@@ -1,4 +1,4 @@
-//! The promotion rule of `contracts/dope-kpi-v2.json` (`spec.rs`).
+//! The promotion rule of `contracts/dope-kpi.json` (`spec.rs`).
 //!
 //! PROMOTE iff (1) the 2.5th percentile of the paired delta is above 0,
 //! (2) the Holm-adjusted p is below 0.05, (3) the delta is at least
