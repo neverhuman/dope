@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import pickle
 import platform
 import threading
@@ -15,24 +16,17 @@ from research.levels import s3_episode_factory as ef
 from research.levels.s3_view_builder import ViewConfig, build_slot
 from research.levels.tests.s3_view_fixtures import NARROW, digest, make_corpus, make_sampler
 
-pytestmark = pytest.mark.skipif(platform.machine() not in ("x86_64", "AMD64"), reason="ring is x86-64 only")
-
 SEED = 20261123
 FIXTURES = "research.levels.tests.s3_view_fixtures"
 RAW = ViewConfig(emit="raw")
 NATIVE = dict(NARROW, multilabel_view_prob=0.0)  # DSE7 has no multilabel task
 
 
-def _have_ffi() -> bool:
-    """False only when the library is not built; a stale build (ABI mismatch) fails the tests."""
-    try:
-        ef.ffi_path()
-        return True
-    except ef.FactoryError:
-        return False
-
-
-needs_ffi = pytest.mark.skipif(not _have_ffi(), reason="build engine/dope-ffi first (cargo build -p dope-ffi)")
+@pytest.fixture(scope="module", autouse=True)
+def supported_ring_platform():
+    assert platform.system() == "Linux" and platform.machine() in ("x86_64", "AMD64"), (
+        "run episode-factory tests on Linux x86-64 with /dev/shm"
+    )
 
 
 @pytest.fixture(scope="module")
@@ -160,7 +154,6 @@ def test_raw_emit_keeps_source_values_and_every_draw(corpus):
 
 
 # -- native DSE7 stage ----------------------------------------------------------------------
-@needs_ffi
 def test_native_packet_uses_fit_rows_only(corpus):
     sampler = make_sampler(corpus, **NATIVE)
     checked = 0
@@ -184,7 +177,6 @@ def test_native_packet_uses_fit_rows_only(corpus):
     assert checked == 24
 
 
-@needs_ffi
 def test_native_factory_matches_in_process_stage(corpus):
     spec = _spec(stage="research.levels.s3_episode_factory:native_dse7", view=RAW, **NATIVE)
     cap = ef.native_capacity(4096, 1024)
@@ -199,7 +191,6 @@ def test_native_factory_matches_in_process_stage(corpus):
     assert stats["stage_share"] is not None and stats["ms_per_episode"] > 0
 
 
-@needs_ffi
 def test_native_stage_counts_unsupported_tasks():
     with pytest.raises(ef.StageError, match="task_unsupported"):
         ef.dse7_arrays(np.zeros((4, 2)), np.zeros(4), np.zeros((0, 2)), np.zeros(0), "multilabel")
@@ -208,7 +199,6 @@ def test_native_stage_counts_unsupported_tasks():
                        np.zeros(0), "binary")
 
 
-@needs_ffi
 def test_column_meta_of_raw_fit_rows(corpus):
     sampler = make_sampler(corpus, **NATIVE)
     episode, _, _ = build_slot(corpus, sampler, SEED, sampler.plan_step(SEED, 0)[0], RAW)
@@ -223,7 +213,6 @@ V8_KEYS = ("ev_col", "ev_edge", "ev_glob", "dec_col", "dec_edge", "dec_glob", "k
            "b_base", "resid_sd", "z_max", "is_cont", "X_fit", "y_fit", "X_qry", "y_qry", "task_id", "n_classes")
 
 
-@needs_ffi
 def test_native_v8_is_fit_only_and_has_the_trainer_shapes(corpus):
     sampler = make_sampler(corpus, **NATIVE)
     checked = refused = 0
@@ -259,7 +248,6 @@ def test_native_v8_is_fit_only_and_has_the_trainer_shapes(corpus):
     assert checked >= 18 and refused <= 6, (checked, refused)
 
 
-@needs_ffi
 def test_native_v8_factory_matches_in_process_stage(corpus):
     spec = _spec(stage="research.levels.s3_episode_factory:native_v8", view=RAW, **NATIVE)
     sampler = make_sampler(corpus, **NATIVE)
@@ -278,8 +266,6 @@ def test_native_v8_factory_matches_in_process_stage(corpus):
     assert compared >= 18, compared
 
 
-
-@needs_ffi
 def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
     """Train/serve identity: `dope_v8_emit fit --fit-meta` on the FIT rows writes the training packet."""
     import subprocess
@@ -287,8 +273,7 @@ def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
     from research.levels.v8_evidence import find_v8_emit_binary, write_dopemat
 
     binary = find_v8_emit_binary()
-    if binary is None:
-        pytest.skip("dope_v8_emit not built")
+    assert binary is not None, "build it: cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit"
     sampler = make_sampler(corpus, **NATIVE)
     for i, spec in enumerate(sampler.plan_step(SEED, 3)[:8]):
         episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
@@ -299,6 +284,7 @@ def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
         subprocess.run([str(binary), "fit", "--in", str(mat), "--task", episode["task"], "--budget", "2048",
                         "--fit-meta", "--seed", str(1000 + i), "--out", str(out)], check=True, capture_output=True)
         assert out.read_bytes() == packet, (i, episode["task"])
+
 
 # -- gradient-farm adapter ------------------------------------------------------------------
 def boom_stage(episode, **_):
@@ -336,15 +322,20 @@ def test_dead_producer_stops_every_consumer(corpus):
         state["ring"].close()
 
 
-REAL_ARENA = "/home/ubuntu/dope-data/flat/s3-v250"
-
-
-@pytest.mark.skipif(not __import__("os").path.exists(REAL_ARENA + "/index.jsonl"), reason="real arena absent")
-def test_v3_preset_plans_meet_the_plan_targets():
-    """Plan-level shares of the v3 preset on the real arena (index only, no rows read)."""
+def test_v3_preset_plans_meet_the_plan_targets(tmp_path):
+    """Check the preset with enough unique families to fill every native stratum."""
     from research.levels.s3_counter_sampler import sampler_for
 
-    spec = ef.v3_spec(REAL_ARENA, seed=7)
+    rows = []
+    for task, classes in (("regression", 0), ("binary", 2), ("multiclass", 5)):
+        for i in range(64):
+            table_id = len(rows)
+            rows.append(dict(table_id=table_id, dataset_hash=f"{table_id:016x}", family_stem=f"fam{table_id}",
+                             task=task, n_classes=classes, n_rows=(512, 1024, 2048)[i % 3],
+                             n_cols=8, split="train"))
+    index = tmp_path / "index.jsonl"
+    index.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    spec = ef.v3_spec(str(tmp_path), seed=7)
     assert spec.view.emit == "raw" and spec.stage.endswith(":native_dse7")
     sampler = sampler_for(spec.sampler_args[0])
     real = fit = qry = n = 0

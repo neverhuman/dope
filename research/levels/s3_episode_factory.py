@@ -141,12 +141,12 @@ def _producer(ring_name: str, k: int, spec: FactorySpec, cpu: int | None, end_un
 @contextmanager
 def _single_thread_env() -> Iterator[None]:
     """Spawned producers inherit one-thread BLAS / OpenMP / rayon settings."""
-    old = {key: os.environ.get(key) for key in THREAD_ENV}
+    original_env = {key: os.environ.get(key) for key in THREAD_ENV}
     os.environ.update({key: "1" for key in THREAD_ENV})
     try:
         yield
     finally:
-        for key, value in old.items():
+        for key, value in original_env.items():
             if value is None:
                 os.environ.pop(key, None)
             else:
@@ -313,7 +313,7 @@ def arena_corpus(arena: str) -> Any:
 
 
 def arena_sampler(corpus: Any, cfg: Any) -> Any:
-    """The counter sampler of a ``SamplerConfig`` that names its arena (``corpus`` is unused)."""
+    """Build the counter sampler from the arena named by the sampler config."""
     from .s3_counter_sampler import sampler_for
 
     return sampler_for(cfg)

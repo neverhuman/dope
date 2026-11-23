@@ -21,7 +21,7 @@ use dope_core::single_encoding::v8::{
 };
 use dope_core::single_encoding::KNOT_COUNT;
 
-use crate::{columns, Code, MAX_BUDGET};
+use crate::{columns, copy_input, Code, MAX_BUDGET};
 
 /// Number of `MISC` slots. In order: resid_sd, z_max, p_eff, k_eff, x_cols_raw, task_id,
 /// rank_use, knot_level, normalized_only, packet_len, y_mean, y_sd, n_classes (the packet's
@@ -355,7 +355,9 @@ pub extern "C" fn dope_ffi_v8_offset(block: u32, p: u32) -> u64 {
 
 /// # Safety
 /// Same buffer contract as `dope_ffi_dse7_episode`; `out_f32_cap` must be at least
-/// `dope_ffi_v8_len(p, n_fit, n_qry)`.
+/// `dope_ffi_v8_len(p, n_fit, n_qry)`. Each input is an aligned, initialized range within one
+/// live allocation and stays immutable for the call. The output ranges are writable and do not
+/// overlap any input or each other.
 #[no_mangle]
 #[allow(clippy::too_many_arguments)]
 pub unsafe extern "C" fn dope_ffi_v8_episode(
@@ -395,27 +397,19 @@ pub unsafe extern "C" fn dope_ffi_v8_episode(
         return Code::Capacity as i32;
     }
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        // SAFETY: lengths are the caller's contract stated above.
-        let xf = unsafe { std::slice::from_raw_parts(x_fit, cells) };
-        let yf = unsafe { std::slice::from_raw_parts(y_fit, n_fit) };
-        let (xq, yq): (&[f32], &[f32]) = if n_qry == 0 {
-            (&[], &[])
-        } else {
-            unsafe {
-                (
-                    std::slice::from_raw_parts(x_qry, qry_cells),
-                    std::slice::from_raw_parts(y_qry, n_qry),
-                )
-            }
-        };
+        // SAFETY: FIT pointers were checked for null. The caller guarantees both source ranges.
+        let (xf, yf) = unsafe { (copy_input(x_fit, cells)?, copy_input(y_fit, n_fit)?) };
+        // SAFETY: the caller guarantees the query ranges. Nonempty query pointers were checked
+        // for null, and copy_input never dereferences a pointer for an empty range.
+        let (xq, yq) = unsafe { (copy_input(x_qry, qry_cells)?, copy_input(y_qry, n_qry)?) };
         v8_episode(
-            xf,
+            &xf,
             n_fit,
             p,
-            yf,
-            xq,
+            &yf,
+            &xq,
             n_qry,
-            yq,
+            &yq,
             task,
             budget as usize,
             normalized_only != 0,

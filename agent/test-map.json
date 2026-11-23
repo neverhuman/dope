@@ -4173,16 +4173,20 @@
       "purpose": "verify the per-episode FIT-only DSE7 (ABI 2) and V8 (ABI 3) stages and their C ABI: query rows never reach the packet, decoder inputs or evidence; rows and column meta in the packet's unit space; deterministic; error codes not panics"
     },
     "research/levels/s3_episode_factory.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets; FIT-only native_v8 payloads with the trainer's shapes"
     },
     "research/levels/s3_episode_native.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify the native DSE7/V8 episode stages through the factory: FIT-only packets and tensors, query rows only mapped, the V8 packet byte-identical to `dope_v8_emit fit --fit-meta`"
     },
     "research/levels/s3_episode_ring.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
-      "purpose": "verify the shared-memory episode ring through the factory: slot handoff, backpressure, producer death and stale-ring sweep"
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify training ring handoff, ordering, backpressure, and producer failure propagation"
+    },
+    "research/levels/tests/test_s3_episode_factory.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the episode-factory proof on Linux x86-64 with its native library"
     },
     "engine/dope-core/src/marginal/column_meta.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test column_meta_v2",

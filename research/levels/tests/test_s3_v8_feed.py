@@ -12,22 +12,10 @@ from research.levels.s3_view_builder import ViewConfig
 from research.levels.tests.s3_view_fixtures import NARROW
 
 torch = pytest.importorskip("torch")
-tr = pytest.importorskip("research.levels.s3_v8_trainer")
+from research.levels import s3_v8_trainer as tr  # noqa: E402  (needs torch)
 
 SEED = 20261123
 FIXTURES = "research.levels.tests.s3_view_fixtures"
-
-
-def _have_ffi() -> bool:
-    try:
-        ef.ffi_path()
-    except ef.FactoryError:
-        return False
-    ef.load_ffi()  # a stale build fails here instead of skipping
-    return True
-
-
-needs_ffi = pytest.mark.skipif(not _have_ffi(), reason="libdope_ffi.so not built (cargo build -p dope-ffi)")
 
 
 def _spec(batch: int):
@@ -36,7 +24,6 @@ def _spec(batch: int):
                           view=ViewConfig(emit="raw"), stage="research.levels.s3_episode_factory:native_v8")
 
 
-@needs_ffi
 def test_feed_serves_deterministic_episodes_for_any_producer_count():
     with FactoryFeed(_spec(6), 6, 2, start_step=1, max_loss_fit=64, max_loss_qry=32) as a:
         first = [a(step, b) for step in (1, 2) for b in range(6)]
@@ -52,7 +39,6 @@ def test_feed_serves_deterministic_episodes_for_any_producer_count():
     assert len({ep["split_sig"] for ep in first}) == 12
 
 
-@needs_ffi
 def test_v8_trainer_steps_on_factory_episodes(tmp_path):
     args = tr.parse_args([
         "--out-dir", str(tmp_path), "--steps", "3", "--episodes-per-step", "2", "--d-model", "32",
