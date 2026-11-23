@@ -37,7 +37,7 @@ and the tasks present average equally. Zero means the sampled rows train the aud
 well as a second real sample of the same size; higher is better. Intervals come from a
 stratified family bootstrap, and comparisons are Holm-adjusted. The full protocol is the
 `dope_kpi` documentation in `engine/dope-arena/docs/kpi-v2.md` and the contract
-`contracts/dope-kpi-v2.json`, which land with the `dope_kpi` change.
+`contracts/dope-kpi.json` (named `contracts/dope-kpi-v2.json` before 2026-11-23; the same bytes).
 
 ## Regenerate from the confirmation receipts
 
