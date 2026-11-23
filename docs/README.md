@@ -6,6 +6,7 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | Path | What it is |
 | --- | --- |
 | [whitepaper-v2/](whitepaper-v2/README.md) | **The DOPE v2.0.0 White Paper**: [`docs/whitepaper-v2/dope-v2.tex`](whitepaper-v2/dope-v2.tex) ([`dope-v2.pdf`](whitepaper-v2/dope-v2.pdf)), covering Format 2, the SingleEncV7 single encoding, CPU fleet training and the `dope_kpi` scoreboard; its macros are generated from committed receipts |
+| [../bench/real-world/results/scoreboard/v3.0.0/](../bench/real-world/results/scoreboard/v3.0.0/README.md) | The v3.0.0 scoreboard (DEV estimate): TRG, the receipts behind the README `DOPE1 SCOREBOARD` block and hero, and the command that re-renders them |
 | [../bench/real-world/results/scoreboard/v2.0.0/](../bench/real-world/results/scoreboard/v2.0.0/README.md) | The v2.0.0 scoreboard: TRG (the twin-referenced gap) definition, the `dope_kpi` receipts behind the README `DOPE1 SCOREBOARD` block and hero, and the command that regenerates them |
 | [../paper/](../paper/README.md) | **The DOPE v1.0.0 White Paper**: [`paper/dope1.tex`](../paper/dope1.tex) (`target/paper/dope1.pdf`) and [`paper/dope1-supplement.tex`](../paper/dope1-supplement.tex) (`target/paper/dope1-supplement.pdf`), covering the standalone Rust `dope` engine, 16-table real-world study, and 1,000+ dataset `DOPE-MLC-v2`/`v3` study |
 | [multilevel-landmark-dl-study.md](multilevel-landmark-dl-study.md) | Canonical 1,000-dataset (`DOPE-MLC-v2`) and 1,069-dataset (`DOPE-MLC-v3`) deep learning study, round-by-round convergence tables, and `v8` receipt provenance |
@@ -27,4 +28,4 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | [decisions.md](decisions.md) | Decisions in force and pending owner decisions |
 | [REPO_MAP.md](REPO_MAP.md) | Top-level directory map |
 
-Every number in the white paper and README is emitted from a committed, SHA-pinned benchmark receipt (`bench/real-world/results/summary.json` and `bench/real-world/results/multilevel-convergence-snapshot.json`; for the v2.0.0 scoreboard, the receipts in `bench/real-world/results/scoreboard/v2.0.0/`).
+Every number in the white paper and README is emitted from a committed, SHA-pinned benchmark receipt (`bench/real-world/results/summary.json` and `bench/real-world/results/multilevel-convergence-snapshot.json`; for the v3.0.0 and v2.0.0 scoreboards, the receipts in `bench/real-world/results/scoreboard/v3.0.0/` and `bench/real-world/results/scoreboard/v2.0.0/`).

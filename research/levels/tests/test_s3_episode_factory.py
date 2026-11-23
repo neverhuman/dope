@@ -208,6 +208,103 @@ def test_column_meta_of_raw_fit_rows(corpus):
     assert np.isfinite(meta).all()
 
 
+# -- V8 stage --------------------------------------------------------------------------------
+V8_KEYS = ("ev_col", "ev_edge", "ev_glob", "dec_col", "dec_edge", "dec_glob", "knots", "loadings", "W_base",
+           "b_base", "resid_sd", "z_max", "is_cont", "X_fit", "y_fit", "X_qry", "y_qry", "task_id", "n_classes")
+
+
+def test_native_v8_is_fit_only_and_has_the_trainer_shapes(corpus):
+    sampler = make_sampler(corpus, **NATIVE)
+    checked = refused = 0
+    for spec in sampler.plan_step(SEED, 2):
+        episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
+        try:
+            a = ef.native_v8(episode)
+        except ef.StageError as exc:  # a counted, value-free refusal is allowed; nothing else
+            assert str(exc).startswith(("ffi_", "v8_")), exc
+            refused += 1
+            continue
+        assert set(V8_KEYS) <= set(a) and 0 < a["packet_bytes"] <= 2048
+        p = a["ev_col"].shape[0]
+        assert a["ev_col"].shape == (p, 128) and a["ev_edge"].shape == (p, p, 16) and a["ev_glob"].shape == (160,)
+        assert a["dec_col"].shape == (p, 48) and a["dec_edge"].shape == (p, p, 4) and a["dec_glob"].shape == (32,)
+        assert a["knots"].shape == (p, 17) and a["loadings"].shape == (p, 12) and a["W_base"].shape == (8, p)
+        assert a["X_fit"].shape[1] == p and a["X_qry"].shape[1] == p and a["is_cont"].shape == (p,)
+        assert a["X_fit"].shape[0] + a["fit_masked"] == episode["X_fit"].shape[0]
+        assert a["X_qry"].shape[0] + a["qry_masked"] == episode["X_qry"].shape[0]
+        for key in V8_KEYS[:13]:
+            assert np.all(np.isfinite(a[key])), key
+        if a["task_id"]:
+            assert set(np.unique(a["y_fit"]).tolist()) <= set(range(a["n_classes"]))
+        poisoned = dict(episode, X_qry=episode["X_qry"][::-1] * 7.0 + 3.0, y_qry=episode["y_qry"][::-1])
+        b = ef.native_v8(poisoned)
+        assert a["packet"] == b["packet"]
+        for key in V8_KEYS[:15] + ("col_meta", "col_index", "M_fit"):
+            assert np.array_equal(a[key], b[key]), key
+        assert np.isfinite(a["X_fit"]).all() and np.isfinite(a["X_qry"]).all()
+        again = ef.native_v8(episode)
+        assert all(np.array_equal(a[k], again[k]) for k in V8_KEYS) and a["packet"] == again["packet"]
+        checked += 1
+    assert checked >= 18 and refused <= 6, (checked, refused)
+
+
+def test_native_v8_factory_matches_in_process_stage(corpus):
+    spec = _spec(stage="research.levels.s3_episode_factory:native_v8", view=RAW, **NATIVE)
+    sampler = make_sampler(corpus, **NATIVE)
+    compared = 0
+    with ef.EpisodeFactory(spec, 24, 2, ef.v8_capacity(4096, 1024), ahead_steps=1, end_step=1) as fac:
+        for item in fac.batch(0, timeout=120):
+            if isinstance(item, ef.EpisodeFailed):
+                continue
+            s = sampler.plan_step(SEED, item["step"])[item["slot"]]
+            episode, _, _ = build_slot(corpus, sampler, SEED, s, RAW)
+            want = ef.native_v8(episode)
+            assert want["packet"] == item["episode"]["packet"]
+            for key in V8_KEYS[:17]:
+                assert np.array_equal(want[key], item["episode"][key]), key
+            compared += 1
+    assert compared >= 18, compared
+
+
+def test_native_v8_packet_is_the_emitter_packet(corpus, tmp_path):
+    """Train/serve identity: `dope_v8_emit fit --fit-meta` on the FIT rows writes the training packet."""
+    import subprocess
+
+    from research.levels.v8_evidence import find_v8_emit_binary, write_dopemat
+
+    binary = find_v8_emit_binary()
+    assert binary is not None, "build it: cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit"
+    sampler = make_sampler(corpus, **NATIVE)
+    for i, spec in enumerate(sampler.plan_step(SEED, 3)[:8]):
+        episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
+        packet, _, _ = ef.v8_arrays(episode["X_fit"], episode["y_fit"], episode["X_qry"], episode["y_qry"],
+                                    episode["task"], seed=1000 + i)
+        mat, out = tmp_path / f"a{i}.mat", tmp_path / f"a{i}.pkt"
+        write_dopemat(mat, episode["X_fit"], episode["y_fit"])
+        subprocess.run([str(binary), "fit", "--in", str(mat), "--task", episode["task"], "--budget", "2048",
+                        "--fit-meta", "--seed", str(1000 + i), "--out", str(out)], check=True, capture_output=True)
+        assert out.read_bytes() == packet, (i, episode["task"])
+
+
+def test_native_v8_evidence_follows_the_physical_fit_rows(corpus):
+    """Episodes carry distinct source-row ids for their FIT rows; with them the evidence bank is
+    the same for any order of those rows (ties between equal X fingerprints included)."""
+    sampler = make_sampler(corpus, **NATIVE)
+    evk = ("ev_col", "ev_edge", "ev_glob")
+    checked = 0
+    for spec in sampler.plan_step(SEED, 5)[:6]:
+        episode, _, _ = build_slot(corpus, sampler, SEED, spec, RAW)
+        ids = np.asarray(episode["fit_rows"])
+        assert ids.shape == (episode["y_fit"].shape[0],) and np.unique(ids).size == ids.size
+        perm = np.random.default_rng(checked).permutation(ids.size)
+        moved = dict(episode, X_fit=episode["X_fit"][perm], y_fit=episode["y_fit"][perm], fit_rows=ids[perm])
+        a, b = ef.native_v8(episode), ef.native_v8(moved)
+        for key in evk:
+            assert np.array_equal(a[key], b[key]), (key, spec.table_id)
+        checked += 1
+    assert checked == 6
+
+
 # -- gradient-farm adapter ------------------------------------------------------------------
 def boom_stage(episode, **_):
     """A coding mistake in a stage: not an episode fault, so the producer dies."""

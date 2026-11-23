@@ -1,77 +1,44 @@
-"""Screaming multi-node CPU-DDP trainer for SingleEncV7 (V7.2: Max-Entropy S3 + Q_nl + Full Disk Telemetry).
-
-Reads the memory-mapped flat corpus (`/dev/shm/dope-flat/s3-v250`), synthesizes exact per-step
-shuffled tri-task batches (6 reg / 5 bin / 5 mc) mixing ALL 4,145 S3 tables (including >8-class
-cropped multiclass) + 20% infinite synthetic nonlinear SCM/tree priors + full row/col/class
-cropping + target swaps + missingness/warps, logs EVERY step loss-decomposition & entropy telemetry
-to disk (`train.jsonl`), saves canonical F32 rank-<=2 SafeTensors checkpoints, and evaluates strictly
-on the isolated 30-table DEV list (never touching CONFIRM).
-"""
+"""Multi-node CPU-DDP/GPU-DiLoCo trainer for SingleEncV7 (V7.2/V7.3, DEV-only eval)."""
 from __future__ import annotations
 
-import argparse
+import argparse, copy, datetime, json, math, multiprocessing, os, time
 from collections import deque
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-import copy, datetime, json, math, multiprocessing, os, time
 from pathlib import Path
 from typing import Any
-
 import numpy as np
-import torch
-import torch.distributed as dist
+import torch, torch.distributed as dist
 
-from .s3_v7_batch_ops import (
-    FlatArenaView, _fit_only_scale, _hash_u64,
-    build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss,
-)
+from .s3_v7_batch_ops import FlatArenaView, _fit_only_scale, _hash_u64, build_unique_v7_episode, collate_v7_batch, compute_v7_batch_loss
 from .s3_v7_entropy import RealDatasetOnePassQueue, diloco_sync_step, task_quota_for_step
 from .s3_v7_eval import (
-    append_jsonl as _append_jsonl, atomic_json as _atomic_json,
-    compute_lr_factor, eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
-    freeze_target_heads, load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
-    save_v7_valley_soup, split_dev_table_abt, tree_visible_joint_loss,
+    append_jsonl as _append_jsonl, atomic_json as _atomic_json, compute_lr_factor, eval_binary,
+    eval_multiclass, eval_realism_and_privacy, eval_regression, freeze_target_heads, load_v7_resume_state,
+    save_v7_resume_state, save_v7_safetensors, save_v7_valley_soup, split_dev_table_abt, tree_visible_joint_loss,
 )
-from .v7_single_encoding import (
-    MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
-    SingleEncV7, extract_dse_packet_numpy,
-)
+from .v7_single_encoding import MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES, SingleEncV7, extract_dse_packet_numpy
 
 
 @torch.no_grad()
 def evaluate_v7_dev_only(
-    model: SingleEncV7,
-    val_arena: FlatArenaView,
-    dev_hashes: list[str],
-    step: int,
-    seed: int = 20261122,
+    model: SingleEncV7, val_arena: FlatArenaView, dev_hashes: list[str], step: int, seed: int = 20261122,
 ) -> dict[str, Any]:
     """Held-out evaluation strictly restricted to `dev_hashes` (NEVER touches CONFIRM!)."""
-    model.eval()
-    t0 = time.time()
-    rng = np.random.default_rng(seed)
+    model.eval(); t0 = time.time(); rng = np.random.default_rng(seed)
     rets, by_t = [], {"regression": [], "binary": [], "multiclass": []}
-    parities, realisms, privs, drvs, c2sts, margs, dcrs, mias, copies, b_sizes, within_caps = (
-        [], [], [], [], [], [], [], [], [], [], []
-    )
+    parities, realisms, privs, drvs, c2sts, margs, dcrs, mias, copies, b_sizes, within_caps, disc_shares = ([] for _ in range(12))
     for dh in dev_hashes:
         idx = val_arena.by_hash.get(dh)
-        if idx is None:
-            continue
+        if idx is None: continue
         X_raw, y_raw, dg, rec = val_arena.load_slice(idx)
         task = str(rec["task"])
         spl = split_dev_table_abt(X_raw, y_raw, dg, task, rng, _fit_only_scale, MAX_COLS, MAX_CLASSES)
-        if spl is None:
-            continue
+        if spl is None: continue
         Xa, ya, Xb, yb, Xt, yt, task_id, k_cls = spl
-
         pkt = extract_dse_packet_numpy(Xa, ya, task_id, k_cls, max_bytes=PACKET_BUDGET_BYTES)
-        p_eff = pkt["p_eff"]
-        n_syn = max(len(Xa) * 2, 256)
-        pkt["X_qry"] = np.zeros((16, MAX_COLS), dtype=np.float32)
-        pkt["y_qry"] = np.zeros((16,), dtype=np.float32)
-        pkt["q_mask"] = np.ones((16,), dtype=np.float32)
-        pkt["n_fit"] = len(Xa)
-        pkt["n_noise"] = 0
+        p_eff, n_syn = pkt["p_eff"], max(len(Xa) * 2, 256)
+        pkt.update(X_qry=np.zeros((16, MAX_COLS), dtype=np.float32), y_qry=np.zeros((16,), dtype=np.float32),
+                   q_mask=np.ones((16,), dtype=np.float32), n_fit=len(Xa), n_noise=0)
         ev_dev = next(model.parameters()).device
         batch = {k: (v.to(ev_dev) if torch.is_tensor(v) else v) for k, v in collate_v7_batch([pkt]).items()}
         gen = torch.Generator().manual_seed(seed ^ (idx * 7919))
@@ -91,15 +58,13 @@ def evaluate_v7_dev_only(
             ys = (np.cumsum(probs, axis=-1) < torch.rand((n_syn, 1), generator=gen).numpy()).sum(axis=-1).clip(0, k_cls - 1).astype(np.float32)
             res = eval_multiclass(Xa[:, :p_eff], ya, Xb[:, :p_eff], yb, Xs, ys, Xt[:, :p_eff], yt, k_cls)
         rp = eval_realism_and_privacy(Xa[:, :p_eff], Xb[:, :p_eff], Xs, Xt[:, :p_eff])
-        b_sizes.append(pkt["packet_bytes"])
-        within_caps.append(1.0 if pkt["packet_bytes"] <= PACKET_BUDGET_BYTES else 0.0)
-        if math.isfinite(res["retention"]):
-            rets.append(res["retention"]); by_t[task].append(res["retention"])
+        b_sizes.append(pkt["packet_bytes"]); within_caps.append(1.0 if pkt["packet_bytes"] <= PACKET_BUDGET_BYTES else 0.0)
+        disc_shares.append(float(np.mean(pkt["col_feats"][:p_eff, 38])) if p_eff > 0 else 0.0)
+        if math.isfinite(res["retention"]): rets.append(res["retention"]); by_t[task].append(res["retention"])
         if math.isfinite(res["parity"]): parities.append(res["parity"])
         if math.isfinite(res["driver_spearman"]): drvs.append(res["driver_spearman"])
-        realisms.append(rp["realism_pass"]); privs.append(rp["privacy_pass"])
-        c2sts.append(rp["c2st_auc"]); margs.append(rp["marg_auc"])
-        dcrs.append(rp["dcr_share"]); mias.append(rp["mia_auc"]); copies.append(rp["exact_copy_excess"])
+        realisms.append(rp["realism_pass"]); privs.append(rp["privacy_pass"]); c2sts.append(rp["c2st_auc"])
+        margs.append(rp["marg_auc"]); dcrs.append(rp["dcr_share"]); mias.append(rp["mia_auc"]); copies.append(rp["exact_copy_excess"])
 
     model.train()
     med = lambda xs: round(float(np.median(xs)), 4) if xs else None
@@ -118,6 +83,7 @@ def evaluate_v7_dev_only(
         "driver_spearman_median": med(drvs), "c2st_auc_median": med(c2sts),
         "marg_auc_median": med(margs), "dcr_share_median": med(dcrs),
         "mia_auc_median": med(mias), "exact_copy_excess_median": med(copies),
+        "disc_col_share_mean": mean(disc_shares),
         "formal_dp_state": "not_claimed",
     }
 
@@ -125,7 +91,10 @@ def evaluate_v7_dev_only(
 def _fetch_microbatch(
     arena: FlatArenaView, seed: int, step: int, rank: int, world_size: int,
     micro_bsz: int, n_fit_cap: int, seen_splits: set[str] | None = None,
-    real_queue: RealDatasetOnePassQueue | None = None, as_numpy: bool = False,
+    real_queue: RealDatasetOnePassQueue | None = None,
+    as_numpy: bool = False,
+    n_qry_cap: int = 256,
+    allow_replay_on_exhaust: bool = False,
 ) -> dict[str, Any] | None:
     """Enforce exact tri-task quota, zero split repeats, and optional zero dataset repeats."""
     quota = task_quota_for_step(micro_bsz, _hash_u64(seed, step, rank))
@@ -135,7 +104,8 @@ def _fetch_microbatch(
         for retry in range(12):
             ep = build_unique_v7_episode(
                 arena, seed + retry * 1_000_003, step, base_slot + qi, n_fit_cap=n_fit_cap,
-                n_qry_cap=128, desired_task=want_task, slots_per_step=slots_per_step, real_queue=real_queue,
+                n_qry_cap=n_qry_cap, desired_task=want_task, slots_per_step=slots_per_step,
+                real_queue=real_queue, allow_replay_on_exhaust=allow_replay_on_exhaust,
             )
             if ep is None: continue
             sh = str(ep["split_hash"])
@@ -187,6 +157,8 @@ def parse_args() -> argparse.Namespace:
         ("--sync-group", dict(type=str, default="")), ("--sync-every", dict(type=int, default=50)),
         ("--sync-outer-lr", dict(type=float, default=0.7)), ("--sync-outer-momentum", dict(type=float, default=0.9)),
         ("--tree-realism-weight", dict(type=float, default=0.0)),
+        ("--n-fit-max", dict(type=int, default=1024)), ("--n-qry-cap", dict(type=int, default=256)),
+        ("--allow-replay-on-exhaust", dict(action="store_true")),
     ):
         ap.add_argument(flag, **kw)
     return ap.parse_args()
@@ -288,6 +260,7 @@ def main() -> None:
     pending: deque[Any] = deque()
     gpu_ring: deque[dict[str, Any]] = deque()
     sub_cursor = [start_step, 0]
+    n_fit_span = max(0, int(args.n_fit_max) - 256)
 
     def _submit_one() -> None:
         if pool is None or sub_cursor[0] >= args.steps:
@@ -296,12 +269,17 @@ def main() -> None:
         sub_cursor[1] += 1
         if sub_cursor[1] >= args.grad_accum:
             sub_cursor[0], sub_cursor[1] = st_s, 0
-        nf_c = int(256 + 256 * min(1.0, st_s / max(1.0, args.steps * 0.5)))
+        nf_c = int(256 + n_fit_span * min(1.0, st_s / max(1.0, args.steps * 0.5)))
         if use_proc_pool:
             rq_sl = real_queue.take_slice(max(2, args.micro_batch // 4)) if real_queue is not None else None
             pending.append(pool.submit(_fetch_microbatch_worker, args.seed + ga_s * 10007, st_s, rank, world_size, args.micro_batch, nf_c, rq_sl))
         else:
-            pending.append(pool.submit(_fetch_microbatch, train_arena, args.seed + ga_s * 10007, st_s, rank, world_size, args.micro_batch, nf_c, seen_splits, real_queue))
+            pending.append(
+                pool.submit(
+                    _fetch_microbatch, train_arena, args.seed + ga_s * 10007, st_s, rank, world_size,
+                    args.micro_batch, nf_c, seen_splits, real_queue, False, args.n_qry_cap, args.allow_replay_on_exhaust,
+                )
+            )
 
     def _stage_to_dev(b_raw: dict[str, Any]) -> dict[str, Any]:
         t_raw = {k: (torch.from_numpy(v) if isinstance(v, np.ndarray) else v) for k, v in b_raw.items()}
@@ -319,10 +297,10 @@ def main() -> None:
 
     try:
         for step in range(start_step + 1, args.steps + 1):
-            n_fit_cap = int(256 + 256 * min(1.0, step / max(1.0, args.steps * 0.5)))
+            n_fit_cap = int(256 + n_fit_span * min(1.0, step / max(1.0, args.steps * 0.5)))
             opt.zero_grad(set_to_none=True)
             acc = {k: 0.0 for k in m_keys}
-            acc_bytes, acc_nfit, acc_noise, acc_crop, step_datasets, step_splits = [], [], [], [], [], []
+            acc_bytes, acc_nfit, acc_noise, acc_crop, acc_disc, step_datasets, step_splits = [], [], [], [], [], [], []
             c_reg = c_bin = c_mc = c_synth = c_swap = c_crop = valid_micros = 0
 
             for ga in range(args.grad_accum):
@@ -335,16 +313,24 @@ def main() -> None:
                             gpu_ring.append(_stage_to_dev(b_cpu))
                     batch = gpu_ring.popleft() if gpu_ring else None
                 else:
-                    b_cpu = _fetch_microbatch(train_arena, args.seed + ga * 10007, step, rank, world_size, args.micro_batch, n_fit_cap, seen_splits, real_queue)
+                    b_cpu = _fetch_microbatch(
+                        train_arena, args.seed + ga * 10007, step, rank, world_size,
+                        args.micro_batch, n_fit_cap, seen_splits, real_queue, False,
+                        args.n_qry_cap, args.allow_replay_on_exhaust,
+                    )
                     batch = _stage_to_dev(b_cpu) if b_cpu is not None else None
                 if batch is None:
                     continue
                 bsz = batch["col_mask"].shape[0]
-                zf = torch.randn((bsz, args.n_syn, MAX_RANK), device=device)
-                zn = torch.randn((bsz, args.n_syn, MAX_COLS), device=device)
-                yn = torch.randn((bsz, args.n_syn), device=device)
+                n_syn_eff = (
+                    min(max(int(batch["n_fit"].max().item()) * 4, 192), 1024)
+                    if args.n_syn <= 0 else args.n_syn
+                )
+                zf = torch.randn((bsz, n_syn_eff, MAX_RANK), device=device)
+                zn = torch.randn((bsz, n_syn_eff, MAX_COLS), device=device)
+                yn = torch.randn((bsz, n_syn_eff), device=device)
                 ref = base_model.refine_packet(batch["col_feats"], batch["glob_feats"], batch["col_mask"])
-                x_s, lg_s, y_r = base_model.sample_batch(batch, args.n_syn, zf, zn, yn, ref=ref)
+                x_s, lg_s, y_r = base_model.sample_batch(batch, n_syn_eff, zf, zn, yn, ref=ref)
                 lg_q, sd_q = base_model.predict_target_on_x(batch, ref, batch["X_qry"] * batch["col_mask"].unsqueeze(1))
                 loss, m = compute_v7_batch_loss(
                     x_s, lg_s, y_r, batch, logits_qry=lg_q, sd_qry=sd_q, ref=ref,
@@ -361,6 +347,7 @@ def main() -> None:
                 for k in m_keys: acc[k] += m[k]
                 acc_bytes.append(float(batch["packet_bytes"].mean().item())); acc_nfit.append(float(batch["n_fit"].mean().item()))
                 acc_noise.append(float(batch["n_noise"].mean().item())); acc_crop.append(float(batch["col_crop_ratio"].mean().item()))
+                acc_disc.append(float(batch["disc_col_share"].mean().item()))
                 step_datasets.extend(batch["dataset_hashes"]); step_splits.extend(batch["split_hashes"])
                 tid = batch["task_id"]
                 c_reg += int((tid == 0).sum().item()); c_bin += int((tid == 1).sum().item()); c_mc += int((tid == 2).sum().item())
@@ -423,6 +410,7 @@ def main() -> None:
                     "episodes_seen": episodes_seen, "real_queue_remaining": real_queue.remaining() if real_queue is not None else -1,
                     "encoding_bytes_avg": round(float(np.mean(acc_bytes)), 1), "avg_n_fit": round(float(np.mean(acc_nfit)), 1),
                     "avg_noise_cols": round(float(np.mean(acc_noise)), 2), "avg_col_crop_ratio": round(float(np.mean(acc_crop)), 3),
+                    "disc_col_share": round(float(np.mean(acc_disc)), 4),
                     "n_reg": c_reg, "n_bin": c_bin, "n_mc": c_mc, "n_synth_prior": c_synth, "n_swapped": c_swap, "n_cropped": c_crop,
                 }
                 _append_jsonl(run_dir / "train.jsonl", row)

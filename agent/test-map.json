@@ -4170,23 +4170,131 @@
     },
     "engine/dope-ffi/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-ffi",
-      "purpose": "verify the per-episode FIT-only DSE7 stage and its C ABI: query rows never reach the packet, deterministic, error codes not panics"
+      "purpose": "verify the per-episode FIT-only DSE7 (ABI 2) and V8 (ABI 3) stages and their C ABI: query rows never reach the packet, decoder inputs or evidence; rows and column meta in the packet's unit space; deterministic; error codes not panics"
     },
     "research/levels/s3_episode_factory.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
-      "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets"
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the parallel episode factory: payloads independent of producer count, a fresh split per episode, raw emit, FIT-only native packets; FIT-only native_v8 payloads with the trainer's shapes"
+    },
+    "research/levels/s3_episode_native.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "purpose": "verify the native DSE7/V8 episode stages through the factory: FIT-only packets and tensors, query rows only mapped, the V8 packet byte-identical to `dope_v8_emit fit --fit-meta`"
     },
     "research/levels/s3_episode_ring.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify training ring handoff, ordering, backpressure, and producer failure propagation"
     },
     "research/levels/tests/test_s3_episode_factory.py": {
-      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && python3 -B -m pytest -q research/levels/tests/test_s3_episode_factory.py",
       "purpose": "verify the episode-factory proof on Linux x86-64 with its native library"
     },
     "engine/dope-core/src/marginal/column_meta.rs": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test column_meta_v2",
       "purpose": "verify per-episode FIT-only Nc2ColumnMetaV2: planted support classes, k=10 bound floor, row-order and missing-cell invariance"
+    },
+    "research/levels/s3_v8_feed.py": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-ffi && python3 -B -m pytest -q research/levels/tests/test_s3_v8_feed.py",
+      "purpose": "verify the V8 episode feed: deterministic for any producer count, a fresh split per episode, the V8 trainer steps on factory episodes"
+    },
+    "contracts/evidence-layout-v1.json": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test evidence_v8",
+      "purpose": "bind frozen dope.evidence-layout/v1 SHA-256, zero-cache FIT-only masks, and 128/16/16/4/8/160 dimensions to pure Rust evidence::extract"
+    },
+    "engine/dope-core/src/evidence/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test evidence_v8",
+      "purpose": "verify pure-Rust FIT-only Evidence Bank T0-T3: exact row-perm invariance, col-perm equivariance, multiclass relabeling, XOR vs XNOR sign resolution, planted mechanisms, and admission refusals"
+    },
+    "engine/dope-core/tests/evidence_v8.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test evidence_v8",
+      "purpose": "integration contract suite for dope_core::evidence"
+    },
+    "engine/dope-core/src/single_encoding/v8/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
+      "purpose": "verify DSE8 v1 nested-prefix wire framing, strict TLV validation, TAG_WEIGHTS_FP fail-closed checks, nominal exclusivity, k>=10 canary floor, row-locality, and SingleEncV8 Rust runtime"
+    },
+    "engine/dope-core/src/auto/v8.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
+      "purpose": "verify 3-way grouped acceptance guard across Format 1, DSE8 analytic Step-0, and DSE8 neural candidates"
+    },
+    "engine/dope-core/src/auto/v8_dpa.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "verify DPA1 tag-8 V8 container encoding, target-last schema round-trip, and fail-closed fingerprint checks"
+    },
+    "engine/dope-cli/src/v8_weights.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope v8_weights && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "verify fail-closed SingleEncV8 F32 SafeTensors loader and DPA1 tag-8 CLI integration"
+    },
+    "engine/dope-cli/tests/auto_v8_cli.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli",
+      "purpose": "end-to-end CLI tests for --format v8|v8-analytic|auto-v8, --v8-weights, --v8-zero-init, --anonymize, and refusals"
+    },
+    "engine/dope-core/tests/single_encoding_v8.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
+      "purpose": "integration contract suite for DSE8 v1 codec, malformed wire refusals, nominal legality, and auto::v8"
+    },
+    "engine/dope-arena/src/bin/dope_v8_emit.rs": {
+      "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify pure-Rust dope_v8_emit CLI fit/sample/evidence/embed/truncate/inspect and <=1e-4 parity across 12 fixtures"
+    },
+    "research/levels/configs/v3_campaign/": {
+      "command": "python3 -m json.tool research/levels/configs/v3_campaign/preregistration_e0_e9.json >/dev/null",
+      "purpose": "validate pre-registered E0-E9 DOPE v3.0 campaign manifest and fail-closed fleet launch guard"
+    },
+    "research/levels/v8_evidence.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "verify Python FIT-only evidence wrapper and layout parity against Rust dope_v8_emit"
+    },
+    "research/levels/v8_packet.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify DSE8 v1 Python wire parser and decoder-input builder parity against Rust"
+    },
+    "research/levels/v8_single_encoding.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify SingleEncV8 PyTorch forward/decode and F32 rank<=2 SafeTensors export parity <=1e-4 against pure Rust"
+    },
+    "research/levels/s3_v8_priors.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py",
+      "purpose": "verify non-Gaussian, lattice, bimodal, and contrastive XOR/XNOR synthetic prior episodes"
+    },
+    "research/levels/s3_v8_losses.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py",
+      "purpose": "verify finite V8 KPI-aligned training losses, Gumbel-Rao K=4, FSQ STE, and PCGrad-Lite conflict projection"
+    },
+    "research/levels/s3_v8_trainer.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "verify 20-step SingleEncV8 launch gate, exact save/resume, SafeTensors export, and Rust round-trip"
+    },
+    "research/levels/s3_v8_eval.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "verify offline DEV smoke evaluator invoking native dope_v8_emit"
+    },
+    "research/levels/tests/test_fp0_loop.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_fp0_loop.py research/levels/tests/test_s3_batch_episode.py",
+      "purpose": "verify FP-0 V7 loop repairs (lattice-safe jitter, per-episode masked SWD, dup-group split, unseen-class refusal)"
+    },
+    "research/levels/tests/test_v8_rust_parity.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "12-fixture hard Rust-vs-Python numerical parity suite (<=1e-4) for DSE8 and SingleEncV8"
+    },
+    "research/levels/tests/test_v8_losses.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py",
+      "purpose": "unit test suite for SingleEncV8 differentiable losses and synthetic priors"
+    },
+    "research/levels/tests/test_s3_v8_launch_gate.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "20-step launch-gate training, exact resume, and Rust round-trip smoke test"
+    },
+    "research/levels/s3_v7_losses.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_fp0_loop.py",
+      "purpose": "verify split SingleEncV7 differentiable batch loss and per-episode masked SWD/marginal/corr"
+    },
+    "research/levels/s3_v8_trainer_io.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "verify V8 episode tensorization, CUDA guard, EMA, Valley Soup, and checkpoint I/O"
+    },
+    "research/levels/v8_parity_decode.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify 12-fixture scalar Python parity mirror <=1e-4 against pure Rust decode_dse8_rows"
     }
   },
   "workspace": "dope"

@@ -10,8 +10,8 @@
 Recorded hosted full-audit report: **88/100 (pass)** with the pinned auditor at [source `bb6069c9`](https://github.com/neverhuman/dope/commit/bb6069c971dc22a0cb0f65d2cf8dc579a76c0f93), with a clean source tree and zero caps, HIGH or critical findings ([hash-only witness](docs/plans/next-version/dope/receipts/hosted-audit-bb-snapshot.json)). The [audit job](https://github.com/neverhuman/dope/actions/runs/41699460421/job/126138603944) failed its final check against the previous 87-point badge; this snapshot copies the genuine generated 88-point artifact. Later commits require their own fresh exact-head check. Historical [earlier hosted](docs/plans/next-version/dope/receipts/hosted-audit-1811-snapshot.json) and [earlier local](docs/plans/next-version/dope/receipts/jankurai-451-snapshot.json) witnesses remain preserved.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v2-dark.svg">
-  <img alt="DOPE v2.0.0 scoreboard: twin-referenced gap (TRG) against artifact bytes on a log axis for DOPE v2.0.0, SDV GaussianCopula, SDV TVAE, Format-2, the V7 single encoding and the copy, bootstrap and independent-marginals controls; every point comes from the committed confirmation receipt." src="bench/real-world/figures/hero-v2-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v3-dark.svg">
+  <img alt="DOPE v3.0.0 scoreboard: twin-referenced gap (TRG) against artifact bytes on a log axis for DOPE v3.0.0 auto-v8, the DOPE v2.0.0 and v1.3.0 encoders, the V7 single encoding, the analytic DSE8 packet and the copy and bootstrap controls; every point comes from the committed DEV report receipt." src="bench/real-world/figures/hero-v3-light.svg">
 </picture>
 
 DOPE reads a table and writes a few-kilobyte **program**: a standard
@@ -61,7 +61,7 @@ predictive structure that learners need.
 </details>
 
 Each generated block below is a byte-for-byte copy of its renderer's output
-([`dope_kpi render-readme`](bench/real-world/results/scoreboard/v2.0.0/README.md),
+([`dope_kpi render-readme`](bench/real-world/results/scoreboard/v3.0.0/README.md),
 [`bench/real-world/render.py`](bench/real-world/render.py),
 [`examples/adult/walkthrough.py`](examples/adult/walkthrough.py)), checked by
 [`tools/claims/dope1.py`](tools/claims/dope1.py).
@@ -71,8 +71,8 @@ Each generated block below is a byte-for-byte copy of its renderer's output
 
 | Goal | Recommended Surface | Key Property |
 | :--- | :--- | :--- |
-| **Compile any CSV into a compact synthetic-row generator** | `dope fit` (`--format 1`, `--format 2` or `--format auto`) / `dope sample` / `dope mlc-v3` ([`engine/dope-cli`](engine/dope-cli/)) | Pure Rust, explicit `--target`, zero source rows stored; the binary embeds the V7 weights for `--format auto` |
-| **Score generators on the v2.0.0 scoreboard** | `dope_kpi` ([`engine/dope-arena`](engine/dope-arena/)) and [the scoreboard receipts](bench/real-world/results/scoreboard/v2.0.0/README.md) | TRG with a family bootstrap, Holm-adjusted comparisons, guards and a pre-registered promotion rule |
+| **Compile any CSV into a compact synthetic-row generator** | `dope fit` (`--format 1`, `--format 2`, `--format auto` or `--format auto-v8`) / `dope sample` / `dope mlc-v3` ([`engine/dope-cli`](engine/dope-cli/)) | Pure Rust, explicit `--target`, zero source rows stored; the binary embeds the V7 weights for `--format auto` |
+| **Score generators on the v3.0.0 scoreboard** | `dope_kpi` ([`engine/dope-arena`](engine/dope-arena/)) and [the scoreboard receipts](bench/real-world/results/scoreboard/v3.0.0/README.md) | TRG with a family bootstrap, Holm-adjusted comparisons, guards and a pre-registered promotion rule |
 | **Embed fit tables into downstream meta-learners / routers** | `dope_core::mlc_v3` (`encode_features_629`, `encode_research_view_629`, `packet_features_v1_from_encoding`) & [`docs/jopedime-integration.md`](docs/jopedime-integration.md) | Pinned `High` (`d0b69603…`) + level-verified `Ultra` & `PacketFeaturesV1` with Rust/Python parity |
 | **Normalize external CSVs once under target-last FIT custody** | [`engine/dope-sdk/`](engine/dope-sdk/) (`dope-sdk`) & [`engine/dope-norm`](engine/dope-norm/) (`NC1`) | Single canonical intake; rejects downstream schema/header drift |
 | **Reproduce the multi-learner paper & Elo tournament** | [`bench/real-world/`](bench/real-world/) & `bash paper/build.sh` ([`paper/dope1.tex`](paper/dope1.tex)) | Regenerated directly from committed SHA-verified receipts |
@@ -184,12 +184,12 @@ dope mlc-v3 encode --preset multitask --csv train.csv --target y --landmark-mode
 ✓ sampled 1,024 synthetic rows (8 features + target, raw space) from packet_high_regression.dml3 (DML3 · high · 2,327 B) -> syn_v3.csv
 ```
 
-*v2.0.0 auto encoder* (build from source with Option C until a signed `dope-engine-v2.0.0` release exists):
+*v3.0.0 release encoder* (`--format auto-v8`; `--format auto` is the v2.0.0 encoder):
 
 ```bash
-# Workflow D — Format 1 or the V7 single encoding, whichever wins the internal duplicate-grouped check;
+# Workflow D — Format 1 or the analytic DSE8 packet, whichever wins the internal grouped two-fold check;
 # the whole file, header included, stays within --budget (default 2k = 2048 bytes):
-dope fit train.csv --target y --format auto -o auto.dope
+dope fit train.csv --target y --format auto-v8 -o auto.dope
 dope sample auto.dope -n 1000 -o synthetic_auto.csv   # reads the DPA1 container by its file magic
 ```
 
@@ -309,33 +309,36 @@ retention on 6512 held-out real rows (classification task, artifact 4079 bytes, 
 *Aggregation & auditor disclosure:* The first row reports the standalone Rust `dope eval` command above (`--factor 4.0`, capped at `50,000` synthetic rows, using `dope-core`'s built-in Rust logistic, histogram-GBDT, and candle-MLP auditors). All remaining rows come directly from `bench/real-world/results/confirm/summary.json` and `records.jsonl` using the external Python benchmark auditors (`LogisticRegression`, `CatBoostClassifier`, `MLPClassifier`), where 3-seed rows report the per-column median across `seed = 0, 1, 2` and `robust` reports $\text{median}_s(\min_f R_{s,f})$ (alongside the seed range and $\min_f(\text{median}_s R_{s,f})$ when they differ, as on `arf@-`: `0.866` vs. `0.874`).
 <!-- END DOPE1 WALKTHROUGH -->
 
-## Results: v2.0.0 Scoreboard
+## Results: v3.0.0 Scoreboard
 
-*Selection-exposed validation estimate:* one pre-registered look at fresh row splits of the
-CONFIRM families only, scored by `dope_kpi`. The same tables, on other row splits, informed the
-design of `--format auto`, so this is not a sealed test.
-[TRG](bench/real-world/results/scoreboard/v2.0.0/README.md#trg-the-twin-referenced-gap)
-is the twin-referenced gap.
+*DEV estimate, not a sealed test:* one pre-registered look at fresh row splits of the DEV
+tables, scored by `dope_kpi` after the encoder was selected on other splits of the same tables;
+no CONFIRM look was taken. Read the guard columns with the headline: TRG improves over
+`--format auto`, the promotion rule's outcome is HOLD, and each failing guard is listed.
+[TRG](bench/real-world/results/scoreboard/v3.0.0/README.md#trg-the-twin-referenced-gap)
+is the twin-referenced gap; the [v2.0.0 scoreboard](bench/real-world/results/scoreboard/v2.0.0/README.md) is kept.
 
 <!-- BEGIN DOPE1 SCOREBOARD -->
 <!-- Generated by dope_kpi render-readme from dope.kpi-receipt/v2 receipts; do not edit. -->
-| Arm | Class | Bytes median / max / share <= 2048 B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Failed / cells |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `dope-2.0.0-small` | source_free | 1462 / 2048 / 1.000 | -0.232 [-0.347, -0.131] | -0.183 (94) | -0.273 (16) | -0.241 (7) | 0.970 / 0.976 / 0.990 | 0.930 | 5 / 125 |
-| `dope-1.3.0-small` | source_free | 1462 / 2048 / 1.000 | -0.234 [-0.348, -0.132] | -0.180 (94) | -0.273 (16) | -0.249 (7) | 0.970 / 0.976 / 0.994 | 0.922 | 5 / 125 |
-| `pr390-v7-step0` | source_free | 535 / 2048 / 1.000 | -0.381 [-0.454, -0.312] | -0.264 (94) | -0.423 (16) | -0.457 (7) | 0.987 / 0.812 / 0.848 | 0.993 | 0 / 125 |
-| `pr390-f2-2k` | source_free | 1992 / 2048 / 1.000 | -0.454 [-0.552, -0.358] | -0.363 (94) | -0.528 (16) | -0.470 (7) | 0.833 / 0.833 / 0.792 | 0.853 | 10 / 125 |
-| `copy_a` | control | - | -0.030 [-0.046, -0.015] | -0.022 (94) | -0.034 (16) | -0.036 (7) | 1.000 / 1.000 / 1.000 | 0.522 | 0 / 125 |
-| `bootstrap_a` | control | - | -0.055 [-0.082, -0.030] | -0.041 (94) | -0.064 (16) | -0.061 (7) | 0.999 / 0.991 / 0.996 | 0.578 | 0 / 125 |
-| `indep_marginals` | control | - | -1.173 [-1.238, -1.110] | -1.170 (94) | -1.104 (16) | -1.246 (7) | -0.120 / -0.003 / -0.329 | 0.961 | 0 / 125 |
-| `label_shuffle` | control | - | -1.156 [-1.212, -1.102] | -1.120 (94) | -1.091 (16) | -1.256 (7) | -0.061 / -0.006 / -0.197 | 0.702 | 0 / 125 |
-| `twin_c` | control | - | -0.173 [-0.231, -0.133] | -0.139 (34) | -0.300 (1) | -0.079 (1) | 0.998 / 0.999 / 0.995 | 0.525 | 0 / 38 (88 n/a) |
+| Arm | Class | Bytes median / max / share <= 2048 B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Realism / privacy / copies mean (max) | Failed / cells |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `dope-v3b-auto-v8` | source_free | 1787 / 2048 / 1.000 | -0.121 [-0.189, -0.049] | -0.137 (4) | -0.136 (3) | -0.089 (4) | 0.942 / 0.916 / 0.792 | 0.967 | 0.194 / 0.688 / 0.000 (0.000) | 0 / 44 |
+| `dope-2.0.0-auto` | source_free | 1817.5 / 2048 / 1.000 | -0.181 [-0.280, -0.085] | -0.118 (4) | -0.278 (3) | -0.146 (4) | 0.939 / 0.917 / 0.792 | 0.958 | 0.306 / 0.719 / 0.000 (0.001) | 0 / 44 |
+| `dope-2.0.0-small` | source_free | 1508 / 2043 / 1.000 | -0.267 [-0.402, -0.133] | -0.250 (4) | -0.438 (3) | -0.112 (4) | 0.918 / 0.915 / 0.865 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
+| `dope-1.3.0-small` | source_free | 1508 / 2043 / 1.000 | -0.266 [-0.399, -0.133] | -0.249 (4) | -0.438 (3) | -0.109 (4) | 0.912 / 0.915 / 0.798 | 0.925 | 0.306 / 0.507 / 0.000 (0.000) | 7 / 44 |
+| `pr390-v7-step0` | source_free | 782.5 / 2026 / 1.000 | -0.432 [-0.585, -0.273] | -0.102 (4) | -0.545 (3) | -0.648 (4) | 0.896 / 0.840 / 0.728 | 0.986 | 0.194 / 0.774 / 0.000 (0.001) | 0 / 44 |
+| `dse8-p0-v3b` | source_free | 867.5 / 2048 / 1.000 | -0.342 [-0.652, -0.103] | -0.094 (4) | -0.276 (3) | -0.655 (4) | 0.950 / 0.942 / 0.741 | 0.977 | 0.194 / 0.753 / 0.000 (0.000) | 0 / 44 |
+| `twin_c` | control | - | -0.060 [-0.060, -0.060] | -0.074 (1) | - | -0.046 (1) | 0.997 / 0.993 / 0.974 | 0.522 | - / - / - | 0 / 8 (36 n/a) |
+| `copy_a` | control | - | -0.039 [-0.069, -0.014] | -0.017 (4) | -0.056 (3) | -0.045 (4) | 1.000 / 1.000 / 1.000 | 0.530 | - / - / - | 0 / 44 |
+| `bootstrap_a` | control | - | -0.088 [-0.147, -0.036] | -0.085 (4) | -0.039 (3) | -0.139 (4) | 0.995 / 0.995 / 0.991 | 0.572 | - / - / - | 0 / 44 |
+| `indep_marginals` | control | - | -1.222 [-1.387, -1.095] | -1.135 (4) | -1.381 (3) | -1.149 (4) | -0.157 / -0.011 / -0.334 | 0.967 | - / - / - | 0 / 44 |
+| `label_shuffle` | control | - | -1.164 [-1.269, -1.063] | -1.235 (4) | -1.004 (3) | -1.251 (4) | -0.105 / -0.004 / -0.208 | 0.687 | - / - / - | 0 / 44 |
 
-| Comparison | Delta TRG [95% CI] | Holm p | Guards | Outcome |
-|---|---:|---:|---|---|
-| `dope-2.0.0-small` vs `dope-1.3.0-small` | +0.002 [-0.002, +0.008] | 0.318 | tasks pass; mlp pass; realism n/e; privacy n/e; copies n/e; bytes pass | **HOLD** |
+| Comparison | Delta TRG [95% CI] | Holm p (m) | Guards | Sign-flip PROMOTE | Outcome |
+|---|---:|---:|---|---:|---|
+| `dope-v3b-auto-v8` vs `dope-2.0.0-auto` | +0.060 [+0.009, +0.114] | 0.009 (1) | tasks -0.053 FAIL; mlp -0.007 FAIL; realism -0.111 FAIL; privacy -0.031 FAIL; copies 0.000 (0.000) pass; bytes 2048 pass | 0.000 | **HOLD** |
 
-Contract `dope-kpi/v2` sha256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623`; panel `all`; receipt sha256 `a0df32778cec155bd678abd3d1f57967847b66c2061718151a68c043a4cc5d37`, `7a313bec99840e5ad33d71d74e46d4b7c2298bcf83cb0795bcd1a4515c5016ec`.
+Contract `dope-kpi/v2` (embedded, candidate) sha256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623`; panel `all`; receipt sha256 `55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba`, `5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49`.
 <!-- END DOPE1 SCOREBOARD -->
 
 ## Historical v1.0.0 Study: `DOPE-MLC-v2` & `DOPE-MLC-v3`
@@ -501,8 +504,8 @@ retention only ([docs/metric.md](docs/metric.md)).
 under log-loss *is* the share of the predictive information `I(X;Y)` the program keeps
 (under squared loss, the share of `Var E[Y|X]`). TDL then estimates, on a grid of tested budgets,
 how many bytes a table's predictive information needs, and DOPE spends its bytes on the
-target model first. The v2.0.0 scoreboard ranks arms by
-[TRG](bench/real-world/results/scoreboard/v2.0.0/README.md#trg-the-twin-referenced-gap), the
+target model first. The v3.0.0 scoreboard ranks arms by
+[TRG](bench/real-world/results/scoreboard/v3.0.0/README.md#trg-the-twin-referenced-gap), the
 twin-referenced retention gap, rather than by TDL.
 
 ## Use a DOPE artifact from Python
@@ -533,7 +536,7 @@ program = json.loads(blob[4:4 + n])      # schema, structure, bit widths, sectio
 | [`engine/`](engine/) | Pure-Rust `dope-core` (`MLC-v3`/`DML4`, `DVS`, research & `PacketFeaturesV1` views), `dope-norm` (`NC1`), `dope-arena` (`dope_kpi`), and `dope-cli` (`dope`) |
 | [`engine/dope-sdk/`](engine/dope-sdk/) | Versioned pure-Rust `dope-sdk` preparation and conditioning APIs |
 | [`bench/real-world/`](bench/real-world/) | Public-table benchmark: datasets, baselines, auditors, records, figures |
-| [`bench/real-world/results/scoreboard/`](bench/real-world/results/scoreboard/v2.0.0/README.md) | The v2.0.0 scoreboard receipts, README block and render manifest |
+| [`bench/real-world/results/scoreboard/`](bench/real-world/results/scoreboard/v3.0.0/README.md) | The v3.0.0 and v2.0.0 scoreboard receipts, README blocks and render manifests |
 | [`docs/whitepaper-v2/`](docs/whitepaper-v2/) | **The DOPE v2.0.0 White Paper** ([`dope-v2.tex`](docs/whitepaper-v2/dope-v2.tex)) and its generated macros |
 | [`paper/`](paper/) | **The DOPE v1.0.0 White Paper** ([`dope1.tex`](paper/dope1.tex) and [`dope1-supplement.tex`](paper/dope1-supplement.tex)) and generated benchmark macros/figures |
 | [`examples/`](examples/) | End-to-end walkthroughs ([`examples/adult/`](examples/adult/), [`examples/quickstart/`](examples/quickstart/)) |

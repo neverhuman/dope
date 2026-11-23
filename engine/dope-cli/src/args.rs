@@ -195,14 +195,19 @@ pub(crate) struct FitArgs {
     #[arg(long)]
     pub(crate) size: Option<dope_core::ModelSize>,
     /// Artifact wire format: 1 (Format 1 legacy safetensors), 2 (Fidelity Engine 2.0 Format 2),
-    /// auto (per table, Format 1 or the SingleEncV7 packet in a DPA1 file) or v7 (the V7
-    /// packet only, in a DPA1 file). DPA1 files stay within --budget, default 2048 bytes.
-    #[arg(long, default_value = "1", value_parser = ["1", "2", "auto", "v7"])]
+    /// auto (Format 1 or SingleEncV7 DPA1), v7 (V7 DPA1), v8 (DSE8 v1 DPA1 tag 8),
+    /// v8-analytic (weightless DSE8 Step-0 DPA1 tag 8), or auto-v8 (3-way Format 1 vs DSE8
+    /// analytic vs DSE8 neural DPA1). DPA1 files stay within --budget, default 2048 bytes.
+    #[arg(long, default_value = "1", value_parser = ["1", "2", "auto", "v7", "v8", "v8-analytic", "auto-v8"])]
     pub(crate) format: String,
     /// SingleEncV7 F32 SafeTensors (4 heads) for --format auto|v7 instead of the weights
     /// compiled into dope; sampling the artifact then needs the same --v7-weights.
     #[arg(long, value_name = "SAFETENSORS")]
     pub(crate) v7_weights: Option<PathBuf>,
+    /// SingleEncV8 F32 SafeTensors (4 heads) for --format v8|auto-v8; sampling a neural V8
+    /// DPA1 artifact then needs the same --v8-weights (or --v8-zero-init).
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v8_weights: Option<PathBuf>,
     /// Teacher mode for --format 2: native | external:<DIR>.
     #[arg(long, default_value = "native")]
     pub(crate) teacher: String,
@@ -326,6 +331,13 @@ pub(crate) struct SampleArgs {
     /// the step-0 baseline) instead of the SingleEncV7 network.
     #[arg(long, conflicts_with = "v7_weights")]
     pub(crate) v7_zero_init: bool,
+    /// SingleEncV8 SafeTensors a neural V8 DPA1 tag-8 artifact was fitted with.
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v8_weights: Option<PathBuf>,
+    /// Decode a V8 DPA1 tag-8 artifact with the weightless analytic Step-0 decoder instead of
+    /// SingleEncV8 neural weights.
+    #[arg(long, conflicts_with = "v8_weights")]
+    pub(crate) v8_zero_init: bool,
 }
 
 #[derive(Args)]

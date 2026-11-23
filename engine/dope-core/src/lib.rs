@@ -40,6 +40,7 @@ pub mod embed;
 pub mod encode;
 pub mod error;
 pub mod eval;
+pub mod evidence;
 pub mod forest;
 pub mod landmark;
 pub mod learned;

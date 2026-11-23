@@ -25,6 +25,8 @@ pub enum Encoder {
     Format1,
     /// A self-contained DSE7 v2 packet decoded with the SingleEncV7 weights it names.
     V7,
+    /// A self-contained DSE8 v1 packet (analytic Step-0 if `NO_FINGERPRINT`, else SingleEncV8).
+    V8,
 }
 
 impl Encoder {
@@ -32,6 +34,7 @@ impl Encoder {
         match self {
             Encoder::Format1 => 1,
             Encoder::V7 => 7,
+            Encoder::V8 => 8,
         }
     }
 
@@ -39,6 +42,7 @@ impl Encoder {
         match tag {
             1 => Some(Encoder::Format1),
             7 => Some(Encoder::V7),
+            8 => Some(Encoder::V8),
             _ => None,
         }
     }
@@ -48,6 +52,7 @@ impl Encoder {
         match self {
             Encoder::Format1 => "format1",
             Encoder::V7 => "v7",
+            Encoder::V8 => "v8",
         }
     }
 }
@@ -126,6 +131,14 @@ mod tests {
 
         let f1 = wrap_dpa1(Encoder::Format1, NO_FINGERPRINT, b"x");
         assert_eq!(parse_dpa1(&f1).unwrap().encoder, Encoder::Format1);
+        let v8_ana = wrap_dpa1(Encoder::V8, NO_FINGERPRINT, b"dse8");
+        let p_ana = parse_dpa1(&v8_ana).unwrap();
+        assert_eq!(p_ana.encoder, Encoder::V8);
+        assert_eq!(p_ana.fingerprint, NO_FINGERPRINT);
+        let v8_nn = wrap_dpa1(Encoder::V8, fp, b"dse8");
+        let p_nn = parse_dpa1(&v8_nn).unwrap();
+        assert_eq!(p_nn.encoder, Encoder::V8);
+        assert_eq!(p_nn.fingerprint, fp);
         for bad in [
             &file[..DPA1_HEADER_BYTES],
             &file[..3],

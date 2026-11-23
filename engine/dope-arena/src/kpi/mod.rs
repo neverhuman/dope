@@ -5,6 +5,7 @@
 //! from here is a pure function of its inputs: no clock, no process id, no
 //! unseeded randomness, and the same bytes for any `--threads` value.
 
+pub mod audit;
 pub mod auditors;
 pub mod boot;
 pub mod celldata;
