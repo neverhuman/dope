@@ -41,6 +41,7 @@ import os
 from pathlib import Path
 import pickle
 import platform
+import threading
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -74,6 +75,14 @@ class StageError(ValueError):
 
 class EpisodeFailed(ValueError):
     """The unit's payload is a counted failure; ``str(exc)`` is its static code."""
+
+
+class RingDown(OSError):
+    """The ring stopped, timed out or lost a producer: a failed step, never a counted episode.
+
+    An ``OSError`` so a gradient-farm worker reports it to its leader (``COMMAND_FAULTS``) instead
+    of counting it as an episode fault (``EPISODE_FAULTS``).
+    """
 
 
 def resolve(path: str) -> Callable[..., Any]:
@@ -183,8 +192,8 @@ class EpisodeRing:
     def stopped(self) -> bool:
         return bool(self.head[H_STOP])
 
-    def stop(self) -> None:
-        self.head[H_STOP] = 1
+    def stop(self, failed: bool = False) -> None:
+        self.head[H_STOP] = 2 if failed else 1
 
     def put(self, unit: int, payload: bytes, flags: int, build_ns: int, producer: int,
             alive: Callable[[], bool] = lambda: True) -> bool:
@@ -217,7 +226,7 @@ class EpisodeRing:
             if (state == EMPTY and int(hdr[1]) > unit) or (state == READY and int(hdr[2]) > unit):
                 raise FactoryError("unit_already_consumed")
             if self.stopped:
-                raise FactoryError("ring_stopped")
+                raise FactoryError("producer_failed" if int(self.head[H_STOP]) == 2 else "ring_stopped")
             if not alive():
                 raise FactoryError("producer_died")
             if deadline is not None and time.perf_counter() > deadline:
@@ -423,6 +432,19 @@ class EpisodeFactory:
             self.close()
             raise
         self.t_open = time.perf_counter()
+        # A consumer in another process (a farm worker) cannot see the producers: a producer that
+        # dies stops the ring with the failure flag, so every waiting consumer raises.
+        self._done = threading.Event()
+        self._watch = threading.Thread(target=self._watchdog, name="dope-episode-watchdog", daemon=True)
+        self._watch.start()
+
+    def _watchdog(self) -> None:
+        while not self._done.wait(0.25):
+            if any(p.exitcode not in (None, 0) for p in self.procs):
+                ring = self.ring
+                if ring is not None:
+                    ring.stop(failed=True)
+                return
 
     @property
     def name(self) -> str:
@@ -462,7 +484,12 @@ class EpisodeFactory:
         ring = getattr(self, "ring", None)
         if ring is None:
             return
-        ring.stop()
+        done = getattr(self, "_done", None)
+        if done is not None:
+            done.set()
+            self._watch.join(timeout=5)
+        if not ring.stopped:
+            ring.stop()
         for proc in getattr(self, "procs", []):
             proc.join(timeout=10)
             if proc.exitcode is None:
@@ -476,6 +503,28 @@ class EpisodeFactory:
 
     def __exit__(self, *exc: Any) -> None:
         self.close()
+
+
+# -- gradient-farm adapter ------------------------------------------------------------------
+def farm_open(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """``episode_init`` of a gradient farm: attach the factory's ring once per farm worker.
+
+    ``episode_kwargs = {"ring": factory.name, "timeout": seconds}`` (timeout default 600 s).
+    """
+    return {"ring": EpisodeRing.attach(str(kwargs["ring"])), "timeout": float(kwargs.get("timeout", 600.0))}
+
+
+def farm_episode(spec: Any, state: dict[str, Any]) -> dict[str, Any]:
+    """``episode_fn`` of a gradient farm: the factory's episode for ``(spec.step, spec.slot)``.
+
+    A failed unit raises ``EpisodeFailed`` (counted by the farm). A ring failure raises
+    ``RingDown`` (the step fails). The farm's ``plan_fn`` must be the factory's sampler and seed.
+    """
+    try:
+        payload = state["ring"].get(int(spec.step), int(spec.slot), state["timeout"])
+    except FactoryError as exc:
+        raise RingDown(str(exc)) from None
+    return payload["episode"]
 
 
 def arena_corpus(arena: str) -> Any:

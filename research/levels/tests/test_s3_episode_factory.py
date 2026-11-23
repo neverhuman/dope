@@ -216,3 +216,39 @@ def test_column_meta_of_raw_fit_rows(corpus):
     assert meta.shape == (episode["X_fit"].shape[1], ef.META_FIELDS)
     assert np.array_equal(meta, ef.column_meta(episode["X_fit"][::-1]))  # row order never matters
     assert np.isfinite(meta).all()
+
+
+# -- gradient-farm adapter ------------------------------------------------------------------
+def boom_stage(episode, **_):
+    """A coding mistake in a stage: not an episode fault, so the producer dies."""
+    raise TypeError("planted")
+
+
+def planted_failure(episode, **_):
+    raise ef.StageError("planted_failure")
+
+
+def test_farm_adapter_reads_units_and_counts_failures(corpus):
+    with ef.EpisodeFactory(_spec(), 24, 2, 8 << 20, ahead_steps=2, end_step=2) as fac:
+        state = ef.farm_open({"ring": fac.name, "timeout": 60})
+        sampler = make_sampler(corpus, **NARROW)
+        for spec in reversed(sampler.plan_step(SEED, 0)):  # any order inside the window
+            episode = ef.farm_episode(spec, state)
+            assert episode["step"] == 0 and episode["slot"] == spec.slot
+        state["ring"].close()
+    spec = _spec(stage=f"{__name__}:planted_failure")
+    with ef.EpisodeFactory(spec, 24, 1, 1 << 20, ahead_steps=1, end_step=1) as fac:
+        state = ef.farm_open({"ring": fac.name})
+        with pytest.raises(ef.EpisodeFailed, match="stage:StageError:planted_failure"):
+            ef.farm_episode(make_sampler(corpus, **NARROW).plan_step(SEED, 0)[0], state)
+        state["ring"].close()
+
+
+def test_dead_producer_stops_every_consumer(corpus):
+    with ef.EpisodeFactory(_spec(stage=f"{__name__}:boom_stage"), 24, 2, 1 << 20, ahead_steps=1) as fac:
+        state = ef.farm_open({"ring": fac.name, "timeout": 60})
+        spec = make_sampler(corpus, **NARROW).plan_step(SEED, 0)[0]
+        with pytest.raises(ef.RingDown, match="producer_failed"):
+            ef.farm_episode(spec, state)
+        assert not isinstance(ef.RingDown("x"), (RuntimeError, ValueError, LookupError, ArithmeticError))
+        state["ring"].close()
