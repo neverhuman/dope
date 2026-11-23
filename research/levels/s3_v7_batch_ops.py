@@ -137,9 +137,11 @@ def build_unique_v7_episode(
     max_bytes: int = PACKET_BUDGET_BYTES,
     desired_task: str | None = None,
     slots_per_step: int = 16,
+    real_queue: Any | None = None,
 ) -> dict[str, Any] | None:
     """Build one maximum-entropy counter-seeded episode (S3 real + synthetic prior + full cropping)."""
-    ep_seed = _hash_u64(seed, step, global_slot)
+    sh_id = getattr(real_queue, "shard_id", 0) if real_queue is not None else 0
+    ep_seed = _hash_u64(seed, step, global_slot, sh_id + 17)
     rng = np.random.default_rng(ep_seed)
     if desired_task is None:
         sched = task_quota_for_step(16, _hash_u64(seed, step, 31337))
@@ -151,15 +153,31 @@ def build_unique_v7_episode(
     is_swapped = False
     is_cropped = False
     crop_ratio = 1.0
-    dataset_hash = f"synth:{task}:{ep_seed:016x}"
+    dataset_hash = f"synth:s{sh_id}:{task}:{ep_seed:016x}"
     split_h = hashlib.blake2b(digest_size=16)
 
     # Log-uniform sample-size cropping EVERY episode so model masters tiny (32) AND large (n_fit_cap) tables!
     n_fit_target = int(round(math.exp(rng.uniform(math.log(32.0), math.log(max(64.0, float(n_fit_cap)))))))
     n_qry_target = int(round(math.exp(rng.uniform(math.log(24.0), math.log(max(32.0, float(n_qry_cap)))))))
 
-    # 20% infinite synthetic nonlinear SCM / depth-3 tree / interaction priors across ALL 3 tasks!
-    if rng.random() < 0.20:
+    use_synth = rng.random() < 0.20
+    tbl_idx: int | None = None
+    from_reg_synth = False
+    if not use_synth:
+        from_reg_synth = (task in ("binary", "multiclass")) and (rng.random() < 0.15)
+        src_task = "regression" if from_reg_synth else task
+        if real_queue is not None:
+            tbl_idx = real_queue.pop_unseen(src_task)
+            if tbl_idx is None:
+                use_synth = True
+                from_reg_synth = False
+        else:
+            tbl_idx = _pick_family_table(arena, src_task, seed, step, global_slot, slots_per_step=slots_per_step)
+            if tbl_idx is None:
+                return None
+
+    # Infinite synthetic nonlinear SCM / depth-3 tree / interaction priors (20% mix OR seamless Tier-2 fallback)!
+    if use_synth:
         is_synth = True
         Xa_raw, ya, Xq_raw, yq, n_cls = sample_synthetic_prior_table(
             rng, task, n_fit_target, n_qry_target, max_cols=MAX_COLS - 4
@@ -168,12 +186,7 @@ def build_unique_v7_episode(
         Xa, Xq = _fit_only_scale(Xa_raw, Xq_raw)
         split_h.update(dataset_hash.encode("utf-8"))
     else:
-        # 15% of binary/multiclass slots synthesize brand-new classification tasks from ALL 3,155 S3 reg tables!
-        from_reg_synth = (task in ("binary", "multiclass")) and (rng.random() < 0.15)
-        src_task = "regression" if from_reg_synth else task
-        tbl_idx = _pick_family_table(arena, src_task, seed, step, global_slot, slots_per_step=slots_per_step)
-        if tbl_idx is None:
-            return None
+        assert tbl_idx is not None
         X_raw, y_raw, dg, rec = arena.load_slice(tbl_idx)
         dataset_hash = str(rec.get("dataset_hash", ""))
         if from_reg_synth:

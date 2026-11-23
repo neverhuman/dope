@@ -278,7 +278,7 @@ def render_figures(data: dict[str, Any], png_out: Path, pdf_out: Path) -> None:
             ax.plot(st, med, label=f"{wname} (n={len(runs)} runs)", color=colors[wname], lw=2.0)
             ax.fill_between(st, q25, q75, color=colors[wname], alpha=0.18)
     ax.set_title("(a) Training Loss Convergence (Median & IQR Across Seeds)")
-    ax.set_xlabel("Optimizer Step (16 Unique S3 Splits / Step / Worker)")
+    ax.set_xlabel("Optimizer Step (16 Training Episodes / Step / Worker)")
     ax.set_ylabel("Total Objective Loss")
     ax.grid(True)
     ax.legend(loc="upper right")
