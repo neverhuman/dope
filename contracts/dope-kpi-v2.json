@@ -1,0 +1,62 @@
+{
+  "schema": "dope.kpi-contract/v2",
+  "contract_id": "dope-kpi/v2",
+  "status": "candidate",
+  "protocol_frozen": false,
+  "scope": "Selection and promotion statistic of the dope-kpi/v2 scoreboard (dope_kpi primary, compare, null). The publishable claim stays the unclipped dope-fidelity/v3 coverage shares. An empirical privacy result is never formal DP or HIPAA de-identification.",
+  "statistic": {
+    "id": "trg",
+    "name": "twin-referenced retention gap",
+    "retention": "R_x = (L0 - L_x) / (L0 - L_A); rows carry r_s (synthetic S) and r_b (real twin B)",
+    "entry_value": "clip(r_s, clip_low, clip_high) - r_b for a scored entry; failed_value for an entry that was not scored",
+    "clip_low": -1.0,
+    "clip_high": 1.25,
+    "failed_value": -1.0,
+    "auditors": ["linear-seeded-v1", "gbdt"],
+    "cell_reduction": "minimum",
+    "held_out_auditor": "mlp-seeded-v1",
+    "stratum": "headline",
+    "primary_multiplier": 4,
+    "matched_multiplier": 1,
+    "tasks": ["regression", "binary", "multiclass"],
+    "aggregation": "mean over sample seeds per (cell, auditor); minimum over the auditors per cell; mean of cells within a family; mean of families within a task; mean of the tasks present",
+    "informative": "per (cell, auditor) from the real reference only",
+    "not_applicable": "an informative entry with status unsupported from a control arm leaves the cell out for that arm; a comparison keeps the cells applicable to every arm it reads"
+  },
+  "bootstrap": {
+    "kind": "stratified family bootstrap: families resampled with replacement within each task, the same draws for both arms of a comparison",
+    "draws": 10000,
+    "seed": 20261123,
+    "lower_quantile": 0.025,
+    "upper_quantile": 0.975,
+    "rank": "sorted draws; lower bound at floor(lower_quantile * (draws - 1)), upper bound at ceil(upper_quantile * (draws - 1))",
+    "p_value": "one-sided for delta <= 0: (count of draws <= 0 + 1) / (draws + 1)"
+  },
+  "promotion": {
+    "multiplicity": "holm step-down across the comparisons of one receipt",
+    "coverage": "per cell the share of informative statistic entries whose realism (privacy) gate passed, a failed entry counting as a miss; the paired delta aggregates like the statistic; a missing flag leaves the guard not evaluated",
+    "exact_copy": "mean over the candidate's scored headline files on the common cells of max(0, rate(S in A) - rate(B in A)); a missing value leaves the guard not evaluated",
+    "ci_low_gt": 0.0,
+    "holm_p_lt": 0.05,
+    "min_delta": 0.01,
+    "default_noise_sd": 0.01,
+    "task_ci_low_gt": -0.02,
+    "mlp_delta_ge": 0.0,
+    "realism_coverage_delta_gt": -0.03,
+    "privacy_coverage_delta_gt": -0.03,
+    "exact_copy_excess_le": 0.005,
+    "min_training_seeds": 3,
+    "reject_ci_high_lt": 0.0
+  },
+  "bytes": {
+    "grid": [512, 1024, 2048, 4096],
+    "headline": 2048,
+    "guard": "a headline file is produced when it was scored or carries a measured packet; the guard fails when a measured packet exceeds headline and is not evaluated when a produced file has no measured packet or nothing was produced"
+  },
+  "null": {
+    "kind": "family sign flip: every family's paired differences multiplied by one independent fair sign, the full decision rule applied to each replicate",
+    "min_replicates": 2000,
+    "seed": 20261124,
+    "max_false_promote_rate": 0.05
+  }
+}

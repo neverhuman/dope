@@ -35,6 +35,14 @@ enum Command {
     Score(kpi::score::ScoreArgs),
     /// Reduce a score ledger with `evaluate_v3` (kappa file, partial evidence, filters).
     ReduceLedger(kpi::reduce::ReduceArgs),
+    /// TRG of each arm with its stratified family bootstrap interval (dope.kpi-receipt/v2).
+    Primary(kpi::primary::PrimaryArgs),
+    /// Paired comparison of candidates with one baseline under the promotion rule.
+    Compare(kpi::compare::CompareArgs),
+    /// Sign-flip null of one comparison: the false-PROMOTE rate of the full rule.
+    Null(kpi::null::NullArgs),
+    /// README scoreboard block from primary, compare and null receipts.
+    RenderReadme(kpi::render::RenderArgs),
 }
 
 fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
@@ -45,6 +53,10 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
         Command::RealRef(args) => kpi::realref::run(args),
         Command::Score(args) => kpi::score::run(args),
         Command::ReduceLedger(args) => kpi::reduce::run(args),
+        Command::Primary(args) => kpi::primary::run(args),
+        Command::Compare(args) => kpi::compare::run(args),
+        Command::Null(args) => kpi::null::run(args),
+        Command::RenderReadme(args) => kpi::render::run(args),
     }
 }
 
