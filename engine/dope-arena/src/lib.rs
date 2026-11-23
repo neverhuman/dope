@@ -4,6 +4,7 @@
 //! complete failure-accounting schedules, swap-ladder diagnostics (`--given`),
 //! and frozen prediction-bundle reduction via `dope_core::dvs::v3`.
 
+pub mod dopemat;
 pub mod ledger;
 pub mod panel;
 pub mod report;

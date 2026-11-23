@@ -1,6 +1,6 @@
 //! Loader for `SingleEncV8` F32 `rank <= 2` SafeTensors checkpoints (`--v8-weights`).
 //!
-//! Before the v3.0.0 release checkpoint wins DEV-SELECT + CONFIRM and is embedded under
+//! Before the v3.0.0 release checkpoint passes development qualification and is embedded under
 //! `models/single-enc-v8/model.safetensors`, omitting `--v8-weights` cleanly yields `Ok(None)`,
 //! selecting the weightless analytic Step-0 `DSE8` decoder (`NO_FINGERPRINT`). Passing
 //! `--v8-weights` loads and validates the checkpoint fail-closed and enforces `TAG_WEIGHTS_FP`

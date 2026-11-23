@@ -262,7 +262,7 @@ pub fn pava_isotonic_r2(x: &[f64], y: &[f64]) -> f64 {
     r2_inc.max(r2_dec)
 }
 
-/// Miller-Madow bias-corrected mutual information (nats) and Wilson-Hilferty G-test Z.
+/// Miller-Madow bias-corrected mutual information (natural log units) and Wilson-Hilferty G-test Z.
 pub fn miller_madow_mi_and_z(bx: &[u8], by: &[u8], nx: usize, ny: usize) -> (f64, f64) {
     let mut counts = vec![0usize; nx * ny];
     let mut cx = vec![0usize; nx];
