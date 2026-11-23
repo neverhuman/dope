@@ -7,7 +7,7 @@ use super::dependence::{tie_scores, untied_score_variance};
 use super::fit::{
     class_prior_codes, fit_features, fit_features_for_budget, FitInput, Labels, MAX_DEPENDENCE_COLS,
 };
-use super::packet::{Level, Packet, Task};
+use super::packet::{Packet, PacketLevel, PacketTask};
 use super::testkit::{
     column, fit_regression, max_corr_gap, n01, pearson, quantile, sorted, table, to_unit, u01,
 };
@@ -30,19 +30,23 @@ fn gaussian_correlations_are_recovered_and_degrade_with_rank() {
         }
     }
     let (_, unit) = to_unit(&raw, n, p);
-    let bytes = pack(&fit_regression(&unit, n, p), Level::E).unwrap();
-    let gap = |level: Level| {
+    let bytes = pack(&fit_regression(&unit, n, p), PacketLevel::E).unwrap();
+    let gap = |level: PacketLevel| {
         let decoder = Decoder::new(&unpack(&truncate(&bytes, level).unwrap()).unwrap()).unwrap();
         max_corr_gap(&unit, &widen(&decoder.rows_unit(5, 0, 50_000)), p)
     };
-    let (g12, g8, g4) = (gap(Level::E), gap(Level::C), gap(Level::B));
+    let (g12, g8, g4) = (
+        gap(PacketLevel::E),
+        gap(PacketLevel::C),
+        gap(PacketLevel::B),
+    );
     println!(
         "max |corr gap| vs FIT rows (P=12, n=2000, 50k decoded): rank 12 {g12:.4}, rank 8 {g8:.4}, rank 4 {g4:.4}"
     );
     assert!(g12 <= 0.05, "rank 12: {g12}");
     assert!(g12 < g8 && g8 < g4, "not monotone: {g12} {g8} {g4}");
     // Level A carries no dependence section: columns are independent.
-    let flat = Decoder::new(&unpack(&truncate(&bytes, Level::A).unwrap()).unwrap()).unwrap();
+    let flat = Decoder::new(&unpack(&truncate(&bytes, PacketLevel::A).unwrap()).unwrap()).unwrap();
     let rows = widen(&flat.rows_unit(5, 0, 50_000));
     let worst = (0..p - 1)
         .map(|j| pearson(&column(&rows, p, j), &column(&rows, p, j + 1)).abs())
@@ -109,12 +113,16 @@ fn principal_axes_reproduce_a_factor_structure_wider_than_the_rank() {
         (0..3).map(|f| load(f) * n01(15, 200 + f, i)).sum::<f64>() + n01(15, j, i)
     });
     let (_, unit) = to_unit(&raw, n, p);
-    let bytes = pack(&fit_regression(&unit, n, p), Level::E).unwrap();
-    let gap = |level: Level| {
+    let bytes = pack(&fit_regression(&unit, n, p), PacketLevel::E).unwrap();
+    let gap = |level: PacketLevel| {
         let decoder = Decoder::new(&unpack(&truncate(&bytes, level).unwrap()).unwrap()).unwrap();
         max_corr_gap(&unit, &widen(&decoder.rows_unit(2, 0, 50_000)), p)
     };
-    let (g12, g8, g4) = (gap(Level::E), gap(Level::C), gap(Level::B));
+    let (g12, g8, g4) = (
+        gap(PacketLevel::E),
+        gap(PacketLevel::C),
+        gap(PacketLevel::B),
+    );
     println!(
         "three factors in 30 columns (n=3000): max |corr gap| rank 12 {g12:.4}, rank 8 {g8:.4}, rank 4 {g4:.4}"
     );
@@ -130,7 +138,7 @@ fn a_budget_without_room_for_dependence_skips_the_factor_fit_exactly() {
         x: &unit,
         rows: n,
         cols: p,
-        task: Task::Regression,
+        task: PacketTask::Regression,
         k: 0,
         labels: Labels::None,
     };
@@ -147,7 +155,10 @@ fn a_budget_without_room_for_dependence_skips_the_factor_fit_exactly() {
             pack(&b.packet, b.level).unwrap()
         );
         // The skip happens exactly when no dependence section fits.
-        assert_eq!(lean.loading.iter().all(|&l| l == 0), a.level == Level::A);
+        assert_eq!(
+            lean.loading.iter().all(|&l| l == 0),
+            a.level == PacketLevel::A
+        );
     }
 }
 
@@ -160,7 +171,10 @@ fn tables_wider_than_the_factor_limit_keep_zero_loadings() {
     assert!(packet.loading.iter().all(|&l| l == 0));
     let fit = fit_to_budget(&packet, 2048);
     assert!(!fit.fits && fit.packet.cols() == p);
-    assert_eq!(unpack(&pack(&packet, Level::E).unwrap()).unwrap(), packet);
+    assert_eq!(
+        unpack(&pack(&packet, PacketLevel::E).unwrap()).unwrap(),
+        packet
+    );
 }
 
 fn class_fixture(n: usize, p: usize) -> (Vec<f64>, Vec<u16>) {
@@ -177,7 +191,7 @@ fn fit_binary(unit: &[f64], n: usize, p: usize, ids: &[u16]) -> Packet {
         x: unit,
         rows: n,
         cols: p,
-        task: Task::Binary,
+        task: PacketTask::Binary,
         k: 2,
         labels: Labels::Classes(ids),
     })
@@ -219,7 +233,7 @@ fn fit_and_decode_are_deterministic_and_row_local() {
         x: &unit,
         rows: n,
         cols: p,
-        task: Task::Multiclass,
+        task: PacketTask::Multiclass,
         k: 3,
         labels: Labels::Classes(&three),
     })
@@ -230,15 +244,15 @@ fn fit_and_decode_are_deterministic_and_row_local() {
         multiclass,
     ] {
         let again = match packet.task {
-            Task::Regression => fit_regression(&unit, n, p),
-            Task::Binary => fit_binary(&unit, n, p, &ids),
+            PacketTask::Regression => fit_regression(&unit, n, p),
+            PacketTask::Binary => fit_binary(&unit, n, p, &ids),
             _ => packet.clone(),
         };
         assert_eq!(
-            pack(&packet, Level::E).unwrap(),
-            pack(&again, Level::E).unwrap()
+            pack(&packet, PacketLevel::E).unwrap(),
+            pack(&again, PacketLevel::E).unwrap()
         );
-        for level in Level::ALL {
+        for level in PacketLevel::ALL {
             let decoder = Decoder::new(&packet.at_level(level).unwrap()).unwrap();
             let bits = |v: Vec<f32>| v.into_iter().map(f32::to_bits).collect::<Vec<u32>>();
             let whole = bits(decoder.rows_unit(8, 0, 1001));
@@ -285,7 +299,7 @@ fn regression_input(x: &[f64], rows: usize) -> FitInput<'_> {
         x,
         rows,
         cols: 2,
-        task: Task::Regression,
+        task: PacketTask::Regression,
         k: 0,
         labels: Labels::None,
     }
@@ -310,7 +324,7 @@ fn fit_rejects_bad_input_without_echoing_values() {
     }
     // Task, class count and labels must agree.
     let ids = vec![0u16; 16];
-    let with = |task: Task, k: u8, labels: Labels<'_>| {
+    let with = |task: PacketTask, k: u8, labels: Labels<'_>| {
         fit_features(&FitInput {
             task,
             k,
@@ -320,23 +334,29 @@ fn fit_rejects_bad_input_without_echoing_values() {
         .map(|_| ())
     };
     let mismatch = Err(StatError::Invalid("labels do not match the task"));
-    assert_eq!(with(Task::Multiclass, 3, Labels::Classes(&ids)), Ok(()));
-    assert_eq!(with(Task::Binary, 2, Labels::None), mismatch);
-    assert_eq!(with(Task::Regression, 0, Labels::Classes(&ids)), mismatch);
     assert_eq!(
-        with(Task::Multiclass, 3, Labels::Classes(&[3u16; 16])),
+        with(PacketTask::Multiclass, 3, Labels::Classes(&ids)),
+        Ok(())
+    );
+    assert_eq!(with(PacketTask::Binary, 2, Labels::None), mismatch);
+    assert_eq!(
+        with(PacketTask::Regression, 0, Labels::Classes(&ids)),
         mismatch
     );
     assert_eq!(
-        with(Task::Multilabel, 2, Labels::Multilabel(&[1u8; 32])),
+        with(PacketTask::Multiclass, 3, Labels::Classes(&[3u16; 16])),
+        mismatch
+    );
+    assert_eq!(
+        with(PacketTask::Multilabel, 2, Labels::Multilabel(&[1u8; 32])),
         Ok(())
     );
     assert_eq!(
-        with(Task::Multilabel, 2, Labels::Multilabel(&[2u8; 32])),
+        with(PacketTask::Multilabel, 2, Labels::Multilabel(&[2u8; 32])),
         mismatch
     );
     assert_eq!(
-        with(Task::Regression, 3, Labels::None),
+        with(PacketTask::Regression, 3, Labels::None),
         Err(StatError::Invalid("class count is not valid for the task"))
     );
 }

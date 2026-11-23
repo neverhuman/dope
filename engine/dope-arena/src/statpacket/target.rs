@@ -21,7 +21,7 @@ use super::linpred::{
     TargetModel, TEMPERATURE_UNIT, WEIGHT_SCALE,
 };
 use super::marginals::{knot_plan, ColumnSampler};
-use super::packet::{f16_to_f64, f64_to_f16, Level, Packet, PairTerm, Task, PAIRS};
+use super::packet::{f16_to_f64, f64_to_f16, Packet, PacketLevel, PacketTask, PairTerm, PAIRS};
 use super::response::temperature_slope;
 pub use super::response::{fit_block, Resp, Response};
 use super::StatError;
@@ -121,7 +121,7 @@ fn fit_linear(packet: &mut Packet, rows: &FitRows, resp: &Resp, sd: &[f64]) {
         }
     }
     // Closed loop: the intercept is refitted against the quantised weights.
-    let linear = TargetModel::new(packet, Level::A, &[]).eta_rows(rows.x, p);
+    let linear = TargetModel::new(packet, PacketLevel::A, &[]).eta_rows(rows.x, p);
     let ones = Dense {
         a: vec![1.0; n],
         n,
@@ -161,7 +161,7 @@ fn fit_temperature(packet: &mut Packet, rows: &FitRows, resp: &Resp, sd: &[f64])
     if matches!(resp, Resp::Gaussian(_)) {
         return;
     }
-    let eta = TargetModel::new(packet, Level::A, &[]).eta_rows(rows.x, rows.p);
+    let eta = TargetModel::new(packet, PacketLevel::A, &[]).eta_rows(rows.x, rows.p);
     let quad = penalty_quadratic(packet, resp, sd);
     let mut t = 1.0f64;
     for _ in 0..TEMPERATURE_SEARCH_STEPS {
@@ -181,7 +181,7 @@ pub fn column_samplers(packet: &Packet) -> Vec<ColumnSampler> {
     packet
         .columns
         .iter()
-        .map(|col| ColumnSampler::new(col, Level::E, &plan))
+        .map(|col| ColumnSampler::new(col, PacketLevel::E, &plan))
         .collect()
 }
 
@@ -203,7 +203,10 @@ fn set_noise(packet: &mut Packet, rows: &FitRows, resp: &Resp, samplers: &[Colum
     ];
     let mut sd = [0.0f64; 3];
     let mut used = 0.0;
-    for (tier, level) in [Level::A, Level::D, Level::E].into_iter().enumerate() {
+    for (tier, level) in [PacketLevel::A, PacketLevel::D, PacketLevel::E]
+        .into_iter()
+        .enumerate()
+    {
         used += df[tier];
         let eta = TargetModel::new(packet, level, samplers).eta_rows(rows.x, rows.p);
         let rss: f64 = y.iter().zip(&eta).map(|(y, e)| (y - e) * (y - e)).sum();
@@ -240,7 +243,8 @@ pub fn fit_target(
     response: Response,
     plan: TargetPlan,
 ) -> Result<(), StatError> {
-    if packet.level != Level::E || rows.p != packet.cols() || rows.x.len() != rows.n * rows.p {
+    if packet.level != PacketLevel::E || rows.p != packet.cols() || rows.x.len() != rows.n * rows.p
+    {
         return Err(StatError::Invalid(
             "target fit needs a level-E packet of the same shape",
         ));
@@ -249,7 +253,7 @@ pub fn fit_target(
     let sd = column_sd(rows);
     let samplers = column_samplers(packet);
     packet.resid_sd = 0;
-    packet.temperature = if packet.task == Task::Regression {
+    packet.temperature = if packet.task == PacketTask::Regression {
         0
     } else {
         TEMPERATURE_UNIT
@@ -276,7 +280,7 @@ pub fn refresh_noise(
 ) -> Result<(), StatError> {
     let resp = Resp::new(packet, response, rows.n)?;
     let samplers = column_samplers(packet);
-    if packet.task == Task::Regression {
+    if packet.task == PacketTask::Regression {
         set_noise(packet, rows, &resp, &samplers);
     }
     Ok(())

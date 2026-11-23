@@ -36,14 +36,14 @@ pub const LOG2_N_MIN: u8 = 4;
 pub const LOG2_N_MAX: u8 = 62;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
-pub enum Task {
+pub enum PacketTask {
     Regression = 0,
     Binary = 1,
     Multiclass = 2,
     Multilabel = 3,
 }
 
-impl Task {
+impl PacketTask {
     pub fn from_u8(v: u8) -> Option<Self> {
         match v {
             0 => Some(Self::Regression),
@@ -66,7 +66,7 @@ impl Task {
 
 /// Nested level: A = S1-S3, B = +S4, C = +S5,S6, D = +S7,S8, E = +S9,S10.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, serde::Serialize)]
-pub enum Level {
+pub enum PacketLevel {
     A = 0,
     B = 1,
     C = 2,
@@ -74,8 +74,14 @@ pub enum Level {
     E = 4,
 }
 
-impl Level {
-    pub const ALL: [Level; 5] = [Level::A, Level::B, Level::C, Level::D, Level::E];
+impl PacketLevel {
+    pub const ALL: [PacketLevel; 5] = [
+        PacketLevel::A,
+        PacketLevel::B,
+        PacketLevel::C,
+        PacketLevel::D,
+        PacketLevel::E,
+    ];
     pub fn from_u8(v: u8) -> Option<Self> {
         Self::ALL.get(v as usize).copied()
     }
@@ -181,12 +187,12 @@ pub struct PairTerm {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Packet {
-    pub task: Task,
+    pub task: PacketTask,
     /// Header K: 0 regression, 2 binary, classes for multiclass, labels for multilabel.
     pub k: u8,
     pub p: u16,
     /// Highest level whose sections this value holds.
-    pub level: Level,
+    pub level: PacketLevel,
     pub log2_n: u8,
     /// S1: `K-1` class codes (binary, multiclass; they sum to at most 255) or `K` label codes.
     pub prior: Vec<u8>,
@@ -220,23 +226,23 @@ impl Packet {
     /// Target outputs O.
     pub fn outputs(&self) -> usize {
         match self.task {
-            Task::Regression | Task::Binary => 1,
-            Task::Multiclass => (self.k as usize).saturating_sub(1),
-            Task::Multilabel => self.k as usize,
+            PacketTask::Regression | PacketTask::Binary => 1,
+            PacketTask::Multiclass => (self.k as usize).saturating_sub(1),
+            PacketTask::Multilabel => self.k as usize,
         }
     }
     /// Class regimes that carry factor means (0 means a single regime).
     pub fn regime_means(&self) -> usize {
         match self.task {
-            Task::Binary | Task::Multiclass => self.k as usize,
-            Task::Regression | Task::Multilabel => 0,
+            PacketTask::Binary | PacketTask::Multiclass => self.k as usize,
+            PacketTask::Regression | PacketTask::Multilabel => 0,
         }
     }
     pub fn prior_len(&self) -> usize {
         match self.task {
-            Task::Regression => 0,
-            Task::Binary | Task::Multiclass => (self.k as usize).saturating_sub(1),
-            Task::Multilabel => self.k as usize,
+            PacketTask::Regression => 0,
+            PacketTask::Binary | PacketTask::Multiclass => (self.k as usize).saturating_sub(1),
+            PacketTask::Multilabel => self.k as usize,
         }
     }
     pub fn continuous_cols(&self) -> usize {
@@ -255,13 +261,13 @@ impl Packet {
     }
 
     /// An all-zero target, dependence and effect skeleton around the given marginals.
-    pub fn skeleton(task: Task, k: u8, log2_n: u8, columns: Vec<ColumnMarginal>) -> Self {
+    pub fn skeleton(task: PacketTask, k: u8, log2_n: u8, columns: Vec<ColumnMarginal>) -> Self {
         let p = columns.len();
         let mut out = Self {
             task,
             k,
             p: p as u16,
-            level: Level::E,
+            level: PacketLevel::E,
             log2_n,
             prior: Vec::new(),
             resid_sd: 0,
@@ -296,7 +302,7 @@ impl Packet {
     }
 
     /// The same packet with every section above `level` cleared to its canonical empty form.
-    pub fn at_level(&self, level: Level) -> Result<Self, StatError> {
+    pub fn at_level(&self, level: PacketLevel) -> Result<Self, StatError> {
         if level > self.level {
             return Err(StatError::Invalid(
                 "requested level exceeds the packet level",
@@ -313,19 +319,19 @@ impl Packet {
         }
         for col in &mut out.columns {
             if let ColumnMarginal::Continuous { mid9, mid17, .. } = col {
-                if level < Level::C {
+                if level < PacketLevel::C {
                     *mid9 = [0; 4];
                 }
-                if level < Level::D {
+                if level < PacketLevel::D {
                     *mid17 = [0; 8];
                 }
             }
         }
-        if level < Level::D {
+        if level < PacketLevel::D {
             out.main_mask.fill(false);
             out.main_effect.fill(0);
         }
-        if level < Level::E {
+        if level < PacketLevel::E {
             out.pairs.clear();
         }
         Ok(out)
@@ -347,7 +353,7 @@ impl Packet {
         if self.prior.len() != self.prior_len() {
             return bad("prior length");
         }
-        let class_task = matches!(self.task, Task::Binary | Task::Multiclass);
+        let class_task = matches!(self.task, PacketTask::Binary | PacketTask::Multiclass);
         if class_task && self.prior.iter().map(|&c| c as u32).sum::<u32>() > 255 {
             return bad("class priors exceed the unit total");
         }
@@ -367,7 +373,7 @@ impl Packet {
         {
             return bad("target scale or intercept is not finite");
         }
-        if self.task != Task::Regression && self.resid_sd != 0 {
+        if self.task != PacketTask::Regression && self.resid_sd != 0 {
             return bad("residual SD set on a task without one");
         }
         if self.loading.len() != p * MAX_RANK
@@ -378,7 +384,7 @@ impl Packet {
         if self.main_mask.len() != p || self.main_effect.len() != p * o * MAIN_BINS {
             return bad("main-effect section shape");
         }
-        let pairs_ok = if self.level == Level::E {
+        let pairs_ok = if self.level == PacketLevel::E {
             self.pairs.len() == PAIRS
         } else {
             self.pairs.is_empty()

@@ -25,7 +25,7 @@ use super::linpred::{
     PAIR_OFFSET_SLOT,
 };
 use super::marginals::ColumnSampler;
-use super::packet::{ColumnMarginal, Level, Packet, PairTerm, MAIN_BINS, SUPPORT_K};
+use super::packet::{ColumnMarginal, Packet, PacketLevel, PairTerm, MAIN_BINS, SUPPORT_K};
 use super::target::{fit_block, FitRows, Resp};
 use dope_core::stats::norm_ppf;
 
@@ -56,7 +56,7 @@ fn leading_columns(packet: &Packet, limit: usize) -> Vec<usize> {
 /// `T * eta` of the FIT rows for the sections a decoder of `level` uses.
 fn scaled_eta(
     packet: &Packet,
-    level: Level,
+    level: PacketLevel,
     rows: &FitRows,
     samplers: &[ColumnSampler],
 ) -> Vec<f64> {
@@ -94,7 +94,7 @@ pub fn fit_main_effects(
     let (n, p, o) = (rows.n, rows.p, packet.outputs());
     let cols = leading_columns(packet, MAIN_FIT_COLS_MAX);
     let t = temperature(packet);
-    let offset = scaled_eta(packet, Level::A, rows, samplers);
+    let offset = scaled_eta(packet, PacketLevel::A, rows, samplers);
     let resid = resp.residuals(&offset);
     let variance = residual_variance(&resid, o);
     let live_outputs = variance.iter().filter(|&&v| v > VARIANCE_FLOOR).count();
@@ -270,7 +270,7 @@ pub fn fit_pairs(packet: &mut Packet, rows: &FitRows, resp: &Resp, samplers: &[C
         .map(|&j| (0..n).map(|i| rows.x[i * p + j]).collect())
         .collect();
     let t = temperature(packet);
-    let offset = scaled_eta(packet, Level::D, rows, samplers);
+    let offset = scaled_eta(packet, PacketLevel::D, rows, samplers);
     let chosen = choose_pairs(&columns, resp.residuals(&offset), o);
     if chosen.is_empty() {
         return;
@@ -303,7 +303,7 @@ pub fn fit_pairs(packet: &mut Packet, rows: &FitRows, resp: &Resp, samplers: &[C
         }
     }
     // Closed loop: the constant is refitted against the quantised products.
-    let with_pairs = scaled_eta(packet, Level::E, rows, samplers);
+    let with_pairs = scaled_eta(packet, PacketLevel::E, rows, samplers);
     let ones = Dense {
         a: vec![1.0; n],
         n,

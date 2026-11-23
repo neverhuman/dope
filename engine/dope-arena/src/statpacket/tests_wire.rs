@@ -2,9 +2,9 @@
 //! checks under mutation with a valid checksum, and the budget boundaries.
 
 use super::codec::{decoder_sha8, fit_to_budget, pack, unpack, BudgetStep};
-use super::fit::{fit_packet, Size, Target};
-use super::packet::{Level, Task, CRC_LEN};
-use super::testkit::{fit_regression, synthetic_packet, to_unit, Kind};
+use super::fit::{fit_packet, FitTarget, Size};
+use super::packet::{PacketLevel, PacketTask, CRC_LEN};
+use super::testkit::{fit_regression, synthetic_packet, to_unit, SynthKind};
 use dope_core::mlc_v3::inflate::crc32_ieee;
 
 const GOLDEN_SHA8: &str = "34db2b6a8d1846ef";
@@ -33,10 +33,10 @@ fn golden_packets_match_the_specification() {
         fit_regression(&unit, n, p)
     };
     // Feature sections only (the target sections stay zero).
-    let constant = pack(&fit(&[3.0; 16], 16, 1), Level::A).unwrap();
+    let constant = pack(&fit(&[3.0; 16], 16, 1), PacketLevel::A).unwrap();
     println!("constant {}", hex(&constant));
     let raw: Vec<f64> = (0..32).flat_map(|i| [i as f64, (i % 2) as f64]).collect();
-    let two = pack(&fit(&raw, 32, 2), Level::E).unwrap();
+    let two = pack(&fit(&raw, 32, 2), PacketLevel::E).unwrap();
     println!(
         "two columns {} bytes sha256 {}",
         two.len(),
@@ -50,10 +50,10 @@ fn golden_packets_match_the_specification() {
         .collect();
     let fitted = fit_packet(
         &raw,
-        Target::Regression(&y),
-        Task::Regression,
+        FitTarget::Regression(&y),
+        PacketTask::Regression,
         0,
-        Size::level(Level::E),
+        Size::level(PacketLevel::E),
         64,
     )
     .unwrap();
@@ -76,13 +76,13 @@ fn with_valid_crc(mut bytes: Vec<u8>) -> Vec<u8> {
 #[test]
 fn a_mutated_file_with_a_valid_checksum_is_rejected_or_canonical() {
     let kinds = |j: usize| match j % 4 {
-        1 => Kind::Explicit(3 + j % 4),
-        2 => Kind::Lattice(5 + j % 9),
-        3 => Kind::Constant,
-        _ => Kind::Continuous,
+        1 => SynthKind::Explicit(3 + j % 4),
+        2 => SynthKind::Lattice(5 + j % 9),
+        3 => SynthKind::Constant,
+        _ => SynthKind::Continuous,
     };
     let (mut accepted, mut rejected) = (0usize, 0usize);
-    for (task, k) in [(Task::Binary, 2u8), (Task::Multiclass, 4)] {
+    for (task, k) in [(PacketTask::Binary, 2u8), (PacketTask::Multiclass, 4)] {
         let packet = synthetic_packet(task, k, 21, kinds, 77);
         let sparse = fit_to_budget(&packet, 250).packet;
         for source in [packet, sparse] {
@@ -119,19 +119,34 @@ fn a_mutated_file_with_a_valid_checksum_is_rejected_or_canonical() {
 fn budget_boundaries_of_the_specification() {
     let at = |p: usize| {
         let fit = fit_to_budget(
-            &synthetic_packet(Task::Regression, 0, p, |_| Kind::Continuous, 3),
+            &synthetic_packet(PacketTask::Regression, 0, p, |_| SynthKind::Continuous, 3),
             2048,
         );
         (fit.level, fit.bytes, fit.step, fit.target_cols, fit.fits)
     };
     // Level B is 34 + 11 P, dense level A 34 + 7 P, sparse level A 34 + 6 P + ceil(P / 8) + m.
-    assert_eq!(at(183), (Level::B, 2047, BudgetStep::Level, 183, true));
-    assert_eq!(at(184), (Level::A, 1322, BudgetStep::Level, 184, true));
-    assert_eq!(at(287), (Level::A, 2043, BudgetStep::Level, 287, true));
+    assert_eq!(
+        at(183),
+        (PacketLevel::B, 2047, BudgetStep::Level, 183, true)
+    );
+    assert_eq!(
+        at(184),
+        (PacketLevel::A, 1322, BudgetStep::Level, 184, true)
+    );
+    assert_eq!(
+        at(287),
+        (PacketLevel::A, 2043, BudgetStep::Level, 287, true)
+    );
     assert_eq!(
         at(288),
-        (Level::A, 2048, BudgetStep::SparseTarget, 250, true)
+        (PacketLevel::A, 2048, BudgetStep::SparseTarget, 250, true)
     );
-    assert_eq!(at(328), (Level::A, 2048, BudgetStep::SparseTarget, 5, true));
-    assert_eq!(at(329), (Level::A, 2050, BudgetStep::OverBudget, 0, false));
+    assert_eq!(
+        at(328),
+        (PacketLevel::A, 2048, BudgetStep::SparseTarget, 5, true)
+    );
+    assert_eq!(
+        at(329),
+        (PacketLevel::A, 2050, BudgetStep::OverBudget, 0, false)
+    );
 }

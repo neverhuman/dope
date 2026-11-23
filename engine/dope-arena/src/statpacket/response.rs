@@ -7,7 +7,7 @@
 //! logit of class `c` against class 0; multilabel one logit per label.
 
 use super::glm::{logistic, ridge, sigmoid, softmax, softmax_row, Basis, SKIP_ROW};
-use super::packet::{Packet, Task, SUPPORT_K};
+use super::packet::{Packet, PacketTask, SUPPORT_K};
 use super::StatError;
 
 /// Target of the FIT rows.
@@ -45,7 +45,7 @@ impl Resp {
         let k = packet.k as usize;
         let bad = Err(StatError::Invalid("target does not match the task"));
         match (packet.task, response) {
-            (Task::Regression, Response::Regression(y)) if y.len() == n => {
+            (PacketTask::Regression, Response::Regression(y)) if y.len() == n => {
                 if y.iter().any(|v| !v.is_finite() || v.abs() > 6.0) {
                     return Err(StatError::Invalid(
                         "regression target is not a finite standardised value",
@@ -53,14 +53,14 @@ impl Resp {
                 }
                 Ok(Self::Gaussian(y.to_vec()))
             }
-            (Task::Binary, Response::Classes(ids)) if ids.len() == n => {
+            (PacketTask::Binary, Response::Classes(ids)) if ids.len() == n => {
                 if ids.iter().any(|&c| c > 1) {
                     return bad;
                 }
                 let y = ids.iter().map(|&c| c as f64).collect();
                 Ok(Self::Logit(vec![supported(y)]))
             }
-            (Task::Multiclass, Response::Classes(ids)) if ids.len() == n => {
+            (PacketTask::Multiclass, Response::Classes(ids)) if ids.len() == n => {
                 if ids.iter().any(|&c| c as usize >= k) {
                     return bad;
                 }
@@ -78,7 +78,7 @@ impl Resp {
                     outputs: k - 1,
                 })
             }
-            (Task::Multilabel, Response::Multilabel(cells)) if cells.len() == n * k => {
+            (PacketTask::Multilabel, Response::Multilabel(cells)) if cells.len() == n * k => {
                 if cells.iter().any(|&c| c > 1) {
                     return bad;
                 }

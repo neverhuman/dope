@@ -17,7 +17,7 @@
 //! therefore keeps its own relative precision, however skewed the column is.
 
 use super::packet::{
-    f16_to_f64, f64_to_f16, AtomTable, AtomValues, ColumnMarginal, Level, CODE6_MAX,
+    f16_to_f64, f64_to_f16, AtomTable, AtomValues, ColumnMarginal, PacketLevel, CODE6_MAX,
     HALF_SPAN_CODE_MAX, MAX_ATOMS, SUPPORT_K,
 };
 use dope_core::stats::{norm_cdf, norm_ppf};
@@ -373,7 +373,7 @@ pub enum ColumnSampler {
 }
 
 impl ColumnSampler {
-    pub fn new(col: &ColumnMarginal, level: Level, plan: &KnotPlan) -> Self {
+    pub fn new(col: &ColumnMarginal, level: PacketLevel, plan: &KnotPlan) -> Self {
         match col {
             ColumnMarginal::Constant => Self::Constant,
             ColumnMarginal::Continuous { .. } => {

@@ -22,7 +22,7 @@ use super::dependence::{LOADING_SCALE, MEAN_STEP, PSI_FLOOR};
 use super::glm::sigmoid;
 use super::linpred::{noise_sd, temperature, TargetModel};
 use super::marginals::{knot_plan, ColumnSampler, UNIT_CLIP};
-use super::packet::{Packet, Task, MAX_RANK};
+use super::packet::{Packet, PacketTask, MAX_RANK};
 use super::scale::ScaleCard;
 use super::StatError;
 use dope_core::rng::{normal, uniform};
@@ -49,7 +49,7 @@ pub enum LabelRule {
 pub struct Decoder {
     p: usize,
     rank: usize,
-    task: Task,
+    task: PacketTask,
     /// Regime probabilities; empty when the sampler has a single regime.
     prior: Vec<f64>,
     prior_cum: Vec<f64>,
@@ -77,7 +77,7 @@ impl Decoder {
     pub fn new(packet: &Packet) -> Result<Self, StatError> {
         packet.validate()?;
         let (p, rank) = (packet.cols(), packet.level.rank());
-        let class_task = matches!(packet.task, Task::Binary | Task::Multiclass);
+        let class_task = matches!(packet.task, PacketTask::Binary | PacketTask::Multiclass);
         let mut share = Vec::new();
         if class_task {
             let head: u32 = packet.prior.iter().map(|&c| c as u32).sum();
@@ -137,7 +137,7 @@ impl Decoder {
             columns,
             target,
             class_on,
-            label_code: if packet.task == Task::Multilabel {
+            label_code: if packet.task == PacketTask::Multilabel {
                 packet.prior.clone()
             } else {
                 Vec::new()
@@ -161,7 +161,7 @@ impl Decoder {
     /// Target cells per row: one, or the label count for multilabel.
     pub fn targets(&self) -> usize {
         match self.task {
-            Task::Multilabel => self.label_code.len(),
+            PacketTask::Multilabel => self.label_code.len(),
             _ => 1,
         }
     }
@@ -242,11 +242,11 @@ impl Decoder {
         let eta = &mut eta[..self.target.outputs()];
         self.target.eta(x, eta);
         match self.task {
-            Task::Regression => {
+            PacketTask::Regression => {
                 let noise = self.target_sd * normal(seed, STREAM_TARGET, row);
                 y[0] = (eta[0] + noise).clamp(-UNIT_CLIP, UNIT_CLIP);
             }
-            Task::Binary | Task::Multiclass => {
+            PacketTask::Binary | PacketTask::Multiclass => {
                 let tied = self.rule == LabelRule::Regime && self.prior.len() > 1;
                 y[0] = if tied {
                     regime as f64
@@ -254,7 +254,7 @@ impl Decoder {
                     self.draw_class(eta, uniform(seed, STREAM_TARGET, row)) as f64
                 };
             }
-            Task::Multilabel => {
+            PacketTask::Multilabel => {
                 for (l, slot) in y.iter_mut().enumerate().take(self.label_code.len()) {
                     *slot = match self.label_code[l] {
                         0 => 0.0,

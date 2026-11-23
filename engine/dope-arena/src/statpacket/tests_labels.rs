@@ -5,10 +5,10 @@
 
 use super::codec::{pack, truncate, unpack};
 use super::decode::{Decoder, LabelRule};
-use super::fit::{fit_packet, Size, Target};
+use super::fit::{fit_packet, FitTarget, Size};
 use super::glm::sigmoid;
 use super::linpred::TargetModel;
-use super::packet::{Level, Packet, Task};
+use super::packet::{Packet, PacketLevel, PacketTask};
 use super::scale::ScaleCard;
 use super::target::column_samplers;
 use super::testkit::{fit_full, mean_sd, n01, table, u01};
@@ -43,14 +43,14 @@ fn three_tasks(n: usize, p: usize) -> Vec<(Packet, ScaleCard)> {
         .enumerate()
         .map(|(i, r)| ((r[0] + 0.8 * n01(104, 0, i) > 0.0) as u16) * 2 + (r[2] > 0.5) as u16)
         .collect();
-    let fit = |y: Target, task: Task, k: u8| {
+    let fit = |y: FitTarget, task: PacketTask, k: u8| {
         let (packet, card, _) = fit_full(&raw, y, task, k, n);
         (packet, card)
     };
     vec![
-        fit(Target::Regression(&y), Task::Regression, 0),
-        fit(Target::Classes(&two), Task::Binary, 2),
-        fit(Target::Classes(&four), Task::Multiclass, 4),
+        fit(FitTarget::Regression(&y), PacketTask::Regression, 0),
+        fit(FitTarget::Classes(&two), PacketTask::Binary, 2),
+        fit(FitTarget::Classes(&four), PacketTask::Multiclass, 4),
     ]
 }
 
@@ -58,8 +58,8 @@ fn three_tasks(n: usize, p: usize) -> Vec<(Packet, ScaleCard)> {
 fn rows_with_their_target_are_local_and_reproducible() {
     let (n, p) = (700usize, 6usize);
     for (packet, card) in three_tasks(n, p) {
-        let bytes = pack(&packet, Level::E).unwrap();
-        for level in Level::ALL {
+        let bytes = pack(&packet, PacketLevel::E).unwrap();
+        for level in PacketLevel::ALL {
             let cut = unpack(&truncate(&bytes, level).unwrap()).unwrap();
             for rule in [LabelRule::Sampled, LabelRule::Regime] {
                 let decoder = Decoder::new(&cut).unwrap().with_label_rule(rule);
@@ -92,10 +92,10 @@ fn labels_are_drawn_from_the_conditional_never_arg_maxed() {
     let (n, p) = (2000usize, 6usize);
     let raw = features(111, n, p);
     let ids = binary_labels(&raw, p, 112);
-    let (packet, _, _) = fit_full(&raw, Target::Classes(&ids), Task::Binary, 2, n);
+    let (packet, _, _) = fit_full(&raw, FitTarget::Classes(&ids), PacketTask::Binary, 2, n);
     let decoder = Decoder::new(&packet).unwrap();
     let rows = decoder.table(None, 3, 0, DECODED_ROWS).unwrap();
-    let model = TargetModel::new(&packet, Level::E, &column_samplers(&packet));
+    let model = TargetModel::new(&packet, PacketLevel::E, &column_samplers(&packet));
     // Ten probability bins: the share of label 1 follows the model's probability.
     let (mut count, mut ones, mut mass) = ([0.0f64; 10], [0.0f64; 10], [0.0f64; 10]);
     let mut eta = [0.0];
@@ -151,7 +151,7 @@ fn the_regime_rule_ties_the_label_to_the_feature_regime() {
         assert!((g - q).abs() < 4.0 * (q * (1.0 - q) / DECODED_ROWS as f64).sqrt() + 1e-9);
     }
     // Level A has no regimes: the rule falls back to sampled labels.
-    let flat = packet.at_level(Level::A).unwrap();
+    let flat = packet.at_level(PacketLevel::A).unwrap();
     let (a, b) = (
         Decoder::new(&flat).unwrap(),
         Decoder::new(&flat)
@@ -186,8 +186,14 @@ fn regression_targets_keep_their_moments_and_a_planted_extreme_never_appears() {
             }
         })
         .collect();
-    let (packet, card, _) = fit_full(&raw, Target::Regression(&y), Task::Regression, 0, n);
-    let bytes = pack(&packet, Level::E).unwrap();
+    let (packet, card, _) = fit_full(
+        &raw,
+        FitTarget::Regression(&y),
+        PacketTask::Regression,
+        0,
+        n,
+    );
+    let bytes = pack(&packet, PacketLevel::E).unwrap();
     for needle in [
         canary.to_le_bytes().to_vec(),
         (canary as f32).to_le_bytes().to_vec(),
@@ -210,7 +216,13 @@ fn regression_targets_keep_their_moments_and_a_planted_extreme_never_appears() {
         .iter()
         .map(|&v| if v == canary { 50.0 } else { v })
         .collect();
-    let (packet, card, _) = fit_full(&raw, Target::Regression(&clean), Task::Regression, 0, n);
+    let (packet, card, _) = fit_full(
+        &raw,
+        FitTarget::Regression(&clean),
+        PacketTask::Regression,
+        0,
+        n,
+    );
     let rows = Decoder::new(&packet)
         .unwrap()
         .table(Some(&card), 2, 0, DECODED_ROWS)
@@ -238,14 +250,14 @@ fn classes_and_labels_below_the_support_floor_are_never_emitted() {
         })
         .collect();
     assert_eq!(ids.iter().filter(|&&c| c == 2).count(), 9);
-    let (packet, card, _) = fit_full(&raw, Target::Classes(&ids), Task::Multiclass, 4, n);
+    let (packet, card, _) = fit_full(&raw, FitTarget::Classes(&ids), PacketTask::Multiclass, 4, n);
     // No prior mass, no weights, no factor means for the rare class.
     assert_eq!(packet.prior[2], 0);
     assert_eq!(packet.prior.iter().map(|&c| c as u32).sum::<u32>(), 255);
     assert!(packet.target_weight[p..2 * p].iter().all(|&w| w == 0));
     assert!(packet.class_mean[2 * 12..4 * 12].iter().all(|&m| m == 0));
     for rule in [LabelRule::Sampled, LabelRule::Regime] {
-        for level in [Level::A, Level::E] {
+        for level in [PacketLevel::A, PacketLevel::E] {
             let cut = packet.at_level(level).unwrap();
             let rows = Decoder::new(&cut)
                 .unwrap()
@@ -262,12 +274,12 @@ fn classes_and_labels_below_the_support_floor_are_never_emitted() {
     let ten: Vec<u16> = (0..n)
         .map(|i| if i % 100 == 7 || i == 0 { 2 } else { ids[i] })
         .collect();
-    let (lifted, ..) = fit_full(&raw, Target::Classes(&ten), Task::Multiclass, 4, n);
+    let (lifted, ..) = fit_full(&raw, FitTarget::Classes(&ten), PacketTask::Multiclass, 4, n);
     assert!(lifted.prior[2] > 0 && lifted.target_weight[p..2 * p].iter().any(|&w| w != 0));
 
     // Binary with 9 positives: a single-class target, no weights.
     let few: Vec<u16> = (0..n).map(|i| (i % 100 == 7) as u16).collect();
-    let (packet, card, _) = fit_full(&raw, Target::Classes(&few), Task::Binary, 2, n);
+    let (packet, card, _) = fit_full(&raw, FitTarget::Classes(&few), PacketTask::Binary, 2, n);
     assert_eq!(packet.prior, vec![255]);
     assert!(packet.target_weight.iter().all(|&w| w == 0));
     let rows = Decoder::new(&packet)
@@ -288,10 +300,10 @@ fn classes_and_labels_below_the_support_floor_are_never_emitted() {
         .collect();
     let fitted = fit_packet(
         &raw,
-        Target::Multilabel(&cells),
-        Task::Multilabel,
+        FitTarget::Multilabel(&cells),
+        PacketTask::Multilabel,
         3,
-        Size::level(Level::E),
+        Size::level(PacketLevel::E),
         n,
     )
     .unwrap();

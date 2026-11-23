@@ -7,8 +7,8 @@
 
 use super::linpred::importance_order;
 use super::packet::{
-    ColumnMarginal, Level, Packet, Task, BIT_PROFILE_V1, CRC_LEN, FLAG_SPARSE_TARGET, HEADER_LEN,
-    KIND_STAT, LOG2_N_MAX, LOG2_N_MIN, MAGIC, VERSION,
+    ColumnMarginal, Packet, PacketLevel, PacketTask, BIT_PROFILE_V1, CRC_LEN, FLAG_SPARSE_TARGET,
+    HEADER_LEN, KIND_STAT, LOG2_N_MAX, LOG2_N_MIN, MAGIC, VERSION,
 };
 use super::sections::{read_section, s2_breakdown, section_len, write_section, Cursor};
 use super::StatError;
@@ -41,13 +41,13 @@ pub fn decoder_sha8() -> [u8; 8] {
 }
 
 /// Length of `pack(packet, level)` without building it.
-pub fn packed_len(packet: &Packet, level: Level) -> usize {
+pub fn packed_len(packet: &Packet, level: PacketLevel) -> usize {
     let body: usize = (1..=level.sections()).map(|i| section_len(packet, i)).sum();
     HEADER_LEN + body + CRC_LEN
 }
 
 /// Serialises the first `level.sections()` sections of `packet`.
-pub fn pack(packet: &Packet, level: Level) -> Result<Vec<u8>, StatError> {
+pub fn pack(packet: &Packet, level: PacketLevel) -> Result<Vec<u8>, StatError> {
     packet.validate()?;
     if level > packet.level {
         return Err(StatError::Invalid(
@@ -93,7 +93,7 @@ fn parse(bytes: &[u8]) -> Result<(Packet, Vec<usize>), StatError> {
     if bytes[5] != KIND_STAT {
         return Err(StatError::Kind);
     }
-    let task = Task::from_u8(bytes[6]).ok_or(StatError::Header("unknown task"))?;
+    let task = PacketTask::from_u8(bytes[6]).ok_or(StatError::Header("unknown task"))?;
     let k = bytes[7];
     if !task.accepts_k(k) {
         return Err(StatError::Header("class count is not valid for the task"));
@@ -102,7 +102,7 @@ fn parse(bytes: &[u8]) -> Result<(Packet, Vec<usize>), StatError> {
     if p == 0 {
         return Err(StatError::Header("zero columns"));
     }
-    let level = Level::from_u8(bytes[10]).ok_or(StatError::Header("unknown level"))?;
+    let level = PacketLevel::from_u8(bytes[10]).ok_or(StatError::Header("unknown level"))?;
     if bytes[11] != BIT_PROFILE_V1 {
         return Err(StatError::Header("unknown bit profile"));
     }
@@ -162,7 +162,7 @@ pub fn unpack(bytes: &[u8]) -> Result<Packet, StatError> {
 
 /// Drops whole trailing sections down to `level` and rewrites the level, the
 /// section count and the CRC. `truncate(pack(p, E), k) == pack(p, k)`.
-pub fn truncate(bytes: &[u8], level: Level) -> Result<Vec<u8>, StatError> {
+pub fn truncate(bytes: &[u8], level: PacketLevel) -> Result<Vec<u8>, StatError> {
     let (packet, lens) = unpack_with_lens(bytes)?;
     if level > packet.level {
         return Err(StatError::Invalid(
@@ -181,7 +181,7 @@ pub fn truncate(bytes: &[u8], level: Level) -> Result<Vec<u8>, StatError> {
 /// Measured bytes of one packed file.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct Ledger {
-    pub level: Level,
+    pub level: PacketLevel,
     pub total: usize,
     pub header: usize,
     pub crc: usize,
@@ -235,7 +235,7 @@ pub enum BudgetStep {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BudgetFit {
     pub packet: Packet,
-    pub level: Level,
+    pub level: PacketLevel,
     pub bytes: usize,
     pub step: BudgetStep,
     pub fits: bool,
@@ -243,7 +243,7 @@ pub struct BudgetFit {
     pub main_effect_cols: usize,
 }
 
-fn finish(packet: Packet, level: Level, step: BudgetStep, max_bytes: usize) -> BudgetFit {
+fn finish(packet: Packet, level: PacketLevel, step: BudgetStep, max_bytes: usize) -> BudgetFit {
     // `level` never exceeds the source level here, so the fallback arm is unreachable.
     let packet = match packet.at_level(level) {
         Ok(cut) => cut,
@@ -270,11 +270,15 @@ fn finish(packet: Packet, level: Level, step: BudgetStep, max_bytes: usize) -> B
 pub fn fit_to_budget(packet: &Packet, max_bytes: usize) -> BudgetFit {
     let order = importance_order(packet);
     let o = packet.outputs();
-    for level in Level::ALL.into_iter().rev().filter(|&l| l <= packet.level) {
+    for level in PacketLevel::ALL
+        .into_iter()
+        .rev()
+        .filter(|&l| l <= packet.level)
+    {
         if packed_len(packet, level) <= max_bytes {
             return finish(packet.clone(), level, BudgetStep::Level, max_bytes);
         }
-        if level == Level::D {
+        if level == PacketLevel::D {
             let mut trial = packet.clone();
             trial.main_mask.fill(false);
             trial.main_effect.fill(0);
@@ -302,7 +306,7 @@ pub fn fit_to_budget(packet: &Packet, max_bytes: usize) -> BudgetFit {
     trial.target_sparse = true;
     trial.target_mask.fill(false);
     trial.target_weight.fill(0);
-    let empty = packed_len(&trial, Level::A);
+    let empty = packed_len(&trial, PacketLevel::A);
     let kept: Vec<usize> = order
         .iter()
         .copied()
@@ -310,7 +314,7 @@ pub fn fit_to_budget(packet: &Packet, max_bytes: usize) -> BudgetFit {
         .collect();
     let m = (max_bytes.saturating_sub(empty) / o).min(kept.len());
     if empty > max_bytes {
-        return finish(trial, Level::A, BudgetStep::OverBudget, max_bytes);
+        return finish(trial, PacketLevel::A, BudgetStep::OverBudget, max_bytes);
     }
     for &j in &kept[..m] {
         trial.target_mask[j] = true;
@@ -318,5 +322,5 @@ pub fn fit_to_budget(packet: &Packet, max_bytes: usize) -> BudgetFit {
             trial.target_weight[k * p + j] = packet.target_weight[k * p + j];
         }
     }
-    finish(trial, Level::A, BudgetStep::SparseTarget, max_bytes)
+    finish(trial, PacketLevel::A, BudgetStep::SparseTarget, max_bytes)
 }

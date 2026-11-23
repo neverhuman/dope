@@ -3,10 +3,10 @@
 //! (`Ridge(alpha = 1)`, `LogisticRegression(C = 1)` on standardised inputs)
 //! up to the int8 quantisation.
 
-use super::fit::Target;
+use super::fit::FitTarget;
 use super::glm::{logistic, ridge, sigmoid, softmax, softmax_row, Basis, Dense, SKIP_ROW};
 use super::linpred::{temperature_value, weight_value, TargetModel, TEMPERATURE_UNIT};
-use super::packet::{f16_to_f64, Level, Packet, Task};
+use super::packet::{f16_to_f64, Packet, PacketLevel, PacketTask};
 use super::testkit::{column, fit_full, mean_sd, n01, table, u01};
 
 /// `[1 | x]` with the columns of `x` standardised, and unit ridge weights.
@@ -151,7 +151,13 @@ fn the_linear_target_is_the_plain_ridge_model() {
             30.0 + 4.0 * (1.5 * r[0] - r[1] + 0.6 * r[3] + 0.3 * r[6] + 0.7 * n01(52, 0, i))
         })
         .collect();
-    let (packet, card, unit) = fit_full(&raw, Target::Regression(&y), Task::Regression, 0, n);
+    let (packet, card, unit) = fit_full(
+        &raw,
+        FitTarget::Regression(&y),
+        PacketTask::Regression,
+        0,
+        n,
+    );
     let (basis, stats) = standard_design(&unit, n, p);
     let target: Vec<f64> = y.iter().map(|&v| card.target_to_unit(v)).collect();
     let want = ridge(&basis, &target);
@@ -180,7 +186,7 @@ fn the_binary_and_multiclass_targets_are_the_plain_logistic_models() {
     let ids: Vec<u16> = (0..n)
         .map(|i| (u01(62, 0, i) < sigmoid(score[i] - 1.2)) as u16)
         .collect();
-    let (packet, _, unit) = fit_full(&raw, Target::Classes(&ids), Task::Binary, 2, n);
+    let (packet, _, unit) = fit_full(&raw, FitTarget::Classes(&ids), PacketTask::Binary, 2, n);
     let (basis, stats) = standard_design(&unit, n, p);
     let labels: Vec<f64> = ids.iter().map(|&c| c as f64).collect();
     let want = logistic(&basis, &vec![0.0; n], &labels, &vec![0.0; p + 1]);
@@ -196,7 +202,7 @@ fn the_binary_and_multiclass_targets_are_the_plain_logistic_models() {
     assert!(packet.temperature.abs_diff(TEMPERATURE_UNIT) <= 1 && packet.resid_sd == 0);
     // The intercept is refitted against the stored weights: the mean fitted
     // probability on the FIT rows equals the FIT share.
-    let eta = TargetModel::new(&packet, Level::A, &[]).eta_rows(&unit, p);
+    let eta = TargetModel::new(&packet, PacketLevel::A, &[]).eta_rows(&unit, p);
     let mean: f64 = eta.iter().map(|&e| sigmoid(e)).sum::<f64>() / n as f64;
     let share = labels.iter().sum::<f64>() / n as f64;
     assert!((mean - share).abs() < 2e-3, "{mean} {share}");
@@ -211,7 +217,7 @@ fn the_binary_and_multiclass_targets_are_the_plain_logistic_models() {
             (0..3).filter(|&c| u > q[..=c].iter().sum::<f64>()).count() as u16
         })
         .collect();
-    let (packet, _, unit) = fit_full(&raw, Target::Classes(&ids), Task::Multiclass, 4, n);
+    let (packet, _, unit) = fit_full(&raw, FitTarget::Classes(&ids), PacketTask::Multiclass, 4, n);
     let (basis, stats) = standard_design(&unit, n, p);
     let label: Vec<usize> = ids.iter().map(|&c| c as usize).collect();
     let d = p + 1;
@@ -222,7 +228,7 @@ fn the_binary_and_multiclass_targets_are_the_plain_logistic_models() {
         worst = worst.max(worst_step_gap(&packet, class - 1, &stats, &want));
     }
     // Mean fitted class probabilities on the FIT rows equal the FIT shares.
-    let eta = TargetModel::new(&packet, Level::A, &[]).eta_rows(&unit, p);
+    let eta = TargetModel::new(&packet, PacketLevel::A, &[]).eta_rows(&unit, p);
     let mut mean = [0.0; 4];
     for row in eta.chunks(3) {
         let mut q = [0.0; 4];
