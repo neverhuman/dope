@@ -6,8 +6,8 @@ use crate::v7_weights::load_model;
 use crate::v8_weights::load_v8_model;
 use dope_core::auto::v8::AutoV8Options;
 use dope_core::auto::{
-    fit_auto, fit_dpa1_v8, is_dpa1, parse_dpa1, AutoOptions, AutoReport, CandidateReport, Encoder,
-    V7Decode, V7Decoder, V8Decoder, V8DpaMode, V8DpaReport, DEFAULT_AUTO_BUDGET,
+    fit_auto, fit_dpa1_v8_with_v7, is_dpa1, parse_dpa1, AutoOptions, AutoReport, CandidateReport,
+    Encoder, V7Decode, V7Decoder, V8Decoder, V8DpaMode, V8DpaReport, DEFAULT_AUTO_BUDGET,
 };
 use dope_core::{DopeError, EmissionMode, FitOptions, ModelSize, RawTable};
 
@@ -100,6 +100,11 @@ pub(crate) fn run_fit_v8(
         "auto-v8" => V8DpaMode::AutoV8,
         _ => V8DpaMode::V8,
     };
+    let v7_model = if mode == V8DpaMode::AutoV8 {
+        Some(load_model(None)?)
+    } else {
+        None
+    };
     let model = load_v8_model(a.v8_weights.as_deref())?;
     let opts = AutoV8Options {
         budget,
@@ -107,7 +112,15 @@ pub(crate) fn run_fit_v8(
         enable_trees: !a.no_trees,
         ..Default::default()
     };
-    let fitted = fit_dpa1_v8(table, target, &opts, model.as_ref(), mode).map_err(e)?;
+    let fitted = fit_dpa1_v8_with_v7(
+        table,
+        target,
+        &opts,
+        v7_model.as_ref(),
+        model.as_ref(),
+        mode,
+    )
+    .map_err(e)?;
     std::fs::write(&a.out, &fitted.bytes).map_err(|x| x.to_string())?;
     if let Some(p) = &a.report {
         let text = serde_json::to_string_pretty(&fitted.report).map_err(|x| x.to_string())?;

@@ -63,15 +63,34 @@ pub fn fit_copula_loadings_v8(x_unit: &[Vec<f32>], rank_use: usize) -> CopulaFit
                 continue;
             }
             let rz = pearson(&z_tie[i], &z_tie[j]);
-            let r_lat = (rz / (kappa[i] * kappa[j]).max(0.0225)).clamp(-0.999, 0.999);
+            // Bound tie-disattenuation amplification without crushing true binary-pair correlations.
+            let r_lat = (rz / (kappa[i] * kappa[j]).max(0.08)).clamp(-0.99, 0.99);
             r_raw[i * p + j] = r_lat;
             r_raw[j * p + i] = r_lat;
         }
     }
-    let r_lat = if p >= 2 {
+    let r_pd = if p >= 2 {
         nearest_correlation(&r_raw, p, 1e-4)
     } else {
         r_raw
+    };
+    // Low-rank-aware shrinkage toward I_p: since top-r eigendecomposition already discards p-r
+    // noise eigenvalues, scale shrinkage strictly with p/n (strong only when n ~ p, gentle at n >> p).
+    let r_lat = if p >= 2 {
+        let alpha_lw = (0.35 * (p as f64 / n.max(2) as f64)).clamp(0.0, 0.35);
+        let keep = 1.0 - alpha_lw;
+        let mut shrunk = vec![0.0f64; p * p];
+        for i in 0..p {
+            shrunk[i * p + i] = 1.0;
+            for j in (i + 1)..p {
+                let v = keep * r_pd[i * p + j];
+                shrunk[i * p + j] = v;
+                shrunk[j * p + i] = v;
+            }
+        }
+        shrunk
+    } else {
+        r_pd
     };
     let (eig_vals, eig_vecs) = if p >= 1 {
         sym_eigen(&r_lat, p)
@@ -88,10 +107,11 @@ pub fn fit_copula_loadings_v8(x_unit: &[Vec<f32>], rank_use: usize) -> CopulaFit
             l_f64[i][k] = sign * eig_vecs[i * p + k] * s;
         }
     }
+    // Cap loading norm at 0.97 (residual idiosyncratic noise_sd >= 0.243) to prevent DCR collapse.
     for row in &mut l_f64 {
         let norm = row.iter().map(|v| v * v).sum::<f64>().sqrt();
-        if norm > 0.999 {
-            let inv = 0.999 / norm;
+        if norm > 0.97 {
+            let inv = 0.97 / norm;
             for v in row.iter_mut() {
                 *v *= inv;
             }
@@ -174,14 +194,17 @@ pub fn fit_regimes_v8(
         f_sd[k] = v.sqrt().max(0.25);
     }
 
-    // Only keep regimes meeting the strict k >= 10 privacy/support floor!
+    // Only keep regimes meeting a strict privacy/stability floor (>= 20 rows) and apply
+    // Empirical-Bayes James-Stein shrinkage so small clusters do not collapse DCR/C2ST.
+    let min_regime_n = (2 * SUPPORT_FLOOR_K).max(20);
     let mut kept = Vec::new();
     let mut tot_kept = 0usize;
     for g in 0..n_cand {
-        if cnts[g] >= SUPPORT_FLOOR_K {
+        if cnts[g] >= min_regime_n {
             tot_kept += cnts[g];
+            let eb = cnts[g] as f64 / (cnts[g] as f64 + 25.0);
             let mean_f: Vec<f32> = (0..r_reg)
-                .map(|k| ((sums[g][k] / (cnts[g] as f64 * f_sd[k])).clamp(-0.85, 0.85)) as f32)
+                .map(|k| ((eb * sums[g][k] / (cnts[g] as f64 * f_sd[k])).clamp(-0.65, 0.65)) as f32)
                 .collect();
             kept.push((cnts[g], mean_f));
         }
@@ -196,7 +219,7 @@ pub fn fit_regimes_v8(
             .map(|(c, mf)| (*c as f64 / tot_kept as f64) * mf[k] as f64)
             .sum();
         for (_, mf) in &mut kept {
-            mf[k] = (mf[k] as f64 - mu_bar).clamp(-0.85, 0.85) as f32;
+            mf[k] = (mf[k] as f64 - mu_bar).clamp(-0.65, 0.65) as f32;
         }
     }
 

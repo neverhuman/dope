@@ -5,7 +5,7 @@ use super::rng_v8::{counter_uniform, STREAM_ATOM, STREAM_MISSING};
 use super::scale_v8::Dse8ColumnMeta;
 use crate::evidence::primitives::{support_u_floor, SUPPORT_FLOOR_K};
 use crate::marginal::atoms::detect_atoms;
-use crate::marginal::lattice::{detect_heaping, detect_lattice};
+use crate::marginal::lattice::detect_lattice;
 use crate::single_encoding::math::{f16_bits_to_f32, f32_to_f16_bits, quant_f16_roundtrip};
 use crate::single_encoding::KNOT_COUNT;
 use crate::stats::{norm_cdf, quantile_sorted};
@@ -67,31 +67,8 @@ impl MarginalColV8 {
             return Self::constant(0.0, miss_rate, knot_level);
         }
 
-        let u_floor = support_u_floor(n_obs);
-        let lo_raw = quantile_sorted(&sorted, u_floor);
-        let hi_raw = quantile_sorted(&sorted, 1.0 - u_floor);
-        if (hi_raw - lo_raw) < 1e-6 {
-            let val = quant_f16_roundtrip(quantile_sorted(&sorted, 0.5) as f32);
-            return Self::constant(val, miss_rate, knot_level);
-        }
-
-        let lo = quant_f16_roundtrip(lo_raw as f32);
-        let span = quant_f16_roundtrip((hi_raw - lo_raw).max(1e-5) as f32).max(1e-5);
-
-        // Build 17-knot quantile curve.
-        let mut knots_f64 = [0.0f64; KNOT_COUNT];
-        for (ki, slot) in knots_f64.iter_mut().enumerate() {
-            let z = -(z_max as f64) + (2.0 * z_max as f64) * (ki as f64 / (KNOT_COUNT - 1) as f64);
-            *slot = quantile_sorted(&sorted, norm_cdf(z));
-        }
-
-        // Detect atoms (strictly k >= 10 support floor!) and lattice/heaping.
-        let atoms = detect_atoms(&sorted, SUPPORT_FLOOR_K);
-        let tot_atom_p: f64 = atoms.iter().map(|a| a.prob).sum();
-        let lattice = detect_lattice(&sorted, SUPPORT_FLOOR_K);
-        let heaping = lattice.as_ref().and_then(|s| detect_heaping(&sorted, s));
-
-        // Distinct values check with k >= 10 kept atoms.
+        // Distinct value runs with k >= 10 support floor checked BEFORE constant collapse so
+        // imbalanced binary/sparse columns with >= 10 minority rows are never crushed to constants.
         let mut runs: Vec<(f64, usize)> = Vec::new();
         for &v in &sorted {
             if let Some(last) = runs.last_mut() {
@@ -107,6 +84,45 @@ impl MarginalColV8 {
             .copied()
             .filter(|&(_, c)| c >= SUPPORT_FLOOR_K)
             .collect();
+        let is_discrete_atoms = runs.len() <= 8
+            && kept_runs.len() >= 2
+            && (kept_runs.iter().map(|r| r.1).sum::<usize>() as f64 / n_obs as f64) >= 0.85;
+
+        let u_floor = support_u_floor(n_obs);
+        let mut lo_raw = quantile_sorted(&sorted, u_floor);
+        let mut hi_raw = quantile_sorted(&sorted, 1.0 - u_floor);
+        if is_discrete_atoms {
+            lo_raw = kept_runs[0].0;
+            hi_raw = kept_runs[kept_runs.len() - 1].0;
+        } else if (hi_raw - lo_raw) < 1e-6 && n_obs >= 2 * SUPPORT_FLOOR_K {
+            // Support-safe k-th order statistics preserve variance on sparse heavy-tail columns
+            // without ever leaking rare extrema (strictly k >= 10 on each side).
+            let lo_k = sorted[SUPPORT_FLOOR_K - 1];
+            let hi_k = sorted[n_obs - SUPPORT_FLOOR_K];
+            if (hi_k - lo_k) >= 1e-6 {
+                lo_raw = lo_k;
+                hi_raw = hi_k;
+            }
+        }
+        if (hi_raw - lo_raw) < 1e-6 {
+            let val = quant_f16_roundtrip(quantile_sorted(&sorted, 0.5) as f32);
+            return Self::constant(val, miss_rate, knot_level);
+        }
+
+        let lo = quant_f16_roundtrip(lo_raw as f32);
+        let span = quant_f16_roundtrip((hi_raw - lo_raw).max(1e-5) as f32).max(1e-5);
+
+        // Build 17-knot quantile curve.
+        let mut knots_f64 = [0.0f64; KNOT_COUNT];
+        for (ki, slot) in knots_f64.iter_mut().enumerate() {
+            let z = -(z_max as f64) + (2.0 * z_max as f64) * (ki as f64 / (KNOT_COUNT - 1) as f64);
+            *slot = quantile_sorted(&sorted, norm_cdf(z));
+        }
+
+        // Detect atoms (strictly k >= 10 support floor!) and lattice.
+        let atoms = detect_atoms(&sorted, SUPPORT_FLOOR_K);
+        let tot_atom_p: f64 = atoms.iter().map(|a| a.prob).sum();
+        let lattice = detect_lattice(&sorted, SUPPORT_FLOOR_K);
 
         // Adaptive tail family from Pickands / excess kurtosis.
         let tail_family = if meta
@@ -141,13 +157,10 @@ impl MarginalColV8 {
         let mut atom_probs = Vec::new();
         let mut lattice_q0 = 0.0f32;
         let mut lattice_origin = 0.0f32;
-        let mut heaping_step = 0.0f32;
-        let mut heaping_excess = 0.0f32;
+        let heaping_step = 0.0f32;
+        let heaping_excess = 0.0f32;
 
-        if runs.len() <= 8
-            && kept_runs.len() >= 2
-            && (kept_runs.iter().map(|r| r.1).sum::<usize>() as f64 / n_obs as f64) >= 0.85
-        {
+        if is_discrete_atoms {
             kind = MARG_ATOMS;
             let tot_k: f64 = kept_runs.iter().map(|r| r.1 as f64).sum::<f64>().max(1.0);
             for (v, c) in kept_runs.into_iter().take(8) {
@@ -171,14 +184,12 @@ impl MarginalColV8 {
             } else {
                 lat.step as f32
             };
-            if q0 > 1e-5 && q0 < span * 0.5 {
+            // Require q0 >= 1.5% of span so f16 rounding of q0 cannot cause cumulative grid drift,
+            // and avoid post-hoc stochastic heaping distortion that inflates marginal C2ST.
+            if q0 >= span * 0.015 && q0 < span * 0.5 {
                 kind = MARG_LATTICE;
                 lattice_q0 = quant_f16_roundtrip(q0);
                 lattice_origin = quant_f16_roundtrip(lat.origin as f32);
-                if let Some(hp) = heaping {
-                    heaping_step = quant_f16_roundtrip(hp.multiple as f32 * q0);
-                    heaping_excess = (hp.excess as f32).clamp(0.0, 0.95);
-                }
             }
         } else if !atoms.is_empty() && tot_atom_p >= 0.12 {
             // Zero-inflated or semi-continuous with k>=10 spike atom(s).
@@ -279,21 +290,6 @@ impl MarginalColV8 {
             return (*self.atom_vals.last().unwrap(), false);
         }
 
-        // Semi-continuous / zero-inflated: spike region maps exact atom value.
-        if self.kind == MARG_ZERO_INFLATED && !self.atom_vals.is_empty() {
-            let u = norm_cdf(z_lat as f64) as f32;
-            let mut lo_p = 0.0f32;
-            for (v, p) in self.atom_vals.iter().zip(&self.atom_probs) {
-                let target_u = self.approx_cdf_of(*v);
-                if (u - target_u).abs() <= 0.5 * *p
-                    || (u >= lo_p && u <= lo_p + *p && (*v - self.lo).abs() <= 1e-4)
-                {
-                    return (*v, false);
-                }
-                lo_p += *p;
-            }
-        }
-
         // Continuous / lattice quantile interpolation with adaptive tail extrapolation.
         let dz = (2.0 * z_max) / (KNOT_COUNT - 1) as f32;
         let pos = (z_lat.clamp(-z_max, z_max) + z_max) / dz;
@@ -313,6 +309,28 @@ impl MarginalColV8 {
                 + mult * slope_hi * (z_lat - z_max).max(0.0);
         }
 
+        // Semi-continuous / zero-inflated: snap exact boundary atoms strictly on their exact
+        // Gaussian CDF mass interval [0, p] or [1-p, 1] (zero double-counting), and snap
+        // interior plateaus only when already within u8 knot quantization tolerance.
+        if self.kind == MARG_ZERO_INFLATED && !self.atom_vals.is_empty() {
+            let u = norm_cdf(z_lat as f64) as f32;
+            let tol = (self.span * 0.012).max(1e-4);
+            let hi = self.lo + self.span;
+            for (&v, &p) in self.atom_vals.iter().zip(&self.atom_probs) {
+                if (v - self.lo).abs() <= (self.span * 0.005).max(1e-4) {
+                    if u <= p {
+                        return (v, false);
+                    }
+                } else if (v - hi).abs() <= (self.span * 0.005).max(1e-4) {
+                    if u >= 1.0 - p {
+                        return (v, false);
+                    }
+                } else if (x - v).abs() <= tol {
+                    return (v, false);
+                }
+            }
+        }
+
         if self.kind == MARG_LATTICE && self.lattice_q0 > 1e-5 {
             let q0 = self.lattice_q0;
             let orig = self.lattice_origin;
@@ -326,14 +344,6 @@ impl MarginalColV8 {
             }
         }
         (x.clamp(-6.0, 6.0), false)
-    }
-
-    fn approx_cdf_of(&self, val: f32) -> f32 {
-        let mut pos = 0usize;
-        while pos < KNOT_COUNT && self.knots17[pos] < val {
-            pos += 1;
-        }
-        (pos as f32 / (KNOT_COUNT - 1) as f32).clamp(0.0, 1.0)
     }
 
     pub fn encode_bytes(&self, out: &mut Vec<u8>) {

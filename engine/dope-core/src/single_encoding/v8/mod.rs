@@ -259,8 +259,16 @@ fn fit_dse8_attempt(
     };
 
     // 2. Tie-disattenuated copula loadings & populated multi-regime factor means.
-    let (_, loadings, z_tie, factor_scores) = fit_copula_loadings_v8(&x_unit, plan.rank_use);
-    let regimes = if opts.enable_regimes && plan.max_regimes >= 2 {
+    // On small-n tables (< 80 rows, where 20% inner validation has < 16 rows), keep the model
+    // strictly low-rank linear to prevent training-row memorization and DCR/GBDT blowup.
+    let allow_nonlin = n_fit >= 80;
+    let eff_rank = if allow_nonlin {
+        plan.rank_use
+    } else {
+        plan.rank_use.min(2)
+    };
+    let (_, loadings, z_tie, factor_scores) = fit_copula_loadings_v8(&x_unit, eff_rank);
+    let regimes = if allow_nonlin && opts.enable_regimes && plan.max_regimes >= 2 {
         fit_regimes_v8(&factor_scores, &y_sc, opts.task_id, k_eff, plan.max_regimes)
     } else {
         RegimesSectionV8::default()
@@ -273,7 +281,7 @@ fn fit_dse8_attempt(
         &loadings,
         &nominal_groups,
         &regimes,
-        plan.rank_use,
+        eff_rank,
         z_max,
     );
     let (linear, mut cur_logits) = fit_linear_v8(&x_unit, &y_sc, opts.task_id, k_eff, &x_syn_probe);
@@ -290,7 +298,7 @@ fn fit_dse8_attempt(
     }
 
     // Sequential inner-val-gated boosting: Effects (`E`) -> Pairs (`Pr`) -> Oblivious Trees (`Tr`).
-    let effects = if opts.enable_effects && plan.max_effects > 0 {
+    let effects = if allow_nonlin && opts.enable_effects && plan.max_effects > 0 {
         fit_effects_v8(
             &cdf,
             &mut cur_logits,
@@ -304,7 +312,7 @@ fn fit_dse8_attempt(
     } else {
         Vec::new()
     };
-    let pairs = if opts.enable_effects && plan.max_pairs > 0 {
+    let pairs = if allow_nonlin && opts.enable_effects && plan.max_pairs > 0 {
         fit_pairs_v8(
             &cdf,
             &mut cur_logits,
@@ -318,7 +326,7 @@ fn fit_dse8_attempt(
     } else {
         Vec::new()
     };
-    let trees = if opts.enable_trees && plan.max_trees > 0 {
+    let trees = if allow_nonlin && opts.enable_trees && plan.max_trees > 0 {
         TreesSectionV8::fit(
             &cdf,
             &mut cur_logits,
@@ -345,7 +353,7 @@ fn fit_dse8_attempt(
             };
         let va_mse = eval_true_loss(&cur_logits, &y_sc, eval_rows, 0, 1.0);
         final_resid_sd = va_mse.sqrt().clamp(0.002, 5.0) as f32;
-        if opts.enable_residual_model && plan.allow_resid {
+        if allow_nonlin && opts.enable_residual_model && plan.allow_resid {
             let rem_e: Vec<f64> = (0..n_fit).map(|r| y_sc[r] - cur_logits[0][r]).collect();
             let (rm, sd_mult) = fit_resid_model_v8(&z_tie, &rem_e, final_resid_sd);
             resid_model = rm;
@@ -435,7 +443,7 @@ fn fit_dse8_attempt(
             p_eff: p_eff as u8,
             x_cols_raw: x_cols_raw as u16,
             flags,
-            rank_use: plan.rank_use as u8,
+            rank_use: eff_rank as u8,
             knot_level: plan.knot_level as u8,
             log2_nfit_norm,
             z_max,

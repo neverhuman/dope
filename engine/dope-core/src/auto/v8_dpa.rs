@@ -13,15 +13,17 @@
 use super::container::{
     fingerprint_hex, wrap_dpa1, Dpa1, Encoder, DPA1_HEADER_BYTES, NO_FINGERPRINT,
 };
+use super::v7::{self, V7Model};
 use super::v7_schema::{decode_section, encode_section, V7Kind, V7Schema};
-use super::v8::{fit_auto_v8, AutoV8Options, V8Choice};
+use super::v8::{fit_auto_v8_with_v7, AutoV8Options, V8Choice};
+use super::v8_guard::raw_to_numeric_inputs;
 use crate::error::{DopeError, Result};
-use crate::schema::{infer, IntakeOptions, Kind, Schema};
+use crate::schema::{infer, IntakeOptions};
 use crate::single_encoding::v8::{
     decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta,
     unpack_dse8_packet, Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
 };
-use crate::table::{is_missing, parse_number, RawTable};
+use crate::table::RawTable;
 use serde::Serialize;
 use std::io::Write;
 use std::time::Instant;
@@ -85,6 +87,7 @@ pub struct V8DpaReport {
     pub rows: usize,
     pub features: usize,
     pub score_format1: Option<f64>,
+    pub score_v7: Option<f64>,
     pub score_dse8_analytic: Option<f64>,
     pub score_dse8_neural: Option<f64>,
     pub v8_weights: String,
@@ -107,57 +110,24 @@ fn task_id_for(classes: usize) -> u8 {
     }
 }
 
-fn target_value(schema: &Schema, cell: &str) -> Option<f64> {
-    if is_missing(cell) {
-        return None;
-    }
-    match &schema.target.kind {
-        Kind::Numeric(_) => parse_number(cell),
-        Kind::Categorical(spec) => spec.levels.iter().position(|l| l == cell).map(|k| k as f64),
-    }
-}
-
-fn packet_inputs(
-    raw: &RawTable,
-    target: usize,
-    schema: &Schema,
-) -> Result<(Vec<Vec<f64>>, Vec<f64>)> {
-    let cells = &raw.columns[target];
-    let rows: Vec<usize> = (0..raw.rows())
-        .filter(|&r| target_value(schema, &cells[r]).is_some())
-        .collect();
-    let y: Vec<f64> = rows
-        .iter()
-        .filter_map(|&r| target_value(schema, &cells[r]))
-        .collect();
-    let mut x = Vec::with_capacity(schema.features.len());
-    for f in &schema.features {
-        let c = raw
-            .headers
-            .iter()
-            .position(|h| *h == f.name)
-            .ok_or_else(|| DopeError::Input("a feature column is missing from the input".into()))?;
-        let col = &raw.columns[c];
-        x.push(
-            rows.iter()
-                .map(|&r| match &f.kind {
-                    Kind::Numeric(_) => parse_number(&col[r]).unwrap_or(f64::NAN),
-                    Kind::Categorical(spec) if !is_missing(&col[r]) => {
-                        spec.level_of(&col[r]).map_or(f64::NAN, |k| k as f64)
-                    }
-                    Kind::Categorical(_) => f64::NAN,
-                })
-                .collect(),
-        );
-    }
-    Ok((x, y))
-}
-
-/// Fit a V8 or 3-way Auto-V8 `DPA1` artifact strictly within `opts.budget` bytes.
+/// Fit a V8 or Auto-V8 `DPA1` artifact strictly within `opts.budget` bytes.
 pub fn fit_dpa1_v8(
     raw: &RawTable,
     target: usize,
     opts: &AutoV8Options,
+    model: Option<&V8Model>,
+    mode: V8DpaMode,
+) -> Result<V8DpaFitted> {
+    fit_dpa1_v8_with_v7(raw, target, opts, None, model, mode)
+}
+
+/// Fit a V8 or Auto-V8 (`Format 1` vs optional embedded `V7` vs `DSE8`) `DPA1` artifact strictly
+/// within `opts.budget` bytes.
+pub fn fit_dpa1_v8_with_v7(
+    raw: &RawTable,
+    target: usize,
+    opts: &AutoV8Options,
+    v7_model: Option<&V7Model>,
     model: Option<&V8Model>,
     mode: V8DpaMode,
 ) -> Result<V8DpaFitted> {
@@ -179,14 +149,13 @@ pub fn fit_dpa1_v8(
     let schema = infer(raw, target, &intake)?;
     let v7s = V7Schema::from_schema(&schema);
     let section = encode_section(&v7s, opts.format1.anonymize)?;
-    let (x_raw, y_raw) = packet_inputs(raw, target, &schema)?;
-    let tid = task_id_for(v7s.classes());
+    let (x_raw, y_raw, tid) = raw_to_numeric_inputs(raw, target, &schema)?;
     let active_model = match mode {
         V8DpaMode::V8Analytic => None,
         V8DpaMode::V8 | V8DpaMode::AutoV8 => model,
     };
 
-    let (encoder, choice, fp, payload, sf1, sp0, snn, note) = match mode {
+    let (encoder, choice, fp, payload, sf1, sv7, sp0, snn, note) = match mode {
         V8DpaMode::V8Analytic | V8DpaMode::V8 => {
             let packet_room = room.checked_sub(section.len()).ok_or_else(|| {
                 DopeError::Budget(
@@ -232,35 +201,57 @@ pub fn fit_dpa1_v8(
                 None,
                 None,
                 None,
+                None,
                 format!("direct {}", mode.name()),
             )
         }
         V8DpaMode::AutoV8 => {
-            // If the V8 schema section leaves too little room for a DSE8 packet, fall back
-            // directly to Format 1 inside `room` instead of failing over_budget!
             let packet_room = room.saturating_sub(section.len());
             if packet_room < 96 {
                 let mut f1_opts = opts.format1.clone();
                 f1_opts.budget = Some(room);
                 f1_opts.task = Some(schema.task);
-                let f1 = crate::compile::fit(raw, target, &f1_opts)?;
-                (
-                    Encoder::Format1,
-                    V8Choice::Format1,
-                    NO_FINGERPRINT,
-                    f1.bytes,
-                    None,
-                    None,
-                    None,
-                    "format1_fallback: schema_exceeds_v8_room".into(),
-                )
+                if let Ok(f1) = crate::compile::fit(raw, target, &f1_opts) {
+                    (
+                        Encoder::Format1,
+                        V8Choice::Format1,
+                        NO_FINGERPRINT,
+                        f1.bytes,
+                        None,
+                        None,
+                        None,
+                        None,
+                        "format1_fallback: schema_exceeds_v8_room".into(),
+                    )
+                } else if let Some(m7) = v7_model {
+                    let f7 = v7::fit(raw, target, Some(schema.task), f1_opts.anonymize, room)?;
+                    (
+                        Encoder::V7,
+                        V8Choice::V7,
+                        m7.fingerprint(),
+                        f7.payload(),
+                        None,
+                        None,
+                        None,
+                        None,
+                        "v7_fallback: schema_exceeds_v8_room".into(),
+                    )
+                } else {
+                    return Err(DopeError::Budget(
+                        "the V8 column schema alone exceeds the budget (try --anonymize)".into(),
+                    ));
+                }
             } else {
-                // Fit Format 1 inside `room`, DSE8 inside `packet_room`, using the 3-way guard!
                 let mut inner_opts = opts.clone();
                 inner_opts.budget = packet_room;
                 inner_opts.format1.budget = Some(room);
-                let fitted =
-                    fit_auto_v8(raw, target, &inner_opts, active_model.map(|m| m.weights()))?;
+                let fitted = fit_auto_v8_with_v7(
+                    raw,
+                    target,
+                    &inner_opts,
+                    v7_model,
+                    active_model.map(|m| m.weights()),
+                )?;
                 let r = fitted.report;
                 match fitted.choice {
                     V8Choice::Format1 => (
@@ -269,10 +260,25 @@ pub fn fit_dpa1_v8(
                         NO_FINGERPRINT,
                         fitted.bytes,
                         r.score_format1,
+                        r.score_v7,
                         r.score_dse8_analytic,
                         r.score_dse8_neural,
                         r.note,
                     ),
+                    V8Choice::V7 => {
+                        let fp = v7_model.map_or(NO_FINGERPRINT, V7Model::fingerprint);
+                        (
+                            Encoder::V7,
+                            V8Choice::V7,
+                            fp,
+                            fitted.bytes,
+                            r.score_format1,
+                            r.score_v7,
+                            r.score_dse8_analytic,
+                            r.score_dse8_neural,
+                            r.note,
+                        )
+                    }
                     V8Choice::Dse8Analytic => {
                         let pl = [&section[..], &fitted.bytes[..]].concat();
                         (
@@ -281,6 +287,7 @@ pub fn fit_dpa1_v8(
                             NO_FINGERPRINT,
                             pl,
                             r.score_format1,
+                            r.score_v7,
                             r.score_dse8_analytic,
                             r.score_dse8_neural,
                             r.note,
@@ -295,6 +302,7 @@ pub fn fit_dpa1_v8(
                             fp,
                             pl,
                             r.score_format1,
+                            r.score_v7,
                             r.score_dse8_analytic,
                             r.score_dse8_neural,
                             r.note,
@@ -324,6 +332,7 @@ pub fn fit_dpa1_v8(
         rows: y_raw.len(),
         features: schema.features.len(),
         score_format1: sf1,
+        score_v7: sv7,
         score_dse8_analytic: sp0,
         score_dse8_neural: snn,
         v8_weights: fingerprint_hex(&fp),
