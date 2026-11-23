@@ -1,0 +1,363 @@
+{
+  "arms": [
+    {
+      "arm_id": "dope-2.0.0-small",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 167,
+        "max": 2048,
+        "median": 1462.0,
+        "share_within_budget": 1.0,
+        "with_packet": 158,
+        "within_budget": 158
+      },
+      "c2st_files": 120,
+      "c2st_median": 0.929564957202,
+      "matched": {
+        "cells": 125,
+        "ci_high": -0.233937680163,
+        "ci_low": -0.476634866166,
+        "failed_cells": 5,
+        "families": 117,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "tasks": [
+          {
+            "ci_high": -0.187079718736,
+            "ci_low": -0.3599285184,
+            "families": 94,
+            "task": "regression",
+            "value": -0.26743107294
+          },
+          {
+            "ci_high": -0.182651618446,
+            "ci_low": -0.562985201712,
+            "families": 16,
+            "task": "binary",
+            "value": -0.355655447264
+          },
+          {
+            "ci_high": -0.157406670542,
+            "ci_low": -0.746570203517,
+            "families": 7,
+            "task": "multiclass",
+            "value": -0.425182560189
+          }
+        ],
+        "trg": -0.349423026798
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 106,
+          "median": 0.969520478909
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 107,
+          "median": 0.975582486756
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 88,
+          "median": 0.989532116651
+        }
+      ],
+      "mlp_trg": -0.129122737157,
+      "primary": {
+        "cells": 125,
+        "ci_high": -0.130917161511,
+        "ci_low": -0.347113763822,
+        "failed_cells": 5,
+        "families": 117,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "tasks": [
+          {
+            "ci_high": -0.116791190819,
+            "ci_low": -0.261769261839,
+            "families": 94,
+            "task": "regression",
+            "value": -0.182758997932
+          },
+          {
+            "ci_high": -0.122542526606,
+            "ci_low": -0.451758335825,
+            "families": 16,
+            "task": "binary",
+            "value": -0.273201815332
+          },
+          {
+            "ci_high": -0.000566095114,
+            "ci_low": -0.534790239362,
+            "families": 7,
+            "task": "multiclass",
+            "value": -0.240813218379
+          }
+        ],
+        "trg": -0.232258010548
+      }
+    },
+    {
+      "arm_id": "dope-1.3.0-small",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 167,
+        "max": 2048,
+        "median": 1462.0,
+        "share_within_budget": 1.0,
+        "with_packet": 158,
+        "within_budget": 158
+      },
+      "c2st_files": 120,
+      "c2st_median": 0.922491836735,
+      "matched": {
+        "cells": 125,
+        "ci_high": -0.237005852524,
+        "ci_low": -0.478196334451,
+        "failed_cells": 5,
+        "families": 117,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "tasks": [
+          {
+            "ci_high": -0.186203608125,
+            "ci_low": -0.358655935924,
+            "families": 94,
+            "task": "regression",
+            "value": -0.266110252213
+          },
+          {
+            "ci_high": -0.182651618446,
+            "ci_low": -0.562985201712,
+            "families": 16,
+            "task": "binary",
+            "value": -0.355655447264
+          },
+          {
+            "ci_high": -0.167685534844,
+            "ci_low": -0.750592399625,
+            "families": 7,
+            "task": "multiclass",
+            "value": -0.43546142449
+          }
+        ],
+        "trg": -0.352409041323
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 106,
+          "median": 0.969520478909
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 107,
+          "median": 0.975582486756
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 88,
+          "median": 0.994355157174
+        }
+      ],
+      "mlp_trg": -0.129382497762,
+      "primary": {
+        "cells": 125,
+        "ci_high": -0.132083954364,
+        "ci_low": -0.348480706298,
+        "failed_cells": 5,
+        "families": 117,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "tasks": [
+          {
+            "ci_high": -0.114406656193,
+            "ci_low": -0.25933478883,
+            "families": 94,
+            "task": "regression",
+            "value": -0.180225743427
+          },
+          {
+            "ci_high": -0.122542526606,
+            "ci_low": -0.451758335825,
+            "families": 16,
+            "task": "binary",
+            "value": -0.273201815332
+          },
+          {
+            "ci_high": -0.005991236128,
+            "ci_low": -0.542731882484,
+            "families": 7,
+            "task": "multiclass",
+            "value": -0.248754861501
+          }
+        ],
+        "trg": -0.234060806754
+      }
+    }
+  ],
+  "bootstrap": {
+    "draws": 10000,
+    "lower_quantile": 0.025,
+    "lower_rank": 249,
+    "seed": 20261123,
+    "upper_quantile": 0.975,
+    "upper_rank": 9750
+  },
+  "command": "compare",
+  "comparisons": [
+    {
+      "baseline": "dope-1.3.0-small",
+      "baseline_trg": -0.234060806754,
+      "candidate_trg": -0.232258010548,
+      "cells": 125,
+      "ci_high": 0.007745108733,
+      "ci_low": -0.001963124335,
+      "decision": {
+        "conditions": [
+          {
+            "check": "fail",
+            "name": "ci_low",
+            "threshold": 0.0,
+            "value": -0.001963124335
+          },
+          {
+            "check": "fail",
+            "name": "holm_p",
+            "threshold": 0.05,
+            "value": 0.317868213179
+          },
+          {
+            "check": "fail",
+            "name": "min_delta",
+            "threshold": 0.01,
+            "value": 0.001802796206
+          }
+        ],
+        "guards": [
+          {
+            "check": "pass",
+            "name": "task_ci_low",
+            "threshold": -0.02,
+            "value": -0.007609139635
+          },
+          {
+            "check": "pass",
+            "name": "mlp_delta",
+            "threshold": 0.0,
+            "value": 0.000259760605
+          },
+          {
+            "check": "not_evaluated",
+            "name": "realism_coverage_delta",
+            "threshold": -0.03,
+            "value": null
+          },
+          {
+            "check": "not_evaluated",
+            "name": "privacy_coverage_delta",
+            "threshold": -0.03,
+            "value": null
+          },
+          {
+            "check": "not_evaluated",
+            "name": "exact_copy_excess",
+            "threshold": 0.005,
+            "value": null
+          },
+          {
+            "check": "pass",
+            "name": "bytes",
+            "threshold": 2048.0,
+            "value": 2048.0
+          }
+        ],
+        "outcome": "HOLD"
+      },
+      "delta": 0.001802796206,
+      "families": 117,
+      "id": "dope-2.0.0-small",
+      "kind": "candidate",
+      "matched": {
+        "cells": 125,
+        "ci_high": 0.010257858478,
+        "ci_low": -0.001237708497,
+        "delta": 0.002986014525,
+        "families": 117,
+        "multiplier": 1,
+        "p_one_sided": 0.260473952605
+      },
+      "member_deltas": [],
+      "members": [
+        "dope-2.0.0-small"
+      ],
+      "mlp_cells": 91,
+      "p_holm": 0.317868213179,
+      "p_one_sided": 0.317868213179,
+      "tasks": [
+        {
+          "ci_high": 0.00004780729,
+          "ci_low": -0.007609139635,
+          "delta": -0.002533254504,
+          "families": 94,
+          "task": "regression"
+        },
+        {
+          "ci_high": 0.0,
+          "ci_low": 0.0,
+          "delta": 0.0,
+          "families": 16,
+          "task": "binary"
+        },
+        {
+          "ci_high": 0.023824929366,
+          "ci_low": 0.0,
+          "delta": 0.007941643122,
+          "families": 7,
+          "task": "multiclass"
+        }
+      ]
+    }
+  ],
+  "contract": {
+    "id": "dope-kpi/v2",
+    "protocol_frozen": false,
+    "sha256": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
+    "source": "embedded",
+    "status": "candidate"
+  },
+  "inputs": {
+    "realref_sha256": "c3dfe97c72ffef7e2f68f4c86383abc84d0d8f05a9b747c018662d148356fdae",
+    "rows_sha256": {
+      "dope-1.3.0-small": "3971a079f969467db79050a16b4ac5cbcf9a638d7fca0a69cd17841ede4df3a3",
+      "dope-2.0.0-small": "18b8a6d381236d15e90ae7faf792c56c176c7a9ce01c95ac0c43fbbd08cff856"
+    },
+    "schedule_file": "schedule-lite.jsonl",
+    "schedule_panel_sha256": "8d18e7837d6cc1bdf640f8e695045225a9c66d0d330ee4e835f8058cdcb7b29e",
+    "schedule_sha256": "5d292ea592ca122e94072595a86f3baf4d56928f1789759e5aa51748ba96143f"
+  },
+  "noise_sd": {
+    "source": "default",
+    "value": 0.01
+  },
+  "panel": {
+    "dev_families": 0,
+    "dev_tables": 0,
+    "dev_tables_scheduled": 0,
+    "dev_tables_sha256": null,
+    "dev_tables_unmatched": 0,
+    "families": 320,
+    "families_sha256": null,
+    "family_set_sha256": "1fb2e1f9408af42afb49cc5e6959e52f8e17ff68624f25c507e2a8c1ed7532b2",
+    "id": "all"
+  },
+  "schema": "dope.kpi-receipt/v2",
+  "tool": {
+    "git_sha": "a4cb829a47ccd3f8c248fb76af489326690f75d3",
+    "name": "dope_kpi",
+    "version": "2.0.0"
+  }
+}

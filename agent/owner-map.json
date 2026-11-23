@@ -841,6 +841,7 @@
     "ops/ci/landmarks.sh": "governance",
     "engine/dope-probes/": "external-evidence",
     "bench/real-world/probes/": "external-evidence",
+    "bench/real-world/results/scoreboard/": "external-evidence",
     "schemas/landmark-coordinates-native-v1.schema.json": "rust-core",
     "engine/dope-core/src/budget.rs": "rust-core",
     "engine/dope-core/tests/budgets.rs": "rust-core",

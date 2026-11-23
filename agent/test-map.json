@@ -3412,6 +3412,10 @@
       "command": "python3 tools/claims/dope1.py --check",
       "purpose": "verify authenticated DOPE1 README blocks and hero figure"
     },
+    "bench/real-world/results/scoreboard/": {
+      "command": "python3 tools/claims/dope1.py --check",
+      "purpose": "verify the DOPE1 SCOREBOARD README block, its dope_kpi receipts and the v2.0.0 hero figures against the scoreboard render manifest"
+    },
     "ops/ci/engine.sh": {
       "command": "bash ops/ci/engine.sh",
       "purpose": "run the engine gate used by CI"
