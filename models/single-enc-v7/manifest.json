@@ -1,0 +1,21 @@
+{
+  "schema": "dope.single-enc-v7-weights/v1",
+  "file": "model.safetensors",
+  "bytes": 2755388,
+  "sha256": "d013eb0cb08c9901c39e2bd65232c6bfbc41f68a613797971f7afb525b70cfac",
+  "arch": "single_enc_v7",
+  "variant": "V7.1 d160l3 yh",
+  "variant_description": "copy of the V7.1 run cpufleet-v71-d160l3-s01 checkpoint step_006000_ema.safetensors with the delta_knots and delta_L weights and biases set to zero; SafeTensors layout and loader unchanged",
+  "source_checkpoint": "cpufleet-v71-d160l3-s01 step_006000_ema.safetensors",
+  "source_sha256": "322ba652528b1be23b7a68c34548ec700dbe0ef604eb4f792f533eaa439f9b84",
+  "dtype": "F32",
+  "col_in": 42,
+  "n_heads": 4,
+  "d_model": 160,
+  "n_layers": 3,
+  "h_target": 32,
+  "selection": "pre-registered V7.1 DEV selection (d160l3, yh, step 6000, release seed s01)",
+  "decision_record": "V7_RELEASE_CHECKPOINT.md",
+  "status": "release: final pre-registered selection for v2.0.0",
+  "consumers": "compiled into the dope binary by engine/dope-cli/src/v7_weights.rs for dope fit --format auto|v7 and dope sample"
+}

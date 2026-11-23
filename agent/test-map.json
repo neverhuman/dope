@@ -4135,6 +4135,30 @@
     "H2/": {
       "command": "python3 -m json.tool H2/metrics.json >/dev/null",
       "purpose": "verify H2 (V7.3 DiLoCo + zero-repeat + tree-realism wave) DEV-only experiment record JSON syntax"
+    },
+    "engine/dope-core/src/auto/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --lib auto:: && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test auto_encoder",
+      "purpose": "verify --format auto: DPA1 container and fingerprint refusals, V7 column schema section, grouped 75/25 internal check with linear and GBDT auditors, margin-gated selection, budget caps and same-seed byte identity"
+    },
+    "engine/dope-core/tests/auto_encoder.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test auto_encoder",
+      "purpose": "synthetic zero-feature, one-feature/40-row, 200-column, mixed-type and tiny-budget auto fits; value-free reports and truncated/foreign-weight refusals"
+    },
+    "engine/dope-cli/src/auto_fit.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_cli",
+      "purpose": "exercise dope fit --format auto|v7 and DPA1 dope sample end to end: <=2048 B, target-last round trip, thread-count byte identity, --v7-weights and --v7-zero-init decoding, and clean refusals"
+    },
+    "engine/dope-cli/src/v7_weights.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope v7_weights && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_cli",
+      "purpose": "verify the embedded SingleEncV7 checkpoint matches its manifest (bytes, sha256, shape) and decodes V7 DPA1 artifacts"
+    },
+    "engine/dope-cli/tests/auto_cli.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_cli",
+      "purpose": "synthetic CLI journeys for --format auto|v7 fit/sample, external and zero-init V7 decoding, wrong-fingerprint, truncated and unknown-tag refusals"
+    },
+    "models/single-enc-v7/": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --bin dope v7_weights && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test auto_encoder",
+      "purpose": "verify the compiled SingleEncV7 weights against manifest.json and their use by --format auto"
     }
   },
   "workspace": "dope"

@@ -28,6 +28,7 @@
 
 pub mod artifact;
 pub mod audit;
+pub mod auto;
 pub mod budget;
 pub mod catf;
 pub mod compile;
