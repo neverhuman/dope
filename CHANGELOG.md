@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased (DOPE v3.0.0 Development)
+
+- **Pure-Rust FIT-Only Evidence Bank (`contracts/evidence-layout-v1.json`, `engine/dope-core/src/evidence/`)**:
+  - Frozen `dope.evidence-layout/v1` schema (`COL=128, EDGE=16, CLASS=16, CLASS_COL=4, GROUP=8, GLOB=160`) with strictly FIT-only zero-cache ephemeral extraction across Tiers `T0–T3`, exact row-permutation invariance, column-permutation equivariance, multiclass relabeling invariance, XOR/XNOR sign resolution, Walsh-Hadamard fANOVA GBDT witness, `k >= 10` support floor, and explicit admission guards (`p <= 256`, `n_classes <= 8`).
+- **Pure-Rust Nested-Prefix `DSE8` v1 Codec & `SingleEncV8` Runtime (`engine/dope-core/src/single_encoding/v8/`, `engine/dope-core/src/auto/v8.rs`, `engine/dope-arena/src/bin/dope_v8_emit.rs`)**:
+  - Self-contained raw and `normalized_only` modes (`<= 2048 B` headline, `512..65536 B` prefix-truncatable), strict ascending non-duplicate TLV framing with `TAG_WEIGHTS_FP` fail-closed identity check, typed marginals + exact nominal one-hot simplex decoding (`0` illegal rows), multi-regime factor means, Newton-IRLS linear head, 1D spline effects, pairwise interactions, depth-3 oblivious trees, heteroscedastic residual quantiles, nested FSQ codes, pure-Rust row-local `SingleEncV8` inference (`entmax_1.5` Soft-NODE + 2-block affine coupling flow), and 3-way grouped `auto::v8` acceptance guard.
+- **FP-0 Loop Repairs & `SingleEncV8` Offline PyTorch Training/Parity Stack (`research/levels/`)**:
+  - Fixed V7 training-loop lattice jitter (`float64` regular/shifted lattice detection), per-episode masked marginal/corr/SWD losses, duplicate-group splitting, and unseen-class episode refusal.
+  - Added `SingleEncV8` trainer (`s3_v8_trainer.py`, ready for C6 `dope-ffi` episode providers and DiLoCo sync), KPI-aligned differentiable losses (`s3_v8_losses.py`), non-Gaussian/XOR/contrastive priors (`s3_v8_priors.py`), 12-fixture Rust-vs-Python numerical parity suite (`<= 1e-4`), and 20-step launch-gate smoke test.
+- Preserves Format 1, `DPK3.2`/v1 receipts, `DSE7`, `DPA1`, and published `v2.0.0` weights bit-identically.
+
 ## Engine 2.0.0 - 2026-11-22
 
 - Release encoder, Rust-only V7 inference and the `dope_kpi` scoreboard:
