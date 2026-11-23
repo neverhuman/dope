@@ -405,9 +405,10 @@ fallback, so narrower faces leave more room.
   comparison's own sign-flip rate (`null_calibration`, reported beside it):
   making it a guard is an owner decision and a change of the pre-registered
   rule.
-- In the hero's dark theme the accent `#3987e5` and its lighter step
-  `#5598e7` are close (OKLab difference about 5.5, below the 15 that keeps
-  two marks apart at a glance); the highlight is told apart by its larger
-  marker and bold label. A control line within a label height of another
-  line or gridline can only be labelled on its far side, which may touch
-  that neighbour.
+- The hero's previous-release step sits on the surface side of the accent:
+  lighter in the light theme (`#2a78d6` / `#86b6ef`), darker in the dark theme
+  (`#4a95ee` / `#2e66ad`, OKLab difference 15.6, both at least 3:1 on the
+  dark surface). The light step is below 3:1 on the light surface, so every
+  point keeps a direct label and the README keeps the table. A control line
+  within a label height of another line or gridline can only be labelled on
+  its far side, which may touch that neighbour.

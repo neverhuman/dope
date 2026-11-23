@@ -298,7 +298,7 @@ fn no_line_runs_through_a_label() {
 fn the_dark_theme_uses_only_dark_tokens() {
     let dark = render(&fixture(), Theme::Dark);
     well_formed(&dark).unwrap();
-    assert!(dark.contains("fill=\"#1a1a19\"") && dark.contains("fill=\"#3987e5\""));
+    assert!(dark.contains("fill=\"#1a1a19\"") && dark.contains("fill=\"#4a95ee\""));
     for light in [
         "#fcfcfb", "#0b0b0b", "#52514e", "#2a78d6", "#86b6ef", "#e1e0d9",
     ] {
