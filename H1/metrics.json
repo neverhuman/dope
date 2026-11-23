@@ -1,0 +1,37 @@
+{
+  "schema": "dope.h-wave-record/v1",
+  "wave": "H1",
+  "name": "SingleEncV7 V7.1/V7.2 CPU-Fleet Pretraining Wave & DEV Head Ablations",
+  "status": "retired_archived_s3",
+  "scope": "DEV-only selection and persisted train.jsonl telemetry (not CONFIRM scoreboard KPIs)",
+  "s3_archive_prefixes": [
+    "s3://veox-jopedime-learning-use2/dope/v2.0.0-wave/",
+    "s3://veox-jopedime-learning-use2/checkpoints/v2.0.0-wave/"
+  ],
+  "s3_verified_objects": {
+    "jsonl_configs_macro_objects": 517,
+    "jsonl_configs_macro_bytes": 297246661,
+    "latest_checkpoint_objects": 65,
+    "latest_checkpoint_bytes": 145956588
+  },
+  "training_telemetry": {
+    "archived_runs": 64,
+    "train_jsonl_rows": 303189,
+    "training_episodes": 5854832,
+    "active_median_tbl_s": 482.1,
+    "peak_tbl_s": 2013.3,
+    "dope_vram_gib_max": 0.0,
+    "world_size_1_runs_of_65": 64
+  },
+  "dev_selection_summary": {
+    "v71_candidate_arms": 180,
+    "v72_eligible_arms": 123,
+    "v71_best_group": "d160l3 yh step=6000",
+    "v71_best_delta_vs_step0": 0.0004,
+    "v72_full_yh_range_vs_step0": [-0.072, -0.020],
+    "v72_best_xh_delta_vs_step0": -0.0015,
+    "step0_dev_c2st_median": 0.955,
+    "v71_v72_dev_c2st_range": [0.957, 0.965],
+    "provisional_v200_ckpt_sha256_prefix": "d013eb0cb08c9901"
+  }
+}

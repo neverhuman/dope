@@ -365,94 +365,109 @@ def diloco_sync_step(
     anchor_state: dict[str, np.ndarray],
     outer_lr: float = 0.7,
     outer_mom: float = 0.9,
+    base_round: int = 0,
+    worker_id: str = "w0",
 ) -> tuple[int, str]:
-    """Atomic LAN DiLoCo / Local-SGD outer-momentum weight sync across asynchronous nodes."""
+    """Atomic LAN/HTTP DiLoCo outer-momentum weight sync across asynchronous nodes."""
     import fcntl
     import hashlib
     import json
     from pathlib import Path
     import struct
     import time
+    import urllib.request
     import torch
+
+    def _pack_st(sd: dict[str, np.ndarray]) -> bytes:
+        hdr: dict[str, Any] = {}
+        blobs: list[bytes] = []
+        off = 0
+        for k in sorted(sd):
+            arr = np.ascontiguousarray(sd[k], dtype=np.float32)
+            b = arr.tobytes()
+            hdr[k] = {"dtype": "F32", "shape": list(arr.shape), "data_offsets": [off, off + len(b)]}
+            blobs.append(b)
+            off += len(b)
+        hb = json.dumps(hdr, separators=(",", ":")).encode("utf-8")
+        hb += b" " * ((8 - (len(hb) % 8)) % 8)
+        return struct.pack("<Q", len(hb)) + hb + b"".join(blobs)
+
+    def _unpack_st(raw: bytes) -> dict[str, np.ndarray]:
+        hlen = struct.unpack("<Q", raw[:8])[0]
+        hdr = json.loads(raw[8 : 8 + hlen].decode("utf-8"))
+        body = raw[8 + hlen :]
+        return {
+            k: np.frombuffer(body[m["data_offsets"][0] : m["data_offsets"][1]], dtype=np.float32).reshape(m["shape"]).copy()
+            for k, m in hdr.items() if k != "__metadata__"
+        }
+
+    def _apply_global(new_g: dict[str, np.ndarray]) -> None:
+        with torch.no_grad():
+            t_sd = {k: torch.from_numpy(v.copy()) for k, v in new_g.items()}
+            base_model.load_state_dict(t_sd, strict=True)
+            for ke, pe in ema_model.state_dict().items():
+                if ke in t_sd and pe.is_floating_point():
+                    pe.mul_(0.5).add_(t_sd[ke].to(pe.dtype), alpha=0.5)
+        anchor_state.clear()
+        for k, v in new_g.items():
+            anchor_state[k] = v.copy()
+
+    cur_sd = {k: v.detach().cpu().to(torch.float32).numpy().copy() for k, v in base_model.state_dict().items()}
+    if str(sync_dir).startswith(("http://", "https://")):
+        url = str(sync_dir).rstrip("/") + "/sync"
+        mode = "init" if base_round <= 0 else "delta"
+        send_sd = cur_sd if mode == "init" else {k: (anchor_state.get(k, cur_sd[k]) - cur_sd[k]).astype(np.float32) for k in cur_sd}
+        body = _pack_st(send_sd)
+        for attempt in range(3):
+            try:
+                req = urllib.request.Request(
+                    url, data=body, method="POST",
+                    headers={
+                        "Content-Type": "application/octet-stream",
+                        "X-Worker-Id": worker_id, "X-Payload-Mode": mode, "X-Base-Round": str(base_round),
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    raw = resp.read()
+                    s_round = int(resp.headers.get("X-Diloco-Round", str(base_round + 1)))
+                    sha = str(resp.headers.get("X-Diloco-Sha", hashlib.sha256(raw).hexdigest()[:16]))
+                _apply_global(_unpack_st(raw))
+                return s_round, sha[:16]
+            except Exception:
+                if attempt == 2:
+                    return base_round, ""
+                time.sleep(0.5 * (attempt + 1))
 
     sdir = Path(sync_dir)
     sdir.mkdir(parents=True, exist_ok=True)
-    lock_p = sdir / "sync.lock"
-    glob_p = sdir / "global_model.safetensors"
-    mom_p = sdir / "global_outer_mom.npz"
-    meta_p = sdir / "global_meta.json"
-
+    lock_p, glob_p, mom_p, meta_p = sdir / "sync.lock", sdir / "global_model.safetensors", sdir / "global_outer_mom.npz", sdir / "global_meta.json"
     with lock_p.open("a+b") as lfh:
         fcntl.flock(lfh.fileno(), fcntl.LOCK_EX)
         try:
-            cur_sd = {k: v.detach().cpu().to(torch.float32).numpy().copy() for k, v in base_model.state_dict().items()}
-            if glob_p.is_file():
-                raw = glob_p.read_bytes()
-                hlen = struct.unpack("<Q", raw[:8])[0]
-                hdr = json.loads(raw[8 : 8 + hlen].decode("utf-8"))
-                body = raw[8 + hlen :]
-                g_sd = {
-                    k: np.frombuffer(body[m["data_offsets"][0] : m["data_offsets"][1]], dtype=np.float32)
-                    .reshape(m["shape"])
-                    .copy()
-                    for k, m in hdr.items()
-                    if k != "__metadata__"
-                }
-            else:
-                g_sd = {k: v.copy() for k, v in cur_sd.items()}
+            g_sd = _unpack_st(glob_p.read_bytes()) if glob_p.is_file() else {k: v.copy() for k, v in cur_sd.items()}
             meta = json.loads(meta_p.read_text(encoding="utf-8")) if meta_p.is_file() else {"sync_round": 0}
             prev_mom = dict(np.load(mom_p)) if mom_p.is_file() else {}
-            new_mom: dict[str, np.ndarray] = {}
-            new_g: dict[str, np.ndarray] = {}
+            new_mom, new_g = {}, {}
             for k in sorted(cur_sd):
                 delta = anchor_state.get(k, cur_sd[k]) - cur_sd[k]
-                v_prev = prev_mom.get(k, np.zeros_like(delta, dtype=np.float32))
-                v_new = (outer_mom * v_prev + delta).astype(np.float32)
-                new_mom[k] = v_new
-                new_g[k] = (g_sd[k] - outer_lr * v_new).astype(np.float32)
-
-            header: dict[str, Any] = {}
-            blobs: list[bytes] = []
-            off = 0
-            for k in sorted(new_g):
-                arr = np.ascontiguousarray(new_g[k], dtype=np.float32)
-                b = arr.tobytes()
-                header[k] = {"dtype": "F32", "shape": list(arr.shape), "data_offsets": [off, off + len(b)]}
-                blobs.append(b)
-                off += len(b)
-            hb = json.dumps(header, separators=(",", ":")).encode("utf-8")
-            hb += b" " * ((8 - (len(hb) % 8)) % 8)
-            payload = struct.pack("<Q", len(hb)) + hb + b"".join(blobs)
+                v_new = (outer_mom * prev_mom.get(k, np.zeros_like(delta, dtype=np.float32)) + delta).astype(np.float32)
+                new_mom[k], new_g[k] = v_new, (g_sd[k] - outer_lr * v_new).astype(np.float32)
+            payload = _pack_st(new_g)
             sha = hashlib.sha256(payload).hexdigest()
             part = glob_p.with_suffix(".safetensors.part")
             part.write_bytes(payload)
             part.replace(glob_p)
-
             mpart = sdir / "global_outer_mom.part.npz"
             np.savez(mpart, **new_mom)
             mpart.replace(mom_p)
             s_round = int(meta.get("sync_round", 0)) + 1
-            meta_out = {
-                "sync_mode": "diloco_outer_momentum",
-                "sync_round": s_round,
-                "global_sha256": sha,
-                "outer_lr": outer_lr,
-                "outer_mom": outer_mom,
-                "updated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            }
             m_tmp = meta_p.with_suffix(".json.part")
-            m_tmp.write_text(json.dumps(meta_out, sort_keys=True) + "\n", encoding="utf-8")
+            m_tmp.write_text(json.dumps({
+                "sync_mode": "diloco_outer_momentum", "sync_round": s_round, "global_sha256": sha,
+                "outer_lr": outer_lr, "outer_mom": outer_mom, "updated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }, sort_keys=True) + "\n", encoding="utf-8")
             m_tmp.replace(meta_p)
-
-            with torch.no_grad():
-                t_sd = {k: torch.from_numpy(v.copy()) for k, v in new_g.items()}
-                base_model.load_state_dict(t_sd, strict=True)
-                for (ke, pe) in ema_model.state_dict().items():
-                    if ke in t_sd and pe.is_floating_point():
-                        pe.mul_(0.5).add_(t_sd[ke].to(pe.dtype), alpha=0.5)
-            anchor_state.clear()
-            for k, v in new_g.items():
-                anchor_state[k] = v.copy()
+            _apply_global(new_g)
             return s_round, sha[:16]
         finally:
             fcntl.flock(lfh.fileno(), fcntl.LOCK_UN)

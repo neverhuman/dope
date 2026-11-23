@@ -1,0 +1,32 @@
+{
+  "schema": "dope.h-wave-record/v1",
+  "wave": "H2",
+  "name": "SingleEncV7 V7.3 Cross-Host DiLoCo, Zero-Repeat & Tree-Visible Realism Wave",
+  "status": "active",
+  "scope": "DEV-only gate milestones (schedule-lite-dev.jsonl) and live training telemetry (not CONFIRM scoreboard KPIs)",
+  "config": {
+    "cohorts": [
+      {"sync_group": "ag-v73-diloco-d160l3", "d_model": 160, "n_layers": 3, "h_target": 32, "bytes": 2757948},
+      {"sync_group": "ag-v73-diloco-d192l4", "d_model": 192, "n_layers": 4, "h_target": 32, "bytes": 5087420}
+    ],
+    "lr": 0.0001,
+    "lr_schedule": "wsd",
+    "hard_tstr_v73": true,
+    "tree_realism_weight": 0.25,
+    "never_repeat_datasets": true,
+    "diloco_outer_lr": 0.2,
+    "diloco_outer_momentum": 0.7,
+    "diloco_staleness_alpha": 0.15,
+    "sync_every_steps": 50,
+    "device": "cpu",
+    "dope_vram_gib": 0.0
+  },
+  "dev_gate_milestones": {
+    "panel": "schedule-lite-dev.jsonl (DEV-only, zero CONFIRM access)",
+    "v73_step0": {"trg": -0.3914, "c2st_median": 0.9553, "binary": -0.5761, "multiclass": -0.4368, "regression": -0.1614},
+    "gate0_g0_httree_xh": {"trg": -0.3898, "delta_vs_step0": 0.0016, "c2st_median": 0.9533, "binary": -0.5838, "multiclass": -0.4217, "regression": -0.1639},
+    "gate0b_anchored_full": {"trg": -0.3979, "delta_vs_step0": -0.0065, "c2st_median": 0.965, "binary": -0.521, "multiclass": -0.4712, "regression": -0.2015},
+    "diloco_d160l3_r000108_full": {"trg": -0.377, "delta_vs_step0": 0.0144, "c2st_median": 0.96, "binary": -0.5107, "multiclass": -0.4611, "regression": -0.1591},
+    "diloco_d160l3_r000108_xh": {"trg": -0.3899, "delta_vs_step0": 0.0015, "c2st_median": 0.9571, "binary": -0.5777, "multiclass": -0.4354, "regression": -0.1565}
+  }
+}

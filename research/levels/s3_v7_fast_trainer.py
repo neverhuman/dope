@@ -33,7 +33,7 @@ from .s3_v7_eval import (
     append_jsonl as _append_jsonl, atomic_json as _atomic_json,
     compute_lr_factor, eval_binary, eval_multiclass, eval_realism_and_privacy, eval_regression,
     freeze_target_heads, load_v7_resume_state, save_v7_resume_state, save_v7_safetensors,
-    save_v7_valley_soup, split_dev_table_abt,
+    save_v7_valley_soup, split_dev_table_abt, tree_visible_joint_loss,
 )
 from .v7_single_encoding import (
     MAX_CLASSES, MAX_COLS, MAX_RANK, PACKET_BUDGET_BYTES,
@@ -176,13 +176,13 @@ def parse_args() -> argparse.Namespace:
         ("--ckpt-every", dict(type=int, default=150)), ("--log-every", dict(type=int, default=1)),
         ("--torch-threads", dict(type=int, default=1)), ("--prefetch-workers", dict(type=int, default=0)),
         ("--seed", dict(type=int, default=2026)), ("--resume", dict(type=str, default="")),
-        ("--lr-schedule", dict(type=str, default="cosine", choices=["cosine", "wsd"])),
-        ("--soup-k", dict(type=int, default=3)), ("--hard-tstr-v73", dict(action="store_true")),
-        ("--freeze-target-heads", dict(action="store_true")),
-        ("--never-repeat-datasets", dict(action="store_true")),
-        ("--shard-id", dict(type=int, default=0)), ("--num-shards", dict(type=int, default=1)),
-        ("--sync-dir", dict(type=str, default="")), ("--sync-every", dict(type=int, default=50)),
+        ("--lr-schedule", dict(type=str, default="cosine", choices=["cosine", "wsd"])), ("--soup-k", dict(type=int, default=3)),
+        ("--hard-tstr-v73", dict(action="store_true")), ("--freeze-target-heads", dict(action="store_true")),
+        ("--never-repeat-datasets", dict(action="store_true")), ("--shard-id", dict(type=int, default=0)),
+        ("--num-shards", dict(type=int, default=1)), ("--sync-dir", dict(type=str, default="")),
+        ("--sync-group", dict(type=str, default="")), ("--sync-every", dict(type=int, default=50)),
         ("--sync-outer-lr", dict(type=float, default=0.7)), ("--sync-outer-momentum", dict(type=float, default=0.9)),
+        ("--tree-realism-weight", dict(type=float, default=0.0)),
     ):
         ap.add_argument(flag, **kw)
     return ap.parse_args()
@@ -209,7 +209,9 @@ def main() -> None:
         _atomic_json(run_dir / "config.json", {
             "arch": "single_enc_v7", "recipe": "v7.3_zero_repeat_qnl" if args.hard_tstr_v73 else "v7.2_max_entropy_qnl",
             "col_in_dim": 46, "artifact_class": "source_free", "run_name": args.run_name,
-            "world_size": world_size, "sync_mode": sync_mode, "never_repeat_datasets": bool(args.never_repeat_datasets),
+            "world_size": world_size, "sync_mode": sync_mode, "sync_dir": args.sync_dir,
+            "sync_group": args.sync_group or args.sync_dir, "never_repeat_datasets": bool(args.never_repeat_datasets),
+            "tree_realism_weight": args.tree_realism_weight, "hard_tstr_v73": bool(args.hard_tstr_v73),
             "shard_id": args.shard_id, "num_shards": args.num_shards,
             "micro_batch": args.micro_batch, "grad_accum": args.grad_accum,
             "global_batch": world_size * args.micro_batch * args.grad_accum,
@@ -276,9 +278,11 @@ def main() -> None:
         if args.sync_dir else {}
     )
     sync_round, global_sha_short = 0, ""
+    worker_tag = f"{args.run_name}_s{args.shard_id}"
     if args.sync_dir and rank == 0:
         sync_round, global_sha_short = diloco_sync_step(
-            args.sync_dir, base_model, ema_model, anchor_state, args.sync_outer_lr, args.sync_outer_momentum
+            args.sync_dir, base_model, ema_model, anchor_state, args.sync_outer_lr, args.sync_outer_momentum,
+            base_round=0, worker_id=worker_tag,
         )
     if rank == 0:
         print(
@@ -308,7 +312,7 @@ def main() -> None:
     zero_valid_streak, win_tables = 0, 0
     run_t0 = time.time()
     win_t0 = run_t0
-    m_keys = ("loss", "cond_loss", "tstr_loss", "mmd_loss", "marg_loss", "corr_loss", "swd_loss", "anchor_loss", "train_unclipped_retention")
+    m_keys = ("loss", "cond_loss", "tstr_loss", "mmd_loss", "marg_loss", "corr_loss", "swd_loss", "tree_loss", "anchor_loss", "train_unclipped_retention")
 
     try:
         for step in range(start_step + 1, args.steps + 1):
@@ -346,6 +350,11 @@ def main() -> None:
                 loss, m = compute_v7_batch_loss(
                     x_s, lg_s, y_r, batch, logits_qry=lg_q, sd_qry=sd_q, ref=ref, hard_tstr_v73=args.hard_tstr_v73
                 )
+                if args.tree_realism_weight > 0.0:
+                    tl = tree_visible_joint_loss(x_s, lg_s, y_r, batch)
+                    loss, m["tree_loss"], m["loss"] = loss + args.tree_realism_weight * tl, float(tl.detach().item()), float((loss + args.tree_realism_weight * tl).detach().item())
+                else:
+                    m["tree_loss"] = 0.0
                 if not torch.isfinite(loss):
                     continue
                 (loss / float(args.grad_accum)).backward()
@@ -392,7 +401,8 @@ def main() -> None:
                     pe.data.mul_(d_ema).add_(pb.data, alpha=1.0 - d_ema)
             if args.sync_dir and rank == 0 and args.sync_every > 0 and (step % args.sync_every == 0 or step == args.steps):
                 sync_round, global_sha_short = diloco_sync_step(
-                    args.sync_dir, base_model, ema_model, anchor_state, args.sync_outer_lr, args.sync_outer_momentum
+                    args.sync_dir, base_model, ema_model, anchor_state, args.sync_outer_lr, args.sync_outer_momentum,
+                    base_round=sync_round, worker_id=worker_tag,
                 )
 
             step_tables = world_size * args.micro_batch * valid_micros

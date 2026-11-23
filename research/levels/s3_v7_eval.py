@@ -425,3 +425,56 @@ def save_v7_valley_soup(
     part.write_bytes(payload)
     part.replace(out_path)
     return len(payload), hashlib.sha256(payload).hexdigest()
+
+
+def tree_visible_joint_loss(
+    x_syn: torch.Tensor, lg_syn: torch.Tensor, y_reg_syn: torch.Tensor, batch: dict[str, torch.Tensor]
+) -> torch.Tensor:
+    """Differentiable 4-quartile axis-aligned 2-way copula + conditional target moment loss.
+
+    Targets the rectangular leaf statistics exploited by boosted-tree C2ST and GBDT retention
+    auditors (where Gaussian RBF MMD + 1D marginals have weak gradient signal).
+    """
+    import torch
+
+    X_qry, y_qry = batch["X_qry"], batch["y_qry"]
+    col_mask, q_mask, tid = batch["col_mask"], batch["q_mask"], batch["task_id"]
+    n_q_use = max(16, min(int(q_mask.sum(dim=1).min().item()), X_qry.shape[1]))
+    xq = X_qry[:, :n_q_use, :]
+    yq = y_qry[:, :n_q_use]
+    mu_q = xq.mean(dim=1, keepdim=True)
+    sd_q = xq.std(dim=1, keepdim=True).clamp_min(0.10)
+    zs = ((x_syn - mu_q) / sd_q).clamp(-4.0, 4.0)
+    zq = ((xq - mu_q) / sd_q).clamp(-4.0, 4.0)
+
+    def _qbins(z: torch.Tensor) -> torch.Tensor:
+        s_lo = torch.sigmoid(3.0 * (z + 0.6745))
+        s_mid = torch.sigmoid(3.0 * z)
+        s_hi = torch.sigmoid(3.0 * (z - 0.6745))
+        return torch.stack((1.0 - s_lo, (s_lo - s_mid).clamp_min(0.0), (s_mid - s_hi).clamp_min(0.0), s_hi), dim=-1)
+
+    bs, bq = _qbins(zs), _qbins(zq)
+    p_dim = x_syn.shape[2]
+    cop_terms = []
+    for shift in (1, 2, 3, 5):
+        if shift >= p_dim:
+            continue
+        pm = col_mask * torch.roll(col_mask, shifts=-shift, dims=1)
+        js = torch.einsum("bnpa,bnpc->bpac", bs, torch.roll(bs, shifts=-shift, dims=2)) / float(x_syn.shape[1])
+        jq = torch.einsum("bnpa,bnpc->bpac", bq, torch.roll(bq, shifts=-shift, dims=2)) / float(n_q_use)
+        cop_terms.append((((js - jq).abs().sum(dim=(-1, -2))) * pm).sum() / pm.sum().clamp_min(1.0))
+    cop_loss = sum(cop_terms) / max(len(cop_terms), 1)
+
+    ys_scalar = torch.where(
+        (tid == 0).unsqueeze(1), y_reg_syn.clamp(-4.0, 4.0),
+        torch.where((tid == 1).unsqueeze(1), torch.sigmoid(lg_syn[:, :, 0].clamp(-8.0, 8.0)),
+                    torch.softmax(lg_syn.clamp(-8.0, 8.0), dim=-1)[:, :, 0]),
+    )
+    yq_scalar = torch.where(
+        (tid == 0).unsqueeze(1), yq.clamp(-4.0, 4.0),
+        torch.where((tid == 1).unsqueeze(1), yq.clamp(0.0, 1.0), (yq.long() == 0).float()),
+    )
+    ms = torch.einsum("bn,bnpa->bpa", ys_scalar, bs) / bs.sum(dim=1).clamp_min(2.0)
+    mq = torch.einsum("bn,bnpa->bpa", yq_scalar, bq) / bq.sum(dim=1).clamp_min(2.0)
+    cond_q_loss = (((ms - mq).abs().mean(dim=-1)) * col_mask).sum() / col_mask.sum().clamp_min(1.0)
+    return cop_loss + 0.5 * cond_q_loss
