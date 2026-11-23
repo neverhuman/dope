@@ -8,8 +8,143 @@ use super::model::{
 };
 use super::packet::Dse8Packet;
 use super::scale_v8::{V8_MAX_CLASSES, V8_MAX_COLS};
-use crate::single_encoding::math::silu;
+use crate::error::Result;
+use crate::single_encoding::math::{gelu_exact, silu};
+use crate::single_encoding::safetensors::{
+    take_layernorm, take_linear, LayerNorm, Linear, TensorMap,
+};
 use crate::single_encoding::KNOT_COUNT;
+
+/// Pre-LN split-QKV multi-head attention block with pairwise edge bias + GELU FFN.
+#[derive(Clone, Debug)]
+pub(crate) struct PairSplitAttnBlock {
+    n_heads: usize,
+    head_dim: usize,
+    norm1: LayerNorm,
+    q_proj: Linear,
+    k_proj: Linear,
+    v_proj: Linear,
+    o_proj: Linear,
+    edge_proj: Linear,
+    norm2: LayerNorm,
+    ff1: Linear,
+    ff2: Linear,
+}
+
+impl PairSplitAttnBlock {
+    pub(crate) fn take(
+        tensors: &TensorMap,
+        prefix: &str,
+        d_model: usize,
+        n_heads: usize,
+        edge_dim: usize,
+    ) -> Result<Self> {
+        let head_dim = d_model / n_heads;
+        let ff1 = take_linear(tensors, &format!("{prefix}.ff1"), Some(d_model), None)?;
+        let d_ff = ff1.out_dim;
+        Ok(Self {
+            n_heads,
+            head_dim,
+            norm1: take_layernorm(tensors, &format!("{prefix}.norm1"), d_model)?,
+            q_proj: take_linear(
+                tensors,
+                &format!("{prefix}.q_proj"),
+                Some(d_model),
+                Some(d_model),
+            )?,
+            k_proj: take_linear(
+                tensors,
+                &format!("{prefix}.k_proj"),
+                Some(d_model),
+                Some(d_model),
+            )?,
+            v_proj: take_linear(
+                tensors,
+                &format!("{prefix}.v_proj"),
+                Some(d_model),
+                Some(d_model),
+            )?,
+            o_proj: take_linear(
+                tensors,
+                &format!("{prefix}.o_proj"),
+                Some(d_model),
+                Some(d_model),
+            )?,
+            edge_proj: take_linear(
+                tensors,
+                &format!("{prefix}.edge_proj"),
+                Some(edge_dim),
+                Some(n_heads),
+            )?,
+            norm2: take_layernorm(tensors, &format!("{prefix}.norm2"), d_model)?,
+            ff1,
+            ff2: take_linear(tensors, &format!("{prefix}.ff2"), Some(d_ff), Some(d_model))?,
+        })
+    }
+
+    pub(crate) fn forward(&self, x: &[Vec<f32>], edge: &[Vec<f32>]) -> Vec<Vec<f32>> {
+        let p = x.len();
+        let d = self.n_heads * self.head_dim;
+        let mut q = Vec::with_capacity(p);
+        let mut k = Vec::with_capacity(p);
+        let mut v = Vec::with_capacity(p);
+        for xc in x.iter().take(p) {
+            let h = self.norm1.forward_vec(xc);
+            q.push(self.q_proj.forward_vec(&h));
+            k.push(self.k_proj.forward_vec(&h));
+            v.push(self.v_proj.forward_vec(&h));
+        }
+        let mut e_bias = Vec::with_capacity(p * p);
+        for e_ij in edge.iter().take(p * p) {
+            e_bias.push(self.edge_proj.forward_vec(e_ij));
+        }
+        let scale = (self.head_dim as f32).sqrt().recip();
+        let mut attn_out = vec![vec![0.0f32; d]; p];
+        for h in 0..self.n_heads {
+            let off = h * self.head_dim;
+            for i in 0..p {
+                let mut scores = vec![0.0f32; p];
+                let mut max_s = f32::NEG_INFINITY;
+                for j in 0..p {
+                    let mut dot = 0.0f32;
+                    for t in 0..self.head_dim {
+                        dot += q[i][off + t] * k[j][off + t];
+                    }
+                    let s = dot * scale + e_bias[i * p + j][h];
+                    scores[j] = s;
+                    if s > max_s {
+                        max_s = s;
+                    }
+                }
+                let mut sum_e = 0.0f32;
+                for s in &mut scores {
+                    *s = (*s - max_s).exp();
+                    sum_e += *s;
+                }
+                let inv_e = sum_e.max(1e-12).recip();
+                for j in 0..p {
+                    let w = scores[j] * inv_e;
+                    for t in 0..self.head_dim {
+                        attn_out[i][off + t] += w * v[j][off + t];
+                    }
+                }
+            }
+        }
+        let mut out = Vec::with_capacity(p);
+        for i in 0..p {
+            let op = self.o_proj.forward_vec(&attn_out[i]);
+            let h1: Vec<f32> = (0..d).map(|t| x[i][t] + op[t]).collect();
+            let n2 = self.norm2.forward_vec(&h1);
+            let mut ff = self.ff1.forward_vec(&n2);
+            for val in &mut ff {
+                *val = gelu_exact(*val);
+            }
+            let ff2 = self.ff2.forward_vec(&ff);
+            out.push((0..d).map(|t| h1[t] + ff2[t]).collect());
+        }
+        out
+    }
+}
 
 /// Apply 2-layer row-local RealNVP coupling flow to latent Gaussian vector `z_lat[..p]`.
 /// Strictly zero-init identity (`flow_s == 0 && flow_t == 0` -> bit-exact no-op!).

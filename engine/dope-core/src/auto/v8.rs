@@ -1,27 +1,23 @@
 //! 3-way grouped acceptance guard for DOPE v3 (`Format 1` vs `DSE8 P0` analytic vs `DSE8 P1/P2` neural).
 //!
-//! Strictly additive alongside existing `auto::fit_auto` (`DPA1` V7 compatibility untouched):
-//! - Fits all 3 candidates inside `budget` bytes on FIT rows.
-//! - On a deterministic duplicate-group-safe 75/25 internal split (`MIN_CHECK_GROUPS = 80`),
-//!   evaluates all usable auditors and computes the worst-auditor retention score per candidate.
-//! - Requires `SELECTION_MARGIN = 0.02` over `Format 1` to promote `DSE8 P0` analytic, and
-//!   requires `SELECTION_MARGIN = 0.02` over BOTH `Format 1` and `DSE8 P0` to promote `DSE8` neural!
-//! - Never leaks raw cell values, headers, or extrema in reports or errors.
+//! Strictly additive alongside `auto::fit_auto` (`DPA1` V7 compatibility untouched):
+//! fits all 3 candidates inside `budget` bytes on FIT rows, scores via stratified 2-fold grouped
+//! 50/50 cross-fitting (`MIN_CHECK_GROUPS = 80`) with a single-fold drop veto (`<= 0.05`) and
+//! `SELECTION_MARGIN = 0.02`, never leaking raw cell values, headers, or extrema.
 
 use super::auditors::{fit_predict, null_predictions, Featurizer, AUDITORS};
-use super::check::{
-    duplicate_groups, grouped_split, retention, CHECK_SYNTH_FACTOR, MIN_CHECK_GROUPS,
-};
+use super::check::{duplicate_groups, retention, CHECK_SYNTH_FACTOR, MIN_CHECK_GROUPS};
 use super::SELECTION_MARGIN;
 use crate::compile::{fit as fit_f1, FitOptions};
 use crate::error::{DopeError, Result};
 use crate::eval::{prediction_loss, Matrix};
 use crate::program::Program;
+use crate::rng::Rng;
 use crate::sample::{sample as sample_f1, SampleOptions};
 use crate::schema::{infer, IntakeOptions, Kind, Schema, Task};
 use crate::single_encoding::v8::{
-    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, unpack_dse8_packet,
-    Dse8FitOptions, SingleEncV8Weights,
+    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta,
+    unpack_dse8_packet, Dse8FitOptions, SingleEncV8Weights,
 };
 use crate::table::{is_missing, parse_number, RawTable};
 use serde::Serialize;
@@ -118,24 +114,14 @@ fn raw_to_numeric_inputs(
     target: usize,
     schema: &Schema,
 ) -> Result<(Vec<Vec<f64>>, Vec<f64>, u8)> {
-    let task_id: u8 = match schema.task {
-        Task::Regression => 0,
-        Task::Classification => {
-            if let Kind::Categorical(spec) = &schema.target.kind {
-                if spec.levels.len() <= 2 {
-                    1
-                } else {
-                    2
-                }
-            } else {
-                1
-            }
-        }
+    let task_id: u8 = match (&schema.task, &schema.target.kind) {
+        (Task::Regression, _) => 0,
+        (Task::Classification, Kind::Categorical(spec)) if spec.levels.len() > 2 => 2,
+        (Task::Classification, _) => 1,
     };
-    let tcol = &raw.columns[target];
     let mut rows = Vec::with_capacity(raw.rows());
     let mut y = Vec::with_capacity(raw.rows());
-    for (r, cell) in tcol.iter().enumerate() {
+    for (r, cell) in raw.columns[target].iter().enumerate() {
         if is_missing(cell) {
             continue;
         }
@@ -172,17 +158,18 @@ fn raw_to_numeric_inputs(
 }
 
 fn decoded_v8_to_raw(schema: &Schema, x: &[Vec<f64>], y: &[f64]) -> RawTable {
-    let n = y.len();
-    let d = schema.features.len();
-    let mut columns: Vec<Vec<String>> = (0..d)
-        .map(|j| {
-            (0..n)
+    let mut columns: Vec<Vec<String>> = schema
+        .features
+        .iter()
+        .enumerate()
+        .map(|(j, f)| {
+            (0..y.len())
                 .map(|r| {
                     let v = x[j][r];
-                    if !v.is_finite() {
-                        String::new()
+                    if v.is_finite() {
+                        f.to_raw(v)
                     } else {
-                        schema.features[j].to_raw(v)
+                        String::new()
                     }
                 })
                 .collect()
@@ -212,6 +199,7 @@ pub fn fit_auto_v8(
     f1_opts.budget = Some(opts.format1.budget.unwrap_or(opts.budget));
     f1_opts.task = Some(schema.task);
 
+    let full_meta = fit_unit_meta(&x_full, &y_full, task_id, opts.normalized_only).ok();
     let dse8_opts = Dse8FitOptions {
         task_id,
         budget_bytes: opts.budget,
@@ -222,7 +210,7 @@ pub fn fit_auto_v8(
         enable_residual_model: opts.enable_residual_model,
         enable_skew_t: opts.enable_skew_t,
         code_tier: opts.code_tier,
-        col_meta: None,
+        col_meta: full_meta.as_deref(),
         seed: opts.format1.seed,
     };
 
@@ -264,21 +252,32 @@ pub fn fit_auto_v8(
             + usize::from(nn_ok.is_some())
             >= 2)
     {
-        let (tr_idx, te_idx) = grouped_split(groups, opts.format1.seed);
-        let (s1, s0, sn) = score_three_way(
-            raw,
-            target,
-            &schema,
-            &tr_idx,
-            &te_idx,
-            &f1_opts,
-            &dse8_opts,
-            weights,
-            opts.format1.seed,
-        )
-        .unwrap_or((None, None, None));
-        let pick = select_v8_candidate(s1, s0, sn);
-        (pick, s1, s0, sn, "scored_3way".to_string())
+        // Stratified 2-fold grouped 50/50 cross-fitting tests 100% of FIT rows (4x held-out rows
+        // vs 75/25) and blocks noisy single-fold regressions > 0.05 below Format 1 on either fold.
+        let strat = schema.task == Task::Classification;
+        let (half_a, half_b) =
+            grouped_two_fold_split(raw, target, strat, groups, opts.format1.seed);
+        let run_fold = |tr: &[usize], te: &[usize], sd: u64| {
+            score_three_way(
+                raw, target, &schema, tr, te, &f1_opts, &dse8_opts, weights, sd,
+            )
+            .unwrap_or((None, None, None))
+        };
+        let f0 = run_fold(&half_a, &half_b, opts.format1.seed);
+        let f1_cv = run_fold(&half_b, &half_a, opts.format1.seed ^ 0x2F01_D5E8);
+        let avg_opt = |a: Option<f64>, b: Option<f64>| a.zip(b).map(|(x, y)| 0.5 * (x + y));
+        let (s1, s0, sn) = (
+            avg_opt(f0.0, f1_cv.0),
+            avg_opt(f0.1, f1_cv.1),
+            avg_opt(f0.2, f1_cv.2),
+        );
+        let no_drop = |c0: Option<f64>, c1: Option<f64>| matches!((f0.0, f1_cv.0, c0, c1), (Some(a), Some(b), Some(x), Some(y)) if x >= a - 0.05 && y >= b - 0.05);
+        let pick = select_v8_candidate(
+            s1,
+            s0.filter(|_| no_drop(f0.1, f1_cv.1)),
+            sn.filter(|_| no_drop(f0.2, f1_cv.2)),
+        );
+        (pick, s1, s0, sn, "scored_3way_2fold".to_string())
     } else if f1_ok.is_some() {
         (
             V8Choice::Format1,
@@ -331,6 +330,35 @@ pub fn fit_auto_v8(
     })
 }
 
+fn grouped_two_fold_split(
+    raw: &RawTable,
+    target: usize,
+    stratify: bool,
+    mut groups: Vec<Vec<usize>>,
+    seed: u64,
+) -> (Vec<usize>, Vec<usize>) {
+    let mut rng = Rng::new(seed ^ 0xA070_5E1E_C7ED_2F01);
+    for i in (1..groups.len()).rev() {
+        let j = (rng.next_u64() as usize) % (i + 1);
+        groups.swap(i, j);
+    }
+    if stratify {
+        let tcol = &raw.columns[target];
+        groups.sort_by(|a, b| tcol[a[0]].cmp(&tcol[b[0]]));
+    }
+    let (mut a, mut b) = (Vec::new(), Vec::new());
+    for (idx, g) in groups.into_iter().enumerate() {
+        if idx % 2 == 0 {
+            a.extend(g);
+        } else {
+            b.extend(g);
+        }
+    }
+    a.sort_unstable();
+    b.sort_unstable();
+    (a, b)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn score_three_way(
     raw: &RawTable,
@@ -358,6 +386,19 @@ fn score_three_way(
     if yr.len() < 20 || yt.len() < 10 {
         return Ok((None, None, None));
     }
+    // For classification, require >= 5 test rows per active class so a tiny 2-row minority
+    // test fold cannot flip the Format 1 vs DSE8 choice on sampling noise!
+    if schema.task == Task::Classification {
+        let mut cnts = std::collections::BTreeMap::<i32, usize>::new();
+        for &v in &yt {
+            if v.is_finite() {
+                *cnts.entry(v.round() as i32).or_default() += 1;
+            }
+        }
+        if cnts.len() < 2 || cnts.values().any(|&c| c < 5) {
+            return Ok((None, None, None));
+        }
+    }
     let n_syn = CHECK_SYNTH_FACTOR * train_tbl.rows();
     let as_mat = |tbl: Result<RawTable>| -> Option<(Matrix, Vec<f64>)> {
         let data = schema.to_model(&tbl.ok()?).ok()?;
@@ -378,16 +419,22 @@ fn score_three_way(
         Ok(decoded_v8_to_raw(&schema, &s.x, &s.y))
     }));
 
-    let (x_tr, y_tr, _) = raw_to_numeric_inputs(&train_tbl, target, &schema)?;
+    let (x_tr, y_tr, tr_tid) = raw_to_numeric_inputs(&train_tbl, target, &schema)?;
+    let tr_meta = fit_unit_meta(&x_tr, &y_tr, tr_tid, dse8_opts.normalized_only).ok();
+    let tr_dse8_opts = Dse8FitOptions {
+        task_id: tr_tid,
+        col_meta: tr_meta.as_deref(),
+        ..*dse8_opts
+    };
     let syn_p0 = as_mat(super::guarded("p0_chk", || {
-        let bytes = fit_dse8_packet(&x_tr, &y_tr, dse8_opts)?;
+        let bytes = fit_dse8_packet(&x_tr, &y_tr, &tr_dse8_opts)?;
         let pkt = unpack_dse8_packet(&bytes)?;
         let dec = decode_dse8_rows(&pkt, None, n_syn, seed ^ 0xD5E8_0000)?;
         Ok(decoded_v8_to_raw(&schema, &dec.x, &dec.y))
     }));
     let syn_nn = weights.and_then(|w| {
         as_mat(super::guarded("nn_chk", || {
-            let bytes = fit_dse8_packet_with_encoder(&x_tr, &y_tr, dse8_opts, w)?;
+            let bytes = fit_dse8_packet_with_encoder(&x_tr, &y_tr, &tr_dse8_opts, w)?;
             let pkt = unpack_dse8_packet(&bytes)?;
             let dec = decode_dse8_rows(&pkt, Some(w), n_syn, seed ^ 0xD5E8_0001)?;
             Ok(decoded_v8_to_raw(&schema, &dec.x, &dec.y))

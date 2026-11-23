@@ -1,14 +1,13 @@
 //! Compact distilled depth-3 oblivious residual forest (`TAG_TREES`, `Tr`) for `DSE8` v1.
 //!
-//! - Fits up to `40` depth-3 oblivious trees (`min_leaf >= 10` privacy/support floor!) on the
-//!   residual after `W + E + Pr`.
-//! - Encodes each tree in `15 B` (`cls_id: u8`, `cols: [u8; 3]`, `thrs: [u8; 3]` in `0..15`
-//!   latent-quantile bin space, `leaf_scale: f16` [2 B], `leaves_i8: [i8; 8]` [8 B] -> `1 + 3 + 3 + 2 + 8 = 17 B`,
-//!   or `14 B` when `o_dim == 1` by omitting `cls_id` and packing 4-bit thresholds!).
-//!   Actually let's use **exact 14 B/tree** (`cols[3]` [3 B] + `packed_thrs_cls[2]` [2 B: 3×4-bit bin thresholds `0..15` + 4-bit `cls_id` `0..15`] + `scale_u8` [1 B log-scale] + `leaves_i8[8]` [8 B] = **14 B/tree for ALL tasks**!).
-//! - Prefix-truncatable: keeping the first `T' <= T` trees is a valid forest with zero refitting!
+//! - Uses exact decode-aligned 16-bin CDF tie-group overlap histograms so discrete/binary/tied
+//!   columns split at their true decode `Phi(z_lat)` boundary `(thr + 1) / 16`!
+//! - Boosts sequentially on live centered Newton working residuals with inner-val early stopping
+//!   and rollback to the best validation prefix (0 spurious trees on clean linear tables!).
+//! - Encodes each tree in exact `14 B` (`V8_TREE_WIRE_BYTES`), prefix-truncatable with zero refit.
 
-use crate::evidence::primitives::{value_consistent_bins, SUPPORT_FLOOR_K};
+use super::calibrate::{centered_working_resid, eval_true_loss, CdfIntervals};
+use crate::evidence::primitives::SUPPORT_FLOOR_K;
 
 pub const V8_TREE_WIRE_BYTES: usize = 14;
 pub const V8_MAX_TREES: usize = 40;
@@ -17,7 +16,7 @@ pub const V8_MAX_TREES: usize = 40;
 pub struct OblivTreeV8 {
     pub cls_idx: u8,
     pub cols: [u8; 3],
-    pub thrs: [u8; 3], // 0..14 in 16-bin latent quantile space (z_lat mapped via Phi)
+    pub thrs: [u8; 3],
     pub scale: f32,
     pub leaves: [f32; 8],
 }
@@ -44,6 +43,21 @@ impl OblivTreeV8 {
         self.leaves[idx]
     }
 
+    #[inline]
+    fn eval_on_cdf_row(&self, cdf: &CdfIntervals, row: usize) -> f64 {
+        let mut idx = 0usize;
+        for d in 0..3 {
+            let c = self.cols[d] as usize;
+            if c < cdf.p {
+                let u_cut = (self.thrs[d] as f32 + 1.0) / 16.0;
+                if cdf.u_mid[c][row] > u_cut {
+                    idx |= 1 << d;
+                }
+            }
+        }
+        self.leaves[idx] as f64
+    }
+
     pub fn encode_bytes(&self, out: &mut Vec<u8>) {
         out.push(self.cols[0]);
         out.push(self.cols[1]);
@@ -52,7 +66,6 @@ impl OblivTreeV8 {
         let b1 = (self.thrs[2] & 0x0F) | ((self.cls_idx & 0x0F) << 4);
         out.push(b0);
         out.push(b1);
-        // Log-quantized scale in [0.0005, 0.05] -> u8 [0..255]
         let sc_u8 = encode_tree_scale(self.scale);
         let sc_dec = decode_tree_scale(sc_u8);
         out.push(sc_u8);
@@ -71,8 +84,8 @@ impl OblivTreeV8 {
         let cls_idx = (bytes[4] >> 4) & 0x0F;
         let scale = decode_tree_scale(bytes[5]);
         let mut leaves = [0.0f32; 8];
-        for l in 0..8 {
-            leaves[l] = (bytes[6 + l] as i8) as f32 * scale;
+        for (l, slot) in leaves.iter_mut().enumerate() {
+            *slot = (bytes[6 + l] as i8) as f32 * scale;
         }
         Some(Self {
             cls_idx,
@@ -105,39 +118,69 @@ fn decode_tree_scale(u: u8) -> f32 {
 }
 
 impl TreesSectionV8 {
-    /// Fit a distilled depth-3 oblivious residual forest on remaining target residuals.
-    /// Enforces strict `min_leaf >= 10` support floor and early-stops when gain < noise floor.
-    pub fn fit(z_tie: &[Vec<f64>], target_resid: &[Vec<f64>], max_trees: usize) -> Self {
-        let p = z_tie.len();
-        let o_dim = target_resid.len();
-        let n = z_tie.first().map(|c| c.len()).unwrap_or(0);
+    /// Fit a decode-aligned depth-3 oblivious residual forest with live working residuals,
+    /// strict `min_leaf >= 10` support floor, and inner-val early stopping + rollback!
+    #[allow(clippy::too_many_arguments)]
+    pub fn fit(
+        cdf: &CdfIntervals,
+        cur_logits: &mut [Vec<f64>],
+        y_sc: &[f64],
+        tr_rows: &[usize],
+        va_rows: &[usize],
+        task_id: u8,
+        temp: f32,
+        max_trees: usize,
+    ) -> Self {
+        let p = cdf.p.min(64);
+        let o_dim = cur_logits.len();
+        let n_tr = tr_rows.len();
         let t_cap = max_trees.min(V8_MAX_TREES);
-        if p == 0 || o_dim == 0 || n < 3 * SUPPORT_FLOOR_K || t_cap == 0 {
+        if p == 0 || o_dim == 0 || n_tr < 3 * SUPPORT_FLOOR_K || va_rows.len() < 10 || t_cap == 0 {
             return Self::default();
         }
 
-        // Convert tie-aware normal scores to 16-bin indices matching `z_to_bin16` at decode time!
-        let bins16: Vec<Vec<u8>> = z_tie
-            .iter()
-            .map(|col| {
-                let (b, _) = value_consistent_bins(col, 16);
-                b.into_iter().map(|v| if v >= 16 { 7 } else { v }).collect()
-            })
-            .collect();
+        // Precompute exact 16-bin overlap weights on tr_rows once for O(1) histogram accumulation!
+        let mut tr_w16: Vec<Vec<(u8, u8, [f32; 16])>> = Vec::with_capacity(p);
+        for col in 0..p {
+            let mut col_w = Vec::with_capacity(n_tr);
+            for &r in tr_rows {
+                let (b0, b1, wf) =
+                    CdfIntervals::bin_weights::<16>(cdf.u_lo[col][r], cdf.u_hi[col][r]);
+                let mut w32 = [0.0f32; 16];
+                for b in b0..=b1 {
+                    w32[b] = wf[b] as f32;
+                }
+                col_w.push((b0 as u8, b1 as u8, w32));
+            }
+            tr_w16.push(col_w);
+        }
 
-        let mut resid: Vec<Vec<f64>> = target_resid.to_vec();
+        let base_va = eval_true_loss(cur_logits, y_sc, va_rows, task_id, temp);
+        let mut best_va = base_va;
+        let mut best_len = 0usize;
+        let mut best_logits = cur_logits.to_vec();
+        let min_improv = (0.001 * base_va.abs()).max(1e-5);
+        let patience = (3 * o_dim).max(4);
+        let mut stale = 0usize;
+
         let mut trees = Vec::with_capacity(t_cap);
-        let lr = 0.25f64;
-        let reg = 6.0f64;
+        let lr = 0.22f64;
+        let reg = 8.0f64;
 
         for step in 0..t_cap {
             let c = step % o_dim;
-            let r_vec = &mut resid[c];
-            let var_r = r_vec.iter().map(|v| v * v).sum::<f64>() / n as f64;
-            if var_r < 1e-4 {
+            let resid_all = centered_working_resid(cur_logits, y_sc, tr_rows, task_id, temp);
+            let r_tr: Vec<f64> = tr_rows.iter().map(|&r| resid_all[c][r]).collect();
+            let var_r = r_tr.iter().map(|v| v * v).sum::<f64>() / n_tr as f64;
+            if var_r < 1e-5 {
+                stale += 1;
+                if stale >= patience {
+                    break;
+                }
                 continue;
             }
-            let mut leaf_id = vec![0usize; n];
+
+            let mut leaf_id = vec![0usize; n_tr];
             let mut cols = [0u8; 3];
             let mut thrs = [7u8; 3];
             let mut tot_gain = 0.0f64;
@@ -145,31 +188,33 @@ impl TreesSectionV8 {
             for depth in 0..3 {
                 let n_leaves = 1usize << depth;
                 let mut cur_g = [0.0f64; 4];
-                let mut cur_c = [0usize; 4];
-                for i in 0..n {
+                let mut cur_c = [0.0f64; 4];
+                for i in 0..n_tr {
                     let l = leaf_id[i];
-                    cur_g[l] += r_vec[i];
-                    cur_c[l] += 1;
+                    cur_g[l] += r_tr[i];
+                    cur_c[l] += 1.0;
                 }
                 let base_score: f64 = (0..n_leaves)
-                    .map(|l| cur_g[l] * cur_g[l] / (cur_c[l] as f64 + reg))
+                    .map(|l| cur_g[l] * cur_g[l] / (cur_c[l] + reg))
                     .sum();
                 let mut best_gain = 0.0f64;
                 let mut best_col = 0usize;
                 let mut best_thr = 7u8;
 
-                for col in 0..p.min(64) {
+                for (col, col_w) in tr_w16.iter().enumerate().take(p) {
                     let mut hg = [[0.0f64; 16]; 4];
-                    let mut hc = [[0usize; 16]; 4];
-                    let cb = &bins16[col];
-                    for i in 0..n {
-                        let b = cb[i] as usize;
+                    let mut hc = [[0.0f64; 16]; 4];
+                    for (i, &(b0, b1, ref w)) in col_w.iter().enumerate() {
                         let l = leaf_id[i];
-                        hg[l][b] += r_vec[i];
-                        hc[l][b] += 1;
+                        let rv = r_tr[i];
+                        for b in (b0 as usize)..=(b1 as usize) {
+                            let wb = w[b] as f64;
+                            hg[l][b] += wb * rv;
+                            hc[l][b] += wb;
+                        }
                     }
                     let mut lg = [0.0f64; 4];
-                    let mut lc = [0usize; 4];
+                    let mut lc = [0.0f64; 4];
                     for t in 0..15u8 {
                         let tb = t as usize;
                         let mut score = 0.0;
@@ -177,14 +222,13 @@ impl TreesSectionV8 {
                         for l in 0..n_leaves {
                             lg[l] += hg[l][tb];
                             lc[l] += hc[l][tb];
-                            let rc = cur_c[l] - lc[l];
-                            if lc[l] >= SUPPORT_FLOOR_K && rc >= SUPPORT_FLOOR_K {
+                            let rc = (cur_c[l] - lc[l]).max(0.0);
+                            if lc[l] >= SUPPORT_FLOOR_K as f64 && rc >= SUPPORT_FLOOR_K as f64 {
                                 ok = true;
                                 let rg = cur_g[l] - lg[l];
-                                score += lg[l] * lg[l] / (lc[l] as f64 + reg)
-                                    + rg * rg / (rc as f64 + reg);
+                                score += lg[l] * lg[l] / (lc[l] + reg) + rg * rg / (rc + reg);
                             } else {
-                                score += cur_g[l] * cur_g[l] / (cur_c[l] as f64 + reg);
+                                score += cur_g[l] * cur_g[l] / (cur_c[l] + reg);
                             }
                         }
                         let gain = score - base_score;
@@ -198,17 +242,17 @@ impl TreesSectionV8 {
                 cols[depth] = best_col as u8;
                 thrs[depth] = best_thr;
                 tot_gain += best_gain;
-                let cb = &bins16[best_col];
-                for i in 0..n {
-                    if cb[i] > best_thr {
+                let u_cut = (best_thr as f32 + 1.0) / 16.0;
+                for (i, &r) in tr_rows.iter().enumerate() {
+                    if cdf.u_mid[best_col][r] > u_cut {
                         leaf_id[i] |= 1 << depth;
                     }
                 }
             }
 
-            // Require statistically meaningful gain over noise floor (`> 2.5 * var_r`).
             if tot_gain < 2.5 * var_r {
-                if o_dim == 1 {
+                stale += 1;
+                if stale >= patience {
                     break;
                 }
                 continue;
@@ -216,21 +260,44 @@ impl TreesSectionV8 {
 
             let mut g8 = [0.0f64; 8];
             let mut c8 = [0usize; 8];
-            for i in 0..n {
+            for i in 0..n_tr {
                 let l = leaf_id[i];
-                g8[l] += r_vec[i];
+                g8[l] += r_tr[i];
                 c8[l] += 1;
             }
+            let mut leaves_f64 = [0.0f64; 8];
+            let mut w_sum = 0.0;
+            let mut w_tot = 0.0;
+            for l in 0..8 {
+                if c8[l] >= SUPPORT_FLOOR_K {
+                    let v = (lr * g8[l] / (c8[l] as f64 + reg)).clamp(-1.8, 1.8);
+                    leaves_f64[l] = v;
+                    w_sum += c8[l] as f64 * v;
+                    w_tot += c8[l] as f64;
+                }
+            }
+            if w_tot <= 0.0 {
+                stale += 1;
+                if stale >= patience {
+                    break;
+                }
+                continue;
+            }
+            let mean_lv = w_sum / w_tot;
             let mut leaves_f32 = [0.0f32; 8];
             let mut max_abs = 0.0f32;
             for l in 0..8 {
                 if c8[l] >= SUPPORT_FLOOR_K {
-                    let v = (lr * g8[l] / (c8[l] as f64 + reg)).clamp(-2.0, 2.0) as f32;
+                    let v = (leaves_f64[l] - mean_lv).clamp(-1.8, 1.8) as f32;
                     leaves_f32[l] = v;
                     max_abs = max_abs.max(v.abs());
                 }
             }
             if max_abs < 1e-4 {
+                stale += 1;
+                if stale >= patience {
+                    break;
+                }
                 continue;
             }
             let sc_u8 = encode_tree_scale(max_abs / 127.0);
@@ -239,16 +306,39 @@ impl TreesSectionV8 {
                 let q = (*slot / sc).round().clamp(-127.0, 127.0) as i8;
                 *slot = q as f32 * sc;
             }
-            for i in 0..n {
-                r_vec[i] -= leaves_f32[leaf_id[i]] as f64;
-            }
-            trees.push(OblivTreeV8 {
+            let tree = OblivTreeV8 {
                 cls_idx: c as u8,
                 cols,
                 thrs,
                 scale: sc,
                 leaves: leaves_f32,
-            });
+            };
+            for &r in tr_rows {
+                cur_logits[c][r] += tree.eval_on_cdf_row(cdf, r);
+            }
+            for &r in va_rows {
+                cur_logits[c][r] += tree.eval_on_cdf_row(cdf, r);
+            }
+            trees.push(tree);
+
+            let va_loss = eval_true_loss(cur_logits, y_sc, va_rows, task_id, temp);
+            if va_loss + min_improv < best_va {
+                best_va = va_loss;
+                best_len = trees.len();
+                best_logits = cur_logits.to_vec();
+                stale = 0;
+            } else {
+                stale += 1;
+                if stale >= patience {
+                    break;
+                }
+            }
+        }
+
+        // Roll back to the exact best inner-validation prefix!
+        trees.truncate(best_len);
+        for (dst, src) in cur_logits.iter_mut().zip(best_logits) {
+            *dst = src;
         }
         Self { trees }
     }

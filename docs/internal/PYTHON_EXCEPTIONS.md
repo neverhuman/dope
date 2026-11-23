@@ -7,8 +7,8 @@ vs `port-candidate`), and justification under the Rust-first architecture
 
 ## Summary by Classification
 
-- **Total tracked `.py` files**: 926
-- **`keep-with-reason`**: 900 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
+- **Total tracked `.py` files**: 929
+- **`keep-with-reason`**: 903 (frozen `python/dope_v1` compatibility oracle, third-party Python ML auditor bindings, matplotlib figure generation, research-only controls, and their direct pytest/unittest suites)
 - **`port-candidate`**: 26 (deterministic CI governance checks, manifest/receipt verifiers, and standalone CLI utilities)
 - The complete inventory below contains exactly the paths from `git ls-files '*.py'`; the PR-scope table above is supplemental context and may repeat paths.
 
@@ -973,3 +973,6 @@ vs `port-candidate`), and justification under the Rust-first architecture
 | `research/levels/tests/test_v8_rust_parity.py` | `research/levels` | `keep-with-reason` | 12-fixture hard Rust-vs-Python numerical parity suite (`<= 1e-4`) across analytic Step-0 and non-zero F32 SafeTensors `SingleEncV8` plus `dope_v8_emit` CLI checks. | Direct pytest parity contract suite validating `v8_single_encoding.py` against pure Rust `dope_v8_emit`. |
 | `research/levels/tests/test_v8_losses.py` | `research/levels` | `keep-with-reason` | Unit tests verifying finite gradients across reg/bin/mc, entmax-1.5, FSQ STE, Gumbel-Rao K=4, PCGrad-Lite conflict cancellation, and contrastive XOR/XNOR priors. | Direct pytest suite for `s3_v8_losses.py` and `s3_v8_priors.py`. |
 | `research/levels/tests/test_s3_v8_launch_gate.py` | `research/levels` | `keep-with-reason` | 20-step single-CPU `SingleEncV8` launch-gate smoke test covering exact save/resume, PCGrad, F32 SafeTensors export, and native Rust `dope_v8_emit` round-trip. | Direct pytest launch-gate suite for `s3_v8_trainer.py` and `s3_v8_eval.py`. |
+| `research/levels/s3_v7_losses.py` | `research/levels` | `keep-with-reason` | Differentiable multi-auditor loss, per-episode masked SWD/marginal/corr, and trust-region anchor for `SingleEncV7` (split from `s3_v7_batch_ops.py`). | Offline PyTorch autograd objective; pure Rust owns production fit/sample and certification. |
+| `research/levels/s3_v8_trainer_io.py` | `research/levels` | `keep-with-reason` | Episode tensorization, CUDA guard, EMA, Valley Soup, and checkpoint I/O helpers for `s3_v8_trainer.py`. | Offline PyTorch training helpers; pure Rust `dope_v8_emit` and `dope` own production fitting and sampling. |
+| `research/levels/v8_parity_decode.py` | `research/levels` | `keep-with-reason` | Exact scalar parity mirror of Rust `decode_dse8_rows` for 12-fixture `<= 1e-4` Rust-vs-Python numerical parity verification. | Offline Python parity reference only; pure Rust `dope_core::single_encoding::v8::decode` owns production decoding. |

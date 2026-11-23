@@ -4287,6 +4287,18 @@
     "research/levels/tests/test_s3_v8_launch_gate.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
       "purpose": "20-step launch-gate training, exact resume, and Rust round-trip smoke test"
+    },
+    "research/levels/s3_v7_losses.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_fp0_loop.py",
+      "purpose": "verify split SingleEncV7 differentiable batch loss and per-episode masked SWD/marginal/corr"
+    },
+    "research/levels/s3_v8_trainer_io.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_s3_v8_launch_gate.py",
+      "purpose": "verify V8 episode tensorization, CUDA guard, EMA, Valley Soup, and checkpoint I/O"
+    },
+    "research/levels/v8_parity_decode.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify 12-fixture scalar Python parity mirror <=1e-4 against pure Rust decode_dse8_rows"
     }
   },
   "workspace": "dope"

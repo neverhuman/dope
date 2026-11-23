@@ -1050,7 +1050,10 @@
     "research/levels/tests/test_fp0_loop.py": "external-evidence",
     "research/levels/tests/test_v8_rust_parity.py": "external-evidence",
     "research/levels/tests/test_v8_losses.py": "external-evidence",
-    "research/levels/tests/test_s3_v8_launch_gate.py": "external-evidence"
+    "research/levels/tests/test_s3_v8_launch_gate.py": "external-evidence",
+    "research/levels/s3_v7_losses.py": "external-evidence",
+    "research/levels/s3_v8_trainer_io.py": "external-evidence",
+    "research/levels/v8_parity_decode.py": "external-evidence"
   },
   "workspace": "dope"
 }

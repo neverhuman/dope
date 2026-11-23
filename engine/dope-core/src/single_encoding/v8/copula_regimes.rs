@@ -63,13 +63,13 @@ pub fn fit_copula_loadings_v8(x_unit: &[Vec<f32>], rank_use: usize) -> CopulaFit
                 continue;
             }
             let rz = pearson(&z_tie[i], &z_tie[j]);
-            let r_lat = (rz / (kappa[i] * kappa[j]).max(0.0225)).clamp(-0.985, 0.985);
+            let r_lat = (rz / (kappa[i] * kappa[j]).max(0.0225)).clamp(-0.999, 0.999);
             r_raw[i * p + j] = r_lat;
             r_raw[j * p + i] = r_lat;
         }
     }
     let r_lat = if p >= 2 {
-        nearest_correlation(&r_raw, p, 1e-3)
+        nearest_correlation(&r_raw, p, 1e-4)
     } else {
         r_raw
     };
@@ -90,8 +90,8 @@ pub fn fit_copula_loadings_v8(x_unit: &[Vec<f32>], rank_use: usize) -> CopulaFit
     }
     for row in &mut l_f64 {
         let norm = row.iter().map(|v| v * v).sum::<f64>().sqrt();
-        if norm > 0.985 {
-            let inv = 0.985 / norm;
+        if norm > 0.999 {
+            let inv = 0.999 / norm;
             for v in row.iter_mut() {
                 *v *= inv;
             }
@@ -162,6 +162,18 @@ pub fn fit_regimes_v8(
         }
     }
 
+    // Standardize factor scores per dim so regime means live in exact N(0,1) factor coordinates.
+    let mut f_sd = vec![1.0f64; r_reg];
+    for k in 0..r_reg {
+        let m = factor_scores.iter().map(|row| row[k]).sum::<f64>() / n as f64;
+        let v = factor_scores
+            .iter()
+            .map(|row| (row[k] - m).powi(2))
+            .sum::<f64>()
+            / n as f64;
+        f_sd[k] = v.sqrt().max(0.25);
+    }
+
     // Only keep regimes meeting the strict k >= 10 privacy/support floor!
     let mut kept = Vec::new();
     let mut tot_kept = 0usize;
@@ -169,7 +181,7 @@ pub fn fit_regimes_v8(
         if cnts[g] >= SUPPORT_FLOOR_K {
             tot_kept += cnts[g];
             let mean_f: Vec<f32> = (0..r_reg)
-                .map(|k| ((sums[g][k] / cnts[g] as f64).clamp(-2.5, 2.5)) as f32)
+                .map(|k| ((sums[g][k] / (cnts[g] as f64 * f_sd[k])).clamp(-0.85, 0.85)) as f32)
                 .collect();
             kept.push((cnts[g], mean_f));
         }
@@ -177,15 +189,20 @@ pub fn fit_regimes_v8(
     if kept.len() < 2 || tot_kept == 0 {
         return RegimesSectionV8::default();
     }
+    // Zero-center kept regime means (weighted by regime share) so E[z_factor] == 0 exactly!
+    for k in 0..r_reg {
+        let mu_bar: f64 = kept
+            .iter()
+            .map(|(c, mf)| (*c as f64 / tot_kept as f64) * mf[k] as f64)
+            .sum();
+        for (_, mf) in &mut kept {
+            mf[k] = (mf[k] as f64 - mu_bar).clamp(-0.85, 0.85) as f32;
+        }
+    }
 
     // Check between-regime variance share: skip if centroids are trivially near zero!
     let mut bet_var = 0.0f64;
-    let mut tot_var = 0.0f64;
-    for row in factor_scores {
-        for &v in row.iter().take(r_reg) {
-            tot_var += v * v;
-        }
-    }
+    let tot_var = (tot_kept * r_reg) as f64;
     for (c, mf) in &kept {
         let sq: f64 = mf.iter().map(|&v| (v as f64).powi(2)).sum();
         bet_var += (*c as f64) * sq;

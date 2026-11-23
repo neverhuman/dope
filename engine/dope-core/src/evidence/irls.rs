@@ -20,6 +20,78 @@ pub(crate) fn fit_irls_subset(
     task_id: u8,
     k_eff: usize,
 ) -> (Vec<Vec<f64>>, Vec<f64>) {
+    let n = rows.len() as f64;
+    let lam = match task_id {
+        0 => (0.05 * n).max(2.0),
+        1 => (0.01 * n).max(1.0),
+        _ => (0.02 * n).max(1.5),
+    };
+    fit_irls_subset_lam(x_unit, y, rows, task_id, k_eff, lam, 6, 8.0, 1e-2, 0.01)
+}
+
+/// Build the regression Gram matrix once on `rows` and solve ridge for every `lam` in `lams`.
+pub(crate) fn fit_ridge_grid_subset(
+    x_unit: &[Vec<f32>],
+    y: &[f64],
+    rows: &[usize],
+    lams: &[f64],
+) -> Vec<(Vec<f64>, f64)> {
+    let p = x_unit.len();
+    let n = rows.len();
+    let m = p + 1;
+    if n < 4 || p == 0 {
+        return lams.iter().map(|_| (vec![0.0; p], 0.0)).collect();
+    }
+    let mut gram = vec![0.0f64; m * m];
+    let mut rhs = vec![0.0f64; m];
+    for &r in rows {
+        let yr = y[r];
+        for i in 0..m {
+            let xi = if i < p { finite_f64(x_unit[i][r]) } else { 1.0 };
+            rhs[i] += xi * yr;
+            for j in i..m {
+                let xj = if j < p { finite_f64(x_unit[j][r]) } else { 1.0 };
+                gram[i * m + j] += xi * xj;
+            }
+        }
+    }
+    for i in 0..m {
+        for j in 0..i {
+            gram[i * m + j] = gram[j * m + i];
+        }
+    }
+    let mut out = Vec::with_capacity(lams.len());
+    let mut work = vec![0.0f64; m * m];
+    for &lam in lams {
+        work.copy_from_slice(&gram);
+        for i in 0..p {
+            work[i * m + i] += lam.max(1e-6);
+        }
+        work[p * m + p] += 1e-4;
+        let sol = solve_spd(&work, &rhs, m);
+        let mut w = vec![0.0f64; p];
+        for j in 0..p {
+            w[j] = sol[j].clamp(-64.0, 64.0);
+        }
+        out.push((w, sol[p].clamp(-12.0, 12.0)));
+    }
+    out
+}
+
+/// Parameterized regularized Newton-IRLS solver (used by `DSE8` OOF-CV linear head and `Evidence`).
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn fit_irls_subset_lam(
+    x_unit: &[Vec<f32>],
+    y: &[f64],
+    rows: &[usize],
+    task_id: u8,
+    k_eff: usize,
+    lam: f64,
+    max_iters: usize,
+    w_clip: f64,
+    reg_b: f64,
+    wt_floor: f64,
+) -> (Vec<Vec<f64>>, Vec<f64>) {
     let p = x_unit.len();
     let n = rows.len();
     let m = p + 1;
@@ -31,7 +103,6 @@ pub(crate) fn fit_irls_subset(
     }
 
     if task_id == 0 {
-        let lam = (0.05 * n as f64).max(2.0);
         let mut gram = vec![0.0f64; m * m];
         let mut rhs = vec![0.0f64; m];
         for &r in rows {
@@ -49,26 +120,50 @@ pub(crate) fn fit_irls_subset(
             for j in 0..i {
                 gram[i * m + j] = gram[j * m + i];
             }
-            gram[i * m + i] += if i < p { lam } else { 1e-2 };
+            gram[i * m + i] += if i < p { lam } else { reg_b };
         }
         let sol = solve_spd(&gram, &rhs, m);
-        w_out[0].copy_from_slice(&sol[..p]);
-        b_out[0] = sol[p];
+        for i in 0..p {
+            w_out[0][i] = sol[i].clamp(-w_clip, w_clip);
+        }
+        b_out[0] = sol[p].clamp(-12.0, 12.0);
     } else if task_id == 1 {
-        let p1 = (rows.iter().filter(|&&r| y[r] > 0.5).count() as f64 / n as f64).clamp(0.02, 0.98);
+        let p1 = (rows.iter().filter(|&&r| y[r] > 0.5).count() as f64 / n as f64).clamp(0.01, 0.99);
         let mut wb = vec![0.0f64; m];
         wb[p] = (p1 / (1.0 - p1)).ln();
-        let lam = (0.01 * n as f64).max(1.0);
-        for _ in 0..6 {
-            let mut h = vec![0.0f64; m * m];
-            let mut g = vec![0.0f64; m];
+        let eval_bin_obj = |v: &[f64]| -> f64 {
+            let mut obj = 0.0;
+            for &r in rows {
+                let mut z = v[p];
+                for i in 0..p {
+                    z += finite_f64(x_unit[i][r]) * v[i];
+                }
+                let zc = z.clamp(-14.0, 14.0);
+                let yr = if y[r] > 0.5 { 1.0 } else { 0.0 };
+                obj += if zc >= 0.0 {
+                    (1.0 + (-zc).exp()).ln() + (1.0 - yr) * zc
+                } else {
+                    (1.0 + zc.exp()).ln() - yr * zc
+                };
+            }
+            for &wi in v.iter().take(p) {
+                obj += 0.5 * lam * wi * wi;
+            }
+            obj + 0.5 * reg_b * v[p] * v[p]
+        };
+        let mut cur_obj = eval_bin_obj(&wb);
+        let mut h = vec![0.0f64; m * m];
+        let mut g = vec![0.0f64; m];
+        for _ in 0..max_iters {
+            h.fill(0.0);
+            g.fill(0.0);
             for &r in rows {
                 let mut z = wb[p];
                 for i in 0..p {
                     z += finite_f64(x_unit[i][r]) * wb[i];
                 }
-                let pr = 1.0 / (1.0 + (-z.clamp(-10.0, 10.0)).exp());
-                let wt = (pr * (1.0 - pr)).max(0.01);
+                let pr = 1.0 / (1.0 + (-z.clamp(-14.0, 14.0)).exp());
+                let wt = (pr * (1.0 - pr)).max(wt_floor);
                 let diff = pr - if y[r] > 0.5 { 1.0 } else { 0.0 };
                 for i in 0..m {
                     let xi = if i < p { finite_f64(x_unit[i][r]) } else { 1.0 };
@@ -83,19 +178,41 @@ pub(crate) fn fit_irls_subset(
                 for j in 0..i {
                     h[i * m + j] = h[j * m + i];
                 }
-                let reg = if i < p { lam } else { 1e-2 };
+                let reg = if i < p { lam } else { reg_b };
                 h[i * m + i] += reg;
                 g[i] += reg * wb[i];
             }
             let step = solve_spd(&h, &g, m);
-            for i in 0..m {
-                wb[i] = (wb[i] - step[i]).clamp(-8.0, 8.0);
+            let max_s = step.iter().map(|v| v.abs()).fold(0.0f64, f64::max);
+            if !max_s.is_finite() || max_s < 1e-5 {
+                break;
+            }
+            // Uniform backtracking line search (NEVER coordinatewise clamp Newton steps!).
+            let mut alpha = if max_s > 4.0 { 4.0 / max_s } else { 1.0 };
+            let mut accepted = false;
+            for _ in 0..6 {
+                let mut cand = vec![0.0f64; m];
+                for i in 0..m {
+                    let cap = if i < p { w_clip } else { 12.0 };
+                    cand[i] = (wb[i] - alpha * step[i]).clamp(-cap, cap);
+                }
+                let cand_obj = eval_bin_obj(&cand);
+                if cand_obj <= cur_obj + 1e-9 {
+                    wb = cand;
+                    cur_obj = cand_obj;
+                    accepted = true;
+                    break;
+                }
+                alpha *= 0.5;
+            }
+            if !accepted || max_s * alpha < 1e-4 {
+                break;
             }
         }
         w_out[0].copy_from_slice(&wb[..p]);
         b_out[0] = wb[p];
     } else {
-        // Exact damped Multinomial Newton-IRLS (eliminates V7 log-odds ridge bias).
+        // Exact damped Multinomial Newton-IRLS with uniform step scaling.
         let mut cnts = vec![1.0f64; o_dim];
         for &r in rows {
             let c = (y[r].round() as isize).clamp(0, (o_dim - 1) as isize) as usize;
@@ -105,8 +222,9 @@ pub(crate) fn fit_irls_subset(
         for c in 0..o_dim {
             b_out[c] = (cnts[c] / tot).max(1e-3).ln();
         }
-        let lam = (0.02 * n as f64).max(1.5);
-        for _ in 0..6 {
+        let mut h = vec![0.0f64; m * m];
+        let mut g = vec![0.0f64; m];
+        for _ in 0..max_iters {
             let mut probs = vec![vec![0.0f64; o_dim]; n];
             for (ri, &r) in rows.iter().enumerate() {
                 let mut max_l = f64::NEG_INFINITY;
@@ -115,7 +233,7 @@ pub(crate) fn fit_irls_subset(
                     for i in 0..p {
                         z += finite_f64(x_unit[i][r]) * w_out[c][i];
                     }
-                    let zc = z.clamp(-10.0, 10.0);
+                    let zc = z.clamp(-14.0, 14.0);
                     probs[ri][c] = zc;
                     if zc > max_l {
                         max_l = zc;
@@ -131,9 +249,10 @@ pub(crate) fn fit_irls_subset(
                     probs[ri][c] *= inv;
                 }
             }
+            let mut max_s = 0.0f64;
             for c in 0..o_dim {
-                let mut h = vec![0.0f64; m * m];
-                let mut g = vec![0.0f64; m];
+                h.fill(0.0);
+                g.fill(0.0);
                 for (ri, &r) in rows.iter().enumerate() {
                     let pr = probs[ri][c];
                     let target = if (y[r].round() as isize) == c as isize {
@@ -142,7 +261,7 @@ pub(crate) fn fit_irls_subset(
                         0.0
                     };
                     let diff = pr - target;
-                    let wt = (pr * (1.0 - pr)).max(0.01);
+                    let wt = (pr * (1.0 - pr)).max(wt_floor);
                     for i in 0..m {
                         let xi = if i < p { finite_f64(x_unit[i][r]) } else { 1.0 };
                         g[i] += xi * diff;
@@ -156,16 +275,19 @@ pub(crate) fn fit_irls_subset(
                     for j in 0..i {
                         h[i * m + j] = h[j * m + i];
                     }
-                    let reg = if i < p { lam } else { 1e-2 };
+                    let reg = if i < p { lam } else { reg_b };
                     let wi = if i < p { w_out[c][i] } else { b_out[c] };
                     h[i * m + i] += reg;
                     g[i] += reg * wi;
                 }
                 let step = solve_spd(&h, &g, m);
+                let step_max = step.iter().map(|v| v.abs()).fold(0.0f64, f64::max);
+                let alpha = if step_max > 3.0 { 3.0 / step_max } else { 0.85 };
+                max_s = max_s.max(step_max * alpha);
                 for i in 0..p {
-                    w_out[c][i] = (w_out[c][i] - 0.85 * step[i]).clamp(-8.0, 8.0);
+                    w_out[c][i] = (w_out[c][i] - alpha * step[i]).clamp(-w_clip, w_clip);
                 }
-                b_out[c] = (b_out[c] - 0.85 * step[p]).clamp(-10.0, 10.0);
+                b_out[c] = (b_out[c] - alpha * step[p]).clamp(-12.0, 12.0);
             }
             for i in 0..p {
                 let mu = (0..o_dim).map(|c| w_out[c][i]).sum::<f64>() / o_dim as f64;
@@ -176,6 +298,9 @@ pub(crate) fn fit_irls_subset(
             let mb = b_out.iter().sum::<f64>() / o_dim as f64;
             for c in 0..o_dim {
                 b_out[c] -= mb;
+            }
+            if max_s < 1e-4 {
+                break;
             }
         }
     }
