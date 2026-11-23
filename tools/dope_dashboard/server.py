@@ -32,6 +32,7 @@ SSH_CMD = (
     "ServerAliveCountMax=2",
 )
 FRAME_LIMIT = 2 << 20
+DEFAULT_MACRO = "/home/ubuntu/dope-data/dashboard/fleet_macro.json"
 
 
 def _wire(msg: dict) -> str:
@@ -177,7 +178,8 @@ def _allowed_origin(request: web.Request) -> bool:
     return parsed.hostname in {"127.0.0.1", "localhost", "::1"}
 
 
-def build_app(state: DopeFleetState) -> web.Application:
+def build_app(state: DopeFleetState, macro_path: Path | None = None) -> web.Application:
+    """Routes; `macro_path` is the `dope.fleet-macro/v1` file written by `dope_fleet_macro`."""
     app = web.Application()
 
     async def index(_request: web.Request) -> web.Response:
@@ -214,8 +216,19 @@ def build_app(state: DopeFleetState) -> web.Application:
             state.waiters.discard(ev)
         return ws
 
+    async def api_macro(_request: web.Request) -> web.Response:
+        if macro_path is None or not macro_path.is_file():
+            return web.json_response({"error": "fleet macro not available"}, status=404)
+        try:
+            text = macro_path.read_text(encoding="utf-8")
+            json.loads(text)
+        except (OSError, ValueError):
+            return web.json_response({"error": "fleet macro unreadable"}, status=503)
+        return web.Response(text=text, content_type="application/json", headers={"Cache-Control": "no-store"})
+
     app.router.add_get("/", index)
     app.router.add_get("/api/snapshot", api_snapshot)
+    app.router.add_get("/api/macro", api_macro)
     app.router.add_get("/ws", ws_handler)
     return app
 
@@ -225,7 +238,7 @@ async def _serve(args: argparse.Namespace) -> None:
     local_host = args.local_host or socket.gethostname().split(".")[0]
     hist_path = Path(args.history_log) if args.history_log else None
     state = DopeFleetState(hosts, history_log=hist_path)
-    app = build_app(state)
+    app = build_app(state, Path(args.macro_json) if args.macro_json else None)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, args.bind, args.port)
@@ -254,6 +267,7 @@ def main() -> None:
     ap.add_argument("--hosts", default=",".join(DEFAULT_HOSTS))
     ap.add_argument("--local-host", default="")
     ap.add_argument("--history-log", default="/home/ubuntu/dope-data/dashboard/fleet_history.jsonl")
+    ap.add_argument("--macro-json", default=DEFAULT_MACRO, help="dope_fleet_macro output served at /api/macro")
     asyncio.run(_serve(ap.parse_args()))
 
 
