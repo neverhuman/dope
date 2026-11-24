@@ -19,8 +19,8 @@ class ReadmeBenchmark(unittest.TestCase):
         history = bench.HISTORY.read_text()
         self.assertEqual(bench.readme_block(history), bench.expected_readme_block(headline))
         self.assertNotIn(bench.BEGIN, (REPO / "README.md").read_text())
-        self.assertIn("paper/dope1.tex", (REPO / "README.md").read_text())
-        self.assertIn("paper/dope1-supplement.tex", (REPO / "README.md").read_text())
+        self.assertIn("paper/dope1.tex", history)
+        self.assertIn("paper/dope1-supplement.tex", history)
         for path in bench.PNGS:
             self.assertIn("docs/readme/" + path.name, history)
             self.assertTrue(path.is_file(), f"committed README figure {path.name} is missing")

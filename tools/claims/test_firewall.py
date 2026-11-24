@@ -315,6 +315,8 @@ class FirewallTests(unittest.TestCase):
         candidate = "# Historical results\n\n"
         candidate += (ROOT / 'paper/generated/readme-result-card.md').read_text()
         candidate += (ROOT / 'paper/generated/readme-demo-notes.md').read_text()
+        candidate += (ROOT / 'examples/adult/TRANSCRIPT.md').read_text()
+        candidate += (ROOT / 'bench/real-world/results/readme-block.md').read_text()
         original_read = Path.read_text
         readme = original_read(readme_path)
         def check(text, landing=readme):
@@ -328,6 +330,7 @@ class FirewallTests(unittest.TestCase):
         self.assertTrue(any('result card markers are missing' in f for f in check(candidate.replace(render.BEGIN, ''))))
         # The landing page refuses historical blocks and hand-typed numbers of its own.
         self.assertIn('README: generated TDL RESULTS block belongs in HISTORY.md', check(candidate, readme + candidate))
+        self.assertIn('README: historical DOPE1 RESULTS block belongs in HISTORY.md', check(candidate, readme + (ROOT / 'bench/real-world/results/readme-block.md').read_text()))
         self.assertTrue(any(f.startswith('README: hand-typed') for f in check(candidate, readme + "New result: 0.123.")))
 
     def test_figure_and_card_drift_is_detected_by_same_gate(self):

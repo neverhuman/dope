@@ -10,7 +10,7 @@ public surface that disagrees with the contract's headline operating point:
   (the claims renderer's input);
 - the \\TdlTransferThreshold, \\TdlDriverThreshold and \\TdlMetricName macros in
   paper/generated/headline-macros.tex;
-- the README's ``KiB@<operating point>`` form and its threshold wording.
+- the ``HISTORY.md`` ``KiB@<operating point>`` form and its threshold wording.
 
 Run from the repository root:
     python3 -B paper/scripts/contract_macros.py           # write
@@ -30,9 +30,10 @@ CONTRACT = ROOT / "contracts" / "tdl-contract-v1.json"
 OUTPUT = ROOT / "paper" / "generated" / "contract-macros.tex"
 RESULTS = ROOT / "paper" / "generated" / "headline-results.json"
 HEADLINE_MACROS = ROOT / "paper" / "generated" / "headline-macros.tex"
-README = ROOT / "README.md"
+HISTORY = ROOT / "HISTORY.md"
+README = HISTORY
 
-# README states the headline thresholds in words; a contract change must update both.
+# HISTORY.md states the historical TDL headline thresholds in words; a contract change must update both.
 THRESHOLD_WORDS = {0.8: "four-fifths", 0.9: "nine-tenths", 0.95: "nineteen-twentieths"}
 COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven",
                8: "eight", 9: "nine", 10: "ten"}
@@ -111,13 +112,13 @@ def surface_failures(contract: dict, results: dict, headline_macros: str | None,
                 failures.append(f"headline-macros.tex \\{name} is {values.get(name)!r}, contract gives {value!r}")
     transfer_label, driver_label = point["id"].split("/")
     if f"`KiB@{point['id']}`" not in readme:
-        failures.append(f"README does not state the public form `KiB@{point['id']}`")
+        failures.append(f"HISTORY.md does not state the public form `KiB@{point['id']}`")
     for label, value in ((transfer_label, point["transfer_threshold"]), (driver_label, point["driver_threshold"])):
         word = THRESHOLD_WORDS.get(value)
         if word is None:
-            failures.append(f"no README wording for threshold {value!r}; extend THRESHOLD_WORDS and the README")
+            failures.append(f"no HISTORY.md wording for threshold {value!r}; extend THRESHOLD_WORDS and HISTORY.md")
         elif f"{word}" not in readme or f"({label})" not in readme:
-            failures.append(f"README does not state the {label} threshold as '{word} ... ({label})'")
+            failures.append(f"HISTORY.md does not state the {label} threshold as '{word} ... ({label})'")
     return failures
 
 
