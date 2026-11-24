@@ -64,3 +64,4 @@ Each third-party generator is paired with DOPE on their common cells, and Holm's
 The receipt that scored the generators (\path{compare-methods.json}) asks whether each generator improves on DOPE.
 The direction reported in Table~\ref{tab:paired}, DOPE against each generator, was re-reduced after scoring from the same per-cell scores with the same \texttt{dope\_kpi} build, which reproduces the committed receipt byte for byte (\path{evidence/paper/} under the scoreboard).
 The paired differences and intervals are the same numbers with the sign reversed; only the one-sided $p$-values and the guard outcomes depend on the direction.
+Each re-reduced receipt applies the decision rule with Holm's adjustment over its own pair; adjusting over the \VThree{MethodsHolmM} pairs instead changes no outcome.
