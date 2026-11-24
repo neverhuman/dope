@@ -20,7 +20,7 @@ number in them is a `dope_kpi` output (`dope.kpi-receipt/v2`).
 - **Second look at the third-party generators.** Addendum H part (a) repeats the paper's
   comparison with the four third-party generators on the final look's DEV splits (data seeds 9-12),
   descriptively, with its own Holm family. Its receipts, logged text and `SHA256SUMS` are in
-  [`addendum-h/`](addendum-h/README.md); the white paper reports it as the second block of Table 2.
+  [`addendum-h/`](addendum-h/README.md); the white paper reports it as the second block of Table 3.
 
 | File | SHA-256 | Origin | Content |
 | --- | --- | --- | --- |

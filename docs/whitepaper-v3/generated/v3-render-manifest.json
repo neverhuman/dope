@@ -66,7 +66,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-macros.tex": "80bf80ab2c940a0d6f58246faf4a1fb0682af59fcdab8dfce30df3ebc6790f52"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "2e69e1e52072435c050d53d93a6076bb58ee68e280ab01d8393f0ede65d7cd22"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }

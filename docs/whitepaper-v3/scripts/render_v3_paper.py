@@ -308,7 +308,8 @@ def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str,
         ("binary has the fewest families", families["binary"] == min(families.values())),
         ("Holm covers a single comparison", comp["holm_m"] == 1),
         ("the contract is not frozen", primary["contract"]["protocol_frozen"] is False),
-    ] + methods_mod.claims(methods, arm, failed_value) + final_mod.claims(final, comp) + methods_mod.second_claims(second)
+    ] + methods_mod.claims(methods, arm, failed_value) + final_mod.claims(final, comp) + methods_mod.second_claims(
+        second, methods and methods["versus"]["arfpy-arf"]["matched"]["ci_low"])
     return [f"prose claim no longer holds for the receipts: {text}" for text, ok in claims if not ok]
 
 

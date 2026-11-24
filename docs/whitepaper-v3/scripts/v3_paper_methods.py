@@ -321,12 +321,14 @@ def second_macros(info: dict[str, Any] | None, ci: Callable, sha256: Callable[[s
            ("SecondLookToolGitSha", info["tool"]["git_sha"]), ("SecondLookToolVersion", info["tool"]["version"])]
     for method, v in info["versus"].items():
         role = ROLES[method]
+        m = v["matched"]
         out += [(f"SecondLook{role}VsPts", ci(scale * v["delta"], scale * v["ci_low"], scale * v["ci_high"], True, 1)),
+                (f"SecondLook{role}VsPtsMatched", ci(scale * m["delta"], scale * m["ci_low"], scale * m["ci_high"], True, 1)),
                 (f"SecondLook{role}VsRule", info["rule"][method])]
     return out
 
 
-def second_claims(info: dict[str, Any] | None) -> list[tuple[str, bool]]:
+def second_claims(info: dict[str, Any] | None, report_arf_matched_low: float | None = None) -> list[tuple[str, bool]]:
     """The second-look prose of sections 0, 1, 5, 6 and 8, against the Addendum H part (a) receipts."""
     if info is None:
         return [("the second-look receipts are committed", False)]
@@ -343,4 +345,6 @@ def second_claims(info: dict[str, Any] | None) -> list[tuple[str, bool]]:
          rule == {"Tvae": "PROMOTE", "Ctgan": "PROMOTE", "Gc": "HOLD", "Arf": "HOLD"}
          and failed == {"Tvae": set(), "Ctgan": set(), "Gc": {"task_ci_low", "privacy_coverage_delta"},
                         "Arf": {"task_ci_low", "mlp_delta", "realism_coverage_delta"}}),
+        ("at matched size the second look's ARF interval is above zero, unlike the report look's",
+         v["Arf"]["matched"]["ci_low"] > 0 and report_arf_matched_low is not None and report_arf_matched_low < 0),
     ]
