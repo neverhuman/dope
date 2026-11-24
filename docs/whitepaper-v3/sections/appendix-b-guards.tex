@@ -1,0 +1,33 @@
+\section{Realism and privacy gates}\label{app:guards}
+
+The coverage guards of \S\ref{sec:protocol} count, per informative entry, whether its synthetic file passes the realism and privacy gates of \path{contracts/dope-fidelity-v3-candidate.json}, as applied by \texttt{dope\_kpi guards}.
+A failed, over-budget or unsupported entry fails both.
+
+\begin{center}
+  \centering\small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Gate & Quantity & Passes if \\
+    \midrule
+    Realism & rows that violate the schema & none \\
+            & C2ST AUC of a boosted-tree discriminator, $B$ against $S$ & $\le \VThree{C2stMax}$ \\
+            & largest per-column marginal AUC, folded & $\le \VThree{MargAucMax}$ \\
+            & synthetic over real rule-violation ratio (when both are present) & $\le \VThree{RuleViolationMax}$ \\
+    \midrule
+    Privacy & share of synthetic rows nearer to $A$ than to $B$ (ties count half) & $\le \VThree{DcrMax}$ \\
+    (empirical) & distance-based membership-inference AUC & $\le \VThree{MiaAucMax}$ \\
+            & its true-positive rate at \VThree{MiaFprPct} false-positive rate & $\le \VThree{MiaTprMax}$ \\
+            & the file's exact-copy excess & $\le \VThree{CopyLe}$ \\
+            & canary hits & none \\
+            & declared support floor of the emitter & $\ge \VThree{SupportK}$ \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\noindent An exact copy is a synthetic row numerically identical to a row of $A$ (Euclidean distance below a tolerance); the twin's copies are the rows of $B$ identical to a row of $A$.
+A synthetic file's exact-copy excess is
+\begin{equation}
+  \max\Bigl(0,\ \frac{\sum \text{copies}}{\sum \text{synthetic rows}} - \frac{\sum \text{twin copies}}{\sum \text{twin rows}}\Bigr),
+\end{equation}
+summed over the file's complete entries; the promotion guard reads its mean over the candidate's headline files on the common cells.
+Controls carry no artifact, so their byte guard is not evaluated and their guard columns are empty in Table~\ref{tab:arms}.

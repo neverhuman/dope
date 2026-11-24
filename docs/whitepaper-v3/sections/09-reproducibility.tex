@@ -1,0 +1,13 @@
+\section{Reproducibility}\label{sec:repro}
+
+\paragraph{From receipts to this paper.}
+Three links, each checked by a tool rather than by hand:
+\begin{enumerate}
+  \item \texttt{dope\_kpi primary} and \texttt{compare} write the receipts \path{bench/real-world/results/scoreboard/v3.0.0/primary.json} and \path{compare.json} (SHA-256 prefixes \texttt{\VThree{PrimarySha}} and \texttt{\VThree{CompareSha}}): sorted-key JSON that records the SHA-256 of the contract, the schedule and every rows file read.
+  \item \texttt{dope\_kpi render-readme} and \texttt{render-hero} turn those receipts into the README block and hero figure; \path{render-manifest.json} records their SHA-256s and \path{tools/claims/dope1.py --check} refuses drift.
+  \item \path{docs/whitepaper-v3/scripts/render_v3_paper.py} writes every \texttt{\textbackslash VThree} macro and results table from the receipts, the contracts and constants parsed from the Rust sources, and fails unless every release row equals the README block's; it converts the hero SVG to PDF and records both SHA-256s. Third-party rows come from \path{primary-methods.json} and \path{compare-methods.json}, which must repeat the release receipts' run and arms and agree with the run's \path{MANIFEST.json}; Appendix~\ref{app:arms} lists the final look's checks.
+\end{enumerate}
+
+\paragraph{What continuous integration checks.}
+\texttt{render\_v3\_paper.py -{}-check} fails on drift of a generated file or the hero PDF, an undefined macro, a typed claim the receipts no longer support, or a digit typed outside a macro, citation, label or short allowlist.
+The \texttt{paper-clean} job rebuilds the generated files and PDF with fixed timestamps and requires a zero diff; \path{docs/whitepaper-v3/README.md} lists the commands.

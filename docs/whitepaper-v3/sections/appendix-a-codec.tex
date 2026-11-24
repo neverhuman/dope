@@ -1,0 +1,14 @@
+\section{\texttt{DSE8} wire format}\label{app:codec}
+
+\paragraph{Header.}
+The \VThree{DseHeaderBytes}-byte header holds, in order: the magic \texttt{DSE8}, the format version, the task, the class count $K$, the active column count $p$, the raw column count, a flag byte, the copula rank $r$, the knot level $\kappa$, the quantized logarithm of the fitting-row count, the latent clip $z_{\max}$, the residual scale, the positive-class prior, the inverse degrees of freedom $1/\nu$ of a row-level Student-$t$ scale on the factors (zero for Gaussian factors), the section count, the code tier and a reserved field.
+The flags mark a normalized-only packet, a column map, custom class ids, stored medians of dropped columns, skew-$t$ factors, and a neural encoder.
+
+\paragraph{Sections.}
+Tags ascend in this order: scale card, marginals, copula, linear head, nominal groups, regimes, main effects, pair interactions, oblivious trees, residual model, neural code, weights fingerprint.
+The scale card (absent only in the normalized-only mode), marginals, copula and linear head are always present, and nominal groups are present whenever the table has one-hot groups, since dropping them would let the sampler emit rows with zero or several active levels.
+The neural code and the weights fingerprint appear only in neural packets.
+Quantization is per section: loadings, effect bins, pair weights, regime means and tree leaves are signed bytes with a fixed or stored scale; marginal ranges and effect scales are half-precision floats; scale-card centres are single-precision and scales brain-float; probabilities are unsigned bytes.
+
+\paragraph{Validation.}
+The parser rejects an unknown magic, version, flag or section tag, a duplicate or out-of-order tag, a truncated section, bytes after the declared sections, a missing mandatory section, a code section that disagrees with the header, and a CRC mismatch; a \texttt{DPA1} container whose weights fingerprint is non-zero is decoded only with the matching checkpoint.

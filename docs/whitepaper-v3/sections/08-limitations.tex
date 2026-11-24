@@ -1,0 +1,41 @@
+\section{Limitations}\label{sec:limits}
+
+\paragraph{The decision is HOLD.}
+The pre-registered comparison improves TRG but does not meet the contract: \VThree{GuardsFailed} of \VThree{GuardsTotal} guards fail.
+(i)~\emph{Regression.} The regression difference is \VThree{DeltaRegression}; its lower bound \VThree{GuardTasks} is below the \VThree{TaskCiLowGt} guard, and the point estimate favours the baseline.
+(ii)~\emph{Held-out MLP.} The MLP auditor, which plays no part in selection or in the statistic, prefers the baseline (difference \VThree{GuardMlp}; TRG \VThree{CandMlp} against \VThree{BaseMlp}).
+(iii)~\emph{Realism coverage.} The difference is \VThree{GuardRealism}: the share of informative entries whose synthetic file passes the realism gate is \VThree{CandRealism} against \VThree{BaseRealism}.
+(iv)~\emph{Privacy coverage.} The difference is \VThree{GuardPrivacy}, just below the \VThree{PrivacyDeltaGt} guard (\VThree{CandPrivacy} against \VThree{BasePrivacy}).
+We have not established the causes of these failures, and \cli{-{}-format 1} remains the command-line default.
+
+\paragraph{Realism.}
+The median C2ST AUC of \cli{auto-v8} is \VThree{CandC2st}; the baseline's is \VThree{BaseC2st} and that of independently permuted columns is \VThree{IndepC2st}, while real resamples score \VThree{CopyAC2st} (copy of $A$) and \VThree{BootAC2st} (bootstrap of $A$).
+A boosted-tree discriminator separates these rows from real ones about as easily as rows with no dependence at all.
+The artifacts preserve predictive structure for the auditors far better than permuted columns do (TRG \VThree{CandTrgPoint} against \VThree{IndepTrgPoint}), but they are not realistic samples, and nothing here supports using them where realism matters.
+
+\paragraph{Privacy.}
+Storing no source rows and clipping marginals at a support floor are design properties, not guarantees.
+The privacy gate is an empirical audit (distance to closest record, a distance-based membership-inference attack, exact copies) on the rows scored; it is neither differential privacy~\citep{dwork2006calibrating} nor HIPAA de-identification, and passing it does not rule out other attacks~\citep{stadler2022groundhog}.
+
+\paragraph{Development data only.}
+No confirmation, holdout or sealed panel was opened.
+Both looks used fresh row splits, but of the same DEV tables on which the encoder was designed and selected, so they say little about tables or lineages outside that set; adaptive reuse of a development set biases such estimates upward~\citep{dwork2015reusable}.
+The pre-registration and its hash log are committed with the receipts; the schedules are identified in the receipts by hash and not published.
+
+\paragraph{Small panel and an unfrozen contract.}
+The report look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
+The sign-flip null shows that the percentile interval is anti-conservative at this size (\S\ref{sec:results}), Holm's adjustment covers a single comparison, and the matched-size gain is not resolved.
+The contract is a candidate and not frozen, so the rule itself may change before a confirmatory look.
+
+\paragraph{The final look.}
+The final look has the same limits, with \VThree{FlFamilies} informative families, and on it the rule is not calibrated.
+Neither look shows the released engine improving on release~\VThree{BaseVersion} under the contract; the candidate's PROMOTE rests on \VThree{FlNonzeroFamilies} families and did not change what shipped.
+
+\paragraph{Third-party baselines.}
+Each third-party generator was fitted once per cell on this development look, with library defaults, no tuning and no byte cap (files scored up to \VThree{MethodsScoreBudget}~bytes), so it fails the byte guard by construction; its TRG reflects its own file sizes.
+Entries whose sample holds a single class score \VThree{FailedValue} by protocol; the run's report (\path{methods-report.md}) attributes TVAE's failed cells to such samples.
+The comparisons are between these configurations on these splits, not the methods in general; SDV and its libraries are licensed \VThree{SdvLicense} and arfpy \VThree{ArfpyLicense}.
+
+\paragraph{Provenance.}
+The receipts record \texttt{dope\_kpi} \VThree{ToolVersion} with build commit ``\VThree{ToolGitSha}'', and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.
+The scoreboard's README reports that a local build of the release source reproduced every scheduled packet's SHA-256 and that the signed binary must too; no committed receipt records either, so we do not claim that the released binary reproduces every scored packet.

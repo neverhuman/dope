@@ -4313,8 +4313,8 @@
       "purpose": "unit and native Rust round-trip test suite for SingleEncV8 model surgery and v8-r3 trainer hooks"
     },
     "docs/whitepaper-v3/": {
-      "command": "python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check",
-      "purpose": "verify DOPE v3.0.0 white paper macros match committed scoreboard/v3.0.0 receipts and frozen contracts with zero drift"
+      "command": "python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py' && python3 -B docs/whitepaper-v3/scripts/render_v3_paper.py --check && bash docs/whitepaper-v3/scripts/build_v3_pdf.sh && git diff --exit-code -- docs/whitepaper-v3",
+      "purpose": "rebuild the DOPE v3.0.0 white paper from the scoreboard/v3.0.0 receipts, contracts and Rust constants: README-identical tables, hero provenance, no hand-typed digits, deterministic PDF with zero drift"
     }
   },
   "workspace": "dope"

@@ -117,6 +117,13 @@ paper:
     python3 docs/whitepaper/scripts/render_figures.py
     python3 -B docs/whitepaper/scripts/paper_build.py
 
+# DOPE v3.0.0 white paper: macros and tables from the receipts, the digit lint, then a
+# deterministic PDF (docs/whitepaper-v3/scripts/build_v3_pdf.sh).
+paper-v3:
+    python3 -B docs/whitepaper-v3/scripts/render_v3_paper.py
+    python3 -B docs/whitepaper-v3/scripts/render_v3_paper.py --check
+    bash docs/whitepaper-v3/scripts/build_v3_pdf.sh
+
 paper-check:
     python3 docs/whitepaper/scripts/local_receipts.py --check
     python3 research/benchmark/verify_paper_numbers.py
@@ -130,9 +137,13 @@ paper-check:
     git diff --exit-code -- docs/whitepaper/generated/fit-trace.json docs/whitepaper/generated/panel-stats.json docs/whitepaper/generated/numbers.tex docs/whitepaper/generated/figure-spec.tex docs/whitepaper/generated/density-table.tex docs/whitepaper/generated/neural-table.tex docs/whitepaper/generated/forest-table.tex docs/whitepaper/generated/headline-table.tex docs/whitepaper/generated/byte-table.tex docs/whitepaper/generated/threshold-table.tex docs/whitepaper/generated/threshold-counts.tex docs/whitepaper/generated/beyond-fit.tex docs/whitepaper/generated/provenance-table.tex docs/whitepaper/generated/fidelity-privacy-table.tex docs/whitepaper/generated/loss-beside-retention.tex docs/whitepaper/generated/artifact-hashes.tex docs/whitepaper/generated/coreset-paragraph.tex docs/whitepaper/generated/compute-cost.json docs/whitepaper/generated/compute-cost-receipts.json docs/whitepaper/generated/compute-cost-table.tex docs/whitepaper/generated/licenses.json docs/whitepaper/generated/availability.tex docs/whitepaper/generated/publication-rows.tex docs/whitepaper/generated/figure-hashes.json docs/whitepaper/figures/retention-bytes.pdf docs/whitepaper/figures/retention-bars.pdf docs/whitepaper/figures/paired-cdf.pdf docs/whitepaper/figures/loss-curves.pdf docs/whitepaper/figures/teaser.pdf docs/whitepaper/generated/teaser-figure-hashes.json docs/whitepaper/figures/pareto.pdf docs/whitepaper/generated/pareto-figure-hashes.json docs/whitepaper/generated/readme-figure-hashes.json docs/readme/pareto.png docs/readme/paired.png README.md HISTORY.md docs/whitepaper/generated/v2-numbers.tex docs/whitepaper/generated/v2-headline.json docs/whitepaper/generated/v2-headline-table.tex docs/whitepaper/generated/v2-size-table.tex docs/whitepaper/generated/v2-fidelity-table.tex docs/whitepaper/generated/v2-fidelity-levels.tex docs/whitepaper/generated/v2-contrasts.tex docs/whitepaper/generated/v2-levels.tex docs/whitepaper/generated/v2-seeds.tex docs/whitepaper/generated/v2-family-numbers.tex docs/whitepaper/generated/v2-family-table.tex docs/whitepaper/generated/v2-all-five-numbers.tex docs/whitepaper/generated/v2-all-five-table.tex docs/whitepaper/generated/mfs-v3-density-table.tex docs/whitepaper/generated/mfs-v3-scalar.tex docs/whitepaper/generated/mfs-v3-layers.tex docs/whitepaper/generated/mfs-v3-figure-hashes.json docs/whitepaper/figures/mfs-v3-retention-bars.pdf docs/whitepaper/figures/mfs-v3-paired.pdf research/benchmark/results/mfs-v3-density-panel.json
     python3 -B docs/whitepaper/scripts/paper_build.py --check
     git diff --exit-code -- docs/whitepaper/generated/architecture-figure-hashes.json docs/whitepaper/figures/architecture.pdf
+    python3 -B docs/whitepaper-v3/scripts/render_v3_paper.py --check
+    bash docs/whitepaper-v3/scripts/build_v3_pdf.sh
+    git diff --exit-code -- docs/whitepaper-v3
 
 # Preserve the independent paper-script suite as its own explicit gate.
 # Its committed-input authentication test is a full replay; admission is separate.
 paper-tests:
     python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'
     python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v
+    python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py'

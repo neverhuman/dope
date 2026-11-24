@@ -192,3 +192,109 @@ only as an opt-in `--v8-weights` asset, never as the default.
   - Fallback: if the RC is not ready by 14:00Z, `b8a0037c` ships on its seeds 5-8 receipt (HOLD
     disclosed) and seeds 9-12 stay unspent.
 - DEV-SELECT only. No CONFIRM, HOLDOUT, SEALED or FMGAP B/C.
+
+### Deviation 4 (written 2026-11-23T20:41Z, before any E3 screen and before any probe step)
+
+- **E3 `v8-rep-r2k3000` is stopped and its checkpoints are kept.**
+  - Reason: the owner (Jepson, 20:30Z) asked whether much larger models would give more lift at the same encoding size.
+  - E3 has the lowest prior of the three E arms. It uses Track B's recipe family, whose paired DEV-lite receipts against `dse8-p0-v3b` are k500 HOLD +0.010 [−0.025, +0.049], k1000 REJECT, and k1500/k2000 HOLD negative.
+  - E3 itself has no screen, so stopping it uses no E3 outcome.
+  - E1 and E2, the finalist rules, the futility rule and the single final look are unchanged.
+- **Its CPUs (xbabe0 88-103, behind x0_gate2) run the capacity × channel probe P1-P4.**
+  - The probe is **information only for v3.1**. It is not a finalist and is never scored on DEV wide or on seeds 9-12.
+  - Design: zero-head fresh inits, so every arm starts exactly at the analytic packet; Track B recipe; no `--init-from`; 1,500 steps; one replica per arm; identical `--seed 801`, so the episode stream is shared and comparisons are paired.
+
+    | Arm | `d_model` | Learned code (`--code-dim`) | CPUs |
+    |---|---|---|---|
+    | P1 | 128 | 64 (32 B, today) | 1 torch + 3 producers |
+    | P2 | 128 | 1,024 (512 B) | 1 torch + 3 producers |
+    | P3 | 256 | 64 | 2 torch + 2 producers |
+    | P4 | 256 | 1,024 | 2 torch + 2 producers |
+
+  - All arms use 4 encoder and 2 decoder layers.
+- **Readout.**
+  - Paired per-step training loss (`total`, `l_ret`, `l_direct_cond`) on the shared fresh-split episode stream, at the largest common step, in 250-step bins after the curriculum (step 1000).
+  - Capacity effect = P3 − P1 and P4 − P2; channel effect = P2 − P1 and P4 − P3.
+  - P1 and P3 (64-value code) may also get information-only DEV-lite screens through the native emitter. P2 and P4 cannot be emitted on the current wire.
+- **Decision rule for v3.1, stated now.**
+  - If neither effect lowers post-curriculum `total` by ≥ 0.02 at the common step, parameter count and code width are not the lever, and v3.1 work goes to the learning signal and gate.
+  - Otherwise the next rung is a native wire code tier and a 20M → 100M ladder, with matched-byte native replay on every cell (Codex 20:38Z).
+
+### Deviation 4b (written 2026-11-23T21:24Z, before any GPU probe step)
+
+- **The owner dedicated xbabe1 (one RTX 4090 24 GB) to DOPE** (Jepson, about 21:12Z, relayed on the board). This adds compute; it changes no rule.
+- **P1-P4 also run on that GPU, with every argument of deviation 4 unchanged:**
+  - deploy `v3-49fb765e`, Track B recipe, zero-head fresh init, 1,500 steps, `--seed 801`;
+  - plus `--device cuda`, in fp32 (no AMP);
+  - **one arm at a time**, in the order P1, P2, P3, P4;
+  - each with the same 20 producer CPUs (`0-19`) and 4 torch threads (`20-23`), so the four GPU arms share identical settings. On xbabe0 the producer counts differ (3 vs 2).
+- **Readout of record: the GPU set.** It uses the readout and the v3.1 decision rule of deviation 4.
+  - The xbabe0 CPU set keeps running as an independent replica and is reported when it completes, including any sign disagreement with the GPU set.
+  - A GPU arm is never compared with a CPU arm.
+- **Still information only for v3.1.** Never a finalist, never scored on wide DEV or on seeds 9-12, and no effect on E1/E2, the finalist rules or the final look.
+
+### Addendum F (written 2026-11-23T22:10Z, before any cand6 build exists or is scored)
+
+- **Why.** Jepson, about 22:05Z: "close any error gaps you are finding... finalize our major release with our MAJOR model update."
+  - This reopens D1 (fallback, 21:26Z) for one bounded RC track.
+  - The `dope-engine-v3.0.0` tag waits until the owner's 11-24 14:00Z time box.
+  - PR #1 (closeout, docs, evidence; no engine change) still merges through the queue.
+- **DEV evidence already seen (no new data).**
+  - Wide DEV seeds 1-4 ledgers (schedule `97439e8a…`).
+  - Codex's attribution, 22:05Z.
+  - My exact route-composition screen: 12 task-dispatch composites of v3b / cand4 / v2, `route_compose.py`. The identity composite reproduces Codex's cand4-vs-v2 receipt exactly. Receipts: `screen-vs-v2.json` and `screen-vs-v3b.json`, Holm m = 12 and 11.
+  - What it found:
+    - v3b's MLP failure is binary table `0a64bb31` (both views, 2 informative MLP rows).
+    - v3b's privacy failure is mainly multiclass table `48b63627`: 0/16 files pass vs cand4's 4/16.
+    - cand4's regression route equals v2's exactly.
+    - Best composite: regression and binary from cand4, multiclass from v3b. It scores +0.051 [+0.005, +0.125] vs v2, with privacy −0.035 (fails) and every other guard passing.
+- **RC build cand6 (AG).**
+  - Regression and binary take cand4's route.
+  - Multiclass takes v3b's DSE8 route, kept only where cand4's FIT-only privacy vetoes pass; otherwise it falls back to cand4's choice.
+  - Budget 2,048 B; everything else unchanged.
+  - At most **3** builds under this addendum (cand6, cand6b, cand6c), all before **11-24 08:00Z**. Holm m equals the number of builds tried.
+- **Eligibility for the single final look, judged on wide DEV seeds 1-4 only:**
+  1. **vs `dope-2.0.0-auto`: PROMOTE.** All contract conditions pass: ci_low > 0, Holm p < 0.05, delta ≥ 0.01, task CI lower bound > −0.02, MLP ≥ 0, realism and privacy coverage > −0.03, exact-copy ≤ 0.005, bytes ≤ 2,048.
+  2. **vs `dope-v3b-auto-v8` (= `b8a0037c`): point delta ≥ 0.**
+  - This replaces D1's "full bar against both baselines". Reason: with 3-4 families per task, a significant lift over b8a0037c is out of reach on DEV.
+  - The contract's promotion standard is defined against the previous release, v2.0.0, and b8a0037c itself is HOLD against it.
+  - The change is stated here before any cand6 number exists.
+- **If a build is eligible:** freeze it by 10:00Z. Run Addendum E's single final look on seeds 9-12: arms RC, `b8a0037c` and `dope-2.0.0-auto` plus controls, in one Holm family.
+  - **The RC ships** if, on the look, it PROMOTEs vs `dope-2.0.0-auto` and its delta vs `b8a0037c` is ≥ 0.
+  - **Otherwise `b8a0037c` ships**, and the look receipt is disclosed with it.
+- **If nothing is eligible by 08:00Z:** `b8a0037c` ships (D1), and seeds 9-12 stay unspent.
+- **Neural V8 stays out of v3.0.0.** No checkpoint beats the analytic packet. The conditional and marginal losses do not learn, and the gate settles near 0.05 (see the training study). Stage A (deviation 4b) continues as v3.1 research.
+- DEV-SELECT only.
+
+### Addendum F freeze (written 2026-11-23T22:48Z, before any seeds 9-12 score)
+
+- **RC: `v3c-cand6b`**, source `bc92df0b1beae93254718e270e4e7ef7b05b38a3` (`origin/feat/v3c-cand6b`).
+  - The look binary is Claude's source build `582ebfc17b3af23ec1f5c558cfcb4111ce9583e0955f2467766fcf41193e547b`.
+  - On wide DEV it is packet-identical, 216/216, to builder binary `41f9efe8…` (Codex identity TSV `620bbd1d…`).
+  - It is the only eligible Addendum F build, out of 2 tried: cand6 HOLD; cand6b PROMOTE, Holm m=2 p 0.0222, +0.0121 vs b8a0037c. Codex re-reduction `2cb5174f…`.
+- **Look inputs** (`xbabe2:~/dope-data/kpi-runs/v3-final-look`):
+  - schedule `beaa2a0fa3e2bcc44c37f23bf15adca0c2ff5b4adb5f212a198c99f3d23f71a2` (108 cells, data seeds 9-12, 22 DEV tables);
+  - panel `d5bd12b0…`, dev tables `6fe72230…`;
+  - contract `200ea0ed…` (embedded);
+  - `dope_kpi` `ea855a89…` (3.0.0, `git_sha` `bc92df0b`; scores byte-identically to `c01fd919` on wide DEV).
+  - The same recipe with seeds 5-8 reproduces the report schedule `14238f1d…` byte for byte.
+- **Arms:**
+  - `rc-auto-v8` = RC;
+  - `served-auto-v8` = `b8a0037c` served build `dope-v3-3fb802fd` `58314f0a…`;
+  - `dope-2.0.0-auto` = `0caec190…`;
+  - native controls.
+- **Holm family:** {rc vs 2.0.0, rc vs served}, m = 2.
+- **Ship rule (unchanged from Addendum F):** the RC ships iff it PROMOTEs vs `dope-2.0.0-auto` on this look **and** its point delta vs `served-auto-v8` is ≥ 0. Otherwise `b8a0037c` ships, and this look's receipts are disclosed with it.
+- **Reported with the decision (disclosure only; no decision role):**
+  - the per-family decomposition of the delta;
+  - the exact family sign-flip randomization p;
+  - the contract's own null calibration;
+  - the per-task deltas.
+
+### Addendum F result (written 2026-11-23T23:03Z, after the look; no rule changed)
+
+- Timeline on xbabe2 `~/dope-data/kpi-runs/v3-final-look` (from `look.log`): plan step (schedule and panel copied from the xbabe0 plan, hash check) 22:47:16Z; freeze posted on the board 22:48:04Z; realref 22:48:16Z; arms 22:48:17Z; first scored ledger 22:52:28Z; receipts 22:57:21Z. No arm was scored before the freeze. (Corrected 2026-11-23T23:56:43Z after Codex review: the first version said "scored 22:47-22:57Z", which conflated the plan step with scoring.) Receipts: primary `892a8ee0442aec76a442eb7bc28fe6951c5187a54ccc92158ed5d7e440c44c73`, family `2be57ae09637d8c786b565bd7f51c14b98ffd09b26d22e8c8c3ed2758ff18a6e`, compare-a `4ddabe59…`, compare-b `d59dfcfa…`. Codex re-reduced both comparisons independently (`93630510…`, `9b5f86ba…`).
+- RC `bc92df0b` vs `dope-2.0.0-auto`: PROMOTE, +0.01648 [+0.00221, +0.03742], Holm (m=2) p 0.0234, all six guards pass.
+- RC vs `served-auto-v8` (`b8a0037c`): −0.00195 [−0.04533, +0.04243] (1×: −0.0349), HOLD.
+- **Ship rule: second condition fails (point < 0). `b8a0037c` ships as v3.0.0; this look's receipts are disclosed with it.**
+- Disclosure-only items (as pre-stated): RC-vs-2.0.0 gain from 3 of 10 families (multiclass `4dac5905` 71 %), exact family sign-flip p 0.125, contract null flip-guard rate 0.137. Descriptive, outside the Holm family: served vs 2.0.0 on this look HOLD +0.0184 [−0.0282, +0.0669], realism −0.056 and task lower bound −0.138 fail (`served-vs-v2.json` `0610fb25…`).

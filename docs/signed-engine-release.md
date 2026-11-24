@@ -50,7 +50,8 @@ fixtures with an empty executable-helper `PATH`.
 
 The normal/build dependency inventory refuses Python bindings, libtorch and implicit
 GPU dependencies. ELF imports are also checked for Python/libtorch/CUDA/MKL linkage.
-The package contains one application executable, model data supplied separately, and
+The package contains one application executable (the V7 encoder weights are compiled in;
+MLC model data is supplied separately; no learned V8 weights ship), and
 build/license/verification sidecars. It contains no Python scripts or environments.
 It can still link ordinary OS libraries such as libc/libm; this GNU build is not a
 universally static image or a macOS/Windows release. CUDA and Metal remain separate

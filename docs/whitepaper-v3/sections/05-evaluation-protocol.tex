@@ -1,0 +1,60 @@
+\section{Evaluation protocol}\label{sec:protocol}
+
+All results come from \texttt{dope\_kpi} (\path{engine/dope-arena}) under the contract \VThree{ContractId} (\path{contracts/dope-kpi.json}, SHA-256 prefix \texttt{\VThree{KpiContractSha}}), which fixes the statistic, the interval, the decision rule and its guards.
+The contract's status is ``\VThree{ContractStatus}'' and it is not frozen.
+
+\paragraph{Cells and roles.}
+A cell is one table with one row split into disjoint roles: $A$, the rows a generator sees; $B$, a real twin with as many rows as $A$; $C$, calibration rows; and $T$, held-out test rows.
+No duplicate group straddles two roles.
+An arm fits on $A$ and emits a synthetic sample $S$ of $m\,|A|$ rows; the headline multiplier is $m=\VThree{PrimaryMult}$ and a matched-size statistic with $m=\VThree{MatchedMult}$ is reported beside it.
+Tables belong to lineage families (tables from one source), each assigned to one task.
+
+\paragraph{Retention and the twin-referenced gap.}
+An auditor is a fixed learning recipe.
+Fitted on rows $x$ and scored on $T$ with loss $L_x$, it has retention
+\begin{equation}\label{eq:retention}
+  R_x = \frac{L_{\mathrm{null}} - L_x}{L_{\mathrm{null}} - L_A},
+\end{equation}
+where $L_{\mathrm{null}}$ is the loss of the null prediction and $L_A$ that of the auditor fitted on $A$.
+For a scored entry (cell, auditor, sample seed),
+\begin{equation}\label{eq:entry}
+  v = \operatorname{clip}\bigl(R_S,\ \VThree{ClipLow},\ \VThree{ClipHigh}\bigr) - R_B ,
+\end{equation}
+and $v=\VThree{FailedValue}$ for an entry that was not scored (a failure, an artifact over budget, a single-class sample or an unsupported table).
+Values are averaged over sample seeds; a cell takes the minimum over the two statistic auditors (a seeded linear model and gradient-boosted trees); cells are averaged within a family, families within a task, and the tasks present are averaged with equal weight:
+\begin{equation}\label{eq:trg}
+  \TRG = \frac{1}{|\mathcal T|}\sum_{t\in\mathcal T}\frac{1}{|\mathcal F_t|}\sum_{f\in\mathcal F_t}\frac{1}{|\mathcal C_f|}\sum_{c\in\mathcal C_f}\ \min_{a}\ \bar v_{c,a}.
+\end{equation}
+Zero means that the synthetic rows train the auditors as well as a real twin the size of the fitting split; higher is better. Only at $m=\VThree{MatchedMult}$ do the synthetic sample and the twin have the same size.
+A third auditor, a seeded MLP, is aggregated the same way, held out of the statistic and read only by a guard.
+A (cell, auditor) unit enters only if it is informative on real data alone: the auditor fitted on $A$ must beat the null on $T$ by a material margin with a positive bootstrap lower bound, and the twin's retention must be close to one.
+
+\paragraph{Uncertainty.}
+Intervals come from a stratified family bootstrap: each of \VThree{BootDraws} draws resamples the families of every task with replacement and recomputes Eq.~\eqref{eq:trg}.
+The \VThree{CiLevel} interval runs between the draws at the \VThree{LowerPct}th and \VThree{UpperPct}th percentiles, and the one-sided $p$ for a paired difference $\Delta\le 0$ is the share of draws at or below zero, with one added to numerator and denominator.
+Both arms of a comparison read the same draws.
+
+\paragraph{Decision rule.}
+A comparison pairs a candidate with a baseline on their common cells and bootstraps the per-family differences.
+Holm's adjustment runs over the comparisons of one receipt.
+The outcome is PROMOTE if and only if
+(i)~the interval's lower bound is above \VThree{CiLowGt};
+(ii)~the Holm-adjusted $p$ is below \VThree{HolmAlpha};
+(iii)~$\Delta \ge \max(\VThree{MinDelta}, \text{noise s.d.})$; and
+(iv)~every guard passes: each task's lower bound is above \VThree{TaskCiLowGt}; the held-out MLP difference is at least \VThree{MlpDeltaGe}; the realism and privacy coverage differences are above \VThree{RealismDeltaGt} and \VThree{PrivacyDeltaGt}; the candidate's exact-copy excess is at most \VThree{CopyLe}; and every produced file is within the \VThree{BudgetBytes}-byte budget.
+It is REJECT if the interval's upper bound is below zero, and HOLD otherwise.
+Coverage is the share of informative statistic entries whose synthetic file passes a realism (or privacy) gate, aggregated like the statistic.
+The realism gate bounds the C2ST AUC of a boosted-tree discriminator between $B$ and $S$, the per-column marginal AUC and the rule-violation ratio; the privacy gate bounds a distance-to-closest-record share, a distance-based membership-inference AUC and its true-positive rate at a low false-positive rate, and requires the declared support floor.
+Appendix~\ref{app:guards} gives the thresholds and the exact-copy excess.
+
+\paragraph{Calibration of the rule.}
+Each comparison also carries a sign-flip null: in each of \VThree{NullReplicates} replicates every family's paired differences are multiplied by an independent fair sign and the rule is reapplied.
+The receipt reports the false-PROMOTE rate of the statistical conditions (i)--(iii) alone and of the conditions together with the guards a flip can move, each with a Wilson interval; the contract deems a rate of at most \VThree{NullMaxRatePct} acceptable.
+These rates are reported beside the decision and do not enter it.
+
+\paragraph{The look.}
+Under a pause on the confirmation, holdout and sealed panels, every number in this paper comes from development (DEV) tables.
+The encoder was selected on DEV in steps recorded in the scoreboard's README before each was scored: a screen on a small DEV schedule; a decision on a wider DEV schedule, where \cli{auto-v8} had to beat \VThree{BaseId} by at least \VThree{MinDelta} in TRG with the paired lower bound above zero; and a single report on fresh row splits of the same DEV tables, planned before selection and scored once after it.
+No guard, threshold or parameter was tuned on the report.
+The one comparison in the report receipt, \VThree{CandId} against \VThree{BaseId}, is the pre-registered one, so Holm's adjustment covers $m=\VThree{HolmM}$ comparison.
+The receipts identify the schedule by SHA-256 (prefix \texttt{\VThree{ScheduleSha}}) but do not include it.

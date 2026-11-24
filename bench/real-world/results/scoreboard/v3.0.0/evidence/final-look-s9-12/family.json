@@ -1,0 +1,151 @@
+{
+ "schema": "dope.v3-final-look-family/v2",
+ "m": 2,
+ "comparisons": [
+  {
+   "receipt": "compare-a.json",
+   "candidate": "rc-auto-v8",
+   "baseline": "dope-2.0.0-auto",
+   "delta": 0.016482377904,
+   "ci_low": 0.002213289377,
+   "ci_high": 0.037419104951,
+   "p_one_sided": 0.011698830117,
+   "p_holm_family": 0.023397660234,
+   "pair_holm_m": 1,
+   "pair_decision": {
+    "conditions": [
+     {
+      "check": "pass",
+      "name": "ci_low",
+      "threshold": 0.0,
+      "value": 0.002213289377
+     },
+     {
+      "check": "pass",
+      "name": "holm_p",
+      "threshold": 0.05,
+      "value": 0.011698830117
+     },
+     {
+      "check": "pass",
+      "name": "min_delta",
+      "threshold": 0.01,
+      "value": 0.016482377904
+     }
+    ],
+    "guards": [
+     {
+      "check": "pass",
+      "name": "task_ci_low",
+      "threshold": -0.02,
+      "value": 0.0
+     },
+     {
+      "check": "pass",
+      "name": "mlp_delta",
+      "threshold": 0.0,
+      "value": 0.004090024337
+     },
+     {
+      "check": "pass",
+      "name": "realism_coverage_delta",
+      "threshold": -0.03,
+      "value": 0.0
+     },
+     {
+      "check": "pass",
+      "name": "privacy_coverage_delta",
+      "threshold": -0.03,
+      "value": 0.0
+     },
+     {
+      "check": "pass",
+      "name": "exact_copy_excess",
+      "threshold": 0.005,
+      "value": 4.7637195e-05
+     },
+     {
+      "check": "pass",
+      "name": "bytes",
+      "threshold": 2048.0,
+      "value": 2047.0
+     }
+    ],
+    "outcome": "PROMOTE"
+   }
+  },
+  {
+   "receipt": "compare-b.json",
+   "candidate": "rc-auto-v8",
+   "baseline": "served-auto-v8",
+   "delta": -0.001945225699,
+   "ci_low": -0.045327318451,
+   "ci_high": 0.042427096533,
+   "p_one_sided": 0.566343365663,
+   "p_holm_family": 0.566343365663,
+   "pair_holm_m": 1,
+   "pair_decision": {
+    "conditions": [
+     {
+      "check": "fail",
+      "name": "ci_low",
+      "threshold": 0.0,
+      "value": -0.045327318451
+     },
+     {
+      "check": "fail",
+      "name": "holm_p",
+      "threshold": 0.05,
+      "value": 0.566343365663
+     },
+     {
+      "check": "fail",
+      "name": "min_delta",
+      "threshold": 0.01,
+      "value": -0.001945225699
+     }
+    ],
+    "guards": [
+     {
+      "check": "fail",
+      "name": "task_ci_low",
+      "threshold": -0.02,
+      "value": -0.129317182361
+     },
+     {
+      "check": "fail",
+      "name": "mlp_delta",
+      "threshold": 0.0,
+      "value": -0.007091043658
+     },
+     {
+      "check": "pass",
+      "name": "realism_coverage_delta",
+      "threshold": -0.03,
+      "value": 0.055555555556
+     },
+     {
+      "check": "pass",
+      "name": "privacy_coverage_delta",
+      "threshold": -0.03,
+      "value": 0.029265873016
+     },
+     {
+      "check": "pass",
+      "name": "exact_copy_excess",
+      "threshold": 0.005,
+      "value": 4.7637195e-05
+     },
+     {
+      "check": "pass",
+      "name": "bytes",
+      "threshold": 2048.0,
+      "value": 2047.0
+     }
+    ],
+    "outcome": "HOLD"
+   }
+  }
+ ],
+ "note": "pair_decision is per receipt (holm_m 1); the final decision uses p_holm_family and the guards"
+}

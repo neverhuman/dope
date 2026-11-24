@@ -153,6 +153,9 @@ assert panel['official_tests_opened'] is False
         self.write('docs/whitepaper/scripts/build_pdf.sh', (SCRIPTS / 'build_pdf.sh').read_bytes())
         verified = self.admit(); self.publish(verified)
         BUILD.auxiliary_outputs(verified, check=False, receipt=BUILD.BuildReceipt('recipe-setup'))
+        # paper-check also builds the v3 paper; its own suite (docs/whitepaper-v3/scripts) covers that
+        # build, so this fixture of the v1 driver stubs it.
+        self.write('docs/whitepaper-v3/scripts/build_v3_pdf.sh', b'#!/bin/sh\nexit 0\n')
         current = (ROOT / 'Justfile').read_text()
         # Reproduce the base-era duplicate entries without requiring history in
         # CPU CI's shallow checkout. Both variants execute actual Just recipes.
