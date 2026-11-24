@@ -1,0 +1,15 @@
+\newcommand{\BudgetData}{../../bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k}
+\pgfplotstableread[col sep=comma]{\BudgetData/served.csv}\ServedBudget
+\pgfplotstableread[col sep=comma]{\BudgetData/rows.csv}\RowsBudget
+\pgfplotstableread[col sep=comma]{\BudgetData/k3-format1.csv}\FormatOneData
+
+% The first four ordered caps are 256, 512, 1024, and 2048 bytes.
+\newcommand{\CapValue}[3][]{%
+  \pgfplotstablegetelem{3}{#3}\of{#2}%
+  \pgfmathprintnumber[fixed,#1]{\pgfplotsretval}}
+\newcommand{\CapScore}[2]{\CapValue[precision=1,fixed zerofill]{#1}{#2}}
+
+\newcommand{\FormatOneValue}[2][]{%
+  \pgfplotstablegetelem{0}{#2}\of{\FormatOneData}%
+  \pgfmathprintnumber[fixed,#1]{\pgfplotsretval}}
+\newcommand{\FormatOneScore}[1]{\FormatOneValue[precision=1,fixed zerofill]{#1}}

@@ -1,0 +1,16 @@
+\begin{tikzpicture}[
+  stage/.style={draw=black!35,fill=black!3,rounded corners=2pt,minimum height=12mm,
+    text width=0.155\linewidth,align=center,font=\small,inner sep=2pt},
+  node distance=4mm,
+  link/.style={draw=black!65,-{Stealth[length=2mm]},semithick},
+]
+\node[stage] (fit) {Fitting rows\\and target};
+\node[stage,right=of fit] (choose) {Fit both codecs\\and select};
+\node[stage,right=of choose,draw=blue!60!black,fill=blue!6] (artifact) {Artifact\\at most $B$ bytes};
+\node[stage,right=of artifact] (sample) {Sample with\\a seed};
+\node[stage,right=of sample] (output) {Synthetic\\rows};
+\draw[link] (fit) -- (choose);
+\draw[link] (choose) -- (artifact);
+\draw[link] (artifact) -- (sample);
+\draw[link] (sample) -- (output);
+\end{tikzpicture}

@@ -1,12 +1,13 @@
 \section{Reproducibility}\label{sec:repro}
 
 \paragraph{From receipts to this paper.}
-Three links, each checked by a tool rather than by hand:
+The build binds scored inputs and generated outputs as follows.
 {\sloppy % long monospace paths: stretch spacing rather than run into the margin
 \begin{enumerate}
   \item \texttt{dope\_kpi primary} and \texttt{compare} write the receipts under \path{bench/real-world/results/scoreboard/v3.0.0/}: \path{primary.json} and \path{primary-methods.json} (SHA-256 prefixes \texttt{\VThree{PrimarySha}} and \texttt{\VThree{MethodsPrimarySha}}), \path{compare-methods.json}, and the four pairs of DOPE against each generator in \path{evidence/paper/}. Each is sorted-key JSON that records the SHA-256 of the contract, the schedule and every rows file read.
   \item \texttt{dope\_kpi render-readme}, \texttt{render-hero} and \texttt{render-paper-tables} turn those receipts into the README block, Figure~\ref{fig:hero} (source SVG SHA-256 prefix \texttt{\VThree{HeroSvgSha}}) and Tables~\ref{tab:ranking} and~\ref{tab:paired}. The scoreboard's \path{render-manifest.json} records the SHA-256s and \path{tools/claims/dope1.py} \texttt{-{}-check} detects drift.
   \item \path{docs/whitepaper-v3/scripts/render_v3_paper.py} writes every \texttt{\textbackslash VThree} macro from the receipts, the contracts and constants parsed from the Rust sources, and fails unless every DOPE row equals the README block's. Third-party rows must repeat the release receipts' run and arms and agree with the run's \path{MANIFEST.json}, and each pair in \path{evidence/paper/} must be the sign reversal of its row in \path{compare-methods.json}. It converts the hero SVG to PDF, records both SHA-256s and records the SHA-256 of both generated tables.
+  \item The equal-storage table and rate--utility chart read the aggregate budget CSVs directly. The paper build verifies these tables and the training figure against \path{evidence/addendum-k/SHA256SUMS}. The evidence guide describes the native row reference and identifies the bound receipts.
 \end{enumerate}\par}
 
 \paragraph{What continuous integration checks.}

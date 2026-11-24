@@ -31,3 +31,21 @@ A synthetic file's exact-copy excess is
 \end{equation}
 summed over the file's complete entries; the promotion guard reads its mean over the candidate's headline files on the common cells.
 Reference rows carry no artifact, so their byte guard is not evaluated.
+
+\paragraph{Retention by auditor.}
+The table shows median retention among successfully scored, informative entries at \VThree{PrimaryMult}$\times$ on the report look. Retention is the improvement over a null model relative to a learner fitted on the source rows (Eq.~\ref{eq:retention}). The headline Transfer Score also accounts for failures, adjusts for the real twin and weights lineage families. The MLP is held out from the headline and participates in the guard.
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Generator & Linear & Boosted trees & Held-out MLP \\
+    \midrule
+    DOPE & \VThree{CandRetLinear} & \VThree{CandRetGbdt} & \VThree{CandRetMlp} \\
+    ARF & \VThree{ArfRetLinear} & \VThree{ArfRetGbdt} & \VThree{ArfRetMlp} \\
+    SDV Gaussian copula & \VThree{GcRetLinear} & \VThree{GcRetGbdt} & \VThree{GcRetMlp} \\
+    SDV TVAE & \VThree{TvaeRetLinear} & \VThree{TvaeRetGbdt} & \VThree{TvaeRetMlp} \\
+    SDV CTGAN & \VThree{CtganRetLinear} & \VThree{CtganRetGbdt} & \VThree{CtganRetMlp} \\
+    \bottomrule
+  \end{tabular}
+\end{center}

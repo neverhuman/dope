@@ -10,10 +10,10 @@ DOPE releases are not compared (owner decision, 2026-11-24), and `render_v3_pape
 fails if a section cites one. The earlier manuscripts ([`docs/whitepaper/`](../whitepaper/),
 [`docs/whitepaper-v2/`](../whitepaper-v2/)) are archived unchanged.
 
-No number is typed into the manuscript. Every quantity is a `\VThree{...}` macro written by
-`scripts/render_v3_paper.py` from the committed receipts, contracts and Rust constants, or a cell
-of a table written by the Rust `dope_kpi render-paper-tables`, and `--check` rejects a digit typed
-into a section.
+Measured values come from committed inputs. The main ranking uses `\VThree{...}` macros and
+tables derived from receipts, contracts and Rust constants. The equal-storage comparison and
+budget sweep read the bound aggregate CSVs in `evidence/addendum-k/` with PGFPlots. The paper
+checker rejects a digit typed into a section.
 
 ## Layout
 
@@ -27,6 +27,8 @@ into a section.
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-ranking-table.tex` | Table 2: the ranking by Transfer Score (`dope_kpi render-paper-tables`) |
 | `generated/v3-paired-table.tex` | Table 3: DOPE minus each generator, one block per look: the report look from `evidence/paper/v3-vs-*.json` and the second look from `evidence/addendum-h/` (`dope_kpi render-paper-tables`) |
+| `budget/` | Equal-cap table and rate–utility figure built from the same aggregate CSVs |
+| `method/` | Encoder and sampler diagram |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
 | `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
 | `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every DOPE row equals the README block |
@@ -76,7 +78,8 @@ python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero
 bash docs/whitepaper-v3/scripts/build_v3_pdf.sh                    # dope-v3.pdf and dope-v3.bbl
 ```
 
-`just paper-v3` runs the last three. `just paper-check` and `just paper-tests` include the v3
+`just paper-v3` runs the last three. The PDF build checks the budget and training inputs against
+`evidence/addendum-k/SHA256SUMS`. `just paper-check` and `just paper-tests` include the v3
 paper, and `ops/ci/paper-clean.sh` deletes its generated files, rebuilds it and requires a
 zero diff.
 

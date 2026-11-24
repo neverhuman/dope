@@ -18,6 +18,9 @@ Tuned configurations, or other generators, may score differently.
 Entries whose sample holds a single class score \VThree{FailedValue} by protocol; the run's report (\path{methods-report.md}) attributes TVAE's failed cells to such samples.
 The comparisons are between these configurations on these splits, not the methods in general.
 
+\paragraph{Auditor and sample-size coverage.}
+The ranking uses a seeded linear model and boosted trees. The MLP is the only held-out learner. The benchmark compares matched-size samples and samples at \VThree{PrimaryMult}$\times$ the fitting set. The effect of other learner families and sampling multipliers remains unmeasured.
+
 \paragraph{Small panel and an unfrozen contract.}
 The report look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
 On the report look, in the four sign-flip checks, one per pair with \VThree{MethodsNullReplicates} replicates each, the statistical conditions passed in \VThree{MethodsStatPassMinPct} to \VThree{MethodsStatPassMaxPct} of replicates; these per-pair sign-flip pass rates are above the contract's threshold of \VThree{NullMaxRatePct}, although on their own they do not show that the percentile interval under-covers. The conditions together with the guards that move under a sign flip passed in at most \VThree{MethodsFlipMaxPct}.
@@ -37,6 +40,7 @@ The privacy gate is an empirical audit (distance to closest record, a distance-b
 \paragraph{Learned refinement.}
 \texttt{DSE8} reserves room for a learned refinement of the analytic decode, trained from the FIT-only evidence bank of Appendix~\ref{app:evidence}.
 Release~\VThree{ReleaseVersion} ships without learned weights. The \cli{auto-v8} route evaluated here uses the compressed program or the analytic packet.
+Appendix~\ref{app:training} reports the long-run training traces, selection screens and the fresh-split result that led us to retain the weight-free release.
 
 \paragraph{Provenance.}
 The receipts record the scoring tool as \texttt{dope\_kpi} version \VThree{ToolVersion} (the tool's own version number, not a DOPE release) with build commit ``\VThree{ToolGitSha}'' (version \VThree{SecondLookToolVersion} and commit ``\VThree{SecondLookToolGitSha}'' on the second look), and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.

@@ -39,6 +39,16 @@ Every DOPE file is within the budget: the median is \VThree{CandBytesMed}~bytes 
 The third-party files have median sizes from \VThree{GcBytesMed}~bytes (Gaussian copula) to \VThree{ArfBytesMed}~bytes (ARF), \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times DOPE's median, and none is within the budget.
 Applying the cap to their emitted files would assign every entry the failure floor (TRG \VThree{FailedValue}, a Transfer Score of \VThree{FailedScore}). This calculation rejects oversize outputs from the observed default fits. A comparison with generators fitted under the same cap would require separate runs.
 
+\paragraph{Equal storage.}
+Under the same \VThree{BudgetKiB}\,KiB whole-file cap, DOPE scores higher than storing a uniform subset of the fitting rows and resampling them with replacement (Table~\ref{tab:budget}). Both use the same report splits, sample sizes and auditors. The row reference can retain a median of \CapValue{\RowsBudget}{retained_rows_median} complete rows with their targets. The intervals summarize each method separately. Appendix~\ref{app:budget} describes the byte accounting and shows the full budget sweep.
+
+\begin{table}[t]
+  \centering\footnotesize
+  \caption{The signed engine and stored fitting rows under the same \VThree{BudgetKiB}\,KiB whole-file cap, on the report DEV schedule. The intervals are \VThree{CiLevel} family-bootstrap intervals for each method. Median and maximum sizes include the file header.}
+  \label{tab:budget}
+  \input{budget/same-cap-table}
+\end{table}
+
 \paragraph{Realism, privacy and copies.}
 Realism coverage is \VThree{CandRealism} for DOPE, lower than ARF's \VThree{ArfRealism} and higher than the Gaussian copula's \VThree{GcRealism}; TVAE and CTGAN pass the realism gate on no entry.
 Privacy coverage is \VThree{CandPrivacy} for DOPE; CTGAN is higher at \VThree{CtganPrivacy}, the Gaussian copula and TVAE are lower (\VThree{GcPrivacy} and \VThree{TvaePrivacy}), and ARF passes the privacy gate on few entries (\VThree{ArfPrivacy}).

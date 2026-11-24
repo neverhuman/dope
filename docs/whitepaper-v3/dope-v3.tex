@@ -13,6 +13,9 @@
 \usepackage{booktabs}
 \usepackage{makecell}
 \usepackage{graphicx}
+\usepackage{pgfplots,pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage{xcolor}
 \usepackage{natbib}
 \usepackage{microtype}
@@ -22,6 +25,7 @@
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 
 \input{generated/v3-macros}
+\input{budget/data}
 
 \hypersetup{
   pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding},
@@ -69,5 +73,7 @@
 \input{sections/appendix-c-arms}
 \input{sections/appendix-d-ablation}
 \input{sections/appendix-e-evidence}
+\input{sections/appendix-f-budget}
+\input{sections/appendix-g-training}
 
 \end{document}

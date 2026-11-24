@@ -225,8 +225,7 @@ fn render_ranking_tex(
         let same_floor = floor.is_some() && above.iter().all(|a| a.trg_at_budget == floor);
         let note = if all_zero && same_floor {
             format!(
-                r"\textdagger{{}} Fitted with library defaults and no byte cap; no file fits within {}~B, so at the {}~B budget each scores {} (failure floor).",
-                tex_grouped_u64(budget),
+                r"\textdagger{{}} Fitted with library defaults and no byte cap. Every observed file exceeds {}~B. Applying the size penalty to those files without refitting gives {} (the failure floor).",
                 tex_grouped_u64(budget),
                 tex_score(floor.unwrap_or(-1.0))
             )

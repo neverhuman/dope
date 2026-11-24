@@ -6,6 +6,13 @@ The encoder writes one artifact $a$ with $|a|\le B$, where $|a|$ counts every by
 The sampler reads $a$ and a seed and emits rows $(\tilde x,\tilde y)$ in the raw column space.
 Every statistic in $a$ is computed from $D_{\mathrm{fit}}$ alone; nothing is fitted on evaluation rows.
 
+\begin{figure}[tbp]
+  \centering
+  \input{method/pipeline}
+  \caption{Fitting uses the declared target and the fitting rows. Sampling uses the selected artifact and a seed, and can run without access to the original table.}
+  \label{fig:pipeline}
+\end{figure}
+
 \begin{center}
 \fbox{\begin{minipage}{0.94\linewidth}
 \small\textbf{Encoder and sampler for the weight-free release}

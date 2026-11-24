@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{28}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -49,6 +49,14 @@ Crist{\'o}bal Esteban, Stephanie~L. Hyland, and Gunnar R{\"a}tsch.
   conditional {GANs}.
 \newblock \emph{arXiv preprint arXiv:1706.02633}, 2017.
 
+\bibitem[Gao and Parameswaran(2016)]{gao2016squish}
+Yihan Gao and Aditya Parameswaran.
+\newblock {Squish}: Near-optimal compression for archival of relational
+  datasets.
+\newblock In \emph{Proceedings of the ACM SIGKDD International Conference on
+  Knowledge Discovery and Data Mining}, 2016.
+\newblock URL \url{https://arxiv.org/abs/1602.04256}.
+
 \bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
 Tilmann Gneiting and Adrian~E. Raftery.
 \newblock Strictly proper scoring rules, prediction, and estimation.
@@ -60,6 +68,26 @@ Sture Holm.
 \newblock A simple sequentially rejective multiple test procedure.
 \newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
   65--70, 1979.
+
+\bibitem[Ilkhechi et~al.(2020)Ilkhechi, Crotty, Galakatos, Mao, Fan, Shi, and
+  Cetintemel]{ilkhechi2020deepsqueeze}
+Amir Ilkhechi, Andrew Crotty, Alex Galakatos, Yicong Mao, Grace Fan, Xiran Shi,
+  and Ugur Cetintemel.
+\newblock {DeepSqueeze}: Deep semantic compression for tabular data.
+\newblock In \emph{Proceedings of the ACM SIGMOD International Conference on
+  Management of Data}, 2020.
+\newblock \doi{10.1145/3318464.3389734}.
+
+\bibitem[Jolicoeur-Martineau et~al.(2024)Jolicoeur-Martineau, Fatras, and
+  Kachman]{jolicoeur2024forest}
+Alexia Jolicoeur-Martineau, Kilian Fatras, and Tal Kachman.
+\newblock Generating and imputing tabular data via diffusion and flow-based
+  gradient-boosted trees.
+\newblock In \emph{Proceedings of the International Conference on Artificial
+  Intelligence and Statistics}, volume 238 of \emph{Proceedings of Machine
+  Learning Research}, pages 1288--1296, 2024.
+\newblock URL
+  \url{https://proceedings.mlr.press/v238/jolicoeur-martineau24a.html}.
 
 \bibitem[Kotelnikov et~al.(2023)Kotelnikov, Baranchuk, Rubachev, and
   Babenko]{kotelnikov2023tabddpm}
@@ -73,6 +101,22 @@ David Lopez-Paz and Maxime Oquab.
 \newblock Revisiting classifier two-sample tests.
 \newblock In \emph{International Conference on Learning Representations
   (ICLR)}, 2017.
+
+\bibitem[McKenna et~al.(2021)McKenna, Miklau, and Sheldon]{mckenna2021mst}
+Ryan McKenna, Gerome Miklau, and Daniel Sheldon.
+\newblock Winning the {NIST} contest: A scalable and general approach to
+  differentially private synthetic data.
+\newblock \emph{Journal of Privacy and Confidentiality}, 11\penalty0 (3), 2021.
+\newblock URL \url{https://arxiv.org/abs/2108.04978}.
+
+\bibitem[McKenna et~al.(2022)McKenna, Mullins, Sheldon, and
+  Miklau]{mckenna2022aim}
+Ryan McKenna, Brett Mullins, Daniel Sheldon, and Gerome Miklau.
+\newblock {AIM}: An adaptive and iterative mechanism for differentially private
+  synthetic data.
+\newblock \emph{Proceedings of the VLDB Endowment}, 15\penalty0 (11):\penalty0
+  2599--2612, 2022.
+\newblock \doi{10.14778/3551793.3551817}.
 
 \bibitem[Mirzasoleiman et~al.(2020)Mirzasoleiman, Bilmes, and
   Leskovec]{mirzasoleiman2020craig}

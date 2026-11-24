@@ -1,0 +1,14 @@
+\section{Transfer under a fixed byte budget}\label{app:budget}
+
+For each cap, we emit and evaluate a file from the signed DOPE encoder with that cap set at fitting and scoring. The stored-rows reference permutes the same fitting rows uniformly with the same fit seed, stores as many complete target-last rows as fit, and samples the stored rows with replacement using the same sampling seeds. The reference uses lossless single-precision rows and counts the matrix header against the cap. It directly resamples the stored records, so its exact copies are expected. It measures this particular storage policy, which does not search for an informative subset.
+
+We retain failures at the contract floor, use the same frozen real reference, and keep every cap on the report DEV schedule. All comparisons here are descriptive. The artifact is checked against the whole-file cap, including schema and framing for DOPE. The \VThree{BudgetKiB}\,KiB DOPE run matched the signed report replay's emission ledger by status, size and packet digest. Both \VThree{PrimaryMult}$\times$ and matched-size results, their separate intervals, realized artifact sizes and failure counts are in \path{evidence/addendum-k/} of the release scoreboard. Figure~\ref{fig:budget} shows the \VThree{PrimaryMult}$\times$ comparison across caps.
+
+DOPE's point estimate rises sharply at small caps and varies modestly among the larger caps. Two larger-cap runs incurred wall-clock fit timeouts during host CPU protection. Both retain the affected cells at the failure floor. The curve therefore reflects the evaluation's time limits as well as the byte caps.
+
+\begin{figure}[!htbp]
+  \centering
+  \input{budget/transfer-curve}
+  \caption{Transfer Score across whole-file budgets on the report DEV schedule, with separate \VThree{CiLevel} family-bootstrap intervals. The two lines join measured caps for each method. They show how the fitted artifacts change with budget.}
+  \label{fig:budget}
+\end{figure}

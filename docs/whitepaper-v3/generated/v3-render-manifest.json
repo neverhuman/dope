@@ -49,7 +49,7 @@
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",
     "docs/whitepaper-v3/generated/v3-paired-table.tex": "735cba3033b205870964714b7dc4daf162258be6b78de805660e598f9202b1de",
-    "docs/whitepaper-v3/generated/v3-ranking-table.tex": "81c621f643fcb95e43a52dee77add8a7d988e35344a4af03206663cbaafd8bf2",
+    "docs/whitepaper-v3/generated/v3-ranking-table.tex": "e34baff8fdb0fd0275926deb784576d922275e1fc5f206fc137a74da52e94c39",
     "engine/dope-core/src/auto/check.rs": "6c9ad81ce6b7846de223dd02f436adda00de45743e7e3a2bf61aa17ca126141d",
     "engine/dope-core/src/auto/container.rs": "16c38db0a977644e2002e2012083337c8ba5f8e8f13f648dd97b06cbf58e28e0",
     "engine/dope-core/src/auto/mod.rs": "d7beb0045bd9996f183331ad761afd534f1d700ccb507434698eb981fba0628e",

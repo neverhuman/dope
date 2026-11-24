@@ -1,0 +1,13 @@
+\newcommand{\CapRow}[1]{%
+  \CapScore{#1}{score} [\CapScore{#1}{low}, \CapScore{#1}{high}] &
+  \CapScore{#1}{matched} &
+  \CapValue{#1}{median} / \CapValue{#1}{max} &
+  \CapValue{#1}{failed} / \CapValue{#1}{informative}}
+\begin{tabular}{lrrrc}
+  \toprule
+  Method & Score at \VThree{PrimaryMult}$\times$ [CI] & Score at \VThree{MatchedMult}$\times$ & Median / max bytes & Failed / cells \\
+  \midrule
+  DOPE & \CapRow{\ServedBudget} \\
+  Stored fitting rows & \CapRow{\RowsBudget} \\
+  \bottomrule
+\end{tabular}

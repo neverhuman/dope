@@ -1,8 +1,18 @@
 \section{What per-table selection adds}\label{app:ablation}
 
-\cli{auto-v8} chooses per table between Format~1 and \texttt{DSE8} (\S\ref{sec:select}).
-The report look also scored \VThree{AnalyticId}, the analytic \texttt{DSE8} packet written on every table without that choice, on the same cells.
-Its Transfer Score is \VThree{AnalyticScore}, against \VThree{CandScore} with selection.
-The packet alone is stronger on regression (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and weaker on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}); its median file is \VThree{AnalyticBytesMed}~bytes.
-Its realism coverage is \VThree{AnalyticRealism} and its privacy coverage \VThree{AnalyticPrivacy}, against \VThree{CandRealism} and \VThree{CandPrivacy} with selection.
-This pair was not pre-registered as a comparison, so we report it descriptively and with no test.
+\cli{auto-v8} chooses per table between Format~1 and \texttt{DSE8} (\S\ref{sec:select}). The report schedule also evaluates the analytic \texttt{DSE8} packet alone and the signed binary forced to Format~1. The table compares complete configurations, including their framing, at the same \VThree{BudgetKiB}\,KiB cap. Failed cells remain in the score at the contract floor. Intervals are separate \VThree{CiLevel} family-bootstrap intervals.
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Configuration & Score at \VThree{PrimaryMult}$\times$ [CI] & Score at \VThree{MatchedMult}$\times$ & Median bytes & Failed / cells \\
+    \midrule
+    Per-table selection & \VThree{CandScore} & \VThree{CandMatchedScorePoint} & \VThree{CandBytesMed} & \VThree{CandFailed} / \VThree{CandCells} \\
+    Format~1 alone & \FormatOneScore{score} [\FormatOneScore{low}, \FormatOneScore{high}] & \FormatOneScore{matched} & \FormatOneValue{median} & \FormatOneValue{failed} / \FormatOneValue{cells} \\
+    Analytic \texttt{DSE8} alone & \VThree{AnalyticScore} & \VThree{AnalyticMatchedScorePoint} & \VThree{AnalyticBytesMed} & \VThree{AnalyticFailed} / \VThree{AnalyticCells} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+At \VThree{PrimaryMult}$\times$, per-table selection has the highest point estimate. Analytic \texttt{DSE8} alone has a higher regression score than the selector (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and lower scores on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}). These comparisons are descriptive on the development report splits.
