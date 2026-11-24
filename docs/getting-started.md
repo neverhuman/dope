@@ -1,16 +1,86 @@
-# From a real table to a sampling program
+# From a table to a sampling program
 
 DOPE compiles a table into a small generator. Another process reloads that
 generator, draws synthetic rows, and trains a learner on those draws. Evaluate
-that learner on real rows that neither compilation nor model selection saw.
-The artifact is a lossy, task-specific representation, not a lossless archive.
+that learner on real rows that the fit did not see. The artifact is a lossy,
+task-specific program. It stores no source rows, and it is not a lossless archive.
 
-## Install and run the public example
+The public path below is the signed engine `dope` from
+[dope-engine-v3.0.0](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0).
+Agents that only need to fit a table should follow this page and
+[AGENTS.md](../AGENTS.md). The Airfoil walkthrough further down uses the older
+`dope-kernel` research binary.
 
-The source-free demonstration supports Linux x86-64. Use Rust from
+## Install the signed engine
+
+Linux x86-64 (`glibc` 2.39 or newer), with `gh` 2.102.0 or newer. The
+installer is pinned to release commit
+`e15c415bad9554f7c419dd240aa670d1a79a27fe`. It checks `SHA256SUMS` and the
+GitHub/Sigstore attestation for that tag and source commit before it copies
+the binary.
+[Verify a package by hand](signed-engine-release.md#verify-before-install)
+or [build from source](signed-engine-release.md#build-and-package) when you
+are not using the one-line installer.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/e15c415bad9554f7c419dd240aa670d1a79a27fe/scripts/install.sh \
+  | bash -s -- \
+      --tag dope-engine-v3.0.0 \
+      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
+      --require-attestation \
+      --no-weights
+dope doctor
+```
+
+`--no-weights` is the analytic release. The published tag does not ship
+`dope-v8-weights.safetensors`, so leave installer `--v8-weights` off. The signed
+tag users install is `dope-engine-v3.0.0`.
+
+## Fit a table
+
+Name the target. Keep the original file, and follow the
+[target-last contract](data-contract.md): one declared target, stable feature
+order, and duplicate physical rows in the same split. Query targets stay out
+of the fit.
+
+```bash
+dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
+dope inspect model.dope
+dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
+dope eval -m model.dope --train train.csv --test test.csv
+```
+
+`--format 1` remains the CLI default. `--format auto-v8` fits Format 1 and the
+weight-free DSE8 packet inside one file of at most 2048 bytes and keeps DSE8
+when a duplicate-grouped two-fold check on the fitting rows prefers it.
+`dope inspect` prints the format and the complete file size. The command list
+for this binary is [engine/README.md](../engine/README.md).
+
+`dope eval` trains linear and boosted-tree auditors on the synthetic rows and
+scores them on the real test rows. For a fixed learner, retention is
+
+```text
+(L_null - L_syn) / (L_null - L_real)
+```
+
+One recovers the measured real-trained lift. Zero recovers none. A negative
+value is worse than the null. A denominator near zero is uninformative. This
+is not accuracy, and it is not the fraction of the table that can be rebuilt.
+
+The landing-page scoreboard and the
+[v3 white paper](whitepaper-v3/dope-v3.pdf) are the measured comparison.
+That report is a fresh-split DEV-SELECT estimate. The paired difference versus
+ARF includes zero. Storing no source rows is not differential privacy and not
+HIPAA de-identification. Cross-model feature-driver preservation is not yet
+measured.
+
+## Historical kernel demonstration
+
+The source-free Airfoil demonstration supports Linux x86-64. Use Rust from
 `rust-toolchain.toml`, its C build tools, and Python 3.12 with venv support.
-Python is used for the optional example learner; the product compiler and
-sampler are Rust. Run from the repository root:
+Python is used for the optional example learner. The compiler and sampler in
+this section are the `dope-kernel` binary, which is separate from the signed
+engine above. Run from the repository root:
 
 ```sh
 git clone https://github.com/neverhuman/dope.git
@@ -56,46 +126,19 @@ It does not measure TDL, a foundation-model panel or privacy certification.
 For a dedicated checksum-verified CLI installation after building, follow
 [the native installer](native-workflow.md).
 
-## Bring your own table
+## Historical kernel routes
 
-Keep the original source. Declare a schema with exactly one target; normalize
-to stable feature order followed by that target using the
-[target-last intake](data-contract.md). Split entities, duplicate groups or
-time periods **before** fitting any data-dependent transform. Query targets
-are for the evaluator, never features, compilation inputs or selection inputs.
+These commands belong to `dope-kernel` and the alpha facade in
+[cli.md](cli.md). A new table uses `dope fit --format auto-v8` in the signed
+engine section above.
 
-Choose an explicit supported route:
-
-| Input | Route | Current boundary |
+| Input | Route | Boundary |
 | --- | --- | --- |
 | Observed numeric, integer, ordinal or Boolean features; continuous target | `compile-raw`, `inspect-raw`, `sample-raw` | Fit-only affine transforms; samples return to original units |
-| Nominal strings or missingness | `compile-csv` / `sample-mixed`, or the explicit mixed schema API | Bounded one-hot nominal carrier; development capability, not the numeric profile |
-| Already projected headerless `train.csv` | `dope compile`, `dope inspect`, `dope sample` | Historical benchmark interface; caller owns projection correctness and accounting |
+| Nominal strings or missingness | `compile-csv` / `sample-mixed`, or the explicit mixed schema API | Bounded one-hot nominal carrier; development capability |
+| Already projected headerless `train.csv` | `dope compile`, `dope inspect`, `dope sample` | Caller owns projection correctness and accounting |
 
-The [CLI reference](cli.md) lists the exact flags. The
-[simulated mixed example](../examples/healthcare-sim/README.md) runs offline
-without Python packages and shows strings and masks. It is separate from the
-real Airfoil example. Do not interpret category numbers as continuous values,
-or treat the old projected interface as raw string ingestion.
-
-## Interpret the result
-
-For a fixed learner and real query set, let `L_null`, `L_real` and `L_syn` be
-losses from a table-independent baseline, the real-trained learner and the
-synthetic-trained learner. Retention is
-
-```text
-(L_null - L_syn) / (L_null - L_real)
-```
-
-Retention of one recovers the measured real-trained lift. Zero recovers none;
-negative values are worse than the null; values above one are possible.
-This is not accuracy, a correlation coefficient, or the fraction of raw data
-that can be reconstructed. A denominator near zero is uninformative, not a
-good compression result.
-
-Compare complete **fitted-state bytes** with transfer, then report the generic
-runtime and cold sampling closure separately. Dividing one median by another
-is a descriptive size ratio, not a per-dataset compression guarantee. The
-headline KPI, [Transfer Description Length](metric.md), requires additional
-driver, budget-grid and hard-gate evidence that this walkthrough does not supply.
+The [simulated mixed example](../examples/healthcare-sim/README.md) runs offline
+without Python packages. Do not interpret category numbers as continuous values.
+[Transfer Description Length](metric.md) needs driver, budget-grid and hard-gate
+evidence that this kernel walkthrough does not supply.
