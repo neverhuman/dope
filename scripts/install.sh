@@ -113,6 +113,10 @@ for selected_tag in "$TAG" "$MODEL_TAG"; do
   fi
 done
 if [[ "$TAG" == dope-engine-v* ]]; then REQUIRE_ATTESTATION=1; fi
+if [[ "$V8_WEIGHTS_MODE" == "require" && ( "$TAG" != dope-engine-v* || $REQUIRE_ATTESTATION -ne 1 ) ]]; then
+  echo "error: --v8-weights requires an attested dope-engine-v* release tag (got '$TAG')" >&2
+  exit 1
+fi
 
 # 2. Platform & tool check.
 if [[ "$(uname -s):$(uname -m)" != "Linux:x86_64" ]]; then
@@ -245,6 +249,10 @@ if [[ $HAS_V8_MANIFEST_SUM -ne $HAS_V8_MODEL_SUM || $HAS_V8_MANIFEST_SUM -gt 1 ]
 fi
 if [[ $HAS_V8_MANIFEST_SUM -eq 1 ]]; then
   if [[ "$V8_WEIGHTS_MODE" != "skip" ]]; then
+    if [[ "$TAG" != dope-engine-v* || $REQUIRE_ATTESTATION -ne 1 ]]; then
+      echo "error: bundled SingleEncV8 weights require an attested dope-engine-v* release tag (pass --no-v8-weights to skip on legacy tags)" >&2
+      exit 1
+    fi
     for name in V8_WEIGHTS_MANIFEST.json dope-v8-weights.safetensors; do
       fetch_asset "$ENGINE_STAGE" "$FROM_DIR" "$TAG" "$name"
       verify_in_sha256sums "$ENGINE_STAGE" "$name"
@@ -341,11 +349,19 @@ if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
 fi
 
 if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  [[ $ATTESTATION_VERIFIED -eq 1 ]] || { echo "error: SingleEncV8 weights require verified Sigstore OIDC attestation" >&2; exit 1; }
   V8_DST_DIR="$WEIGHTS_DIR/single-enc-v8"
-  if [[ -L "$WEIGHTS_DIR" || -L "$V8_DST_DIR" || -L "$V8_DST_DIR/manifest.json" || -L "$V8_DST_DIR/model.safetensors" ]]; then
-    echo "error: refusing to install SingleEncV8 weights through symlinked path" >&2
+  if [[ -L "$WEIGHTS_DIR" || ( -e "$WEIGHTS_DIR" && ! -d "$WEIGHTS_DIR" ) || -L "$V8_DST_DIR" || ( -e "$V8_DST_DIR" && ! -d "$V8_DST_DIR" ) ]]; then
+    echo "error: refusing to install SingleEncV8 weights through symlink or non-directory path" >&2
     exit 1
   fi
+  for v8_name in manifest.json model.safetensors; do
+    v8_dst="$V8_DST_DIR/$v8_name"
+    if [[ -L "$v8_dst" || ( -e "$v8_dst" && ! -f "$v8_dst" ) ]]; then
+      echo "error: refusing to install SingleEncV8 weights over symlink or non-regular path: $v8_dst" >&2
+      exit 1
+    fi
+  done
 fi
 
 chmod u+x -- "$ENGINE_STAGE/dope-linux-x86_64"
@@ -358,7 +374,7 @@ if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
     --wire "$MODEL_STAGE/packet_high_regression.dml3" -n 16 --seed 42 -o "$STAGE/smoke.csv" >/dev/null
 fi
 
-# 6. Atomic installation (refusing symlinks at destination paths).
+# 6. Atomic installation (refusing symlinks and non-regular destination files).
 atomic_install() {
   local src="$1"
   local dst_dir="$2"
@@ -366,14 +382,14 @@ atomic_install() {
   local mode="$4"
   mkdir -p -- "$dst_dir"
   local dst="$dst_dir/$dst_name"
-  if [[ -L "$dst" ]]; then
-    echo "error: refusing to overwrite symlink at $dst" >&2
+  if [[ -L "$dst" || ( -e "$dst" && ! -f "$dst" ) ]]; then
+    echo "error: refusing to overwrite symlink or non-regular destination at $dst" >&2
     exit 1
   fi
   local tmp="$dst_dir/.${dst_name}.tmp.$$"
   rm -f -- "$tmp"
   install -m "$mode" "$src" "$tmp"
-  mv -f -- "$tmp" "$dst"
+  mv -fT -- "$tmp" "$dst"
 }
 
 atomic_install "$ENGINE_STAGE/dope-linux-x86_64" "$INSTALL_DIR" "dope" 0755
@@ -396,11 +412,7 @@ echo "$(c_green "✓ Installed") $(c_bold "$INSTALL_DIR/dope") (sha256: ${BIN_SH
 echo "  $(c_dim "notices")       $SHARE_DIR/{LICENSE,THIRD_PARTY_NOTICES,BUILDINFO.json}"
 if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
   echo "  $(c_dim "v8 weights")    $WEIGHTS_DIR/single-enc-v8/model.safetensors (${V8_ACTUAL_BYTES} B, sha256: ${V8_ACTUAL_SHA:0:16}…)"
-  if [[ $ATTESTATION_VERIFIED -eq 1 ]]; then
-    echo "  $(c_dim "v8 verification") tag $TAG · sigstore-oidc-attestation + sha256-content-integrity (build/packaging identity only; not quality or privacy certification)"
-  else
-    echo "  $(c_dim "v8 verification") tag $TAG · sha256-content-integrity-only (pinned SHA256SUMS + V8_WEIGHTS_MANIFEST.json verified; no cryptographic attestation)"
-  fi
+  echo "  $(c_dim "v8 verification") tag $TAG · sigstore-oidc-attestation + sha256-content-integrity (build/packaging identity only; not quality or privacy certification)"
 fi
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
   echo "  $(c_dim "weights")       $WEIGHTS_DIR/dope_mlc_v3_multitask_best.safetensors (${ST_ACTUAL_BYTES} B, sha256: ${ST_ACTUAL_SHA:0:16}…)"

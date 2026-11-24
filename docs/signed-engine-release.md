@@ -149,10 +149,10 @@ the helper additionally runs `gh attestation verify` on `dope-v8-weights.safeten
 `V8_WEIGHTS_MANIFEST.json` (four attested subjects total) and cross-checks
 `V8_WEIGHTS_MANIFEST.json` and `BUILDINFO.json` (`v8_weights_sha256`, `v8_weights_bytes`).
 `scripts/install.sh` supports `--v8-weights` (require and install attested `SingleEncV8`
-weights into `$DOPE_WEIGHTS_DIR/single-enc-v8/{manifest.json,model.safetensors}`, failing
-closed on weight-free tags such as `dope-engine-v3.0.0`) and `--no-v8-weights` (skip even
-if bundled). Signing establishes build/packaging identity only; it never certifies model
-quality or privacy. It never executes the unverified binary. The GitHub CLI is an
+weights into `$DOPE_WEIGHTS_DIR/single-enc-v8/{manifest.json,model.safetensors}`, restricted
+to attested `dope-engine-v*` tags and failing closed on legacy tags or weight-free tags such
+as `dope-engine-v3.0.0`) and `--no-v8-weights` (skip even if bundled). Signing establishes
+build/packaging identity only; it never certifies model quality or privacy. It never executes the unverified binary. The GitHub CLI is an
 installation-time verifier, not an application dependency.
 Retain the bundle and exact source commit with your deployment record. Offline bundle
 verification is possible with GitHub CLI's `--bundle` mode, but is not an unsigned

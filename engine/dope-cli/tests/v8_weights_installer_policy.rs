@@ -396,6 +396,80 @@ fn v8_weights_failures_refuse_before_execution_or_install() {
         .arg(&sym.engine)
         .output()
         .unwrap();
-    sym.assert_refused(out, "symlinked path");
+    sym.assert_refused(out, "symlink or non-directory path");
     assert!(!decoy.join("model.safetensors").exists());
+
+    // 7. Legacy non-engine tags cannot install SingleEncV8 weights without attestation.
+    let leg_req = V8Fixture::new(true);
+    let out = leg_req
+        .cmd()
+        .args(["--tag", "v1.0.0", "--no-weights", "--v8-weights"])
+        .output()
+        .unwrap();
+    leg_req.assert_refused(out, "attested dope-engine-v* release tag");
+    assert!(!leg_req.root.join("curl.log").exists());
+    assert!(!leg_req.root.join("gh.log").exists());
+
+    let leg_auto = V8Fixture::new(true);
+    let out = leg_auto
+        .cmd()
+        .args(["--tag", "v1.0.0", "--from-dir"])
+        .arg(&leg_auto.engine)
+        .output()
+        .unwrap();
+    leg_auto.assert_refused(out, "attested dope-engine-v* release tag");
+    assert!(!leg_auto.root.join("gh.log").exists());
+
+    // Legacy tag with --no-v8-weights skips bundled V8 weights and installs engine-only cleanly.
+    let leg_skip = V8Fixture::new(true);
+    let out = leg_skip
+        .cmd()
+        .args(["--tag", "v1.0.0", "--no-v8-weights", "--from-dir"])
+        .arg(&leg_skip.engine)
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(leg_skip.prefix.join("bin/dope").is_file());
+    assert!(!leg_skip.prefix.join("weights/single-enc-v8").exists());
+
+    // 8. Existing directory at V8 destination file paths (or file at single-enc-v8 dir) fails closed before execution.
+    for collision in ["model.safetensors", "manifest.json"] {
+        let dir_col = V8Fixture::new(true);
+        let col_path = dir_col.prefix.join("weights/single-enc-v8").join(collision);
+        fs::create_dir_all(&col_path).unwrap();
+        let out = dir_col
+            .cmd()
+            .args(["--tag", ENGINE_V31, "--source-digest", SOURCE, "--from-dir"])
+            .arg(&dir_col.engine)
+            .output()
+            .unwrap();
+        assert!(
+            !out.status.success(),
+            "unexpected success on {collision} dir"
+        );
+        assert!(
+            String::from_utf8_lossy(&out.stderr).contains("non-regular path"),
+            "{}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert!(!dir_col.prefix.join("bin/dope").exists());
+        assert!(!dir_col.root.join("executed.log").exists());
+        assert!(col_path.is_dir());
+        assert_eq!(fs::read_dir(&col_path).unwrap().count(), 0);
+    }
+
+    let file_dir = V8Fixture::new(true);
+    fs::create_dir_all(file_dir.prefix.join("weights")).unwrap();
+    fs::write(file_dir.prefix.join("weights/single-enc-v8"), b"not-a-dir").unwrap();
+    let out = file_dir
+        .cmd()
+        .args(["--tag", ENGINE_V31, "--source-digest", SOURCE, "--from-dir"])
+        .arg(&file_dir.engine)
+        .output()
+        .unwrap();
+    file_dir.assert_refused(out, "non-directory path");
 }
