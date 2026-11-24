@@ -394,6 +394,11 @@ fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
         well_formed(&svg).unwrap();
         assert!(svg.contains(">Transfer Score (95% CI)</text>"));
         assert!(svg.contains(">DOPE v3 \u{b7} 87.9</text>"));
+        assert!(svg.contains(">ARF \u{b7} 77.2</text>"));
+        assert!(svg.contains(">Gaussian copula \u{b7} 40.2</text>"));
+        assert!(svg.contains(">TVAE \u{b7} \u{2212}3.9</text>"));
+        assert!(svg.contains(">CTGAN \u{b7} \u{2212}69.2</text>"));
+        assert!(svg.contains("only generator inside the 2 KiB budget"));
         assert!(svg.contains(">real twin</text>"));
         assert!(svg.contains(">copy of the fitting rows</text>"));
         assert!(!svg.contains("previous release"));

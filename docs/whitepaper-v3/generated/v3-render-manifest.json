@@ -2,9 +2,9 @@
   "hero": {
     "command": "SOURCE_DATE_EPOCH=1795392000 rsvg-convert -f pdf -o docs/whitepaper-v3/figures/hero-v3-methods.pdf bench/real-world/figures/hero-v3-methods-light.svg",
     "output": "docs/whitepaper-v3/figures/hero-v3-methods.pdf",
-    "output_sha256": "4d148bf55b57a5b2c6a3248b5f658daa31d132df2cc562a79b09117e744fcef3",
+    "output_sha256": "53ebd927bf2d4ad6fc4aaeab3b9f08e5fd2b0826123d0074047e68514b8bed11",
     "source": "bench/real-world/figures/hero-v3-methods-light.svg",
-    "source_sha256": "2e7a8dda62ac5b201dac72231090811b17a581ee1ca20e190fe8673d1e8b0c76",
+    "source_sha256": "04848ed853e1748b82bfd93389396b03873e4af90fedb9872ec32bfe3860e68e",
     "tool": "rsvg-convert version 2.58.0"
   },
   "inputs": {
@@ -44,7 +44,7 @@
     "bench/real-world/results/scoreboard/v3.0.0/primary-methods.json": "47ff73b1e35b8b29210de6df55538d60c65b59486c405d641027aff2124deda2",
     "bench/real-world/results/scoreboard/v3.0.0/primary.json": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
     "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "6842e2065af28994a5e27549cc4899765823566ee18c5a24298315795ef132c7",
-    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "1ee5820a29bb75d4363108444fb3259b6a33650cad6b55b40adec66d863704e7",
+    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "707dcbb785a1b69052b97e60a8cfe4699b973c2d7f197a3b9712bfbbcfbc8fe8",
     "contracts/dope-fidelity-v3-candidate.json": "87bc12eef5191d60b75e40f7c3f556f4816f64c50b7c2c6cb1a689e5aea29f60",
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",
@@ -66,7 +66,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-macros.tex": "2e69e1e52072435c050d53d93a6076bb58ee68e280ab01d8393f0ede65d7cd22"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "8e8703701b8ba3ce9bcc259319a4814253b692260a876265108eeaf713076d73"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }

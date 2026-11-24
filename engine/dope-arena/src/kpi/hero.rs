@@ -77,7 +77,7 @@ pub struct HeroArgs {
 
 const DEFAULT_NOTE: &str = "Panel {panel}: {families} families, {cells} cells, scored by dope_kpi. TRG 0 = matches the real B sample under both auditors.";
 const SCORE_NOTE: &str = "Panel {panel}: {families} families, {cells} cells, scored by dope_kpi. Transfer Score = 100 × (1 + TRG); 100 matches a second real sample.";
-const METHODS_NOTE: &str = "DEV panel ({families} families, {cells} cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap.";
+const METHODS_NOTE: &str = "DEV panel ({families} families, {cells} cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap. DOPE is the only generator inside the 2 KiB budget.";
 const METHODS_ARMS: [&str; 5] = [
     "dope-v3b-auto-v8",
     "arfpy-arf",

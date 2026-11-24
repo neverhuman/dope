@@ -10,7 +10,7 @@
 //! least.
 
 use super::hero_layout::{line_box, text_width, Anchor, Candidate, Placer, Rect};
-use super::hero_model::{budget_text, Emphasis, Hero, Tokens};
+use super::hero_model::{budget_text, Emphasis, Hero, Tokens, YScale};
 
 pub const HIGHLIGHT_SIZE: f64 = 13.0;
 pub const LABEL_SIZE: f64 = 12.0;
@@ -185,10 +185,13 @@ pub fn place(hero: &Hero, t: &Tokens, marks: &[Mark], guides: &Guides) -> Vec<La
     for i in order {
         let p = &hero.points[i];
         let highlight = p.tier == Emphasis::Highlight;
-        let (text, size) = if highlight {
+        // On the Transfer Score chart every generator carries its score, so the
+        // ranking is readable without a second table. The TRG chart still names
+        // only the highlighted arm.
+        let (text, size) = if highlight || hero.y_scale == YScale::TransferScore {
             (
                 hero.y_scale.highlight_label(&p.label, p.trg),
-                HIGHLIGHT_SIZE,
+                if highlight { HIGHLIGHT_SIZE } else { LABEL_SIZE },
             )
         } else {
             (p.label.clone(), LABEL_SIZE)

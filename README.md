@@ -13,7 +13,7 @@ Compile a tabular dataset into a compact binary **program** that stores zero sou
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v3-methods-dark.svg">
-  <img alt="DEV scoreboard showing Transfer Score with uncertainty against median artifact bytes for DOPE v3, ARF, SDV Gaussian copula, TVAE, CTGAN, and real-row controls." src="bench/real-world/figures/hero-v3-methods-light.svg">
+  <img alt="Transfer Score versus artifact bytes for DOPE v3, ARF, the Gaussian copula, TVAE, and CTGAN. Each point is labelled with its Transfer Score. DOPE is the only generator inside the byte budget." src="bench/real-world/figures/hero-v3-methods-light.svg">
 </picture>
 
 ## Results

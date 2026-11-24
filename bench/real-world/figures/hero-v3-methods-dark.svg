@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="hero-title hero-desc" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
 <title id="hero-title">Transfer Score vs. artifact size</title>
-<desc id="hero-desc">DEV panel (11 families, 44 cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap. Transfer Score with its 95% interval against the median emitted-file size on a log axis; a dashed line marks the 2 KiB budget and dotted lines mark controls. DOPE v3: Transfer Score 87.9 [81.1, 95.1], 1,787 B. Gaussian copula: Transfer Score 40.2 [27.9, 51.8], 140,675.5 B. CTGAN: Transfer Score −69.2 [−82.7, −55.2], 1,053,957.5 B. TVAE: Transfer Score −3.9 [−26.2, 17.8], 475,125.5 B. ARF: Transfer Score 77.2 [58.4, 90.0], 2,937,782.5 B. Controls: real twin 100.0; copy of the fitting rows 96.1.</desc>
+<desc id="hero-desc">DEV panel (11 families, 44 cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap. DOPE is the only generator inside the 2 KiB budget. Transfer Score with its 95% interval against the median emitted-file size on a log axis; a dashed line marks the 2 KiB budget and dotted lines mark controls. DOPE v3: Transfer Score 87.9 [81.1, 95.1], 1,787 B. Gaussian copula: Transfer Score 40.2 [27.9, 51.8], 140,675.5 B. CTGAN: Transfer Score −69.2 [−82.7, −55.2], 1,053,957.5 B. TVAE: Transfer Score −3.9 [−26.2, 17.8], 475,125.5 B. ARF: Transfer Score 77.2 [58.4, 90.0], 2,937,782.5 B. Controls: real twin 100.0; copy of the fitting rows 96.1.</desc>
 <rect class="bg" width="960" height="540" fill="#1a1a19"/>
 <line class="grid" x1="75.0" y1="458.0" x2="928.0" y2="458.0" stroke="#2c2c2a" stroke-width="1"/>
 <text class="tick" x="67.0" y="462.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">−100</text>
-<line class="grid" x1="75.0" y1="416.5" x2="928.0" y2="416.5" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="420.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">−75</text>
-<line class="grid" x1="75.0" y1="375.0" x2="928.0" y2="375.0" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="379.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">−50</text>
-<line class="grid" x1="75.0" y1="333.5" x2="928.0" y2="333.5" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="337.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">−25</text>
-<line class="grid" x1="75.0" y1="292.0" x2="928.0" y2="292.0" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="296.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">0</text>
-<line class="grid" x1="75.0" y1="250.5" x2="928.0" y2="250.5" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="254.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">25</text>
-<line class="grid" x1="75.0" y1="209.0" x2="928.0" y2="209.0" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="213.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">50</text>
-<line class="grid" x1="75.0" y1="167.5" x2="928.0" y2="167.5" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="171.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">75</text>
-<line class="grid" x1="75.0" y1="126.0" x2="928.0" y2="126.0" stroke="#2c2c2a" stroke-width="1"/>
-<text class="tick" x="67.0" y="130.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">100</text>
+<line class="grid" x1="75.0" y1="418.8" x2="928.0" y2="418.8" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="422.8" font-size="12.0" fill="#c3c2b7" text-anchor="end">−75</text>
+<line class="grid" x1="75.0" y1="379.5" x2="928.0" y2="379.5" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="383.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">−50</text>
+<line class="grid" x1="75.0" y1="340.2" x2="928.0" y2="340.2" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="344.2" font-size="12.0" fill="#c3c2b7" text-anchor="end">−25</text>
+<line class="grid" x1="75.0" y1="301.0" x2="928.0" y2="301.0" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="305.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">0</text>
+<line class="grid" x1="75.0" y1="261.8" x2="928.0" y2="261.8" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="265.8" font-size="12.0" fill="#c3c2b7" text-anchor="end">25</text>
+<line class="grid" x1="75.0" y1="222.5" x2="928.0" y2="222.5" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="226.5" font-size="12.0" fill="#c3c2b7" text-anchor="end">50</text>
+<line class="grid" x1="75.0" y1="183.2" x2="928.0" y2="183.2" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="187.2" font-size="12.0" fill="#c3c2b7" text-anchor="end">75</text>
+<line class="grid" x1="75.0" y1="144.0" x2="928.0" y2="144.0" stroke="#2c2c2a" stroke-width="1"/>
+<text class="tick" x="67.0" y="148.0" font-size="12.0" fill="#c3c2b7" text-anchor="end">100</text>
 <line class="axis" x1="75.0" y1="476.0" x2="928.0" y2="476.0" stroke="#383835" stroke-width="1"/>
 <line class="tick" x1="75.0" y1="476.0" x2="75.0" y2="481.0" stroke="#383835" stroke-width="1"/>
 <text class="tick" x="75.0" y="495.0" font-size="12.0" fill="#c3c2b7" text-anchor="middle">1 KiB</text>
@@ -32,46 +32,47 @@
 <text class="tick" x="715.3" y="495.0" font-size="12.0" fill="#c3c2b7" text-anchor="middle">1 MiB</text>
 <line class="tick" x1="928.0" y1="476.0" x2="928.0" y2="481.0" stroke="#383835" stroke-width="1"/>
 <text class="tick" x="928.0" y="495.0" font-size="12.0" fill="#c3c2b7" text-anchor="middle">10 MiB</text>
-<line class="budget" x1="139.0" y1="108.0" x2="139.0" y2="476.0" stroke="#c3c2b7" stroke-width="1" stroke-dasharray="4 3"/>
-<line class="ref" x1="75.0" y1="126.0" x2="928.0" y2="126.0" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
-<line class="ref" x1="75.0" y1="132.5" x2="928.0" y2="132.5" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
+<line class="budget" x1="139.0" y1="126.0" x2="139.0" y2="476.0" stroke="#c3c2b7" stroke-width="1" stroke-dasharray="4 3"/>
+<line class="ref" x1="75.0" y1="144.0" x2="928.0" y2="144.0" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
+<line class="ref" x1="75.0" y1="150.1" x2="928.0" y2="150.1" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
 <g><title>Gaussian copula: Transfer Score 40.2 [27.9, 51.8], 140,675.5 B</title>
-<line class="ci ot" x1="529.7" y1="206.0" x2="529.7" y2="245.7" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
-<circle class="pt ot" cx="529.7" cy="225.3" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<line class="ci ot" x1="529.7" y1="219.7" x2="529.7" y2="257.2" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
+<circle class="pt ot" cx="529.7" cy="237.9" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
 </g>
 <g><title>CTGAN: Transfer Score −69.2 [−82.7, −55.2], 1,053,957.5 B</title>
-<line class="ci ot" x1="715.8" y1="383.6" x2="715.8" y2="429.2" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
-<circle class="pt ot" cx="715.8" cy="406.8" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<line class="ci ot" x1="715.8" y1="387.7" x2="715.8" y2="430.8" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
+<circle class="pt ot" cx="715.8" cy="409.6" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
 </g>
 <g><title>TVAE: Transfer Score −3.9 [−26.2, 17.8], 475,125.5 B</title>
-<line class="ci ot" x1="642.2" y1="262.5" x2="642.2" y2="335.4" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
-<circle class="pt ot" cx="642.2" cy="298.5" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<line class="ci ot" x1="642.2" y1="273.1" x2="642.2" y2="342.1" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
+<circle class="pt ot" cx="642.2" cy="307.2" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
 </g>
 <g><title>ARF: Transfer Score 77.2 [58.4, 90.0], 2,937,782.5 B</title>
-<line class="ci ot" x1="810.5" y1="142.7" x2="810.5" y2="195.1" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
-<circle class="pt ot" cx="810.5" cy="163.9" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<line class="ci ot" x1="810.5" y1="159.8" x2="810.5" y2="209.3" stroke="#898781" stroke-width="1.5" stroke-linecap="round"/>
+<circle class="pt ot" cx="810.5" cy="179.9" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
 </g>
 <g><title>DOPE v3: Transfer Score 87.9 [81.1, 95.1], 1,787 B</title>
-<line class="ci hl" x1="126.4" y1="134.2" x2="126.4" y2="157.4" stroke="#4a95ee" stroke-width="1.5" stroke-linecap="round"/>
-<circle class="pt hl" cx="126.4" cy="146.0" r="5.0" fill="#4a95ee" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<line class="ci hl" x1="126.4" y1="151.7" x2="126.4" y2="173.7" stroke="#4a95ee" stroke-width="1.5" stroke-linecap="round"/>
+<circle class="pt hl" cx="126.4" cy="162.9" r="5.0" fill="#4a95ee" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
 </g>
-<text class="budget-label" x="144.0" y="118.4" font-size="11.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2 KiB budget</text>
-<text class="ref-label" x="926.0" y="119.4" font-size="11.0" fill="#c3c2b7" text-anchor="end" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">real twin</text>
-<text class="ref-label" x="806.0" y="144.9" font-size="11.0" fill="#c3c2b7" text-anchor="end" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">copy of the fitting rows</text>
-<text class="label hl" x="144.0" y="149.4" font-size="13.0" fill="#f0efec" font-weight="600" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">DOPE v3 · 87.9</text>
-<text class="label" x="539.7" y="228.4" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Gaussian copula</text>
-<text class="label" x="725.8" y="409.9" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">CTGAN</text>
-<text class="label" x="652.2" y="301.6" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">TVAE</text>
-<text class="label" x="820.5" y="167.0" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">ARF</text>
+<text class="budget-label" x="144.0" y="136.4" font-size="11.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">2 KiB budget</text>
+<text class="ref-label" x="926.0" y="137.4" font-size="11.0" fill="#c3c2b7" text-anchor="end" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">real twin</text>
+<text class="ref-label" x="806.0" y="162.5" font-size="11.0" fill="#c3c2b7" text-anchor="end" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">copy of the fitting rows</text>
+<text class="label hl" x="144.0" y="166.3" font-size="13.0" fill="#f0efec" font-weight="600" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">DOPE v3 · 87.9</text>
+<text class="label" x="539.7" y="241.0" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">Gaussian copula · 40.2</text>
+<text class="label" x="725.8" y="412.7" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">CTGAN · −69.2</text>
+<text class="label" x="652.2" y="310.3" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">TVAE · −3.9</text>
+<text class="label" x="820.5" y="183.0" font-size="12.0" fill="#c3c2b7" stroke="#1a1a19" stroke-width="3" stroke-linejoin="round" paint-order="stroke">ARF · 77.2</text>
 <text class="title" x="32.0" y="42.0" font-size="22.0" fill="#f0efec" font-weight="600">Transfer Score vs. artifact size</text>
-<text class="note" x="32.0" y="66.0" font-size="13.0" fill="#c3c2b7">DEV panel (11 families, 44 cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap.</text>
-<circle class="key" cx="660.4" cy="90.0" r="5.0" fill="#4a95ee" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
-<text class="key" x="671.4" y="94.0" font-size="12.0" fill="#c3c2b7">DOPE v3</text>
-<circle class="key" cx="743.5" cy="90.0" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
-<text class="key" x="753.5" y="94.0" font-size="12.0" fill="#c3c2b7">other methods</text>
-<line class="key" x1="857.9" y1="90.0" x2="873.9" y2="90.0" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
-<text class="key" x="879.9" y="94.0" font-size="12.0" fill="#c3c2b7">controls</text>
-<text class="axis-title" x="32.0" y="94.0" font-size="12.0" fill="#c3c2b7">Transfer Score (95% CI)</text>
+<text class="note" x="32.0" y="66.0" font-size="13.0" fill="#c3c2b7">DEV panel (11 families, 44 cells, 4×). Transfer Score = 100 × (1 + TRG); 100 = real twin. External methods have no byte cap. DOPE is</text>
+<text class="note" x="32.0" y="84.0" font-size="13.0" fill="#c3c2b7">the only generator inside the 2 KiB budget.</text>
+<circle class="key" cx="660.4" cy="108.0" r="5.0" fill="#4a95ee" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<text class="key" x="671.4" y="112.0" font-size="12.0" fill="#c3c2b7">DOPE v3</text>
+<circle class="key" cx="743.5" cy="108.0" r="4.0" fill="#898781" stroke="#1a1a19" stroke-width="4" paint-order="stroke"/>
+<text class="key" x="753.5" y="112.0" font-size="12.0" fill="#c3c2b7">other methods</text>
+<line class="key" x1="857.9" y1="108.0" x2="873.9" y2="108.0" stroke="#898781" stroke-width="1" stroke-dasharray="2 3"/>
+<text class="key" x="879.9" y="112.0" font-size="12.0" fill="#c3c2b7">controls</text>
+<text class="axis-title" x="32.0" y="112.0" font-size="12.0" fill="#c3c2b7">Transfer Score (95% CI)</text>
 <text class="axis-title" x="501.5" y="514.0" font-size="12.0" fill="#c3c2b7" text-anchor="middle">Artifact bytes: median emitted file (log scale)</text>
 <text class="footer" x="928.0" y="530.0" font-size="10.0" fill="#898781" text-anchor="end">contract 200ea0ed · receipt 47ff73b1</text>
 </svg>

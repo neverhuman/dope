@@ -2,8 +2,8 @@
   "files": {
     "bench/real-world/figures/hero-v3-dark.svg": "8bb26e97190aa2de00cda930aebc670e8daf074be384f90c5ebd9a9b99069b67",
     "bench/real-world/figures/hero-v3-light.svg": "bcd83c2f81b5d34c99b08d9470863d224993d4e61d70736e4ab5cae2f9ffaa62",
-    "bench/real-world/figures/hero-v3-methods-dark.svg": "4b3a018bdc5247f5c5af0dbb0af6b70db068aa3ee3ff521daaa62837dac69322",
-    "bench/real-world/figures/hero-v3-methods-light.svg": "2e7a8dda62ac5b201dac72231090811b17a581ee1ca20e190fe8673d1e8b0c76",
+    "bench/real-world/figures/hero-v3-methods-dark.svg": "f5bff6c97f070382798f1dae5fac2b1b634368e9abfc86fc4167192a040778d5",
+    "bench/real-world/figures/hero-v3-methods-light.svg": "04848ed853e1748b82bfd93389396b03873e4af90fedb9872ec32bfe3860e68e",
     "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "6842e2065af28994a5e27549cc4899765823566ee18c5a24298315795ef132c7"
   },
   "receipts": {

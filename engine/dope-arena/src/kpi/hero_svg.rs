@@ -3,9 +3,10 @@
 //!
 //! x is an arm's median emitted-file size on a log10 axis and y its TRG,
 //! with the 95% interval as a thin whisker and gridlines every 0.25. The
-//! highlighted arm wears the accent and a bold label that carries its TRG,
-//! earlier DOPE releases a lighter step of the accent and every other method
-//! neutral gray; every point has a direct label and a small key names the
+//! highlighted arm wears the accent and a bold label. On the Transfer Score
+//! scale every generator's label carries its score; on the TRG scale only the
+//! highlight does. Earlier DOPE releases wear a lighter step of the accent and
+//! every other method neutral gray. Every point has a direct label and a small key names the
 //! four kinds of mark. Controls without bytes are dotted horizontal reference
 //! lines labelled at the right end, and the headline byte budget is a dashed
 //! vertical line: a reference, not a filter. Coordinates have one decimal and
