@@ -9,7 +9,7 @@ scoreboard and its receipts stay in [`../v2.0.0/`](../v2.0.0/README.md).
 | --- | --- |
 | `primary.json` | `dope_kpi primary` (`dope.kpi-receipt/v2`): TRG of every arm with its family-bootstrap interval |
 | `compare.json` | `dope_kpi compare`: the one pre-registered comparison, its Holm-adjusted p, guards and outcome |
-| `readme-block.md` | `dope_kpi render-readme` from the receipts above; `README.md` carries it byte for byte |
+| `readme-block.md` | `dope_kpi render-readme --ranked` from the receipts above. `README.md` carries it byte for byte. |
 | `../../../figures/hero-v3-light.svg`, `../../../figures/hero-v3-dark.svg` | `dope_kpi render-hero` from the same receipts |
 | `render-manifest.json` | the SHA-256 of every receipt, of the block and of both hero files |
 
@@ -62,6 +62,10 @@ stratified family bootstrap, and comparisons are Holm-adjusted. The full protoco
 `dope_kpi` documentation in `engine/dope-arena/docs/kpi-v2.md` and the contract
 `contracts/dope-kpi.json`.
 
+The README presents the same statistic as **Transfer Score = 100 + 100 × TRG**,
+in points. The 4× score sets 100 at parity with the real twin and preserves the
+TRG ordering. Paired gains and interval bounds are in points on the same scale.
+
 ## Regenerate from the receipts
 
 Run from the repository root, with `KPI` set to a `dope_kpi` binary. It re-renders the
@@ -73,11 +77,12 @@ KPI=/path/to/dope_kpi bash -euo pipefail <<'CHECK'
 D=bench/real-world/results/scoreboard/v3.0.0; F=bench/real-world/figures
 mkdir -p target; S=$(mktemp -d target/scoreboard-v3.XXXXXX)
 args=(--receipt "$D/primary.json" --receipt "$D/compare.json")
-"$KPI" render-readme "${args[@]}" < /dev/null > "$S/readme-block.md"
-hero=(--highlight dope-v3b-auto-v8 --label "dope-v3b-auto-v8=DOPE 3.0.0 auto-v8"
+labels=(--label "dope-v3b-auto-v8=DOPE 3.0.0 auto-v8"
   --label "dope-2.0.0-auto=DOPE 2.0.0 auto" --label "dope-2.0.0-small=DOPE 2.0.0 small"
   --label "dope-1.3.0-small=DOPE 1.3.0 small" --label "pr390-v7-step0=V7 step 0"
-  --label "dse8-p0-v3b=DSE8 analytic" --previous dope-2.0.0-auto --previous dope-2.0.0-small
+  --label "dse8-p0-v3b=DSE8 analytic")
+"$KPI" render-readme --ranked "${args[@]}" "${labels[@]}" < /dev/null > "$S/readme-block.md"
+hero=(--highlight dope-v3b-auto-v8 "${labels[@]}" --previous dope-2.0.0-auto --previous dope-2.0.0-small
   --previous dope-1.3.0-small --reference copy_a --reference bootstrap_a
   --note "DEV estimate: fresh row splits of the 22 DEV tables, {cells} cells, {families} families (no CONFIRM look)")
 for t in light dark; do "$KPI" render-hero "${args[@]}" --theme "$t" --out "$S/hero-v3-$t.svg" "${hero[@]}" < /dev/null; done
