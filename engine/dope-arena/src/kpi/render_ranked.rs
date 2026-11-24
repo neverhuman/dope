@@ -137,6 +137,11 @@ pub(super) fn validate_ranked_arms(
                 "arm {id} cannot be passed to both --include and --reference"
             ));
         }
+        if arm.artifact_class != "control" {
+            return contract(format!(
+                "--reference arm {id} is not a control; pass it with --include"
+            ));
+        }
         if arm.primary.trg.is_none() {
             return contract(format!("--reference arm {id} has no primary TRG"));
         }

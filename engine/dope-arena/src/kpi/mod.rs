@@ -48,6 +48,7 @@ pub mod receipt;
 pub mod reduce;
 pub mod render;
 pub mod render_paper;
+mod render_paper_tex;
 pub mod render_ranked;
 pub mod roles;
 pub mod rule;

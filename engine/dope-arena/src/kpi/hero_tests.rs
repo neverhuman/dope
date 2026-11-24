@@ -442,3 +442,72 @@ fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
         );
     }
 }
+
+#[test]
+fn include_rejects_excluded_highlight_and_anchors_to_plotted_arm() {
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let receipt_path = repo.join("bench/real-world/results/scoreboard/v3.0.0/primary-methods.json");
+    let raw = std::fs::read(&receipt_path).expect("committed primary-methods.json");
+
+    let bad_args = HeroArgs {
+        receipts: vec![receipt_path.clone()],
+        theme: ThemeArg::Light,
+        out: PathBuf::from("unused.svg"),
+        labels: Vec::new(),
+        highlight: Some("dope-v3b-auto-v8".to_string()),
+        previous: Vec::new(),
+        references: Vec::new(),
+        include: vec!["arfpy-arf".to_string()],
+        score_scale: true,
+        real_twin: None,
+        methods: false,
+        title: None,
+        note: None,
+    };
+    let err = match build_hero(&bad_args, &[raw.clone()]) {
+        Ok(_) => panic!("expected excluded --highlight to fail closed"),
+        Err(err) => err.to_string(),
+    };
+    assert!(
+        err.contains("--highlight arm dope-v3b-auto-v8 must be included by --include"),
+        "{err}"
+    );
+
+    let mut modified: serde_json::Value = serde_json::from_slice(&raw).unwrap();
+    for arm in modified["arms"].as_array_mut().unwrap() {
+        if arm["arm_id"] == "arfpy-arf" {
+            arm["primary"]["families"] = serde_json::json!(8);
+            arm["primary"]["cells"] = serde_json::json!(37);
+            arm["bytes"]["budget"] = serde_json::json!(4096);
+        }
+    }
+    let modified_bytes = serde_json::to_vec(&modified).unwrap();
+    let filtered_args = HeroArgs {
+        receipts: vec![receipt_path],
+        theme: ThemeArg::Light,
+        out: PathBuf::from("unused.svg"),
+        labels: Vec::new(),
+        highlight: None,
+        previous: Vec::new(),
+        references: Vec::new(),
+        include: vec!["arfpy-arf".to_string()],
+        score_scale: true,
+        real_twin: None,
+        methods: false,
+        title: None,
+        note: None,
+    };
+    let (h, _) = build_hero(&filtered_args, &[modified_bytes]).unwrap();
+    assert_eq!(h.points.len(), 1);
+    assert!((h.budget - 4096.0).abs() < 1e-9);
+    let note = h.note.expect("default score note");
+    assert!(
+        note.contains("8 families, 37 cells"),
+        "expected plotted arm anchor in note: {note}"
+    );
+}

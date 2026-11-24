@@ -14,8 +14,12 @@ use super::jsonl::{canonical_json, parse_json, read_file, sha256_hex, write_atom
 use super::primary::ArmSummary;
 use super::receipt::{Receipt, RECEIPT_SCHEMA};
 use super::render::fixed3;
-use super::render_ranked::{arm_labels, human_bytes, score1, signed_pts1};
-use super::rule::Check;
+use super::render_paper_tex::{
+    display_name, short_guard, tex_bytes, tex_delta_ci, tex_grouped_u64, tex_opt3, tex_p,
+    tex_score, tex_score_ci,
+};
+use super::render_ranked::arm_labels;
+use super::rule::{Check, Outcome};
 use super::rundir::{contract, TASKS};
 use dope_arena::ArenaResult;
 use serde::Serialize;
@@ -76,91 +80,85 @@ struct Summary {
     paired_sha256: String,
 }
 
-fn tex_escape(text: &str) -> String {
-    text.replace('\\', r"\textbackslash{}")
-        .replace('&', r"\&")
-        .replace('%', r"\%")
-        .replace('_', r"\_")
-        .replace('#', r"\#")
-}
-
-fn tex_minus(text: &str) -> String {
-    if let Some(rest) = text.strip_prefix('-') {
-        format!(r"\ensuremath{{-}}{rest}")
-    } else {
-        text.to_string()
-    }
-}
-
-fn tex_score(trg: f64) -> String {
-    tex_minus(&score1(trg))
-}
-
-fn tex_signed_pts(delta: f64) -> String {
-    tex_minus(&signed_pts1(delta))
-}
-
-fn tex_score_ci(trg: f64, lo: f64, hi: f64) -> String {
-    format!("{} [{}, {}]", tex_score(trg), tex_score(lo), tex_score(hi))
-}
-
-fn tex_delta_ci(delta: f64, lo: f64, hi: f64) -> String {
-    format!(
-        "{} [{}, {}]",
-        tex_signed_pts(delta),
-        tex_signed_pts(lo),
-        tex_signed_pts(hi)
-    )
-}
-
-fn tex_p(p: f64) -> String {
-    if p < 0.001 {
-        r"\textless{}0.001".to_string()
-    } else {
-        fixed3(p)
-    }
-}
-
-fn tex_opt3(x: Option<f64>) -> String {
-    x.map_or_else(|| "--".to_string(), |v| tex_minus(&fixed3(v)))
-}
-
-fn tex_grouped_u64(n: u64) -> String {
-    let raw = n.to_string();
-    let mut out = String::new();
-    for (i, ch) in raw.chars().enumerate() {
-        if i > 0 && (raw.len() - i) % 3 == 0 {
-            out.push_str("{,}");
-        }
-        out.push(ch);
-    }
-    out
-}
-
-fn tex_bytes(bytes: Option<f64>) -> String {
-    bytes.map_or_else(
-        || "--".to_string(),
-        |b| human_bytes(b).replace(',', "{,}").replace(' ', "~"),
-    )
-}
-
-fn short_guard(name: &str) -> &str {
-    match name {
-        "task_ci_low" => "tasks",
-        "mlp_delta" => "mlp",
-        "realism_coverage_delta" => "realism",
-        "privacy_coverage_delta" => "privacy",
-        "exact_copy_excess" => "copies",
-        other => other,
-    }
-}
-
 fn same_run(a: &Receipt, b: &Receipt) -> bool {
     a.contract.sha256 == b.contract.sha256
         && a.inputs.schedule_sha256 == b.inputs.schedule_sha256
+        && a.inputs.schedule_panel_sha256 == b.inputs.schedule_panel_sha256
         && a.inputs.realref_sha256 == b.inputs.realref_sha256
         && a.panel == b.panel
         && a.bootstrap == b.bootstrap
+}
+
+fn check_arm_provenance(
+    primary: &Receipt,
+    comp_receipt: &Receipt,
+    arm_id: &str,
+    index: usize,
+) -> ArenaResult<()> {
+    match (
+        primary.inputs.rows_sha256.get(arm_id),
+        comp_receipt.inputs.rows_sha256.get(arm_id),
+    ) {
+        (Some(a), Some(b)) if a == b => {}
+        _ => {
+            return contract(format!(
+                "compare receipt {index} differs from primary on rows_sha256 for arm {arm_id}"
+            ));
+        }
+    }
+    if primary.inputs.guards_sha256.get(arm_id) != comp_receipt.inputs.guards_sha256.get(arm_id) {
+        return contract(format!(
+            "compare receipt {index} differs from primary on guards_sha256 for arm {arm_id}"
+        ));
+    }
+    if primary.inputs.guards_summary_sha256.get(arm_id)
+        != comp_receipt.inputs.guards_summary_sha256.get(arm_id)
+    {
+        return contract(format!(
+            "compare receipt {index} differs from primary on guards_summary_sha256 for arm {arm_id}"
+        ));
+    }
+    if let (Some(pa), Some(ca)) = (
+        primary.arms.iter().find(|a| a.arm_id == arm_id),
+        comp_receipt.arms.iter().find(|a| a.arm_id == arm_id),
+    ) {
+        if pa != ca {
+            return contract(format!(
+                "compare receipt {index} disagrees with primary summary for arm {arm_id}"
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn effective_outcome(comp: &ComparisonResult, p_holm: f64) -> ArenaResult<Outcome> {
+    let Some(holm_thresh) = comp
+        .decision
+        .conditions
+        .iter()
+        .find(|c| c.name == "holm_p")
+        .and_then(|c| c.threshold)
+    else {
+        return contract(format!(
+            "comparison {} vs {} lacks a holm_p condition threshold",
+            comp.id, comp.baseline
+        ));
+    };
+    let holm_pass = p_holm < holm_thresh;
+    let other_conds_pass = comp
+        .decision
+        .conditions
+        .iter()
+        .filter(|c| c.name != "holm_p")
+        .all(|c| c.check == Check::Pass);
+    let all_guards_pass = comp.decision.guards.iter().all(|g| g.check == Check::Pass);
+    if holm_pass && other_conds_pass && all_guards_pass {
+        Ok(Outcome::Promote)
+    } else if comp.decision.outcome == Outcome::Reject {
+        Ok(Outcome::Reject)
+    } else {
+        Ok(Outcome::Hold)
+    }
 }
 
 fn parse_receipt(label: &str, bytes: &[u8]) -> ArenaResult<Receipt> {
@@ -169,18 +167,6 @@ fn parse_receipt(label: &str, bytes: &[u8]) -> ArenaResult<Receipt> {
         return contract(format!("{label} is not {RECEIPT_SCHEMA}"));
     }
     Ok(r)
-}
-
-fn display_name(arm_id: &str, labels: &BTreeMap<String, String>, bold: bool) -> String {
-    let text = labels
-        .get(arm_id)
-        .map(|s| tex_escape(s))
-        .unwrap_or_else(|| format!(r"\texttt{{{}}}", tex_escape(arm_id)));
-    if bold {
-        format!(r"\textbf{{{text}}}")
-    } else {
-        text
-    }
 }
 
 fn ranking_row_a(
@@ -346,16 +332,20 @@ fn render_paired_tex(
         r"\midrule".to_string(),
     ];
     for ((arm, comp), &p_h) in methods.iter().zip(comps.iter()).zip(holm_p.iter()) {
+        let outcome = effective_outcome(comp, p_h)?;
         let matched = comp.matched.as_ref().map_or_else(
             || "--".to_string(),
             |m| tex_delta_ci(m.delta, m.ci_low, m.ci_high),
         );
-        let missed: Vec<&str> = comp
+        let missed: Vec<String> = comp
             .decision
             .guards
             .iter()
-            .filter(|g| g.check == Check::Fail)
-            .map(|g| short_guard(&g.name))
+            .filter_map(|g| match g.check {
+                Check::Pass => None,
+                Check::Fail => Some(short_guard(&g.name).to_string()),
+                Check::NotEvaluated => Some(format!("{} (n/e)", short_guard(&g.name))),
+            })
             .collect();
         let guards_text = if missed.is_empty() {
             "none".to_string()
@@ -369,7 +359,7 @@ fn render_paired_tex(
             matched,
             tex_p(comp.p_one_sided),
             tex_p(p_h),
-            comp.decision.outcome.word(),
+            outcome.word(),
             guards_text
         ));
     }
@@ -383,7 +373,7 @@ pub(super) fn build_tables(
     compare_bytes: &[Vec<u8>],
 ) -> ArenaResult<(String, String, BTreeMap<String, f64>)> {
     let primary = parse_receipt("primary receipt", primary_bytes)?;
-    let mut all_comps: Vec<ComparisonResult> = Vec::new();
+    let mut compare_receipts: Vec<Receipt> = Vec::new();
     for (i, bytes) in compare_bytes.iter().enumerate() {
         let r = parse_receipt(&format!("compare receipt {}", i + 1), bytes)?;
         if !same_run(&primary, &r) {
@@ -392,7 +382,7 @@ pub(super) fn build_tables(
                 i + 1
             ));
         }
-        all_comps.extend(r.comparisons);
+        compare_receipts.push(r);
     }
     let method_ids: Vec<String> = if args.methods.is_empty() {
         DEFAULT_METHODS.iter().map(|s| (*s).to_string()).collect()
@@ -438,9 +428,11 @@ pub(super) fn build_tables(
     })?);
     let mut matched_comps: Vec<&ComparisonResult> = Vec::new();
     for arm in &methods {
-        let hits: Vec<&ComparisonResult> = all_comps
+        let hits: Vec<(usize, &Receipt, &ComparisonResult)> = compare_receipts
             .iter()
-            .filter(|c| c.id == args.candidate && c.baseline == arm.arm_id)
+            .enumerate()
+            .flat_map(|(i, r)| r.comparisons.iter().map(move |c| (i + 1, r, c)))
+            .filter(|(_, _, c)| c.id == args.candidate && c.baseline == arm.arm_id)
             .collect();
         if hits.len() != 1 {
             return contract(format!(
@@ -450,7 +442,10 @@ pub(super) fn build_tables(
                 hits.len()
             ));
         }
-        matched_comps.push(hits[0]);
+        let (index, comp_receipt, comp) = hits[0];
+        check_arm_provenance(&primary, comp_receipt, &args.candidate, index)?;
+        check_arm_provenance(&primary, comp_receipt, &arm.arm_id, index)?;
+        matched_comps.push(comp);
     }
     let raw_p: Vec<f64> = matched_comps.iter().map(|c| c.p_one_sided).collect();
     let adjusted = holm(&raw_p);

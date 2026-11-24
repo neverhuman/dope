@@ -98,3 +98,121 @@ fn paper_tables_match_committed_receipts_with_zero_prior_versions() {
         "docs/whitepaper-v3/generated/v3-paired-table.tex drifted from committed receipts"
     );
 }
+
+#[test]
+fn holm_flip_and_not_evaluated_guard_demote_outcome_to_hold() {
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let primary_path = repo.join("bench/real-world/results/scoreboard/v3.0.0/primary-methods.json");
+    let paper_dir = repo.join("bench/real-world/results/scoreboard/v3.0.0/evidence/paper");
+    let primary = std::fs::read(&primary_path).expect("primary-methods.json");
+    let arf = std::fs::read(paper_dir.join("v3-vs-arfpy-arf.json")).expect("arf receipt");
+    let tvae_raw = std::fs::read(paper_dir.join("v3-vs-sdv-tvae.json")).expect("tvae receipt");
+
+    let mut tvae: serde_json::Value = serde_json::from_slice(&tvae_raw).unwrap();
+    tvae["comparisons"][0]["p_one_sided"] = serde_json::json!(0.030);
+    tvae["comparisons"][0]["p_holm"] = serde_json::json!(0.030);
+    for cond in tvae["comparisons"][0]["decision"]["conditions"]
+        .as_array_mut()
+        .unwrap()
+    {
+        if cond["name"] == "holm_p" {
+            cond["value"] = serde_json::json!(0.030);
+            cond["check"] = serde_json::json!("pass");
+        }
+    }
+    tvae["comparisons"][0]["decision"]["outcome"] = serde_json::json!("PROMOTE");
+    let tvae_near = serde_json::to_vec(&tvae).unwrap();
+
+    let args = PaperTablesArgs {
+        primary: primary_path.clone(),
+        compares: Vec::new(),
+        ranking_out: PathBuf::from("unused-ranking.tex"),
+        paired_out: PathBuf::from("unused-paired.tex"),
+        candidate: DEFAULT_CANDIDATE.to_string(),
+        methods: vec!["arfpy-arf".to_string(), "sdv-tvae".to_string()],
+        references: Vec::new(),
+        labels: Vec::new(),
+    };
+    let (_, paired, holm_map) = build_tables(&args, &primary, &[arf.clone(), tvae_near]).unwrap();
+    assert!((holm_map["sdv-tvae"] - 0.060).abs() < 1e-9);
+    assert!(
+        paired.contains(r"& 0.030 & 0.060 & \textbf{HOLD} & none \\"),
+        "{paired}"
+    );
+    assert!(!paired.contains(r"\textbf{PROMOTE}"), "{paired}");
+
+    let mut tvae_ne: serde_json::Value = serde_json::from_slice(&tvae_raw).unwrap();
+    for guard in tvae_ne["comparisons"][0]["decision"]["guards"]
+        .as_array_mut()
+        .unwrap()
+    {
+        if guard["name"] == "privacy_coverage_delta" {
+            guard["check"] = serde_json::json!("not_evaluated");
+            guard["value"] = serde_json::Value::Null;
+        }
+    }
+    let tvae_ne_bytes = serde_json::to_vec(&tvae_ne).unwrap();
+    let (_, paired_ne, _) = build_tables(&args, &primary, &[arf, tvae_ne_bytes]).unwrap();
+    assert!(
+        paired_ne.contains(r"& \textbf{HOLD} & privacy (n/e) \\"),
+        "{paired_ne}"
+    );
+    assert!(!paired_ne.contains(r"\textbf{PROMOTE}"), "{paired_ne}");
+}
+
+#[test]
+fn provenance_mismatches_between_primary_and_compare_fail_closed() {
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let primary_path = repo.join("bench/real-world/results/scoreboard/v3.0.0/primary-methods.json");
+    let paper_dir = repo.join("bench/real-world/results/scoreboard/v3.0.0/evidence/paper");
+    let primary = std::fs::read(&primary_path).expect("primary-methods.json");
+    let tvae_raw = std::fs::read(paper_dir.join("v3-vs-sdv-tvae.json")).expect("tvae receipt");
+    let args = PaperTablesArgs {
+        primary: primary_path,
+        compares: Vec::new(),
+        ranking_out: PathBuf::from("unused-ranking.tex"),
+        paired_out: PathBuf::from("unused-paired.tex"),
+        candidate: DEFAULT_CANDIDATE.to_string(),
+        methods: vec!["sdv-tvae".to_string()],
+        references: Vec::new(),
+        labels: Vec::new(),
+    };
+    type ReceiptEdit = fn(&mut serde_json::Value);
+    let cases: [(&str, ReceiptEdit); 4] = [
+        ("rows_sha256", |v| {
+            v["inputs"]["rows_sha256"]["dope-v3b-auto-v8"] = serde_json::json!("deadbeef");
+        }),
+        ("guards_sha256", |v| {
+            v["inputs"]["guards_sha256"]["sdv-tvae"] = serde_json::json!("deadbeef");
+        }),
+        ("guards_summary_sha256", |v| {
+            v["inputs"]["guards_summary_sha256"]
+                .as_object_mut()
+                .unwrap()
+                .remove("sdv-tvae");
+        }),
+        ("primary summary", |v| {
+            v["arms"][0]["primary"]["trg"] = serde_json::json!(-0.999);
+        }),
+    ];
+    for (needle, mutate) in cases {
+        let mut val: serde_json::Value = serde_json::from_slice(&tvae_raw).unwrap();
+        mutate(&mut val);
+        let bytes = serde_json::to_vec(&val).unwrap();
+        let err = match build_tables(&args, &primary, &[bytes]) {
+            Ok(_) => panic!("expected failure for {needle}"),
+            Err(err) => err.to_string(),
+        };
+        assert!(err.contains(needle), "expected {needle} in {err}");
+    }
+}

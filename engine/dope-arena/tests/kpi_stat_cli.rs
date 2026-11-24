@@ -492,6 +492,15 @@ fn null_and_readme_block_are_deterministic() {
         err_dup.contains("both --include and --reference"),
         "{err_dup}"
     );
+    let err_non_ctrl = kpi_err(&[
+        "render-readme",
+        "--receipt",
+        path_str(&paths[0]),
+        "--ranked",
+        "--reference",
+        "cand",
+    ]);
+    assert!(err_non_ctrl.contains("not a control"), "{err_non_ctrl}");
 }
 
 #[test]

@@ -216,6 +216,22 @@ fn check_roles(
             return contract(format!("--include arm {id} needs a byte median and a TRG"));
         }
     }
+    if !include.is_empty() {
+        if let Some(hl) = highlight {
+            if !include.iter().any(|id| id == hl) {
+                return contract(format!(
+                    "--highlight arm {hl} must be included by --include"
+                ));
+            }
+        }
+        for prev in previous {
+            if !include.iter().any(|id| id == prev) {
+                return contract(format!(
+                    "--previous arm {prev} must be included by --include"
+                ));
+            }
+        }
+    }
     Ok(())
 }
 
@@ -272,6 +288,7 @@ pub(super) fn hero(args: &HeroArgs, receipts: &[Vec<u8>]) -> ArenaResult<(Hero, 
         }
     };
     let (mut points, mut unplotted) = (Vec::new(), Vec::new());
+    let mut plotted_arms: Vec<&ArmSummary> = Vec::new();
     for arm in &arms {
         if references_ids.contains(&arm.arm_id) {
             continue;
@@ -281,14 +298,17 @@ pub(super) fn hero(args: &HeroArgs, receipts: &[Vec<u8>]) -> ArenaResult<(Hero, 
             continue;
         }
         match plotted(arm) {
-            Some((bytes, trg, ci_low, ci_high)) => points.push(Point {
-                label: label(&arm.arm_id),
-                bytes,
-                trg,
-                ci_low,
-                ci_high,
-                tier: tier(&arm.arm_id),
-            }),
+            Some((bytes, trg, ci_low, ci_high)) => {
+                plotted_arms.push(arm);
+                points.push(Point {
+                    label: label(&arm.arm_id),
+                    bytes,
+                    trg,
+                    ci_low,
+                    ci_high,
+                    tier: tier(&arm.arm_id),
+                });
+            }
             None => unplotted.push(arm.arm_id.clone()),
         }
     }
@@ -314,8 +334,8 @@ pub(super) fn hero(args: &HeroArgs, receipts: &[Vec<u8>]) -> ArenaResult<(Hero, 
             }),
     );
     let Some(anchor) = highlight
-        .and_then(|id| arms.iter().find(|a| a.arm_id == id))
-        .or_else(|| arms.iter().find(|a| plotted(a).is_some()))
+        .and_then(|id| plotted_arms.iter().copied().find(|a| a.arm_id == id))
+        .or_else(|| plotted_arms.first().copied())
     else {
         return contract("render-hero needs an arm with a byte median and a TRG");
     };
