@@ -641,3 +641,6 @@ fn dse8_calibrated_priors_collinear_precision_and_discrete_trees() {
         "discrete XOR gap collapsed to {gap:.3} (expected > 1.8)"
     );
 }
+
+#[path = "single_encoding_v8/decoder_capability.rs"]
+mod decoder_capability;

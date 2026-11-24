@@ -22,6 +22,7 @@ pub mod nominal;
 pub mod packet;
 pub mod packet_decode;
 pub mod planner;
+mod replay;
 pub mod rng_v8;
 pub mod scale_v8;
 pub mod target_v8;
@@ -46,6 +47,7 @@ pub use packet::{
     DSE8_VERSION, FLAG_HAS_COL_MAP, FLAG_HAS_CUSTOM_CLASSES, FLAG_HAS_DROPPED_MEDS,
     FLAG_HAS_NEURAL_ENCODER, FLAG_HAS_SKEW_T, FLAG_NORMALIZED_ONLY,
 };
+pub use replay::{ReplayArmV8, ReplayPlanV8};
 pub use scale_v8::{Dse8ColumnMeta, ScaleCardV8, V8_MAX_CLASSES, V8_MAX_COLS};
 pub use target_v8::{CodeSectionV8, Effect1DV8, LinearSectionV8, PairIntV8, ResidSectionV8};
 pub use trees_v8::{OblivTreeV8, TreesSectionV8};
@@ -106,7 +108,7 @@ pub fn fit_dse8_packet(
     y_raw: &[f64],
     opts: &Dse8FitOptions<'_>,
 ) -> Result<Vec<u8>> {
-    fit_dse8_internal(x_raw, y_raw, opts, None)
+    fit_dse8_internal(x_raw, y_raw, opts, None, false)
 }
 
 /// Fit a neural-compiled `DSE8` v1 packet using `SingleEncV8Weights` Owner Evidence Encoder.
@@ -116,7 +118,16 @@ pub fn fit_dse8_packet_with_encoder(
     opts: &Dse8FitOptions<'_>,
     weights: &SingleEncV8Weights,
 ) -> Result<Vec<u8>> {
-    fit_dse8_internal(x_raw, y_raw, opts, Some(weights))
+    fit_dse8_internal(x_raw, y_raw, opts, Some(weights), false)
+}
+
+pub(crate) fn fit_dse8_packet_with_code_reservation(
+    x_raw: &[Vec<f64>],
+    y_raw: &[f64],
+    opts: &Dse8FitOptions<'_>,
+    weights: &SingleEncV8Weights,
+) -> Result<Vec<u8>> {
+    fit_dse8_internal(x_raw, y_raw, opts, Some(weights), true)
 }
 
 fn fit_dse8_internal(
@@ -124,11 +135,12 @@ fn fit_dse8_internal(
     y_raw: &[f64],
     opts: &Dse8FitOptions<'_>,
     weights: Option<&SingleEncV8Weights>,
+    reserve_code: bool,
 ) -> Result<Vec<u8>> {
     let mut plan_budget = opts.budget_bytes;
     let mut last_err = DopeError::Budget("over_budget".into());
     for _ in 0..6 {
-        match fit_dse8_attempt(x_raw, y_raw, opts, weights, plan_budget) {
+        match fit_dse8_attempt(x_raw, y_raw, opts, weights, plan_budget, reserve_code) {
             Ok(bytes) => return Ok(bytes),
             Err(DopeError::Budget(msg)) if !opts.normalized_only && plan_budget >= 192 => {
                 last_err = DopeError::Budget(msg);
@@ -146,6 +158,7 @@ fn fit_dse8_attempt(
     opts: &Dse8FitOptions<'_>,
     weights: Option<&SingleEncV8Weights>,
     plan_budget: usize,
+    reserve_code: bool,
 ) -> Result<Vec<u8>> {
     let x_cols_raw = x_raw.len();
     if x_cols_raw == 0 || x_cols_raw > u16::MAX as usize {
@@ -356,7 +369,12 @@ fn fit_dse8_attempt(
     // 5. Optional opt-in Student-t inv_nu & Owner Evidence Encoder nested FSQ code (`Z`).
     let mut inv_nu = 0.0f32;
     let mut code = CodeSectionV8::default();
-    let need_ev = opts.enable_skew_t || (weights.is_some() && plan.code_tier > 0);
+    let code_tier = if reserve_code {
+        want_code.clamp(1, 3)
+    } else {
+        plan.code_tier
+    };
+    let need_ev = opts.enable_skew_t || (weights.is_some() && code_tier > 0);
     if need_ev {
         let ev_meta: Option<Vec<EvColMeta>> = active_meta
             .as_ref()
@@ -381,9 +399,9 @@ fn fit_dse8_attempt(
                 inv_nu = ev.glob[42].clamp(0.0, 0.45);
             }
             if let Some(w) = weights {
-                if plan.code_tier > 0 {
+                if code_tier > 0 {
                     if let Some(code_vec) = w.encode_evidence_code(&ev) {
-                        code = CodeSectionV8::from_unit_vec(&code_vec, plan.code_tier);
+                        code = CodeSectionV8::from_unit_vec(&code_vec, code_tier);
                     }
                 }
             }
@@ -460,8 +478,8 @@ fn fit_dse8_attempt(
 
     // Pack strictly within budget, then calibrate intercepts `b` against the EXACT
     // budget-surviving X/E/Pr/Tr sections via 512 deterministic synthetic rows!
-    let packed = pack_dse8_packet(&pkt, opts.budget_bytes)?;
+    let packed = packet::pack_with_code_priority(&pkt, opts.budget_bytes, reserve_code)?;
     let mut final_pkt = unpack_dse8_packet(&packed)?;
     calibrate_intercepts_on_packet(&mut final_pkt, &y_sc);
-    pack_dse8_packet(&final_pkt, opts.budget_bytes)
+    packet::pack_with_code_priority(&final_pkt, opts.budget_bytes, reserve_code)
 }

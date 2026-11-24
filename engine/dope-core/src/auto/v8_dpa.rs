@@ -13,17 +13,18 @@
 use super::container::{
     fingerprint_hex, wrap_dpa1, Dpa1, Encoder, DPA1_HEADER_BYTES, NO_FINGERPRINT,
 };
-use super::v7_schema::{decode_section, encode_section, V7Kind, V7Schema};
-use super::v8::{fit_auto_v8, AutoV8Options, V8Choice};
+mod sampling;
+
+use super::v7_schema::{decode_section, encode_section, V7Schema};
+use super::v8::{fit_auto_v8_with_payload_room, AutoV8Options, V8Choice};
 use crate::error::{DopeError, Result};
 use crate::schema::{infer, IntakeOptions, Kind, Schema};
 use crate::single_encoding::v8::{
-    decode_dse8_rows, fit_dse8_packet, fit_dse8_packet_with_encoder, fit_unit_meta,
-    unpack_dse8_packet, Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
+    fit_dse8_packet, fit_dse8_packet_with_code_reservation, fit_dse8_packet_with_encoder,
+    fit_unit_meta, unpack_dse8_packet, Dse8FitOptions, Dse8Packet, SingleEncV8Weights,
 };
 use crate::table::{is_missing, parse_number, RawTable};
 use serde::Serialize;
-use std::io::Write;
 use std::time::Instant;
 
 /// SingleEncV8 weights and SHA-256 identity used by `DPA1` tag `8` headers and `TAG_WEIGHTS_FP`.
@@ -161,6 +162,27 @@ pub fn fit_dpa1_v8(
     model: Option<&V8Model>,
     mode: V8DpaMode,
 ) -> Result<V8DpaFitted> {
+    fit_dpa1_v8_inner(raw, target, opts, model, mode, false)
+}
+
+/// Fit the experimental direct neural arm with code charged before optional analytic sections.
+pub fn fit_dpa1_v8_with_code_reservation(
+    raw: &RawTable,
+    target: usize,
+    opts: &AutoV8Options,
+    model: &V8Model,
+) -> Result<V8DpaFitted> {
+    fit_dpa1_v8_inner(raw, target, opts, Some(model), V8DpaMode::V8, true)
+}
+
+fn fit_dpa1_v8_inner(
+    raw: &RawTable,
+    target: usize,
+    opts: &AutoV8Options,
+    model: Option<&V8Model>,
+    mode: V8DpaMode,
+    reserve_code: bool,
+) -> Result<V8DpaFitted> {
     let start = Instant::now();
     let budget = opts.budget;
     let room = budget
@@ -213,7 +235,16 @@ pub fn fit_dpa1_v8(
             };
             let (pkt, ch, fp) = match active_model {
                 Some(m) => (
-                    fit_dse8_packet_with_encoder(&x_raw, &y_raw, &dse8_opts, m.weights())?,
+                    if reserve_code {
+                        fit_dse8_packet_with_code_reservation(
+                            &x_raw,
+                            &y_raw,
+                            &dse8_opts,
+                            m.weights(),
+                        )?
+                    } else {
+                        fit_dse8_packet_with_encoder(&x_raw, &y_raw, &dse8_opts, m.weights())?
+                    },
                     V8Choice::Dse8Neural,
                     m.fingerprint(),
                 ),
@@ -259,8 +290,13 @@ pub fn fit_dpa1_v8(
                 let mut inner_opts = opts.clone();
                 inner_opts.budget = packet_room;
                 inner_opts.format1.budget = Some(room);
-                let fitted =
-                    fit_auto_v8(raw, target, &inner_opts, active_model.map(|m| m.weights()))?;
+                let fitted = fit_auto_v8_with_payload_room(
+                    raw,
+                    target,
+                    &inner_opts,
+                    active_model.map(|m| m.weights()),
+                    Some(room),
+                )?;
                 let r = fitted.report;
                 match fitted.choice {
                     V8Choice::Format1 => (
@@ -399,64 +435,5 @@ impl V8Decoder {
 
     pub fn is_neural(&self) -> bool {
         self.header_fp != NO_FINGERPRINT
-    }
-
-    /// Decode `rows` synthetic rows strictly from the artifact and write target-last CSV.
-    pub fn write_csv<W: Write>(
-        &self,
-        model: Option<&V8Model>,
-        zero_init: bool,
-        rows: usize,
-        seed: u64,
-        w: W,
-    ) -> Result<()> {
-        let use_weights = if zero_init || self.header_fp == NO_FINGERPRINT {
-            None
-        } else {
-            model.map(|m| m.weights())
-        };
-        let dec = decode_dse8_rows(&self.packet, use_weights, rows, seed)?;
-        let mut csv = csv::Writer::from_writer(w);
-        csv.write_record(self.headers())?;
-        let p = self.schema.features.len();
-        let mut row_cells = Vec::with_capacity(p + 1);
-        for r in 0..rows {
-            row_cells.clear();
-            for j in 0..p {
-                let v = if dec.missing[j][r] {
-                    f64::NAN
-                } else {
-                    dec.x[j][r]
-                };
-                row_cells.push(format_cell(&self.schema.features[j].kind, v));
-            }
-            row_cells.push(format_cell(&self.schema.target.kind, dec.y[r]));
-            csv.write_record(&row_cells)?;
-        }
-        csv.flush()?;
-        Ok(())
-    }
-}
-
-fn format_cell(kind: &V7Kind, value: f64) -> String {
-    if !value.is_finite() {
-        return String::new();
-    }
-    match kind {
-        V7Kind::Real => {
-            let v = if value == 0.0 { 0.0 } else { value };
-            format!("{v}")
-        }
-        V7Kind::Integer => {
-            let r = value.round();
-            format!("{}", if r == 0.0 { 0 } else { r as i64 })
-        }
-        V7Kind::Categorical(labels) => {
-            if labels.is_empty() {
-                return String::new();
-            }
-            let idx = (value.round() as isize).clamp(0, labels.len() as isize - 1) as usize;
-            labels[idx].clone()
-        }
     }
 }

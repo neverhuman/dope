@@ -59,6 +59,12 @@ struct StTensorMeta {
 pub(crate) type TensorMap = BTreeMap<String, (Vec<usize>, Vec<f32>)>;
 
 pub(crate) fn parse_f32_rank2_safetensors(bytes: &[u8]) -> Result<TensorMap> {
+    parse_f32_rank2_safetensors_with_metadata(bytes).map(|(tensors, _)| tensors)
+}
+
+pub(crate) fn parse_f32_rank2_safetensors_with_metadata(
+    bytes: &[u8],
+) -> Result<(TensorMap, serde_json::Value)> {
     if bytes.len() < 8 || bytes.len() > MAX_SAFETENSORS_BYTES {
         return Err(DopeError::Artifact(
             "single_enc_v7 safetensors size out of bounds".into(),
@@ -72,14 +78,12 @@ pub(crate) fn parse_f32_rank2_safetensors(bytes: &[u8]) -> Result<TensorMap> {
     }
     let hdr_str = std::str::from_utf8(&bytes[8..8 + hdr_len])
         .map_err(|_| DopeError::Artifact("single_enc_v7 safetensors non-utf8 header".into()))?;
-    let raw_map: BTreeMap<String, serde_json::Value> = serde_json::from_str(hdr_str)
+    let mut raw_map: BTreeMap<String, serde_json::Value> = serde_json::from_str(hdr_str)
         .map_err(|_| DopeError::Artifact("single_enc_v7 safetensors invalid json".into()))?;
     let data = &bytes[8 + hdr_len..];
+    let metadata = raw_map.remove("__metadata__").unwrap_or_default();
     let mut tensors = BTreeMap::new();
     for (k, v) in raw_map {
-        if k == "__metadata__" {
-            continue;
-        }
         let meta: StTensorMeta = serde_json::from_value(v)
             .map_err(|_| DopeError::Artifact(format!("invalid tensor meta: {k}")))?;
         if meta.dtype != "F32" {
@@ -112,7 +116,7 @@ pub(crate) fn parse_f32_rank2_safetensors(bytes: &[u8]) -> Result<TensorMap> {
         }
         tensors.insert(k, (meta.shape, vals));
     }
-    Ok(tensors)
+    Ok((tensors, metadata))
 }
 
 pub(crate) fn take_linear(

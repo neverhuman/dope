@@ -19,8 +19,6 @@ use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const DOPEMAT_MAGIC: &[u8; 8] = b"DOPEMAT1";
-
 #[derive(Parser)]
 #[command(
     name = "dope_v8_emit",
@@ -129,20 +127,7 @@ enum Cmd {
     },
 }
 
-use dope_arena::dopemat::{read_dopemat, write_atomic};
-
-fn write_dopemat(path: &Path, rows: usize, x_cols: usize, body: &[f32]) -> Result<(), String> {
-    let mut buf = Vec::with_capacity(24 + body.len() * 4);
-    buf.extend_from_slice(DOPEMAT_MAGIC);
-    buf.extend_from_slice(&(rows as u32).to_le_bytes());
-    buf.extend_from_slice(&(x_cols as u32).to_le_bytes());
-    buf.extend_from_slice(&1u32.to_le_bytes());
-    buf.extend_from_slice(&0u32.to_le_bytes());
-    for &v in body {
-        buf.extend_from_slice(&v.to_le_bytes());
-    }
-    write_atomic(path, &buf)
-}
+use dope_arena::dopemat::{read_dopemat, write_atomic, write_dopemat};
 
 fn parse_task(task: &str) -> Result<u8, String> {
     match task {

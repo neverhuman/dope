@@ -7,6 +7,10 @@
 //! 3. Post-nonlinear class prior & regression mean drift on decoded synthetic X rows
 //!    (decode remains 100% row-local!).
 
+mod midrank;
+
+pub use midrank::project_fit_midrank;
+
 use super::copula_regimes::{RegimesSectionV8, V8_MAX_RANK};
 use super::decode::{build_decode_plan_v8, decode_dse8_row_at};
 use super::marginals::MarginalColV8;
@@ -16,7 +20,6 @@ use super::rng_v8::{
     counter_normal, counter_uniform, sample_categorical, STREAM_FACTOR, STREAM_NOISE, STREAM_REGIME,
 };
 use super::scale_v8::V8_MAX_CLASSES;
-use crate::stats::norm_ppf;
 
 const CAL_SYNTH_ROWS: usize = 512;
 const CAL_SEED: u64 = 0xCA11_B8A7_D5E8_0001;
@@ -165,35 +168,22 @@ impl CdfIntervals {
         let mut z_mid = vec![vec![0.0f64; n]; p];
 
         for j in 0..p {
-            let mut obs: Vec<(usize, f64)> = x_unit[j]
-                .iter()
-                .enumerate()
-                .filter(|(_, v)| v.is_finite())
-                .map(|(r, &v)| (r, v as f64))
-                .collect();
-            let n_obs = obs.len();
-            if n_obs < 2 {
+            let obs = midrank::sorted_observations(&x_unit[j]);
+            if obs.len() < 2 {
                 continue;
             }
-            obs.sort_by(|a, b| a.1.total_cmp(&b.1).then(a.0.cmp(&b.0)));
-            let nf = n_obs as f64;
-            let mut i = 0usize;
-            while i < n_obs {
-                let mut k = i + 1;
-                while k < n_obs && (obs[k].1 - obs[i].1).abs() <= 1e-12 * obs[i].1.abs().max(1.0) {
-                    k += 1;
-                }
-                let lo = (i as f64 / nf) as f32;
-                let hi = (k as f64 / nf) as f32;
+            let nf = obs.len() as f64;
+            for group in midrank::groups(&obs) {
+                let lo = (group.start as f64 / nf) as f32;
+                let hi = (group.end as f64 / nf) as f32;
                 let mid = 0.5 * (lo + hi);
-                let zm = norm_ppf((mid as f64).clamp(1e-4, 1.0 - 1e-4)).clamp(-3.5, 3.5);
-                for &(r, _) in &obs[i..k] {
+                let zm = midrank::normal_score(mid);
+                for &(r, _) in &obs[group] {
                     u_lo[j][r] = lo;
                     u_hi[j][r] = hi;
                     u_mid[j][r] = mid;
                     z_mid[j][r] = zm;
                 }
-                i = k;
             }
         }
         Self {

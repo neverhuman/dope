@@ -1038,6 +1038,7 @@
     "engine/dope-core/tests/evidence_v8.rs": "rust-core",
     "engine/dope-core/tests/single_encoding_v8.rs": "rust-core",
     "engine/dope-arena/src/bin/dope_v8_emit.rs": "rust-core",
+    "engine/dope-arena/src/bin/dope_v8_replay.rs": "rust-core",
     "research/levels/configs/v3_campaign/": "external-evidence",
     "research/levels/v8_evidence.py": "external-evidence",
     "research/levels/v8_packet.py": "external-evidence",

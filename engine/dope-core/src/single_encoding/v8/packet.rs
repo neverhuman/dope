@@ -189,6 +189,14 @@ fn encode_resid_section(rs: &ResidSectionV8) -> Vec<u8> {
 
 /// Pack a `Dse8Packet` strictly within `budget_bytes`, greedily fitting nested optional sections.
 pub fn pack_dse8_packet(pkt: &Dse8Packet, budget_bytes: usize) -> Result<Vec<u8>> {
+    pack_with_code_priority(pkt, budget_bytes, false)
+}
+
+pub(super) fn pack_with_code_priority(
+    pkt: &Dse8Packet,
+    budget_bytes: usize,
+    reserve_code: bool,
+) -> Result<Vec<u8>> {
     let h = &pkt.header;
     let mut sections: Vec<(u8, Vec<u8>)> = Vec::with_capacity(11);
 
@@ -244,6 +252,16 @@ pub fn pack_dse8_packet(pkt: &Dse8Packet, budget_bytes: usize) -> Result<Vec<u8>
         return Err(DopeError::Budget("over_budget".into()));
     }
     let mut rem = budget_bytes - mandatory_bytes;
+    let code_reserved = if reserve_code {
+        (1..=pkt.code.tier)
+            .rev()
+            .map(CodeSectionV8::tier_bytes)
+            .find(|&need| pkt.code.packed.len() >= need && TLV_HDR_BYTES + need <= rem)
+            .map_or(0, |need| TLV_HDR_BYTES + need)
+    } else {
+        0
+    };
+    rem -= code_reserved;
 
     // Optional enhancement sections in strict ascending tag & utility-per-byte order!
     let mut try_push = |tag: u8, payload: Vec<u8>, rem: &mut usize| {
@@ -276,7 +294,10 @@ pub fn pack_dse8_packet(pkt: &Dse8Packet, budget_bytes: usize) -> Result<Vec<u8>
         }
     }
     // Prefix-fit trees (14 B each) — reserve room for nested FSQ code if requested!
-    let code_reserve = if pkt.code.tier > 0 && rem >= TLV_HDR_BYTES + CodeSectionV8::tier_bytes(1) {
+    let code_reserve = if !reserve_code
+        && pkt.code.tier > 0
+        && rem >= TLV_HDR_BYTES + CodeSectionV8::tier_bytes(1)
+    {
         TLV_HDR_BYTES + CodeSectionV8::tier_bytes(pkt.code.tier).min(rem - TLV_HDR_BYTES)
     } else {
         0
@@ -298,6 +319,7 @@ pub fn pack_dse8_packet(pkt: &Dse8Packet, budget_bytes: usize) -> Result<Vec<u8>
         try_push(TAG_RESID, resid_b, &mut rem);
     }
     // Nested FSQ neural code (fits highest tier 3 -> 2 -> 1 that fits!)
+    rem += code_reserved;
     let mut final_code_tier = 0u8;
     if pkt.code.tier > 0 {
         for cand_t in (1..=pkt.code.tier).rev() {
