@@ -1,26 +1,23 @@
-//! Loader for `SingleEncV8` F32 `rank <= 2` SafeTensors checkpoints (`--v8-weights`).
+//! Loader for `SingleEncV8` F32/BF16 `rank <= 2` SafeTensors checkpoints (`--v8-weights`, `<= 1 GiB`).
 //!
 //! Before the v3.0.0 release checkpoint passes development qualification and is embedded under
 //! `models/single-enc-v8/model.safetensors`, omitting `--v8-weights` cleanly yields `Ok(None)`,
 //! selecting the weightless analytic Step-0 `DSE8` decoder (`NO_FINGERPRINT`). Passing
-//! `--v8-weights` loads and validates the checkpoint fail-closed and enforces `TAG_WEIGHTS_FP`
-//! + `DPA1` tag `8` fingerprint equality on decode.
+//! `--v8-weights` loads and validates the checkpoint fail-closed (auto-inferring attention heads
+//! and Tier 1/2/3 nested code width `64|128|256`) and enforces `TAG_WEIGHTS_FP` + `DPA1` tag `8`
+//! fingerprint equality on decode.
 
 use dope_core::auto::V8Model;
 use std::path::Path;
 
-/// Default attention heads for canonical `SingleEncV8` checkpoints.
-pub(crate) const V8_N_HEADS: usize = 4;
-
-/// Load `--v8-weights` if supplied, failing closed on missing/corrupt/non-F32 files.
+/// Load `--v8-weights` if supplied, failing closed on missing/corrupt/unsupported files.
 pub(crate) fn load_v8_model(path: Option<&Path>) -> Result<Option<V8Model>, String> {
     let Some(path) = path else {
         return Ok(None);
     };
     let bytes = std::fs::read(path).map_err(|e| format!("cannot read --v8-weights: {e}"))?;
-    let model = V8Model::from_safetensors(&bytes, V8_N_HEADS).map_err(|e| {
-        format!("--v8-weights is not SingleEncV8 F32 SafeTensors with {V8_N_HEADS} heads: {e}")
-    })?;
+    let model = V8Model::from_safetensors_auto(&bytes)
+        .map_err(|e| format!("--v8-weights is not valid SingleEncV8 F32/BF16 SafeTensors: {e}"))?;
     Ok(Some(model))
 }
 

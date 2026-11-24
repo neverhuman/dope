@@ -4236,6 +4236,18 @@
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_replay && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
       "purpose": "verify the native fixed-counter replay tool and fingerprint-bound V8 decoder behavior"
     },
+    "engine/dope-core/src/auto/v8_budget.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_fit_parity",
+      "purpose": "verify shared DPA1 V8 schema wrapper budget preparation and byte-for-byte non-neural section parity"
+    },
+    "engine/dope-core/tests/single_encoding_v8_scale.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_scale",
+      "purpose": "verify 1GiB BF16/F32 SafeTensors loading, active-rank-v1 capability, and Tier 1-3 code heads"
+    },
+    "engine/dope-core/tests/single_encoding_v8_fit_parity.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_fit_parity",
+      "purpose": "verify shared FIT evidence extraction, ScaleCardV8 f64 target scaling, and canonical/renamed wrapper budget parity"
+    },
     "engine/dope-arena/src/bin/dope_v8_emit.rs": {
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
       "purpose": "verify pure-Rust dope_v8_emit CLI fit/sample/evidence/embed/truncate/inspect and <=1e-4 parity across 12 fixtures"
@@ -4311,6 +4323,22 @@
     "research/levels/tests/test_v8_surgery_select.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery_select.py",
       "purpose": "unit tests for the consistent-selection V7 -> V8 decoder surgery that produced the v8-s7/v8-s7w init files"
+    },
+    "research/levels/tests/test_v8_code_dim.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_code_dim.py",
+      "purpose": "pin the 64-value wire default of the SingleEncV8 learned code and the analytic step-0 start of wider research codes and models (capacity x channel probe)"
+    },
+    "research/levels/v8_model_blocks.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify SingleEncV8 core building blocks, log-domain Gumbel-Rao stability, and F32/BF16 SafeTensors export"
+    },
+    "research/levels/v8_analytic_torch.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify vectorized PyTorch DSE8 analytic packet helpers and FIT midrank scores against Rust decode_dse8_rows"
+    },
+    "research/levels/s3_v8_auditors.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py",
+      "purpose": "verify differentiable linear, tree, and RFF TSTR surrogate auditors"
     },
     "research/levels/tests/test_v8_surgery.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery.py",

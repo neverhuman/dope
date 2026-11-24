@@ -6,7 +6,7 @@ use super::marginals::MARG_CONT;
 use super::model::{NeuralPlanV8, SingleEncV8Weights, DEC_CODE_DIM, DEC_GLOB_DIM};
 use super::model_ops::{apply_row_local_flow, build_decoder_inputs, eval_neural_target_residual};
 use super::nominal::decode_nominal_group;
-use super::packet::{pack_dse8_packet, Dse8Packet};
+use super::packet::{pack_dse8_packet, Dse8Packet, FLAG_ACTIVE_RANK_V1};
 use super::rng_v8::{
     counter_normal, counter_student_t_scale, counter_uniform, sample_categorical,
     sample_softmax_categorical, STREAM_FACTOR, STREAM_NOISE, STREAM_REGIME, STREAM_TARGET,
@@ -53,13 +53,26 @@ pub fn build_decode_plan_v8(
     packet: &Dse8Packet,
     weights: Option<&SingleEncV8Weights>,
 ) -> Result<DecodePlanV8> {
-    if weights.is_some_and(|w| {
-        (w.active_rank_mask || packet.weights_fp.is_some())
-            && packet.weights_fp != Some(w.fingerprint())
-    }) {
-        return Err(DopeError::Artifact(
-            "dse8_weights_fingerprint_mismatch".into(),
-        ));
+    if let Some(w) = weights {
+        let pkt_active_rank = (packet.header.flags & FLAG_ACTIVE_RANK_V1) != 0;
+        if pkt_active_rank != w.active_rank_v1 {
+            return Err(DopeError::Artifact(
+                "dse8_decoder_capability_mismatch".into(),
+            ));
+        }
+        match packet.weights_fp {
+            Some(pkt_fp) if pkt_fp != w.fingerprint() => {
+                return Err(DopeError::Artifact(
+                    "dse8_weights_fingerprint_mismatch".into(),
+                ));
+            }
+            None if w.active_rank_v1 => {
+                return Err(DopeError::Artifact(
+                    "dse8_weights_fingerprint_required".into(),
+                ));
+            }
+            _ => {}
+        }
     }
     let p = packet.header.p_eff as usize;
     let o_dim = packet.linear.o_dim;
@@ -113,7 +126,7 @@ pub fn build_decode_plan_v8(
     }
 
     for j in 0..p {
-        let sq: f32 = l_eff[j].iter().map(|v| v * v).sum();
+        let sq: f32 = l_eff[j][..rank].iter().map(|v| v * v).sum();
         noise_sd[j] = (1.0 - sq).max(1e-4).sqrt();
     }
 

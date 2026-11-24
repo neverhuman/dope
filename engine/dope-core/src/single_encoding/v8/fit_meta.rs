@@ -11,8 +11,11 @@
 //! robust unit space. Nothing here reads anything but the rows passed in, and no meta field
 //! holds a source value or an extremum.
 
-use super::scale_v8::{Dse8ColumnMeta, ScaleCardV8, V8_MAX_COLS};
+use super::scale_v8::{Dse8ColumnMeta, ScaleCardV8, V8_MAX_CLASSES, V8_MAX_COLS};
 use crate::error::Result;
+use crate::evidence::{
+    extract_with_rows, ColumnMeta as EvColMeta, Evidence, EvidenceInput, EvidenceTier, RowIdentity,
+};
 use crate::marginal::column_meta::{fit_columns, ColumnDecl, Nc2ColumnMetaV2, UnitSpace};
 
 impl From<&Nc2ColumnMetaV2> for Dse8ColumnMeta {
@@ -74,4 +77,63 @@ pub fn fit_unit_meta(
         .iter()
         .map(Dse8ColumnMeta::from)
         .collect())
+}
+
+/// Shared FIT-only evidence extraction used by both serving (`fit_dse8_packet_with_encoder`)
+/// and training (`dope-ffi`).
+///
+/// When `include_raw_companion` is `false` (historical checkpoints without `active-rank-v1`),
+/// passes `x_raw: None` and `rows: None` to keep prior fit/decode behavior byte-identical.
+/// When `include_raw_companion` is `true` (`active-rank-v1` serving and `dope-ffi`), passes
+/// the active raw FIT columns and optional stable physical `fit_row_ids` sliced to `valid_rows`.
+#[allow(clippy::too_many_arguments)]
+pub fn extract_fit_evidence_v8(
+    x_raw: &[Vec<f64>],
+    x_unit_valid: &[Vec<f32>],
+    y_sc: &[f64],
+    valid_rows: &[usize],
+    card: &ScaleCardV8,
+    active_meta: Option<&[Dse8ColumnMeta]>,
+    tier: EvidenceTier,
+    seed: u64,
+    fit_row_ids: Option<&[u64]>,
+    include_raw_companion: bool,
+) -> Result<Evidence> {
+    let ev_meta: Option<Vec<EvColMeta>> =
+        active_meta.map(|ms| ms.iter().map(EvColMeta::from).collect());
+    let ev_raw: Option<Vec<Vec<f64>>> = include_raw_companion.then(|| {
+        card.col_indices
+            .iter()
+            .map(|&j| valid_rows.iter().map(|&i| x_raw[j][i]).collect())
+            .collect()
+    });
+    let ev_ids: Option<Vec<u64>> = if include_raw_companion {
+        fit_row_ids.map(|ids| valid_rows.iter().map(|&i| ids[i]).collect())
+    } else {
+        None
+    };
+    let rows = ev_ids.as_deref().map(|row_ids| RowIdentity {
+        row_ids,
+        group_ids: None,
+    });
+    let n_classes = match card.task_id {
+        0 => 1,
+        1 => 2,
+        _ => card.classes.len().clamp(2, V8_MAX_CLASSES),
+    };
+    extract_with_rows(
+        &EvidenceInput {
+            x_unit: x_unit_valid,
+            x_raw: ev_raw.as_deref(),
+            y: y_sc,
+            task_id: card.task_id,
+            n_classes,
+            col_meta: ev_meta.as_deref(),
+            packet_probe: None,
+            tier,
+            target_free: false,
+            seed,
+        },
+        rows,
+    )
 }

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ctypes
 import hashlib
+import json
 import os
 from pathlib import Path
 from typing import Any
@@ -68,6 +69,23 @@ def load_ffi(path: str | Path | None = None) -> Any:
             f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, f32p, ctypes.c_uint32, f32p, ctypes.c_uint8,
             ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64),
             f32p, ctypes.c_uint64, u8p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32)]
+        lib.dope_ffi_v8_episode_reserved.restype = ctypes.c_int32
+        lib.dope_ffi_v8_episode_reserved.argtypes = [
+            f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, f32p, ctypes.c_uint32, f32p, ctypes.c_uint8,
+            ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64),
+            ctypes.c_uint8, ctypes.c_uint8,
+            f32p, ctypes.c_uint64, u8p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32)]
+        lib.dope_ffi_v8_episode_prepared.restype = ctypes.c_int32
+        lib.dope_ffi_v8_episode_prepared.argtypes = [
+            f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, f32p, ctypes.c_uint32, f32p, ctypes.c_uint8,
+            ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64),
+            ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint32,
+            f32p, ctypes.c_uint64, u8p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32)]
+        lib.dope_ffi_v8_schema_wrapper_bytes.restype = ctypes.c_int32
+        lib.dope_ffi_v8_schema_wrapper_bytes.argtypes = [u8p, ctypes.c_uint32, ctypes.c_uint8]
+        lib.dope_ffi_project_fit_midrank.restype = ctypes.c_int32
+        lib.dope_ffi_project_fit_midrank.argtypes = [
+            f32p, ctypes.c_uint32, ctypes.c_uint32, f32p, ctypes.c_uint32, f32p]
         _LIB = lib
     return _LIB
 
@@ -111,9 +129,51 @@ _V8_SHAPES = {"ev_col": (-1, 128), "ev_edge": (-1, -1, 16), "dec_col": (-1, 48),
 V8_MAX_COLS = 64
 
 
+def project_fit_midrank_ffi(x_fit: np.ndarray, x_eval: np.ndarray) -> np.ndarray:
+    """Project `x_eval` `[n_eval, p]` through uncapped FIT columns `x_fit` `[n_fit, p]` via native Rust."""
+    lib = load_ffi()
+    xf = np.ascontiguousarray(x_fit, dtype=np.float32)
+    xe = np.ascontiguousarray(x_eval, dtype=np.float32)
+    n_fit, p = xf.shape
+    n_eval = xe.shape[0]
+    if xe.shape[1] != p:
+        raise StageError("shape")
+    out = np.empty((n_eval, p), dtype=np.float32)
+    if n_eval == 0:
+        return out
+    code = lib.dope_ffi_project_fit_midrank(
+        _ptr(xf, ctypes.c_float), n_fit, p, _ptr(xe, ctypes.c_float), n_eval, _ptr(out, ctypes.c_float)
+    )
+    if code != 0:
+        raise StageError("ffi_" + _CODES.get(int(code), "unknown"))
+    return out
+
+
+def dpa_v8_wrapper_bytes(feature_names: list[str], feature_kinds: list[Any] | None = None,
+                         target_name: str = "target", target_labels: list[str] | None = None,
+                         anonymize: bool = False) -> int:
+    """Exact DPA1 header + V7Schema wrapper byte cost via the shared Rust core path."""
+    lib = load_ffi()
+    spec: dict[str, Any] = {"feature_names": list(feature_names), "target_name": str(target_name)}
+    if feature_kinds is not None:
+        spec["feature_kinds"] = list(feature_kinds)
+    if target_labels is not None:
+        spec["target_labels"] = list(target_labels)
+    raw = json.dumps(spec, separators=(",", ":")).encode("utf-8")
+    buf = np.frombuffer(raw, dtype=np.uint8)
+    n = int(lib.dope_ffi_v8_schema_wrapper_bytes(
+        _ptr(buf, ctypes.c_uint8), len(raw), int(bool(anonymize))
+    ))
+    if n < 0:
+        raise StageError("ffi_" + _CODES.get(-n, "unknown"))
+    return n
+
+
 def v8_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: np.ndarray, task: str,
               budget: int = 2048, normalized_only: bool = False, tier: int = 2,
-              seed: int = 0, fit_row_ids: np.ndarray | None = None) -> tuple[bytes, np.ndarray, int]:
+              seed: int = 0, fit_row_ids: np.ndarray | None = None,
+              code_tier: int = 0, reserve_dpa_wrapper: bool = False,
+              wrapper_bytes: int = 0) -> tuple[bytes, np.ndarray, int]:
     """(DSE8 packet bytes, flat float32 V8 tensors, layout width) from FIT rows; query rows are only mapped.
 
     ``fit_row_ids`` (distinct stable physical ids of the FIT rows, e.g. source-table row indices)
@@ -137,12 +197,29 @@ def v8_arrays(x_fit: np.ndarray, y_fit: np.ndarray, x_qry: np.ndarray, y_qry: np
     cap = max(budget, 64)
     pkt = np.empty(cap, dtype=np.uint8)
     pkt_len = ctypes.c_uint32(0)
-    code = lib.dope_ffi_v8_episode(
-        _ptr(xf, ctypes.c_float), n_fit, p, _ptr(yf, ctypes.c_float), _ptr(xq, ctypes.c_float), n_qry,
-        _ptr(yq, ctypes.c_float), _TASK_ID[task], budget, int(bool(normalized_only)), tier,
-        seed & 0xFFFFFFFFFFFFFFFF, None if ids is None else _ptr(ids, ctypes.c_uint64),
-        _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
-        ctypes.byref(pkt_len))
+    if int(wrapper_bytes) > 0:
+        code = lib.dope_ffi_v8_episode_prepared(
+            _ptr(xf, ctypes.c_float), n_fit, p, _ptr(yf, ctypes.c_float), _ptr(xq, ctypes.c_float), n_qry,
+            _ptr(yq, ctypes.c_float), _TASK_ID[task], budget, int(bool(normalized_only)), tier,
+            seed & 0xFFFFFFFFFFFFFFFF, None if ids is None else _ptr(ids, ctypes.c_uint64),
+            int(code_tier), int(bool(reserve_dpa_wrapper)), int(wrapper_bytes),
+            _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
+            ctypes.byref(pkt_len))
+    elif int(code_tier) > 0 or bool(reserve_dpa_wrapper):
+        code = lib.dope_ffi_v8_episode_reserved(
+            _ptr(xf, ctypes.c_float), n_fit, p, _ptr(yf, ctypes.c_float), _ptr(xq, ctypes.c_float), n_qry,
+            _ptr(yq, ctypes.c_float), _TASK_ID[task], budget, int(bool(normalized_only)), tier,
+            seed & 0xFFFFFFFFFFFFFFFF, None if ids is None else _ptr(ids, ctypes.c_uint64),
+            int(code_tier), int(bool(reserve_dpa_wrapper)),
+            _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
+            ctypes.byref(pkt_len))
+    else:
+        code = lib.dope_ffi_v8_episode(
+            _ptr(xf, ctypes.c_float), n_fit, p, _ptr(yf, ctypes.c_float), _ptr(xq, ctypes.c_float), n_qry,
+            _ptr(yq, ctypes.c_float), _TASK_ID[task], budget, int(bool(normalized_only)), tier,
+            seed & 0xFFFFFFFFFFFFFFFF, None if ids is None else _ptr(ids, ctypes.c_uint64),
+            _ptr(out, ctypes.c_float), out.size, _ptr(pkt, ctypes.c_uint8), cap,
+            ctypes.byref(pkt_len))
     if code != 0:
         raise StageError("ffi_" + _CODES.get(int(code), "unknown"))
     return pkt[:pkt_len.value].tobytes(), out, min(p, V8_MAX_COLS)
@@ -174,7 +251,8 @@ def split_v8(floats: np.ndarray, p: int, n_fit: int, n_qry: int) -> dict[str, np
 
 
 def native_v8(episode: dict[str, Any], budget: int = 2048, normalized_only: bool = False,
-              tier: int = 2) -> dict[str, Any]:
+              tier: int = 2, code_tier: int = 0, reserve_dpa_wrapper: bool = False,
+              wrapper_bytes: int = 0) -> dict[str, Any]:
     """Stage: one ``SingleEncV8`` training episode, every tensor from this episode's FIT rows.
 
     Wants a view built with ``ViewConfig(emit="raw")``. Returns exactly the precomputed dict
@@ -189,21 +267,29 @@ def native_v8(episode: dict[str, Any], budget: int = 2048, normalized_only: bool
     seed = int(hashlib.sha256(f"{episode['split_sig']}|{episode['view_sig']}".encode()).hexdigest()[:16], 16)
     # Stable physical FIT row ids (source-table rows) make the evidence free of the row order.
     ids = episode.get("fit_rows")
+    eff_wrapper = int(wrapper_bytes)
+    if eff_wrapper == 0 and reserve_dpa_wrapper and isinstance(episode.get("v7_schema"), dict):
+        eff_wrapper = dpa_v8_wrapper_bytes(**episode["v7_schema"])
     packet, floats, w = v8_arrays(episode["X_fit"], episode["y_fit"], episode["X_qry"], episode["y_qry"],
                                   episode["task"], budget, normalized_only, tier, seed,
-                                  None if ids is None else np.asarray(ids, dtype=np.uint64))
+                                  None if ids is None else np.asarray(ids, dtype=np.uint64),
+                                  code_tier=code_tier, reserve_dpa_wrapper=reserve_dpa_wrapper,
+                                  wrapper_bytes=eff_wrapper)
     n_fit, n_qry = int(episode["y_fit"].shape[0]), int(episode["y_qry"].shape[0])
     v = split_v8(floats, int(episode["X_fit"].shape[1]), n_fit, n_qry)
     misc = v["misc"]
     p_eff = int(misc[2])
     keep_f = v["y_fit"] >= 0 if episode["task"] != "regression" else np.ones(n_fit, dtype=bool)
-    keep_q = v["y_qry"] >= 0 if episode["task"] != "regression" else np.ones(n_qry, dtype=bool)
-    if int(keep_f.sum()) < 4 or int(keep_q.sum()) < 1:
+    qry_invalid = (v["y_qry"] < 0) if episode["task"] != "regression" else np.zeros(n_qry, dtype=bool)
+    if int(keep_f.sum()) < 4 or n_qry < 1:
         raise StageError("v8_too_few_rows")
     task_id = _TASK_ID[episode["task"]]
     n_classes = 1 if task_id == 0 else (2 if task_id == 1 else int(misc[12]))
     # Missing cells: 0 is the unit-space median; the masks travel with the rows.
-    x_fit, x_qry = v["x_fit"][keep_f, :p_eff], v["x_qry"][keep_q, :p_eff]
+    # Keep ALL physical query rows intact regardless of held-out labels (carry invalid labels as -1);
+    # compute query midrank z from the ENTIRE uncapped FIT rows BEFORE any downstream row capping!
+    x_fit, x_qry = v["x_fit"][keep_f, :p_eff], v["x_qry"][:, :p_eff]
+    z_qry = project_fit_midrank_ffi(x_fit, x_qry)
     out = {key: episode[key] for key in ("dataset_hash", "family_stem", "source_kind", "task", "split_sig",
                                          "view_sig", "kind", "table_id", "step", "slot", "attempt")
            if key in episode}
@@ -214,11 +300,12 @@ def native_v8(episode: dict[str, Any], budget: int = 2048, normalized_only: bool
         W_base=v["W_base"][:, :p_eff].copy(), b_base=v["b_base"].copy(), resid_sd=np.float32(misc[0]),
         z_max=np.float32(misc[1]), is_cont=v["is_cont"][:p_eff].copy(),
         X_fit=np.nan_to_num(x_fit, nan=0.0), y_fit=v["y_fit"][keep_f].copy(),
-        X_qry=np.nan_to_num(x_qry, nan=0.0), y_qry=v["y_qry"][keep_q].copy(),
+        X_qry=np.nan_to_num(x_qry, nan=0.0), y_qry=v["y_qry"].copy(),
+        Z_qry=z_qry,
         M_fit=~np.isfinite(x_fit), M_qry=~np.isfinite(x_qry),
         task_id=task_id, n_classes=n_classes, packet=packet, packet_bytes=len(packet),
         col_index=v["col_index"][:p_eff].astype(np.int32), col_meta=v["col_meta"][:p_eff].copy(),
-        fit_masked=int(n_fit - keep_f.sum()), qry_masked=int(n_qry - keep_q.sum()),
+        fit_masked=int(n_fit - keep_f.sum()), qry_masked=int(qry_invalid.sum()),
     )
     if w < p_eff:
         raise FactoryError("native_v8_layout")

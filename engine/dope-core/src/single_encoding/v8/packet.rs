@@ -33,12 +33,15 @@ pub const FLAG_HAS_CUSTOM_CLASSES: u8 = 0x04;
 pub const FLAG_HAS_DROPPED_MEDS: u8 = 0x08;
 pub const FLAG_HAS_SKEW_T: u8 = 0x10;
 pub const FLAG_HAS_NEURAL_ENCODER: u8 = 0x20;
+/// Marks packets fitted under `dope_dse8_decoder = "active-rank-v1"` (rejected by `v3.0.0` unpackers).
+pub const FLAG_ACTIVE_RANK_V1: u8 = 0x40;
 pub const ALL_KNOWN_FLAGS: u8 = FLAG_NORMALIZED_ONLY
     | FLAG_HAS_COL_MAP
     | FLAG_HAS_CUSTOM_CLASSES
     | FLAG_HAS_DROPPED_MEDS
     | FLAG_HAS_SKEW_T
-    | FLAG_HAS_NEURAL_ENCODER;
+    | FLAG_HAS_NEURAL_ENCODER
+    | FLAG_ACTIVE_RANK_V1;
 
 pub const TAG_SCALE: u8 = 0x01;
 pub const TAG_MARG: u8 = 0x02;

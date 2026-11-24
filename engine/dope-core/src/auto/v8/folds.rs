@@ -77,11 +77,14 @@ pub(super) fn score_three_way(
         Ok(decoded_v8_to_raw(&schema, &s.x, &s.y))
     }));
 
-    let (x_tr, y_tr, tr_tid) = raw_to_numeric_inputs(&train_tbl, target, &schema)?;
+    let (x_tr, y_tr, tr_tid, tr_row_ids) = raw_to_numeric_inputs(&train_tbl, target, &schema)?;
     let tr_meta = fit_unit_meta(&x_tr, &y_tr, tr_tid, dse8_opts.normalized_only).ok();
     let tr_dse8_opts = Dse8FitOptions {
         task_id: tr_tid,
         col_meta: tr_meta.as_deref(),
+        fit_row_ids: weights
+            .filter(|w| w.active_rank_v1)
+            .map(|_| tr_row_ids.as_slice()),
         ..*dse8_opts
     };
     let syn_p0 = as_mat(crate::auto::guarded("p0_chk", || {

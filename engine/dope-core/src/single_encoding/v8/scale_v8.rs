@@ -325,29 +325,32 @@ impl ScaleCardV8 {
         out
     }
 
+    /// Map one raw target value to normalized/class-index space in f64 (`None` if missing or unseen).
+    pub fn forward_y_one(&self, v: f64) -> Option<f64> {
+        if !v.is_finite() {
+            return None;
+        }
+        if self.task_id == 0 {
+            let ys = if self.normalized_only {
+                v.clamp(-6.0, 6.0)
+            } else {
+                ((v - self.y_mean as f64) / (self.y_sd as f64).max(1e-5)).clamp(-6.0, 6.0)
+            };
+            Some(ys)
+        } else {
+            let iv = v.round() as i32;
+            self.classes.binary_search(&iv).ok().map(|pos| pos as f64)
+        }
+    }
+
     /// Map raw target values to internal normalized/class-index targets, returning `(y_sc, valid_rows)`.
-    /// Rows with rare/unseen classes excluded by `k >= 10` are cleanly filtered out (never mapped to 0!).
     pub fn forward_y(&self, y_raw: &[f64]) -> (Vec<f64>, Vec<usize>) {
         let mut y_sc = Vec::with_capacity(y_raw.len());
         let mut valid = Vec::with_capacity(y_raw.len());
         for (r, &v) in y_raw.iter().enumerate() {
-            if !v.is_finite() {
-                continue;
-            }
-            if self.task_id == 0 {
-                let ys = if self.normalized_only {
-                    v.clamp(-6.0, 6.0)
-                } else {
-                    ((v - self.y_mean as f64) / (self.y_sd as f64).max(1e-5)).clamp(-6.0, 6.0)
-                };
+            if let Some(ys) = self.forward_y_one(v) {
                 y_sc.push(ys);
                 valid.push(r);
-            } else {
-                let iv = v.round() as i32;
-                if let Ok(pos) = self.classes.binary_search(&iv) {
-                    y_sc.push(pos as f64);
-                    valid.push(r);
-                }
             }
         }
         (y_sc, valid)

@@ -37,6 +37,7 @@ def decode_dse8_rows_py_parity(
     model: SingleEncV8 | None,
     n_rows: int,
     seed: int,
+    active_rank_v1: bool = True,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Exact scalar parity mirror of Rust `decode_dse8_rows` for 12-fixture hard parity (`<= 1e-4`)."""
     h = pkt["header"]
@@ -61,9 +62,11 @@ def decode_dse8_rows_py_parity(
             torch.from_numpy(dz)[None],
         )
         plan_np = {k: v[0].cpu().numpy() for k, v in pl.items() if k not in ("h_dec", "g_pool")}
+        r_lim = min(r_use, L_eff.shape[1]) if active_rank_v1 else L_eff.shape[1]
+        dl_eff = plan_np["delta_L"][:, :r_lim] if r_lim > 0 else np.zeros((p, 1), dtype=np.float32)
         max_eff = max(
             float(np.max(np.abs(plan_np["delta_knots"]))),
-            float(np.max(np.abs(plan_np["delta_L"]))),
+            float(np.max(np.abs(dl_eff))),
             float(np.max(np.abs(plan_np["delta_W"][:, :o_dim]))),
             float(np.max(np.abs(plan_np["node_leaves"]))),
             float(np.max(np.abs(plan_np["bilin_w"]))),
@@ -76,9 +79,15 @@ def decode_dse8_rows_py_parity(
         else:
             resid_sd_eff = float(np.clip(resid_sd_eff * float(plan_np["resid_sd_mult"]), 0.002, 6.0))
             for j in range(p):
-                L_eff[j] = L_eff[j] + plan_np["delta_L"][j]
-                sc = max(float(np.linalg.norm(L_eff[j])) / 0.999, 1.0)
-                L_eff[j] /= sc
+                if active_rank_v1:
+                    L_eff[j, :r_lim] = L_eff[j, :r_lim] + plan_np["delta_L"][j, :r_lim]
+                    L_eff[j, r_lim:] = 0.0
+                    sc = max(float(np.linalg.norm(L_eff[j, :r_lim])) / 0.999, 1.0)
+                    L_eff[j, :r_lim] /= sc
+                else:
+                    L_eff[j] = L_eff[j] + plan_np["delta_L"][j]
+                    sc = max(float(np.linalg.norm(L_eff[j])) / 0.999, 1.0)
+                    L_eff[j] /= sc
                 if pkt["marginals"][j]["kind"] == 0:
                     base = pkt["marginals"][j]["knots17"]
                     bd = np.maximum(base[1:] - base[:-1], 0.0)
@@ -91,7 +100,8 @@ def decode_dse8_rows_py_parity(
                 for c in range(o_dim):
                     W_eff[c, j] += float(plan_np["delta_W"][j, c])
 
-    noise_sd = np.sqrt(np.maximum(1.0 - np.sum(L_eff ** 2, axis=1), 1e-4)).astype(np.float32)
+    r_noise = min(r_use, L_eff.shape[1]) if (model is not None and active_rank_v1) else L_eff.shape[1]
+    noise_sd = np.sqrt(np.maximum(1.0 - np.sum(L_eff[:, :r_noise] ** 2, axis=1), 1e-4)).astype(np.float32)
 
     x_out = np.zeros((n_rows, card["x_cols_raw"]), dtype=np.float32)
     y_out = np.zeros(n_rows, dtype=np.float32)
@@ -287,3 +297,15 @@ def decode_dse8_rows_py_parity(
                 dc_i += 1
 
     return x_out, y_out
+
+
+from research.levels.v8_analytic_torch import (  # noqa: E402,F401
+    _rust_norm_cdf_torch,
+    apply_typed_marginals_ste_torch,
+    categorical_f64_torch,
+    compute_fit_midrank_z_np,
+    eval_analytic_packet_logits_torch,
+    extract_packet_analytic_tensors,
+    invert_knots_to_z_torch,
+    sample_classes_torch,
+)

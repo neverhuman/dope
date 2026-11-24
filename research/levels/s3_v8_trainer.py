@@ -20,34 +20,18 @@ from typing import Any
 import numpy as np
 import torch
 
-from research.levels.s3_v8_losses import (
-    compute_v8_episode_loss,
-    loss_direct_conditional_nll,
-    pcgrad_lite_combine,
-)
+from research.levels.s3_v8_losses import compute_v8_episode_loss, loss_direct_conditional_nll, pcgrad_lite_combine
 from research.levels.s3_v8_priors import sample_contrastive_xor_pair, sample_v8_prior_episode
 from research.levels.s3_v8_trainer_io import (
-    _episode_to_tensors,
-    _export_state_dict_safetensors,
-    _update_ema,
-    build_valley_soup,
-    check_cuda_exclusive_guard,
-    consume_episode_tensors,
-    save_full_checkpoint,
+    _episode_to_tensors, _export_state_dict_safetensors, _update_ema, build_valley_soup,
+    check_cuda_exclusive_guard, consume_episode_tensors, parse_args, save_full_checkpoint,
 )
 from research.levels.v8_packet import DEC_CODE_DIM
 from research.levels.v8_single_encoding import SingleEncV8
 
 __all__ = [
-    "_episode_to_tensors",
-    "_export_state_dict_safetensors",
-    "_update_ema",
-    "build_valley_soup",
-    "check_cuda_exclusive_guard",
-    "consume_episode_tensors",
-    "parse_args",
-    "save_full_checkpoint",
-    "train_v8",
+    "_episode_to_tensors", "_export_state_dict_safetensors", "_update_ema", "build_valley_soup",
+    "check_cuda_exclusive_guard", "consume_episode_tensors", "parse_args", "save_full_checkpoint", "train_v8",
 ]
 
 
@@ -59,6 +43,15 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     shared_vram_gb = float(getattr(args, "allow_shared_gpu_vram_gb", 0.0) or 0.0)
     check_cuda_exclusive_guard(args.device, shared_vram_gb=shared_vram_gb)
     device = torch.device(args.device)
+    deterministic = bool(getattr(args, "deterministic", False))
+    no_tf32 = bool(getattr(args, "no_tf32", False))
+    if deterministic:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        torch.use_deterministic_algorithms(True, warn_only=True)
+    if no_tf32 and device.type == "cuda":
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
     use_amp = bool(getattr(args, "amp", False)) and device.type == "cuda"
     amp_dtype = torch.bfloat16 if (use_amp and torch.cuda.is_bf16_supported()) else torch.float16
     torch.manual_seed(args.seed)
@@ -69,14 +62,35 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "n_heads": args.n_heads,
         "n_enc_layers": args.n_enc_layers,
         "n_dec_layers": args.n_dec_layers,
-        "code_dim": DEC_CODE_DIM,
+        "code_dim": int(getattr(args, "code_dim", DEC_CODE_DIM) or DEC_CODE_DIM),
         "with_owner_encoder": not args.decoder_only,
+        "ff_mult": int(getattr(args, "ff_mult", 2) or 2),
+    }
+    export_dtype = str(getattr(args, "export_dtype", "f32") or "f32")
+    no_delta_w = bool(getattr(args, "no_delta_w", False))
+    historical_forward = bool(getattr(args, "historical_forward", False))
+    all_rank_norm = bool(getattr(args, "all_rank_norm", False)) or historical_forward
+    active_rank_v1 = not all_rank_norm
+    dec_cap = None if all_rank_norm else "active-rank-v1"
+    run_flags = {
+        "no_delta_w": no_delta_w,
+        "historical_forward": historical_forward,
+        "all_rank_norm": all_rank_norm,
+        "deterministic": deterministic,
+        "no_tf32": no_tf32,
     }
     model = SingleEncV8(**cfg).to(device)
     init_from = str(getattr(args, "init_from", "") or "")
     if init_from:
         from safetensors.torch import load_file as _st_load
         model.load_state_dict(_st_load(init_from, device=str(device)), strict=False)
+    if no_delta_w:
+        with torch.no_grad():
+            model.delta_W.weight.zero_()
+            model.delta_W.bias.zero_()
+        for name, p in model.named_parameters():
+            if name.startswith("delta_W."):
+                p.requires_grad_(False)
     if bool(getattr(args, "freeze_target_heads", False)):
         for name, p in model.named_parameters():
             if any(name.startswith(pfx) for pfx in ("delta_W.", "node_", "bilin_", "gate_head.")):
@@ -125,19 +139,45 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "0.9998": copy.deepcopy(model.state_dict()),
     }
     start_step = 0
+    optimizer_steps = 0
+    skipped_nonfinite_steps = 0
+    non_finite_streak = 0
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = out_dir / "latest.pt"
     if args.resume and ckpt_path.is_file():
         ck = torch.load(ckpt_path, map_location=device, weights_only=False)
+        saved_flags = ck.get("run_flags")
+        if isinstance(saved_flags, dict):
+            for fk, fv in run_flags.items():
+                if fk in saved_flags and bool(saved_flags[fk]) != bool(fv):
+                    raise ValueError(
+                        f"resume flag mismatch on {fk}: checkpoint={saved_flags[fk]} vs current={fv}"
+                    )
         model.load_state_dict(ck["model"])
         optimizer.load_state_dict(ck["optimizer"])
         if ck.get("scheduler") is not None:
             scheduler.load_state_dict(ck["scheduler"])
         emas = ck["emas"]
+        if no_delta_w:
+            for dname in ("delta_W.weight", "delta_W.bias"):
+                if float(model.state_dict()[dname].detach().abs().max().item()) != 0.0:
+                    raise ValueError(f"resumed model has non-zero {dname} under --no-delta-w")
+                for decay_s, ema_st in emas.items():
+                    if float(ema_st[dname].detach().abs().max().item()) != 0.0:
+                        raise ValueError(f"resumed EMA {decay_s} has non-zero {dname} under --no-delta-w")
         start_step = int(ck["step"])
+        saved_cnt = ck.get("counters")
+        if isinstance(saved_cnt, dict):
+            optimizer_steps = int(saved_cnt.get("optimizer_steps", start_step))
+            skipped_nonfinite_steps = int(saved_cnt.get("skipped_nonfinite_steps", 0))
+            non_finite_streak = int(saved_cnt.get("non_finite_streak", 0))
+        else:
+            optimizer_steps = start_step
         torch.set_rng_state(ck["rng_state"]["torch"].cpu())
+        if device.type == "cuda" and ck["rng_state"].get("cuda") is not None:
+            torch.cuda.set_rng_state(ck["rng_state"]["cuda"].cpu(), device=device)
         np_rng.bit_generator.state = ck["rng_state"]["numpy"]
 
     sync_dir = str(getattr(args, "sync_dir", "") or "")
@@ -156,12 +196,18 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             float(getattr(args, "sync_outer_momentum", 0.70)),
             base_round=0, worker_id=str(getattr(args, "run_name", "v8_w0")),
         )
+        if no_delta_w:
+            with torch.no_grad():
+                model.delta_W.weight.zero_()
+                model.delta_W.bias.zero_()
+                ema_proxy.delta_W.weight.zero_()
+                ema_proxy.delta_W.bias.zero_()
         emas["0.999"] = copy.deepcopy(ema_proxy.state_dict())
 
     t0 = time.monotonic()
     log_path = out_dir / "train.jsonl"
     metrics_last: dict[str, Any] = {}
-    steps_done, non_finite_streak = 0, 0
+    steps_done = 0
     ckpt_every = int(getattr(args, "ckpt_every", 0) or 0)
     grad_accum = max(1, int(getattr(args, "grad_accum_steps", 1) or 1))
     prior_mix_prob = float(getattr(args, "prior_mix_prob", 0.0) or 0.0)
@@ -172,7 +218,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     alpha_floor_w = float(getattr(args, "alpha_floor_weight", 0.05) or 0.05)
     resid_cond_w = float(getattr(args, "resid_cond_weight", 0.0) or 0.0)
 
-    for step in range(start_step + 1, args.steps + 1):
+    stop_at = int(getattr(args, "stop_at_step", 0) or 0)
+    end_step = min(args.steps, stop_at) if stop_at > 0 else args.steps
+    for step in range(start_step + 1, end_step + 1):
         if args.max_wall_s > 0 and (time.monotonic() - t0) >= args.max_wall_s:
             break
         model.train()
@@ -229,19 +277,27 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                         cur_a_floor = 0.2 * alpha_floor
                     plan = dict(plan)
                     plan["alpha_table"] = torch.clamp(raw_alpha, min=cur_a_floor)
+                pkt_an = None if historical_forward else td.get("pkt_analytic")
                 dec = model.decode_batch_differentiable(
                     plan,
                     td["knots"][None], td["loadings"][None], td["W_base"][None], td["b_base"][None],
                     td["resid_sd"][None], td["z_max"][None], td["is_cont"][None], col_mask,
-                    n_rows=args.n_syn, antithetic=True,
+                    n_rows=args.n_syn, antithetic=True, pkt_analytic=pkt_an,
+                    active_rank_v1=active_rank_v1,
                 )
                 xq_clean = torch.nan_to_num(td["X_qry"], nan=0.0)
+                zq_in = None if historical_forward else (td["z_qry"][None] if "z_qry" in td else None)
+                knots_q = None if historical_forward else td["knots"][None]
+                zmax_q = None if historical_forward else td["z_max"][None]
                 logits_qry = model.predict_target_on_x(
-                    plan, td["W_base"][None], td["b_base"][None], xq_clean[None]
+                    plan, td["W_base"][None], td["b_base"][None], xq_clean[None],
+                    z_in=zq_in, base_knots=knots_q, z_max=zmax_q, pkt_analytic=pkt_an,
                 )[0]
                 loss_w = {
                     "direct_cond": float(getattr(args, "direct_cond_weight", 0.60)),
                     "anchor": float(getattr(args, "anchor_weight", 0.15)),
+                    "anchor_nl": float(getattr(args, "anchor_nonlinear_weight", 0.40)),
+                    "joint_swd": float(getattr(args, "joint_swd_weight", 0.0)),
                 }
                 ld = compute_v8_episode_loss(
                     dec["x_syn"][0], dec["logits"][0], dec["y_reg"][0], dec["resid_sd_eff"][0],
@@ -259,11 +315,22 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                     plan_nl = dict(plan)
                     plan_nl["delta_W"] = torch.zeros_like(plan["delta_W"])
                     logits_nl = model.predict_target_on_x(
-                        plan_nl, td["W_base"][None].detach(), td["b_base"][None].detach(), xq_clean[None]
+                        plan_nl, td["W_base"][None].detach(), td["b_base"][None].detach(), xq_clean[None],
+                        z_in=zq_in, base_knots=knots_q, z_max=zmax_q, pkt_analytic=pkt_an,
                     )[0]
-                    l_resid_nl = loss_direct_conditional_nll(
-                        logits_nl, dec["resid_sd_eff"][0].detach(), td["y_qry"], td["task_id"], td["n_classes"]
-                    )
+                    yq_raw = td["y_qry"]
+                    if td["task_id"] == 0:
+                        vq = torch.isfinite(yq_raw)
+                    else:
+                        k_lim = 2 if td["task_id"] == 1 else max(2, min(int(td["n_classes"]), logits_nl.shape[-1]))
+                        vq = torch.isfinite(yq_raw) & (yq_raw >= 0.0) & (yq_raw < float(k_lim))
+                    if int(vq.sum().item()) >= 4:
+                        l_resid_nl = loss_direct_conditional_nll(
+                            logits_nl[vq], dec["resid_sd_eff"][0].detach(), yq_raw[vq],
+                            td["task_id"], td["n_classes"],
+                        )
+                    else:
+                        l_resid_nl = l_aux.new_tensor(0.0)
                 else:
                     l_resid_nl = l_aux.new_tensor(0.0)
                 ep_tot = ld["total"] + l_aux + l_a_pen + resid_cond_w * l_resid_nl
@@ -288,32 +355,54 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             else:
                 (micro_loss / float(grad_accum)).backward()
 
+        def _persist_latest(cur_step: int) -> None:
+            rng_payload: dict[str, Any] = {
+                "torch": torch.get_rng_state(),
+                "numpy": np_rng.bit_generator.state,
+            }
+            if device.type == "cuda":
+                rng_payload["cuda"] = torch.cuda.get_rng_state(device=device)
+            save_full_checkpoint(
+                ckpt_path, model, optimizer, scheduler, emas, cur_step, rng_payload, cfg,
+                run_flags=run_flags,
+                counters={
+                    "optimizer_steps": optimizer_steps,
+                    "skipped_nonfinite_steps": skipped_nonfinite_steps,
+                    "non_finite_streak": non_finite_streak,
+                },
+            )
+
         grad_norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item())
         if not math.isfinite(grad_norm) or not math.isfinite(step_loss_sum):
             optimizer.zero_grad(set_to_none=True)
             non_finite_streak += 1
+            skipped_nonfinite_steps += 1
+            rec_skip = {
+                "step": step,
+                "optimizer_step": optimizer_steps,
+                "skipped_nonfinite": True,
+                "skipped_nonfinite_total": skipped_nonfinite_steps,
+                "phase": phase,
+                "lr": float(scheduler.get_last_lr()[0]),
+                "grad_norm": None if not math.isfinite(grad_norm) else grad_norm,
+                "total": None if not math.isfinite(step_loss_sum) else round(step_loss_sum, 5),
+                "wall_s": round(time.monotonic() - t0, 3),
+                "sync_round": sync_round,
+                "eff_batch": total_eps,
+            }
+            metrics_last = rec_skip
+            with log_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(rec_skip) + "\n")
             if non_finite_streak >= 5:
                 raise FloatingPointError(f"non-finite loss/grad at step {step}: loss={step_loss_sum} grad={grad_norm}")
+            if args.save_every > 0 and (step % args.save_every == 0 or step == end_step):
+                _persist_latest(step)
             continue
         non_finite_streak = 0
 
-        if args.use_asam and (step % max(args.asam_every, 1) == 0):
-            rho = 0.02
-            with torch.no_grad():
-                e_ws = []
-                for p in model.parameters():
-                    if p.grad is None:
-                        e_ws.append(None)
-                        continue
-                    ew = (rho * (p.abs() + 1e-3) * p.grad) / max(grad_norm, 1e-6)
-                    p.add_(ew)
-                    e_ws.append(ew)
-                for p, ew in zip(model.parameters(), e_ws):
-                    if ew is not None:
-                        p.sub_(ew)
-
         optimizer.step()
         scheduler.step()
+        optimizer_steps += 1
         for decay_s, ema_st in emas.items():
             _update_ema(ema_st, model, float(decay_s))
 
@@ -327,6 +416,12 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                 float(getattr(args, "sync_outer_momentum", 0.70)),
                 base_round=sync_round, worker_id=str(getattr(args, "run_name", "v8_w0")),
             )
+            if no_delta_w:
+                with torch.no_grad():
+                    model.delta_W.weight.zero_()
+                    model.delta_W.bias.zero_()
+                    ema_proxy.delta_W.weight.zero_()
+                    ema_proxy.delta_W.bias.zero_()
             emas["0.999"] = copy.deepcopy(ema_proxy.state_dict())
 
         bilin_norm = float(
@@ -335,6 +430,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         inv_ep = 1.0 / float(max(total_eps, 1))
         rec = {
             "step": step,
+            "optimizer_step": optimizer_steps,
+            "skipped_nonfinite": False,
+            "skipped_nonfinite_total": skipped_nonfinite_steps,
             "phase": phase,
             "lr": float(scheduler.get_last_lr()[0]),
             "grad_norm": grad_norm,
@@ -350,81 +448,35 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         with log_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec) + "\n")
 
-        if args.save_every > 0 and (step % args.save_every == 0 or step == args.steps):
-            save_full_checkpoint(
-                ckpt_path, model, optimizer, scheduler, emas, step,
-                {"torch": torch.get_rng_state(), "numpy": np_rng.bit_generator.state}, cfg,
-            )
+        if args.save_every > 0 and (step % args.save_every == 0 or step == end_step):
+            _persist_latest(step)
         if ckpt_every > 0 and (step % ckpt_every == 0):
             ckpt_dir = out_dir / "checkpoints"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
-            _export_state_dict_safetensors(cfg, emas["0.999"], ckpt_dir / f"step_{step:06d}_ema.safetensors")
+            _export_state_dict_safetensors(
+                cfg, emas["0.999"], ckpt_dir / f"step_{step:06d}_ema.safetensors",
+                dtype=export_dtype, decoder_capability=dec_cap, assert_zero_delta_w=no_delta_w,
+            )
 
-    st_path = model.export_v8_safetensors(out_dir / "model_v8.safetensors")
-    _export_state_dict_safetensors(cfg, emas["0.999"], out_dir / "model_v8_ema.safetensors")
+    st_path = model.export_v8_safetensors(
+        out_dir / "model_v8.safetensors",
+        dtype=export_dtype,
+        decoder_capability=dec_cap,
+        assert_zero_delta_w=no_delta_w,
+    )
+    _export_state_dict_safetensors(
+        cfg, emas["0.999"], out_dir / "model_v8_ema.safetensors",
+        dtype=export_dtype, decoder_capability=dec_cap, assert_zero_delta_w=no_delta_w,
+    )
     return {
         "steps_done": steps_done,
+        "optimizer_steps": optimizer_steps,
+        "skipped_nonfinite_steps": skipped_nonfinite_steps,
         "last_step": metrics_last.get("step", start_step),
         "last_metrics": metrics_last,
         "checkpoint_pt": str(ckpt_path),
         "safetensors": str(st_path),
     }
-
-
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="SingleEncV8 (DOPE v3.0) resumable trainer")
-    ap.add_argument("--out-dir", type=str, required=True)
-    ap.add_argument("--run-name", type=str, default="v8_run")
-    ap.add_argument("--device", type=str, default="cpu")
-    ap.add_argument("--torch-threads", type=int, default=0)
-    ap.add_argument("--amp", action="store_true")
-    ap.add_argument("--allow-shared-gpu-vram-gb", type=float, default=0.0)
-    ap.add_argument("--steps", type=int, default=100)
-    ap.add_argument("--episodes-per-step", type=int, default=4)
-    ap.add_argument("--grad-accum-steps", type=int, default=1)
-    ap.add_argument("--max-p-curriculum", type=int, default=0)
-    ap.add_argument("--curriculum-steps", type=int, default=1000)
-    ap.add_argument("--n-fit", type=int, default=256)
-    ap.add_argument("--n-qry", type=int, default=192)
-    ap.add_argument("--n-syn", type=int, default=256)
-    ap.add_argument("--d-model", type=int, default=128)
-    ap.add_argument("--n-heads", type=int, default=4)
-    ap.add_argument("--n-enc-layers", type=int, default=4)
-    ap.add_argument("--n-dec-layers", type=int, default=2)
-    ap.add_argument("--decoder-only", action="store_true")
-    ap.add_argument("--use-rust-packet", action="store_true")
-    ap.add_argument("--budget-bytes", type=int, default=2048)
-    ap.add_argument("--prior-mix-prob", type=float, default=0.0)
-    ap.add_argument("--lr", type=float, default=3e-4)
-    ap.add_argument("--lr-schedule", type=str, default="wsd", choices=["cosine", "wsd"])
-    ap.add_argument("--warmup-steps", type=int, default=200)
-    ap.add_argument("--weight-decay", type=float, default=1e-2)
-    ap.add_argument("--grad-clip", type=float, default=1.0)
-    ap.add_argument("--direct-cond-weight", type=float, default=0.60)
-    ap.add_argument("--anchor-weight", type=float, default=0.15)
-    ap.add_argument("--alpha-floor", type=float, default=0.0)
-    ap.add_argument("--alpha-floor-steps", type=int, default=1000)
-    ap.add_argument("--alpha-floor-weight", type=float, default=0.05)
-    ap.add_argument("--resid-cond-weight", type=float, default=0.0)
-    ap.add_argument("--backbone-lr-mult", type=float, default=1.0)
-    ap.add_argument("--backbone-warmup-steps", type=int, default=500)
-    ap.add_argument("--init-from", type=str, default="")
-    ap.add_argument("--freeze-target-heads", action="store_true")
-    ap.add_argument("--freeze-x-heads", action="store_true")
-    ap.add_argument("--use-pcgrad", action="store_true")
-    ap.add_argument("--use-asam", action="store_true")
-    ap.add_argument("--asam-every", type=int, default=10)
-    ap.add_argument("--contrastive-prob", type=float, default=0.15)
-    ap.add_argument("--save-every", type=int, default=50)
-    ap.add_argument("--ckpt-every", type=int, default=0)
-    ap.add_argument("--sync-dir", type=str, default="")
-    ap.add_argument("--sync-every", type=int, default=25)
-    ap.add_argument("--sync-outer-lr", type=float, default=0.25)
-    ap.add_argument("--sync-outer-momentum", type=float, default=0.70)
-    ap.add_argument("--resume", action="store_true")
-    ap.add_argument("--max-wall-s", type=float, default=0.0)
-    ap.add_argument("--seed", type=int, default=42)
-    return ap.parse_args(argv)
 
 
 if __name__ == "__main__":

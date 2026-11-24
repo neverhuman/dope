@@ -614,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "dope-arena"
-version = "3.0.0"
+version = "3.1.0-dev"
 dependencies = [
  "clap",
  "csv",
@@ -627,7 +627,7 @@ dependencies = [
 
 [[package]]
 name = "dope-cli"
-version = "3.0.0"
+version = "3.1.0-dev"
 dependencies = [
  "clap",
  "dope-core",
@@ -639,7 +639,7 @@ dependencies = [
 
 [[package]]
 name = "dope-core"
-version = "3.0.0"
+version = "3.1.0-dev"
 dependencies = [
  "brotli",
  "candle-core",
@@ -657,7 +657,7 @@ dependencies = [
 
 [[package]]
 name = "dope-ffi"
-version = "3.0.0"
+version = "3.1.0-dev"
 dependencies = [
  "dope-core",
 ]
@@ -673,7 +673,7 @@ dependencies = [
 
 [[package]]
 name = "dope-probes"
-version = "3.0.0"
+version = "3.1.0-dev"
 dependencies = [
  "brotli",
  "clap",

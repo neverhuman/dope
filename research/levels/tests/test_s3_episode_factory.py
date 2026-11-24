@@ -231,7 +231,19 @@ def test_native_v8_is_fit_only_and_has_the_trainer_shapes(corpus):
         assert a["knots"].shape == (p, 17) and a["loadings"].shape == (p, 12) and a["W_base"].shape == (8, p)
         assert a["X_fit"].shape[1] == p and a["X_qry"].shape[1] == p and a["is_cont"].shape == (p,)
         assert a["X_fit"].shape[0] + a["fit_masked"] == episode["X_fit"].shape[0]
-        assert a["X_qry"].shape[0] + a["qry_masked"] == episode["X_qry"].shape[0]
+        assert a["X_qry"].shape[0] == episode["X_qry"].shape[0]
+        assert a["Z_qry"].shape == a["X_qry"].shape
+        if a["task_id"]:
+            assert int((a["y_qry"] < 0).sum()) == a["qry_masked"]
+            # Replacing ALL held-out query labels with an unseen class must NEVER drop rows or alter X_qry/Z_qry!
+            all_unseen = dict(episode, y_qry=np.full_like(episode["y_qry"], 9999.0))
+            a_unseen = ef.native_v8(all_unseen)
+            assert a_unseen["packet"] == a["packet"]
+            assert np.array_equal(a_unseen["X_qry"], a["X_qry"])
+            assert np.array_equal(a_unseen["M_qry"], a["M_qry"])
+            assert np.array_equal(a_unseen["Z_qry"], a["Z_qry"])
+            assert a_unseen["qry_masked"] == episode["X_qry"].shape[0]
+            assert np.all(a_unseen["y_qry"] == -1.0)
         for key in V8_KEYS[:13]:
             assert np.all(np.isfinite(a[key])), key
         if a["task_id"]:
