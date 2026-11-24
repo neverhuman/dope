@@ -1,10 +1,10 @@
 {
   "hero": {
-    "command": "SOURCE_DATE_EPOCH=1795392000 rsvg-convert -f pdf -o docs/whitepaper-v3/figures/hero-v3.pdf bench/real-world/figures/hero-v3-light.svg",
-    "output": "docs/whitepaper-v3/figures/hero-v3.pdf",
-    "output_sha256": "40a05869ea72e62d0291491e7b1a388721a6df1f09a290badc0f41a7deff93d4",
-    "source": "bench/real-world/figures/hero-v3-light.svg",
-    "source_sha256": "bcd83c2f81b5d34c99b08d9470863d224993d4e61d70736e4ab5cae2f9ffaa62",
+    "command": "SOURCE_DATE_EPOCH=1795392000 rsvg-convert -f pdf -o docs/whitepaper-v3/figures/hero-v3-methods.pdf bench/real-world/figures/hero-v3-methods-light.svg",
+    "output": "docs/whitepaper-v3/figures/hero-v3-methods.pdf",
+    "output_sha256": "4d148bf55b57a5b2c6a3248b5f658daa31d132df2cc562a79b09117e744fcef3",
+    "source": "bench/real-world/figures/hero-v3-methods-light.svg",
+    "source_sha256": "2e7a8dda62ac5b201dac72231090811b17a581ee1ca20e190fe8673d1e8b0c76",
     "tool": "rsvg-convert version 2.58.0"
   },
   "inputs": {
@@ -21,6 +21,10 @@
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/null-a.json": "a09a2dad555784cacf0e57a48ff11c5d3525603502905014b1bd9f75f9328f29",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/primary.json": "892a8ee0442aec76a442eb7bc28fe6951c5187a54ccc92158ed5d7e440c44c73",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/served-vs-v2-descriptive.json": "0610fb25087ed7b8e665a2604096de29b96bf1f935195e4d802d9939948613c4",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-arfpy-arf.json": "aba08611a37b197716f2f5a7ca8797c40a54bf0b5b35cd93701f781fdda683b7",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-ctgan.json": "8650350fd3d1ba74dbc564b64d40125558e5b4bb3f1e7784d01bdd5369bcad56",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-gaussian-copula.json": "6f1cb70a8dc695a33a3cbe37b8a441707c19c5bdc6e5760a8fb78d8413d25a58",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-tvae.json": "97b682a81d9592637aa9f0fee0bcb1d9c9bef5df954e12ad4ee379a861d03704",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/selection/PREREG_LOG.txt": "b719db03bf92c706741843f98768c5dbe63f429ea9e8e1042f0a876cd7487397",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/selection/V3_SELECTION_PREREG.md": "f711447b500cba4a01444f598be861fbb177de733205d2438c610739dd4f4b74",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/selection/wide-dev/cmp-v3c-cand6-vs-dope-2.0.0-auto.json": "5dfca6bc4bd3a7d0bc40aa08f4d2fc2e6cee41cc021921859e11b9be175c106d",
@@ -35,6 +39,8 @@
     "contracts/dope-fidelity-v3-candidate.json": "87bc12eef5191d60b75e40f7c3f556f4816f64c50b7c2c6cb1a689e5aea29f60",
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",
+    "docs/whitepaper-v3/generated/v3-paired-table.tex": "a2ffdca5a0ab6f06f2eebe73ab1bc06cf9545bef26c420d03b494469be526b79",
+    "docs/whitepaper-v3/generated/v3-ranking-table.tex": "81c621f643fcb95e43a52dee77add8a7d988e35344a4af03206663cbaafd8bf2",
     "engine/dope-core/src/auto/check.rs": "6c9ad81ce6b7846de223dd02f436adda00de45743e7e3a2bf61aa17ca126141d",
     "engine/dope-core/src/auto/container.rs": "16c38db0a977644e2002e2012083337c8ba5f8e8f13f648dd97b06cbf58e28e0",
     "engine/dope-core/src/auto/mod.rs": "d7beb0045bd9996f183331ad761afd534f1d700ccb507434698eb981fba0628e",
@@ -51,10 +57,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-comparison-table.tex": "cc0c57336ff4a2f8ccb8de3a79172f2fb6c3a0187da948755f1ad4457ce18ff9",
-    "docs/whitepaper-v3/generated/v3-macros.tex": "8f85b9c390e280ca673c9d40c319cde46e8cdae1b8b196074a41ba800cf5eda5",
-    "docs/whitepaper-v3/generated/v3-methods-table.tex": "84c80ca0adca609f99ea66ad4e1422fadbefdb532eb999be1c73f50758b148c3",
-    "docs/whitepaper-v3/generated/v3-results-table.tex": "b439bf1ba0dd882b1e5e18ae42e4fb6c687ad7b8192daaceb3384cb34cdf16c7"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "ead92287ade60f63197f1dd0c3023b7b087ec70cdb65a694a44396174bf7a358"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }
