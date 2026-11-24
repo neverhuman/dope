@@ -5,13 +5,16 @@ the `dope_kpi` receipts under `bench/real-world/results/scoreboard/v3.0.0/`, the
 under `contracts/`, and constants of the Rust sources. Nothing falls back to a default: a
 missing receipt, contract key or source constant is an error.
 
-  render_v3_paper.py            write generated/{v3-macros.tex, v3-results-table.tex,
-                                v3-comparison-table.tex, v3-render-manifest.json}
-  render_v3_paper.py --figures  also convert the README hero SVG to figures/hero-v3.pdf
+  render_v3_paper.py            write generated/{v3-macros.tex, v3-render-manifest.json}
+  render_v3_paper.py --figures  also convert the methods hero SVG to figures/hero-v3-methods.pdf
   render_v3_paper.py --check    write nothing; fail on drift of any generated file, on a hero
                                 PDF whose provenance does not match, on any digit typed into
-                                a section body (sections/*.tex) or the title block, and on a
+                                a section body (sections/*.tex) or the title block, on a section
+                                or paper table that cites an earlier DOPE release, and on a
                                 comparative claim of the prose that the receipts contradict.
+
+The paper's Tables 1 and 2 (generated/v3-{ranking,paired}-table.tex) are written by the Rust
+`dope_kpi render-paper-tables`; this script records their SHA-256 and lints them.
 """
 from __future__ import annotations
 
@@ -35,12 +38,15 @@ import v3_paper_tables as tables  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
 SCOREBOARD = "bench/real-world/results/scoreboard/v3.0.0"
-HERO_SVG = "bench/real-world/figures/hero-v3-light.svg"
-HERO_PDF = "docs/whitepaper-v3/figures/hero-v3.pdf"
+HERO_SVG = "bench/real-world/figures/hero-v3-methods-light.svg"
+HERO_PDF = "docs/whitepaper-v3/figures/hero-v3-methods.pdf"
 GEN = "docs/whitepaper-v3/generated"
-OUT = {"macros": f"{GEN}/v3-macros.tex", "arms": f"{GEN}/v3-results-table.tex",
-       "comparison": f"{GEN}/v3-comparison-table.tex", "methods": f"{GEN}/v3-methods-table.tex",
-       "manifest": f"{GEN}/v3-render-manifest.json"}
+RUST_TABLES = (f"{GEN}/v3-ranking-table.tex", f"{GEN}/v3-paired-table.tex")
+# The paper reports this release against third-party generators only (owner, 2026-11-24): no section
+# may cite an earlier release's arms, the comparison with it, or its final look.
+PRIOR_MACRO = re.compile(r"(Base|Old|PrevSmall|V7|Fl|Wide)[A-Z]|Delta|Guard|Flip|StatPass|Matched[DP]|PHolm|HolmM|Outcome|Comp[CFa]")
+PRIOR_ARM = re.compile(r"dope-\d|pr\d{3}|\bv7\b", re.I)
+OUT = {"macros": f"{GEN}/v3-macros.tex", "manifest": f"{GEN}/v3-render-manifest.json"}
 HERO_EPOCH = "1795392000"  # 2026-11-23T00:00:00Z: fixes the PDF creation date of the conversion.
 V8 = "engine/dope-core/src/single_encoding/v8"
 RUST = {  # macro: (source, regex); the first group is the value.
@@ -123,8 +129,8 @@ def num(x: float, digits: int = 3, signed: bool = False) -> str:
     return text.replace("-", r"\ensuremath{-}")
 
 
-def ci(v: float, lo: float, hi: float, signed: bool = False) -> str:
-    return f"{num(v, 3, signed)} [{num(lo, 3, signed)}, {num(hi, 3, signed)}]"
+def ci(v: float, lo: float, hi: float, signed: bool = False, digits: int = 3) -> str:
+    return f"{num(v, digits, signed)} [{num(lo, digits, signed)}, {num(hi, digits, signed)}]"
 
 
 def grouped(x: float) -> str:
@@ -162,16 +168,28 @@ def role_ids(primary: dict[str, Any], comp: dict[str, Any]) -> dict[str, str]:
             "LabelShuffle": "label_shuffle", "TwinC": "twin_c"}
 
 
+SCORE_SCALE = 100  # Transfer Score = SCORE_SCALE x (1 + TRG), the README headline (owner-approved 2026-11-24)
+
+
+def score(trg: float) -> float:
+    """Transfer Score in points; SCORE_SCALE is a real twin of the fitting split."""
+    return SCORE_SCALE * (1.0 + float(trg))
+
+
 def arm_macros(role: str, arm: dict[str, Any]) -> list[tuple[str, str]]:
     p, m, b = arm["primary"], arm["matched"], arm["bytes"]
     out = [(f"{role}Id", tt(arm["arm_id"])), (f"{role}Trg", ci(p["trg"], p["ci_low"], p["ci_high"])),
            (f"{role}TrgPoint", num(p["trg"])), (f"{role}Matched", ci(m["trg"], m["ci_low"], m["ci_high"])),
+           # Transfer Score = 100 x (1 + TRG), the README headline: a fixed relabel, same ranks, intervals x 100.
+           (f"{role}Score", ci(score(p["trg"]), score(p["ci_low"]), score(p["ci_high"]), digits=1)),
+           (f"{role}ScorePoint", num(score(p["trg"]), 1)), (f"{role}MatchedScorePoint", num(score(m["trg"]), 1)),
            (f"{role}Mlp", num(arm["mlp_trg"])), (f"{role}Failed", str(p["failed_cells"])),
            (f"{role}Cells", str(p["cells"])), (f"{role}NotApplicable", str(p["not_applicable_cells"]))]
     if arm.get("c2st_median") is not None:
         out.append((f"{role}C2st", num(arm["c2st_median"])))
     for task in p["tasks"]:
-        out.append((f"{role}{task['task'].capitalize()}", num(task["value"])))
+        out += [(f"{role}{task['task'].capitalize()}", num(task["value"])),
+                (f"{role}{task['task'].capitalize()}Score", num(score(task["value"]), 1))]
     if b.get("median") is not None:
         out += [(f"{role}BytesMed", grouped(b["median"])), (f"{role}BytesMax", grouped(b["max"]))]
     for key, name in (("realism_coverage", "Realism"), ("privacy_coverage", "Privacy")):
@@ -186,6 +204,8 @@ def comparison_macros(comp: dict[str, Any], compare: dict[str, Any]) -> list[tup
     m, cal = comp["matched"], comp["null_calibration"]
     out = [("Delta", ci(comp["delta"], comp["ci_low"], comp["ci_high"], True)),
            ("DeltaPoint", num(comp["delta"], 3, True)), ("PHolm", num(comp["p_holm"])),
+           ("DeltaPts", ci(SCORE_SCALE * comp["delta"], SCORE_SCALE * comp["ci_low"], SCORE_SCALE * comp["ci_high"], True, 1)),
+           ("DeltaPtsPoint", num(SCORE_SCALE * comp["delta"], 1, True)), ("ScoreScale", str(SCORE_SCALE)),
            ("HolmM", str(comp["holm_m"])), ("Outcome", comp["decision"]["outcome"]),
            ("MatchedDelta", ci(m["delta"], m["ci_low"], m["ci_high"], True)),
            ("MatchedP", num(m["p_one_sided"])), ("MatchedMult", str(m["multiplier"])),
@@ -218,7 +238,8 @@ def contract_macros(kpi: dict[str, Any], fid: dict[str, Any], layout: dict[str, 
     dims = layout["dims"]
     return [("ContractId", tt(kpi["contract_id"])), ("ContractStatus", kpi["status"]),
             ("ClipLow", short(st["clip_low"])), ("ClipHigh", short(st["clip_high"])),
-            ("FailedValue", short(st["failed_value"])), ("PrimaryMult", str(st["primary_multiplier"])),
+            ("FailedValue", short(st["failed_value"])), ("FailedScore", num(score(st["failed_value"]), 1)),
+            ("PrimaryMult", str(st["primary_multiplier"])),
             ("CiLevel", f"{round(100 * (bs['upper_quantile'] - bs['lower_quantile']))}\\%"),
             ("LowerPct", short(100 * bs["lower_quantile"])), ("UpperPct", short(100 * bs["upper_quantile"])),
             ("HolmAlpha", short(pr["holm_p_lt"])), ("MinDelta", short(pr["min_delta"])),
@@ -332,7 +353,7 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
         entries += arm_macros(role, by_id[arm_id])
     entries += comparison_macros(comp, compare)
     if methods:
-        entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256)
+        entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256, pct, SCORE_SCALE)
     entries += final_mod.macros(final, num, sha256)
     if hero:
         entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
@@ -343,11 +364,12 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
              r"\newcommand{\VThree}[1]{\ifcsname VThree@#1\endcsname\csname VThree@#1\endcsname"
              r"\else\PackageError{dope-v3}{undefined receipt macro #1}{Re-run render_v3_paper.py}\fi}"]
     lines += [rf"\expandafter\newcommand\csname VThree@{k}\endcsname{{{v}}}" for k, v in entries]
-    out = {"macros": "\n".join(lines) + "\n",
-           "arms": tables.render_arm_table(primary["arms"], third, roles["Cand"]),
-           "comparison": tables.render_comparison_table(comp),
-           "methods": tables.render_methods_table(methods["comparisons"] if methods else [])}
+    out = {"macros": "\n".join(lines) + "\n"}
+    missing = [rel for rel in RUST_TABLES if not (REPO / rel).is_file()]
+    if missing:
+        raise RenderError(f"missing {missing}: run dope_kpi render-paper-tables")
     inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
+                    | set(RUST_TABLES)
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
                        "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"]))
     manifest = {"schema": "dope.whitepaper-v3-render/v1", "hero": hero,
@@ -419,7 +441,12 @@ def paper_errors(macros: str) -> list[str]:
                 for p in sorted((REPO / "docs/whitepaper-v3/sections").glob("*.tex"))]
     for rel, text in sources:
         errors += lint_tex(rel, text)
-        used |= set(re.findall(r"\\VThree\{([^{}]*)\}", text))
+        cited = set(re.findall(r"\\VThree\{([^{}]*)\}", text))
+        errors += [f"{rel}: \\VThree{{{n}}} cites an earlier DOPE release" for n in sorted(cited) if PRIOR_MACRO.match(n)]
+        used |= cited
+    for rel in RUST_TABLES:
+        if PRIOR_ARM.search((REPO / rel).read_text(encoding="utf-8")):
+            errors.append(f"{rel} lists an arm of an earlier DOPE release")
     return errors + [f"undefined macro \\VThree{{{n}}}" for n in sorted(used - defined)]
 
 

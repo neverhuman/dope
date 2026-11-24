@@ -1,0 +1,8 @@
+\section{What per-table selection adds}\label{app:ablation}
+
+\cli{auto-v8} chooses per table between Format~1 and \texttt{DSE8} (\S\ref{sec:select}).
+The report look also scored \VThree{AnalyticId}, the analytic \texttt{DSE8} packet written on every table without that choice, on the same cells.
+Its Transfer Score is \VThree{AnalyticScore}, against \VThree{CandScore} with selection.
+The packet alone is stronger on regression (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and weaker on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}); its median file is \VThree{AnalyticBytesMed}~bytes.
+Its realism coverage is \VThree{AnalyticRealism} and its privacy coverage \VThree{AnalyticPrivacy}, against \VThree{CandRealism} and \VThree{CandPrivacy} with selection.
+This pair was not pre-registered as a comparison, so we report it descriptively and with no test.

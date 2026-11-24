@@ -163,11 +163,11 @@ def methods_info(primary: dict, files: dict | None = None) -> dict | None:
     files = files or {}
 
     def read(rel: str) -> dict:
-        name = rel.rsplit("/", 1)[1]
+        name = rel.split(f"{rp.SCOREBOARD}/", 1)[1]
         return files[name] if name in files else load(name)
 
     def exists(rel: str) -> bool:
-        name = rel.rsplit("/", 1)[1]
+        name = rel.split(f"{rp.SCOREBOARD}/", 1)[1]
         return files[name] is not None if name in files else (SCOREBOARD / name).is_file()
     return methods_mod.load(rp.SCOREBOARD, read, exists, primary, rp.sha256(f"{rp.SCOREBOARD}/primary.json"),
                             rp.check_same_run)
@@ -248,6 +248,15 @@ class ThirdPartyReceipts(unittest.TestCase):
         methods["arms"][0]["primary"]["trg"] += 0.001
         with self.assertRaisesRegex(methods_mod.MethodsError, "field for field"):
             methods_info(self.primary, {methods_mod.PRIMARY: methods})
+
+    def test_a_paper_pair_must_be_the_exact_sign_reversal(self):
+        name = methods_mod.VERSUS.format("arfpy-arf")
+        pair = load(name)
+        pair["comparisons"][0]["ci_low"] += 1e-6
+        with self.assertRaisesRegex(methods_mod.MethodsError, "sign reversal"):
+            methods_info(self.primary, {name: pair})
+        with self.assertRaisesRegex(methods_mod.MethodsError, "missing"):
+            methods_info(self.primary, {name: None})
 
     def test_another_run_is_an_error(self):
         compare = load(methods_mod.COMPARE)

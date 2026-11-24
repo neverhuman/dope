@@ -36,11 +36,10 @@ rm -rf docs/whitepaper/generated
 rm -f docs/whitepaper/figures/architecture.pdf
 nice -n 10 ionice -c 3 just paper
 nice -n 10 ionice -c 3 bash paper/build.sh
-# The v3 paper: its macros and tables are rebuilt from the receipts; the hero PDF and its
-# recorded provenance stay, and render_v3_paper.py --check verifies them.
-rm -f docs/whitepaper-v3/generated/v3-macros.tex docs/whitepaper-v3/generated/v3-results-table.tex \
-  docs/whitepaper-v3/generated/v3-comparison-table.tex docs/whitepaper-v3/generated/v3-methods-table.tex \
-  docs/whitepaper-v3/dope-v3.pdf docs/whitepaper-v3/dope-v3.bbl
+# The v3 paper: its macros are rebuilt from the receipts. The hero PDF and the two tables that
+# the Rust `dope_kpi render-paper-tables` writes stay (a cargo test pins the tables to the
+# receipts); render_v3_paper.py --check verifies their recorded SHA-256s.
+rm -f docs/whitepaper-v3/generated/v3-macros.tex docs/whitepaper-v3/dope-v3.pdf docs/whitepaper-v3/dope-v3.bbl
 nice -n 10 ionice -c 3 just paper-v3
 nice -n 10 ionice -c 3 python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py'
 # Include absent/untracked files as well as tracked drift in the clean-rebuild gate.

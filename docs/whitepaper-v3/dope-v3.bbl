@@ -81,6 +81,15 @@ Baharan Mirzasoleiman, Jeff Bilmes, and Jure Leskovec.
 \newblock In \emph{Proceedings of the International Conference on Machine
   Learning (ICML)}, 2020.
 
+\bibitem[{NEVERHUMAN Research}(2026)]{dope2026v3release}
+{NEVERHUMAN Research}.
+\newblock {DOPE} engine v3.0.0: signed release record.
+\newblock
+  \url{https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0},
+  2026.
+\newblock Source commit \texttt{e15c415b}; lists the packet-reproduction replay
+  of the signed binary and its receipts.
+
 \bibitem[Nosek et~al.(2018)Nosek, Ebersole, DeHaven, and
   Mellor]{nosek2018preregistration}
 Brian~A. Nosek, Charles~R. Ebersole, Alexander~C. DeHaven, and David~T. Mellor.
@@ -113,21 +122,12 @@ Theresa Stadler, Bristena Oprisanu, and Carmela Troncoso.
 \newblock Synthetic data -- anonymisation groundhog day.
 \newblock In \emph{USENIX Security Symposium}, 2022.
 
-\bibitem[Taylor et~al.(2026{\natexlab{a}})Taylor, Alexander, and
-  Morrow]{dope2026v1}
+\bibitem[Taylor et~al.(2026)Taylor, Alexander, and Morrow]{dope2026v1}
 Jepson Taylor, Alton Alexander, and Jordan Morrow.
 \newblock {D.O.P.E.}: Downstream objective-preserving encoding --- generative
   compression of predictive structure.
-\newblock Technical report, NEVERHUMAN Research, 2026{\natexlab{a}}.
+\newblock Technical report, NEVERHUMAN Research, 2026.
 \newblock DOPE v1.0.0 manuscript, \texttt{docs/whitepaper/dope-mfs.tex}.
-
-\bibitem[Taylor et~al.(2026{\natexlab{b}})Taylor, Alexander, and
-  Morrow]{dope2026v2}
-Jepson Taylor, Alton Alexander, and Jordan Morrow.
-\newblock {D.O.P.E.} v2.0.0: Sub-2\,{KiB} pure-{Rust} tabular synthesis,
-  fidelity engine~2.0, and twin-referenced multi-auditor confirmation.
-\newblock Technical report, NEVERHUMAN Research, 2026{\natexlab{b}}.
-\newblock \texttt{docs/whitepaper-v2/dope-v2.tex}.
 
 \bibitem[Wang et~al.(2018)Wang, Zhu, Torralba, and Efros]{wang2018distillation}
 Tongzhou Wang, Jun-Yan Zhu, Antonio Torralba, and Alexei~A. Efros.

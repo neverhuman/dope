@@ -56,6 +56,7 @@
 \expandafter\newcommand\csname VThree@ClipLow\endcsname{\ensuremath{-}1}
 \expandafter\newcommand\csname VThree@ClipHigh\endcsname{1.25}
 \expandafter\newcommand\csname VThree@FailedValue\endcsname{\ensuremath{-}1}
+\expandafter\newcommand\csname VThree@FailedScore\endcsname{0.0}
 \expandafter\newcommand\csname VThree@PrimaryMult\endcsname{4}
 \expandafter\newcommand\csname VThree@CiLevel\endcsname{95\%}
 \expandafter\newcommand\csname VThree@LowerPct\endcsname{2.5}
@@ -90,14 +91,20 @@
 \expandafter\newcommand\csname VThree@CandTrg\endcsname{\ensuremath{-}0.121 [\ensuremath{-}0.189, \ensuremath{-}0.049]}
 \expandafter\newcommand\csname VThree@CandTrgPoint\endcsname{\ensuremath{-}0.121}
 \expandafter\newcommand\csname VThree@CandMatched\endcsname{\ensuremath{-}0.309 [\ensuremath{-}0.488, \ensuremath{-}0.171]}
+\expandafter\newcommand\csname VThree@CandScore\endcsname{87.9 [81.1, 95.1]}
+\expandafter\newcommand\csname VThree@CandScorePoint\endcsname{87.9}
+\expandafter\newcommand\csname VThree@CandMatchedScorePoint\endcsname{69.1}
 \expandafter\newcommand\csname VThree@CandMlp\endcsname{\ensuremath{-}0.349}
 \expandafter\newcommand\csname VThree@CandFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@CandCells\endcsname{44}
 \expandafter\newcommand\csname VThree@CandNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@CandC2st\endcsname{0.967}
 \expandafter\newcommand\csname VThree@CandRegression\endcsname{\ensuremath{-}0.137}
+\expandafter\newcommand\csname VThree@CandRegressionScore\endcsname{86.3}
 \expandafter\newcommand\csname VThree@CandBinary\endcsname{\ensuremath{-}0.136}
+\expandafter\newcommand\csname VThree@CandBinaryScore\endcsname{86.4}
 \expandafter\newcommand\csname VThree@CandMulticlass\endcsname{\ensuremath{-}0.089}
+\expandafter\newcommand\csname VThree@CandMulticlassScore\endcsname{91.1}
 \expandafter\newcommand\csname VThree@CandBytesMed\endcsname{1{,}787}
 \expandafter\newcommand\csname VThree@CandBytesMax\endcsname{2{,}048}
 \expandafter\newcommand\csname VThree@CandRealism\endcsname{0.194}
@@ -109,14 +116,20 @@
 \expandafter\newcommand\csname VThree@BaseTrg\endcsname{\ensuremath{-}0.181 [\ensuremath{-}0.280, \ensuremath{-}0.085]}
 \expandafter\newcommand\csname VThree@BaseTrgPoint\endcsname{\ensuremath{-}0.181}
 \expandafter\newcommand\csname VThree@BaseMatched\endcsname{\ensuremath{-}0.333 [\ensuremath{-}0.513, \ensuremath{-}0.174]}
+\expandafter\newcommand\csname VThree@BaseScore\endcsname{81.9 [72.0, 91.5]}
+\expandafter\newcommand\csname VThree@BaseScorePoint\endcsname{81.9}
+\expandafter\newcommand\csname VThree@BaseMatchedScorePoint\endcsname{66.7}
 \expandafter\newcommand\csname VThree@BaseMlp\endcsname{\ensuremath{-}0.341}
 \expandafter\newcommand\csname VThree@BaseFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@BaseCells\endcsname{44}
 \expandafter\newcommand\csname VThree@BaseNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@BaseC2st\endcsname{0.958}
 \expandafter\newcommand\csname VThree@BaseRegression\endcsname{\ensuremath{-}0.118}
+\expandafter\newcommand\csname VThree@BaseRegressionScore\endcsname{88.2}
 \expandafter\newcommand\csname VThree@BaseBinary\endcsname{\ensuremath{-}0.278}
+\expandafter\newcommand\csname VThree@BaseBinaryScore\endcsname{72.2}
 \expandafter\newcommand\csname VThree@BaseMulticlass\endcsname{\ensuremath{-}0.146}
+\expandafter\newcommand\csname VThree@BaseMulticlassScore\endcsname{85.4}
 \expandafter\newcommand\csname VThree@BaseBytesMed\endcsname{1{,}817.5}
 \expandafter\newcommand\csname VThree@BaseBytesMax\endcsname{2{,}048}
 \expandafter\newcommand\csname VThree@BaseRealism\endcsname{0.306}
@@ -128,14 +141,20 @@
 \expandafter\newcommand\csname VThree@AnalyticTrg\endcsname{\ensuremath{-}0.342 [\ensuremath{-}0.652, \ensuremath{-}0.103]}
 \expandafter\newcommand\csname VThree@AnalyticTrgPoint\endcsname{\ensuremath{-}0.342}
 \expandafter\newcommand\csname VThree@AnalyticMatched\endcsname{\ensuremath{-}0.452 [\ensuremath{-}0.744, \ensuremath{-}0.225]}
+\expandafter\newcommand\csname VThree@AnalyticScore\endcsname{65.8 [34.8, 89.7]}
+\expandafter\newcommand\csname VThree@AnalyticScorePoint\endcsname{65.8}
+\expandafter\newcommand\csname VThree@AnalyticMatchedScorePoint\endcsname{54.8}
 \expandafter\newcommand\csname VThree@AnalyticMlp\endcsname{\ensuremath{-}0.491}
 \expandafter\newcommand\csname VThree@AnalyticFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@AnalyticCells\endcsname{44}
 \expandafter\newcommand\csname VThree@AnalyticNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@AnalyticC2st\endcsname{0.977}
 \expandafter\newcommand\csname VThree@AnalyticRegression\endcsname{\ensuremath{-}0.094}
+\expandafter\newcommand\csname VThree@AnalyticRegressionScore\endcsname{90.6}
 \expandafter\newcommand\csname VThree@AnalyticBinary\endcsname{\ensuremath{-}0.276}
+\expandafter\newcommand\csname VThree@AnalyticBinaryScore\endcsname{72.4}
 \expandafter\newcommand\csname VThree@AnalyticMulticlass\endcsname{\ensuremath{-}0.655}
+\expandafter\newcommand\csname VThree@AnalyticMulticlassScore\endcsname{34.5}
 \expandafter\newcommand\csname VThree@AnalyticBytesMed\endcsname{867.5}
 \expandafter\newcommand\csname VThree@AnalyticBytesMax\endcsname{2{,}048}
 \expandafter\newcommand\csname VThree@AnalyticRealism\endcsname{0.194}
@@ -147,14 +166,20 @@
 \expandafter\newcommand\csname VThree@V7Trg\endcsname{\ensuremath{-}0.432 [\ensuremath{-}0.585, \ensuremath{-}0.273]}
 \expandafter\newcommand\csname VThree@V7TrgPoint\endcsname{\ensuremath{-}0.432}
 \expandafter\newcommand\csname VThree@V7Matched\endcsname{\ensuremath{-}0.395 [\ensuremath{-}0.553, \ensuremath{-}0.257]}
+\expandafter\newcommand\csname VThree@V7Score\endcsname{56.8 [41.5, 72.7]}
+\expandafter\newcommand\csname VThree@V7ScorePoint\endcsname{56.8}
+\expandafter\newcommand\csname VThree@V7MatchedScorePoint\endcsname{60.5}
 \expandafter\newcommand\csname VThree@V7Mlp\endcsname{\ensuremath{-}0.344}
 \expandafter\newcommand\csname VThree@V7Failed\endcsname{0}
 \expandafter\newcommand\csname VThree@V7Cells\endcsname{44}
 \expandafter\newcommand\csname VThree@V7NotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@V7C2st\endcsname{0.986}
 \expandafter\newcommand\csname VThree@V7Regression\endcsname{\ensuremath{-}0.102}
+\expandafter\newcommand\csname VThree@V7RegressionScore\endcsname{89.8}
 \expandafter\newcommand\csname VThree@V7Binary\endcsname{\ensuremath{-}0.545}
+\expandafter\newcommand\csname VThree@V7BinaryScore\endcsname{45.5}
 \expandafter\newcommand\csname VThree@V7Multiclass\endcsname{\ensuremath{-}0.648}
+\expandafter\newcommand\csname VThree@V7MulticlassScore\endcsname{35.2}
 \expandafter\newcommand\csname VThree@V7BytesMed\endcsname{782.5}
 \expandafter\newcommand\csname VThree@V7BytesMax\endcsname{2{,}026}
 \expandafter\newcommand\csname VThree@V7Realism\endcsname{0.194}
@@ -166,14 +191,20 @@
 \expandafter\newcommand\csname VThree@PrevSmallTrg\endcsname{\ensuremath{-}0.267 [\ensuremath{-}0.402, \ensuremath{-}0.133]}
 \expandafter\newcommand\csname VThree@PrevSmallTrgPoint\endcsname{\ensuremath{-}0.267}
 \expandafter\newcommand\csname VThree@PrevSmallMatched\endcsname{\ensuremath{-}0.470 [\ensuremath{-}0.668, \ensuremath{-}0.276]}
+\expandafter\newcommand\csname VThree@PrevSmallScore\endcsname{73.3 [59.8, 86.7]}
+\expandafter\newcommand\csname VThree@PrevSmallScorePoint\endcsname{73.3}
+\expandafter\newcommand\csname VThree@PrevSmallMatchedScorePoint\endcsname{53.0}
 \expandafter\newcommand\csname VThree@PrevSmallMlp\endcsname{\ensuremath{-}0.415}
 \expandafter\newcommand\csname VThree@PrevSmallFailed\endcsname{7}
 \expandafter\newcommand\csname VThree@PrevSmallCells\endcsname{44}
 \expandafter\newcommand\csname VThree@PrevSmallNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@PrevSmallC2st\endcsname{0.925}
 \expandafter\newcommand\csname VThree@PrevSmallRegression\endcsname{\ensuremath{-}0.250}
+\expandafter\newcommand\csname VThree@PrevSmallRegressionScore\endcsname{75.0}
 \expandafter\newcommand\csname VThree@PrevSmallBinary\endcsname{\ensuremath{-}0.438}
+\expandafter\newcommand\csname VThree@PrevSmallBinaryScore\endcsname{56.2}
 \expandafter\newcommand\csname VThree@PrevSmallMulticlass\endcsname{\ensuremath{-}0.112}
+\expandafter\newcommand\csname VThree@PrevSmallMulticlassScore\endcsname{88.8}
 \expandafter\newcommand\csname VThree@PrevSmallBytesMed\endcsname{1{,}508}
 \expandafter\newcommand\csname VThree@PrevSmallBytesMax\endcsname{2{,}043}
 \expandafter\newcommand\csname VThree@PrevSmallRealism\endcsname{0.306}
@@ -185,14 +216,20 @@
 \expandafter\newcommand\csname VThree@OldSmallTrg\endcsname{\ensuremath{-}0.266 [\ensuremath{-}0.399, \ensuremath{-}0.133]}
 \expandafter\newcommand\csname VThree@OldSmallTrgPoint\endcsname{\ensuremath{-}0.266}
 \expandafter\newcommand\csname VThree@OldSmallMatched\endcsname{\ensuremath{-}0.468 [\ensuremath{-}0.667, \ensuremath{-}0.275]}
+\expandafter\newcommand\csname VThree@OldSmallScore\endcsname{73.4 [60.1, 86.7]}
+\expandafter\newcommand\csname VThree@OldSmallScorePoint\endcsname{73.4}
+\expandafter\newcommand\csname VThree@OldSmallMatchedScorePoint\endcsname{53.2}
 \expandafter\newcommand\csname VThree@OldSmallMlp\endcsname{\ensuremath{-}0.415}
 \expandafter\newcommand\csname VThree@OldSmallFailed\endcsname{7}
 \expandafter\newcommand\csname VThree@OldSmallCells\endcsname{44}
 \expandafter\newcommand\csname VThree@OldSmallNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@OldSmallC2st\endcsname{0.925}
 \expandafter\newcommand\csname VThree@OldSmallRegression\endcsname{\ensuremath{-}0.249}
+\expandafter\newcommand\csname VThree@OldSmallRegressionScore\endcsname{75.1}
 \expandafter\newcommand\csname VThree@OldSmallBinary\endcsname{\ensuremath{-}0.438}
+\expandafter\newcommand\csname VThree@OldSmallBinaryScore\endcsname{56.2}
 \expandafter\newcommand\csname VThree@OldSmallMulticlass\endcsname{\ensuremath{-}0.109}
+\expandafter\newcommand\csname VThree@OldSmallMulticlassScore\endcsname{89.1}
 \expandafter\newcommand\csname VThree@OldSmallBytesMed\endcsname{1{,}508}
 \expandafter\newcommand\csname VThree@OldSmallBytesMax\endcsname{2{,}043}
 \expandafter\newcommand\csname VThree@OldSmallRealism\endcsname{0.306}
@@ -204,14 +241,20 @@
 \expandafter\newcommand\csname VThree@CopyATrg\endcsname{\ensuremath{-}0.039 [\ensuremath{-}0.069, \ensuremath{-}0.014]}
 \expandafter\newcommand\csname VThree@CopyATrgPoint\endcsname{\ensuremath{-}0.039}
 \expandafter\newcommand\csname VThree@CopyAMatched\endcsname{\ensuremath{-}0.039 [\ensuremath{-}0.069, \ensuremath{-}0.014]}
+\expandafter\newcommand\csname VThree@CopyAScore\endcsname{96.1 [93.1, 98.6]}
+\expandafter\newcommand\csname VThree@CopyAScorePoint\endcsname{96.1}
+\expandafter\newcommand\csname VThree@CopyAMatchedScorePoint\endcsname{96.1}
 \expandafter\newcommand\csname VThree@CopyAMlp\endcsname{\ensuremath{-}0.014}
 \expandafter\newcommand\csname VThree@CopyAFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@CopyACells\endcsname{44}
 \expandafter\newcommand\csname VThree@CopyANotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@CopyAC2st\endcsname{0.530}
 \expandafter\newcommand\csname VThree@CopyARegression\endcsname{\ensuremath{-}0.017}
+\expandafter\newcommand\csname VThree@CopyARegressionScore\endcsname{98.3}
 \expandafter\newcommand\csname VThree@CopyABinary\endcsname{\ensuremath{-}0.056}
+\expandafter\newcommand\csname VThree@CopyABinaryScore\endcsname{94.4}
 \expandafter\newcommand\csname VThree@CopyAMulticlass\endcsname{\ensuremath{-}0.045}
+\expandafter\newcommand\csname VThree@CopyAMulticlassScore\endcsname{95.5}
 \expandafter\newcommand\csname VThree@CopyARetLinear\endcsname{1.000}
 \expandafter\newcommand\csname VThree@CopyARetGbdt\endcsname{1.000}
 \expandafter\newcommand\csname VThree@CopyARetMlp\endcsname{1.000}
@@ -219,14 +262,20 @@
 \expandafter\newcommand\csname VThree@BootATrg\endcsname{\ensuremath{-}0.088 [\ensuremath{-}0.147, \ensuremath{-}0.036]}
 \expandafter\newcommand\csname VThree@BootATrgPoint\endcsname{\ensuremath{-}0.088}
 \expandafter\newcommand\csname VThree@BootAMatched\endcsname{\ensuremath{-}0.214 [\ensuremath{-}0.360, \ensuremath{-}0.098]}
+\expandafter\newcommand\csname VThree@BootAScore\endcsname{91.2 [85.3, 96.4]}
+\expandafter\newcommand\csname VThree@BootAScorePoint\endcsname{91.2}
+\expandafter\newcommand\csname VThree@BootAMatchedScorePoint\endcsname{78.6}
 \expandafter\newcommand\csname VThree@BootAMlp\endcsname{\ensuremath{-}0.145}
 \expandafter\newcommand\csname VThree@BootAFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@BootACells\endcsname{44}
 \expandafter\newcommand\csname VThree@BootANotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@BootAC2st\endcsname{0.572}
 \expandafter\newcommand\csname VThree@BootARegression\endcsname{\ensuremath{-}0.085}
+\expandafter\newcommand\csname VThree@BootARegressionScore\endcsname{91.5}
 \expandafter\newcommand\csname VThree@BootABinary\endcsname{\ensuremath{-}0.039}
+\expandafter\newcommand\csname VThree@BootABinaryScore\endcsname{96.1}
 \expandafter\newcommand\csname VThree@BootAMulticlass\endcsname{\ensuremath{-}0.139}
+\expandafter\newcommand\csname VThree@BootAMulticlassScore\endcsname{86.1}
 \expandafter\newcommand\csname VThree@BootARetLinear\endcsname{0.995}
 \expandafter\newcommand\csname VThree@BootARetGbdt\endcsname{0.995}
 \expandafter\newcommand\csname VThree@BootARetMlp\endcsname{0.991}
@@ -234,14 +283,20 @@
 \expandafter\newcommand\csname VThree@IndepTrg\endcsname{\ensuremath{-}1.222 [\ensuremath{-}1.387, \ensuremath{-}1.095]}
 \expandafter\newcommand\csname VThree@IndepTrgPoint\endcsname{\ensuremath{-}1.222}
 \expandafter\newcommand\csname VThree@IndepMatched\endcsname{\ensuremath{-}1.222 [\ensuremath{-}1.387, \ensuremath{-}1.095]}
+\expandafter\newcommand\csname VThree@IndepScore\endcsname{\ensuremath{-}22.2 [\ensuremath{-}38.7, \ensuremath{-}9.5]}
+\expandafter\newcommand\csname VThree@IndepScorePoint\endcsname{\ensuremath{-}22.2}
+\expandafter\newcommand\csname VThree@IndepMatchedScorePoint\endcsname{\ensuremath{-}22.2}
 \expandafter\newcommand\csname VThree@IndepMlp\endcsname{\ensuremath{-}1.406}
 \expandafter\newcommand\csname VThree@IndepFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@IndepCells\endcsname{44}
 \expandafter\newcommand\csname VThree@IndepNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@IndepC2st\endcsname{0.967}
 \expandafter\newcommand\csname VThree@IndepRegression\endcsname{\ensuremath{-}1.135}
+\expandafter\newcommand\csname VThree@IndepRegressionScore\endcsname{\ensuremath{-}13.5}
 \expandafter\newcommand\csname VThree@IndepBinary\endcsname{\ensuremath{-}1.381}
+\expandafter\newcommand\csname VThree@IndepBinaryScore\endcsname{\ensuremath{-}38.1}
 \expandafter\newcommand\csname VThree@IndepMulticlass\endcsname{\ensuremath{-}1.149}
+\expandafter\newcommand\csname VThree@IndepMulticlassScore\endcsname{\ensuremath{-}14.9}
 \expandafter\newcommand\csname VThree@IndepRetLinear\endcsname{\ensuremath{-}0.157}
 \expandafter\newcommand\csname VThree@IndepRetGbdt\endcsname{\ensuremath{-}0.011}
 \expandafter\newcommand\csname VThree@IndepRetMlp\endcsname{\ensuremath{-}0.334}
@@ -249,14 +304,20 @@
 \expandafter\newcommand\csname VThree@LabelShuffleTrg\endcsname{\ensuremath{-}1.164 [\ensuremath{-}1.269, \ensuremath{-}1.063]}
 \expandafter\newcommand\csname VThree@LabelShuffleTrgPoint\endcsname{\ensuremath{-}1.164}
 \expandafter\newcommand\csname VThree@LabelShuffleMatched\endcsname{\ensuremath{-}1.164 [\ensuremath{-}1.269, \ensuremath{-}1.063]}
+\expandafter\newcommand\csname VThree@LabelShuffleScore\endcsname{\ensuremath{-}16.4 [\ensuremath{-}26.9, \ensuremath{-}6.3]}
+\expandafter\newcommand\csname VThree@LabelShuffleScorePoint\endcsname{\ensuremath{-}16.4}
+\expandafter\newcommand\csname VThree@LabelShuffleMatchedScorePoint\endcsname{\ensuremath{-}16.4}
 \expandafter\newcommand\csname VThree@LabelShuffleMlp\endcsname{\ensuremath{-}1.274}
 \expandafter\newcommand\csname VThree@LabelShuffleFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@LabelShuffleCells\endcsname{44}
 \expandafter\newcommand\csname VThree@LabelShuffleNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@LabelShuffleC2st\endcsname{0.687}
 \expandafter\newcommand\csname VThree@LabelShuffleRegression\endcsname{\ensuremath{-}1.235}
+\expandafter\newcommand\csname VThree@LabelShuffleRegressionScore\endcsname{\ensuremath{-}23.5}
 \expandafter\newcommand\csname VThree@LabelShuffleBinary\endcsname{\ensuremath{-}1.004}
+\expandafter\newcommand\csname VThree@LabelShuffleBinaryScore\endcsname{\ensuremath{-}0.4}
 \expandafter\newcommand\csname VThree@LabelShuffleMulticlass\endcsname{\ensuremath{-}1.251}
+\expandafter\newcommand\csname VThree@LabelShuffleMulticlassScore\endcsname{\ensuremath{-}25.1}
 \expandafter\newcommand\csname VThree@LabelShuffleRetLinear\endcsname{\ensuremath{-}0.105}
 \expandafter\newcommand\csname VThree@LabelShuffleRetGbdt\endcsname{\ensuremath{-}0.004}
 \expandafter\newcommand\csname VThree@LabelShuffleRetMlp\endcsname{\ensuremath{-}0.208}
@@ -264,19 +325,27 @@
 \expandafter\newcommand\csname VThree@TwinCTrg\endcsname{\ensuremath{-}0.060 [\ensuremath{-}0.060, \ensuremath{-}0.060]}
 \expandafter\newcommand\csname VThree@TwinCTrgPoint\endcsname{\ensuremath{-}0.060}
 \expandafter\newcommand\csname VThree@TwinCMatched\endcsname{\ensuremath{-}0.060 [\ensuremath{-}0.060, \ensuremath{-}0.060]}
+\expandafter\newcommand\csname VThree@TwinCScore\endcsname{94.0 [94.0, 94.0]}
+\expandafter\newcommand\csname VThree@TwinCScorePoint\endcsname{94.0}
+\expandafter\newcommand\csname VThree@TwinCMatchedScorePoint\endcsname{94.0}
 \expandafter\newcommand\csname VThree@TwinCMlp\endcsname{\ensuremath{-}0.069}
 \expandafter\newcommand\csname VThree@TwinCFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@TwinCCells\endcsname{8}
 \expandafter\newcommand\csname VThree@TwinCNotApplicable\endcsname{36}
 \expandafter\newcommand\csname VThree@TwinCC2st\endcsname{0.522}
 \expandafter\newcommand\csname VThree@TwinCRegression\endcsname{\ensuremath{-}0.074}
+\expandafter\newcommand\csname VThree@TwinCRegressionScore\endcsname{92.6}
 \expandafter\newcommand\csname VThree@TwinCMulticlass\endcsname{\ensuremath{-}0.046}
+\expandafter\newcommand\csname VThree@TwinCMulticlassScore\endcsname{95.4}
 \expandafter\newcommand\csname VThree@TwinCRetLinear\endcsname{0.997}
 \expandafter\newcommand\csname VThree@TwinCRetGbdt\endcsname{0.993}
 \expandafter\newcommand\csname VThree@TwinCRetMlp\endcsname{0.974}
 \expandafter\newcommand\csname VThree@Delta\endcsname{+0.060 [+0.009, +0.114]}
 \expandafter\newcommand\csname VThree@DeltaPoint\endcsname{+0.060}
 \expandafter\newcommand\csname VThree@PHolm\endcsname{0.009}
+\expandafter\newcommand\csname VThree@DeltaPts\endcsname{+6.0 [+0.9, +11.4]}
+\expandafter\newcommand\csname VThree@DeltaPtsPoint\endcsname{+6.0}
+\expandafter\newcommand\csname VThree@ScoreScale\endcsname{100}
 \expandafter\newcommand\csname VThree@HolmM\endcsname{1}
 \expandafter\newcommand\csname VThree@Outcome\endcsname{HOLD}
 \expandafter\newcommand\csname VThree@MatchedDelta\endcsname{+0.024 [\ensuremath{-}0.020, +0.071]}
@@ -309,18 +378,42 @@
 \expandafter\newcommand\csname VThree@GuardBytesCheck\endcsname{pass}
 \expandafter\newcommand\csname VThree@GuardsFailed\endcsname{4}
 \expandafter\newcommand\csname VThree@GuardsTotal\endcsname{6}
+\expandafter\newcommand\csname VThree@GcVsPts\endcsname{+47.8 [+33.7, +62.6]}
+\expandafter\newcommand\csname VThree@GcVsPtsMatched\endcsname{+51.9 [+37.0, +69.1]}
+\expandafter\newcommand\csname VThree@GcVsRule\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@CtganVsPts\endcsname{+157.1 [+141.8, +173.6]}
+\expandafter\newcommand\csname VThree@CtganVsPtsMatched\endcsname{+138.5 [+123.2, +155.2]}
+\expandafter\newcommand\csname VThree@CtganVsRule\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@TvaeVsPts\endcsname{+91.9 [+71.9, +112.3]}
+\expandafter\newcommand\csname VThree@TvaeVsPtsMatched\endcsname{+85.2 [+60.0, +110.0]}
+\expandafter\newcommand\csname VThree@TvaeVsRule\endcsname{PROMOTE}
+\expandafter\newcommand\csname VThree@ArfVsPts\endcsname{+10.8 [\ensuremath{-}3.5, +29.5]}
+\expandafter\newcommand\csname VThree@ArfVsPtsMatched\endcsname{+6.1 [\ensuremath{-}16.5, +28.7]}
+\expandafter\newcommand\csname VThree@ArfVsRule\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@MethodsStatPassMinPct\endcsname{6.40\%}
+\expandafter\newcommand\csname VThree@MethodsStatPassMaxPct\endcsname{8.85\%}
+\expandafter\newcommand\csname VThree@MethodsFlipMaxPct\endcsname{0.30\%}
+\expandafter\newcommand\csname VThree@MethodsNullReplicates\endcsname{2{,}000}
+\expandafter\newcommand\csname VThree@MethodsRatioMin\endcsname{79}
+\expandafter\newcommand\csname VThree@MethodsRatioMax\endcsname{1{,}644}
 \expandafter\newcommand\csname VThree@GcId\endcsname{\texttt{sdv-gaussian-copula}}
 \expandafter\newcommand\csname VThree@GcTrg\endcsname{\ensuremath{-}0.598 [\ensuremath{-}0.721, \ensuremath{-}0.482]}
 \expandafter\newcommand\csname VThree@GcTrgPoint\endcsname{\ensuremath{-}0.598}
 \expandafter\newcommand\csname VThree@GcMatched\endcsname{\ensuremath{-}0.828 [\ensuremath{-}1.013, \ensuremath{-}0.641]}
+\expandafter\newcommand\csname VThree@GcScore\endcsname{40.2 [27.9, 51.8]}
+\expandafter\newcommand\csname VThree@GcScorePoint\endcsname{40.2}
+\expandafter\newcommand\csname VThree@GcMatchedScorePoint\endcsname{17.2}
 \expandafter\newcommand\csname VThree@GcMlp\endcsname{\ensuremath{-}0.811}
 \expandafter\newcommand\csname VThree@GcFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@GcCells\endcsname{44}
 \expandafter\newcommand\csname VThree@GcNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@GcC2st\endcsname{0.992}
 \expandafter\newcommand\csname VThree@GcRegression\endcsname{\ensuremath{-}0.168}
+\expandafter\newcommand\csname VThree@GcRegressionScore\endcsname{83.2}
 \expandafter\newcommand\csname VThree@GcBinary\endcsname{\ensuremath{-}0.612}
+\expandafter\newcommand\csname VThree@GcBinaryScore\endcsname{38.8}
 \expandafter\newcommand\csname VThree@GcMulticlass\endcsname{\ensuremath{-}1.015}
+\expandafter\newcommand\csname VThree@GcMulticlassScore\endcsname{\ensuremath{-}1.5}
 \expandafter\newcommand\csname VThree@GcBytesMed\endcsname{140{,}675.5}
 \expandafter\newcommand\csname VThree@GcBytesMax\endcsname{1{,}145{,}929}
 \expandafter\newcommand\csname VThree@GcRealism\endcsname{0.111}
@@ -334,14 +427,20 @@
 \expandafter\newcommand\csname VThree@CtganTrg\endcsname{\ensuremath{-}1.692 [\ensuremath{-}1.827, \ensuremath{-}1.552]}
 \expandafter\newcommand\csname VThree@CtganTrgPoint\endcsname{\ensuremath{-}1.692}
 \expandafter\newcommand\csname VThree@CtganMatched\endcsname{\ensuremath{-}1.694 [\ensuremath{-}1.842, \ensuremath{-}1.546]}
+\expandafter\newcommand\csname VThree@CtganScore\endcsname{\ensuremath{-}69.2 [\ensuremath{-}82.7, \ensuremath{-}55.2]}
+\expandafter\newcommand\csname VThree@CtganScorePoint\endcsname{\ensuremath{-}69.2}
+\expandafter\newcommand\csname VThree@CtganMatchedScorePoint\endcsname{\ensuremath{-}69.4}
 \expandafter\newcommand\csname VThree@CtganMlp\endcsname{\ensuremath{-}1.656}
 \expandafter\newcommand\csname VThree@CtganFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@CtganCells\endcsname{44}
 \expandafter\newcommand\csname VThree@CtganNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@CtganC2st\endcsname{0.996}
 \expandafter\newcommand\csname VThree@CtganRegression\endcsname{\ensuremath{-}1.502}
+\expandafter\newcommand\csname VThree@CtganRegressionScore\endcsname{\ensuremath{-}50.2}
 \expandafter\newcommand\csname VThree@CtganBinary\endcsname{\ensuremath{-}1.888}
+\expandafter\newcommand\csname VThree@CtganBinaryScore\endcsname{\ensuremath{-}88.8}
 \expandafter\newcommand\csname VThree@CtganMulticlass\endcsname{\ensuremath{-}1.685}
+\expandafter\newcommand\csname VThree@CtganMulticlassScore\endcsname{\ensuremath{-}68.5}
 \expandafter\newcommand\csname VThree@CtganBytesMed\endcsname{1{,}053{,}957.5}
 \expandafter\newcommand\csname VThree@CtganBytesMax\endcsname{5{,}404{,}151}
 \expandafter\newcommand\csname VThree@CtganRealism\endcsname{0.000}
@@ -355,14 +454,20 @@
 \expandafter\newcommand\csname VThree@TvaeTrg\endcsname{\ensuremath{-}1.039 [\ensuremath{-}1.262, \ensuremath{-}0.822]}
 \expandafter\newcommand\csname VThree@TvaeTrgPoint\endcsname{\ensuremath{-}1.039}
 \expandafter\newcommand\csname VThree@TvaeMatched\endcsname{\ensuremath{-}1.161 [\ensuremath{-}1.380, \ensuremath{-}0.945]}
+\expandafter\newcommand\csname VThree@TvaeScore\endcsname{\ensuremath{-}3.9 [\ensuremath{-}26.2, 17.8]}
+\expandafter\newcommand\csname VThree@TvaeScorePoint\endcsname{\ensuremath{-}3.9}
+\expandafter\newcommand\csname VThree@TvaeMatchedScorePoint\endcsname{\ensuremath{-}16.1}
 \expandafter\newcommand\csname VThree@TvaeMlp\endcsname{\ensuremath{-}1.045}
 \expandafter\newcommand\csname VThree@TvaeFailed\endcsname{5}
 \expandafter\newcommand\csname VThree@TvaeCells\endcsname{44}
 \expandafter\newcommand\csname VThree@TvaeNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@TvaeC2st\endcsname{0.977}
 \expandafter\newcommand\csname VThree@TvaeRegression\endcsname{\ensuremath{-}0.700}
+\expandafter\newcommand\csname VThree@TvaeRegressionScore\endcsname{30.0}
 \expandafter\newcommand\csname VThree@TvaeBinary\endcsname{\ensuremath{-}1.432}
+\expandafter\newcommand\csname VThree@TvaeBinaryScore\endcsname{\ensuremath{-}43.2}
 \expandafter\newcommand\csname VThree@TvaeMulticlass\endcsname{\ensuremath{-}0.986}
+\expandafter\newcommand\csname VThree@TvaeMulticlassScore\endcsname{1.4}
 \expandafter\newcommand\csname VThree@TvaeBytesMed\endcsname{475{,}125.5}
 \expandafter\newcommand\csname VThree@TvaeBytesMax\endcsname{3{,}340{,}780}
 \expandafter\newcommand\csname VThree@TvaeRealism\endcsname{0.000}
@@ -376,14 +481,20 @@
 \expandafter\newcommand\csname VThree@ArfTrg\endcsname{\ensuremath{-}0.228 [\ensuremath{-}0.416, \ensuremath{-}0.100]}
 \expandafter\newcommand\csname VThree@ArfTrgPoint\endcsname{\ensuremath{-}0.228}
 \expandafter\newcommand\csname VThree@ArfMatched\endcsname{\ensuremath{-}0.370 [\ensuremath{-}0.549, \ensuremath{-}0.235]}
+\expandafter\newcommand\csname VThree@ArfScore\endcsname{77.2 [58.4, 90.0]}
+\expandafter\newcommand\csname VThree@ArfScorePoint\endcsname{77.2}
+\expandafter\newcommand\csname VThree@ArfMatchedScorePoint\endcsname{63.0}
 \expandafter\newcommand\csname VThree@ArfMlp\endcsname{\ensuremath{-}0.230}
 \expandafter\newcommand\csname VThree@ArfFailed\endcsname{0}
 \expandafter\newcommand\csname VThree@ArfCells\endcsname{44}
 \expandafter\newcommand\csname VThree@ArfNotApplicable\endcsname{0}
 \expandafter\newcommand\csname VThree@ArfC2st\endcsname{0.941}
 \expandafter\newcommand\csname VThree@ArfRegression\endcsname{\ensuremath{-}0.071}
+\expandafter\newcommand\csname VThree@ArfRegressionScore\endcsname{92.9}
 \expandafter\newcommand\csname VThree@ArfBinary\endcsname{\ensuremath{-}0.412}
+\expandafter\newcommand\csname VThree@ArfBinaryScore\endcsname{58.8}
 \expandafter\newcommand\csname VThree@ArfMulticlass\endcsname{\ensuremath{-}0.203}
+\expandafter\newcommand\csname VThree@ArfMulticlassScore\endcsname{79.7}
 \expandafter\newcommand\csname VThree@ArfBytesMed\endcsname{2{,}937{,}782.5}
 \expandafter\newcommand\csname VThree@ArfBytesMax\endcsname{24{,}068{,}428}
 \expandafter\newcommand\csname VThree@ArfRealism\endcsname{0.278}
@@ -469,5 +580,5 @@
 \expandafter\newcommand\csname VThree@WideSixbNonzero\endcsname{3}
 \expandafter\newcommand\csname VThree@WideSixbFamilies\endcsname{11}
 \expandafter\newcommand\csname VThree@WideSixbSignFlipP\endcsname{0.125}
-\expandafter\newcommand\csname VThree@HeroSvgSha\endcsname{bcd83c2f81b5}
-\expandafter\newcommand\csname VThree@HeroPdfSha\endcsname{40a05869ea72}
+\expandafter\newcommand\csname VThree@HeroSvgSha\endcsname{2e7a8dda62ac}
+\expandafter\newcommand\csname VThree@HeroPdfSha\endcsname{4d148bf55b57}
