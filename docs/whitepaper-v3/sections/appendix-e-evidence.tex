@@ -1,4 +1,4 @@
-\section{A FIT-only evidence bank}\label{sec:evidence}
+\section{The FIT-only evidence bank}\label{app:evidence}
 
 Learned encoders need many training episodes, and every episode must be computed from the rows the encoder would see at fit time and nothing else.
 The evidence bank (\path{engine/dope-core/src/evidence/}) is the summary those encoders read.
@@ -10,4 +10,4 @@ It is a pure function of the fitting rows, the column schema, a tier and a seed,
   \item \textbf{Frozen layout, no cache.} The output is a set of fixed-width tensors with validity bitmasks: \VThree{EvColDim} slots per column, \VThree{EvEdgeDim} per column pair, \VThree{EvClassDim} per class, \VThree{EvClassColDim} per class and column, \VThree{EvGroupDim} per nominal group and \VThree{EvGlobDim} global slots, arranged in \VThree{EvTiers} tiers from single-pass marginal summaries to a closed-loop probe of a fitted packet. The layout is fixed by \path{contracts/evidence-layout-v1.json} (SHA-256 prefix \texttt{\VThree{EvLayoutSha}}), and nothing is cached across episodes or tables.
 \end{itemize}
 An episode factory built on the same C ABI draws a fresh random split of a table into fitting and query rows for every episode and computes the analytic packet and the evidence from the fitting rows.
-The released analytic encoder uses only the bank's primitives (support floor, canonical row order); the full tensors feed the learned encoder of \S\ref{sec:learned}.
+The released analytic encoder uses only the bank's primitives (support floor, canonical row order); the full tensors are the input of the learned refinement noted in \S\ref{sec:limits}.

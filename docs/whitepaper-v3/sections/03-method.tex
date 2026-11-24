@@ -10,7 +10,7 @@ Every statistic in $a$ is computed from $D_{\mathrm{fit}}$ alone; nothing is fit
 Every \cli{auto-v8} artifact is a \texttt{DPA1} container: a \VThree{DpaHeaderBytes}-byte header holding a magic, an encoder tag and a weights fingerprint (all zero when no learned weights are needed), followed by the payload.
 The payload is one of two candidates fitted on all of $D_{\mathrm{fit}}$:
 \begin{itemize}
-  \item \textbf{Format~1}, the program of earlier releases~\citep{dope2026v1}: a safetensors file holding one compressed stream with quantile marginals on a normal-score grid, a regime mixture of Gaussian copulas, and a target model made of a residual network and boosted oblivious trees, with bit depths chosen by a rate--distortion search. It is fitted within $B-\VThree{DpaHeaderBytes}$ bytes.
+  \item \textbf{Format~1}, a compressed program~\citep{dope2026v1}: a safetensors file holding one compressed stream with quantile marginals on a normal-score grid, a regime mixture of Gaussian copulas, and a target model made of a residual network and boosted oblivious trees, with bit depths chosen by a rate--distortion search. It is fitted within $B-\VThree{DpaHeaderBytes}$ bytes.
   \item \textbf{\texttt{DSE8}}, preceded by a compact column-schema section (types and level names needed to write raw rows) and fitted within the room that remains. If the schema leaves fewer than \VThree{MinPacketRoom}~bytes, \cli{auto-v8} writes Format~1 directly.
 \end{itemize}
 

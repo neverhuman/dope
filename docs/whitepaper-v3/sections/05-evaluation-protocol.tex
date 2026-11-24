@@ -25,7 +25,7 @@ Values are averaged over sample seeds; a cell takes the minimum over the two sta
 \begin{equation}\label{eq:trg}
   \TRG = \frac{1}{|\mathcal T|}\sum_{t\in\mathcal T}\frac{1}{|\mathcal F_t|}\sum_{f\in\mathcal F_t}\frac{1}{|\mathcal C_f|}\sum_{c\in\mathcal C_f}\ \min_{a}\ \bar v_{c,a}.
 \end{equation}
-Zero means that the synthetic rows train the auditors as well as a real twin the size of the fitting split; higher is better. For a single readable headline we also report the \emph{Transfer Score} $\VThree{ScoreScale}\,(1+\mathrm{TRG})$ in points, as the README does. It is a fixed relabel of TRG, so ranks, the Holm test and every decision are unchanged and intervals scale by \VThree{ScoreScale}. A score of \VThree{ScoreScale} is the real twin; on the report look the copy control of $A$, which returns the fitting rows themselves, scores \VThree{CopyAScorePoint}. Only at $m=\VThree{MatchedMult}$ do the synthetic sample and the twin have the same size.
+Zero means that the synthetic rows train the auditors as well as a real twin the size of the fitting split; higher is better. We rank generators by the \emph{Transfer Score} $\VThree{ScoreScale}\times(1+\mathrm{TRG})$ in points, as the README does. It is a fixed relabel of TRG, so ranks, the Holm test and every decision are unchanged and intervals scale by \VThree{ScoreScale}. A score of \VThree{ScoreScale} is the real twin; on the report look the copy control of $A$, which returns the fitting rows themselves, scores \VThree{CopyAScorePoint}. Only at $m=\VThree{MatchedMult}$ do the synthetic sample and the twin have the same size.
 A third auditor, a seeded MLP, is aggregated the same way, held out of the statistic and read only by a guard.
 A (cell, auditor) unit enters only if it is informative on real data alone: the auditor fitted on $A$ must beat the null on $T$ by a material margin with a positive bootstrap lower bound, and the twin's retention must be close to one.
 
@@ -54,7 +54,13 @@ These rates are reported beside the decision and do not enter it.
 
 \paragraph{The look.}
 Under a pause on the confirmation, holdout and sealed panels, every number in this paper comes from development (DEV) tables.
-The encoder was selected on DEV in steps recorded in the scoreboard's README before each was scored: a screen on a small DEV schedule; a decision on a wider DEV schedule, where \cli{auto-v8} had to beat \VThree{BaseId} by at least \VThree{MinDelta} in TRG with the paired lower bound above zero; and a single report on fresh row splits of the same DEV tables, planned before selection and scored once after it.
+The encoder was selected on DEV in steps recorded in the scoreboard's README before each was scored: a screen on a small DEV schedule, a decision on a wider DEV schedule, and a single report on fresh row splits of the same DEV tables, planned before selection and scored once after it.
 No guard, threshold or parameter was tuned on the report.
-The one comparison in the report receipt, \VThree{CandId} against \VThree{BaseId}, is the pre-registered one, so Holm's adjustment covers $m=\VThree{HolmM}$ comparison.
+The third-party generators were fitted and scored on the same report schedule, once each, after the encoder was fixed.
 The receipts identify the schedule by SHA-256 (prefix \texttt{\VThree{ScheduleSha}}) but do not include it.
+
+\paragraph{Comparisons with the third-party generators.}
+Each third-party generator is paired with DOPE on their common cells, and Holm's adjustment runs over the \VThree{MethodsHolmM} pairs.
+The receipt that scored the generators (\path{compare-methods.json}) asks whether each generator improves on DOPE.
+The direction reported in Table~\ref{tab:paired}, DOPE against each generator, was re-reduced after scoring from the same per-cell scores with the same \texttt{dope\_kpi} build, which reproduces the committed receipt byte for byte (\path{evidence/paper/} under the scoreboard).
+The paired differences and intervals are the same numbers with the sign reversed; only the one-sided $p$-values and the guard outcomes depend on the direction.
