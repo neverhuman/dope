@@ -1,0 +1,167 @@
+{
+ "schema": "dope.addendum-h-a/manifest/v1",
+ "addendum_h_text_sha256": "c7e446a801874703b3b4e38e9c0ac1f01365ac687b848ae1814db4a03a384b98",
+ "role": "descriptive; no role in Addendum G G4, model selection or release qualification",
+ "dope_kpi": {
+  "path": "/home/ubuntu/dope-data/kpi-runs/v3-h-s9-12/bin/dope_kpi",
+  "sha256": "ea855a89d4fad31ae1d197f3f2a1045a84daf98ec6b527a8e03c71b3653c2863",
+  "version_on_xbabe0": "dope_kpi 3.0.0"
+ },
+ "inputs": {
+  "schedule-look-dev.jsonl": "beaa2a0fa3e2bcc44c37f23bf15adca0c2ff5b4adb5f212a198c99f3d23f71a2",
+  "realref.jsonl": "5aa9d2d628409feb64bf54435550745b3f483ebb4841e670991df27cb07c3970",
+  "families.jsonl": "3fa7f21fe4b6eceab4148fdf51bc298cde5f1733841296e2880fc3f473c0718b",
+  "plan/baseline-v250.panel.json": "d5bd12b0096238a11391e77fa9538123215e7cb54b23ff990f65ad5091bfbf84",
+  "plan/ag-dev-tables.txt": "6fe722304bdef26bec60b5fd403dbc39e4a31e92bd1da191ac7a512754ef2ff1",
+  "f-primary.json": "892a8ee0442aec76a442eb7bc28fe6951c5187a54ccc92158ed5d7e440c44c73",
+  "arms.json": "1396ef6ab8204db05dc5379444259c3a8be05c16fff9c85a6e6e97f83f8ff6f4",
+  "arms-baselines.json": "1eeabd2975fd81f3e99afc6259265a6e7bc0d6ae460b06d23564b8db65e31ca3",
+  "report-arms.json": "71b0eea4960ad31d3627165a3ac57ba7247c3aa27d78fb0492bf950f440d980f",
+  "report-MANIFEST.json": "c44db0cc0178fab281ff2e9eceb5215be638b598e21c84cf907b15049262b143"
+ },
+ "panel_canonical_sha256": "8d18e7837d6cc1bdf640f8e695045225a9c66d0d330ee4e835f8058cdcb7b29e",
+ "contract_sha256": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
+ "baselines_pins": {
+  "arms-baselines.json": "1eeabd2975fd81f3e99afc6259265a6e7bc0d6ae460b06d23564b8db65e31ca3",
+  "make_arms.py": "5bf45e1160e53052b611c914e77d71be3056704347039403a55bb68652b547da",
+  "baselines.py": "b091e0ddd7dde26c274602ac5e697817f206cea1bc69d92bcd85f9e9b25abed1",
+  "requirements-venv.lock": "31be3c38f34eff639b6b9f5410a54fa4e49cb424fc0359795e8789cac3e362ea",
+  "report MANIFEST.json": "c44db0cc0178fab281ff2e9eceb5215be638b598e21c84cf907b15049262b143"
+ },
+ "venv_versions": "3.12.3 sdv=2.2.0 ctgan=0.13.0 copulas=0.15.0 rdt=2.1.0 arfpy=0.1.1 torch=2.10.0+cu128 sklearn=1.7.2",
+ "threads": {
+  "sdv-gaussian-copula": 3,
+  "arfpy-arf": 3,
+  "sdv-ctgan": 7,
+  "sdv-tvae": 4
+ },
+ "jobs": {
+  "h-a-fast": [
+   "sdv-gaussian-copula",
+   "arfpy-arf"
+  ],
+  "h-a-ctgan": [
+   "sdv-ctgan"
+  ],
+  "h-a-tvae": [
+   "sdv-tvae"
+  ]
+ },
+ "argv": {
+  "emit (xbabe0, per method; one more identical pass iff the first left timeout rows)": [
+   "{K}",
+   "emit-cli",
+   "--arena",
+   "/home/ubuntu/dope-data/flat/s3-v250",
+   "--schedule",
+   "schedule-look-dev.jsonl",
+   "--out",
+   ".",
+   "--arm-file",
+   "arms.json",
+   "--arm",
+   "{ARM}",
+   "--threads",
+   "{T}",
+   "--timeout-s",
+   "14400",
+   "--resume"
+  ],
+  "score (xbabe0, per method)": [
+   "{K}",
+   "score",
+   "--arena",
+   "/home/ubuntu/dope-data/flat/s3-v250",
+   "--schedule",
+   "schedule-look-dev.jsonl",
+   "--realref",
+   "realref.jsonl",
+   "--emit-dir",
+   ".",
+   "--arm",
+   "{ARM}",
+   "--out",
+   "score/{ARM}",
+   "--budget-bytes",
+   "1000000000",
+   "--privacy-rows",
+   "1024",
+   "--threads",
+   "{T}"
+  ],
+  "guards (xbabe0, per method)": [
+   "{K}",
+   "guards",
+   "--run-dir",
+   ".",
+   "--arm",
+   "{ARM}",
+   "--threads",
+   "{T}"
+  ],
+  "primary (xbabe2)": [
+   "{K}",
+   "primary",
+   "--run-dir",
+   ".",
+   "--schedule",
+   "schedule-look-dev.jsonl",
+   "--panel",
+   "dev",
+   "--dev-tables",
+   "plan/ag-dev-tables.txt",
+   "--arm",
+   "served-auto-v8",
+   "--arm",
+   "twin_c",
+   "--arm",
+   "copy_a",
+   "--arm",
+   "bootstrap_a",
+   "--arm",
+   "indep_marginals",
+   "--arm",
+   "label_shuffle",
+   "--arm",
+   "sdv-gaussian-copula",
+   "--arm",
+   "sdv-ctgan",
+   "--arm",
+   "sdv-tvae",
+   "--arm",
+   "arfpy-arf",
+   "--out",
+   "primary-h.json"
+  ],
+  "compare (xbabe2, per method)": [
+   "{K}",
+   "compare",
+   "--run-dir",
+   ".",
+   "--schedule",
+   "schedule-look-dev.jsonl",
+   "--panel",
+   "dev",
+   "--dev-tables",
+   "plan/ag-dev-tables.txt",
+   "--candidate",
+   "served-auto-v8",
+   "--baseline",
+   "{METHOD}",
+   "--out",
+   "v3-vs-{METHOD}-h.json"
+  ]
+ },
+ "argv_reference": ".agent/tools/v3-look/final_look.sh receipts) for primary/compare; xbabe0 run_method.sh for emit/score/guards",
+ "reused_arms_check": "file digests = f-primary.json inputs; precheck-reused.json rows = f-primary.json rows",
+ "report_manifest_comparison": {
+  "report_manifest_sha256": "c44db0cc0178fab281ff2e9eceb5215be638b598e21c84cf907b15049262b143",
+  "permitted_differences": [
+   "binary: isolated ea855a89 path for dope_kpi",
+   "schedule path schedule-look-dev.jsonl and run dir",
+   "emit --timeout-s 3600 -> 14400 (xbabe0 job logs bl-fast/bl-ctgan/bl-tvae)",
+   "T per method = methods[].wall.threads"
+  ],
+  "result": "every other token of emit/score/guards equals the report manifest; T equals wall.threads"
+ }
+}

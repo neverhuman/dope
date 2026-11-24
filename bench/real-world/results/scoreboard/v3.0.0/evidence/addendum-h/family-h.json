@@ -1,0 +1,72 @@
+{
+ "schema": "dope.addendum-h-family/v1",
+ "look": "data seeds 9-12 (part a)",
+ "m": 4,
+ "rule": "Holm m=4 over p_one_sided; a singleton PROMOTE whose adjusted p misses alpha becomes HOLD; 'replicates' = 4x lower bound > 0 and Holm p < 0.05",
+ "comparisons": [
+  {
+   "receipt": "v3-vs-arfpy-arf-h.json",
+   "receipt_sha256": "e8d33a24cf182b9532b75eb12883ac5415104a1a32639edc5f64bbdd89d52d5c",
+   "baseline": "arfpy-arf",
+   "delta_points_4x": 17.8207657385,
+   "ci_points_4x": [
+    -6.4808523923,
+    43.5609427805
+   ],
+   "p_one_sided": 0.080891910809,
+   "p_holm_m4": 0.080891910809,
+   "alpha": 0.05,
+   "outcome_singleton": "HOLD",
+   "outcome_holm_m4": "HOLD",
+   "replicates": false
+  },
+  {
+   "receipt": "v3-vs-sdv-ctgan-h.json",
+   "receipt_sha256": "fe5628b34134f90f089ef1f796bda5066df4e3724c112c923c7660bdb1e13d4f",
+   "baseline": "sdv-ctgan",
+   "delta_points_4x": 139.2627488176,
+   "ci_points_4x": [
+    121.4323877514,
+    158.5048805838
+   ],
+   "p_one_sided": 9.9990001e-05,
+   "p_holm_m4": 0.000399960004,
+   "alpha": 0.05,
+   "outcome_singleton": "PROMOTE",
+   "outcome_holm_m4": "PROMOTE",
+   "replicates": true
+  },
+  {
+   "receipt": "v3-vs-sdv-gaussian-copula-h.json",
+   "receipt_sha256": "518563fdbc0b73d0f4d94a5eb0425eb5b215b74223438303a3b895b2edb735ce",
+   "baseline": "sdv-gaussian-copula",
+   "delta_points_4x": 46.8786895283,
+   "ci_points_4x": [
+    36.591741948599996,
+    58.156019821
+   ],
+   "p_one_sided": 9.9990001e-05,
+   "p_holm_m4": 0.000399960004,
+   "alpha": 0.05,
+   "outcome_singleton": "HOLD",
+   "outcome_holm_m4": "HOLD",
+   "replicates": true
+  },
+  {
+   "receipt": "v3-vs-sdv-tvae-h.json",
+   "receipt_sha256": "4fb4c744065ba0f2b0a47e90ad156b6902885ef81e41f21c1b441e1d77e4e510",
+   "baseline": "sdv-tvae",
+   "delta_points_4x": 89.7893377553,
+   "ci_points_4x": [
+    56.3674630694,
+    121.28050961150001
+   ],
+   "p_one_sided": 9.9990001e-05,
+   "p_holm_m4": 0.000399960004,
+   "alpha": 0.05,
+   "outcome_singleton": "PROMOTE",
+   "outcome_holm_m4": "PROMOTE",
+   "replicates": true
+  }
+ ]
+}

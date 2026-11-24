@@ -237,3 +237,110 @@ def _versus_claims(info: dict[str, Any], release: dict[str, dict[str, Any]],
          and task["Analytic"]["regression"] > task["Cand"]["regression"]
          and task["Analytic"]["binary"] < task["Cand"]["binary"] and task["Analytic"]["multiclass"] < task["Cand"]["multiclass"]),
     ]
+
+
+# Addendum H part (a): the four methods on the DEV row splits of the final selection look (data seeds 9-12),
+# reduced as `served-auto-v8 - method`, Holm (m = 4) over the four pairs. Descriptive; a second block of
+# Table 2 and a results paragraph. The two looks are never pooled.
+SECOND = "evidence/addendum-h"
+SECOND_CAND = "served-auto-v8"
+SECOND_REUSED = (SECOND_CAND, "twin_c", "copy_a", "bootstrap_a", "indep_marginals", "label_shuffle")
+SECOND_TEXT = ("ADDENDUM_H.md", "PREREG_LOG-H.txt", "MANIFEST-h.json")
+
+
+def holm_outcome(c: dict[str, Any], p_holm: float) -> str:
+    """The contract rule with the Holm-adjusted p in place of the pair's own (render_paper_paired.rs)."""
+    dec = c["decision"]
+    alpha = next(x["threshold"] for x in dec["conditions"] if x["name"] == "holm_p")
+    if p_holm < alpha and all(x["check"] == "pass" for x in dec["conditions"] if x["name"] != "holm_p") \
+            and all(g["check"] == "pass" for g in dec["guards"]):
+        return "PROMOTE"
+    return "REJECT" if dec["outcome"] == "REJECT" else "HOLD"
+
+
+def load_second(scoreboard: str, read: Callable[[str], dict], exists: Callable[[str], bool],
+                sha256: Callable[[str], str], look: dict[str, Any],
+                same_run: Callable[[dict, dict, str], None]) -> dict[str, Any] | None:
+    """`family-h.json` and what it binds, checked against the committed final look's `primary.json` (`look`)."""
+    base = f"{scoreboard}/{SECOND}"
+    fam_rel, prim_rel = f"{base}/family-h.json", f"{base}/primary-h.json"
+    if not exists(fam_rel):
+        return None
+    paths = [fam_rel, prim_rel] + [f"{base}/{n}" for n in SECOND_TEXT]
+    missing = [p for p in paths if not exists(p)]
+    if missing:
+        raise MethodsError(f"second-look evidence is incomplete: {missing}")
+    fam, prim = read(fam_rel), read(prim_rel)
+    same_run(look, prim, prim_rel)
+    reused = {a["arm_id"]: a for a in look["arms"] if a["arm_id"] in SECOND_REUSED}
+    if sorted(reused) != sorted(SECOND_REUSED) or \
+            {a["arm_id"]: a for a in prim["arms"] if a["arm_id"] in reused} != reused:
+        raise MethodsError(f"{prim_rel} does not repeat the final look's DOPE and control rows field for field")
+    if sorted(a["arm_id"] for a in prim["arms"] if a["arm_id"] not in reused) != sorted(ROLES):
+        raise MethodsError(f"{prim_rel}: expected the arms {sorted(ROLES)} beside the reused rows")
+    if fam.get("schema") != "dope.addendum-h-family/v1" or fam.get("m") != len(ROLES) \
+            or sorted(r["baseline"] for r in fam["comparisons"]) != sorted(ROLES):
+        raise MethodsError(f"{fam_rel} is not the Holm family over the four methods")
+    versus = {}
+    for row in fam["comparisons"]:
+        rel = f"{base}/{row['receipt']}"
+        if row["receipt"] != f"v3-vs-{row['baseline']}-h.json" or not exists(rel) or sha256(rel) != row["receipt_sha256"]:
+            raise MethodsError(f"{fam_rel} does not bind {rel}")
+        rec = read(rel)
+        same_run(prim, rec, rel)
+        if len(rec["comparisons"]) != 1 or (rec["comparisons"][0]["id"], rec["comparisons"][0]["baseline"]) \
+                != (SECOND_CAND, row["baseline"]):
+            raise MethodsError(f"{rel} must hold exactly {SECOND_CAND} against {row['baseline']}")
+        for arm in (SECOND_CAND, row["baseline"]):
+            for key in ("rows_sha256", "guards_sha256", "guards_summary_sha256"):
+                if rec["inputs"][key].get(arm) != prim["inputs"][key].get(arm):
+                    raise MethodsError(f"{rel} and {prim_rel} differ on {key} for {arm}")
+        versus[row["baseline"]] = rec["comparisons"][0]
+        paths.append(rel)
+    adjusted = holm({k: c["p_one_sided"] for k, c in versus.items()})
+    rule = {k: holm_outcome(c, adjusted[k]) for k, c in versus.items()}
+    for row in fam["comparisons"]:
+        k, c = row["baseline"], versus[row["baseline"]]
+        if abs(row["p_holm_m4"] - adjusted[k]) > 1e-12 or row["outcome_holm_m4"] != rule[k] \
+                or row["replicates"] != (c["ci_low"] > 0 and adjusted[k] < row["alpha"]):
+            raise MethodsError(f"{fam_rel}: the row for {k} differs from Holm over the four receipts")
+    cand = next(a for a in prim["arms"] if a["arm_id"] == SECOND_CAND)
+    if any(read(rel)["tool"] != prim["tool"] for rel in paths[len(SECOND_TEXT) + 2:]):
+        raise MethodsError("the second look's receipts name more than one dope_kpi build")
+    return {"versus": versus, "holm": adjusted, "rule": rule, "family": fam, "cand": cand, "paths": paths,
+            "tool": prim["tool"]}
+
+
+def second_macros(info: dict[str, Any] | None, ci: Callable, sha256: Callable[[str], str],
+                  scale: float) -> list[tuple[str, str]]:
+    if info is None:
+        return []
+    out = [("SecondLookCells", str(info["cand"]["primary"]["cells"])),
+           ("SecondLookFamilies", str(info["cand"]["primary"]["families"])),
+           ("SecondLookPrimarySha", sha256(info["paths"][1])[:12]), ("SecondLookFamilySha", sha256(info["paths"][0])[:12]),
+           ("SecondLookToolGitSha", info["tool"]["git_sha"]), ("SecondLookToolVersion", info["tool"]["version"])]
+    for method, v in info["versus"].items():
+        role = ROLES[method]
+        out += [(f"SecondLook{role}VsPts", ci(scale * v["delta"], scale * v["ci_low"], scale * v["ci_high"], True, 1)),
+                (f"SecondLook{role}VsRule", info["rule"][method])]
+    return out
+
+
+def second_claims(info: dict[str, Any] | None) -> list[tuple[str, bool]]:
+    """The second-look prose of sections 0, 1, 5, 6 and 8, against the Addendum H part (a) receipts."""
+    if info is None:
+        return [("the second-look receipts are committed", False)]
+    v = {ROLES[k]: c for k, c in info["versus"].items()}
+    rule = {ROLES[k]: o for k, o in info["rule"].items()}
+    rep = {ROLES[r["baseline"]]: r["replicates"] for r in info["family"]["comparisons"]}
+    failed = {r: {g["name"] for g in c["decision"]["guards"] if g["check"] == "fail"} for r, c in v.items()}
+    return [
+        ("on the second look the SDV gains replicate (lower bound above zero, Holm p below alpha) and the ARF "
+         "interval contains zero", rep == {"Gc": True, "Tvae": True, "Ctgan": True, "Arf": False}
+         and v["Arf"]["ci_low"] < 0 < v["Arf"]["delta"]),
+        ("on the second look the rule is PROMOTE against TVAE and CTGAN, and HOLD against the Gaussian copula "
+         "(tasks, privacy) and ARF (interval, tasks, mlp, realism)",
+         rule == {"Tvae": "PROMOTE", "Ctgan": "PROMOTE", "Gc": "HOLD", "Arf": "HOLD"}
+         and failed == {"Tvae": set(), "Ctgan": set(), "Gc": {"task_ci_low", "privacy_coverage_delta"},
+                        "Arf": {"task_ci_low", "mlp_delta", "realism_coverage_delta"}}),
+    ]

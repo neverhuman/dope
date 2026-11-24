@@ -202,6 +202,56 @@ def look(name: str) -> dict:
     return load(f"{final_mod.LOOK}/{name}")
 
 
+def second_info(files: dict | None = None) -> dict | None:
+    """The committed second look (Addendum H part (a)), with receipts replaced via `files` (by file name)."""
+    files = files or {}
+
+    def read_json(rel: str) -> dict:
+        name = rel.rsplit("/", 1)[1]
+        return copy.deepcopy(files[name]) if name in files else rp.read_json(rel)
+
+    def exists(rel: str) -> bool:
+        name = rel.rsplit("/", 1)[1]
+        return files[name] is not None if name in files else (rp.REPO / rel).is_file()
+    return methods_mod.load_second(rp.SCOREBOARD, read_json, exists, rp.sha256, look("primary.json"), rp.check_same_run)
+
+
+class SecondLook(unittest.TestCase):
+    def test_committed_second_look_binds_its_receipts_and_replicates_the_sdv_gains(self):
+        info = second_info()
+        self.assertEqual(sorted(info["versus"]), sorted(methods_mod.ROLES))
+        self.assertEqual(methods_mod.second_claims(info) and [ok for _, ok in methods_mod.second_claims(info)], [True, True])
+        macros = dict(methods_mod.second_macros(info, rp.ci, rp.sha256, rp.SCORE_SCALE))
+        self.assertTrue(macros["SecondLookArfVsPts"].startswith("+17.8"), macros)
+        self.assertEqual(macros["SecondLookCtganVsRule"], "PROMOTE")
+        self.assertFalse(any(rp.PRIOR_MACRO.match(n) for n in macros), sorted(macros))
+
+    def test_absent_second_look_is_none_and_its_prose_fails(self):
+        self.assertIsNone(second_info({"family-h.json": None}))
+        self.assertEqual([ok for _, ok in methods_mod.second_claims(None)], [False])
+
+    def test_a_reused_row_that_differs_from_the_final_look_is_an_error(self):
+        prim = rp.read_json(f"{rp.SCOREBOARD}/{methods_mod.SECOND}/primary-h.json")
+        next(a for a in prim["arms"] if a["arm_id"] == "copy_a")["primary"]["trg"] += 0.001
+        with self.assertRaisesRegex(methods_mod.MethodsError, "field for field"):
+            second_info({"primary-h.json": prim})
+
+    def test_an_unbound_or_changed_pair_receipt_is_an_error(self):
+        fam = rp.read_json(f"{rp.SCOREBOARD}/{methods_mod.SECOND}/family-h.json")
+        fam["comparisons"][0]["receipt_sha256"] = "0" * 64
+        with self.assertRaisesRegex(methods_mod.MethodsError, "does not bind"):
+            second_info({"family-h.json": fam})
+        fam = rp.read_json(f"{rp.SCOREBOARD}/{methods_mod.SECOND}/family-h.json")
+        fam["comparisons"][0]["replicates"] = not fam["comparisons"][0]["replicates"]
+        with self.assertRaisesRegex(methods_mod.MethodsError, "differs from Holm"):
+            second_info({"family-h.json": fam})
+
+    def test_a_changed_second_look_outcome_invalidates_the_prose(self):
+        info = copy.deepcopy(second_info())
+        info["rule"]["sdv-ctgan"] = "HOLD"
+        self.assertEqual([ok for _, ok in methods_mod.second_claims(info)], [True, False])
+
+
 class ProseClaims(unittest.TestCase):
     def setUp(self):
         self.primary, compare = load("primary.json"), load("compare.json")
@@ -212,7 +262,7 @@ class ProseClaims(unittest.TestCase):
 
     def errors(self, comp=None, methods="committed", final=None) -> list[str]:
         info = self.methods if methods == "committed" else methods
-        return rp.prose_errors(self.primary, comp or self.comp, self.roles, info, -1.0, final or self.final)
+        return rp.prose_errors(self.primary, comp or self.comp, self.roles, info, -1.0, final or self.final, second_info())
 
     def test_committed_receipts_support_every_claim(self):
         self.assertEqual(self.errors(), [])

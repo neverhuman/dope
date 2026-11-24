@@ -9,17 +9,15 @@
 //!   external methods, contract outcome, and missed guards.
 
 use super::boot::holm;
-use super::compare::ComparisonResult;
 use super::jsonl::{canonical_json, parse_json, read_file, sha256_hex, write_atomic};
 use super::primary::ArmSummary;
 use super::receipt::{Receipt, RECEIPT_SCHEMA};
 use super::render::fixed3;
+use super::render_paper_paired::{look_comparisons, render_paired_tex, same_run, LookBlock};
 use super::render_paper_tex::{
-    display_name, short_guard, tex_bytes, tex_delta_ci, tex_grouped_u64, tex_opt3, tex_p,
-    tex_score, tex_score_ci,
+    display_name, tex_bytes, tex_grouped_u64, tex_opt3, tex_score, tex_score_ci,
 };
 use super::render_ranked::arm_labels;
-use super::rule::{Check, Outcome};
 use super::rundir::{contract, TASKS};
 use dope_arena::ArenaResult;
 use serde::Serialize;
@@ -27,6 +25,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 pub(super) const DEFAULT_CANDIDATE: &str = "dope-v3b-auto-v8";
+pub(super) const DEFAULT_SECOND_CANDIDATE: &str = "served-auto-v8";
 const DEFAULT_METHODS: [&str; 4] = ["arfpy-arf", "sdv-gaussian-copula", "sdv-tvae", "sdv-ctgan"];
 const DEFAULT_REFS: [&str; 4] = ["copy_a", "bootstrap_a", "indep_marginals", "label_shuffle"];
 const DEFAULT_LABELS: [(&str, &str); 9] = [
@@ -67,6 +66,20 @@ pub struct PaperTablesArgs {
     /// Display name override `ARM=Text` (repeat).
     #[arg(long = "label")]
     pub labels: Vec<String>,
+    /// Second look's primary receipt (a different set of DEV row splits, e.g. Addendum H part
+    /// (a)). Its comparisons become a second block of Table 2 with their own Holm family; Table 1
+    /// stays on the report look.
+    #[arg(long = "second-primary", requires_all = ["second_compares", "look_titles"])]
+    pub second_primary: Option<PathBuf>,
+    /// Second look's compare receipt(s): candidate = `--second-candidate`, baseline = each method.
+    #[arg(long = "second-compare")]
+    pub second_compares: Vec<PathBuf>,
+    /// Candidate arm id in the second look's receipts.
+    #[arg(long = "second-candidate", default_value = DEFAULT_SECOND_CANDIDATE)]
+    pub second_candidate: String,
+    /// Table 2 block headings, report look first (exactly two, with `--second-primary`).
+    #[arg(long = "look-title")]
+    pub look_titles: Vec<String>,
 }
 
 #[derive(Serialize)]
@@ -78,87 +91,6 @@ struct Summary {
     holm_p: BTreeMap<String, f64>,
     ranking_sha256: String,
     paired_sha256: String,
-}
-
-fn same_run(a: &Receipt, b: &Receipt) -> bool {
-    a.contract.sha256 == b.contract.sha256
-        && a.inputs.schedule_sha256 == b.inputs.schedule_sha256
-        && a.inputs.schedule_panel_sha256 == b.inputs.schedule_panel_sha256
-        && a.inputs.realref_sha256 == b.inputs.realref_sha256
-        && a.panel == b.panel
-        && a.bootstrap == b.bootstrap
-}
-
-fn check_arm_provenance(
-    primary: &Receipt,
-    comp_receipt: &Receipt,
-    arm_id: &str,
-    index: usize,
-) -> ArenaResult<()> {
-    match (
-        primary.inputs.rows_sha256.get(arm_id),
-        comp_receipt.inputs.rows_sha256.get(arm_id),
-    ) {
-        (Some(a), Some(b)) if a == b => {}
-        _ => {
-            return contract(format!(
-                "compare receipt {index} differs from primary on rows_sha256 for arm {arm_id}"
-            ));
-        }
-    }
-    if primary.inputs.guards_sha256.get(arm_id) != comp_receipt.inputs.guards_sha256.get(arm_id) {
-        return contract(format!(
-            "compare receipt {index} differs from primary on guards_sha256 for arm {arm_id}"
-        ));
-    }
-    if primary.inputs.guards_summary_sha256.get(arm_id)
-        != comp_receipt.inputs.guards_summary_sha256.get(arm_id)
-    {
-        return contract(format!(
-            "compare receipt {index} differs from primary on guards_summary_sha256 for arm {arm_id}"
-        ));
-    }
-    if let (Some(pa), Some(ca)) = (
-        primary.arms.iter().find(|a| a.arm_id == arm_id),
-        comp_receipt.arms.iter().find(|a| a.arm_id == arm_id),
-    ) {
-        if pa != ca {
-            return contract(format!(
-                "compare receipt {index} disagrees with primary summary for arm {arm_id}"
-            ));
-        }
-    }
-    Ok(())
-}
-
-fn effective_outcome(comp: &ComparisonResult, p_holm: f64) -> ArenaResult<Outcome> {
-    let Some(holm_thresh) = comp
-        .decision
-        .conditions
-        .iter()
-        .find(|c| c.name == "holm_p")
-        .and_then(|c| c.threshold)
-    else {
-        return contract(format!(
-            "comparison {} vs {} lacks a holm_p condition threshold",
-            comp.id, comp.baseline
-        ));
-    };
-    let holm_pass = p_holm < holm_thresh;
-    let other_conds_pass = comp
-        .decision
-        .conditions
-        .iter()
-        .filter(|c| c.name != "holm_p")
-        .all(|c| c.check == Check::Pass);
-    let all_guards_pass = comp.decision.guards.iter().all(|g| g.check == Check::Pass);
-    if holm_pass && other_conds_pass && all_guards_pass {
-        Ok(Outcome::Promote)
-    } else if comp.decision.outcome == Outcome::Reject {
-        Ok(Outcome::Reject)
-    } else {
-        Ok(Outcome::Hold)
-    }
 }
 
 fn parse_receipt(label: &str, bytes: &[u8]) -> ArenaResult<Receipt> {
@@ -310,80 +242,36 @@ fn render_ranking_tex(
     Ok(lines.join("\n") + "\n")
 }
 
-fn render_paired_tex(
-    methods: &[&ArmSummary],
-    comps: &[&ComparisonResult],
-    holm_p: &[f64],
-    labels: &BTreeMap<String, String>,
-) -> ArenaResult<String> {
-    let mult = methods.first().map_or(4, |a| a.primary.multiplier);
-    let matched_mult = comps
-        .first()
-        .and_then(|c| c.matched.as_ref())
-        .map_or(1, |m| m.multiplier);
-    let m = methods.len();
-    let mut lines = vec![
-        "% Generated by dope_kpi render-paper-tables -- DO NOT EDIT BY HAND.".to_string(),
-        r"\begin{tabular}{@{}lrrrrll@{}}".to_string(),
-        r"\toprule".to_string(),
-        format!(
-            r"Method & \makecell{{v3 \ensuremath{{-}} method,\\${mult}\times$ [95\% CI]}} & \makecell{{${matched_mult}\times$ [95\% CI]}} & \makecell{{one-sided\\$p$}} & \makecell{{Holm $p$\\($m={m}$)}} & outcome & guards missed \\"
-        ),
-        r"\midrule".to_string(),
-    ];
-    for ((arm, comp), &p_h) in methods.iter().zip(comps.iter()).zip(holm_p.iter()) {
-        let outcome = effective_outcome(comp, p_h)?;
-        let matched = comp.matched.as_ref().map_or_else(
-            || "--".to_string(),
-            |m| tex_delta_ci(m.delta, m.ci_low, m.ci_high),
-        );
-        let missed: Vec<String> = comp
-            .decision
-            .guards
-            .iter()
-            .filter_map(|g| match g.check {
-                Check::Pass => None,
-                Check::Fail => Some(short_guard(&g.name).to_string()),
-                Check::NotEvaluated => Some(format!("{} (n/e)", short_guard(&g.name))),
-            })
-            .collect();
-        let guards_text = if missed.is_empty() {
-            "none".to_string()
-        } else {
-            missed.join(", ")
-        };
-        lines.push(format!(
-            "{} & {} & {} & {} & {} & \\textbf{{{}}} & {} \\\\",
-            display_name(&arm.arm_id, labels, false),
-            tex_delta_ci(comp.delta, comp.ci_low, comp.ci_high),
-            matched,
-            tex_p(comp.p_one_sided),
-            tex_p(p_h),
-            outcome.word(),
-            guards_text
-        ));
+fn parse_look(
+    look: &str,
+    primary_bytes: &[u8],
+    compare_bytes: &[Vec<u8>],
+) -> ArenaResult<(Receipt, Vec<Receipt>)> {
+    let primary = parse_receipt(&format!("{look} primary receipt"), primary_bytes)?;
+    let mut receipts: Vec<Receipt> = Vec::new();
+    for (i, bytes) in compare_bytes.iter().enumerate() {
+        let r = parse_receipt(&format!("{look} compare receipt {}", i + 1), bytes)?;
+        if !same_run(&primary, &r) {
+            return contract(format!(
+                "{look} compare receipt {} differs from its primary in contract, schedule, real reference, panel or bootstrap",
+                i + 1
+            ));
+        }
+        receipts.push(r);
     }
-    lines.extend([r"\bottomrule".to_string(), r"\end{tabular}".to_string()]);
-    Ok(lines.join("\n") + "\n")
+    Ok((primary, receipts))
 }
+
+/// The second look's inputs: its primary receipt and compare receipts.
+pub(super) type SecondLook<'a> = Option<(&'a [u8], &'a [Vec<u8>])>;
 
 pub(super) fn build_tables(
     args: &PaperTablesArgs,
     primary_bytes: &[u8],
     compare_bytes: &[Vec<u8>],
+    second: SecondLook<'_>,
 ) -> ArenaResult<(String, String, BTreeMap<String, f64>)> {
-    let primary = parse_receipt("primary receipt", primary_bytes)?;
-    let mut compare_receipts: Vec<Receipt> = Vec::new();
-    for (i, bytes) in compare_bytes.iter().enumerate() {
-        let r = parse_receipt(&format!("compare receipt {}", i + 1), bytes)?;
-        if !same_run(&primary, &r) {
-            return contract(format!(
-                "compare receipt {} differs from primary in contract, schedule, real reference, panel or bootstrap",
-                i + 1
-            ));
-        }
-        compare_receipts.push(r);
-    }
+    let (primary, compare_receipts) = parse_look("report-look", primary_bytes, compare_bytes)?;
     let method_ids: Vec<String> = if args.methods.is_empty() {
         DEFAULT_METHODS.iter().map(|s| (*s).to_string()).collect()
     } else {
@@ -426,36 +314,75 @@ pub(super) fn build_tables(
     labels.extend(arm_labels(&args.labels, |id| {
         primary.arms.iter().any(|a| a.arm_id == id)
     })?);
-    let mut matched_comps: Vec<&ComparisonResult> = Vec::new();
-    for arm in &methods {
-        let hits: Vec<(usize, &Receipt, &ComparisonResult)> = compare_receipts
+    // Table 2 keeps the report look's method order in every block.
+    let order: Vec<&str> = methods.iter().map(|a| a.arm_id.as_str()).collect();
+    let matched_comps = look_comparisons(&primary, &compare_receipts, &args.candidate, &order)?;
+    let adjusted = holm(
+        &matched_comps
             .iter()
-            .enumerate()
-            .flat_map(|(i, r)| r.comparisons.iter().map(move |c| (i + 1, r, c)))
-            .filter(|(_, _, c)| c.id == args.candidate && c.baseline == arm.arm_id)
-            .collect();
-        if hits.len() != 1 {
-            return contract(format!(
-                "expected 1 comparison for {} vs {}, found {}",
-                args.candidate,
-                arm.arm_id,
-                hits.len()
-            ));
-        }
-        let (index, comp_receipt, comp) = hits[0];
-        check_arm_provenance(&primary, comp_receipt, &args.candidate, index)?;
-        check_arm_provenance(&primary, comp_receipt, &arm.arm_id, index)?;
-        matched_comps.push(comp);
-    }
-    let raw_p: Vec<f64> = matched_comps.iter().map(|c| c.p_one_sided).collect();
-    let adjusted = holm(&raw_p);
+            .map(|c| c.p_one_sided)
+            .collect::<Vec<f64>>(),
+    );
     let holm_map: BTreeMap<String, f64> = methods
         .iter()
         .zip(adjusted.iter())
         .map(|(arm, &p)| (arm.arm_id.clone(), p))
         .collect();
     let ranking = render_ranking_tex(cand, &methods, &refs, &labels)?;
-    let paired = render_paired_tex(&methods, &matched_comps, &adjusted, &labels)?;
+    let second_look = match second {
+        Some((p2, c2)) => Some(parse_look("second-look", p2, c2)?),
+        None => None,
+    };
+    let mut blocks = Vec::new();
+    match &second_look {
+        None => {
+            if !args.look_titles.is_empty() {
+                return contract("--look-title is only valid with --second-primary".to_string());
+            }
+            blocks.push(LookBlock {
+                title: None,
+                comps: matched_comps,
+                holm_p: adjusted,
+            });
+        }
+        Some((primary2, receipts2)) => {
+            if args.look_titles.len() != 2 {
+                return contract(format!(
+                    "expected 2 --look-title values, found {}",
+                    args.look_titles.len()
+                ));
+            }
+            let Some(cand2) = primary2
+                .arms
+                .iter()
+                .find(|a| a.arm_id == args.second_candidate)
+            else {
+                return contract(format!(
+                    "arm {} is absent from the second-look primary",
+                    args.second_candidate
+                ));
+            };
+            if cand2.primary.multiplier != cand.primary.multiplier {
+                return contract(
+                    "the second look's primary multiplier differs from the report look's"
+                        .to_string(),
+                );
+            }
+            let comps2 = look_comparisons(primary2, receipts2, &args.second_candidate, &order)?;
+            let holm2 = holm(&comps2.iter().map(|c| c.p_one_sided).collect::<Vec<f64>>());
+            blocks.push(LookBlock {
+                title: Some(args.look_titles[0].clone()),
+                comps: matched_comps,
+                holm_p: adjusted,
+            });
+            blocks.push(LookBlock {
+                title: Some(args.look_titles[1].clone()),
+                comps: comps2,
+                holm_p: holm2,
+            });
+        }
+    }
+    let paired = render_paired_tex(&methods, &blocks, &labels)?;
     Ok((ranking, paired, holm_map))
 }
 
@@ -466,7 +393,20 @@ pub fn run(args: &PaperTablesArgs) -> ArenaResult<String> {
         .iter()
         .map(|p| read_file(p))
         .collect::<ArenaResult<Vec<_>>>()?;
-    let (ranking, paired, holm_p) = build_tables(args, &primary, &compares)?;
+    let second_primary = args
+        .second_primary
+        .as_ref()
+        .map(|p| read_file(p))
+        .transpose()?;
+    let second_compares = args
+        .second_compares
+        .iter()
+        .map(|p| read_file(p))
+        .collect::<ArenaResult<Vec<_>>>()?;
+    let second = second_primary
+        .as_deref()
+        .map(|p| (p, second_compares.as_slice()));
+    let (ranking, paired, holm_p) = build_tables(args, &primary, &compares, second)?;
     write_atomic(&args.ranking_out, ranking.as_bytes())?;
     write_atomic(&args.paired_out, paired.as_bytes())?;
     canonical_json(&Summary {

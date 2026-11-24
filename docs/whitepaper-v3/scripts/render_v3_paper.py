@@ -266,7 +266,8 @@ def check_same_run(primary: dict[str, Any], other: dict[str, Any], name: str) ->
 
 
 def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str, str],
-                 methods: dict[str, Any] | None, failed_value: float, final: dict[str, Any]) -> list[str]:
+                 methods: dict[str, Any] | None, failed_value: float, final: dict[str, Any],
+                 second: dict[str, Any] | None) -> list[str]:
     """The comparative wording of the sections, checked against the receipts.
 
     The sections cite every value through a macro, but words such as "fails", "below", "the same
@@ -307,7 +308,7 @@ def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str,
         ("binary has the fewest families", families["binary"] == min(families.values())),
         ("Holm covers a single comparison", comp["holm_m"] == 1),
         ("the contract is not frozen", primary["contract"]["protocol_frozen"] is False),
-    ] + methods_mod.claims(methods, arm, failed_value) + final_mod.claims(final, comp)
+    ] + methods_mod.claims(methods, arm, failed_value) + final_mod.claims(final, comp) + methods_mod.second_claims(second)
     return [f"prose claim no longer holds for the receipts: {text}" for text, ok in claims if not ok]
 
 
@@ -328,6 +329,8 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     roles = role_ids(primary, comp)
     final = final_mod.load(SCOREBOARD, read_json, lambda rel: (REPO / rel).read_text(encoding="utf-8"),
                            lambda rel: (REPO / rel).is_file(), sha256, primary, roles["Base"], roles["Cand"], check_same_run)
+    second = methods_mod.load_second(SCOREBOARD, read_json, lambda rel: (REPO / rel).is_file(), sha256,
+                                     read_json(f"{SCOREBOARD}/{final_mod.LOOK}/primary.json"), check_same_run)
     readme = (REPO / f"{SCOREBOARD}/readme-block.md").read_text(encoding="utf-8")
     if methods:
         readme_arms = [a for a in primary["arms"] if a["arm_id"] == roles["Cand"] or a["artifact_class"] == "control"] + third
@@ -359,6 +362,7 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     if methods:
         entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256, pct, SCORE_SCALE)
     entries += final_mod.macros(final, num, sha256)
+    entries += methods_mod.second_macros(second, ci, sha256, SCORE_SCALE)
     if hero:
         entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
     names = [k for k, _ in entries]
@@ -375,12 +379,13 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
                     | set(RUST_TABLES)
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
-                       "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"]))
+                       "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"])
+                    | set(second["paths"] if second else []))
     manifest = {"schema": "dope.whitepaper-v3-render/v1", "hero": hero,
                 "inputs": {rel: sha256(rel) for rel in inputs},
                 "outputs": {OUT[k]: hashlib.sha256(v.encode()).hexdigest() for k, v in out.items()}}
     out["manifest"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-    return out, prose_errors(primary, comp, roles, methods, float(kpi["statistic"]["failed_value"]), final)
+    return out, prose_errors(primary, comp, roles, methods, float(kpi["statistic"]["failed_value"]), final, second)
 
 
 def convert_hero() -> dict[str, Any]:

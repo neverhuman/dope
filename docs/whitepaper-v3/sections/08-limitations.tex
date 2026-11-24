@@ -5,9 +5,12 @@ No confirmation, holdout or sealed panel was opened.
 The report look used fresh row splits, but of the same DEV tables on which the encoder was designed and selected, so it says little about tables or lineages outside that set; adaptive reuse of a development set biases such estimates upward~\citep{dwork2015reusable}, in DOPE's favour and not the third-party generators'.
 The pre-registration and its hash log are committed with the receipts; the schedule is identified in the receipts by hash and not published.
 
-\paragraph{One look.}
-The comparison reported here uses one set of DEV row splits.
-Its direction, DOPE against each generator, was re-reduced after scoring (\S\ref{sec:protocol}); the per-cell scores and intervals were not changed by it.
+\paragraph{Two looks.}
+The comparison with the third-party generators rests on two sets of row splits of the same DEV tables, reported separately and never pooled.
+The ranking in Table~\ref{tab:ranking} and Figure~\ref{fig:hero} use the report look alone.
+The second look's splits are not new for DOPE: the released encoder had been scored on them, and that result was known when the second look was planned, so only the third-party generators met those splits for the first time.
+Other DOPE configurations were also scored on those splits, and the second look's Holm adjustment covers only its \VThree{MethodsHolmM} third-party pairs.
+The report look's direction, DOPE against each generator, was re-reduced after scoring (\S\ref{sec:protocol}); the per-cell scores and intervals were not changed by it.
 
 \paragraph{Third-party configurations.}
 Each third-party generator was fitted once per cell with library defaults, no tuning and no byte cap (files scored up to \VThree{MethodsScoreBudget}~bytes), so it fails the byte guard by construction and its score reflects its own file sizes.
@@ -40,6 +43,6 @@ That receipt is committed with the scoreboard; this paper does not rely on it.
 No checkpoint has yet passed the promotion rule against the analytic packet, so the release ships no learned weights and \cli{auto-v8} without \cli{-{}-v8-weights} never writes a neural packet.
 
 \paragraph{Provenance.}
-The receipts record the scoring tool as \texttt{dope\_kpi} version \VThree{ToolVersion} (the tool's own version number, not a DOPE release) with build commit ``\VThree{ToolGitSha}'', and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.
+The receipts record the scoring tool as \texttt{dope\_kpi} version \VThree{ToolVersion} (the tool's own version number, not a DOPE release) with build commit ``\VThree{ToolGitSha}'' (version \VThree{SecondLookToolVersion} and commit ``\VThree{SecondLookToolGitSha}'' on the second look), and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.
 Before publication, the signed release binary re-emitted every scheduled packet of the report look, and the status, size and SHA-256 matched on every key; the release record lists this replay and its receipts~\citep{dope2026v3release}.
 The replay shows that the published binary writes the packets that were scored; it does not recompute the scores, which need the private tables.

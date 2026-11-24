@@ -26,11 +26,11 @@ into a section.
 | `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-methods-light.svg` (`dope_kpi render-hero --methods`), converted with `rsvg-convert -f pdf` |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-ranking-table.tex` | Table 2: the ranking by Transfer Score (`dope_kpi render-paper-tables`) |
-| `generated/v3-paired-table.tex` | Table 3: DOPE minus each generator, from `evidence/paper/v3-vs-*.json` (`dope_kpi render-paper-tables`) |
+| `generated/v3-paired-table.tex` | Table 3: DOPE minus each generator, one block per look: the report look from `evidence/paper/v3-vs-*.json` and the second look from `evidence/addendum-h/` (`dope_kpi render-paper-tables`) |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
 | `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
 | `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every DOPE row equals the README block |
-| `scripts/v3_paper_methods.py` | Loads and checks the third-party receipts and the four DOPE-versus-method pairs (exact sign reversal of `compare-methods.json`), writes their macros, checks the prose about them |
+| `scripts/v3_paper_methods.py` | Loads and checks the third-party receipts and the four DOPE-versus-method pairs (exact sign reversal of `compare-methods.json`), writes their macros, checks the prose about them; also loads and checks the second look (`evidence/addendum-h/`, Addendum H part (a)) |
 | `scripts/v3_paper_final_look.py` | Loads and checks the final-look receipts (Addendum F); kept for the scoreboard, not cited by the paper |
 | `scripts/test_render_v3_paper.py` | Unit tests |
 | `scripts/build_v3_pdf.sh` | Deterministic `latexmk` build in `target/paper-v3/` |
@@ -47,11 +47,29 @@ receipts are all present (or all absent), name the release receipts' schedule, r
 reference, panel, contract and bootstrap, and repeat every release arm of `primary.json` field
 for field.
 
+## Second look
+
+Addendum H part (a) repeats the comparison on the final look's DEV splits, descriptively:
+`evidence/addendum-h/` holds `primary-h.json`, the four `v3-vs-<method>-h.json` pairs and
+`family-h.json` (Holm, m = 4). The renderer fails unless `primary-h.json` repeats DOPE's and the
+controls' rows of `evidence/final-look-s9-12/primary.json` field for field, is the same run,
+and `family-h.json` binds the four pairs by SHA-256 with Holm p, outcomes and the
+"replicates" flag equal to a recomputation. Table 3 shows the two looks as separate blocks,
+never pooled; the ranking table and Figure 1 stay on the report look.
+
 ## Build and verify
 
 From the repository root:
 
 ```bash
+S=bench/real-world/results/scoreboard/v3.0.0; M="arfpy-arf sdv-gaussian-copula sdv-tvae sdv-ctgan"
+dope_kpi render-paper-tables --primary $S/primary-methods.json \
+  $(for m in $M; do echo --compare $S/evidence/paper/v3-vs-$m.json; done) \
+  --second-primary $S/evidence/addendum-h/primary-h.json \
+  $(for m in $M; do echo --second-compare $S/evidence/addendum-h/v3-vs-$m-h.json; done) \
+  --look-title "Report look" --look-title "Second look: other row splits of the same DEV tables" \
+  --ranking-out docs/whitepaper-v3/generated/v3-ranking-table.tex \
+  --paired-out docs/whitepaper-v3/generated/v3-paired-table.tex   # Tables 2 and 3
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --figures   # needs rsvg-convert; only when the hero SVG changes
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py              # macros, manifest
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero provenance, digit lint
