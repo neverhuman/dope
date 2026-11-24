@@ -17,7 +17,7 @@
 Figure~\ref{fig:hero} and Tables~\ref{tab:arms}, \ref{tab:compare} and~\ref{tab:methods} describe the report look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
 
 \paragraph{Headline.}
-\cli{auto-v8} reaches a TRG of \VThree{CandTrg}, against \VThree{BaseTrg} for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{Delta} with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
+\cli{auto-v8} reaches a Transfer Score of \VThree{CandScore} points (TRG \VThree{CandTrg}), against \VThree{BaseScore} (TRG \VThree{BaseTrg}) for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{DeltaPts} points (TRG \VThree{Delta}) with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
 Its median file is \VThree{CandBytesMed}~bytes (\VThree{BaseBytesMed} for the baseline), the largest is \VThree{CandBytesMax}, and it fails \VThree{CandFailed} of \VThree{CandCells} cells.
 The gain comes from classification: the paired task differences are \VThree{DeltaBinary} for binary and \VThree{DeltaMulticlass} for multiclass targets, and \VThree{DeltaRegression} for regression, where \cli{auto-v8} is lower on the point estimate (\VThree{CandRegression} against \VThree{BaseRegression}).
 
@@ -59,4 +59,4 @@ On that look (\VThree{FlCells} informative cells, \VThree{FlFamilies} families),
 The second condition fails, so the released engine remains \VThree{FlServedBuild}.
 The pre-registered disclosures qualify the PROMOTE: \VThree{FlNonzeroFamilies} of \VThree{FlFamilies} families carry the gain, \VThree{FlTopSharePct} of it one multiclass family (\texttt{\VThree{FlTopFamily}}); the exact family sign-flip $p$ is \VThree{FlSignFlipP}; and the contract's sign-flip null promotes in \VThree{FlNullFlipRate} of replicates with or without the guards a flip can move, above its limit of \VThree{FlNullMaxRate}, so the rule is not calibrated on this look.
 Descriptively, outside the Holm family, the released engine is \VThree{FlServedVsBaseOutcome} against release~\VThree{BaseVersion} at \VThree{FlServedVsBaseDelta}, failing the realism (\VThree{FlServedRealism}) and task lower-bound (\VThree{FlServedTaskLow}) guards.
-It is the second fresh look, after data seeds \VThree{ReportSeeds} above, on which the released engine is HOLD against release~\VThree{BaseVersion}.
+The released engine's paired transfer interval spans zero on this look. It is the second fresh look, after data seeds \VThree{ReportSeeds} above, on which the released engine is HOLD against release~\VThree{BaseVersion}.

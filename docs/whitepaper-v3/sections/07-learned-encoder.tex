@@ -3,9 +3,12 @@
 \texttt{DSE8} reserves room for a learned refinement.
 \texttt{SingleEncV8} is an encoder--decoder pair: the encoder reads the evidence bank of \S\ref{sec:evidence} on the fitting rows and writes a short quantized code section into the packet; the decoder reads only the packet and refines the analytic decode with residual heads (marginal knot warps, loading updates, a row-local coupling flow and soft oblivious trees on the target) designed so that zero-initialized heads leave the analytic decode unchanged.
 A neural packet carries a SHA-256 prefix of its checkpoint, and the sampler refuses a mismatch.
-The Rust inference path is matched by a Python reference in parity tests, and training runs on fresh FIT-only episodes from the factory of \S\ref{sec:evidence} with an objective built from differentiable stand-ins for the auditors.
+Decoder-level parity tests compare the Rust inference path with a Python reference. Training runs on fresh FIT-only episodes from the factory of \S\ref{sec:evidence} with an objective built from differentiable stand-ins for the auditors. The complete training forward and the served packet need a separate parity check.
 
 The result so far is negative.
 In the development screens run to date, no checkpoint has passed the promotion rule of \S\ref{sec:protocol} against the analytic packet.
 The screening receipts, information only and not selection steps, are committed under the scoreboard's \path{evidence/selection/dev-lite/}; we report no numbers from them.
 The release therefore ships no learned weights, and \cli{auto-v8} without \cli{-{}-v8-weights} never writes a neural packet.
+
+\paragraph{Successor evaluation.}
+The planned matched pilot compares the historical training forward with a forward that uses the served packet's active ranks and analytic terms. The comparisons share initialization, example schedules and the complete \VThree{BudgetBytes}-byte artifact cap. Paired native DEV-SELECT transfer and the promotion guards will determine whether a learned checkpoint qualifies for a later release.

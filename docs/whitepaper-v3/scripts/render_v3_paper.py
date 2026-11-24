@@ -123,8 +123,8 @@ def num(x: float, digits: int = 3, signed: bool = False) -> str:
     return text.replace("-", r"\ensuremath{-}")
 
 
-def ci(v: float, lo: float, hi: float, signed: bool = False) -> str:
-    return f"{num(v, 3, signed)} [{num(lo, 3, signed)}, {num(hi, 3, signed)}]"
+def ci(v: float, lo: float, hi: float, signed: bool = False, digits: int = 3) -> str:
+    return f"{num(v, digits, signed)} [{num(lo, digits, signed)}, {num(hi, digits, signed)}]"
 
 
 def grouped(x: float) -> str:
@@ -162,10 +162,21 @@ def role_ids(primary: dict[str, Any], comp: dict[str, Any]) -> dict[str, str]:
             "LabelShuffle": "label_shuffle", "TwinC": "twin_c"}
 
 
+SCORE_SCALE = 100  # Transfer Score = SCORE_SCALE x (1 + TRG), the README headline (owner-approved 2026-11-24)
+
+
+def score(trg: float) -> float:
+    """Transfer Score in points; SCORE_SCALE is a real twin of the fitting split."""
+    return SCORE_SCALE * (1.0 + float(trg))
+
+
 def arm_macros(role: str, arm: dict[str, Any]) -> list[tuple[str, str]]:
     p, m, b = arm["primary"], arm["matched"], arm["bytes"]
     out = [(f"{role}Id", tt(arm["arm_id"])), (f"{role}Trg", ci(p["trg"], p["ci_low"], p["ci_high"])),
            (f"{role}TrgPoint", num(p["trg"])), (f"{role}Matched", ci(m["trg"], m["ci_low"], m["ci_high"])),
+           # Transfer Score = 100 x (1 + TRG), the README headline: a fixed relabel, same ranks, intervals x 100.
+           (f"{role}Score", ci(score(p["trg"]), score(p["ci_low"]), score(p["ci_high"]), digits=1)),
+           (f"{role}ScorePoint", num(score(p["trg"]), 1)),
            (f"{role}Mlp", num(arm["mlp_trg"])), (f"{role}Failed", str(p["failed_cells"])),
            (f"{role}Cells", str(p["cells"])), (f"{role}NotApplicable", str(p["not_applicable_cells"]))]
     if arm.get("c2st_median") is not None:
@@ -186,6 +197,8 @@ def comparison_macros(comp: dict[str, Any], compare: dict[str, Any]) -> list[tup
     m, cal = comp["matched"], comp["null_calibration"]
     out = [("Delta", ci(comp["delta"], comp["ci_low"], comp["ci_high"], True)),
            ("DeltaPoint", num(comp["delta"], 3, True)), ("PHolm", num(comp["p_holm"])),
+           ("DeltaPts", ci(SCORE_SCALE * comp["delta"], SCORE_SCALE * comp["ci_low"], SCORE_SCALE * comp["ci_high"], True, 1)),
+           ("DeltaPtsPoint", num(SCORE_SCALE * comp["delta"], 1, True)), ("ScoreScale", str(SCORE_SCALE)),
            ("HolmM", str(comp["holm_m"])), ("Outcome", comp["decision"]["outcome"]),
            ("MatchedDelta", ci(m["delta"], m["ci_low"], m["ci_high"], True)),
            ("MatchedP", num(m["p_one_sided"])), ("MatchedMult", str(m["multiplier"])),
