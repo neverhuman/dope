@@ -39,8 +39,9 @@ The transfer advantage over a method **replicates** on this look iff the 4× low
 | SDV CTGAN | +139.3 [+121.4, +158.5] | < 0.001 | yes | PROMOTE |
 | arfpy ARF | +17.8 [−6.5, +43.6] | 0.081 | no | HOLD (interval, tasks, mlp, realism) |
 
-DOPE is not shown to transfer better than ARF on either look. The paper's Table 2 shows both looks
-as separate blocks (`dope_kpi render-paper-tables --second-primary … --second-compare …`).
+At the headline 4× sampling, DOPE is not shown to transfer better than ARF on either look. At matched
+size (1×) this look's ARF difference, +33.7 [+14.4, +56.6], has an interval above zero, unlike the report
+look's; H's reading and the promotion rule use 4× only. The paper's Table 3 shows both looks as separate blocks (`dope_kpi render-paper-tables --second-primary … --second-compare …`).
 
 ## Files (`SHA256SUMS`)
 

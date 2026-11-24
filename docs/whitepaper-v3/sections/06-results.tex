@@ -9,7 +9,7 @@
 
 \begin{table}[t]
   \centering\footnotesize
-  \caption{DOPE minus each third-party generator in Transfer Score points, paired on common cells, at \VThree{PrimaryMult}$\times$ and at matched size, with the one-sided $p$, Holm's adjustment over the \VThree{MethodsHolmM} pairs of each look, the outcome of the contract's promotion rule with DOPE as the candidate, and the guards that rule misses (\S\ref{sec:protocol}). The report look's direction was re-reduced after scoring from the same per-cell scores (\texttt{evidence/paper/}); the second look was pre-registered in this direction (\texttt{evidence/addendum-h/}, family receipt \texttt{\VThree{SecondLookFamilySha}}). The two looks are not pooled.}
+  \caption{DOPE minus each third-party generator in Transfer Score points, paired on common cells, at \VThree{PrimaryMult}$\times$ and at matched size; the one-sided $p$, Holm's adjustment over the \VThree{MethodsHolmM} pairs of each look, the outcome of the contract's promotion rule with DOPE as the candidate, and the guards that rule misses are for \VThree{PrimaryMult}$\times$ (\S\ref{sec:protocol}). The report look's direction was re-reduced after scoring from the same per-cell scores (\texttt{evidence/paper/}); the second look was pre-registered in this direction (\texttt{evidence/addendum-h/}, family receipt \texttt{\VThree{SecondLookFamilySha}}). The two looks are not pooled.}
   \label{tab:paired}
   \input{generated/v3-paired-table}
 \end{table}
@@ -56,5 +56,6 @@ TVAE fails \VThree{TvaeFailed} of \VThree{TvaeCells} cells, where its sample hol
 The lower block of Table~\ref{tab:paired} repeats the comparison on other row splits of the same DEV tables, with the same generator recipes, contract and auditors (\VThree{SecondLookCells} informative cells in \VThree{SecondLookFamilies} families; receipt \texttt{\VThree{SecondLookPrimarySha}}).
 It was pre-registered before any third-party generator was scored on these splits, but DOPE's own scores on them were already known (\S\ref{sec:limits}).
 DOPE is ahead of the Gaussian copula by \VThree{SecondLookGcVsPts} points, of TVAE by \VThree{SecondLookTvaeVsPts} and of CTGAN by \VThree{SecondLookCtganVsPts}; each interval is above zero and each Holm-adjusted $p$ is below \VThree{HolmAlpha}, so the advantage over the three SDV generators replicates on this look.
-Against ARF the difference is \VThree{SecondLookArfVsPts} points and its interval again contains zero: on neither look is DOPE shown to transfer better than ARF.
+Against ARF the difference is \VThree{SecondLookArfVsPts} points and its interval again contains zero: at \VThree{PrimaryMult}$\times$, on neither look is DOPE shown to transfer better than ARF.
+At matched size the second look's difference from ARF, \VThree{SecondLookArfVsPtsMatched} points, has an interval above zero, unlike the report look's; the promotion rule and the reading above use \VThree{PrimaryMult}$\times$ only.
 Under the full promotion rule DOPE is \VThree{SecondLookTvaeVsRule} against TVAE and CTGAN on this look, with every guard passing; against the Gaussian copula the per-task lower bound and privacy coverage miss, and against ARF the interval contains zero and three guards miss, so these two pairs are \VThree{SecondLookGcVsRule}.

@@ -217,12 +217,17 @@ def second_info(files: dict | None = None) -> dict | None:
 
 
 class SecondLook(unittest.TestCase):
+    def setUp(self):
+        self.arf_low = methods_info(load("primary.json"))["versus"]["arfpy-arf"]["matched"]["ci_low"]
+
     def test_committed_second_look_binds_its_receipts_and_replicates_the_sdv_gains(self):
         info = second_info()
         self.assertEqual(sorted(info["versus"]), sorted(methods_mod.ROLES))
-        self.assertEqual(methods_mod.second_claims(info) and [ok for _, ok in methods_mod.second_claims(info)], [True, True])
+        self.assertEqual([ok for _, ok in methods_mod.second_claims(info, self.arf_low)], [True, True, True])
+        self.assertFalse(methods_mod.second_claims(info, None)[-1][1])
         macros = dict(methods_mod.second_macros(info, rp.ci, rp.sha256, rp.SCORE_SCALE))
         self.assertTrue(macros["SecondLookArfVsPts"].startswith("+17.8"), macros)
+        self.assertTrue(macros["SecondLookArfVsPtsMatched"].startswith("+33.7"), macros)
         self.assertEqual(macros["SecondLookCtganVsRule"], "PROMOTE")
         self.assertFalse(any(rp.PRIOR_MACRO.match(n) for n in macros), sorted(macros))
 
@@ -249,7 +254,7 @@ class SecondLook(unittest.TestCase):
     def test_a_changed_second_look_outcome_invalidates_the_prose(self):
         info = copy.deepcopy(second_info())
         info["rule"]["sdv-ctgan"] = "HOLD"
-        self.assertEqual([ok for _, ok in methods_mod.second_claims(info)], [True, False])
+        self.assertEqual([ok for _, ok in methods_mod.second_claims(info, self.arf_low)], [True, False, True])
 
 
 class ProseClaims(unittest.TestCase):
