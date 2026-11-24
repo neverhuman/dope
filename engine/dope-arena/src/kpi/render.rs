@@ -241,6 +241,7 @@ fn ranked_summary(
     arms: &[&ArmSummary],
     comparisons: &[&ComparisonResult],
     budget: u64,
+    noise_sd: f64,
     labels: &BTreeMap<String, String>,
 ) {
     let label = |id: &str| {
@@ -256,10 +257,11 @@ fn ranked_summary(
         .collect();
     scored.sort_by(|(a, _), (b, _)| b.total_cmp(a));
     out.push(String::new());
-    if let [comparison] = comparisons {
+    if let ([comparison], Some(arm)) = (comparisons, arms.first()) {
         out.push(format!(
-            "**{:+.1} points** for {} vs {} (paired 95% CI {:+.1} to {:+.1}).",
+            "**{:+.1} points at {}× sampling** for {} vs {} (paired 95% CI {:+.1} to {:+.1}).",
             100.0 * comparison.delta,
+            arm.primary.multiplier,
             label(&comparison.id),
             label(&comparison.baseline),
             100.0 * comparison.ci_low,
@@ -268,27 +270,55 @@ fn ranked_summary(
         out.push(String::new());
     }
     if !scored.is_empty() {
-        out.push("Transfer Score measures downstream transfer from synthetic rows. A score of 100 matches a second real training sample. Higher is better. Ranks use the point estimate.".to_string());
+        out.push("**Transfer Score = 100 × (1 + TRG).** A score of 100 matches a second real training sample. Higher is better.".to_string());
+        if let Some(copy_trg) = arms
+            .iter()
+            .find(|a| a.arm_id == "copy_a" && a.artifact_class == "control")
+            .and_then(|a| a.primary.trg)
+        {
+            out.push(format!(
+                "On this report a copy of the real training rows scores **{:.1}**.",
+                100.0 * (1.0 + copy_trg)
+            ));
+        }
         out.push(String::new());
         out.push(format!(
             "| Rank | Encoder ({budget} B budget) | Transfer Score ↑ |"
         ));
         out.push("|---:|---|---:|".to_string());
-        for (index, (trg, arm)) in scored.iter().enumerate() {
-            let color = ["🟩", "🟦"].get(index).unwrap_or(&"⬜");
-            let above_budget = if arm.bytes.scored_above_budget > 0 {
-                " †"
-            } else {
-                ""
-            };
-            out.push(format!(
-                "| {color} {} | {} | {:.1}{above_budget} |",
-                index + 1,
-                label(&arm.arm_id),
-                100.0 + 100.0 * trg
-            ));
+        let mut start = 0;
+        while start < scored.len() {
+            let top = scored[start].0;
+            let size = scored[start..]
+                .iter()
+                .take_while(|(trg, _)| *trg == top || top - *trg < noise_sd)
+                .count();
+            let rank = start + 1;
+            let tie = if size > 1 { "=" } else { "" };
+            let color = ["🟩", "🟦"].get(start).unwrap_or(&"⬜");
+            for (trg, arm) in &scored[start..start + size] {
+                let above_budget = if arm.bytes.scored_above_budget > 0 {
+                    " †"
+                } else {
+                    ""
+                };
+                out.push(format!(
+                    "| {color} {rank}{tie} | {} | {:.1}{above_budget} |",
+                    label(&arm.arm_id),
+                    100.0 * (1.0 + trg)
+                ));
+            }
+            start += size;
         }
         out.push(String::new());
+        if noise_sd > 0.0 {
+            out.push(format!(
+                "A tie spans less than {} point{}.",
+                100.0 * noise_sd,
+                if 100.0 * noise_sd == 1.0 { "" } else { "s" }
+            ));
+            out.push(String::new());
+        }
     }
     if let [comparison] = comparisons {
         out.push(format!(
@@ -345,7 +375,11 @@ fn render(receipts: &[Vec<u8>], args: &RenderArgs) -> ArenaResult<String> {
     let comparisons: Vec<_> = parsed.iter().flat_map(|(r, _)| &r.comparisons).collect();
     if args.ranked {
         let labels = arm_labels(&args.labels, |id| arms.iter().any(|arm| arm.arm_id == id))?;
-        ranked_summary(&mut out, &arms, &comparisons, budget, &labels);
+        let noise_sd = parsed
+            .iter()
+            .find_map(|(r, _)| r.noise_sd.as_ref())
+            .map_or(0.0, |sd| sd.value);
+        ranked_summary(&mut out, &arms, &comparisons, budget, noise_sd, &labels);
     }
     if !arms.is_empty() {
         out.push(format!(
