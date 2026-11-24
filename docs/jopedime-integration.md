@@ -11,9 +11,10 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Compatible encoder source commit | `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (signed `dope-engine-v1.3.0`; includes `WP00`–`WP09`, `encode_research_view_629`, `PacketFeaturesV1`, `sanitize_public_landmark_bundle`, and `dope-norm`; earlier signed `dope-engine-v1.2.0` pin `5fc96f2819a97ed313658c336a9a46e637299352` and `dope-engine-v1.1.0` pin `15e12aa3dc33851655580f6aa7c9c66353143f23` remain valid for `1.2.0` and `1.1.0` consumers) |
-| Source engine workspace version | `1.3.0` ([`dope-engine-v1.3.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.3.0), tag commit `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`) |
-| Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) |
+| Recommended encoder source commit | `e15c415bad9554f7c419dd240aa670d1a79a27fe` (signed [`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0), annotated tag `590386580fecfb7f95ff7d41149c86de4f18551d`; 0-byte diff vs `v1.3.0` across `engine/dope-core/src/{mlc_v3/**,prepare.rs,landmark.rs,landmarks.rs}`, `engine/dope-core/Cargo.toml`, and `research/levels/{encoder.py,multilevel_model.py,building_block_landmarks.py}`; adds `DSE8` / `auto-v8`) |
+| Source engine workspace version | `3.0.0` ([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0), tag commit `e15c415bad9554f7c419dd240aa670d1a79a27fe`) |
+| Previous rollback pins | `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`), `5fc96f2819a97ed313658c336a9a46e637299352` (`dope-engine-v1.2.0`), `15e12aa3dc33851655580f6aa7c9c66353143f23` (`dope-engine-v1.1.0`) |
+| Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) (preserved; engine releases carry signed binaries, not MLC SafeTensors weights) |
 | Canonical file | `dope_mlc_v3_multitask_best.safetensors` |
 | Exact bytes | `1,781,800` |
 | SHA-256 | `d0b6960328d1955386632ff78b512e3add53a9b0256db7bbf067e2e0be5f0c6c` |
@@ -22,19 +23,26 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Rust dependency graph | [engine/Cargo.lock](../engine/Cargo.lock) at the source pin |
 
 The model release `v1.0.0` and the signed engine releases
-([`dope-engine-v1.3.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.3.0),
+([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0),
+[`dope-engine-v1.3.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.3.0),
 [`dope-engine-v1.2.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.2.0),
 [`dope-engine-v1.1.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.1.0), and
 [`dope-engine-v1.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v1.0.0))
-are distinct. The engine releases carry binaries, not these model weights.
+are distinct. The engine releases carry signed binaries, not these model weights.
 The `v1.0.0` source tag predates `research/levels/multilevel_model.py`, the Python
 model source used by Micro. Checking out that tag does not provide the encoder.
-Use the exact source commit above, separately from the weight asset URL. Commit
-`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`) pins the signed
-Rust engine (`dope-core` `1.3.0`); `main` (`b674c3d6` and later) adds post-`1.3.0`
-research/transfer schemas and the measured provenance summary in
-[exposure_inventory.json](plans/next-version/exposure_inventory.json) without
-modifying `engine/`.
+Use the exact source commit above, separately from the weight asset URL.
+
+**Upgrading from `dope-engine-v1.3.0` to `dope-engine-v3.0.0`:** Commit
+`e15c415bad9554f7c419dd240aa670d1a79a27fe` (`dope-engine-v3.0.0`) updates the
+`dope-core` crate version to `3.0.0` while keeping the entire `mlc_v3`,
+`prepare`, `landmark`/`landmarks`, and `research/levels/{encoder,multilevel_model,building_block_landmarks}`
+surface byte-for-byte identical to `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`),
+with zero `dope-core/Cargo.toml` dependency changes. Downstream JopeDime parity
+checks against the `v1.3.0` pin confirm bit-exact (`0` ULP) outputs across
+`Dope512` (`c5bf4ffb…`), `LandmarkBundle` (`3efc658b…`), and `ultra 629`
+(`4ee07c77…`). To roll back, detach the DOPE source pin back to
+`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` and revert the `dope-core` lockfile entry.
 
 The 1.70 MiB checkpoint fits comfortably within GitHub's per-asset limit of under
 2 GiB ([GitHub release documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)).
@@ -58,10 +66,10 @@ submodule gitlink; do not follow a moving branch automatically.
 ```bash
 set -euo pipefail
 git clone https://github.com/neverhuman/dope.git vendor/dope
-git -C vendor/dope checkout --detach cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b
+git -C vendor/dope checkout --detach e15c415bad9554f7c419dd240aa670d1a79a27fe
 # Alternatively, instead of the clone above:
 # git submodule add https://github.com/neverhuman/dope.git vendor/dope
-# git -C vendor/dope checkout --detach cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b
+# git -C vendor/dope checkout --detach e15c415bad9554f7c419dd240aa670d1a79a27fe
 # git add .gitmodules vendor/dope
 
 python3.12 -m venv .venv
