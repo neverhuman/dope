@@ -208,17 +208,25 @@ pub fn byte_domain(lo: f64, hi: f64) -> (f64, f64) {
 }
 
 /// TRG gridline step.
+#[cfg(test)]
 pub const TRG_STEP: f64 = 0.25;
 
-/// The y domain for TRG values in `lo..=hi`, in whole gridline steps, always
-/// holding 0 (a TRG of 0 matches the real B sample).
-pub fn trg_steps(lo: f64, hi: f64) -> (i64, i64) {
-    let mut low = ((lo / TRG_STEP).floor() as i64).min(0);
-    let high = ((hi / TRG_STEP).ceil() as i64).max(0);
+/// The y domain for values in `lo..=hi`, in whole gridline steps of `step`,
+/// always holding `anchor * step`.
+pub fn y_steps(lo: f64, hi: f64, step: f64, anchor: i64) -> (i64, i64) {
+    let mut low = ((lo / step).floor() as i64).min(anchor);
+    let high = ((hi / step).ceil() as i64).max(anchor);
     if low == high {
         low -= 1;
     }
     (low, high)
+}
+
+/// The y domain for TRG values in `lo..=hi`, in whole gridline steps, always
+/// holding 0 (a TRG of 0 matches the real B sample).
+#[cfg(test)]
+pub fn trg_steps(lo: f64, hi: f64) -> (i64, i64) {
+    y_steps(lo, hi, TRG_STEP, 0)
 }
 
 /// Greedy wrap of `text` at spaces into lines at most `max` px wide at

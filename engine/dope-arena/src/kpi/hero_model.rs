@@ -3,6 +3,65 @@
 //! of every label. Standard library only.
 
 pub const DEFAULT_TITLE: &str = "Predictive structure kept vs. artifact size";
+pub const SCORE_TITLE: &str = "Transfer Score vs. artifact size";
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum YScale {
+    #[default]
+    Trg,
+    TransferScore,
+}
+
+impl YScale {
+    pub fn convert(self, trg: f64) -> f64 {
+        match self {
+            YScale::Trg => trg,
+            YScale::TransferScore => 100.0 * (1.0 + trg),
+        }
+    }
+
+    pub fn step(self) -> f64 {
+        match self {
+            YScale::Trg => 0.25,
+            YScale::TransferScore => 25.0,
+        }
+    }
+
+    pub fn anchor_step(self) -> i64 {
+        match self {
+            YScale::Trg => 0,
+            YScale::TransferScore => 4,
+        }
+    }
+
+    pub fn title(self) -> &'static str {
+        match self {
+            YScale::Trg => "TRG (95% CI)",
+            YScale::TransferScore => "Transfer Score (95% CI)",
+        }
+    }
+
+    pub fn value_text(self, trg: f64) -> String {
+        match self {
+            YScale::Trg => trg_text(trg),
+            YScale::TransferScore => score_text(self.convert(trg)),
+        }
+    }
+
+    pub fn tick_label(self, value: f64) -> String {
+        match self {
+            YScale::Trg => tick_text(value),
+            YScale::TransferScore => score_tick_text(value),
+        }
+    }
+
+    pub fn highlight_label(self, label: &str, trg: f64) -> String {
+        match self {
+            YScale::Trg => format!("{label} \u{b7} TRG {}", trg_text(trg)),
+            YScale::TransferScore => format!("{label} \u{b7} {}", score_text(self.convert(trg))),
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Theme {
@@ -120,6 +179,8 @@ pub struct Hero {
     pub budget: f64,
     /// Small print at the bottom right (contract and receipt digests).
     pub footer: String,
+    /// Y-axis scale (`TRG` or `Transfer Score = 100 * (1 + TRG)`).
+    pub y_scale: YScale,
 }
 
 /// A coordinate with one decimal and no negative zero.
@@ -150,6 +211,26 @@ pub fn trg_text(x: f64) -> String {
 pub fn tick_text(value: f64) -> String {
     let text = format!("{value:.2}");
     if text == "0.00" || text == "-0.00" {
+        "0".to_string()
+    } else {
+        minus(text)
+    }
+}
+
+/// Transfer Score value with 1 decimal, no negative zero and a true minus sign.
+pub fn score_text(score: f64) -> String {
+    let text = format!("{score:.1}");
+    if text == "-0.0" {
+        "0.0".to_string()
+    } else {
+        minus(text)
+    }
+}
+
+/// Transfer Score gridline value: integer with a true minus sign.
+pub fn score_tick_text(value: f64) -> String {
+    let text = format!("{value:.0}");
+    if text == "-0" {
         "0".to_string()
     } else {
         minus(text)
@@ -208,31 +289,43 @@ pub fn esc(text: &str) -> String {
     out
 }
 
-/// `DOPE v2.0.0: TRG −0.232 [−0.347, −0.131], 1,462 B`.
-pub fn point_title(p: &Point) -> String {
+/// `DOPE v2.0.0: TRG −0.232 [−0.347, −0.131], 1,462 B` (or Transfer Score).
+pub fn point_title(p: &Point, scale: YScale) -> String {
+    let metric = match scale {
+        YScale::Trg => "TRG",
+        YScale::TransferScore => "Transfer Score",
+    };
     format!(
-        "{}: TRG {} [{}, {}], {}",
+        "{}: {metric} {} [{}, {}], {}",
         p.label,
-        trg_text(p.trg),
-        trg_text(p.ci_low),
-        trg_text(p.ci_high),
+        scale.value_text(p.trg),
+        scale.value_text(p.ci_low),
+        scale.value_text(p.ci_high),
         bytes_text(p.bytes)
     )
 }
 
 /// The text alternative: the note, what is plotted, every point and control.
 pub fn describe(hero: &Hero) -> String {
+    let metric = match hero.y_scale {
+        YScale::Trg => "TRG",
+        YScale::TransferScore => "Transfer Score",
+    };
     let mut parts: Vec<String> = hero.note.iter().cloned().collect();
     parts.push(format!(
-        "TRG with its 95% interval against the median emitted-file size on a log axis; a dashed line marks the {} and dotted lines mark controls.",
+        "{metric} with its 95% interval against the median emitted-file size on a log axis; a dashed line marks the {} and dotted lines mark controls.",
         budget_text(hero.budget)
     ));
-    parts.extend(hero.points.iter().map(|p| format!("{}.", point_title(p))));
+    parts.extend(
+        hero.points
+            .iter()
+            .map(|p| format!("{}.", point_title(p, hero.y_scale))),
+    );
     if !hero.references.is_empty() {
         let refs: Vec<String> = hero
             .references
             .iter()
-            .map(|r| format!("{} {}", r.label, trg_text(r.trg)))
+            .map(|r| format!("{} {}", r.label, hero.y_scale.value_text(r.trg)))
             .collect();
         parts.push(format!("Controls: {}.", refs.join("; ")));
     }

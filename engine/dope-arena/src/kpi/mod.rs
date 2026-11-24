@@ -47,6 +47,9 @@ pub mod realref;
 pub mod receipt;
 pub mod reduce;
 pub mod render;
+pub mod render_paper;
+mod render_paper_tex;
+pub mod render_ranked;
 pub mod roles;
 pub mod rule;
 pub mod rundir;
@@ -66,6 +69,8 @@ pub mod guard_fixture;
 mod guard_tests;
 #[cfg(test)]
 mod hero_tests;
+#[cfg(test)]
+mod render_paper_tests;
 #[cfg(test)]
 pub mod stat_testing;
 #[cfg(test)]

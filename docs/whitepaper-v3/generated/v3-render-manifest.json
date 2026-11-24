@@ -31,7 +31,7 @@
     "bench/real-world/results/scoreboard/v3.0.0/primary-methods.json": "47ff73b1e35b8b29210de6df55538d60c65b59486c405d641027aff2124deda2",
     "bench/real-world/results/scoreboard/v3.0.0/primary.json": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
     "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "cc380e928498be851512ca93ebdfeafb93e6ac407ed9724e440848b5aac7c3ab",
-    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "58577328c27df7249eb4287ade6b5c8a7ee26d0e4e675635892df804d16333ad",
+    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "dd3441b86da9c8bc31f042c53c070f47b40d70f7963e4644274f322befee92f2",
     "contracts/dope-fidelity-v3-candidate.json": "87bc12eef5191d60b75e40f7c3f556f4816f64c50b7c2c6cb1a689e5aea29f60",
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",

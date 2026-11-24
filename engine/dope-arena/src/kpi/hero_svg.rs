@@ -15,11 +15,9 @@
 
 use super::hero_labels::{place, Guides, Label, Mark};
 use super::hero_layout::{
-    baseline, byte_domain, text_width, trg_steps, wrap, Anchor, Axis, Rect, BYTE_TICKS, TRG_STEP,
+    baseline, byte_domain, text_width, wrap, y_steps, Anchor, Axis, Rect, BYTE_TICKS,
 };
-use super::hero_model::{
-    coord, describe, esc, point_title, tick_text, Emphasis, Hero, Theme, Tokens,
-};
+use super::hero_model::{coord, describe, esc, point_title, Emphasis, Hero, Theme, Tokens, YScale};
 
 pub const WIDTH: f64 = 960.0;
 pub const HEIGHT: f64 = 540.0;
@@ -31,7 +29,6 @@ const SMALL: f64 = 12.0;
 const FOOT_SIZE: f64 = 10.0;
 /// Space between the plot edge and the outermost gridline, kept for labels.
 const INNER_PAD: f64 = 18.0;
-const Y_TITLE: &str = "TRG (95% CI)";
 const X_TITLE: &str = "Artifact bytes: median emitted file (log scale)";
 
 /// Style of one text element.
@@ -194,6 +191,7 @@ struct Frame {
     key_x: f64,
     key_base: f64,
     y_title_base: f64,
+    y_scale: YScale,
     x0: f64,
     x1: f64,
     top: f64,
@@ -212,6 +210,7 @@ fn extent(values: impl Iterator<Item = f64>) -> (f64, f64) {
 impl Frame {
     fn new(hero: &Hero, key_w: f64) -> Frame {
         let title_base = 42.0;
+        let y_scale = hero.y_scale;
         let note = hero
             .note
             .as_deref()
@@ -224,22 +223,26 @@ impl Frame {
         let key_x = WIDTH - MARGIN - key_w;
         let key_base = header + 28.0;
         // The y title shares the key row unless the key reaches it.
-        let shared = key_x >= MARGIN + text_width(Y_TITLE, SMALL, false) + 24.0;
+        let shared = key_x >= MARGIN + text_width(y_scale.title(), SMALL, false) + 24.0;
         let y_title_base = if shared { key_base } else { key_base + 18.0 };
         let (top, bottom) = (y_title_base + 14.0, HEIGHT - 64.0);
-        let trg = hero
-            .points
-            .iter()
-            .flat_map(|p| [p.trg, p.ci_low, p.ci_high]);
-        let (lo, hi) = extent(trg.chain(hero.references.iter().map(|r| r.trg)));
-        let steps = trg_steps(lo, hi);
+        let y_vals = hero.points.iter().flat_map(|p| {
+            [
+                y_scale.convert(p.trg),
+                y_scale.convert(p.ci_low),
+                y_scale.convert(p.ci_high),
+            ]
+        });
+        let (lo, hi) = extent(y_vals.chain(hero.references.iter().map(|r| y_scale.convert(r.trg))));
+        let step = y_scale.step();
+        let steps = y_steps(lo, hi, step, y_scale.anchor_step());
         let tick_w = (steps.0..=steps.1)
-            .map(|k| text_width(&tick_text(k as f64 * TRG_STEP), SMALL, false))
+            .map(|k| text_width(&y_scale.tick_label(k as f64 * step), SMALL, false))
             .fold(0.0, f64::max);
         let (x0, x1) = (MARGIN + tick_w + 10.0, WIDTH - MARGIN);
         let ys = Axis {
-            lo: steps.0 as f64 * TRG_STEP,
-            hi: steps.1 as f64 * TRG_STEP,
+            lo: steps.0 as f64 * step,
+            hi: steps.1 as f64 * step,
             start: bottom - INNER_PAD,
             end: top + INNER_PAD,
         };
@@ -257,6 +260,7 @@ impl Frame {
             key_x,
             key_base,
             y_title_base,
+            y_scale,
             x0,
             x1,
             top,
@@ -271,12 +275,18 @@ impl Frame {
 /// Gridlines with their values, then the x axis with its byte ticks.
 fn axes(svg: &mut Svg, f: &Frame, t: &Tokens) {
     let tick = Style::plain(SMALL, t.ink2);
+    let step = f.y_scale.step();
     for k in f.steps.0..=f.steps.1 {
-        let value = k as f64 * TRG_STEP;
+        let value = k as f64 * step;
         let y = f.ys.at(value);
         svg.line("grid", (f.x0, y), (f.x1, y), t.grid, "");
         let at = (f.x0 - 8.0, y + 4.0);
-        svg.text("tick", at, tick.anchored(Anchor::End), &tick_text(value));
+        svg.text(
+            "tick",
+            at,
+            tick.anchored(Anchor::End),
+            &f.y_scale.tick_label(value),
+        );
     }
     svg.line("axis", (f.x0, f.bottom), (f.x1, f.bottom), t.axis, "");
     for (value, label) in BYTE_TICKS {
@@ -298,13 +308,13 @@ fn marks(hero: &Hero, f: &Frame) -> Vec<Mark> {
         } else {
             4.0
         };
-        let cy = f.ys.at(p.trg);
+        let cy = f.ys.at(f.y_scale.convert(p.trg));
         Mark {
             cx: f.xs.at(p.bytes.log10()),
             cy,
             r,
-            top: f.ys.at(p.ci_high).min(cy - r - 2.0),
-            bottom: f.ys.at(p.ci_low).max(cy + r + 2.0),
+            top: f.ys.at(f.y_scale.convert(p.ci_high)).min(cy - r - 2.0),
+            bottom: f.ys.at(f.y_scale.convert(p.ci_low)).max(cy + r + 2.0),
         }
     };
     hero.points.iter().map(mark).collect()
@@ -317,11 +327,14 @@ fn points(svg: &mut Svg, hero: &Hero, marks: &[Mark], f: &Frame, t: &Tokens) {
     for i in order {
         let (p, m) = (&hero.points[i], &marks[i]);
         let (color, class) = (p.tier.color(t), p.tier.class());
-        svg.push(format!("<g><title>{}</title>", esc(&point_title(p))));
+        svg.push(format!(
+            "<g><title>{}</title>",
+            esc(&point_title(p, f.y_scale))
+        ));
         svg.push(format!(
             "<line class=\"ci {class}\" x1=\"{x}\" y1=\"{}\" x2=\"{x}\" y2=\"{}\" stroke=\"{color}\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>",
-            coord(f.ys.at(p.ci_high)),
-            coord(f.ys.at(p.ci_low)),
+            coord(f.ys.at(f.y_scale.convert(p.ci_high))),
+            coord(f.ys.at(f.y_scale.convert(p.ci_low))),
             x = coord(m.cx)
         ));
         svg.dot(&format!("pt {class}"), m.cx, m.cy, m.r, color);
@@ -352,7 +365,12 @@ fn furniture(svg: &mut Svg, hero: &Hero, f: &Frame, key: &[(KeyMark, String)], t
         svg.text("key", (text_x, f.key_base), small, text);
         x = text_x + text_width(text, SMALL, false) + 16.0;
     }
-    svg.text("axis-title", (MARGIN, f.y_title_base), small, Y_TITLE);
+    svg.text(
+        "axis-title",
+        (MARGIN, f.y_title_base),
+        small,
+        f.y_scale.title(),
+    );
     let at = ((f.x0 + f.x1) / 2.0, f.bottom + 38.0);
     svg.text("axis-title", at, small.anchored(Anchor::Middle), X_TITLE);
     let foot = Style::plain(FOOT_SIZE, t.muted).anchored(Anchor::End);
@@ -399,7 +417,11 @@ pub(super) fn draw(hero: &Hero, theme: Theme) -> (String, Rect, Vec<Rect>) {
         t.ink2,
         "4 3",
     );
-    let ref_y: Vec<f64> = hero.references.iter().map(|r| f.ys.at(r.trg)).collect();
+    let ref_y: Vec<f64> = hero
+        .references
+        .iter()
+        .map(|r| f.ys.at(f.y_scale.convert(r.trg)))
+        .collect();
     for y in &ref_y {
         svg.line("ref", (f.x0, *y), (f.x1, *y), t.muted, "2 3");
     }
