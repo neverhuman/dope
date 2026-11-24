@@ -10,7 +10,7 @@ written by a generator, and generated hero figures:
   (``bench/real-world/render.py`` from the benchmark summary);
 * ``DOPE1 WALKTHROUGH``: ``examples/adult/TRANSCRIPT.md``
   (``examples/adult/walkthrough.py`` from a recorded CLI run);
-* heroes: the v3.0.0 ``bench/real-world/figures/hero-v3-{light,dark}.svg``
+* heroes: the v3.0.0 ``bench/real-world/figures/hero-v3-methods-{light,dark}.svg``
   (``dope_kpi render-hero``), hash-listed in the scoreboard manifest next to the
   receipt digests, and the v1.0.0 ``bench/real-world/figures/hero.png``,
   hash-listed in the render manifest next to the summary digest.
@@ -37,7 +37,7 @@ BLOCKS = {
 HERO = "bench/real-world/figures/hero.png"
 MANIFEST = "bench/real-world/results/render-manifest.json"
 SUMMARY = "bench/real-world/results/confirm/summary.json"
-HEROES = ("bench/real-world/figures/hero-v3-light.svg", "bench/real-world/figures/hero-v3-dark.svg")
+HEROES = ("bench/real-world/figures/hero-v3-methods-light.svg", "bench/real-world/figures/hero-v3-methods-dark.svg")
 SCOREBOARD_MANIFEST = f"{SCOREBOARD}/render-manifest.json"
 
 

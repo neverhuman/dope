@@ -110,9 +110,12 @@ def calibration_cell(comp: dict[str, Any]) -> str:
 
 def comparison_cells(comp: dict[str, Any]) -> list[str]:
     """The README row of one comparison: 6 cells (first one without backticks)."""
-    if comp.get("kind") == "seed_group" or comp.get("baseline_above_budget", 0) > 0:
-        raise TableError(f"comparison {comp.get('id')}: seed groups and over-budget baselines are not rendered")
+    if comp.get("kind") == "seed_group":
+        raise TableError(f"comparison {comp.get('id')}: seed groups are not rendered")
     guards = "; ".join(guard_word(g, comp) for g in comp["decision"]["guards"])
+    above = comp.get("baseline_above_budget", 0)
+    if above > 0:
+        guards += f"; baseline above budget {above}"
     delta = f"{signed3(comp['delta'])} [{signed3(comp['ci_low'])}, {signed3(comp['ci_high'])}]"
     return [f"{comp['id']} vs {comp['baseline']}", delta, f"{p_value(comp['p_holm'])} ({comp['holm_m']})",
             guards, calibration_cell(comp), comp["decision"]["outcome"]]

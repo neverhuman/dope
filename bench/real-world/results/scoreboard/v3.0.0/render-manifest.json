@@ -4,12 +4,15 @@
     "bench/real-world/figures/hero-v3-light.svg": "bcd83c2f81b5d34c99b08d9470863d224993d4e61d70736e4ab5cae2f9ffaa62",
     "bench/real-world/figures/hero-v3-methods-dark.svg": "4b3a018bdc5247f5c5af0dbb0af6b70db068aa3ee3ff521daaa62837dac69322",
     "bench/real-world/figures/hero-v3-methods-light.svg": "2e7a8dda62ac5b201dac72231090811b17a581ee1ca20e190fe8673d1e8b0c76",
-    "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "cc380e928498be851512ca93ebdfeafb93e6ac407ed9724e440848b5aac7c3ab"
+    "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "d58b7311fc5d767d208a14dfa2c39c4c4240a3447cb8ca2e63569ed3ea0a7311"
   },
   "receipts": {
-    "bench/real-world/results/scoreboard/v3.0.0/compare.json": "5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49",
-    "bench/real-world/results/scoreboard/v3.0.0/primary.json": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba"
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-arfpy-arf.json": "aba08611a37b197716f2f5a7ca8797c40a54bf0b5b35cd93701f781fdda683b7",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-ctgan.json": "8650350fd3d1ba74dbc564b64d40125558e5b4bb3f1e7784d01bdd5369bcad56",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-gaussian-copula.json": "6f1cb70a8dc695a33a3cbe37b8a441707c19c5bdc6e5760a8fb78d8413d25a58",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/paper/v3-vs-sdv-tvae.json": "97b682a81d9592637aa9f0fee0bcb1d9c9bef5df954e12ad4ee379a861d03704",
+    "bench/real-world/results/scoreboard/v3.0.0/primary-methods.json": "47ff73b1e35b8b29210de6df55538d60c65b59486c405d641027aff2124deda2"
   },
-  "renderer": "dope_kpi render-readme --ranked",
+  "renderer": "dope_kpi render-readme --ranked --only-included",
   "schema": "dope.scoreboard-render-manifest/v1"
 }

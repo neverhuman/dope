@@ -58,40 +58,46 @@ class CellFormatting(unittest.TestCase):
 
 class ReadmeCrossCheck(unittest.TestCase):
     def setUp(self):
-        self.primary, self.compare = load("primary.json"), load("compare.json")
+        primary_methods = load("primary-methods.json")
+        keep = {"dope-v3b-auto-v8", "arfpy-arf", "sdv-gaussian-copula", "sdv-tvae", "sdv-ctgan"}
+        self.arms = [a for a in primary_methods["arms"] if a["arm_id"] in keep or a["artifact_class"] == "control"]
+        self.comps = [
+            load(f"evidence/paper/v3-vs-{arm}.json")["comparisons"][0]
+            for arm in ("arfpy-arf", "sdv-gaussian-copula", "sdv-tvae", "sdv-ctgan")
+        ]
 
     def test_committed_receipts_render_the_committed_readme_block(self):
-        tables.cross_check(readme(), self.primary["arms"], self.compare["comparisons"], set())
+        tables.cross_check(readme(), self.arms, self.comps, set())
 
     def test_every_receipt_row_is_a_readme_row_with_eleven_cells(self):
         arms, comps = tables.parse_readme_block(readme())
-        self.assertEqual(set(arms), {a["arm_id"] for a in self.primary["arms"]})
+        self.assertEqual(set(arms), {a["arm_id"] for a in self.arms})
         self.assertTrue(all(len(cells) == 11 for cells in arms.values()))
-        self.assertEqual(len(comps), len(self.compare["comparisons"]))
+        self.assertEqual(len(comps), len(self.comps))
 
     def test_a_changed_value_is_an_error(self):
-        arms = copy.deepcopy(self.primary["arms"])
+        arms = copy.deepcopy(self.arms)
         arms[0]["primary"]["trg"] += 0.01
         with self.assertRaisesRegex(tables.TableError, "differs from its receipt"):
-            tables.cross_check(readme(), arms, self.compare["comparisons"], set())
+            tables.cross_check(readme(), arms, self.comps, set())
 
-    def test_a_receipt_arm_absent_from_the_readme_is_an_error_unless_third_party(self):
-        extra = copy.deepcopy(self.primary["arms"][0])
-        extra["arm_id"] = "sdv-gaussian-copula"
-        arms = self.primary["arms"] + [extra]
+    def test_a_receipt_arm_absent_from_the_readme_is_an_error_unless_extra(self):
+        extra = copy.deepcopy(self.arms[0])
+        extra["arm_id"] = "dope-2.0.0-auto"
+        arms = self.arms + [extra]
         with self.assertRaisesRegex(tables.TableError, "missing from the README"):
-            tables.cross_check(readme(), arms, self.compare["comparisons"], set())
-        tables.cross_check(readme(), arms, self.compare["comparisons"], {"sdv-gaussian-copula"})
+            tables.cross_check(readme(), arms, self.comps, set())
+        tables.cross_check(readme(), arms, self.comps, {"dope-2.0.0-auto"})
 
     def test_a_readme_row_without_a_receipt_is_an_error(self):
         with self.assertRaisesRegex(tables.TableError, "in no receipt"):
-            tables.cross_check(readme(), self.primary["arms"][1:], self.compare["comparisons"], set())
+            tables.cross_check(readme(), self.arms[1:], self.comps, set())
 
     def test_a_changed_comparison_is_an_error(self):
-        comps = copy.deepcopy(self.compare["comparisons"])
+        comps = copy.deepcopy(self.comps)
         comps[0]["p_holm"] = 0.5
         with self.assertRaisesRegex(tables.TableError, "comparison rows differ"):
-            tables.cross_check(readme(), self.primary["arms"], comps, set())
+            tables.cross_check(readme(), self.arms, comps, set())
 
 
 class ArmAndComparisonTables(unittest.TestCase):

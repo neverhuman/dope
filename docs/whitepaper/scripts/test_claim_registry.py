@@ -71,7 +71,7 @@ class ClaimRegistryTests(unittest.TestCase):
         self.assertIsNotNone(self.inputs[6], "CITATION.cff is checked in the repository")
 
     def test_forbidden_language_in_readme_prose_or_title_is_refused(self):
-        readme = self.inputs[5].replace("a few-kilobyte **program**", "a **kilobyte-scale** generator", 1)
+        readme = self.inputs[5].replace("a compact binary **program**", "a **kilobyte-scale** generator", 1)
         self.assertNotEqual(readme, self.inputs[5])
         self.assertIn("README uses forbidden language", self.failures(readme=readme))
         history = self.inputs[8].replace("These are historical", "These are state-of-the-art historical", 1)

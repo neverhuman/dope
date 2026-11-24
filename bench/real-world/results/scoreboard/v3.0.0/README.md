@@ -7,11 +7,12 @@ scoreboard and its receipts stay in [`../v2.0.0/`](../v2.0.0/README.md).
 
 | File | Written by |
 | --- | --- |
-| `primary.json` | `dope_kpi primary` (`dope.kpi-receipt/v2`): TRG of every arm with its family-bootstrap interval |
-| `compare.json` | `dope_kpi compare`: the one pre-registered comparison, its Holm-adjusted p, guards and outcome |
-| `readme-block.md` | `dope_kpi render-readme --ranked` from the receipts above. `README.md` carries it byte for byte. |
-| `../../../figures/hero-v3-light.svg`, `../../../figures/hero-v3-dark.svg` | `dope_kpi render-hero` from the same receipts |
-| `render-manifest.json` | the SHA-256 of every receipt, of the block and of both hero files |
+| `primary-methods.json` | `dope_kpi primary` (`dope.kpi-receipt/v2`): TRG of DOPE v3, third-party generators and controls with family-bootstrap intervals |
+| `evidence/paper/v3-vs-*.json` | `dope_kpi compare`: paired comparisons of DOPE v3 against ARF, SDV Gaussian copula, TVAE and CTGAN |
+| `primary.json`, `compare.json` | archived DOPE-internal receipts for the release decision (HOLD) |
+| `readme-block.md` | `dope_kpi render-readme --ranked --only-included` from `primary-methods.json` and `evidence/paper/v3-vs-*.json`. `README.md` carries it byte for byte. |
+| `../../../figures/hero-v3-methods-light.svg`, `../../../figures/hero-v3-methods-dark.svg` | `dope_kpi render-hero` from `primary-methods.json` |
+| `render-manifest.json` | the SHA-256 of every rendered receipt, of `readme-block.md`, and of the hero SVG files |
 
 ## What this look is
 
@@ -35,11 +36,16 @@ integration branch. A local static-pie build of `dope 3.0.0` from `3fb802fd` rep
 all 108 scheduled packet SHA-256 digests. The signed draft binary must reproduce
 the same digests before publication.
 
-**Read the guards with the headline.** The comparison's outcome under the `dope-kpi/v2`
-promotion rule is HOLD, not PROMOTE. TRG improves, but four guards fail: the regression lower
-bound, the held-out MLP auditor, realism coverage and privacy coverage. The block reports each
-one. The release ships `--format auto-v8` as the encoder with the best TRG at 2 KiB, with those
-trade-offs stated. `--format 1` remains the CLI default.
+**Read the guards with the headline.** In the archived internal release comparison of
+`dope-v3b-auto-v8` against `dope-2.0.0-auto` ([`compare.json`](compare.json)), the outcome
+under the `dope-kpi/v2` promotion rule is HOLD, not PROMOTE: TRG improves, but four guards
+fail (the regression lower bound, the held-out MLP auditor, realism coverage, and privacy
+coverage). The visible README scoreboard block reports the four external method comparisons
+from [`evidence/paper/v3-vs-*.json`](evidence/paper/README.md) (`PROMOTE` against SDV TVAE;
+`HOLD` against ARF, SDV Gaussian copula, and SDV CTGAN) together with each pair's guards.
+The release ships `--format auto-v8` as the encoder with the best TRG at 2 KiB among the
+evaluated DOPE release candidates, with those trade-offs stated. `--format 1` remains the
+CLI default.
 
 ## TRG, the twin-referenced gap
 
@@ -76,18 +82,27 @@ block and both hero files from the committed receipts into a staging directory u
 KPI=/path/to/dope_kpi bash -euo pipefail <<'CHECK'
 D=bench/real-world/results/scoreboard/v3.0.0; F=bench/real-world/figures
 mkdir -p target; S=$(mktemp -d target/scoreboard-v3.XXXXXX)
-args=(--receipt "$D/primary.json" --receipt "$D/compare.json")
-labels=(--label "dope-v3b-auto-v8=DOPE 3.0.0 auto-v8"
-  --label "dope-2.0.0-auto=DOPE 2.0.0 auto" --label "dope-2.0.0-small=DOPE 2.0.0 small"
-  --label "dope-1.3.0-small=DOPE 1.3.0 small" --label "pr390-v7-step0=V7 step 0"
-  --label "dse8-p0-v3b=DSE8 analytic")
-"$KPI" render-readme --ranked "${args[@]}" "${labels[@]}" < /dev/null > "$S/readme-block.md"
-hero=(--highlight dope-v3b-auto-v8 "${labels[@]}" --previous dope-2.0.0-auto --previous dope-2.0.0-small
-  --previous dope-1.3.0-small --reference copy_a --reference bootstrap_a
-  --note "DEV estimate: fresh row splits of the 22 DEV tables, {cells} cells, {families} families (no CONFIRM look)")
-for t in light dark; do "$KPI" render-hero "${args[@]}" --theme "$t" --out "$S/hero-v3-$t.svg" "${hero[@]}" < /dev/null; done
+args=(--receipt "$D/primary-methods.json"
+  --receipt "$D/evidence/paper/v3-vs-arfpy-arf.json"
+  --receipt "$D/evidence/paper/v3-vs-sdv-gaussian-copula.json"
+  --receipt "$D/evidence/paper/v3-vs-sdv-tvae.json"
+  --receipt "$D/evidence/paper/v3-vs-sdv-ctgan.json")
+include=(--include dope-v3b-auto-v8 --include arfpy-arf --include sdv-gaussian-copula
+  --include sdv-tvae --include sdv-ctgan
+  --reference copy_a --reference bootstrap_a --reference indep_marginals --reference label_shuffle
+  --only-included)
+labels=(--label "dope-v3b-auto-v8=DOPE v3" --label "arfpy-arf=ARF"
+  --label "sdv-gaussian-copula=SDV Gaussian copula" --label "sdv-tvae=SDV TVAE"
+  --label "sdv-ctgan=SDV CTGAN" --label "copy_a=Copy of fitting rows"
+  --label "bootstrap_a=Bootstrap of fitting rows" --label "indep_marginals=Independent marginals"
+  --label "label_shuffle=Label shuffle")
+"$KPI" render-readme --ranked "${args[@]}" "${include[@]}" "${labels[@]}" < /dev/null > "$S/readme-block.md"
+for t in light dark; do
+  "$KPI" render-hero --methods --receipt "$D/primary-methods.json" --theme "$t" \
+    --out "$S/hero-v3-methods-$t.svg" < /dev/null
+done
 cmp "$S/readme-block.md" "$D/readme-block.md"
-for t in light dark; do cmp "$S/hero-v3-$t.svg" "$F/hero-v3-$t.svg"; done
+for t in light dark; do cmp "$S/hero-v3-methods-$t.svg" "$F/hero-v3-methods-$t.svg"; done
 python3 tools/claims/dope1.py --check
 CHECK
 ```

@@ -329,7 +329,11 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     final = final_mod.load(SCOREBOARD, read_json, lambda rel: (REPO / rel).read_text(encoding="utf-8"),
                            lambda rel: (REPO / rel).is_file(), sha256, primary, roles["Base"], roles["Cand"], check_same_run)
     readme = (REPO / f"{SCOREBOARD}/readme-block.md").read_text(encoding="utf-8")
-    tables.cross_check(readme, primary["arms"] + third, compare["comparisons"], {a["arm_id"] for a in third})
+    if methods:
+        readme_arms = [a for a in primary["arms"] if a["arm_id"] == roles["Cand"] or a["artifact_class"] == "control"] + third
+        tables.cross_check(readme, readme_arms, list(methods["versus"].values()), set())
+    else:
+        tables.cross_check(readme, primary["arms"], compare["comparisons"], set())
     consts, rust_files = rust_constants()
     by_id = {a["arm_id"]: a for a in primary["arms"]}
     cand = by_id[roles["Cand"]]["primary"]
