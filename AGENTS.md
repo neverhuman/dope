@@ -1,6 +1,80 @@
-# Dope repository guide
+# DOPE
 
-## Current language policy — 2026-11-03
+DOPE compiles a table with a declared target into a small generative program.
+The program stores no source rows. `dope sample` draws synthetic rows from that file alone.
+
+External coding agents should follow [Using DOPE](#using-dope) and stop there.
+[Changing this repository](#changing-this-repository) is for people who edit this source tree.
+
+## Using DOPE
+
+### Install
+
+The public binary is the signed Linux x86-64 engine, tag `dope-engine-v3.0.0`.
+`gh` 2.102.0 or newer is required. `scripts/install.sh` checks `SHA256SUMS` and the
+GitHub/Sigstore attestation before it installs the binary.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --no-weights
+dope doctor
+```
+
+`--no-weights` installs the analytic engine. The published `dope-engine-v3.0.0`
+release does not ship `dope-v8-weights.safetensors`, so do not pass installer
+`--v8-weights` for that tag. Do not invent a `dope-engine-v3.1.0` tag. Source on
+`main` can package a later weights path; the signed release users download is
+still `dope-engine-v3.0.0`.
+
+Verification and a from-source build are in
+[docs/signed-engine-release.md](docs/signed-engine-release.md).
+A step-by-step table walkthrough is in
+[docs/getting-started.md](docs/getting-started.md).
+
+### Fit, inspect, sample, evaluate
+
+Use a headered CSV and name the target. Follow
+[the target-last contract](docs/data-contract.md): the target comes from that
+declaration, it stays out of the features, and duplicate physical rows stay in
+the same split.
+
+```bash
+dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
+dope inspect model.dope
+dope sample model.dope -n 1000 -o synthetic.csv
+dope eval -m model.dope --train train.csv --test test.csv
+```
+
+`--format 1` is the CLI default. `--format auto-v8` is the v3.0.0 release encoder.
+It fits Format 1 and the weight-free DSE8 packet inside one file of at most 2048
+bytes, and it keeps DSE8 when a duplicate-grouped two-fold check on the fitting
+rows prefers it.
+
+The command list for this binary is [engine/README.md](engine/README.md).
+[docs/cli.md](docs/cli.md) documents a different program, the historical
+`dope-kernel` facade (`compile-raw`, `fit-table`, and the alpha installer).
+
+### What you may say about the results
+
+The numbers on the landing page come from the committed v3.0.0 scoreboard.
+Read them from [README.md](README.md) and the
+[scoreboard receipts](bench/real-world/results/scoreboard/v3.0.0/README.md).
+The manuscript is [docs/whitepaper-v3/dope-v3.pdf](docs/whitepaper-v3/dope-v3.pdf).
+Earlier manuscripts live under `docs/whitepaper/`, `docs/whitepaper-v2/`, and `paper/`.
+
+When you summarize a result, keep these limits:
+
+- The published tag is an uncertified engine release. The certification gates are in [docs/release.md](docs/release.md).
+- The report is a fresh-split DEV-SELECT estimate. No confirmation, holdout, or sealed panel was opened.
+- On that report look, the paired difference versus ARF includes zero. DOPE is PROMOTE against TVAE and HOLD against ARF, the Gaussian copula, and CTGAN. The second look is in the paper and is not pooled with the first.
+- Storing no source rows is a property of the file format. It is not differential privacy and not HIPAA de-identification.
+- Cross-model feature-driver preservation is not yet measured.
+- Synthetic rows from this release remain easy for a boosted-tree classifier to distinguish from real rows.
+
+Treat a `.dope` file and any synthetic CSV as derived data. Schema and fitted summaries can carry information about the input.
+
+## Changing this repository
+
+### Current language policy — 2026-11-03
 
 The latest user instruction is **Python ONLY for deep-learning TRAINING; everything else in DOPE must be Rust**. This supersedes historical V1, advanced-data, benchmark and research-Python exceptions as end-state permission. Python may own actual neural model/loss/autograd/optimizer steps and necessary training-coupled batch/RNG/checkpoint state. Standalone preparation, inference, classical evaluator fitting, validation/metrics/Elo, reports/qualification, CLI/orchestration, CI/checkers/examples and new nontraining tests are Rust. A mixed module or use of a neural model is not an exemption.
 

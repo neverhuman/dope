@@ -1,14 +1,20 @@
 # Documentation
 
-Start with the [repository map](REPO_MAP.md) if you are new, and with
-[the math](math.md) if you want to know why DOPE works and what to build next.
+Start with [getting started](getting-started.md) to install the signed engine
+and fit a table, and with [AGENTS.md](../AGENTS.md) if you are an automated
+coding agent. The current manuscript is
+[whitepaper-v3/dope-v3.pdf](whitepaper-v3/dope-v3.pdf).
 
 | Path | What it is |
 | --- | --- |
-| [whitepaper-v2/](whitepaper-v2/README.md) | **The DOPE v2.0.0 White Paper**: [`docs/whitepaper-v2/dope-v2.tex`](whitepaper-v2/dope-v2.tex) ([`dope-v2.pdf`](whitepaper-v2/dope-v2.pdf)), covering Format 2, the SingleEncV7 single encoding, CPU fleet training and the `dope_kpi` scoreboard; its macros are generated from committed receipts |
+| [getting-started.md](getting-started.md) | Install `dope-engine-v3.0.0` and run `dope fit --format auto-v8` |
+| [../AGENTS.md](../AGENTS.md) | Public engine usage, claim limits, and repository rules for editors |
+| [whitepaper-v3/](whitepaper-v3/README.md) | **Current white paper** (`dope-v3.pdf`): Transfer Score for `auto-v8` against ARF, SDV Gaussian copula, TVAE, and CTGAN. Every number is a macro from committed receipts |
+| [signed-engine-release.md](signed-engine-release.md) | Verify `scripts/install.sh`, `SHA256SUMS`, and the Sigstore attestation |
+| [whitepaper-v2/](whitepaper-v2/README.md) | Archived DOPE v2.0.0 manuscript: [`dope-v2.tex`](whitepaper-v2/dope-v2.tex) ([`dope-v2.pdf`](whitepaper-v2/dope-v2.pdf)), Format 2, SingleEncV7, and the v2 scoreboard |
 | [../bench/real-world/results/scoreboard/v3.0.0/](../bench/real-world/results/scoreboard/v3.0.0/README.md) | The v3.0.0 scoreboard (DEV estimate): TRG, the receipts behind the README `DOPE1 SCOREBOARD` block and hero, and the command that re-renders them |
 | [../bench/real-world/results/scoreboard/v2.0.0/](../bench/real-world/results/scoreboard/v2.0.0/README.md) | The v2.0.0 scoreboard: TRG (the twin-referenced gap) definition, the `dope_kpi` receipts behind the README `DOPE1 SCOREBOARD` block and hero, and the command that regenerates them |
-| [../paper/](../paper/README.md) | **The DOPE v1.0.0 White Paper**: [`paper/dope1.tex`](../paper/dope1.tex) (`target/paper/dope1.pdf`) and [`paper/dope1-supplement.tex`](../paper/dope1-supplement.tex) (`target/paper/dope1-supplement.pdf`), covering the standalone Rust `dope` engine, 16-table real-world study, and 1,000+ dataset `DOPE-MLC-v2`/`v3` study |
+| [../paper/](../paper/README.md) | Archived v1.0.0 manuscript: [`paper/dope1.tex`](../paper/dope1.tex) and [`paper/dope1-supplement.tex`](../paper/dope1-supplement.tex) |
 | [multilevel-landmark-dl-study.md](multilevel-landmark-dl-study.md) | Canonical 1,000-dataset (`DOPE-MLC-v2`) and 1,069-dataset (`DOPE-MLC-v3`) deep learning study, round-by-round convergence tables, and `v8` receipt provenance |
 | [model-sizes-and-elo.md](model-sizes-and-elo.md) | Complete model weight inventory (`SafeTensors`, `.pt`, `.dml3`), SHA-256 digests, wire byte accounting, and Bradley–Terry Elo tables |
 | [jopedime-integration.md](jopedime-integration.md) | **Downstream Integration & Pinning Guide (`JopeDime` & `JopeDimeMicro`)**: `v1.0.0` weight asset + signed `dope-engine-v1.3.0` (`cd35d9d0`) source pinning, `[B, 256] + [B, 64, 17] -> [B, 629]` and `[B, 512]` contracts (`DopeEncoder629` and Rust `MlcV3Model`), `encoder_629` and `resident_release_check` examples, CPU export, CUDA capture, and proposed downstream projection optimization |
@@ -19,9 +25,8 @@ Start with the [repository map](REPO_MAP.md) if you are new, and with
 | [claims-policy.md](claims-policy.md) | What the public surface may claim, evidence labels, banned phrases |
 | [benchmark.md](benchmark.md) | Public-table benchmark protocol, datasets, baselines, and auditors |
 | [architecture.md](architecture.md) | Pure-Rust engine product, compatibility boundary, and contract inputs |
-| [cli.md](cli.md) | Native command reference, including the table and `mlc-v3` workflows |
+| [cli.md](cli.md) | Historical `dope-kernel` facade (`compile-raw`, `fit-table`). The signed engine commands are in [engine/README.md](../engine/README.md) |
 | [data-contract.md](data-contract.md) | The mandatory target-last table contract |
-| [signed-engine-release.md](signed-engine-release.md) | Verified `scripts/install.sh` workflow, `SHA256SUMS` + `BUILDINFO.json` integrity, and Sigstore OIDC release attestations |
 | [testing.md](testing.md) | Deterministic test commands, budgets, and repair evidence |
 | [audit.md](audit.md), [audit-rubric.md](audit-rubric.md) | Jankurai gate, exceptions, and finding severity |
 | [release.md](release.md) | Certification and publication gates |
