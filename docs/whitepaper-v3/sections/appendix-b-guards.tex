@@ -31,3 +31,50 @@ A synthetic file's exact-copy excess is
 \end{equation}
 summed over the file's complete entries; the promotion guard reads its mean over the candidate's headline files on the common cells.
 Reference rows carry no artifact, so their byte guard is not evaluated.
+
+\paragraph{Development comparisons and the contract decision.}
+Tables~\ref{tab:paired} and~\ref{tab:repeat-b} report the recorded decisions with DOPE as the candidate. We use the intervals to describe development transfer in the main text. The directional tests and guard outcomes document the development contract.
+
+\begin{table}[tbp]
+  \centering\footnotesize
+  \caption{DOPE minus each third-party generator in Transfer Score points on common cells, at \VThree{PrimaryMult}$\times$ and at matched size. The contract's one-sided $p$-values, Holm adjustment over \VThree{MethodsHolmM} pairs per block, decisions and failed guards apply at \VThree{PrimaryMult}$\times$. The report direction was recomputed after scoring from the same per-cell results. The second set of splits used that direction prospectively (family receipt \texttt{\VThree{SecondLookFamilySha}}). The two blocks are separate.}
+  \label{tab:paired}
+  \input{generated/v3-paired-table}
+\end{table}
+
+\begin{table}[tbp]
+  \centering\footnotesize
+  \caption{Final set of row splits on the same development tables. The table covers \HPartBValue{\HPartBDope}{cells} informative headline cells in \HPartBValue{\HPartBDope}{families} families. The first score column uses \VThree{PrimaryMult}$\times$ sampling. Both paired differences are DOPE minus the baseline, with separate \VThree{CiLevel} family-bootstrap intervals. The adjusted probabilities and contract decisions apply at \VThree{PrimaryMult}$\times$. Failures remain in the score.}
+  \label{tab:repeat-b}
+  \begin{tabular}{@{}lrrrrrl@{}}
+    \toprule
+    Generator & Score & Failed & Difference at \VThree{PrimaryMult}$\times$ [CI] & At \VThree{MatchedMult}$\times$ [CI] & Holm $p$ & Decision \\
+    \midrule
+    DOPE & \HPartBScore{\HPartBDope}{score} & \HPartBValue{\HPartBDope}{failed} & --- & --- & --- & --- \\
+    \HPartBComparedRow{ARF}{\HPartBArf}
+    \HPartBComparedRow{Gaussian copula}{\HPartBCopula}
+    \HPartBComparedRow{TVAE}{\HPartBTvae}
+    \HPartBComparedRow{CTGAN}{\HPartBCtgan}
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The Gaussian copula comparison passes the statistical conditions. Its task-level guard requires a lower bound above \HPartBScore{\HPartBCopula}{task_threshold} points. The bound is \HPartBScore{\HPartBCopula}{task_guard}, so the contract decision is HOLD. ARF's intervals cross zero at both sample sizes on this split set.
+
+\paragraph{Retention by auditor.}
+The table shows median retention among successfully scored, informative entries at \VThree{PrimaryMult}$\times$ on the report look. Retention is the improvement over a null model relative to a learner fitted on the source rows (Eq.~\ref{eq:retention}). The headline Transfer Score also accounts for failures, adjusts for the real twin and weights lineage families. The MLP is held out from the headline and participates in the guard.
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Generator & Linear & Boosted trees & Held-out MLP \\
+    \midrule
+    DOPE & \VThree{CandRetLinear} & \VThree{CandRetGbdt} & \VThree{CandRetMlp} \\
+    ARF & \VThree{ArfRetLinear} & \VThree{ArfRetGbdt} & \VThree{ArfRetMlp} \\
+    SDV Gaussian copula & \VThree{GcRetLinear} & \VThree{GcRetGbdt} & \VThree{GcRetMlp} \\
+    SDV TVAE & \VThree{TvaeRetLinear} & \VThree{TvaeRetGbdt} & \VThree{TvaeRetMlp} \\
+    SDV CTGAN & \VThree{CtganRetLinear} & \VThree{CtganRetGbdt} & \VThree{CtganRetMlp} \\
+    \bottomrule
+  \end{tabular}
+\end{center}

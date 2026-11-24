@@ -1,19 +1,19 @@
 \section{Introduction}\label{sec:intro}
 
-\begin{figure}[t]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{figures/hero-v3-methods.pdf}
-  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling, with its \VThree{CiLevel} family-bootstrap interval, against the median file size (log axis) on the pre-registered report look (\S\ref{sec:protocol}): DOPE~\VThree{ReleaseVersion} and four third-party generators, all fitted on the same rows; the third-party generators use library defaults and no byte cap. The vertical line is the \VThree{BudgetBytes}-byte budget; the horizontal lines mark a real twin of the fitting split (\VThree{ScoreScale}) and a copy of the fitting rows (\VThree{CopyAScorePoint}). Drawn by \texttt{dope\_kpi render-hero} from \texttt{primary-methods.json} (SHA-256 prefix \texttt{\VThree{MethodsPrimarySha}}) and converted to PDF without change (source SVG \texttt{\VThree{HeroSvgSha}}).}
+  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling on the development report splits. The left panel compares signed DOPE with storing and resampling a uniform subset of fitting rows under the same \VThree{BudgetBytes}-byte cap. The right panel compares DOPE with four generators fitted with library defaults and no cap, and gives the median whole-file sizes. Whiskers are \VThree{CiLevel} family-bootstrap intervals for individual scores. The final column gives paired differences in Transfer Score points and their intervals.}
   \label{fig:hero}
 \end{figure}
 
 Much of the demand for synthetic tabular data is downstream: a model is trained on synthetic rows and then used on real ones.
 DOPE treats this as a compression problem.
-A table with a declared target is the input to a compiler; its output is an artifact of at most $B$ bytes that stores no source rows, and a sampler draws rows from the artifact alone.
+A table with a declared target is the input to a compiler. Its output is an artifact of at most $B$ bytes that stores no complete input record. A sampler draws rows from that artifact alone. The recipient can fit a learner of their choice or feed rows through an existing preprocessing and model-selection pipeline.
 The questions are how much of the table's predictive structure survives at a fixed byte budget, measured by learners that never see the source rows during training, and how that compares with generators that may use as many bytes as they need.
 
 Release~\VThree{ReleaseVersion} encodes a table with \cli{dope fit -{}-format auto-v8}.
-It fits two codecs under a common container, the compressed program Format~1 and \texttt{DSE8}, an analytic packet that needs no trained weights, and chooses between them per table with a duplicate-grouped two-fold check on the fitting rows.
+It fits two codecs under a common container, Format~1 and the analytic \texttt{DSE8} packet. Both fit parameters from the input table without a pretrained checkpoint. A duplicate-grouped two-fold check on the fitting rows chooses the codec.
 The whole file, header included, stays within the budget (\VThree{BudgetBytes}~bytes by default).
 
 We summarize each generator by one number, the Transfer Score of \S\ref{sec:protocol}: a real twin of the fitting split scores \VThree{ScoreScale}, and higher is better.
@@ -24,13 +24,7 @@ Figure~\ref{fig:hero} and Table~\ref{tab:ranking} place DOPE against four third-
   \item \textbf{A packet codec with an explicit byte model} (\S\ref{sec:codec}, Appendix~\ref{app:codec}). \texttt{DSE8} is a CRC-checked sequence of tagged sections. Mandatory sections are sized by a closed-form byte model before fitting; optional sections are appended in a fixed order and truncated to the longest prefix that fits. Decoding is row-local and counter-seeded, so row $i$ depends only on the artifact, the seed and $i$.
   \item \textbf{An analytic, weight-free fit of that packet from the fitting rows only} (\S\ref{sec:fit}): typed marginals clipped at a support floor, a low-rank factor copula with regimes, and a calibrated target head with gated effects, pairwise interactions and oblivious trees.
   \item \textbf{Per-table codec selection} (\S\ref{sec:select}): \cli{auto-v8} keeps \texttt{DSE8} only when it beats Format~1 by a margin on a target-stratified, duplicate-grouped two-fold check and loses little on each fold. Appendix~\ref{app:ablation} shows what selection adds.
-  \item \textbf{A comparison with independent generators on one number} (\S\S\ref{sec:protocol}--\ref{sec:results}): a pre-registered, twin-referenced protocol with a family bootstrap and Holm's adjustment, under which DOPE and four third-party generators are scored on the same cells. Every number in this paper is rendered from committed receipts and checked in continuous integration (\S\ref{sec:repro}).
+  \item \textbf{A comparison with independent generators on one number} (\S\S\ref{sec:protocol}--\ref{sec:results}): a twin-referenced transfer protocol applied to four other generators and a uniform stored-row reference. Each comparison uses common fitting and test splits. Section~\ref{sec:repro} identifies the evidence.
 \end{enumerate}
 
-\paragraph{What we do not claim.}
-The evaluation is a development-set estimate; no confirmation, holdout or sealed panel was opened.
-DOPE is not shown to transfer better than ARF at the headline \VThree{PrimaryMult}$\times$ sampling: their paired interval contains zero on both looks reported here (at matched size it does on the report look only).
-The third-party generators ran with library defaults and no byte cap, and tuned configurations may score differently.
-Under the contract's full promotion rule, which also bounds per-task losses, a held-out auditor, realism and privacy, DOPE is PROMOTE over TVAE alone on the report look, and over TVAE and CTGAN on the second look (Table~\ref{tab:paired}).
-The artifacts do not make synthetic rows realistic in the two-sample sense, and the privacy diagnostics are empirical audits, not guarantees.
-Section~\ref{sec:limits} lists these limitations in full.
+The external comparisons answer a question about measured utility and file size on these development tables. The paired intervals and guard results in Section~\ref{sec:results} show where those rankings are uncertain and where higher predictive transfer coexists with weaker realism or privacy coverage.

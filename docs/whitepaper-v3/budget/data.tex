@@ -1,0 +1,47 @@
+\newcommand{\BudgetData}{../../bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k}
+\pgfplotstableread[col sep=comma]{\BudgetData/served.csv}\ServedBudget
+\pgfplotstableread[col sep=comma]{\BudgetData/rows.csv}\RowsBudget
+\pgfplotstableread[col sep=comma]{\BudgetData/k3-format1.csv}\FormatOneData
+\pgfplotstableread[col sep=comma]{\BudgetData/k3-group.csv}\RouteData
+\pgfplotstableread[col sep=comma]{\BudgetData/k33-summary.csv}\FitStatusData
+\pgfplotstableread[col sep=comma]{\BudgetData/panel-report.csv}\ReportPanelData
+\pgfplotstableread[col sep=comma]{\BudgetData/k5-training-summary.csv}\TrainingData
+\pgfplotstableread[col sep=comma]{../../bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/part-b/summary.csv}\HPartBData
+
+\newcommand{\MeasuredValue}[4][]{%
+  \pgfplotstablegetelem{#2}{#4}\of{#3}%
+  \pgfmathprintnumber[fixed,#1]{\pgfplotsretval}}
+% The fourth budget row is the common 2 KiB cap.
+\newcommand{\CapValue}[3][]{\MeasuredValue[#1]{3}{#2}{#3}}
+\newcommand{\CapScore}[2]{\CapValue[precision=1,fixed zerofill]{#1}{#2}}
+
+\newcommand{\FormatOneValue}[2][]{\MeasuredValue[#1]{0}{\FormatOneData}{#2}}
+\newcommand{\FormatOneScore}[1]{\FormatOneValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\FormatRouteValue}[2][]{\MeasuredValue[#1]{0}{\RouteData}{#2}}
+\newcommand{\AnalyticRouteValue}[2][]{\MeasuredValue[#1]{1}{\RouteData}{#2}}
+\newcommand{\FormatRouteScore}[1]{\FormatRouteValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\AnalyticRouteScore}[1]{\AnalyticRouteValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\FitValue}[2][]{\MeasuredValue[#1]{0}{\FitStatusData}{#2}}
+\newcommand{\FitScore}[1]{\FitValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\FitFailedValue}[2][]{\MeasuredValue[#1]{1}{\FitStatusData}{#2}}
+\newcommand{\FitFailedScore}[1]{\FitFailedValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\ReportPanelValue}[2][]{\MeasuredValue[#1]{0}{\ReportPanelData}{#2}}
+\newcommand{\ReportPanelDecimal}[1]{\ReportPanelValue[precision=1]{#1}}
+\newcommand{\TrainingValue}[2][]{\MeasuredValue[#1]{0}{\TrainingData}{#2}}
+\newcommand{\TrainingScore}[1]{\TrainingValue[precision=2,fixed zerofill]{#1}}
+\newcommand{\TrainingHours}[1]{\TrainingValue[precision=1]{#1}}
+\newcommand{\TrainingGpu}{\pgfplotstablegetelem{0}{gpu}\of{\TrainingData}\pgfplotsretval}
+
+\newcommand{\HPartBDope}{0}
+\newcommand{\HPartBArf}{1}
+\newcommand{\HPartBCopula}{2}
+\newcommand{\HPartBTvae}{3}
+\newcommand{\HPartBCtgan}{4}
+\newcommand{\HPartBValue}[3][]{\MeasuredValue[#1]{#2}{\HPartBData}{#3}}
+\newcommand{\HPartBScore}[2]{\HPartBValue[precision=1,fixed zerofill]{#1}{#2}}
+\newcommand{\HPartBComparedRow}[2]{%
+  #1 & \HPartBScore{#2}{score} & \HPartBValue{#2}{failed} &
+  \HPartBScore{#2}{delta} [\HPartBScore{#2}{delta_low}, \HPartBScore{#2}{delta_high}] &
+  \HPartBScore{#2}{matched_delta} [\HPartBScore{#2}{matched_delta_low}, \HPartBScore{#2}{matched_delta_high}] &
+  \HPartBValue[precision=4]{#2}{p_holm} &
+  \pgfplotstablegetelem{#2}{outcome}\of{\HPartBData}\pgfplotsretval \\}

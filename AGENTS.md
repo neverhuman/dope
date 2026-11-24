@@ -1,10 +1,11 @@
 # DOPE
 
 DOPE compiles a table with a declared target into a small generative program.
-The program stores no source rows. `dope sample` draws synthetic rows from that file alone.
+The file contains fitted summaries and schema without any complete fitting records.
+`dope sample` draws synthetic rows from the file.
 
-External coding agents should follow [Using DOPE](#using-dope) and stop there.
-[Changing this repository](#changing-this-repository) is for people who edit this source tree.
+To consume the installed engine, follow [Using DOPE](#using-dope).
+[Changing this repository](#changing-this-repository) applies to everyone who edits this source tree.
 
 ## Using DOPE
 
@@ -37,7 +38,7 @@ Verification and a from-source build are in
 A step-by-step table walkthrough is in
 [docs/getting-started.md](docs/getting-started.md).
 
-### Fit, inspect, sample, evaluate
+### Fit and sample
 
 Use a headered CSV and name the target. Follow
 [the target-last contract](docs/data-contract.md): the target comes from that
@@ -46,15 +47,14 @@ the same split.
 
 ```bash
 dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
-dope inspect model.dope
+wc -c < model.dope
 dope sample model.dope -n 1000 -o synthetic.csv
-dope eval -m model.dope --train train.csv --test test.csv
 ```
 
 `--format 1` is the CLI default. `--format auto-v8` is the v3.0.0 release encoder.
-It fits Format 1 and the weight-free DSE8 packet inside one file of at most 2048
-bytes, and it keeps DSE8 when a duplicate-grouped two-fold check on the fitting
-rows prefers it.
+It fits Format 1 and analytic DSE8 as separate candidates and writes one file
+of at most 2048 bytes. When both fit, a duplicate-grouped two-fold check on the
+fitting rows can select DSE8.
 
 The command list for this binary is [engine/README.md](engine/README.md).
 [docs/cli.md](docs/cli.md) documents a different program, the historical
@@ -72,8 +72,8 @@ When you summarize a result, keep these limits:
 
 - The published tag is an uncertified engine release. The certification gates are in [docs/release.md](docs/release.md).
 - The report is a fresh-split DEV-SELECT estimate. No confirmation, holdout, or sealed panel was opened.
-- On that report look, the paired difference versus ARF includes zero. DOPE is PROMOTE against TVAE and HOLD against ARF, the Gaussian copula, and CTGAN. The second look is in the paper and is not pooled with the first.
-- Storing no source rows is a property of the file format. It is not differential privacy and not HIPAA de-identification.
+- On that report look, the paired difference versus ARF includes zero. DOPE is PROMOTE against TVAE and HOLD against ARF, the Gaussian copula, and CTGAN. The paper reports each development split set independently.
+- The file contains no complete fitting records. The privacy measures are empirical diagnostics, with the measured scope in the paper.
 - Cross-model feature-driver preservation is not yet measured.
 - Synthetic rows from this release remain easy for a boosted-tree classifier to distinguish from real rows.
 

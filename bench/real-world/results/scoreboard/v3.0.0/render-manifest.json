@@ -1,5 +1,7 @@
 {
   "files": {
+    "bench/real-world/figures/hero-v3-comparison-dark.svg": "4c7ed8ce7f7fa1d336ef98e91644ed1a04824d391fa1fb4089c5c4c0cf6dfe01",
+    "bench/real-world/figures/hero-v3-comparison-light.svg": "e69fb33b94b2901d75d4611f1e918f57bcc0131ecb55aae4158d34f65e9dfa62",
     "bench/real-world/figures/hero-v3-dark.svg": "8bb26e97190aa2de00cda930aebc670e8daf074be384f90c5ebd9a9b99069b67",
     "bench/real-world/figures/hero-v3-light.svg": "bcd83c2f81b5d34c99b08d9470863d224993d4e61d70736e4ab5cae2f9ffaa62",
     "bench/real-world/figures/hero-v3-methods-dark.svg": "4b3a018bdc5247f5c5af0dbb0af6b70db068aa3ee3ff521daaa62837dac69322",

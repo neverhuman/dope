@@ -1,7 +1,7 @@
 # DOPE v3.0.0 white paper
 
-**D.O.P.E.: Downstream Objective-Preserving Encoding. Release v3.0.0: synthetic tables from a file of
-at most 2 KiB, ranked against independent generators by Transfer Score.**
+**D.O.P.E.: Downstream Objective-Preserving Encoding. Release v3.0.0. Task-preserving synthetic
+training rows from at most 2 KiB, ranked against independent generators by Transfer Score.**
 
 The paper describes the v3.0.0 encoder (`dope fit --format auto-v8`) and the `DSE8` codec, and ranks
 it by Transfer Score, 100 × (1 + TRG), against four third-party generators scored on the same
@@ -10,10 +10,10 @@ DOPE releases are not compared (owner decision, 2026-11-24), and `render_v3_pape
 fails if a section cites one. The earlier manuscripts ([`docs/whitepaper/`](../whitepaper/),
 [`docs/whitepaper-v2/`](../whitepaper-v2/)) are archived unchanged.
 
-No number is typed into the manuscript. Every quantity is a `\VThree{...}` macro written by
-`scripts/render_v3_paper.py` from the committed receipts, contracts and Rust constants, or a cell
-of a table written by the Rust `dope_kpi render-paper-tables`, and `--check` rejects a digit typed
-into a section.
+Measured values come from committed inputs. The main ranking uses `\VThree{...}` macros and
+tables derived from receipts, contracts and Rust constants. The equal-storage comparison and
+budget sweep read the bound aggregate CSVs in `evidence/addendum-k/` with PGFPlots. The paper
+checker rejects a digit typed into a section.
 
 ## Layout
 
@@ -23,10 +23,12 @@ into a section.
 | `sections/*.tex` | One file per section (`00-abstract` to `09-reproducibility`) and per appendix (`appendix-*`) |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
-| `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-methods-light.svg` (`dope_kpi render-hero --methods`), converted with `rsvg-convert -f pdf` |
+| `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-comparison-light.svg` (`dope_kpi render-hero --methods --same-cap-rows`), converted with `rsvg-convert -f pdf` |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
-| `generated/v3-ranking-table.tex` | Table 2: the ranking by Transfer Score (`dope_kpi render-paper-tables`) |
-| `generated/v3-paired-table.tex` | Table 3: DOPE minus each generator, one block per look: the report look from `evidence/paper/v3-vs-*.json` and the second look from `evidence/addendum-h/` (`dope_kpi render-paper-tables`) |
+| `generated/v3-ranking-table.tex` | Ranking by Transfer Score (`dope_kpi render-paper-tables`) |
+| `generated/v3-paired-table.tex` | DOPE minus each generator on the report splits and the second set of splits (`dope_kpi render-paper-tables`) |
+| `budget/` | Equal-cap table and rate–utility figure built from the same aggregate CSVs |
+| `method/` | Encoder and sampler diagram |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
 | `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
 | `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every DOPE row equals the README block |
@@ -54,8 +56,13 @@ Addendum H part (a) repeats the comparison on the final look's DEV splits, descr
 `family-h.json` (Holm, m = 4). The renderer fails unless `primary-h.json` repeats DOPE's and the
 controls' rows of `evidence/final-look-s9-12/primary.json` field for field, is the same run,
 and `family-h.json` binds the four pairs by SHA-256 with Holm p, outcomes and the
-"replicates" flag equal to a recomputation. Table 3 shows the two looks as separate blocks,
-never pooled; the ranking table and Figure 1 stay on the report look.
+"replicates" flag equal to a recomputation. The appendix comparison table shows each set of splits
+in its own block. The ranking table and Figure 1 use the report splits.
+
+Part (b) repeats the same baseline comparison on a third set of development splits, data seeds 13–16.
+The [part (b) evidence](../../bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/part-b/)
+contains the signed v3 primary, paired and Holm-adjusted receipts. The appendix reads the bound
+aggregate summary directly. Each split set is analyzed independently.
 
 ## Build and verify
 
@@ -69,14 +76,15 @@ dope_kpi render-paper-tables --primary $S/primary-methods.json \
   $(for m in $M; do echo --second-compare $S/evidence/addendum-h/v3-vs-$m-h.json; done) \
   --look-title "Report look" --look-title "Second look: other row splits of the same DEV tables" \
   --ranking-out docs/whitepaper-v3/generated/v3-ranking-table.tex \
-  --paired-out docs/whitepaper-v3/generated/v3-paired-table.tex   # Tables 2 and 3
+  --paired-out docs/whitepaper-v3/generated/v3-paired-table.tex
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --figures   # needs rsvg-convert; only when the hero SVG changes
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py              # macros, manifest
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero provenance, digit lint
 bash docs/whitepaper-v3/scripts/build_v3_pdf.sh                    # dope-v3.pdf and dope-v3.bbl
 ```
 
-`just paper-v3` runs the last three. `just paper-check` and `just paper-tests` include the v3
+`just paper-v3` runs the last three. The PDF build verifies the supplementary budget, training
+and split-set evidence against its SHA-256 manifests. `just paper-check` and `just paper-tests` include the v3
 paper, and `ops/ci/paper-clean.sh` deletes its generated files, rebuilds it and requires a
 zero diff.
 

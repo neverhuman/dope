@@ -23,11 +23,11 @@
 \end{center}
 
 \paragraph{Third-party configuration.}
-Each method ran with its library defaults (no hyperparameter was passed or tuned) on CPU with one thread, through a wrapper that fits once per cell on $A$ and samples once per multiplier.
+Each method ran with its library defaults on CPU, through a wrapper that fits once per cell on $A$ and samples once per multiplier. The neural wrappers set one PyTorch thread. SDV's CTGAN and TVAE preprocessing used a separate process pool whose size depended on CPU affinity.
 SDV detects the feature types, and the target is declared categorical or numerical by task.
-A file is the pickled fitted object: SDV's own save, and for ARF the fitted object without its copy of the fitting rows and its forest, neither of which the sampler reads.
+A file is the serialized fitted object. SDV uses its library save, and ARF serializes the fitted object after dropping its fitting rows and forest. File sizes include serialization and runtime state.
 No byte cap was applied, and the files were scored with a byte limit of \VThree{MethodsScoreBudget}.
 The run manifest (\path{MANIFEST.json}, SHA-256 prefix \texttt{\VThree{MethodsManifestSha}}) records the software: Python~\VThree{MethodsPythonVersion}, SDV~\VThree{SdvVersion} with CTGAN~\VThree{CtganVersion}, copulas~\VThree{CopulasVersion} and RDT~\VThree{RdtVersion}, arfpy~\VThree{ArfpyVersion}, PyTorch~\VThree{TorchVersion} and scikit-learn~\VThree{SklearnVersion}, with every recipe and command.
 SDV and its libraries are licensed \VThree{SdvLicense}; arfpy is licensed \VThree{ArfpyLicense}.
-The run labels these arms \texttt{source\_free} after an audit of \VThree{MethodsAuditFiles} smoke-run files per method (the run scored \VThree{MethodsScheduledCells} cells per method) found no stored table of fitting rows and no copy of a fitting column.
-The files do keep per-column ranges, category values and fitted transformer parameters (SDV) and per-leaf means, deviations, bounds and class probabilities (ARF).
+The original smoke audit checked for stored fitting tables and literal columns. It missed row-indexed categorical membership in CTGAN's retained training sampler. SDV's default save serializes the fitted object including that state~\citep{ctgan013sampler,sdv22save}. This includes class membership when the target is categorical. The serialized CTGAN files remain private. Its reported byte sizes include that state, and its empirical audits evaluate the emitted synthetic rows.
+SDV files also retain per-column ranges, category values and fitted transformer parameters. ARF keeps fitted leaf statistics and class probabilities.

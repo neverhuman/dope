@@ -1,0 +1,45 @@
+{
+ "addendum_k_text_sha256": "dede108ef1438353af250bc8dd6f54286eaf1c0b94a37146c92c4216355a52f7",
+ "bind_sha256": "8f4425fff240d667a58605b77398774466dc2fceaa3ce5400cd810e7312a19c9",
+ "outputs_sha256": {
+  "k5-curves-recomputed.json": "64582e68d1e945a24fc43b509457d1a8fa44c5ad913bf1849ba3f7bee43e9089",
+  "k5-plot-inputs.json": "adf1919e425908afcdd15e5a4e1d916e980e2c6be0f040ddb8aad720ec0e5ef5",
+  "training-k5r2.pdf": "75ab6487fd2bcf63cae006274ddca04b29663de683425318e0f179114123f96d",
+  "training-k5r2.png": "cf2fe7d8d477359a442dc9c279651c1a3c60a4557350d782fa9e69afe7f37fda"
+ },
+ "receipts_sha256": {
+  "cmp-g1-C-s11-auto-v8-vs-dope-v3b-auto-v8": "fff8e99c4035aba3b4144fa893cd64a49e4dc6aafda19c72219d232c8bca136d",
+  "cmp-g1-C-s12-auto-v8-vs-dope-v3b-auto-v8": "6fa24b62264fc2a4b0362f088a011c8d6a36b56b2ed441ad9b472345333df7b4",
+  "cmp-g1-C-s13-auto-v8-vs-dope-v3b-auto-v8": "210612217646353ab857809ffe42b15c9c759d0be527fd55b3e2ad8288c82557",
+  "cmp-g1-L-s11-auto-v8-vs-dope-v3b-auto-v8": "e62ed3987176580b2d02403675a1ba500619f950db341948ddffeaf5c49bfe02",
+  "cmp-g1-L-s12-auto-v8-vs-dope-v3b-auto-v8": "2b6f0067be0a6579d686e24b7898609e5eb2b378b5c55adea135c54b2b188d13",
+  "cmp-g1-L-s13-auto-v8-vs-dope-v3b-auto-v8": "596a6d21b9135e2ef0ada1c5cb32801dbd10e1abd945ebf9a91016490e8e090e",
+  "cmp-i1-C-s11-k4000-auto-v8-vs-dope-v3b-auto-v8": "84def306d649bc48480057539043a976a911f63e01e81539787070cd3d54a2c6",
+  "cmp-i1-C-s11-k6000-auto-v8-vs-dope-v3b-auto-v8": "6e6d809a28d6f10bdcffdc8eb91da3de447f7255966f70f6c72fafb94367c0ac",
+  "cmp-i1-C-s11-k8000-auto-v8-vs-dope-v3b-auto-v8": "939af5e1d6f99d0a9c10edcd076d3bb6a3ae0c735821ec7f1682be325452b43e",
+  "cmp-i1-C-s12-k4000-auto-v8-vs-dope-v3b-auto-v8": "71263fde30145e2afb9426eac9eb02a68c03d1a5f23000a4d005681c81756521",
+  "cmp-i1-C-s12-k6000-auto-v8-vs-dope-v3b-auto-v8": "ddde3174cf4d4ac4b5747b518d63a86d8cadc50fa8ca77b1e84468eddc109d8b",
+  "cmp-i1-C-s12-k8000-auto-v8-vs-dope-v3b-auto-v8": "c8f9aab10148b15802e7173bee0d566003cb11e03ec3044d2ea1145651fc4f91",
+  "cmp-i1-C-s13-k4000-auto-v8-vs-dope-v3b-auto-v8": "46db4d584c59aaa700f413d2f35fb150d3b1b9570c6793d36e660878c6f47488",
+  "cmp-i1-C-s13-k6000-auto-v8-vs-dope-v3b-auto-v8": "3246ec894dcd89713f3b43d045e00428d8ca839ce68635488643bebe45fc9dcb",
+  "cmp-i1-C-s13-k8000-auto-v8-vs-dope-v3b-auto-v8": "052b05372aee23aa663bd8a026c1eeeeeb96842ad69e54a2d33adbff788d7752",
+  "cmp-i2-C-s11-k8000-auto-v8-vs-dope-v3b-auto-v8": "06b5be160dedb2d5a178e9587aa93e693432ef5f29967738d4faeb51dcc35504",
+  "cmp-i2-C-s12-k6000-auto-v8-vs-dope-v3b-auto-v8": "c1fd94df6b7536e424b478d42cd0dd566c0cc4e69ba2582920544bb3aa8eb113",
+  "cmp-i2-C-s13-k6000-auto-v8-vs-dope-v3b-auto-v8": "d144e05e9fd5356b266ccc3a170c35475f1942da311a74da756123fe09e514b0",
+  "i3-compare-i3-C-s12-k6000-auto-v8-w-vs-served-auto-v8": "86077b13a18b8991dd3a5baf2016cfe83bf0d12cb2f55ea657f8db26fba84510"
+ },
+ "result_sha256": "0a3ceeadc74c4ad07339a866440c123c884940d5c6c60d492b1bc6d576f920b1",
+ "schema": "dope.addendum-k5-public/v1",
+ "telemetry_sha256": {
+  "C-s11": "8229c45cabfd97c937c34136cff6ff5ba76f85ff6f8208e5f128ad413b2040b0",
+  "C-s12": "453436402fc4e6e93113c3aa1554f77fa4ca3e62bcee398bffb2b45df8bc14a5",
+  "C-s13": "a5e13ae36c13302805544df90b0db399c0f111ecbce808cd34c22fadce8dee9c",
+  "L-s11": "84244798874ab878a856fd81f462dad91e0eb0738b91e21aba31c844ea2116f1",
+  "L-s12": "ef905eeb3f6b5bf16e7c32498e8a036d67c671855ae95fe19fdda16866b4b66d",
+  "L-s13": "93026036de033913efaaf7de3995223b3f117a7b133853778d2e8e133afa6812"
+ },
+ "tools_sha256": {
+  "k5_curves.py": "958a6b3850a6f1e22b74615699abd19f72b600ff552e485c6946006e9342e598",
+  "training_fig_v3.py": "661059d3714e71ca5c398b042ead1245162038ec6feef0f412d6dec7810cdb1f"
+ }
+}

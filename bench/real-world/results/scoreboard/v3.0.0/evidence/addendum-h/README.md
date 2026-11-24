@@ -52,3 +52,7 @@ look's; H's reading and the promotion rule use 4× only. The paper's Table 3 sho
 | `family-h.json` | the Holm (m = 4) family over the four pair receipts, bound to their SHA-256s, with singleton and Holm outcomes |
 | `MANIFEST-h.json` | provenance: argv of every stage, binary, input and pin digests, package versions |
 | `ADDENDUM_H.md`, `PREREG_LOG-H.txt` | the logged pre-registration text and its hash-log line |
+
+## Additional split set
+
+[Part (b)](part-b/) contains the independently reproduced baseline results on DEV data seeds 13–16.

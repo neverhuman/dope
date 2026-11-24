@@ -4,6 +4,13 @@
 # TeX Live gives the same bytes; the PDF and the .bbl are then copied next to the source.
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
+evidence=bench/real-world/results/scoreboard/v3.0.0/evidence
+for supplement in addendum-k addendum-h/part-b; do
+  if ! (cd "$evidence/$supplement" && shasum --algorithm 256 --check --strict --status SHA256SUMS); then
+    echo "dope-v3: $supplement evidence does not match SHA256SUMS" >&2
+    exit 1
+  fi
+done
 out="$PWD/target/paper-v3"
 mkdir -p "$out"
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1795392000}"

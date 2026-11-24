@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{33}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -17,6 +17,13 @@ Ahmed~M. Alaa, Boris van Breugel, Evgeny Saveliev, and Mihaela van~der Schaar.
 Olivier Bachem, Mario Lucic, and Andreas Krause.
 \newblock Practical coreset constructions for machine learning.
 \newblock \emph{arXiv preprint arXiv:1703.06476}, 2017.
+
+\bibitem[{CTGAN Developers}()]{ctgan013sampler}
+{CTGAN Developers}.
+\newblock {CTGAN} data sampler.
+\newblock URL
+  \url{https://github.com/sdv-dev/CTGAN/blob/v0.13.0/ctgan/data_sampler.py}.
+\newblock Source code, version 0.13.0.
 
 \bibitem[Davison and Hinkley(1997)]{davison1997bootstrap}
 Anthony~C. Davison and David~V. Hinkley.
@@ -49,6 +56,14 @@ Crist{\'o}bal Esteban, Stephanie~L. Hyland, and Gunnar R{\"a}tsch.
   conditional {GANs}.
 \newblock \emph{arXiv preprint arXiv:1706.02633}, 2017.
 
+\bibitem[Gao and Parameswaran(2016)]{gao2016squish}
+Yihan Gao and Aditya Parameswaran.
+\newblock {Squish}: Near-optimal compression for archival of relational
+  datasets.
+\newblock In \emph{Proceedings of the ACM SIGKDD International Conference on
+  Knowledge Discovery and Data Mining}, 2016.
+\newblock URL \url{https://arxiv.org/abs/1602.04256}.
+
 \bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
 Tilmann Gneiting and Adrian~E. Raftery.
 \newblock Strictly proper scoring rules, prediction, and estimation.
@@ -60,6 +75,26 @@ Sture Holm.
 \newblock A simple sequentially rejective multiple test procedure.
 \newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
   65--70, 1979.
+
+\bibitem[Ilkhechi et~al.(2020)Ilkhechi, Crotty, Galakatos, Mao, Fan, Shi, and
+  Cetintemel]{ilkhechi2020deepsqueeze}
+Amir Ilkhechi, Andrew Crotty, Alex Galakatos, Yicong Mao, Grace Fan, Xiran Shi,
+  and Ugur Cetintemel.
+\newblock {DeepSqueeze}: Deep semantic compression for tabular data.
+\newblock In \emph{Proceedings of the ACM SIGMOD International Conference on
+  Management of Data}, 2020.
+\newblock \doi{10.1145/3318464.3389734}.
+
+\bibitem[Jolicoeur-Martineau et~al.(2024)Jolicoeur-Martineau, Fatras, and
+  Kachman]{jolicoeur2024forest}
+Alexia Jolicoeur-Martineau, Kilian Fatras, and Tal Kachman.
+\newblock Generating and imputing tabular data via diffusion and flow-based
+  gradient-boosted trees.
+\newblock In \emph{Proceedings of the International Conference on Artificial
+  Intelligence and Statistics}, volume 238 of \emph{Proceedings of Machine
+  Learning Research}, pages 1288--1296, 2024.
+\newblock URL
+  \url{https://proceedings.mlr.press/v238/jolicoeur-martineau24a.html}.
 
 \bibitem[Kotelnikov et~al.(2023)Kotelnikov, Baranchuk, Rubachev, and
   Babenko]{kotelnikov2023tabddpm}
@@ -73,6 +108,22 @@ David Lopez-Paz and Maxime Oquab.
 \newblock Revisiting classifier two-sample tests.
 \newblock In \emph{International Conference on Learning Representations
   (ICLR)}, 2017.
+
+\bibitem[McKenna et~al.(2021)McKenna, Miklau, and Sheldon]{mckenna2021mst}
+Ryan McKenna, Gerome Miklau, and Daniel Sheldon.
+\newblock Winning the {NIST} contest: A scalable and general approach to
+  differentially private synthetic data.
+\newblock \emph{Journal of Privacy and Confidentiality}, 11\penalty0 (3), 2021.
+\newblock URL \url{https://arxiv.org/abs/2108.04978}.
+
+\bibitem[McKenna et~al.(2022)McKenna, Mullins, Sheldon, and
+  Miklau]{mckenna2022aim}
+Ryan McKenna, Brett Mullins, Daniel Sheldon, and Gerome Miklau.
+\newblock {AIM}: An adaptive and iterative mechanism for differentially private
+  synthetic data.
+\newblock \emph{Proceedings of the VLDB Endowment}, 15\penalty0 (11):\penalty0
+  2599--2612, 2022.
+\newblock \doi{10.14778/3551793.3551817}.
 
 \bibitem[Mirzasoleiman et~al.(2020)Mirzasoleiman, Bilmes, and
   Leskovec]{mirzasoleiman2020craig}
@@ -97,11 +148,34 @@ Brian~A. Nosek, Charles~R. Ebersole, Alexander~C. DeHaven, and David~T. Mellor.
 \newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0
   (11):\penalty0 2600--2606, 2018.
 
+\bibitem[Nowok et~al.(2016)Nowok, Raab, and Dibben]{nowok2016synthpop}
+Beata Nowok, Gillian~M. Raab, and Chris Dibben.
+\newblock {synthpop}: Bespoke creation of synthetic data in {R}.
+\newblock \emph{Journal of Statistical Software}, 74\penalty0 (11):\penalty0
+  1--26, 2016.
+\newblock \doi{10.18637/jss.v074.i11}.
+
 \bibitem[Patki et~al.(2016)Patki, Wedge, and Veeramachaneni]{patki2016sdv}
 Neha Patki, Roy Wedge, and Kalyan Veeramachaneni.
 \newblock The synthetic data vault.
 \newblock In \emph{IEEE International Conference on Data Science and Advanced
   Analytics (DSAA)}, pages 399--410, 2016.
+
+\bibitem[Qian et~al.(2023)Qian, Davis, and van~der Schaar]{qian2023synthcity}
+Zhaozhi Qian, Rob Davis, and Mihaela van~der Schaar.
+\newblock {Synthcity}: A benchmark framework for diverse use cases of tabular
+  synthetic data.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~36, 2023.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/09723c9f291f6056fd1885081859c186-Abstract.html}.
+
+\bibitem[{SDV Developers}()]{sdv22save}
+{SDV Developers}.
+\newblock {SDV} fitted-object serialization.
+\newblock URL
+  \url{https://github.com/sdv-dev/SDV/blob/v2.2.0/sdv/single_table/base.py}.
+\newblock Source code, version 2.2.0.
 
 \bibitem[Shokri et~al.(2017)Shokri, Stronati, Song, and
   Shmatikov]{shokri2017membership}
@@ -115,6 +189,15 @@ Abe Sklar.
 \newblock Fonctions de r{\'e}partition {\`a} {$n$} dimensions et leurs marges.
 \newblock \emph{Publications de l'Institut de Statistique de l'Universit{\'e}
   de Paris}, 8:\penalty0 229--231, 1959.
+
+\bibitem[Snoke et~al.(2018)Snoke, Raab, Nowok, Dibben, and
+  Slavkovic]{snoke2018utility}
+Joshua Snoke, Gillian~M. Raab, Beata Nowok, Chris Dibben, and Aleksandra
+  Slavkovic.
+\newblock General and specific utility measures for synthetic data.
+\newblock \emph{Journal of the Royal Statistical Society: Series A},
+  181\penalty0 (3):\penalty0 663--688, 2018.
+\newblock \doi{10.1111/rssa.12358}.
 
 \bibitem[Stadler et~al.(2022)Stadler, Oprisanu, and
   Troncoso]{stadler2022groundhog}

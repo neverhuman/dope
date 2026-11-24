@@ -1,6 +1,5 @@
-% DOPE v3.0.0 white paper. Each section is one file under sections/. Every number in the text is a
-% \VThree macro written by scripts/render_v3_paper.py from committed receipts, contracts and Rust
-% constants; `render_v3_paper.py --check` rejects a digit typed into a section or the title block.
+% The ranking reads generated receipt macros. Supplemental tables read the bound aggregate CSVs.
+% The paper checker rejects typed digits in prose and the PDF build verifies supplemental inputs.
 \documentclass[10pt,letterpaper]{article}
 \pdfminorversion=7
 \usepackage[T1]{fontenc}
@@ -13,6 +12,9 @@
 \usepackage{booktabs}
 \usepackage{makecell}
 \usepackage{graphicx}
+\usepackage{pgfplots,pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage{xcolor}
 \usepackage{natbib}
 \usepackage{microtype}
@@ -22,6 +24,7 @@
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 
 \input{generated/v3-macros}
+\input{budget/data}
 
 \hypersetup{
   pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding},
@@ -43,7 +46,7 @@
 \begin{center}
   {\LARGE\bfseries D.O.P.E.: Downstream Objective-Preserving Encoding\par}
   \vspace{0.4em}
-  {\large\itshape Release~\VThree{ReleaseVersion}: synthetic tables from a file of at most \VThree{BudgetKiB}\,KiB,\\
+  {\large\itshape Release~\VThree{ReleaseVersion}: task-preserving synthetic training rows from at most \VThree{BudgetKiB}\,KiB,\\
   ranked against independent generators by Transfer Score\par}
   \vspace{0.8em}
   {\normalsize Jepson Taylor \qquad Alton Alexander \qquad Jordan Morrow\par}
@@ -69,5 +72,7 @@
 \input{sections/appendix-c-arms}
 \input{sections/appendix-d-ablation}
 \input{sections/appendix-e-evidence}
+\input{sections/appendix-f-budget}
+\input{sections/appendix-g-training}
 
 \end{document}

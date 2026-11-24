@@ -3,7 +3,8 @@
 DOPE compiles a table into a small generator. Another process reloads that
 generator, draws synthetic rows, and trains a learner on those draws. Evaluate
 that learner on real rows that the fit did not see. The artifact is a lossy,
-task-specific program. It stores no source rows, and it is not a lossless archive.
+task-specific program. It contains fitted summaries and schema without any
+complete fitting records.
 
 The public path below is the signed engine `dope` from
 [dope-engine-v3.0.0](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0).
@@ -45,19 +46,19 @@ of the fit.
 
 ```bash
 dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
-dope inspect model.dope
+wc -c < model.dope
 dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
-dope eval -m model.dope --train train.csv --test test.csv
 ```
 
-`--format 1` remains the CLI default. `--format auto-v8` fits Format 1 and the
-weight-free DSE8 packet inside one file of at most 2048 bytes and keeps DSE8
-when a duplicate-grouped two-fold check on the fitting rows prefers it.
-`dope inspect` prints the format and the complete file size. The command list
-for this binary is [engine/README.md](../engine/README.md).
+`--format 1` remains the CLI default. `--format auto-v8` fits Format 1 and
+analytic DSE8 separately and writes one file of at most 2048 bytes. When both
+fit, a duplicate-grouped two-fold check on the fitting rows can select DSE8.
+The command list for this binary is [engine/README.md](../engine/README.md).
 
-`dope eval` trains linear and boosted-tree auditors on the synthetic rows and
-scores them on the real test rows. For a fixed learner, retention is
+To measure transfer, train a fixed learner once on the synthetic rows and
+once on the fitting rows. Score both on the same separately held real test
+rows. Retention measures the fraction of the real learner's lift over a
+null model.
 
 ```text
 (L_null - L_syn) / (L_null - L_real)
@@ -70,9 +71,8 @@ is not accuracy, and it is not the fraction of the table that can be rebuilt.
 The landing-page scoreboard and the
 [v3 white paper](whitepaper-v3/dope-v3.pdf) are the measured comparison.
 That report is a fresh-split DEV-SELECT estimate. The paired difference versus
-ARF includes zero. Storing no source rows is not differential privacy and not
-HIPAA de-identification. Cross-model feature-driver preservation is not yet
-measured.
+ARF includes zero. The paper describes the scope of the empirical privacy
+measures. Cross-model feature-driver preservation remains unmeasured.
 
 ## Historical kernel demonstration
 

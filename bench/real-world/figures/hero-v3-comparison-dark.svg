@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="988" height="438" viewBox="0 0 988 438" role="img" aria-labelledby="title desc">
+<title id="title">DOPE v3 leads with a 2 KiB budget</title>
+<desc id="desc">Two comparisons on the development report splits at four times the fitting rows. The left panel compares signed DOPE v3 with storing fitting rows under the same cap. The right panel compares v3 with four uncapped library-default generators, with scores, intervals and file sizes.</desc>
+<style>
+text {font-family:DejaVu Sans,sans-serif;font-size:15px;fill:#f0efec}
+.headline {font-size:32px;font-weight:700}
+.heading {font-size:20px;font-weight:700}
+.note,.tick,.column,.gain {fill:#c3c2b7;font-size:13px}
+.column,.value,.gain,.lead-value {text-anchor:end}
+.gain {fill:#68dbc2;font-weight:700}
+.detail {fill:#c3c2b7;font-size:12px;text-anchor:end}
+.value,.lead {font-weight:700}
+.lead {fill:#68dbc2}
+.lead-value {font-size:31px;font-weight:700}
+.lead-value.lead {fill:#68dbc2}
+.tick {text-anchor:middle}
+.grid {stroke:#2c2c2a}
+.winner {stroke:#68dbc2;fill:#68dbc2;stroke-width:2.5}
+.peer {stroke:#c3c2b7;fill:#c3c2b7;stroke-width:1.8}
+</style>
+<rect width="988" height="438" rx="14" fill="#1a1a19"/>
+<line x1="315" x2="315" y1="88" y2="365" class="grid"/>
+<text x="24" y="43" class="headline">DOPE v3 leads with a 2 KiB budget</text>
+<text x="24" y="68" class="note">Transfer Score ↑  ·  Development report splits  ·  4× sampling</text>
+<text x="24" y="105" class="heading">Same byte cap</text>
+<text x="24" y="126" class="note">Signed v3 vs. storing and resampling rows</text>
+<line class="grid" x1="43.0" x2="43.0" y1="159" y2="335"/>
+<text x="43" y="354" class="tick">−100</text>
+<line class="grid" x1="162.0" x2="162.0" y1="159" y2="335"/>
+<text x="162" y="354" class="tick">0</text>
+<line class="grid" x1="281.0" x2="281.0" y1="159" y2="335"/>
+<text x="281" y="354" class="tick">100</text>
+<text x="24" y="170" class="lead">DOPE v3</text>
+<text x="281" y="170" class="lead-value lead">87.9</text>
+<g class="winner"><line x1="258.5" x2="275.1" y1="191" y2="191"/><circle cx="266.6" cy="191" r="5"/></g>
+<text x="24" y="255" class="">Stored real rows</text>
+<text x="281" y="255" class="lead-value">2.6</text>
+<g class="peer"><line x1="125.2" x2="203.4" y1="276" y2="276"/><circle cx="165.1" cy="276" r="5"/></g>
+<text x="336" y="105" class="heading">Third-party generators</text>
+<text x="336" y="126" class="note">Library defaults with no cap on external files</text>
+<text x="691" y="151" class="column">Score</text>
+<text x="783" y="151" class="column">Median file</text>
+<text x="964" y="151" class="column">DOPE lead [95% CI]</text>
+<line class="grid" x1="473.0" x2="473.0" y1="159" y2="335"/>
+<text x="473" y="354" class="tick">−100</text>
+<line class="grid" x1="556.0" x2="556.0" y1="159" y2="335"/>
+<text x="556" y="354" class="tick">0</text>
+<line class="grid" x1="639.0" x2="639.0" y1="159" y2="335"/>
+<text x="639" y="354" class="tick">100</text>
+<text x="336" y="180" class="lead">DOPE v3</text>
+<g class="winner"><line x1="623.3" x2="634.9" y1="175" y2="175"/><circle cx="629.0" cy="175" r="5"/></g>
+<text x="691" y="180" class="value">87.9</text>
+<text x="783" y="180" class="column">1,787 B</text>
+<text x="964" y="180" class="column">—</text>
+<text x="336" y="216" class="">ARF</text>
+<g class="peer"><line x1="604.5" x2="630.7" y1="211" y2="211"/><circle cx="620.0" cy="211" r="5"/></g>
+<text x="691" y="216" class="value">77.2</text>
+<text x="783" y="216" class="column">2.94 MB</text>
+<text x="964" y="216" class="column">+10.8  [−3.5, 29.5]</text>
+<text x="964" y="230" class="detail">Inconclusive</text>
+<text x="783" y="230" class="detail">1,644× DOPE</text>
+<text x="336" y="252" class="">Gaussian copula</text>
+<g class="peer"><line x1="579.2" x2="599.0" y1="247" y2="247"/><circle cx="589.3" cy="247" r="5"/></g>
+<text x="691" y="252" class="value">40.2</text>
+<text x="783" y="252" class="column">141 kB</text>
+<text x="964" y="252" class="gain">+47.8  [33.7, 62.6]</text>
+<text x="964" y="266" class="detail">DOPE ahead</text>
+<text x="783" y="266" class="detail">79× DOPE</text>
+<text x="336" y="288" class="">TVAE</text>
+<g class="peer"><line x1="534.3" x2="570.8" y1="283" y2="283"/><circle cx="552.7" cy="283" r="5"/></g>
+<text x="691" y="288" class="value">−3.9</text>
+<text x="783" y="288" class="column">475 kB</text>
+<text x="964" y="288" class="gain">+91.9  [71.9, 112.3]</text>
+<text x="964" y="302" class="detail">DOPE ahead</text>
+<text x="783" y="302" class="detail">266× DOPE</text>
+<text x="336" y="324" class="">CTGAN</text>
+<g class="peer"><line x1="487.4" x2="510.2" y1="319" y2="319"/><circle cx="498.6" cy="319" r="5"/></g>
+<text x="691" y="324" class="value">−69.2</text>
+<text x="783" y="324" class="column">1.05 MB</text>
+<text x="964" y="324" class="gain">+157.1  [141.8, 173.6]</text>
+<text x="964" y="338" class="detail">DOPE ahead</text>
+<text x="783" y="338" class="detail">590× DOPE</text>
+<text x="336" y="377" class="note">DOPE ahead means the paired interval is above zero. See the paper for guard decisions.</text>
+<text x="24" y="411" class="note">95% family-bootstrap intervals  ·  100 matches a second real sample  ·  44 informative cells</text>
+</svg>

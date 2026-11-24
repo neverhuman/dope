@@ -12,6 +12,7 @@
 //! below the highlight's. In `--note`, `{cells}`, `{families}` and `{panel}`
 //! take the highlight's (else the first point's) statistic and the panel id.
 
+use super::hero_comparison;
 use super::hero_model::{
     Emphasis, Hero, Point, Reference, Theme, YScale, DEFAULT_TITLE, SCORE_TITLE,
 };
@@ -67,6 +68,9 @@ pub struct HeroArgs {
     /// Preset for DOPE v3 vs external generators on the Transfer Score scale.
     #[arg(long)]
     pub methods: bool,
+    /// Add the equal-cap stored-row comparison from the public budget sweep CSV.
+    #[arg(long, requires = "methods", conflicts_with_all = ["include", "highlight", "previous", "labels", "references"])]
+    pub same_cap_rows: Option<PathBuf>,
     /// Title (default: "Predictive structure kept vs. artifact size").
     #[arg(long)]
     pub title: Option<String>,
@@ -85,7 +89,7 @@ const METHODS_ARMS: [&str; 5] = [
     "sdv-tvae",
     "sdv-ctgan",
 ];
-const METHODS_LABELS: [(&str, &str); 6] = [
+pub(super) const METHODS_LABELS: [(&str, &str); 6] = [
     ("dope-v3b-auto-v8", "DOPE v3"),
     ("arfpy-arf", "ARF"),
     ("sdv-gaussian-copula", "Gaussian copula"),
@@ -395,7 +399,15 @@ pub fn run(args: &HeroArgs) -> ArenaResult<String> {
         ThemeArg::Light => Theme::Light,
         ThemeArg::Dark => Theme::Dark,
     };
-    let svg = render(&hero, theme);
+    let svg = if let Some(path) = &args.same_cap_rows {
+        let paired = receipts
+            .iter()
+            .map(|bytes| parse_json::<Receipt>("comparison receipt", bytes))
+            .collect::<ArenaResult<Vec<_>>>()?;
+        hero_comparison::render(&hero, theme, &read_file(path)?, &paired)?
+    } else {
+        render(&hero, theme)
+    };
     write_atomic(&args.out, svg.as_bytes())?;
     canonical_json(&Summary {
         command: "render-hero",

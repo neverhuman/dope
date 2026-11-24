@@ -1,8 +1,42 @@
 \section{What per-table selection adds}\label{app:ablation}
 
-\cli{auto-v8} chooses per table between Format~1 and \texttt{DSE8} (\S\ref{sec:select}).
-The report look also scored \VThree{AnalyticId}, the analytic \texttt{DSE8} packet written on every table without that choice, on the same cells.
-Its Transfer Score is \VThree{AnalyticScore}, against \VThree{CandScore} with selection.
-The packet alone is stronger on regression (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and weaker on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}); its median file is \VThree{AnalyticBytesMed}~bytes.
-Its realism coverage is \VThree{AnalyticRealism} and its privacy coverage \VThree{AnalyticPrivacy}, against \VThree{CandRealism} and \VThree{CandPrivacy} with selection.
-This pair was not pre-registered as a comparison, so we report it descriptively and with no test.
+\cli{auto-v8} chooses per table between Format~1 and \texttt{DSE8} (\S\ref{sec:select}). The report schedule also evaluates the analytic \texttt{DSE8} packet alone and the signed binary forced to Format~1. The table compares complete configurations, including their framing, at the same \VThree{BudgetKiB}\,KiB cap. Failed cells remain in the score at the contract floor. Intervals are separate \VThree{CiLevel} family-bootstrap intervals.
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Configuration & Score at \VThree{PrimaryMult}$\times$ [CI] & Score at \VThree{MatchedMult}$\times$ & Median bytes & Failed / cells \\
+    \midrule
+    Per-table selection & \VThree{CandScore} & \VThree{CandMatchedScorePoint} & \VThree{CandBytesMed} & \VThree{CandFailed} / \VThree{CandCells} \\
+    Format~1 alone & \FormatOneScore{score} [\FormatOneScore{low}, \FormatOneScore{high}] & \FormatOneScore{matched} & \FormatOneValue{median} & \FormatOneValue{failed} / \FormatOneValue{cells} \\
+    Analytic \texttt{DSE8} alone & \VThree{AnalyticScore} & \VThree{AnalyticMatchedScorePoint} & \VThree{AnalyticBytesMed} & \VThree{AnalyticFailed} / \VThree{AnalyticCells} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+At \VThree{PrimaryMult}$\times$, per-table selection has the highest point estimate. Analytic \texttt{DSE8} alone has a higher regression score than the selector (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and lower scores on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}). These comparisons are descriptive on the development report splits.
+
+\subsection{Which codec the released selector chose}
+The signed replay selected Format~1 on \FormatRouteValue{fits} fits and analytic \texttt{DSE8} on \AnalyticRouteValue{fits} fits across the full schedule. Every packet matched its recorded digest. No neural packet was selected. Table~\ref{tab:chosen-codec} summarizes the headline cells within each group, using the same underlying score rows and guard ledger as the overall release result.
+
+\begin{table}[!htbp]
+  \centering\small
+  \caption{Descriptive results grouped by the signed selector's choice. Parentheses show informative cells. MLP Transfer Score is at \VThree{PrimaryMult}$\times$.}
+  \label{tab:chosen-codec}
+  \begin{tabular}{@{}lrrrrr@{}}
+    \toprule
+    Chosen codec & Headline cells & Families & Score at \VThree{PrimaryMult}$\times$ [CI] & Score at \VThree{MatchedMult}$\times$ & MLP \\
+    \midrule
+    Format~1 & \FormatRouteValue{headline} (\FormatRouteValue{informative}) & \FormatRouteValue{families} & \FormatRouteScore{score} [\FormatRouteScore{low}, \FormatRouteScore{high}] & \FormatRouteScore{matched} & \FormatRouteScore{mlp} \\
+    Analytic \texttt{DSE8} & \AnalyticRouteValue{headline} (\AnalyticRouteValue{informative}) & \AnalyticRouteValue{families} & \AnalyticRouteScore{score} [\AnalyticRouteScore{low}, \AnalyticRouteScore{high}] & \AnalyticRouteScore{matched} & \AnalyticRouteScore{mlp} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The two groups differ in task mix. For example, the selector chose analytic \texttt{DSE8} for \AnalyticRouteValue{binary} binary headline cells and \AnalyticRouteValue{regression} regression headline cells. Some families contribute to both groups. The analytic \texttt{DSE8} interval is based on only \AnalyticRouteValue{families} informative families. The grouped scores measure transfer after the selector's choice and cannot estimate the effect of assigning a different codec to the same cells.
+
+\subsection{Comparing configurations where Format~1 fits}
+Forced Format~1 fitted on \FitValue{headline} of \VThree{Scheduled} headline cells. On the informative cells of that subset, per-table selection scores \FitScore{served} at \VThree{PrimaryMult}$\times$, compared with \FitScore{forced} for Format~1 alone. The paired difference is \FitScore{delta} [\FitScore{low}, \FitScore{high}] points at \VThree{PrimaryMult}$\times$ and \FitScore{matched_delta} [\FitScore{matched_low}, \FitScore{matched_high}] points at matched size. Median files are \FitValue{served_bytes} and \FitValue{forced_bytes} bytes, respectively.
+
+On the other \FitFailedValue{headline} headline cells, Format~1 failed to fit. Its \FitFailedValue{informative} informative cells score at the failure floor, and per-table selection scores \FitFailedScore{served} at \VThree{PrimaryMult}$\times$. Only \FitFailedValue{families} informative families enter that estimate. Both comparisons condition on observed fit status and include differences in container framing.

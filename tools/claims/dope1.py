@@ -6,7 +6,7 @@
 * ``DOPE1 SCOREBOARD`` (summary prefix before ``<details>``): derived from
   ``bench/real-world/results/scoreboard/v3.0.0/readme-block.md``
   (``dope_kpi render-readme`` from the v3.0.0 scoreboard receipts beside it);
-* heroes: ``bench/real-world/figures/hero-v3-methods-{light,dark}.svg``
+* heroes: ``bench/real-world/figures/hero-v3-comparison-{light,dark}.svg``
   (``dope_kpi render-hero``), hash-listed in the scoreboard manifest next to the
   receipt digests.
 
@@ -49,7 +49,8 @@ BLOCKS = {**README_BLOCKS, **HISTORY_BLOCKS}
 HERO = "bench/real-world/figures/hero.png"
 MANIFEST = "bench/real-world/results/render-manifest.json"
 SUMMARY = "bench/real-world/results/confirm/summary.json"
-HEROES = ("bench/real-world/figures/hero-v3-methods-light.svg", "bench/real-world/figures/hero-v3-methods-dark.svg")
+HEROES = ("bench/real-world/figures/hero-v3-methods-light.svg", "bench/real-world/figures/hero-v3-methods-dark.svg",
+          "bench/real-world/figures/hero-v3-comparison-light.svg", "bench/real-world/figures/hero-v3-comparison-dark.svg")
 SCOREBOARD_MANIFEST = f"{SCOREBOARD}/render-manifest.json"
 
 

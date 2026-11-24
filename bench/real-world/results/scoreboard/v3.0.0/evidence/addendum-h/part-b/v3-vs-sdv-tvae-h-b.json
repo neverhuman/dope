@@ -1,0 +1,446 @@
+{
+  "arms": [
+    {
+      "arm_id": "served-auto-v8",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 64,
+        "max": 2048,
+        "median": 1800.0,
+        "over_budget": 0,
+        "over_budget_unmeasured": 0,
+        "scored_above_budget": 0,
+        "share_within_budget": 1.0,
+        "with_packet": 64,
+        "within_budget": 64
+      },
+      "c2st_files": 45,
+      "c2st_median": 0.961779591837,
+      "exact_copy": {
+        "files": 45,
+        "max": 0.0009765625,
+        "mean": 0.000021701389,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "exact_copy_excess": 0.000021701389,
+      "matched": {
+        "cells": 46,
+        "ci_high": -0.151856814928,
+        "ci_low": -0.341838896165,
+        "failed_cells": 1,
+        "families": 11,
+        "mlp_only_cells": 1,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.062666949676,
+            "ci_low": -0.356889320345,
+            "families": 4,
+            "task": "regression",
+            "value": -0.204756832923
+          },
+          {
+            "ci_high": -0.214650914761,
+            "ci_low": -0.510992865257,
+            "families": 3,
+            "task": "binary",
+            "value": -0.323622823538
+          },
+          {
+            "ci_high": -0.025971438489,
+            "ci_low": -0.390661282524,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.208316360506
+          }
+        ],
+        "trg": -0.245565338989,
+        "uninformative_cells": 18
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 38,
+          "median": 0.936400918338
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 35,
+          "median": 0.899434143919
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 25,
+          "median": 0.78471080184
+        }
+      ],
+      "mlp_trg": -0.235379106509,
+      "primary": {
+        "cells": 46,
+        "ci_high": -0.114874061517,
+        "ci_low": -0.288615078686,
+        "failed_cells": 1,
+        "families": 11,
+        "mlp_only_cells": 1,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.035632426003,
+            "ci_low": -0.285317348895,
+            "families": 4,
+            "task": "regression",
+            "value": -0.146916221564
+          },
+          {
+            "ci_high": -0.092407227365,
+            "ci_low": -0.496825312011,
+            "families": 3,
+            "task": "binary",
+            "value": -0.253266750623
+          },
+          {
+            "ci_high": -0.069843922065,
+            "ci_low": -0.323015159296,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.196429540681
+          }
+        ],
+        "trg": -0.198870837623,
+        "uninformative_cells": 18
+      },
+      "privacy_coverage": 0.553240740741,
+      "realism_coverage": 0.289351851852,
+      "trg_failed_at_floor": -0.236595337377
+    },
+    {
+      "arm_id": "sdv-tvae",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 64,
+        "max": 3342765,
+        "median": 474958.0,
+        "over_budget": 0,
+        "over_budget_unmeasured": 0,
+        "scored_above_budget": 45,
+        "share_within_budget": 0.0,
+        "with_packet": 64,
+        "within_budget": 0
+      },
+      "c2st_files": 39,
+      "c2st_median": 0.968998432159,
+      "exact_copy": {
+        "files": 39,
+        "max": 0.0,
+        "mean": 0.0,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "exact_copy_excess": 0.0,
+      "matched": {
+        "cells": 46,
+        "ci_high": -0.984172330546,
+        "ci_low": -1.491330403941,
+        "failed_cells": 7,
+        "families": 11,
+        "mlp_only_cells": 1,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.580518037679,
+            "ci_low": -1.568965628313,
+            "families": 4,
+            "task": "regression",
+            "value": -1.200139878518
+          },
+          {
+            "ci_high": -1.0,
+            "ci_low": -1.960851418647,
+            "families": 3,
+            "task": "binary",
+            "value": -1.523711267418
+          },
+          {
+            "ci_high": -0.656520518885,
+            "ci_low": -1.322285392704,
+            "families": 4,
+            "task": "multiclass",
+            "value": -1.026989889627
+          }
+        ],
+        "trg": -1.250280345188,
+        "uninformative_cells": 18
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 33,
+          "median": 0.062054229747
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 31,
+          "median": 0.583615136772
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 23,
+          "median": 0.359548967033
+        }
+      ],
+      "mlp_trg": -1.078707387219,
+      "primary": {
+        "cells": 46,
+        "ci_high": -0.892797482007,
+        "ci_low": -1.362372199599,
+        "failed_cells": 7,
+        "families": 11,
+        "mlp_only_cells": 1,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.473386746085,
+            "ci_low": -1.310411838613,
+            "families": 4,
+            "task": "regression",
+            "value": -0.907094814311
+          },
+          {
+            "ci_high": -1.0,
+            "ci_low": -1.960851418647,
+            "families": 3,
+            "task": "binary",
+            "value": -1.506633163411
+          },
+          {
+            "ci_high": -0.614754730857,
+            "ci_low": -1.248089671795,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.97597009983
+          }
+        ],
+        "trg": -1.129899359184,
+        "uninformative_cells": 18
+      },
+      "privacy_coverage": 0.373842592593,
+      "realism_coverage": 0.0,
+      "trg_at_budget": -1.0,
+      "trg_failed_at_floor": -1.389157511283
+    }
+  ],
+  "bootstrap": {
+    "draws": 10000,
+    "lower_quantile": 0.025,
+    "lower_rank": 249,
+    "seed": 20261123,
+    "upper_quantile": 0.975,
+    "upper_rank": 9750
+  },
+  "command": "compare",
+  "comparisons": [
+    {
+      "baseline": "sdv-tvae",
+      "baseline_above_budget": 39,
+      "baseline_trg": -1.129899359184,
+      "candidate_trg": -0.198870837623,
+      "cells": 46,
+      "ci_high": 1.17306711709,
+      "ci_low": 0.672073460956,
+      "decision": {
+        "conditions": [
+          {
+            "check": "pass",
+            "name": "ci_low",
+            "threshold": 0.0,
+            "value": 0.672073460956
+          },
+          {
+            "check": "pass",
+            "name": "holm_p",
+            "threshold": 0.05,
+            "value": 0.000099990001
+          },
+          {
+            "check": "pass",
+            "name": "min_delta",
+            "threshold": 0.01,
+            "value": 0.931028521561
+          }
+        ],
+        "guards": [
+          {
+            "check": "pass",
+            "name": "task_ci_low",
+            "threshold": -0.02,
+            "value": 0.437754320082
+          },
+          {
+            "check": "pass",
+            "name": "mlp_delta",
+            "threshold": 0.0,
+            "value": 0.84332828071
+          },
+          {
+            "check": "pass",
+            "name": "realism_coverage_delta",
+            "threshold": -0.03,
+            "value": 0.289351851852
+          },
+          {
+            "check": "pass",
+            "name": "privacy_coverage_delta",
+            "threshold": -0.03,
+            "value": 0.179398148148
+          },
+          {
+            "check": "pass",
+            "name": "exact_copy_excess",
+            "threshold": 0.005,
+            "value": 0.000021701389
+          },
+          {
+            "check": "pass",
+            "name": "bytes",
+            "threshold": 2048.0,
+            "value": 2048.0
+          }
+        ],
+        "outcome": "PROMOTE"
+      },
+      "delta": 0.931028521561,
+      "exact_copy": {
+        "files": 45,
+        "max": 0.0009765625,
+        "mean": 0.000021701389,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "families": 11,
+      "holm_m": 1,
+      "id": "served-auto-v8",
+      "kind": "candidate",
+      "matched": {
+        "cells": 46,
+        "ci_high": 1.254143598548,
+        "ci_low": 0.736070084092,
+        "delta": 1.004715006198,
+        "families": 11,
+        "multiplier": 1,
+        "p_one_sided": 0.000099990001
+      },
+      "member_deltas": [],
+      "members": [
+        "served-auto-v8"
+      ],
+      "mlp_cells": 25,
+      "null_calibration": {
+        "families": 11,
+        "flip_guard_rule": {
+          "acceptable": true,
+          "count": 8,
+          "rate": 0.004,
+          "wilson95_high": 0.007873464296,
+          "wilson95_low": 0.002028246607
+        },
+        "max_false_promote_rate": 0.05,
+        "replicates": 2000,
+        "seed": 20261124,
+        "statistical_pass": {
+          "acceptable": false,
+          "count": 181,
+          "rate": 0.0905,
+          "wilson95_high": 0.103871053105,
+          "wilson95_low": 0.078699008618
+        }
+      },
+      "p_holm": 0.000099990001,
+      "p_one_sided": 0.000099990001,
+      "tasks": [
+        {
+          "ci_high": 1.070252842067,
+          "ci_low": 0.437754320082,
+          "delta": 0.760178592746,
+          "families": 4,
+          "task": "regression"
+        },
+        {
+          "ci_high": 1.790283706154,
+          "ci_low": 0.503174687989,
+          "delta": 1.253366412788,
+          "families": 3,
+          "task": "binary"
+        },
+        {
+          "ci_high": 1.064237256276,
+          "ci_low": 0.494843862022,
+          "delta": 0.779540559149,
+          "families": 4,
+          "task": "multiclass"
+        }
+      ]
+    }
+  ],
+  "contract": {
+    "id": "dope-kpi/v2",
+    "protocol_frozen": false,
+    "sha256": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
+    "source": "embedded",
+    "status": "candidate"
+  },
+  "inputs": {
+    "guards_sha256": {
+      "sdv-tvae": "49cd734329a6cd833b12b062b7dc887c0f31f34ee99b77b7f83a949bc37b5cb0",
+      "served-auto-v8": "ecbbdc1f0c9b13e4b6571fdbaab31a4a9ab0a9d6137cd45d52de6bc806019d3f"
+    },
+    "guards_summary_sha256": {
+      "sdv-tvae": "ea0dda5c0d4e9f7770533f21d030f8cf0bba6dbad2acea9bb18a0fb6b0133c3a",
+      "served-auto-v8": "24757269d9d23392505d4fcc1e97ac3eafbf3874744e79e6ad94e05d0dc43561"
+    },
+    "realref_auditors": [
+      "gbdt",
+      "linear-seeded-v1",
+      "mlp-seeded-v1"
+    ],
+    "realref_sha256": "33f948ff49dd79c3e9ebd24b63da7d28c798a47a4863777c4a0a4ab465d87e00",
+    "rows_sha256": {
+      "sdv-tvae": "6735fffee04a8c417f1eae5919cfe714190faab0f0fb893e0a1332f21022563b",
+      "served-auto-v8": "d693c4aa2ad7e261d7ad89ac2e3f95831d1b888505c09004e0decc225412ac3a"
+    },
+    "schedule_file": "schedule-look-dev.jsonl",
+    "schedule_panel_sha256": "8d18e7837d6cc1bdf640f8e695045225a9c66d0d330ee4e835f8058cdcb7b29e",
+    "schedule_sha256": "534d3da82eda377892dac1c2712df0035980868de2b9d5f9eeda4acb2ee53062"
+  },
+  "noise_sd": {
+    "source": "default",
+    "value": 0.01
+  },
+  "panel": {
+    "dev_families": 22,
+    "dev_tables": 30,
+    "dev_tables_scheduled": 22,
+    "dev_tables_sha256": "6fe722304bdef26bec60b5fd403dbc39e4a31e92bd1da191ac7a512754ef2ff1",
+    "dev_tables_unmatched": 0,
+    "families": 22,
+    "families_sha256": "3fa7f21fe4b6eceab4148fdf51bc298cde5f1733841296e2880fc3f473c0718b",
+    "family_set_sha256": "005cf45182c0966843f998fe63af6f054241af4bbe9e83bfe22367a0d34feaec",
+    "id": "dev"
+  },
+  "schema": "dope.kpi-receipt/v2",
+  "tool": {
+    "git_sha": "bc92df0b1beae93254718e270e4e7ef7b05b38a3",
+    "name": "dope_kpi",
+    "version": "3.0.0"
+  }
+}

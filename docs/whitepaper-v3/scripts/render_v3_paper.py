@@ -38,7 +38,7 @@ import v3_paper_tables as tables  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
 SCOREBOARD = "bench/real-world/results/scoreboard/v3.0.0"
-HERO_SVG = "bench/real-world/figures/hero-v3-methods-light.svg"
+HERO_SVG = "bench/real-world/figures/hero-v3-comparison-light.svg"
 HERO_PDF = "docs/whitepaper-v3/figures/hero-v3-methods.pdf"
 GEN = "docs/whitepaper-v3/generated"
 RUST_TABLES = (f"{GEN}/v3-ranking-table.tex", f"{GEN}/v3-paired-table.tex")
@@ -377,7 +377,7 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     missing = [rel for rel in RUST_TABLES if not (REPO / rel).is_file()]
     if missing:
         raise RenderError(f"missing {missing}: run dope_kpi render-paper-tables")
-    inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
+    inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json", "evidence/addendum-k/rows.csv")}
                     | set(RUST_TABLES)
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
                        "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"])

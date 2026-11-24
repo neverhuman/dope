@@ -6,6 +6,24 @@ The encoder writes one artifact $a$ with $|a|\le B$, where $|a|$ counts every by
 The sampler reads $a$ and a seed and emits rows $(\tilde x,\tilde y)$ in the raw column space.
 Every statistic in $a$ is computed from $D_{\mathrm{fit}}$ alone; nothing is fitted on evaluation rows.
 
+\begin{center}
+  \input{method/pipeline}
+  \captionof{figure}{Fitting uses the declared target and the fitting rows. Sampling uses the selected artifact and a seed.}
+  \label{fig:pipeline}
+\end{center}
+
+\begin{center}
+\fbox{\begin{minipage}{0.94\linewidth}
+\small\textbf{Fitting and sampling}
+\begin{enumerate}[topsep=.3em]
+  \item Infer the schema from $D_{\mathrm{fit}}$ with the declared target. Reserve the container header for both candidates and the column schema for \texttt{DSE8}.
+  \item Fit each candidate to its remaining byte allowance. When exactly one fits, use it. When neither fits, report a fit failure.
+  \item When both fit, prefer Format~1 unless the duplicate-grouped fold check admits \texttt{DSE8} by Eq.~\eqref{eq:select}. Write the winning candidate and check the complete file size against $B$.
+  \item At sampling, read the encoder tag and dispatch to its decoder with the requested seed. The original table is unnecessary at this stage.
+\end{enumerate}
+\end{minipage}}
+\end{center}
+
 \subsection{Container and the two candidates}\label{sec:container}
 Every \cli{auto-v8} artifact is a \texttt{DPA1} container: a \VThree{DpaHeaderBytes}-byte header holding a magic, an encoder tag and a weights fingerprint (all zero when no learned weights are needed), followed by the payload.
 The payload is one of two candidates fitted on all of $D_{\mathrm{fit}}$:
@@ -75,7 +93,7 @@ $\eta = b + W x + \sum_e g_e(z) + \sum_q h_q(z) + \sum_t \mathrm{tree}_t(z)$
 of the linear head, the main effects, the pair interactions and the oblivious trees: a softmax or logistic draw at a fitted temperature for classification, and for regression the head's mean plus noise whose scale may depend on $z$ and whose quantiles are shifted by the residual section.
 
 \subsection{Analytic fit from the fitting rows}\label{sec:fit}
-The released encoder fits \texttt{DSE8} without learned weights.
+The released route fits \texttt{DSE8} from the current fitting rows without a pretrained checkpoint.
 \begin{enumerate}
   \item \textbf{Scale card and typed marginals.} Column kinds (continuous, lattice, discrete atoms, zero-inflated, constant) are inferred from $D_{\mathrm{fit}}$. Each column's encoded range runs between its empirical quantiles at levels $u$ and $1-u$, where $u=\min(\VThree{TailCap},\,k/\max(n_{\mathrm{obs}}+1,\VThree{TailMinDen}))$ for $n_{\mathrm{obs}}$ observed values and support floor $k=\VThree{SupportK}$; discrete values that occur at least $k$ times may instead be encoded as atoms, depending on the column's type.
   \item \textbf{Copula.} Rank-$r$ loadings are fitted to tie-aware normal scores, with loading norms capped below one so that every column keeps its own noise; a small mixture of factor means (regimes) is fitted when the budget allows.
@@ -91,7 +109,7 @@ If there are fewer than $G=\VThree{MinCheckGroups}$ groups, Format~1 is written 
 Otherwise the groups are shuffled, ordered by target value for classification, and dealt alternately into halves $H_1, H_2$, so no duplicate group straddles the halves and class proportions are balanced.
 On fold $f$, each candidate is refitted on one half, $\VThree{CheckSynthFactor}$ times as many rows as that half are sampled from it, and two internal auditors (a linear model and gradient-boosted trees) are trained on the sample and on the real half and scored on the other half.
 The candidate's fold score $s^{(f)}$ is the minimum over auditors of the retention $(L_0-L_{\mathrm{syn}})/(L_0-L_{\mathrm{real}})$, with $L_0$ the null loss; if a classification fold has fewer than \VThree{MinTestPerClass} test rows in some class, the check is void and Format~1 is kept.
-With fold means $\bar s$, \texttt{DSE8} is written if and only if
+When both candidates fit and the check is valid, \texttt{DSE8} is written if and only if
 \begin{equation}\label{eq:select}
   \bar s_{\texttt{DSE8}} > \bar s_{\mathrm{F1}} + \delta
   \quad\text{and}\quad
