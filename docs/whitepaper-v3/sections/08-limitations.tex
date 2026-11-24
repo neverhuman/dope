@@ -17,15 +17,15 @@ The comparisons are between these configurations on these splits, not the method
 
 \paragraph{Small panel and an unfrozen contract.}
 The look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
-In the four sign-flip checks, one per pair with \VThree{MethodsNullReplicates} replicates each, the statistical conditions passed in \VThree{MethodsStatPassMinPct} to \VThree{MethodsStatPassMaxPct} of replicates, above the \VThree{NullMaxRatePct} the contract deems acceptable, so the percentile interval is anti-conservative at this size; the conditions together with the guards that move under a sign flip passed in at most \VThree{MethodsFlipMaxPct}.
+In the four sign-flip checks, one per pair with \VThree{MethodsNullReplicates} replicates each, the statistical conditions passed in \VThree{MethodsStatPassMinPct} to \VThree{MethodsStatPassMaxPct} of replicates; these per-pair sign-flip pass rates are above the contract's threshold of \VThree{NullMaxRatePct}, although on their own they do not show that the percentile interval under-covers. The conditions together with the guards that move under a sign flip passed in at most \VThree{MethodsFlipMaxPct}.
 These are diagnostics of each pair on its own, not a joint false-PROMOTE rate over the four.
 Holm's adjustment covers the \VThree{MethodsHolmM} third-party pairs and nothing else scored on these splits.
 The contract is a candidate and not frozen, so the rule itself may change before a confirmatory look.
 
 \paragraph{Realism.}
-No generator scored here produces realistic rows.
+The observed median C2ST AUCs are high for every generator scored here.
 A boosted-tree discriminator separates DOPE's rows from real ones about as easily as rows with no dependence at all (median C2ST AUC \VThree{CandC2st} for both), and the third-party rows are separated about as easily (medians from \VThree{ArfC2st} to \VThree{CtganC2st}).
-The artifacts preserve predictive structure for the auditors far better than permuted columns do, but nothing here supports using them where realism matters.
+DOPE preserves more predictive structure for the auditors than independently permuted columns do, and CTGAN scores below that control (Table~\ref{tab:ranking}); nothing here supports using any of these rows where realism matters.
 
 \paragraph{Privacy.}
 Storing no source rows and clipping marginals at a support floor are design properties, not guarantees.
@@ -41,4 +41,5 @@ No checkpoint has yet passed the promotion rule against the analytic packet, so 
 
 \paragraph{Provenance.}
 The receipts record the scoring tool as \texttt{dope\_kpi} version \VThree{ToolVersion} (the tool's own version number, not a DOPE release) with build commit ``\VThree{ToolGitSha}'', and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.
-The scoreboard's README reports that a local build of the release source reproduced every scheduled packet's SHA-256 and that the signed binary must too; no committed receipt records either, so we do not claim that the released binary reproduces every scored packet.
+Before publication, the signed release binary re-emitted every scheduled packet of the report look, and the status, size and SHA-256 matched on every key; the release record lists this replay and its receipts~\citep{dope2026v3release}.
+The replay shows that the published binary writes the packets that were scored; it does not recompute the scores, which need the private tables.

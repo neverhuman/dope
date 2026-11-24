@@ -20,13 +20,13 @@ Every generator was fitted on the same rows $A$ of each cell and scored by the s
 \paragraph{Ranking.}
 At \VThree{PrimaryMult}$\times$ sampling, DOPE reaches a Transfer Score of \VThree{CandScore}.
 ARF follows at \VThree{ArfScore}, then the Gaussian copula at \VThree{GcScore}, TVAE at \VThree{TvaeScore} and CTGAN at \VThree{CtganScore}.
-For reference, a copy of the fitting rows scores \VThree{CopyAScorePoint}, not \VThree{ScoreScale}: each cell keeps the auditor on which the real twin does better than the sample, so even other real rows score a little below \VThree{ScoreScale}. A bootstrap resample of the fitting rows scores \VThree{BootAScorePoint}.
+For reference, a copy of the fitting rows scores \VThree{CopyAScorePoint} and a bootstrap resample of them \VThree{BootAScorePoint}.
 Permuting every column independently scores \VThree{IndepScorePoint} and permuting only the target \VThree{LabelShuffleScorePoint}; CTGAN scores below both.
 
 \paragraph{Paired differences.}
 DOPE is ahead of the Gaussian copula by \VThree{GcVsPts} points, of TVAE by \VThree{TvaeVsPts} and of CTGAN by \VThree{CtganVsPts}; each interval is above zero.
 Against ARF the difference is \VThree{ArfVsPts} points, and its interval contains zero: on this look DOPE is not shown to transfer better than ARF.
-The two differ by task.
+The two differ by task, in point estimates that carry no interval of their own.
 ARF is higher on regression (\VThree{ArfRegressionScore} against \VThree{CandRegressionScore}); DOPE is higher on binary (\VThree{CandBinaryScore} against \VThree{ArfBinaryScore}) and multiclass targets (\VThree{CandMulticlassScore} against \VThree{ArfMulticlassScore}).
 
 \paragraph{Matched size.}
@@ -41,8 +41,8 @@ Their scores are therefore those of unconstrained files; held to the budget, eve
 \paragraph{Realism, privacy and copies.}
 Realism coverage is \VThree{CandRealism} for DOPE, lower than ARF's \VThree{ArfRealism} and higher than the Gaussian copula's \VThree{GcRealism}; TVAE and CTGAN pass the realism gate on no entry.
 Privacy coverage is \VThree{CandPrivacy} for DOPE; CTGAN is higher at \VThree{CtganPrivacy}, the Gaussian copula and TVAE are lower (\VThree{GcPrivacy} and \VThree{TvaePrivacy}), and ARF passes the privacy gate on few entries (\VThree{ArfPrivacy}).
-CTGAN alone exceeds the exact-copy bound.
-No generator produces realistic rows: the median C2ST AUC is \VThree{CandC2st} for DOPE, the same as for independently permuted columns, and between \VThree{ArfC2st} and \VThree{CtganC2st} for the third-party generators, against \VThree{CopyAC2st} for a copy of the fitting rows.
+Only CTGAN's mean exact-copy excess fails the exact-copy guard; the maxima in Table~\ref{tab:ranking}(b) show single entries above the bound for the Gaussian copula as well as CTGAN.
+Every generator's rows are easy to tell from real ones: the median C2ST AUC is \VThree{CandC2st} for DOPE, the same as for independently permuted columns, and between \VThree{ArfC2st} and \VThree{CtganC2st} for the third-party generators, against \VThree{CopyAC2st} for a copy of the fitting rows.
 
 \paragraph{The full promotion rule.}
 Table~\ref{tab:paired} also applies the contract's promotion rule to each pair with DOPE as the candidate.

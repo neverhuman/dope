@@ -177,6 +177,9 @@ def claims(info: dict[str, Any] | None, release: dict[str, dict[str, Any]], fail
          all("bytes" in f for f in failed.values())
          and all(a["bytes"]["within_budget"] == 0 and a["trg_at_budget"] == failed_value for a in arm.values())),
         ("CTGAN alone fails the exact-copy guard", [r for r, f in failed.items() if "exact_copy_excess" in f] == ["Ctgan"]),
+        ("only the Gaussian copula and CTGAN have single entries above the exact-copy bound",
+         sorted(r for r, a in {**arm, "Cand": release["Cand"]}.items() if a["exact_copy"]["over_bound"] > 0)
+         == ["Ctgan", "Gc"]),
         ("TVAE alone has failed cells", [r for r, a in arm.items() if a["primary"]["failed_cells"] > 0] == ["Tvae"]),
         ("the packet audit found no row container and no column copy in any audited file",
          all(f["audit_row_containers"] == 0 and f["audit_column_copies"] == 0
