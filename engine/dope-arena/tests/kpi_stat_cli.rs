@@ -629,3 +629,78 @@ fn refusals_exit_non_zero_without_echoing_values() {
     ]);
     assert!(err.contains("panel"), "{err}");
 }
+
+#[test]
+fn render_readme_matches_committed_v3_scoreboard_and_clarifies_over_budget_footnote() {
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    let board = repo.join("bench/real-world/results/scoreboard/v3.0.0");
+    let primary = board.join("primary-methods.json");
+    let arf = board.join("evidence/paper/v3-vs-arfpy-arf.json");
+    let copula = board.join("evidence/paper/v3-vs-sdv-gaussian-copula.json");
+    let tvae = board.join("evidence/paper/v3-vs-sdv-tvae.json");
+    let ctgan = board.join("evidence/paper/v3-vs-sdv-ctgan.json");
+    let rendered = kpi_ok(&[
+        "render-readme",
+        "--ranked",
+        "--receipt",
+        path_str(&primary),
+        "--receipt",
+        path_str(&arf),
+        "--receipt",
+        path_str(&copula),
+        "--receipt",
+        path_str(&tvae),
+        "--receipt",
+        path_str(&ctgan),
+        "--include",
+        "dope-v3b-auto-v8",
+        "--include",
+        "arfpy-arf",
+        "--include",
+        "sdv-gaussian-copula",
+        "--include",
+        "sdv-tvae",
+        "--include",
+        "sdv-ctgan",
+        "--reference",
+        "copy_a",
+        "--reference",
+        "bootstrap_a",
+        "--reference",
+        "indep_marginals",
+        "--reference",
+        "label_shuffle",
+        "--only-included",
+        "--label",
+        "dope-v3b-auto-v8=DOPE v3",
+        "--label",
+        "arfpy-arf=ARF",
+        "--label",
+        "sdv-gaussian-copula=SDV Gaussian copula",
+        "--label",
+        "sdv-tvae=SDV TVAE",
+        "--label",
+        "sdv-ctgan=SDV CTGAN",
+        "--label",
+        "copy_a=Copy of fitting rows",
+        "--label",
+        "bootstrap_a=Bootstrap of fitting rows",
+        "--label",
+        "indep_marginals=Independent marginals",
+        "--label",
+        "label_shuffle=Label shuffle",
+    ]);
+    let committed = std::fs::read_to_string(board.join("readme-block.md")).unwrap();
+    assert_eq!(rendered, committed);
+    assert!(
+        rendered.contains(
+            "† Every observed file exceeds 2048 B (0 files within 2048 B; Transfer Score shown is for those oversized files, whereas applying the 2048 B cap penalty without re-fitting scores 0.0)."
+        ),
+        "{rendered}"
+    );
+    assert!(!rendered.contains("Transfer Score 0.0 at 2048 B"));
+}

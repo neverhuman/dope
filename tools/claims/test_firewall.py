@@ -328,10 +328,22 @@ class FirewallTests(unittest.TestCase):
         self.assertTrue(any('hand-typed' in f for f in check(candidate + "New result: 0.123.")))
         self.assertTrue(any('demo notes drift' in f for f in check(candidate.replace('`artifact_bytes` 151', '`artifact_bytes` 152'))))
         self.assertTrue(any('result card markers are missing' in f for f in check(candidate.replace(render.BEGIN, ''))))
-        # The landing page refuses historical blocks and hand-typed numbers of its own.
+        # The landing page refuses historical blocks, full collapsed metrics, and hand-typed numbers of its own.
         self.assertIn('README: generated TDL RESULTS block belongs in HISTORY.md', check(candidate, readme + candidate))
         self.assertIn('README: historical DOPE1 RESULTS block belongs in HISTORY.md', check(candidate, readme + (ROOT / 'bench/real-world/results/readme-block.md').read_text()))
+        self.assertTrue(any('DOPE1 SCOREBOARD block drifted' in f for f in check(candidate, readme.replace('<!-- END DOPE1 SCOREBOARD -->', '<details></details>\n<!-- END DOPE1 SCOREBOARD -->'))))
         self.assertTrue(any(f.startswith('README: hand-typed') for f in check(candidate, readme + "New result: 0.123.")))
+        # The scoreboard README carries the complete block (with <details>) and also fails on drift.
+        board_readme_path = ROOT / 'bench/real-world/results/scoreboard/v3.0.0/README.md'
+        board_text = original_read(board_readme_path)
+        def read_drifted_board(path, *args, **kwargs):
+            if path == history_path:
+                return candidate
+            if path == board_readme_path:
+                return board_text.replace('| `dope-v3b-auto-v8` |', '| `drifted` |', 1)
+            return original_read(path, *args, **kwargs)
+        with patch.object(Path, 'read_text', read_drifted_board):
+            self.assertTrue(any('scoreboard/v3.0.0/README.md: DOPE1 SCOREBOARD block drifted' in f for f in C.public_failures(check_render=False)))
 
     def test_figure_and_card_drift_is_detected_by_same_gate(self):
         from unittest.mock import patch

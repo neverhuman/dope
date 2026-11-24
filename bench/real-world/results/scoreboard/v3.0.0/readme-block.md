@@ -18,7 +18,7 @@ On this report a copy of the real training rows scores **96.1**.
 | — | *Independent marginals* | *-22.2* | *—* |
 | — | *Label shuffle* | *-16.4* | *—* |
 
-† Scored with files above the 2048 B budget (0 files within 2048 B; Transfer Score 0.0 at 2048 B).
+† Every observed file exceeds 2048 B (0 files within 2048 B; Transfer Score shown is for those oversized files, whereas applying the 2048 B cap penalty without re-fitting scores 0.0).
 
 A tie spans less than 1 point.
 
