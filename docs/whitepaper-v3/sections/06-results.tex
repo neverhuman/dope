@@ -17,7 +17,7 @@
 Figure~\ref{fig:hero} and Tables~\ref{tab:arms}, \ref{tab:compare} and~\ref{tab:methods} describe the report look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
 
 \paragraph{Headline.}
-\cli{auto-v8} reaches a Transfer Score of \VThree{CandScore} points (TRG \VThree{CandTrg}), against \VThree{BaseScore} (TRG \VThree{BaseTrg}) for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{DeltaPts} points (TRG \VThree{Delta}) with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
+At \VThree{PrimaryMult}$\times$ sampling, \cli{auto-v8} reaches a Transfer Score of \VThree{CandScore} points (TRG \VThree{CandTrg}), against \VThree{BaseScore} (TRG \VThree{BaseTrg}) for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{DeltaPts} points (TRG \VThree{Delta}) with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
 Its median file is \VThree{CandBytesMed}~bytes (\VThree{BaseBytesMed} for the baseline), the largest is \VThree{CandBytesMax}, and it fails \VThree{CandFailed} of \VThree{CandCells} cells.
 The gain comes from classification: the paired task differences are \VThree{DeltaBinary} for binary and \VThree{DeltaMulticlass} for multiclass targets, and \VThree{DeltaRegression} for regression, where \cli{auto-v8} is lower on the point estimate (\VThree{CandRegression} against \VThree{BaseRegression}).
 
