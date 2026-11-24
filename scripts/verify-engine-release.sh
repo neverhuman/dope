@@ -23,13 +23,44 @@ for name in dope-linux-x86_64 SHA256SUMS; do
     --source-ref "refs/tags/$tag" --source-digest "$commit" --format json > /dev/null
 done
 # Only fixed package members may be named, even inside a signed checksum file.
-expected=(BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NOTICES dope-linux-x86_64)
+expected_core=(BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NOTICES dope-linux-x86_64)
+expected_with_v8=(BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NOTICES V8_WEIGHTS_MANIFEST.json dope-linux-x86_64 dope-v8-weights.safetensors)
 mapfile -t lines < "$release_dir/SHA256SUMS"
-[[ ${#lines[@]} == ${#expected[@]} ]] || { echo 'engine_release_inventory_invalid' >&2; exit 1; }
+have_v8_weights=0
+if [[ ${#lines[@]} == ${#expected_core[@]} ]]; then
+  expected=("${expected_core[@]}")
+  for stray in V8_WEIGHTS_MANIFEST.json dope-v8-weights.safetensors; do
+    [[ ! -e "$release_dir/$stray" && ! -L "$release_dir/$stray" ]] || { echo 'engine_release_stray_v8_weights_forbidden' >&2; exit 1; }
+  done
+elif [[ ${#lines[@]} == ${#expected_with_v8[@]} ]]; then
+  expected=("${expected_with_v8[@]}")
+  have_v8_weights=1
+else
+  echo 'engine_release_inventory_invalid' >&2; exit 1
+fi
 for i in "${!expected[@]}"; do
   digest=${lines[$i]:0:64}
   [[ "$digest" =~ ^[0-9a-f]{64}$ && "${lines[$i]}" == "$digest  ${expected[$i]}" ]] || { echo 'engine_release_inventory_invalid' >&2; exit 1; }
   [[ -f "$release_dir/${expected[$i]}" && ! -L "$release_dir/${expected[$i]}" ]] || exit 1
 done
 (cd -- "$release_dir" && sha256sum --check --status SHA256SUMS)
-printf '%s\n' 'Verified signed Rust engine release; binary and package hashes match.'
+if [[ $have_v8_weights -eq 1 ]]; then
+  command -v jq > /dev/null || { echo 'engine_release_jq_required' >&2; exit 1; }
+  for name in dope-v8-weights.safetensors V8_WEIGHTS_MANIFEST.json; do
+    [[ -s "$release_dir/$name" ]] || { echo 'engine_release_v8_weights_empty' >&2; exit 1; }
+    gh attestation verify "$release_dir/$name" --repo neverhuman/dope \
+      --signer-workflow neverhuman/dope/.github/workflows/engine-release.yml \
+      --source-ref "refs/tags/$tag" --source-digest "$commit" --format json > /dev/null
+  done
+  v8_sha=$(sha256sum "$release_dir/dope-v8-weights.safetensors"); v8_sha=${v8_sha%% *}
+  v8_bytes=$(wc -c < "$release_dir/dope-v8-weights.safetensors" | tr -d ' ')
+  jq -e --arg sha "$v8_sha" --argjson bytes "$v8_bytes" \
+    '.schema == "dope.single-enc-v8-weights/v1" and .file == "model.safetensors" and .arch == "single_enc_v8" and .sha256 == $sha and .bytes == $bytes and .bytes > 0 and .bytes <= 1073741824' \
+    "$release_dir/V8_WEIGHTS_MANIFEST.json" > /dev/null || { echo 'engine_release_v8_weights_manifest_invalid' >&2; exit 1; }
+  jq -e --arg sha "$v8_sha" --argjson bytes "$v8_bytes" \
+    '.v8_weights_sha256 == $sha and .v8_weights_bytes == $bytes' \
+    "$release_dir/BUILDINFO.json" > /dev/null || { echo 'engine_release_buildinfo_v8_weights_mismatch' >&2; exit 1; }
+  printf '%s\n' 'Verified signed Rust engine release with SingleEncV8 weights; binary, weights and package hashes match.'
+else
+  printf '%s\n' 'Verified signed Rust engine release; binary and package hashes match.'
+fi
