@@ -17,10 +17,10 @@ use super::hero_svg::render;
 use super::jsonl::{canonical_json, parse_json, read_file, sha256_hex, write_atomic};
 use super::primary::ArmSummary;
 use super::receipt::{Receipt, RECEIPT_SCHEMA};
+use super::render::arm_labels;
 use super::rundir::contract;
 use dope_arena::ArenaResult;
 use serde::Serialize;
-use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 #[derive(clap::ValueEnum, Clone, Copy, Debug)]
@@ -131,25 +131,6 @@ fn plotted(arm: &ArmSummary) -> Option<(f64, f64, f64, f64)> {
     Some((bytes, p.trg?, p.ci_low?, p.ci_high?))
 }
 
-fn labels(args: &HeroArgs, arms: &[ArmSummary]) -> ArenaResult<BTreeMap<String, String>> {
-    let mut labels = BTreeMap::new();
-    for item in &args.labels {
-        let Some((arm, text)) = item.split_once('=') else {
-            return contract("--label takes ARM=Text");
-        };
-        if text.trim().is_empty() {
-            return contract(format!("--label {arm} has no text"));
-        }
-        if !arms.iter().any(|a| a.arm_id == arm) {
-            return contract(format!("--label names arm {arm}, which no receipt holds"));
-        }
-        if labels.insert(arm.to_string(), text.to_string()).is_some() {
-            return contract(format!("--label names arm {arm} twice"));
-        }
-    }
-    Ok(labels)
-}
-
 /// Every flag names an arm of the receipts once, a highlight or earlier
 /// release that can be a point and a reference with a TRG.
 fn check_roles(args: &HeroArgs, arms: &[ArmSummary]) -> ArenaResult<()> {
@@ -187,7 +168,7 @@ fn check_roles(args: &HeroArgs, arms: &[ArmSummary]) -> ArenaResult<()> {
 /// The graphic's input from the receipts and flags, and the unplotted arms.
 fn hero(args: &HeroArgs, receipts: &[Vec<u8>]) -> ArenaResult<(Hero, Vec<String>)> {
     let (first, shas, arms) = load(receipts)?;
-    let labels = labels(args, &arms)?;
+    let labels = arm_labels(&args.labels, |id| arms.iter().any(|arm| arm.arm_id == id))?;
     check_roles(args, &arms)?;
     let label = |id: &str| labels.get(id).cloned().unwrap_or_else(|| id.to_string());
     let highlight = args.highlight.as_deref();

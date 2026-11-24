@@ -416,6 +416,21 @@ fn null_and_readme_block_are_deterministic() {
         assert!(footer.contains(&sha), "{footer}");
     }
     assert!(!block.contains("-0.000"));
+
+    args.extend(["--ranked", "--label", "cand=Candidate"]);
+    let ranked = kpi_ok(&args);
+    let (ranking, full) = ranked.split_once("<details>").unwrap();
+    assert!(ranking.contains("| Transfer Score ↑ |"), "{ranking}");
+    let rows: Vec<_> = ranking
+        .lines()
+        .filter(|line| line.starts_with("| 🟩") || line.starts_with("| 🟦"))
+        .collect();
+    assert_eq!(rows.len(), 2, "{ranking}");
+    assert!(rows[0].starts_with("| 🟩 1 | Candidate |"), "{ranking}");
+    assert!(rows[1].starts_with("| 🟦 2 | `base` |"), "{ranking}");
+    assert!(!ranking.contains("`twin_c`"), "{ranking}");
+    assert!(full.contains("| `twin_c` | control |"), "{full}");
+    assert!(full.contains("| `cand` vs `base` | +0.404"), "{full}");
 }
 
 #[test]
