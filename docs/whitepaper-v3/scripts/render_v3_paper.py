@@ -67,7 +67,7 @@ RUST = {  # macro: (source, regex); the first group is the value.
     "MinPacketRoom": ("engine/dope-core/src/auto/v8_dpa.rs", r"if packet_room < (\d+) \{"),
     "CliBudget": ("engine/dope-core/src/auto/v8.rs", r"budget: (\d+),"),
     "FoldVeto": ("engine/dope-core/src/auto/v8.rs", r"x >= a - ([0-9.]+) && y >= b - [0-9.]+"),
-    "MinTestPerClass": ("engine/dope-core/src/auto/v8.rs", r"any\(\|&c\| c < (\d+)\)"),
+    "MinTestPerClass": ("engine/dope-core/src/auto/v8/folds.rs", r"any\(\|&c\| c < (\d+)\)"),
     "MinCheckGroups": ("engine/dope-core/src/auto/check.rs", r"pub const MIN_CHECK_GROUPS: usize = (\d+);"),
     "CheckSynthFactor": ("engine/dope-core/src/auto/check.rs", r"pub const CHECK_SYNTH_FACTOR: usize = (\d+);"),
     "SelectionMargin": ("engine/dope-core/src/auto/mod.rs", r"pub const SELECTION_MARGIN: f64 = ([0-9.]+);"),
