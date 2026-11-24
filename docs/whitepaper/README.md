@@ -1,5 +1,8 @@
 # Historical white paper: DOPE v2 validation
 
+> **Archived.** This manuscript describes an earlier DOPE release and is kept unchanged for reproducibility.
+> The current paper is the [DOPE v3 white paper](../whitepaper-v3/dope-v3.pdf).
+
 **Frozen 2026-10-15 (T-111).** `dope-mfs.tex` and `supplement.tex` are the historical v2
 validation paper, *DOPE: Generative Compression of Predictive Structure*. They are kept
 reproducible and are not extended. See the

@@ -1,5 +1,8 @@
 # DOPE v2.0.0 White Paper
 
+> **Archived.** This manuscript describes an earlier DOPE release and is kept unchanged for reproducibility.
+> The current paper is the [DOPE v3 white paper](../whitepaper-v3/dope-v3.pdf).
+
 This directory houses the versioned **DOPE v2.0.0** white paper:
 
 > **D.O.P.E. v2.0.0: Downstream Objective-Preserving Encoding — Fidelity Engine 2.0, Sub-2 KiB Source-Free Single-Encoding Neural Synthesis, and Twin-Referenced Multi-Auditor Evaluation**
