@@ -16,3 +16,22 @@
 \end{center}
 
 At \VThree{PrimaryMult}$\times$, per-table selection has the highest point estimate. Analytic \texttt{DSE8} alone has a higher regression score than the selector (\VThree{AnalyticRegressionScore} against \VThree{CandRegressionScore}) and lower scores on binary (\VThree{AnalyticBinaryScore} against \VThree{CandBinaryScore}) and multiclass targets (\VThree{AnalyticMulticlassScore} against \VThree{CandMulticlassScore}). These comparisons are descriptive on the development report splits.
+
+\subsection{Which codec the released selector chose}
+The signed replay selected Format~1 on \FormatRouteValue{fits} fits and analytic \texttt{DSE8} on \AnalyticRouteValue{fits} fits across the full schedule. Every packet matched its recorded digest. No neural packet was selected. Table~\ref{tab:chosen-codec} summarizes the headline cells within each group, using the same underlying score rows and guard ledger as the overall release result.
+
+\begin{table}[!htbp]
+  \centering\small
+  \caption{Descriptive results grouped by the signed selector's choice. Parentheses show informative cells. MLP Transfer Score is at \VThree{PrimaryMult}$\times$.}
+  \label{tab:chosen-codec}
+  \begin{tabular}{@{}lrrrrr@{}}
+    \toprule
+    Chosen codec & Headline cells & Families & Score at \VThree{PrimaryMult}$\times$ [CI] & Score at \VThree{MatchedMult}$\times$ & MLP \\
+    \midrule
+    Format~1 & \FormatRouteValue{headline} (\FormatRouteValue{informative}) & \FormatRouteValue{families} & \FormatRouteScore{score} [\FormatRouteScore{low}, \FormatRouteScore{high}] & \FormatRouteScore{matched} & \FormatRouteScore{mlp} \\
+    Analytic \texttt{DSE8} & \AnalyticRouteValue{headline} (\AnalyticRouteValue{informative}) & \AnalyticRouteValue{families} & \AnalyticRouteScore{score} [\AnalyticRouteScore{low}, \AnalyticRouteScore{high}] & \AnalyticRouteScore{matched} & \AnalyticRouteScore{mlp} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The two groups differ in task mix. For example, the selector chose analytic \texttt{DSE8} for \AnalyticRouteValue{binary} binary headline cells and \AnalyticRouteValue{regression} regression headline cells. Some families contribute to both groups. The analytic \texttt{DSE8} interval is based on only \AnalyticRouteValue{families} informative families. The grouped scores measure transfer after the selector's choice and cannot estimate the effect of assigning a different codec to the same cells.

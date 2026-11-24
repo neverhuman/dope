@@ -1,7 +1,7 @@
 # DOPE v3.0.0 white paper
 
-**D.O.P.E.: Downstream Objective-Preserving Encoding. Release v3.0.0: synthetic tables from a file of
-at most 2 KiB, ranked against independent generators by Transfer Score.**
+**D.O.P.E.: Downstream Objective-Preserving Encoding. Release v3.0.0. Task-preserving synthetic
+training rows from at most 2 KiB, ranked against independent generators by Transfer Score.**
 
 The paper describes the v3.0.0 encoder (`dope fit --format auto-v8`) and the `DSE8` codec, and ranks
 it by Transfer Score, 100 × (1 + TRG), against four third-party generators scored on the same
@@ -25,8 +25,8 @@ checker rejects a digit typed into a section.
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
 | `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-methods-light.svg` (`dope_kpi render-hero --methods`), converted with `rsvg-convert -f pdf` |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
-| `generated/v3-ranking-table.tex` | Table 2: the ranking by Transfer Score (`dope_kpi render-paper-tables`) |
-| `generated/v3-paired-table.tex` | Table 3: DOPE minus each generator, one block per look: the report look from `evidence/paper/v3-vs-*.json` and the second look from `evidence/addendum-h/` (`dope_kpi render-paper-tables`) |
+| `generated/v3-ranking-table.tex` | Ranking by Transfer Score (`dope_kpi render-paper-tables`) |
+| `generated/v3-paired-table.tex` | DOPE minus each generator on the report splits and the second set of splits (`dope_kpi render-paper-tables`) |
 | `budget/` | Equal-cap table and rate–utility figure built from the same aggregate CSVs |
 | `method/` | Encoder and sampler diagram |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
@@ -56,8 +56,8 @@ Addendum H part (a) repeats the comparison on the final look's DEV splits, descr
 `family-h.json` (Holm, m = 4). The renderer fails unless `primary-h.json` repeats DOPE's and the
 controls' rows of `evidence/final-look-s9-12/primary.json` field for field, is the same run,
 and `family-h.json` binds the four pairs by SHA-256 with Holm p, outcomes and the
-"replicates" flag equal to a recomputation. Table 3 shows the two looks as separate blocks,
-never pooled; the ranking table and Figure 1 stay on the report look.
+"replicates" flag equal to a recomputation. The appendix comparison table shows each set of splits
+in its own block. The ranking table and Figure 1 use the report splits.
 
 ## Build and verify
 
@@ -71,7 +71,7 @@ dope_kpi render-paper-tables --primary $S/primary-methods.json \
   $(for m in $M; do echo --second-compare $S/evidence/addendum-h/v3-vs-$m-h.json; done) \
   --look-title "Report look" --look-title "Second look: other row splits of the same DEV tables" \
   --ranking-out docs/whitepaper-v3/generated/v3-ranking-table.tex \
-  --paired-out docs/whitepaper-v3/generated/v3-paired-table.tex   # Tables 2 and 3
+  --paired-out docs/whitepaper-v3/generated/v3-paired-table.tex
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --figures   # needs rsvg-convert; only when the hero SVG changes
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py              # macros, manifest
 python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero provenance, digit lint

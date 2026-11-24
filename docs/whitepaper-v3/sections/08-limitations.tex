@@ -20,6 +20,7 @@ The comparisons are between these configurations on these splits, not the method
 
 \paragraph{Auditor and sample-size coverage.}
 The ranking uses a seeded linear model and boosted trees. The MLP is the only held-out learner. The benchmark compares matched-size samples and samples at \VThree{PrimaryMult}$\times$ the fitting set. The effect of other learner families and sampling multipliers remains unmeasured.
+The internal codec selector uses the same learner families as the headline auditors, on its own fitting-only folds. The held-out MLP favors ARF on the report splits. For applications that only need one predictor, this experiment provides no direct comparison to shipping a predictor under the same byte cap.
 
 \paragraph{Small panel and an unfrozen contract.}
 The report look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
@@ -39,7 +40,7 @@ The privacy gate is an empirical audit (distance to closest record, a distance-b
 
 \paragraph{Learned refinement.}
 \texttt{DSE8} reserves room for a learned refinement of the analytic decode, trained from the FIT-only evidence bank of Appendix~\ref{app:evidence}.
-Release~\VThree{ReleaseVersion} ships without learned weights. The \cli{auto-v8} route evaluated here uses the compressed program or the analytic packet.
+Release~\VThree{ReleaseVersion} ships no learned \texttt{DSE8} checkpoint. The \cli{auto-v8} route evaluated here fits the compressed program or the analytic packet on the current input table.
 Appendix~\ref{app:training} reports the long-run training traces, selection screens and the fresh-split result that led us to retain the weight-free release.
 
 \paragraph{Provenance.}

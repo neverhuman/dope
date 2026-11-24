@@ -28,11 +28,16 @@ The 4 KiB and 8 KiB DOPE runs each recorded four informative headline fit timeou
 
 The score reducer requires private per-cell artifacts and ledgers. Public inputs here contain summary values and digests. Report results apply to the stated benchmark and raw-row retention policy.
 
+`panel-report.csv` summarizes the scheduled headline fits from the pinned report schedule. It uses each cell's projected feature count and fitting and test row counts. The raw fitting-matrix size is the 24-byte `DOPEMAT1` header plus four bytes per feature or target entry. The size ratio is the median of the per-cell raw-matrix-to-artifact ratios on the verified 2,048-byte replay. It uses this particular numeric representation of the input, including the whole-file header.
+
 ## Codec attribution
 
 `k3-format1.csv` records the signed engine forced to Format 1 on the report schedule and the same cap. Its file framing is the direct Format 1 output. The primary receipt, result and evidence bind digests are in the CSV. An independent run matched all 216 emission keys against the schedule and reproduced the native primary byte for byte from bound score and guard files. The two other configurations in the paper's table come from the release report receipt. The comparison is descriptive.
 
+`k3-census-public.json` counts the selected codecs by task and stratum across all 108 signed report fits. An independent census matched every packet digest to the original emission ledger before reading the container tag and weights fingerprint. `k3-group.json` binds the full and partitioned reductions of the original score files for all cells, the Format 1 selections and the analytic DSE8 selections. The independent check regenerated the four filtered inputs, both guard files and the native primary receipt for each group byte for byte. The full replay reproduces the released score. `k3-group.csv` projects the public aggregates used by the paper's grouped table. Differences reflect the cells the selector assigned to each codec, including differences in task mix.
+
 ## Learned refinement pilot
 
 - `k5-plot-inputs.json` contains the plotted medians over non-overlapping windows of 200 applied updates and the paired Transfer Score differences by schedule. The telemetry spans three seeds at 8,000 corrected-objective updates and three controls at 2,000 updates, with no skipped nonfinite updates.
+- `k5-training-summary.csv` counts contiguous applied updates and reports median elapsed training hours per arm from the bound telemetry. Its paired result uses the unrounded fresh-split point and interval from the plot inputs.
 - `k5-public.json` binds telemetry, native score receipts, plotted inputs and render outputs by SHA-256. `training-k5r2.pdf` is the bound figure used in the paper. The final fresh-seed DEV result did not promote the learned refinement. The signed v3.0.0 engine remains the release.

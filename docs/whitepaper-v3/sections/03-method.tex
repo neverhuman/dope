@@ -6,16 +6,15 @@ The encoder writes one artifact $a$ with $|a|\le B$, where $|a|$ counts every by
 The sampler reads $a$ and a seed and emits rows $(\tilde x,\tilde y)$ in the raw column space.
 Every statistic in $a$ is computed from $D_{\mathrm{fit}}$ alone; nothing is fitted on evaluation rows.
 
-\begin{figure}[tbp]
-  \centering
+\begin{center}
   \input{method/pipeline}
-  \caption{Fitting uses the declared target and the fitting rows. Sampling uses the selected artifact and a seed, and can run without access to the original table.}
+  \captionof{figure}{Fitting uses the declared target and the fitting rows. Sampling uses the selected artifact and a seed.}
   \label{fig:pipeline}
-\end{figure}
+\end{center}
 
 \begin{center}
 \fbox{\begin{minipage}{0.94\linewidth}
-\small\textbf{Encoder and sampler for the weight-free release}
+\small\textbf{Fitting and sampling}
 \begin{enumerate}[topsep=.3em]
   \item Infer the schema from $D_{\mathrm{fit}}$ with the declared target. Reserve the container header for both candidates and the column schema for \texttt{DSE8}.
   \item Fit each candidate to its remaining byte allowance. When exactly one fits, use it. When neither fits, report a fit failure.
@@ -94,7 +93,7 @@ $\eta = b + W x + \sum_e g_e(z) + \sum_q h_q(z) + \sum_t \mathrm{tree}_t(z)$
 of the linear head, the main effects, the pair interactions and the oblivious trees: a softmax or logistic draw at a fitted temperature for classification, and for regression the head's mean plus noise whose scale may depend on $z$ and whose quantiles are shifted by the residual section.
 
 \subsection{Analytic fit from the fitting rows}\label{sec:fit}
-The released encoder fits \texttt{DSE8} without learned weights.
+The released route fits \texttt{DSE8} from the current fitting rows without a pretrained checkpoint.
 \begin{enumerate}
   \item \textbf{Scale card and typed marginals.} Column kinds (continuous, lattice, discrete atoms, zero-inflated, constant) are inferred from $D_{\mathrm{fit}}$. Each column's encoded range runs between its empirical quantiles at levels $u$ and $1-u$, where $u=\min(\VThree{TailCap},\,k/\max(n_{\mathrm{obs}}+1,\VThree{TailMinDen}))$ for $n_{\mathrm{obs}}$ observed values and support floor $k=\VThree{SupportK}$; discrete values that occur at least $k$ times may instead be encoded as atoms, depending on the column's type.
   \item \textbf{Copula.} Rank-$r$ loadings are fitted to tie-aware normal scores, with loading norms capped below one so that every column keeps its own noise; a small mixture of factor means (regimes) is fitted when the budget allows.

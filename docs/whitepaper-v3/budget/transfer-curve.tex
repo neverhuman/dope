@@ -3,7 +3,7 @@
     width=0.98\linewidth,height=0.39\linewidth,
     xmode=log,log basis x=2,xmin=230,xmax=18300,
     xtick={256,512,1024,2048,4096,8192,16384},
-    xticklabels={256 B,512 B,1 KiB,2 KiB,4 KiB,8 KiB,16 KiB},
+    xticklabels={256 B,512 B,1 KiB,2 KiB,4 KiB$^\dagger$,8 KiB$^\dagger$,16 KiB},
     xlabel={Whole-file budget},ylabel={Transfer Score at $\VThree{PrimaryMult}\times$},
     legend pos=south east,legend cell align=left,
     ymajorgrids,grid style={gray!20},tick label style={font=\small},
@@ -13,7 +13,7 @@
     x=cap,y=score,y error plus expr=\thisrow{high}-\thisrow{score},
     y error minus expr=\thisrow{score}-\thisrow{low}
   ]{\ServedBudget};
-  \addlegendentry{DOPE v\VThree{ReleaseVersion}}
+  \addlegendentry{DOPE \VThree{ReleaseVersion}}
   \addplot+[orange!70!black,thick,dashed,mark=square*] table[
     x=cap,y=score,y error plus expr=\thisrow{high}-\thisrow{score},
     y error minus expr=\thisrow{score}-\thisrow{low}

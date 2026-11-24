@@ -1,0 +1,46 @@
+{
+ "addendum_k_text_sha256": "dede108ef1438353af250bc8dd6f54286eaf1c0b94a37146c92c4216355a52f7",
+ "census_sha256": "d90b6c1600604b6d6a8f1d9e11749b7eb57a537b3ac096ffa26c2128e6a060f6",
+ "counts": {
+  "all": {
+   "binary": {
+    "dse8-analytic": 19,
+    "format1": 21
+   },
+   "multiclass": {
+    "dse8-analytic": 11,
+    "format1": 21
+   },
+   "regression": {
+    "dse8-analytic": 4,
+    "format1": 32
+   }
+  },
+  "headline": {
+   "binary": {
+    "dse8-analytic": 15,
+    "format1": 13
+   },
+   "multiclass": {
+    "dse8-analytic": 3,
+    "format1": 13
+   },
+   "regression": {
+    "dse8-analytic": 4,
+    "format1": 16
+   }
+  }
+ },
+ "excluded": {},
+ "fits": 108,
+ "inputs": {
+  "emit_ledger_sha256": "070eb1e4a391b7811fc046b08e77fdb4678041fc4956b8e70c638a3256ef851f",
+  "schedule_sha256": "14238f1d5b9ef7182f862d4aae63d06f3d512a29e6dfebfdb02896735bd20570",
+  "score_rows_sha256": "c59a5c9fa8a33fba58a7a3387b1218aee75a4b076de6d80445fdc51577cc2e06"
+ },
+ "role": "descriptive DEV evidence (Addendum K K3.1); no new fit, no scoring",
+ "rule": "one count per fit; the packet must exist, equal the ledger's packet_sha256 for its cell, carry the DPA1 magic and a known tag; tag 1 = Format 1, tag 8 = DSE8 (zero weights fingerprint = analytic)",
+ "schema": "dope.addendum-k3-census-public/v1",
+ "source": "the DEV report look's retained served packets (read-only)",
+ "tool_sha256": "06455e0dae588ac20b66fc076e7aef5200a6f622547c655bf71a6926d81f1596"
+}

@@ -7,20 +7,15 @@
   \input{generated/v3-ranking-table}
 \end{table}
 
-\begin{table}[t]
-  \centering\footnotesize
-  \caption{DOPE minus each third-party generator in Transfer Score points, paired on common cells, at \VThree{PrimaryMult}$\times$ and at matched size; the one-sided $p$, Holm's adjustment over the \VThree{MethodsHolmM} pairs of each look, the outcome of the contract's promotion rule with DOPE as the candidate, and the guards that rule misses are for \VThree{PrimaryMult}$\times$ (\S\ref{sec:protocol}). The report look's direction was re-reduced after scoring from the same per-cell scores (\texttt{evidence/paper/}); the second look was pre-registered in this direction (\texttt{evidence/addendum-h/}, family receipt \texttt{\VThree{SecondLookFamilySha}}). The two looks are not pooled.}
-  \label{tab:paired}
-  \input{generated/v3-paired-table}
-\end{table}
-
-Figure~\ref{fig:hero} and Tables~\ref{tab:ranking} and~\ref{tab:paired} describe the report look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
+Figure~\ref{fig:hero} and Table~\ref{tab:ranking} rank the methods on the development report splits. Of \VThree{Scheduled} scheduled cells, \VThree{Uninformative} lack sufficient predictive signal in the real reference and are excluded for every method under the same rule (\S\ref{sec:protocol}). The remaining \VThree{CandCells} cells cover \VThree{Families} families. Appendix Table~\ref{tab:paired} includes both sets of splits.
 Every generator was fitted on the same rows $A$ of each cell and scored by the same auditors on the same test rows; Appendix~\ref{app:arms} gives the third-party configurations.
+The scheduled headline cells draw from \ReportPanelValue{scheduled_tables} tables and include different row splits and feature views. The median cell has \ReportPanelValue{features_med} features, \ReportPanelValue{fit_rows_med} fitting rows and \ReportPanelValue{test_rows_med} test rows.
 
 \paragraph{Ranking.}
 At \VThree{PrimaryMult}$\times$ sampling, DOPE reaches a Transfer Score of \VThree{CandScore}.
 ARF follows at \VThree{ArfScore}, then the Gaussian copula at \VThree{GcScore}, TVAE at \VThree{TvaeScore} and CTGAN at \VThree{CtganScore}.
 For reference, a copy of the fitting rows scores \VThree{CopyAScorePoint} and a bootstrap resample of them \VThree{BootAScorePoint}.
+A second empirical calibration reference, drawn from disjoint real calibration rows, scores \VThree{TwinCScorePoint} on the \VThree{TwinCCells} informative cells where it is available. Its coverage is narrower than the main table's.
 Permuting every column independently scores \VThree{IndepScorePoint} and permuting only the target \VThree{LabelShuffleScorePoint}; CTGAN scores below both.
 
 \paragraph{Paired differences.}
@@ -36,7 +31,8 @@ The difference from ARF is \VThree{ArfVsPtsMatched} points.
 
 \paragraph{Size.}
 Every DOPE file is within the budget: the median is \VThree{CandBytesMed}~bytes and the largest \VThree{CandBytesMax}.
-The third-party files have median sizes from \VThree{GcBytesMed}~bytes (Gaussian copula) to \VThree{ArfBytesMed}~bytes (ARF), \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times DOPE's median, and none is within the budget.
+Across scheduled headline cells, the median ratio of raw fitting-matrix bytes to DOPE artifact bytes is \ReportPanelDecimal{matrix_per_artifact_med}$\times$. The reference counts the target column and the matrix header in a lossless single-precision representation.
+The uncapped serialized Python objects have median sizes from \VThree{GcBytesMed}~bytes (Gaussian copula) to \VThree{ArfBytesMed}~bytes (ARF), \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times DOPE's median. Every observed file exceeds the cap. These totals include serialization and library state and measure the files actually used for sampling.
 Applying the cap to their emitted files would assign every entry the failure floor (TRG \VThree{FailedValue}, a Transfer Score of \VThree{FailedScore}). This calculation rejects oversize outputs from the observed default fits. A comparison with generators fitted under the same cap would require separate runs.
 
 \paragraph{Equal storage.}
@@ -55,18 +51,12 @@ Privacy coverage is \VThree{CandPrivacy} for DOPE; CTGAN is higher at \VThree{Ct
 Only CTGAN's mean exact-copy excess fails the exact-copy guard; the maxima in Table~\ref{tab:ranking}(b) show single entries above the bound for the Gaussian copula as well as CTGAN.
 Every generator's rows are easy to tell from real ones: the median C2ST AUCs of DOPE and of independently permuted columns both round to \VThree{CandC2st}, and the medians lie between \VThree{ArfC2st} and \VThree{CtganC2st} for the third-party generators, against \VThree{CopyAC2st} for a copy of the fitting rows.
 
-\paragraph{The full promotion rule.}
-Table~\ref{tab:paired} also applies the contract's promotion rule to each pair with DOPE as the candidate.
-DOPE is \VThree{TvaeVsRule} against TVAE, with every guard passing.
-Against the Gaussian copula and CTGAN the transfer conditions hold but one guard misses (the Gaussian copula's per-task lower bound and CTGAN's privacy coverage), and against ARF the interval contains zero and three guards miss, so these three pairs are \VThree{GcVsRule}.
-
 \paragraph{Failures.}
 TVAE fails \VThree{TvaeFailed} of \VThree{TvaeCells} cells, where its sample holds a single class and the entry scores \VThree{FailedValue} by protocol; DOPE and the other generators score every cell.
 
 \paragraph{A second look.}
 The lower block of Table~\ref{tab:paired} repeats the comparison on other row splits of the same DEV tables, with the same generator recipes, contract and auditors (\VThree{SecondLookCells} informative cells in \VThree{SecondLookFamilies} families; receipt \texttt{\VThree{SecondLookPrimarySha}}).
 It was pre-registered before any third-party generator was scored on these splits, but DOPE's own scores on them were already known (\S\ref{sec:limits}).
-DOPE is ahead of the Gaussian copula by \VThree{SecondLookGcVsPts} points, of TVAE by \VThree{SecondLookTvaeVsPts} and of CTGAN by \VThree{SecondLookCtganVsPts}; each interval is above zero and each Holm-adjusted $p$ is below \VThree{HolmAlpha}, so the advantage over the three SDV generators replicates on this look.
+DOPE is ahead of the Gaussian copula by \VThree{SecondLookGcVsPts} points, of TVAE by \VThree{SecondLookTvaeVsPts} and of CTGAN by \VThree{SecondLookCtganVsPts}. Each interval is above zero on these other splits as well.
 Against ARF the difference is \VThree{SecondLookArfVsPts} points and its interval again contains zero: at \VThree{PrimaryMult}$\times$, on neither look is DOPE shown to transfer better than ARF.
 At matched size the second look's difference from ARF, \VThree{SecondLookArfVsPtsMatched} points, has an interval above zero, unlike the report look's; the promotion rule and the reading above use \VThree{PrimaryMult}$\times$ only.
-Under the full promotion rule DOPE is \VThree{SecondLookTvaeVsRule} against TVAE and CTGAN on this look, with every guard passing; against the Gaussian copula the per-task lower bound and privacy coverage miss, and against ARF the interval contains zero and three guards miss, so these two pairs are \VThree{SecondLookGcVsRule}.

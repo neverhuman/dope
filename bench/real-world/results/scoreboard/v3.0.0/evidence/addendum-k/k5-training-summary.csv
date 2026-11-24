@@ -1,0 +1,2 @@
+corrected_runs,control_runs,corrected_steps,control_steps,corrected_hours,control_hours,applied_steps,nonfinite,delta,low,high,gpu
+3,3,8000,2000,5.493320555555556,1.6651208333333334,30000,0,-0.3666449069,-2.7077581244999998,1.7229262626000001,RTX 4090

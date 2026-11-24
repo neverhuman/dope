@@ -2,14 +2,26 @@
 \pgfplotstableread[col sep=comma]{\BudgetData/served.csv}\ServedBudget
 \pgfplotstableread[col sep=comma]{\BudgetData/rows.csv}\RowsBudget
 \pgfplotstableread[col sep=comma]{\BudgetData/k3-format1.csv}\FormatOneData
+\pgfplotstableread[col sep=comma]{\BudgetData/k3-group.csv}\RouteData
+\pgfplotstableread[col sep=comma]{\BudgetData/panel-report.csv}\ReportPanelData
+\pgfplotstableread[col sep=comma]{\BudgetData/k5-training-summary.csv}\TrainingData
 
-% The first four ordered caps are 256, 512, 1024, and 2048 bytes.
-\newcommand{\CapValue}[3][]{%
-  \pgfplotstablegetelem{3}{#3}\of{#2}%
+\newcommand{\MeasuredValue}[4][]{%
+  \pgfplotstablegetelem{#2}{#4}\of{#3}%
   \pgfmathprintnumber[fixed,#1]{\pgfplotsretval}}
+% The fourth budget row is the common 2 KiB cap.
+\newcommand{\CapValue}[3][]{\MeasuredValue[#1]{3}{#2}{#3}}
 \newcommand{\CapScore}[2]{\CapValue[precision=1,fixed zerofill]{#1}{#2}}
 
-\newcommand{\FormatOneValue}[2][]{%
-  \pgfplotstablegetelem{0}{#2}\of{\FormatOneData}%
-  \pgfmathprintnumber[fixed,#1]{\pgfplotsretval}}
+\newcommand{\FormatOneValue}[2][]{\MeasuredValue[#1]{0}{\FormatOneData}{#2}}
 \newcommand{\FormatOneScore}[1]{\FormatOneValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\FormatRouteValue}[2][]{\MeasuredValue[#1]{0}{\RouteData}{#2}}
+\newcommand{\AnalyticRouteValue}[2][]{\MeasuredValue[#1]{1}{\RouteData}{#2}}
+\newcommand{\FormatRouteScore}[1]{\FormatRouteValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\AnalyticRouteScore}[1]{\AnalyticRouteValue[precision=1,fixed zerofill]{#1}}
+\newcommand{\ReportPanelValue}[2][]{\MeasuredValue[#1]{0}{\ReportPanelData}{#2}}
+\newcommand{\ReportPanelDecimal}[1]{\ReportPanelValue[precision=1]{#1}}
+\newcommand{\TrainingValue}[2][]{\MeasuredValue[#1]{0}{\TrainingData}{#2}}
+\newcommand{\TrainingScore}[1]{\TrainingValue[precision=2,fixed zerofill]{#1}}
+\newcommand{\TrainingHours}[1]{\TrainingValue[precision=1]{#1}}
+\newcommand{\TrainingGpu}{\pgfplotstablegetelem{0}{gpu}\of{\TrainingData}\pgfplotsretval}

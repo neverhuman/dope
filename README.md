@@ -1,13 +1,13 @@
 # D.O.P.E.: Downstream Objective-Preserving Encoding
 
-Compile a tabular dataset into a compact binary **program** that stores zero source rows and preserves downstream predictive transfer.
+DOPE fits a small **program** that generates synthetic rows for training predictive models. The file contains fitted summaries and schema without any complete fitting records.
 
 [![White Paper (PDF)](https://img.shields.io/badge/white%20paper-PDF-b31b1b.svg)](docs/whitepaper-v3/dope-v3.pdf)
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai full-audit score snapshot](docs/readme/jankurai.svg)](https://github.com/neverhuman/dope/actions/workflows/jankurai.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-- **Compact, self-contained artifacts:** `dope fit --format auto-v8` compiles a table with a declared target into a single binary program within the complete byte cap, storing zero source rows; `dope sample` generates synthetic rows on any CPU.
+- **Compact, self-contained artifacts:** `dope fit --format auto-v8` fits a table with a declared target within the whole-file cap. `dope sample` generates rows from the file and a seed.
 - **One signed CPU Rust executable:** No Python, PyTorch, or LibTorch required at runtime; signed Linux x86-64 releases carry GitHub/Sigstore OIDC attestations ([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0)).
 - **Adaptive codec selection and twin-referenced ranking:** Per-table duplicate-grouped cross-fitting chooses between `Format 1` and the `DSE8` packet inside the byte cap, ranked against third-party generators on one headline Transfer Score ([white paper PDF](docs/whitepaper-v3/dope-v3.pdf)).
 
@@ -46,9 +46,10 @@ A tie spans less than 1 point.
 
 <!-- END DOPE1 SCOREBOARD -->
 
-All scores are fresh-split DEV-SELECT estimates (no confirmation, holdout, or sealed panel was opened). Against ARF, the paired interval includes zero, so DOPE is not shown to transfer better than ARF on this look. Under the contract's full promotion rule, DOPE is **PROMOTE** against TVAE alone on the report look and **HOLD** against ARF, Gaussian copula, and CTGAN (on the second DEV look in the white paper, DOPE is **PROMOTE** against TVAE and CTGAN and **HOLD** against ARF and Gaussian copula). Synthetic rows from every generator remain easy for a boosted-tree classifier to distinguish from real rows, and the empirical privacy diagnostics are not differential privacy and not HIPAA de-identification.
+At the same byte cap, DOPE scored higher than storing and resampling a uniform subset of fitting rows at both evaluated sample sizes. On these development splits, the paired DOPE–ARF interval includes zero. Boosted trees readily distinguished synthetic rows from real rows. Privacy diagnostics apply to the measured samples.
 
 [White paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)
+· [Equal-budget comparison with stored fitting rows](bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/)
 · [Full metrics and guard results](bench/real-world/results/scoreboard/v3.0.0/README.md#full-benchmark-metrics-and-guard-results)
 · [Third-party evaluation receipts](bench/real-world/results/scoreboard/v3.0.0/evidence/paper/README.md)
 
