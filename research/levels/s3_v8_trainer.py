@@ -155,6 +155,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "0.9998": copy.deepcopy(model.state_dict()),
     }
     start_step = 0
+    optimizer_steps = 0
+    skipped_nonfinite_steps = 0
+    non_finite_streak = 0
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -181,6 +184,13 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                     if float(ema_st[dname].detach().abs().max().item()) != 0.0:
                         raise ValueError(f"resumed EMA {decay_s} has non-zero {dname} under --no-delta-w")
         start_step = int(ck["step"])
+        saved_cnt = ck.get("counters")
+        if isinstance(saved_cnt, dict):
+            optimizer_steps = int(saved_cnt.get("optimizer_steps", start_step))
+            skipped_nonfinite_steps = int(saved_cnt.get("skipped_nonfinite_steps", 0))
+            non_finite_streak = int(saved_cnt.get("non_finite_streak", 0))
+        else:
+            optimizer_steps = start_step
         torch.set_rng_state(ck["rng_state"]["torch"].cpu())
         if device.type == "cuda" and ck["rng_state"].get("cuda") is not None:
             torch.cuda.set_rng_state(ck["rng_state"]["cuda"].cpu(), device=device)
@@ -213,7 +223,7 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     t0 = time.monotonic()
     log_path = out_dir / "train.jsonl"
     metrics_last: dict[str, Any] = {}
-    steps_done, non_finite_streak = 0, 0
+    steps_done = 0
     ckpt_every = int(getattr(args, "ckpt_every", 0) or 0)
     grad_accum = max(1, int(getattr(args, "grad_accum_steps", 1) or 1))
     prior_mix_prob = float(getattr(args, "prior_mix_prob", 0.0) or 0.0)
@@ -361,17 +371,54 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             else:
                 (micro_loss / float(grad_accum)).backward()
 
+        def _persist_latest(cur_step: int) -> None:
+            rng_payload: dict[str, Any] = {
+                "torch": torch.get_rng_state(),
+                "numpy": np_rng.bit_generator.state,
+            }
+            if device.type == "cuda":
+                rng_payload["cuda"] = torch.cuda.get_rng_state(device=device)
+            save_full_checkpoint(
+                ckpt_path, model, optimizer, scheduler, emas, cur_step, rng_payload, cfg,
+                run_flags=run_flags,
+                counters={
+                    "optimizer_steps": optimizer_steps,
+                    "skipped_nonfinite_steps": skipped_nonfinite_steps,
+                    "non_finite_streak": non_finite_streak,
+                },
+            )
+
         grad_norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip).item())
         if not math.isfinite(grad_norm) or not math.isfinite(step_loss_sum):
             optimizer.zero_grad(set_to_none=True)
             non_finite_streak += 1
+            skipped_nonfinite_steps += 1
+            rec_skip = {
+                "step": step,
+                "optimizer_step": optimizer_steps,
+                "skipped_nonfinite": True,
+                "skipped_nonfinite_total": skipped_nonfinite_steps,
+                "phase": phase,
+                "lr": float(scheduler.get_last_lr()[0]),
+                "grad_norm": None if not math.isfinite(grad_norm) else grad_norm,
+                "total": None if not math.isfinite(step_loss_sum) else round(step_loss_sum, 5),
+                "wall_s": round(time.monotonic() - t0, 3),
+                "sync_round": sync_round,
+                "eff_batch": total_eps,
+            }
+            metrics_last = rec_skip
+            with log_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(rec_skip) + "\n")
             if non_finite_streak >= 5:
                 raise FloatingPointError(f"non-finite loss/grad at step {step}: loss={step_loss_sum} grad={grad_norm}")
+            if args.save_every > 0 and (step % args.save_every == 0 or step == end_step):
+                _persist_latest(step)
             continue
         non_finite_streak = 0
 
         optimizer.step()
         scheduler.step()
+        optimizer_steps += 1
         for decay_s, ema_st in emas.items():
             _update_ema(ema_st, model, float(decay_s))
 
@@ -399,6 +446,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         inv_ep = 1.0 / float(max(total_eps, 1))
         rec = {
             "step": step,
+            "optimizer_step": optimizer_steps,
+            "skipped_nonfinite": False,
+            "skipped_nonfinite_total": skipped_nonfinite_steps,
             "phase": phase,
             "lr": float(scheduler.get_last_lr()[0]),
             "grad_norm": grad_norm,
@@ -415,16 +465,7 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             fh.write(json.dumps(rec) + "\n")
 
         if args.save_every > 0 and (step % args.save_every == 0 or step == end_step):
-            rng_payload: dict[str, Any] = {
-                "torch": torch.get_rng_state(),
-                "numpy": np_rng.bit_generator.state,
-            }
-            if device.type == "cuda":
-                rng_payload["cuda"] = torch.cuda.get_rng_state(device=device)
-            save_full_checkpoint(
-                ckpt_path, model, optimizer, scheduler, emas, step, rng_payload, cfg,
-                run_flags=run_flags,
-            )
+            _persist_latest(step)
         if ckpt_every > 0 and (step % ckpt_every == 0):
             ckpt_dir = out_dir / "checkpoints"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -445,6 +486,8 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     )
     return {
         "steps_done": steps_done,
+        "optimizer_steps": optimizer_steps,
+        "skipped_nonfinite_steps": skipped_nonfinite_steps,
         "last_step": metrics_last.get("step", start_step),
         "last_metrics": metrics_last,
         "checkpoint_pt": str(ckpt_path),

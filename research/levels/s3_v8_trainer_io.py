@@ -326,6 +326,7 @@ def save_full_checkpoint(
     rng_state: dict[str, Any],
     config: dict[str, Any],
     run_flags: dict[str, Any] | None = None,
+    counters: dict[str, int] | None = None,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".part")
@@ -340,6 +341,8 @@ def save_full_checkpoint(
     }
     if run_flags is not None:
         payload["run_flags"] = dict(run_flags)
+    if counters is not None:
+        payload["counters"] = {k: int(v) for k, v in counters.items()}
     torch.save(payload, tmp)
     os.replace(tmp, path)
 
