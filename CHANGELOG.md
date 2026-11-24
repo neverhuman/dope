@@ -11,6 +11,8 @@
   privacy-coverage guards fail. The frozen report used fresh DEV row splits. A local static-pie
   build of `3fb802fd` reproduced all 108 scheduled packets byte for byte. Verify the same packet
   hashes with the signed draft binary before publication.
+- **Signed asset:** `dope-linux-x86_64` is a dynamic GNU build for Linux x86_64 and needs
+  GLIBC 2.39 or newer (Ubuntu 24.04 or later). This release has no macOS, Windows or arm64 asset.
 - This is an uncertified engine release (`dope-engine-v3.0.0`). See the
   [release procedure](docs/release.md) for scientific certification.
 - **Stable FIT row identity** (`evidence::extract_with_rows`, `RowIdentity`): with distinct physical row ids

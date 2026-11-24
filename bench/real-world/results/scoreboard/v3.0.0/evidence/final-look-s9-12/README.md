@@ -13,6 +13,11 @@ xbabe2 `~/dope-data/kpi-runs/` and are listed with their SHA-256 in [`SHA256SUMS
 - **Ship rule:** the candidate ships only if it PROMOTEs against `dope-2.0.0-auto` and its point
   delta against `served-auto-v8` is at least zero. It PROMOTEs against v2.0.0, but its delta
   against the released engine is below zero, so the released engine stays `b8a0037c`.
+- **Engine identity:** `served-auto-v8` ran binary `58314f0a…` built from `3fb802fd`, whose
+  `engine/` tree (`7b94f0a1…`) equals that of `b8a0037c`. The `dope-engine-v3.0.0` tag is cut
+  from main, whose engine source differs from `b8a0037c` only in the test
+  `engine/dope-cli/tests/installer_policy.rs`; the signed release binary must reproduce these
+  packets before the release is published.
 - **Disclosure only, no decision role:** the per-family decompositions with exact family
   sign-flip p values (`family-disclosure-*.json`), the contract's sign-flip null (`null-a.json`)
   and, outside the Holm family, the released engine against v2.0.0 (`served-vs-v2-descriptive.json`).
