@@ -18,6 +18,10 @@ xbabe2 `~/dope-data/kpi-runs/` and are listed with their SHA-256 in [`SHA256SUMS
   from main, whose engine source differs from `b8a0037c` only in the test
   `engine/dope-cli/tests/installer_policy.rs`; the signed release binary must reproduce these
   packets before the release is published.
+- **Matched-size (1×) disclosure, added 2026-11-24 after Codex review:** the candidate's 1× delta
+  against the released engine is −0.02052 on the wide-DEV selection screen (data seeds 1–4,
+  `../selection/wide-dev/cmp-v3c-cand6b-vs-dope-v3b-auto-v8.json`, `matched.delta`) and −0.03492 on
+  this look (`compare-b.json`, `matched.delta`). Addendum F's decision used the 4× deltas.
 - **Disclosure only, no decision role:** the per-family decompositions with exact family
   sign-flip p values (`family-disclosure-*.json`), the contract's sign-flip null (`null-a.json`)
   and, outside the Holm family, the released engine against v2.0.0 (`served-vs-v2-descriptive.json`).

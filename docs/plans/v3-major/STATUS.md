@@ -313,7 +313,7 @@ Use physical family units within task, native failures, 10,000 paired family dra
 
 | Release gate | Owner | State | Evidence and remaining work |
 | --- | --- | --- | --- |
-| G10 formal protocol freeze | Jepson and custodian | NOT STARTED | Reserved for certification. The seeds 9–12 DEV look will bind the embedded candidate contract SHA-256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623` in `PREREG_LOG` before scoring, with the schedule, DEV table set and scorer digest. The final-look receipt check requires that exact contract hash and `source: embedded`. The seeds 9–12 look was frozen in `PREREG_LOG` at 2026-11-23T22:48Z and scored after the freeze (primary `892a8ee0442aec76a442eb7bc28fe6951c5187a54ccc92158ed5d7e440c44c73`, family `2be57ae09637d8c786b565bd7f51c14b98ffd09b26d22e8c8c3ed2758ff18a6e`); the candidate missed the pre-registered ship rule and `b8a0037c` ships. Certification freeze remains NOT STARTED. |
+| G10 formal protocol freeze | Jepson and custodian | NOT STARTED | Reserved for certification. The seeds 9–12 DEV look bound the embedded candidate contract SHA-256 `200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623` in `PREREG_LOG` before scoring, with the schedule, DEV table set and scorer digest. The final-look receipt check requires that exact contract hash and `source: embedded`. The seeds 9–12 look was frozen in `PREREG_LOG` at 2026-11-23T22:48Z and scored after the freeze (primary `892a8ee0442aec76a442eb7bc28fe6951c5187a54ccc92158ed5d7e440c44c73`, family `2be57ae09637d8c786b565bd7f51c14b98ffd09b26d22e8c8c3ed2758ff18a6e`); the candidate missed the pre-registered ship rule and `b8a0037c` ships. Certification freeze remains NOT STARTED. |
 
 ### T90 and D80
 
