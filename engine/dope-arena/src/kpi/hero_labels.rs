@@ -191,7 +191,11 @@ pub fn place(hero: &Hero, t: &Tokens, marks: &[Mark], guides: &Guides) -> Vec<La
         let (text, size) = if highlight || hero.y_scale == YScale::TransferScore {
             (
                 hero.y_scale.highlight_label(&p.label, p.trg),
-                if highlight { HIGHLIGHT_SIZE } else { LABEL_SIZE },
+                if highlight {
+                    HIGHLIGHT_SIZE
+                } else {
+                    LABEL_SIZE
+                },
             )
         } else {
             (p.label.clone(), LABEL_SIZE)
