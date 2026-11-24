@@ -132,3 +132,19 @@ def test_multiclass_all_k_grads_and_unseen_query_mask_and_direct_cond() -> None:
     assert logits_qry.grad is not None
     assert float(logits_qry.grad[:14].abs().sum()) == 0.0
     assert float(logits_qry.grad[14:].abs().sum()) > 1e-5
+
+
+def test_gumbel_rao_ste_log_domain_extreme_logits_finite() -> None:
+    """Large-magnitude analytic logits (|logit| > 88.7 in FP32) must stay finite forward and backward."""
+    torch.manual_seed(13)
+    logits = torch.tensor(
+        [[-165.3, 0.0, -5.0], [0.0, 165.3, -20.0], [-120.0, 0.0, 120.0]],
+        dtype=torch.float32,
+        requires_grad=True,
+    )
+    y = gumbel_rao_ste(logits, tau=0.8, k_mc=4)
+    assert torch.all(torch.isfinite(y))
+    assert torch.allclose(y.sum(dim=-1), torch.ones(3), atol=1e-5)
+    loss = (y * torch.tensor([[1.0, -0.5, 0.25]]).expand_as(y)).sum()
+    loss.backward()
+    assert logits.grad is not None and torch.all(torch.isfinite(logits.grad))

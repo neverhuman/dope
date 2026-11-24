@@ -4328,6 +4328,18 @@
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_code_dim.py",
       "purpose": "pin the 64-value wire default of the SingleEncV8 learned code and the analytic step-0 start of wider research codes and models (capacity x channel probe)"
     },
+    "research/levels/v8_model_blocks.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify SingleEncV8 core building blocks, log-domain Gumbel-Rao stability, and F32/BF16 SafeTensors export"
+    },
+    "research/levels/v8_analytic_torch.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
+      "purpose": "verify vectorized PyTorch DSE8 analytic packet helpers and FIT midrank scores against Rust decode_dse8_rows"
+    },
+    "research/levels/s3_v8_auditors.py": {
+      "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_losses.py",
+      "purpose": "verify differentiable linear, tree, and RFF TSTR surrogate auditors"
+    },
     "research/levels/tests/test_v8_surgery.py": {
       "command": "PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_surgery.py",
       "purpose": "unit and native Rust round-trip test suite for SingleEncV8 model surgery and v8-r3 trainer hooks"

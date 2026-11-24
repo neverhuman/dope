@@ -1062,6 +1062,9 @@
     "research/levels/v8_surgery.py": "external-evidence",
     "research/levels/tests/test_v8_surgery_select.py": "external-evidence",
     "research/levels/tests/test_v8_code_dim.py": "external-evidence",
+    "research/levels/v8_model_blocks.py": "external-evidence",
+    "research/levels/v8_analytic_torch.py": "external-evidence",
+    "research/levels/s3_v8_auditors.py": "external-evidence",
     "docs/whitepaper-v3/": "governance"
   },
   "workspace": "dope"

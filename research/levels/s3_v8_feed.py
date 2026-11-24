@@ -150,6 +150,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--arena", required=True)
     ap.add_argument("--producers", type=int, default=4)
     ap.add_argument("--producer-cpus", default="", help="comma list, one CPU per producer")
+    ap.add_argument("--ahead-steps", type=int, default=2, help="ring look-ahead steps (>= 2)")
     ap.add_argument("--max-loss-fit", type=int, default=1024)
     ap.add_argument("--max-loss-qry", type=int, default=512)
     ap.add_argument("--normalized-only", action="store_true")
@@ -181,7 +182,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                            normalized_only=a.normalized_only, code_tier=code_tier,
                            reserve_dpa_wrapper=reserve_dpa)
     with FactoryFeed(spec, targs.episodes_per_step, a.producers, start_step=start, cpus=cpus,
-                     max_loss_fit=a.max_loss_fit, max_loss_qry=a.max_loss_qry, log_path=out / "feed.jsonl") as feed:
+                     max_loss_fit=a.max_loss_fit, max_loss_qry=a.max_loss_qry,
+                     ahead_steps=int(a.ahead_steps), log_path=out / "feed.jsonl") as feed:
         result = tr.train_v8(targs, episode_provider=feed)
         result["feed"] = feed.stats()
     (out / "feed-summary.json").write_text(json.dumps(result["feed"], indent=2, sort_keys=True, default=str))

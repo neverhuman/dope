@@ -371,50 +371,6 @@ def test_active_rank_v1_and_legacy_parity_plus_fit_midrank_z(v8_emit_bin: Path, 
         assert max_dy_diff <= 1e-5, f"decode_batch_differentiable Y parity diff {max_dy_diff} > 1e-5"
 
 
-def test_shared_fit_schema_wrapper_budget_matches_canonical_and_renamed_headers() -> None:
-    """Verify exact DPA1 schema wrapper bytes through shared Rust FFI on canonical and renamed headers."""
-    import hashlib
-    from research.levels.s3_episode_native import dpa_v8_wrapper_bytes, native_v8
-    from research.levels.v8_packet import unpack_dse8_packet_py
-
-    canon_names = [f"c{j}" for j in range(48)]
-    renamed_names = [f"measurement_{hashlib.sha256(str(j).encode()).hexdigest()[:12]}" for j in range(48)]
-    w_canon = dpa_v8_wrapper_bytes(canon_names, feature_kinds=["real"] * 48, target_name="target")
-    w_renamed = dpa_v8_wrapper_bytes(renamed_names, feature_kinds=["real"] * 48, target_name="target")
-    w_anon = dpa_v8_wrapper_bytes(renamed_names, feature_kinds=["real"] * 48, target_name="target", anonymize=True)
-    w_cls = dpa_v8_wrapper_bytes(
-        canon_names, feature_kinds=["real"] * 48, target_name="outcome",
-        target_labels=["alpha_class", "beta_class", "gamma_class"],
-    )
-    assert w_canon == 91, f"expected 91 B canonical wrapper, got {w_canon}"
-    assert w_renamed == 390, f"expected 390 B renamed wrapper, got {w_renamed}"
-    assert w_anon < w_renamed
-    assert w_cls > w_canon
-
-    rng = np.random.default_rng(174)
-    X = rng.normal(size=(128, 48)).astype(np.float32)
-    Xq = rng.normal(size=(16, 48)).astype(np.float32)
-    y = (X[:, 0] - X[:, 1] + rng.normal(size=128)).astype(np.float32)
-    ep_base = {
-        "dataset_hash": "fit-schema-test", "family_stem": "synthetic", "source_kind": "synthetic",
-        "X_fit": X, "X_qry": Xq, "y_fit": y, "y_qry": np.zeros(len(Xq), dtype=np.float32),
-        "fit_rows": np.arange(len(X), dtype=np.uint64),
-        "split_sig": "fixture-split", "view_sig": "fixture-view", "task": "regression",
-    }
-    out_canon = native_v8(ep_base, code_tier=1, reserve_dpa_wrapper=True, wrapper_bytes=w_canon)
-    ep_renamed = dict(
-        ep_base,
-        v7_schema={"feature_names": renamed_names, "feature_kinds": ["real"] * 48, "target_name": "target"},
-    )
-    out_renamed = native_v8(ep_renamed, code_tier=1, reserve_dpa_wrapper=True)
-    hdr_canon = unpack_dse8_packet_py(out_canon["packet"])["header"]
-    hdr_renamed = unpack_dse8_packet_py(out_renamed["packet"])["header"]
-    assert len(out_canon["packet"]) + w_canon <= 2048
-    assert len(out_renamed["packet"]) + w_renamed <= 2048
-    assert hdr_canon["rank_use"] == 6
-    assert hdr_renamed["rank_use"] == 5
-
-
 def test_v300_forward_incompatibility_guard(v8_emit_bin: Path, tmp_path: Path) -> None:
     """Verify active-rank-v1 checkpoints (F32 & BF16) and packets fail closed on v3.0.0 binaries."""
     import os

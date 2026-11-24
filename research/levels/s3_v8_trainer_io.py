@@ -1,6 +1,7 @@
 """I/O, episode tensorization, CUDA guard, EMA, and Valley Soup helpers for `s3_v8_trainer.py`."""
 from __future__ import annotations
 
+import argparse
 import math
 import os
 from pathlib import Path
@@ -363,3 +364,103 @@ def _export_state_dict_safetensors(
         decoder_capability=decoder_capability,
         assert_zero_delta_w=assert_zero_delta_w,
     )
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="SingleEncV8 (DOPE v3.0) resumable trainer")
+    ap.add_argument("--out-dir", type=str, required=True)
+    ap.add_argument("--run-name", type=str, default="v8_run")
+    ap.add_argument("--device", type=str, default="cpu")
+    ap.add_argument("--torch-threads", type=int, default=0)
+    ap.add_argument("--amp", action="store_true")
+    ap.add_argument("--allow-shared-gpu-vram-gb", type=float, default=0.0)
+    ap.add_argument("--steps", type=int, default=100)
+    ap.add_argument("--episodes-per-step", type=int, default=4)
+    ap.add_argument("--grad-accum-steps", type=int, default=1)
+    ap.add_argument("--max-p-curriculum", type=int, default=0)
+    ap.add_argument("--curriculum-steps", type=int, default=1000)
+    ap.add_argument("--n-fit", type=int, default=256)
+    ap.add_argument("--n-qry", type=int, default=192)
+    ap.add_argument("--n-syn", type=int, default=256)
+    ap.add_argument("--d-model", type=int, default=128)
+    ap.add_argument("--n-heads", type=int, default=4)
+    ap.add_argument("--n-enc-layers", type=int, default=4)
+    ap.add_argument("--n-dec-layers", type=int, default=2)
+    ap.add_argument("--decoder-only", action="store_true")
+    ap.add_argument(
+        "--code-dim",
+        type=int,
+        default=DEC_CODE_DIM,
+        help="learned FSQ code width; native wire Tiers 1/2/3 use 64/128/256 (32/64/128 B), "
+        "other widths are research-only capacity/channel probes",
+    )
+    ap.add_argument("--ff-mult", type=int, default=2)
+    ap.add_argument("--export-dtype", type=str, default="f32", choices=["f32", "bf16"])
+    ap.add_argument(
+        "--all-rank-norm",
+        action="store_true",
+        help="use historical 12-rank loading normalization and omit dope_dse8_decoder=active-rank-v1 metadata",
+    )
+    ap.add_argument(
+        "--historical-forward",
+        action="store_true",
+        help="reproduce pre-parity training forward (no packet analytic/typed-marginal/FIT-midrank terms, "
+        "all-12-rank loading norm, omits active-rank-v1 metadata and marker tensor)",
+    )
+    ap.add_argument(
+        "--no-delta-w",
+        action="store_true",
+        help="zero and freeze delta_W linear correction head while keeping feature, nonlinear, and residual-scale "
+        "heads matched; asserted exact zero on every SafeTensors export",
+    )
+    ap.add_argument("--use-rust-packet", action="store_true")
+    ap.add_argument("--budget-bytes", type=int, default=2048)
+    ap.add_argument("--prior-mix-prob", type=float, default=0.0)
+    ap.add_argument("--lr", type=float, default=3e-4)
+    ap.add_argument("--lr-schedule", type=str, default="wsd", choices=["cosine", "wsd"])
+    ap.add_argument("--warmup-steps", type=int, default=200)
+    ap.add_argument("--weight-decay", type=float, default=1e-2)
+    ap.add_argument("--grad-clip", type=float, default=1.0)
+    ap.add_argument("--direct-cond-weight", type=float, default=0.60)
+    ap.add_argument("--anchor-weight", type=float, default=0.15)
+    ap.add_argument("--anchor-nonlinear-weight", type=float, default=0.40)
+    ap.add_argument("--joint-swd-weight", type=float, default=0.0)
+    ap.add_argument("--alpha-floor", type=float, default=0.0)
+    ap.add_argument("--alpha-floor-steps", type=int, default=1000)
+    ap.add_argument("--alpha-floor-weight", type=float, default=0.05)
+    ap.add_argument("--resid-cond-weight", type=float, default=0.0)
+    ap.add_argument("--backbone-lr-mult", type=float, default=1.0)
+    ap.add_argument("--backbone-warmup-steps", type=int, default=500)
+    ap.add_argument("--init-from", type=str, default="")
+    ap.add_argument("--freeze-target-heads", action="store_true")
+    ap.add_argument("--freeze-x-heads", action="store_true")
+    ap.add_argument("--use-pcgrad", action="store_true")
+    ap.add_argument("--use-asam", action="store_true")
+    ap.add_argument("--asam-every", type=int, default=10)
+    ap.add_argument("--contrastive-prob", type=float, default=0.15)
+    ap.add_argument("--save-every", type=int, default=50)
+    ap.add_argument("--ckpt-every", type=int, default=0)
+    ap.add_argument("--sync-dir", type=str, default="")
+    ap.add_argument("--sync-every", type=int, default=25)
+    ap.add_argument("--sync-outer-lr", type=float, default=0.25)
+    ap.add_argument("--sync-outer-momentum", type=float, default=0.70)
+    ap.add_argument("--resume", action="store_true")
+    ap.add_argument(
+        "--stop-at-step",
+        type=int,
+        default=0,
+        help="optional early stop step (0=disabled) preserving --steps schedule/phase boundaries for exact resume",
+    )
+    ap.add_argument(
+        "--deterministic",
+        action="store_true",
+        help="disable cuDNN autotune and enable deterministic PyTorch kernels for exact GPU resume parity",
+    )
+    ap.add_argument(
+        "--no-tf32",
+        action="store_true",
+        help="disable CUDA TF32 matmul/cuDNN precision (kept enabled by default for throughput)",
+    )
+    ap.add_argument("--max-wall-s", type=float, default=0.0)
+    ap.add_argument("--seed", type=int, default=42)
+    return ap.parse_args(argv)
