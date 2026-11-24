@@ -10,7 +10,7 @@
 //! least.
 
 use super::hero_layout::{line_box, text_width, Anchor, Candidate, Placer, Rect};
-use super::hero_model::{budget_text, trg_text, Emphasis, Hero, Tokens};
+use super::hero_model::{budget_text, Emphasis, Hero, Tokens};
 
 pub const HIGHLIGHT_SIZE: f64 = 13.0;
 pub const LABEL_SIZE: f64 = 12.0;
@@ -87,7 +87,7 @@ fn reference_candidates(guides: &Guides, y: f64, w: f64, h: f64) -> Vec<Candidat
     }
 }
 
-fn point_candidates(m: &Mark, w: f64, h: f64) -> Vec<Candidate> {
+fn point_candidates(m: &Mark, budget_x: f64, w: f64, h: f64) -> Vec<Candidate> {
     let side = |dy: f64| {
         let y = m.cy - h / 2.0 + dy;
         [
@@ -108,6 +108,12 @@ fn point_candidates(m: &Mark, w: f64, h: f64) -> Vec<Candidate> {
         let dy = f64::from(k) * (h + 2.0);
         candidates.extend(side(-dy));
         candidates.extend(side(dy));
+    }
+    // If a point sits right beside the vertical budget line, allow clearing it cleanly.
+    for dy in [0.0, -(h + 2.0), h + 2.0] {
+        let y = m.cy - h / 2.0 + dy;
+        candidates.push(box_at(budget_x + 5.0, y, w, h, Anchor::Start));
+        candidates.push(box_at(budget_x - 5.0 - w, y, w, h, Anchor::End));
     }
     candidates
 }
@@ -181,14 +187,14 @@ pub fn place(hero: &Hero, t: &Tokens, marks: &[Mark], guides: &Guides) -> Vec<La
         let highlight = p.tier == Emphasis::Highlight;
         let (text, size) = if highlight {
             (
-                format!("{} \u{b7} TRG {}", p.label, trg_text(p.trg)),
+                hero.y_scale.highlight_label(&p.label, p.trg),
                 HIGHLIGHT_SIZE,
             )
         } else {
             (p.label.clone(), LABEL_SIZE)
         };
         let (w, h) = (text_width(&text, size, highlight), line_box(size));
-        if let Some(at) = placer.place(&point_candidates(&marks[i], w, h), &avoid) {
+        if let Some(at) = placer.place(&point_candidates(&marks[i], bx, w, h), &avoid) {
             labels.push(Label {
                 text,
                 at,

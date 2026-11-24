@@ -16,14 +16,14 @@
 //! bytes. Several receipts of one run (same contract, schedule, real
 //! reference and panel) render as one block.
 
-use super::compare::ComparisonResult;
 use super::jsonl::{parse_json, read_file, sha256_hex};
 use super::primary::ArmSummary;
 use super::receipt::{Receipt, RECEIPT_SCHEMA};
+pub(super) use super::render_ranked::arm_labels;
+use super::render_ranked::{ranked_summary, validate_ranked_arms, RankedOptions};
 use super::rule::{Check, Item};
 use super::rundir::{contract, TASKS};
 use dope_arena::ArenaResult;
-use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 pub const BLOCK: &str = "DOPE1 SCOREBOARD";
@@ -39,6 +39,18 @@ pub struct RenderArgs {
     /// Display name of an arm in the ranking, `ARM=Text` (repeatable).
     #[arg(long = "label", requires = "ranked")]
     pub labels: Vec<String>,
+    /// Generator arm to include in the ranking table (repeatable; default: all source-free arms).
+    #[arg(long = "include", requires = "ranked")]
+    pub include: Vec<String>,
+    /// Control arm to display as an unranked reference row in the ranking table (repeatable).
+    #[arg(long = "reference", requires = "ranked")]
+    pub references: Vec<String>,
+    /// Always show the median artifact size column in the ranking table.
+    #[arg(long = "show-size", requires = "ranked")]
+    pub show_size: bool,
+    /// Also restrict the collapsed full-metrics arm table to `--include` arms and controls.
+    #[arg(long = "only-included", requires = "include")]
+    pub only_included: bool,
 }
 
 /// `x` with 3 decimals and no negative zero.
@@ -214,124 +226,6 @@ fn comparison_row(c: &super::compare::ComparisonResult) -> String {
     )
 }
 
-pub(super) fn arm_labels(
-    items: &[String],
-    has_arm: impl Fn(&str) -> bool,
-) -> ArenaResult<BTreeMap<String, String>> {
-    let mut labels = BTreeMap::new();
-    for item in items {
-        let Some((arm, text)) = item.split_once('=') else {
-            return contract("--label takes ARM=Text");
-        };
-        if text.trim().is_empty() {
-            return contract(format!("--label {arm} has no text"));
-        }
-        if !has_arm(arm) {
-            return contract(format!("--label names arm {arm}, which no receipt holds"));
-        }
-        if labels.insert(arm.to_string(), text.to_string()).is_some() {
-            return contract(format!("--label names arm {arm} twice"));
-        }
-    }
-    Ok(labels)
-}
-
-fn ranked_summary(
-    out: &mut Vec<String>,
-    arms: &[&ArmSummary],
-    comparisons: &[&ComparisonResult],
-    budget: u64,
-    noise_sd: f64,
-    labels: &BTreeMap<String, String>,
-) {
-    let label = |id: &str| {
-        labels.get(id).map_or_else(
-            || format!("`{id}`"),
-            |text| text.replace('|', "\\|").replace(['\r', '\n'], " "),
-        )
-    };
-    let mut scored: Vec<_> = arms
-        .iter()
-        .filter(|arm| arm.artifact_class == "source_free")
-        .filter_map(|arm| arm.primary.trg.map(|trg| (trg, arm)))
-        .collect();
-    scored.sort_by(|(a, _), (b, _)| b.total_cmp(a));
-    out.push(String::new());
-    if let ([comparison], Some(arm)) = (comparisons, arms.first()) {
-        out.push(format!(
-            "**{:+.1} points at {}× sampling** for {} vs {} (paired 95% CI {:+.1} to {:+.1}).",
-            100.0 * comparison.delta,
-            arm.primary.multiplier,
-            label(&comparison.id),
-            label(&comparison.baseline),
-            100.0 * comparison.ci_low,
-            100.0 * comparison.ci_high
-        ));
-        out.push(String::new());
-    }
-    if !scored.is_empty() {
-        out.push("**Transfer Score = 100 × (1 + TRG).** A score of 100 matches a second real training sample. Higher is better.".to_string());
-        if let Some(copy_trg) = arms
-            .iter()
-            .find(|a| a.arm_id == "copy_a" && a.artifact_class == "control")
-            .and_then(|a| a.primary.trg)
-        {
-            out.push(format!(
-                "On this report a copy of the real training rows scores **{:.1}**.",
-                100.0 * (1.0 + copy_trg)
-            ));
-        }
-        out.push(String::new());
-        out.push(format!(
-            "| Rank | Encoder ({budget} B budget) | Transfer Score ↑ |"
-        ));
-        out.push("|---:|---|---:|".to_string());
-        let mut start = 0;
-        while start < scored.len() {
-            let top = scored[start].0;
-            let size = scored[start..]
-                .iter()
-                .take_while(|(trg, _)| *trg == top || top - *trg < noise_sd)
-                .count();
-            let rank = start + 1;
-            let tie = if size > 1 { "=" } else { "" };
-            let color = ["🟩", "🟦"].get(start).unwrap_or(&"⬜");
-            for (trg, arm) in &scored[start..start + size] {
-                let above_budget = if arm.bytes.scored_above_budget > 0 {
-                    " †"
-                } else {
-                    ""
-                };
-                out.push(format!(
-                    "| {color} {rank}{tie} | {} | {:.1}{above_budget} |",
-                    label(&arm.arm_id),
-                    100.0 * (1.0 + trg)
-                ));
-            }
-            start += size;
-        }
-        out.push(String::new());
-        if noise_sd > 0.0 {
-            out.push(format!(
-                "A tie spans less than {} point{}.",
-                100.0 * noise_sd,
-                if 100.0 * noise_sd == 1.0 { "" } else { "s" }
-            ));
-            out.push(String::new());
-        }
-    }
-    if let [comparison] = comparisons {
-        out.push(format!(
-            "**Promotion outcome is {}.**",
-            comparison.decision.outcome.word()
-        ));
-        out.push(String::new());
-    }
-    out.push("<details>".to_string());
-    out.push("<summary>Full benchmark metrics and guard results</summary>".to_string());
-    out.push(String::new());
-}
-
 /// The block for `receipts` (file bytes in command-line order).
 fn render(receipts: &[Vec<u8>], args: &RenderArgs) -> ArenaResult<String> {
     let mut parsed: Vec<(Receipt, String)> = Vec::new();
@@ -374,20 +268,39 @@ fn render(receipts: &[Vec<u8>], args: &RenderArgs) -> ArenaResult<String> {
     ];
     let comparisons: Vec<_> = parsed.iter().flat_map(|(r, _)| &r.comparisons).collect();
     if args.ranked {
+        validate_ranked_arms(&args.include, &args.references, &arms)?;
         let labels = arm_labels(&args.labels, |id| arms.iter().any(|arm| arm.arm_id == id))?;
         let noise_sd = parsed
             .iter()
             .find_map(|(r, _)| r.noise_sd.as_ref())
             .map_or(0.0, |sd| sd.value);
-        ranked_summary(&mut out, &arms, &comparisons, budget, noise_sd, &labels);
+        let opts = RankedOptions {
+            budget,
+            noise_sd,
+            labels: &labels,
+            include: &args.include,
+            references: &args.references,
+            show_size: args.show_size,
+        };
+        ranked_summary(&mut out, &arms, &comparisons, &opts);
     }
-    if !arms.is_empty() {
+    let display_arms: Vec<&ArmSummary> = if args.only_included && !args.include.is_empty() {
+        arms.iter()
+            .copied()
+            .filter(|arm| {
+                arm.artifact_class == "control" || args.include.iter().any(|id| id == &arm.arm_id)
+            })
+            .collect()
+    } else {
+        arms
+    };
+    if !display_arms.is_empty() {
         out.push(format!(
             "| Arm | Class | Bytes median / max / share <= {budget} B | TRG [95% CI] | Regression (families) | Binary (families) | Multiclass (families) | Median retention linear / gbdt / mlp | C2ST | Realism / privacy / copies mean (max) | Failed / cells |"
         ));
         out.push("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|".to_string());
-        out.extend(arms.iter().map(|arm| arm_row(arm)));
-        let above: Vec<String> = arms
+        out.extend(display_arms.iter().map(|arm| arm_row(arm)));
+        let above: Vec<String> = display_arms
             .iter()
             .filter(|a| a.bytes.scored_above_budget > 0)
             .map(|a| {

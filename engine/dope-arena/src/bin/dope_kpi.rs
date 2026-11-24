@@ -47,8 +47,10 @@ enum Command {
     Null(kpi::null::NullArgs),
     /// README scoreboard block from primary, compare and null receipts.
     RenderReadme(kpi::render::RenderArgs),
-    /// README hook graphic (SVG): TRG against artifact bytes from primary or compare receipts.
+    /// README hook graphic (SVG): TRG or Transfer Score against artifact bytes from receipts.
     RenderHero(kpi::hero::HeroArgs),
+    /// White paper LaTeX tables (`v3-ranking-table.tex`, `v3-paired-table.tex`) from receipts.
+    RenderPaperTables(kpi::render_paper::PaperTablesArgs),
 }
 
 fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
@@ -66,6 +68,7 @@ fn run(cli: &Cli) -> dope_arena::ArenaResult<String> {
         Command::Null(args) => kpi::null::run(args),
         Command::RenderReadme(args) => kpi::render::run(args),
         Command::RenderHero(args) => kpi::hero::run(args),
+        Command::RenderPaperTables(args) => kpi::render_paper::run(args),
     }
 }
 

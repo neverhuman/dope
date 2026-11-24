@@ -3,14 +3,16 @@
 //! receipt (two coincident DOPE releases, two research arms, a third-party
 //! baseline far past the budget, five controls in two tight pairs).
 
+use super::hero::{hero as build_hero, HeroArgs, ThemeArg};
 use super::hero_layout::{
     byte_domain, text_width, trg_steps, wrap, Anchor, Candidate, Placer, Rect,
 };
 use super::hero_model::{
-    budget_text, bytes_text, esc, tick_text, trg_text, Emphasis, Hero, Point, Reference, Theme,
-    DEFAULT_TITLE,
+    budget_text, bytes_text, esc, score_text, score_tick_text, tick_text, trg_text, Emphasis, Hero,
+    Point, Reference, Theme, YScale, DEFAULT_TITLE,
 };
 use super::hero_svg::{draw, render};
+use std::path::PathBuf;
 
 fn point(label: &str, bytes: f64, trg: f64, half: f64, tier: Emphasis) -> Point {
     Point {
@@ -53,6 +55,7 @@ pub fn fixture() -> Hero {
         ],
         budget: 2048.0,
         footer: "contract 200ea0ed \u{b7} receipt 5c999726".to_string(),
+        y_scale: YScale::Trg,
     }
 }
 
@@ -338,4 +341,104 @@ fn labels_and_titles_are_escaped() {
     well_formed(&svg).unwrap();
     assert!(svg.contains("A &lt;b&gt; &amp; &quot;c&quot;"));
     assert!(svg.contains(">x &lt; y &amp; z</text>"));
+}
+
+#[test]
+fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
+    assert_eq!(score_text(87.91), "87.9");
+    assert_eq!(score_text(-0.04), "0.0");
+    assert_eq!(score_text(-69.2), "\u{2212}69.2");
+    assert_eq!(score_tick_text(100.0), "100");
+    assert_eq!(score_tick_text(-25.0), "\u{2212}25");
+    assert_eq!(score_tick_text(-0.0), "0");
+
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let receipt_path = repo.join("bench/real-world/results/scoreboard/v3.0.0/primary-methods.json");
+    let raw = std::fs::read(&receipt_path).expect("committed primary-methods.json");
+    let args = HeroArgs {
+        receipts: vec![receipt_path],
+        theme: ThemeArg::Light,
+        out: PathBuf::from("unused.svg"),
+        labels: Vec::new(),
+        highlight: None,
+        previous: Vec::new(),
+        references: Vec::new(),
+        include: Vec::new(),
+        score_scale: false,
+        real_twin: None,
+        methods: true,
+        title: None,
+        note: None,
+    };
+    let (h, unplotted) = build_hero(&args, &[raw]).unwrap();
+    assert_eq!(h.y_scale, YScale::TransferScore);
+    assert_eq!(h.points.len(), 5, "v3 plus four external methods only");
+    assert_eq!(h.references.len(), 2, "real twin + copy of fitting rows");
+    assert!(unplotted.iter().any(|id| id == "dope-2.0.0-auto"));
+    assert!(unplotted.iter().any(|id| id == "dope-1.3.0-small"));
+    assert_eq!(h.points[0].label, "DOPE v3");
+    assert!((h.points[0].bytes - 1787.0).abs() < 1e-6);
+    assert!((h.y_scale.convert(h.points[0].trg) - 87.9).abs() < 0.06);
+    assert_eq!(h.references[0].label, "real twin");
+    assert!((h.y_scale.convert(h.references[0].trg) - 100.0).abs() < 1e-9);
+    assert_eq!(h.references[1].label, "copy of the fitting rows");
+    assert!((h.y_scale.convert(h.references[1].trg) - 96.1).abs() < 0.06);
+
+    for theme in [Theme::Light, Theme::Dark] {
+        let (svg, bounds, boxes) = draw(&h, theme);
+        well_formed(&svg).unwrap();
+        assert!(svg.contains(">Transfer Score (95% CI)</text>"));
+        assert!(svg.contains(">DOPE v3 \u{b7} 87.9</text>"));
+        assert!(svg.contains(">real twin</text>"));
+        assert!(svg.contains(">copy of the fitting rows</text>"));
+        assert!(!svg.contains("previous release"));
+        assert!(!svg.contains("2.0.0") && !svg.contains("1.3.0"));
+        assert_eq!(boxes.len(), 8, "budget + 2 references + 5 points");
+        for (i, a) in boxes.iter().enumerate() {
+            assert!(a.within(&bounds), "label {i} inside plot bounds");
+            for (j, b) in boxes.iter().enumerate().skip(i + 1) {
+                assert_eq!(a.overlap(b), 0.0, "labels {i} and {j} overlap");
+            }
+        }
+        let budget = svg
+            .lines()
+            .find(|l| l.contains("class=\"budget\""))
+            .unwrap();
+        let bx = attr(budget, "x1");
+        let mut lines = vec![Rect {
+            x: bx - 1.0,
+            y: bounds.y,
+            w: 2.0,
+            h: bounds.h,
+        }];
+        for line in svg.lines().filter(|l| l.contains("class=\"ref\"")) {
+            let y = attr(line, "y1");
+            lines.push(Rect {
+                x: attr(line, "x1"),
+                y: y - 0.5,
+                w: attr(line, "x2") - attr(line, "x1"),
+                h: 1.0,
+            });
+        }
+        for (i, label) in boxes.iter().enumerate() {
+            for line in &lines {
+                assert_eq!(label.overlap(line), 0.0, "a line crosses label {i}");
+            }
+        }
+        let committed_name = match theme {
+            Theme::Light => "bench/real-world/figures/hero-v3-methods-light.svg",
+            Theme::Dark => "bench/real-world/figures/hero-v3-methods-dark.svg",
+        };
+        let committed = std::fs::read_to_string(repo.join(committed_name))
+            .expect("committed hero-v3-methods SVG");
+        assert_eq!(
+            svg, committed,
+            "{committed_name} drifted from committed receipts"
+        );
+    }
 }

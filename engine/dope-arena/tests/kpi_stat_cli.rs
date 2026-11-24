@@ -431,6 +431,67 @@ fn null_and_readme_block_are_deterministic() {
     assert!(!ranking.contains("`twin_c`"), "{ranking}");
     assert!(full.contains("| `twin_c` | control |"), "{full}");
     assert!(full.contains("| `cand` vs `base` | +0.404"), "{full}");
+
+    let filtered_args = vec![
+        "render-readme",
+        "--receipt",
+        path_str(&paths[0]),
+        "--receipt",
+        path_str(&paths[1]),
+        "--ranked",
+        "--include",
+        "cand",
+        "--reference",
+        "twin_c",
+        "--label",
+        "cand=Candidate",
+        "--label",
+        "twin_c=Real twin",
+        "--show-size",
+        "--only-included",
+    ];
+    let filtered = kpi_ok(&filtered_args);
+    let (f_rank, f_full) = filtered.split_once("<details>").unwrap();
+    assert!(
+        f_rank.contains("| Rank | Generator | Transfer Score ↑ | Median file |"),
+        "{f_rank}"
+    );
+    assert!(
+        f_rank.contains("| 🟩 1 | Candidate | 89.6 | 1,800 B |"),
+        "{f_rank}"
+    );
+    assert!(
+        f_rank.contains("| — | *Real twin* | *92.5* | *—* |"),
+        "{f_rank}"
+    );
+    assert!(!f_rank.contains("`base`"), "{f_rank}");
+    assert!(!f_full.contains("| `base` |"), "{f_full}");
+    assert!(f_full.contains("| `cand` | source_free |"), "{f_full}");
+    assert!(f_full.contains("| `twin_c` | control |"), "{f_full}");
+
+    let err_ctrl = kpi_err(&[
+        "render-readme",
+        "--receipt",
+        path_str(&paths[0]),
+        "--ranked",
+        "--include",
+        "twin_c",
+    ]);
+    assert!(err_ctrl.contains("--reference"), "{err_ctrl}");
+    let err_dup = kpi_err(&[
+        "render-readme",
+        "--receipt",
+        path_str(&paths[0]),
+        "--ranked",
+        "--include",
+        "cand",
+        "--reference",
+        "cand",
+    ]);
+    assert!(
+        err_dup.contains("both --include and --reference"),
+        "{err_dup}"
+    );
 }
 
 #[test]
