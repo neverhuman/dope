@@ -181,11 +181,11 @@ fn above_budget_footnote(scored: &[(f64, &ArmSummary)], budget: u64) -> Option<S
     if all_zero_within && same_floor {
         let floor_score = score1(floor.unwrap_or(-1.0));
         Some(format!(
-            "† Scored with files above the {budget} B budget (0 files within {budget} B; Transfer Score {floor_score} at {budget} B)."
+            "† Every observed file exceeds {budget} B (0 files within {budget} B; Transfer Score shown is for those oversized files, whereas applying the {budget} B cap penalty without re-fitting scores {floor_score})."
         ))
     } else {
         Some(format!(
-            "† Scored with files above the {budget} B budget (Transfer Score reflects rows as scored; see full metrics below)."
+            "† Scored with files above the {budget} B cap (Transfer Score reflects rows as scored; see full metrics)."
         ))
     }
 }

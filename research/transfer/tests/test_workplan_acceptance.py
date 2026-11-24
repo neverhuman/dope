@@ -313,21 +313,20 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
         for text in (readme_text, history_text):
             self.assertNotIn("dope compile-csv", text)
         self.assertIn("cross-model feature-driver preservation: not yet measured", history_text)
-        # The landing page's scope paragraph wraps the same label across lines.
-        self.assertIn("cross-model feature-driver preservation: not yet measured", " ".join(readme_text.split()))
         self.assertIn("Feature-Target Correlation Proxy", history_text)
         self.assertIn("strongest measured comparator on this historical block", history_text)
-        self.assertIn("paper/dope1.tex", readme_text)
-        self.assertIn("paper/dope1-supplement.tex", readme_text)
-        # The landing page is the prose outside generated blocks and collapsed <details>
-        # sections; the historical and kernel blocks stay verbatim inside them.
+        self.assertIn("paper/dope1.tex", history_text)
+        self.assertIn("paper/dope1-supplement.tex", history_text)
+        self.assertIn("docs/whitepaper-v3/dope-v3.pdf", readme_text)
+        self.assertIn("HISTORY.md", readme_text)
+        # The landing page is the concise v3 prose outside generated blocks.
         stripped = re.sub(r"<!-- BEGIN (DOPE1 \w+|BENCHMARK|TDL RESULTS|PINNED DEMOS|COMPRESSION|QUICKSTART|EQUAL BYTES) -->.*?<!-- END \1 -->", "", readme_text, flags=re.S)
         while True:
             collapsed = re.sub(r"<details>(?:(?!<details>).)*?</details>", "", stripped, flags=re.S)
             if collapsed == stripped:
                 break
             stripped = collapsed
-        self.assertTrue(650 <= len(stripped.split()) <= 1250)
+        self.assertTrue(200 <= len(stripped.split()) <= 650, f"unexpected README prose word count: {len(stripped.split())}")
         wp_env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}
         for mod in ("test_readme_benchmark", "test_figure_one", "test_hero_figure"):
             res = subprocess.run([sys.executable, "-B", "-m", "unittest", mod, "-v"], cwd=str(REPO_ROOT), env=wp_env, capture_output=True, text=True, check=True)

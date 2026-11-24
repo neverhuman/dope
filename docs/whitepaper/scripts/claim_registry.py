@@ -504,18 +504,18 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
         path = root / name
         if not path.is_file() or path.read_text() != expected:
             failures.append(f"{name}: equal-byte generated output drift")
-    # The landing page: the DOPE engine's generated blocks and hero, and linted prose.
+    # The landing page: the v3 scoreboard and hero, and linted prose; historical blocks live in HISTORY.md.
     from tools.claims import dope1
     readme = (root / "README.md").read_text()
+    history_path = root / HISTORY
+    history = history_path.read_text() if history_path.is_file() else ""
     failures.extend(readme_hero_failures(readme))
     for name in HISTORICAL_BLOCKS:
         if f"<!-- BEGIN {name} -->" in readme or f"<!-- END {name} -->" in readme:
             failures.append(f"README: generated {name} block belongs in {HISTORY}")
-    failures.extend(dope1.failures(readme, root))
-    failures.extend(lint_public_text(dope1.strip(readme), "README"))
+    failures.extend(dope1.failures(readme, root, history))
+    failures.extend(lint_public_text(dope1.strip(readme, tuple(dope1.README_BLOCKS)), "README"))
     # The history page: every historical generated block, authenticated, and linted prose.
-    history_path = root / HISTORY
-    history = history_path.read_text() if history_path.is_file() else ""
     if render.BEGIN not in history:
         failures.append(f"{HISTORY}: generated result card markers are missing")
     elif history.count(render.BEGIN) != 1 or history.count(render.END) != 1 or history.index(render.BEGIN) > history.index(render.END):
@@ -553,8 +553,9 @@ def public_failures(root: Path = REPO, check_render: bool = True) -> list[str]:
                 if block != equal_outputs["paper/generated/readme-equal-bytes.md"].strip():
                     failures.append(f"{HISTORY}: generated equal-byte block drift")
                 prose = prose.replace(block, "")
-        if "<!-- BEGIN DOPE1 " in prose or "<!-- END DOPE1 " in prose:
-            failures.append(f"{HISTORY}: the DOPE engine's generated blocks belong in README.md")
+        if "<!-- BEGIN DOPE1 SCOREBOARD -->" in prose or "<!-- END DOPE1 SCOREBOARD -->" in prose:
+            failures.append(f"{HISTORY}: the DOPE1 SCOREBOARD block belongs in README.md")
+        prose = dope1.strip(prose, tuple(dope1.HISTORY_BLOCKS))
         failures.extend(lint_public_text(prose, HISTORY))
     verified_outputs = set(outputs) | {name for name in equal_outputs if name.endswith(".tex")}
     compression_tex, compression_failures = readme_blocks.verified_tex(root)

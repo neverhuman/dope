@@ -332,11 +332,15 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
 
         title = plain_title(main)
         self.assertEqual(plain_title(supplement), "Supplement: " + title)
+        v3_tex = (check_paper.ROOT.parents[1] / "docs/whitepaper-v3/dope-v3.tex").read_text()
+        v3_title = re.search(r"pdftitle=\{([^{}]*)\}", v3_tex).group(1)
         cited = re.search(r"preferred-citation:.*?\n  title: \"([^\"]*)\"", citation, re.S)
         self.assertIsNotNone(cited)
-        self.assertEqual(cited.group(1), title)
+        self.assertEqual(cited.group(1), v3_title)
         self.assertTrue(title.startswith("D.O.P.E.: "))
+        self.assertTrue(v3_title.startswith("D.O.P.E.: "))
         self.assertNotIn("Kilobyte", title)
+        self.assertNotIn("Kilobyte", v3_title)
         self.assertIn("Downstream Objective-Preserving Encoding", main)
         # The round records keep all four profiles and record no selection, so these statements are withdrawn.
         for text in (main, supplement, registry):
@@ -347,22 +351,25 @@ elif args[:1] == ["docs/whitepaper/scripts/paper_build.py"]:
             self.assertIn("selection-exposed", text)
 
     def test_readme_citation_and_pdf_metadata_carry_the_one_title_without_kilobyte_branding(self):
-        """README heading and bibtex, CITATION.cff and both pdftitle entries name the paper title; byte counts stay measurements."""
+        """README heading and bibtex, CITATION.cff and v3 pdftitle name the v3 paper; historical PDFs keep their title."""
         main = check_paper.TEX.read_text()
         supplement = (check_paper.ROOT / "supplement.tex").read_text()
+        v3_tex = (check_paper.ROOT.parents[1] / "docs/whitepaper-v3/dope-v3.tex").read_text()
         readme = (check_paper.ROOT.parents[1] / "README.md").read_text()
         citation = (check_paper.ROOT.parents[1] / "CITATION.cff").read_text()
         title = re.search(r"\\title\{\\texorpdfstring\{.*?\}\{([^{}]*)\}\}", main, re.S).group(1)
+        v3_title = re.search(r"pdftitle=\{([^{}]*)\}", v3_tex).group(1)
         self.assertIn(r"pdftitle={" + title + "}", main)
         self.assertIn(r"pdftitle={Supplement: " + title + "}", supplement)
-        self.assertEqual(readme.splitlines()[0], "# " + title.split(" -- ")[0])
-        bibtex = re.search(r"@misc\{taylor2026dope,\n  title  = \{(.*)\},\n", readme)
+        self.assertEqual(readme.splitlines()[0], "# " + v3_title)
+        bibtex = re.search(r"@(?:misc|techreport)\{taylor2026dope,\n  title\s*= \{(.*)\},\n", readme)
         self.assertIsNotNone(bibtex)
-        self.assertEqual(bibtex.group(1), "{D.O.P.E.}: " + title.removeprefix("D.O.P.E.: "))
+        self.assertEqual(bibtex.group(1), "{D.O.P.E.}: " + v3_title.removeprefix("D.O.P.E.: "))
+        self.assertIn("docs/whitepaper-v3/dope-v3.pdf", readme.split("## Citation", 1)[1])
         self.assertNotIn("<!-- BEGIN BENCHMARK -->", readme)
         history = (check_paper.ROOT.parents[1] / "HISTORY.md").read_text()
         history = history.split("<!-- BEGIN BENCHMARK -->")[0] + history.split("<!-- END BENCHMARK -->")[1]
-        for text in (readme, history, citation, title):
+        for text in (readme, history, citation, title, v3_title):
             self.assertNotRegex(text.lower(), r"kilobyte[- ]scale|kilobyte generator")
         self.assertIn("Downstream Objective-Preserving Encoding", readme)
 

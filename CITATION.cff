@@ -16,7 +16,7 @@ authors:
     affiliation: NEVERHUMAN Research
 preferred-citation:
   type: report
-  title: "D.O.P.E.: Downstream Objective-Preserving Encoding -- Generative Compression of Predictive Structure"
+  title: "D.O.P.E.: Downstream Objective-Preserving Encoding"
   authors:
     - family-names: Taylor
       given-names: Jepson
