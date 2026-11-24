@@ -10,12 +10,19 @@ External coding agents should follow [Using DOPE](#using-dope) and stop there.
 
 ### Install
 
-The public binary is the signed Linux x86-64 engine, tag `dope-engine-v3.0.0`.
-`gh` 2.102.0 or newer is required. `scripts/install.sh` checks `SHA256SUMS` and the
-GitHub/Sigstore attestation before it installs the binary.
+The public binary is the signed Linux x86-64 engine, tag `dope-engine-v3.0.0`
+(`glibc` 2.39 or newer). `gh` 2.102.0 or newer is required. The installer
+below is pinned to release commit `e15c415bad9554f7c419dd240aa670d1a79a27fe`.
+It checks `SHA256SUMS` and the GitHub/Sigstore attestation for that tag and
+source commit before it installs the binary.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --no-weights
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/e15c415bad9554f7c419dd240aa670d1a79a27fe/scripts/install.sh \
+  | bash -s -- \
+      --tag dope-engine-v3.0.0 \
+      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
+      --require-attestation \
+      --no-weights
 dope doctor
 ```
 

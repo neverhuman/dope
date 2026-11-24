@@ -13,14 +13,22 @@ Agents that only need to fit a table should follow this page and
 
 ## Install the signed engine
 
-Linux x86-64, with `gh` 2.102.0 or newer. The installer checks `SHA256SUMS`
-and the GitHub/Sigstore attestation before it copies the binary.
+Linux x86-64 (`glibc` 2.39 or newer), with `gh` 2.102.0 or newer. The
+installer is pinned to release commit
+`e15c415bad9554f7c419dd240aa670d1a79a27fe`. It checks `SHA256SUMS` and the
+GitHub/Sigstore attestation for that tag and source commit before it copies
+the binary.
 [Verify a package by hand](signed-engine-release.md#verify-before-install)
 or [build from source](signed-engine-release.md#build-and-package) when you
 are not using the one-line installer.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --no-weights
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/e15c415bad9554f7c419dd240aa670d1a79a27fe/scripts/install.sh \
+  | bash -s -- \
+      --tag dope-engine-v3.0.0 \
+      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
+      --require-attestation \
+      --no-weights
 dope doctor
 ```
 

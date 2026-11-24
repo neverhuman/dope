@@ -4,12 +4,19 @@
 
 The program a new user runs is the signed `dope` binary from
 [dope-engine-v3.0.0](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0).
-It is Linux x86-64 and needs `gh` 2.102.0 or newer. The installer verifies
-`SHA256SUMS` and the GitHub/Sigstore attestation, then installs
+It is Linux x86-64 (`glibc` 2.39 or newer) and needs `gh` 2.102.0 or newer.
+The installer below is pinned to release commit
+`e15c415bad9554f7c419dd240aa670d1a79a27fe`. It verifies `SHA256SUMS` and the
+GitHub/Sigstore attestation for that tag and source commit, then installs
 `~/.local/bin/dope`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/main/scripts/install.sh | bash -s -- --no-weights
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/e15c415bad9554f7c419dd240aa670d1a79a27fe/scripts/install.sh \
+  | bash -s -- \
+      --tag dope-engine-v3.0.0 \
+      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
+      --require-attestation \
+      --no-weights
 dope doctor
 dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
 ```

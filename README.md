@@ -74,6 +74,7 @@ Provide a CSV with an explicitly declared target ([target-last data contract](do
 [Verify a downloaded release](docs/signed-engine-release.md#verify-before-install)
 · [Build from source](docs/signed-engine-release.md#build-and-package)
 · [Getting started](docs/getting-started.md)
+· [AGENTS.md](AGENTS.md)
 
 ## Documentation
 
