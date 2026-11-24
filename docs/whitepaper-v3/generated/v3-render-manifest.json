@@ -11,6 +11,15 @@
     "bench/real-world/results/scoreboard/v3.0.0/MANIFEST.json": "c44db0cc0178fab281ff2e9eceb5215be638b598e21c84cf907b15049262b143",
     "bench/real-world/results/scoreboard/v3.0.0/compare-methods.json": "36f00d467dcb56b79d10993fae8a8c226d8a9441624b7925ad53b1fc3427f112",
     "bench/real-world/results/scoreboard/v3.0.0/compare.json": "5ac5a9bd0d49cef9454da192ef7adee969d0788b2d01fa76000532f6c3c36c49",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/ADDENDUM_H.md": "c7e446a801874703b3b4e38e9c0ac1f01365ac687b848ae1814db4a03a384b98",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/MANIFEST-h.json": "55aeb5308c84912496b4773096f8280990808c57a32e3bf619152641172ae0a1",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/PREREG_LOG-H.txt": "61c62e430ec0f23b318c27080399906eb6448c02fa2566964967c13a59a183bc",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/family-h.json": "01bb97407b4b391e6d3105fde954a3f3037f34bdd73bb82754d56628639ebc82",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/primary-h.json": "18762caca7bd793653618c5cb94d106f9951ebcdfab882c4e758ab8357fee483",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-arfpy-arf-h.json": "e8d33a24cf182b9532b75eb12883ac5415104a1a32639edc5f64bbdd89d52d5c",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-ctgan-h.json": "fe5628b34134f90f089ef1f796bda5066df4e3724c112c923c7660bdb1e13d4f",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-gaussian-copula-h.json": "518563fdbc0b73d0f4d94a5eb0425eb5b215b74223438303a3b895b2edb735ce",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-tvae-h.json": "4fb4c744065ba0f2b0a47e90ad156b6902885ef81e41f21c1b441e1d77e4e510",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/SHA256SUMS": "9cd78cd414eb88a67289ae1c44c92276845df4f2734fbe3cc1e2e343da01e6d6",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/arms.json": "02cdf99c852ad5ebf3f6b9d6822145a85a9c36f619e06e1d6a3ba37af73d00be",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/compare-a.json": "4ddabe593b3f2b8715f3f073c14e9cf7011a647e068eecbbba92374594cc1ee6",
@@ -39,7 +48,7 @@
     "contracts/dope-fidelity-v3-candidate.json": "87bc12eef5191d60b75e40f7c3f556f4816f64c50b7c2c6cb1a689e5aea29f60",
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",
-    "docs/whitepaper-v3/generated/v3-paired-table.tex": "a2ffdca5a0ab6f06f2eebe73ab1bc06cf9545bef26c420d03b494469be526b79",
+    "docs/whitepaper-v3/generated/v3-paired-table.tex": "735cba3033b205870964714b7dc4daf162258be6b78de805660e598f9202b1de",
     "docs/whitepaper-v3/generated/v3-ranking-table.tex": "81c621f643fcb95e43a52dee77add8a7d988e35344a4af03206663cbaafd8bf2",
     "engine/dope-core/src/auto/check.rs": "6c9ad81ce6b7846de223dd02f436adda00de45743e7e3a2bf61aa17ca126141d",
     "engine/dope-core/src/auto/container.rs": "16c38db0a977644e2002e2012083337c8ba5f8e8f13f648dd97b06cbf58e28e0",
@@ -57,7 +66,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-macros.tex": "ead92287ade60f63197f1dd0c3023b7b087ec70cdb65a694a44396174bf7a358"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "80bf80ab2c940a0d6f58246faf4a1fb0682af59fcdab8dfce30df3ebc6790f52"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }

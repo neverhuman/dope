@@ -1,6 +1,8 @@
 //! Unit tests for `dope_kpi render-paper-tables`.
 
-use super::render_paper::{build_tables, PaperTablesArgs, DEFAULT_CANDIDATE};
+use super::render_paper::{
+    build_tables, PaperTablesArgs, DEFAULT_CANDIDATE, DEFAULT_SECOND_CANDIDATE,
+};
 use std::path::PathBuf;
 
 #[test]
@@ -33,8 +35,12 @@ fn paper_tables_match_committed_receipts_with_zero_prior_versions() {
         methods: Vec::new(),
         references: Vec::new(),
         labels: Vec::new(),
+        second_primary: None,
+        second_compares: Vec::new(),
+        second_candidate: DEFAULT_SECOND_CANDIDATE.to_string(),
+        look_titles: Vec::new(),
     };
-    let (ranking, paired, holm_map) = build_tables(&args, &primary, &compares).unwrap();
+    let (ranking, paired, holm_map) = build_tables(&args, &primary, &compares, None).unwrap();
     assert!(!ranking.contains("\\label{") && !paired.contains("\\label{"));
     assert!(
         ranking.contains(r"\textbf{DOPE v3} & 87.9 [81.1, 95.1] & 69.1"),
@@ -86,15 +92,114 @@ fn paper_tables_match_committed_receipts_with_zero_prior_versions() {
     let committed_ranking =
         std::fs::read_to_string(repo.join("docs/whitepaper-v3/generated/v3-ranking-table.tex"))
             .expect("committed v3-ranking-table.tex");
-    let committed_paired =
-        std::fs::read_to_string(repo.join("docs/whitepaper-v3/generated/v3-paired-table.tex"))
-            .expect("committed v3-paired-table.tex");
     assert_eq!(
         ranking, committed_ranking,
         "docs/whitepaper-v3/generated/v3-ranking-table.tex drifted from committed receipts"
     );
+    // A single look renders one untitled block; the committed Table 2 carries both looks and is
+    // pinned by `paired_table_with_second_look_matches_addendum_h_receipts`.
+    assert!(!paired.contains(r"\multicolumn"), "{paired}");
+}
+
+/// Report-look block titles for the committed two-look Table 2 (`v3-paired-table.tex`).
+pub(super) const LOOK_TITLES: [&str; 2] = [
+    "Report look",
+    "Second look: other row splits of the same DEV tables",
+];
+
+#[test]
+fn paired_table_with_second_look_matches_addendum_h_receipts() {
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let board = repo.join("bench/real-world/results/scoreboard/v3.0.0");
+    let methods = ["arfpy-arf", "sdv-gaussian-copula", "sdv-tvae", "sdv-ctgan"];
+    let compare_paths: Vec<PathBuf> = methods
+        .iter()
+        .map(|m| board.join(format!("evidence/paper/v3-vs-{m}.json")))
+        .collect();
+    let second_paths: Vec<PathBuf> = methods
+        .iter()
+        .map(|m| board.join(format!("evidence/addendum-h/v3-vs-{m}-h.json")))
+        .collect();
+    let primary = std::fs::read(board.join("primary-methods.json")).expect("primary-methods.json");
+    let primary2 =
+        std::fs::read(board.join("evidence/addendum-h/primary-h.json")).expect("primary-h.json");
+    let read_all = |ps: &[PathBuf]| -> Vec<Vec<u8>> {
+        ps.iter()
+            .map(|p| std::fs::read(p).expect("receipt"))
+            .collect()
+    };
+    let (compares, compares2) = (read_all(&compare_paths), read_all(&second_paths));
+    let args = PaperTablesArgs {
+        primary: board.join("primary-methods.json"),
+        compares: compare_paths,
+        ranking_out: PathBuf::from("unused-ranking.tex"),
+        paired_out: PathBuf::from("unused-paired.tex"),
+        candidate: DEFAULT_CANDIDATE.to_string(),
+        methods: Vec::new(),
+        references: Vec::new(),
+        labels: Vec::new(),
+        second_primary: Some(board.join("evidence/addendum-h/primary-h.json")),
+        second_compares: second_paths,
+        second_candidate: DEFAULT_SECOND_CANDIDATE.to_string(),
+        look_titles: LOOK_TITLES.iter().map(|t| (*t).to_string()).collect(),
+    };
+    let (_, paired, holm_map) =
+        build_tables(&args, &primary, &compares, Some((&primary2, &compares2))).unwrap();
+    // The report look's block and Holm family are unchanged by the second look.
+    assert!((holm_map["arfpy-arf"] - 0.113888611139).abs() < 1e-9);
+    for row in [
+        r"ARF & +10.8 [\ensuremath{-}3.5, +29.5] & +6.1 [\ensuremath{-}16.5, +28.7] & 0.114 & 0.114 & \textbf{HOLD} & tasks, mlp, realism",
+        r"ARF & +17.8 [\ensuremath{-}6.5, +43.6]",
+        r"SDV TVAE & +89.8 [+56.4, +121.3]",
+        r"SDV CTGAN & +139.3 [+121.4, +158.5]",
+        r"SDV Gaussian copula & +46.9 [+36.6, +58.2]",
+        r"\multicolumn{7}{@{}l}{\emph{Report look}} \\",
+        r"\multicolumn{7}{@{}l}{\emph{Second look: other row splits of the same DEV tables}} \\",
+    ] {
+        assert!(paired.contains(row), "missing {row} in {paired}");
+    }
+    // Second-look Holm (m = 4) and outcomes equal family-h.json (Codex-verified 08:03Z).
+    let second: Vec<&str> = paired
+        .lines()
+        .skip_while(|l| !l.contains("Second look"))
+        .collect();
+    let row = |name: &str| {
+        second
+            .iter()
+            .find(|l| l.starts_with(name))
+            .copied()
+            .unwrap_or_default()
+    };
+    assert!(
+        row("ARF &").contains(r"& 0.081 & 0.081 & \textbf{HOLD} &"),
+        "{}",
+        row("ARF &")
+    );
+    assert!(
+        row("SDV TVAE &").contains(r"\textbf{PROMOTE} & none"),
+        "{}",
+        row("SDV TVAE &")
+    );
+    assert!(
+        row("SDV CTGAN &").contains(r"\textbf{PROMOTE} & none"),
+        "{}",
+        row("SDV CTGAN &")
+    );
+    assert!(
+        row("SDV Gaussian copula &").contains(r"\textbf{HOLD} & tasks, privacy"),
+        "{}",
+        row("SDV Gaussian copula &")
+    );
+    let committed =
+        std::fs::read_to_string(repo.join("docs/whitepaper-v3/generated/v3-paired-table.tex"))
+            .expect("committed v3-paired-table.tex");
     assert_eq!(
-        paired, committed_paired,
+        paired, committed,
         "docs/whitepaper-v3/generated/v3-paired-table.tex drifted from committed receipts"
     );
 }
@@ -137,8 +242,13 @@ fn holm_flip_and_not_evaluated_guard_demote_outcome_to_hold() {
         methods: vec!["arfpy-arf".to_string(), "sdv-tvae".to_string()],
         references: Vec::new(),
         labels: Vec::new(),
+        second_primary: None,
+        second_compares: Vec::new(),
+        second_candidate: DEFAULT_SECOND_CANDIDATE.to_string(),
+        look_titles: Vec::new(),
     };
-    let (_, paired, holm_map) = build_tables(&args, &primary, &[arf.clone(), tvae_near]).unwrap();
+    let (_, paired, holm_map) =
+        build_tables(&args, &primary, &[arf.clone(), tvae_near], None).unwrap();
     assert!((holm_map["sdv-tvae"] - 0.060).abs() < 1e-9);
     assert!(
         paired.contains(r"& 0.030 & 0.060 & \textbf{HOLD} & none \\"),
@@ -157,7 +267,7 @@ fn holm_flip_and_not_evaluated_guard_demote_outcome_to_hold() {
         }
     }
     let tvae_ne_bytes = serde_json::to_vec(&tvae_ne).unwrap();
-    let (_, paired_ne, _) = build_tables(&args, &primary, &[arf, tvae_ne_bytes]).unwrap();
+    let (_, paired_ne, _) = build_tables(&args, &primary, &[arf, tvae_ne_bytes], None).unwrap();
     assert!(
         paired_ne.contains(r"& \textbf{HOLD} & privacy (n/e) \\"),
         "{paired_ne}"
@@ -186,6 +296,10 @@ fn provenance_mismatches_between_primary_and_compare_fail_closed() {
         methods: vec!["sdv-tvae".to_string()],
         references: Vec::new(),
         labels: Vec::new(),
+        second_primary: None,
+        second_compares: Vec::new(),
+        second_candidate: DEFAULT_SECOND_CANDIDATE.to_string(),
+        look_titles: Vec::new(),
     };
     type ReceiptEdit = fn(&mut serde_json::Value);
     let cases: [(&str, ReceiptEdit); 4] = [
@@ -209,7 +323,7 @@ fn provenance_mismatches_between_primary_and_compare_fail_closed() {
         let mut val: serde_json::Value = serde_json::from_slice(&tvae_raw).unwrap();
         mutate(&mut val);
         let bytes = serde_json::to_vec(&val).unwrap();
-        let err = match build_tables(&args, &primary, &[bytes]) {
+        let err = match build_tables(&args, &primary, &[bytes], None) {
             Ok(_) => panic!("expected failure for {needle}"),
             Err(err) => err.to_string(),
         };

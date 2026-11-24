@@ -3,9 +3,16 @@
 \toprule
 Method & \makecell{v3 \ensuremath{-} method,\\$4\times$ [95\% CI]} & \makecell{$1\times$ [95\% CI]} & \makecell{one-sided\\$p$} & \makecell{Holm $p$\\($m=4$)} & outcome & guards missed \\
 \midrule
+\multicolumn{7}{@{}l}{\emph{Report look}} \\
 ARF & +10.8 [\ensuremath{-}3.5, +29.5] & +6.1 [\ensuremath{-}16.5, +28.7] & 0.114 & 0.114 & \textbf{HOLD} & tasks, mlp, realism \\
 SDV Gaussian copula & +47.8 [+33.7, +62.6] & +51.9 [+37.0, +69.1] & \textless{}0.001 & \textless{}0.001 & \textbf{HOLD} & tasks \\
 SDV TVAE & +91.9 [+71.9, +112.3] & +85.2 [+60.0, +110.0] & \textless{}0.001 & \textless{}0.001 & \textbf{PROMOTE} & none \\
 SDV CTGAN & +157.1 [+141.8, +173.6] & +138.5 [+123.2, +155.2] & \textless{}0.001 & \textless{}0.001 & \textbf{HOLD} & privacy \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Second look: other row splits of the same DEV tables}} \\
+ARF & +17.8 [\ensuremath{-}6.5, +43.6] & +33.7 [+14.4, +56.6] & 0.081 & 0.081 & \textbf{HOLD} & tasks, mlp, realism \\
+SDV Gaussian copula & +46.9 [+36.6, +58.2] & +52.8 [+36.2, +70.1] & \textless{}0.001 & \textless{}0.001 & \textbf{HOLD} & tasks, privacy \\
+SDV TVAE & +89.8 [+56.4, +121.3] & +79.7 [+47.5, +111.2] & \textless{}0.001 & \textless{}0.001 & \textbf{PROMOTE} & none \\
+SDV CTGAN & +139.3 [+121.4, +158.5] & +138.5 [+119.5, +157.6] & \textless{}0.001 & \textless{}0.001 & \textbf{PROMOTE} & none \\
 \bottomrule
 \end{tabular}

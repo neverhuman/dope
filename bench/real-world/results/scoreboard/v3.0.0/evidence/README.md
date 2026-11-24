@@ -17,6 +17,10 @@ number in them is a `dope_kpi` output (`dope.kpi-receipt/v2`).
   `SHA256SUMS`. The candidate PROMOTEs against v2.0.0 but is below the released engine
   `b8a0037c`, so `b8a0037c` ships; the wide-DEV eligibility receipts of the builds tried are
   the `selection/wide-dev/cmp-v3c-*` and `family-disclosure-cand6b-vs-v2.json` rows below.
+- **Second look at the third-party generators.** Addendum H part (a) repeats the paper's
+  comparison with the four third-party generators on the final look's DEV splits (data seeds 9-12),
+  descriptively, with its own Holm family. Its receipts, logged text and `SHA256SUMS` are in
+  [`addendum-h/`](addendum-h/README.md); the white paper reports it as the second block of Table 2.
 
 | File | SHA-256 | Origin | Content |
 | --- | --- | --- | --- |
