@@ -42,7 +42,7 @@ Their scores are therefore those of unconstrained files; held to the budget, eve
 Realism coverage is \VThree{CandRealism} for DOPE, lower than ARF's \VThree{ArfRealism} and higher than the Gaussian copula's \VThree{GcRealism}; TVAE and CTGAN pass the realism gate on no entry.
 Privacy coverage is \VThree{CandPrivacy} for DOPE; CTGAN is higher at \VThree{CtganPrivacy}, the Gaussian copula and TVAE are lower (\VThree{GcPrivacy} and \VThree{TvaePrivacy}), and ARF passes the privacy gate on few entries (\VThree{ArfPrivacy}).
 Only CTGAN's mean exact-copy excess fails the exact-copy guard; the maxima in Table~\ref{tab:ranking}(b) show single entries above the bound for the Gaussian copula as well as CTGAN.
-Every generator's rows are easy to tell from real ones: the median C2ST AUC is \VThree{CandC2st} for DOPE, the same as for independently permuted columns, and between \VThree{ArfC2st} and \VThree{CtganC2st} for the third-party generators, against \VThree{CopyAC2st} for a copy of the fitting rows.
+Every generator's rows are easy to tell from real ones: the median C2ST AUCs of DOPE and of independently permuted columns both round to \VThree{CandC2st}, and the medians lie between \VThree{ArfC2st} and \VThree{CtganC2st} for the third-party generators, against \VThree{CopyAC2st} for a copy of the fitting rows.
 
 \paragraph{The full promotion rule.}
 Table~\ref{tab:paired} also applies the contract's promotion rule to each pair with DOPE as the candidate.

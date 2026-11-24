@@ -6,7 +6,7 @@ The report look used fresh row splits, but of the same DEV tables on which the e
 The pre-registration and its hash log are committed with the receipts; the schedule is identified in the receipts by hash and not published.
 
 \paragraph{One look.}
-The comparison with the third-party generators rests on this one look; it has not been repeated on other splits.
+The comparison reported here uses one set of DEV row splits.
 Its direction, DOPE against each generator, was re-reduced after scoring (\S\ref{sec:protocol}); the per-cell scores and intervals were not changed by it.
 
 \paragraph{Third-party configurations.}
@@ -24,7 +24,7 @@ The contract is a candidate and not frozen, so the rule itself may change before
 
 \paragraph{Realism.}
 The observed median C2ST AUCs are high for every generator scored here.
-A boosted-tree discriminator separates DOPE's rows from real ones about as easily as rows with no dependence at all (median C2ST AUC \VThree{CandC2st} for both), and the third-party rows are separated about as easily (medians from \VThree{ArfC2st} to \VThree{CtganC2st}).
+A boosted-tree discriminator separates DOPE's rows from real ones about as easily as rows with no dependence at all (both median C2ST AUCs round to \VThree{CandC2st}), and the third-party rows are separated about as easily (medians from \VThree{ArfC2st} to \VThree{CtganC2st}).
 DOPE preserves more predictive structure for the auditors than independently permuted columns do, and CTGAN scores below that control (Table~\ref{tab:ranking}); nothing here supports using any of these rows where realism matters.
 
 \paragraph{Privacy.}
