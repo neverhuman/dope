@@ -10,7 +10,7 @@ We have not established the causes of these failures, and \cli{-{}-format 1} rem
 
 \paragraph{Realism.}
 The median C2ST AUC of \cli{auto-v8} is \VThree{CandC2st}; the baseline's is \VThree{BaseC2st} and that of independently permuted columns is \VThree{IndepC2st}, while real resamples score \VThree{CopyAC2st} (copy of $A$) and \VThree{BootAC2st} (bootstrap of $A$).
-A boosted-tree discriminator separates these synthetic rows from real ones about as easily as it separates rows with no dependence at all.
+A boosted-tree discriminator separates these rows from real ones about as easily as rows with no dependence at all.
 The artifacts preserve predictive structure for the auditors far better than permuted columns do (TRG \VThree{CandTrgPoint} against \VThree{IndepTrgPoint}), but they are not realistic samples, and nothing here supports using them where realism matters.
 
 \paragraph{Privacy.}
@@ -19,21 +19,23 @@ The privacy gate is an empirical audit (distance to closest record, a distance-b
 
 \paragraph{Development data only.}
 No confirmation, holdout or sealed panel was opened.
-The report used fresh row splits, but of the same DEV tables on which the encoder was designed and selected, so it says little about tables or lineages outside that set; adaptive reuse of a development set biases such estimates upward~\citep{dwork2015reusable}.
-The schedule and the pre-registration are recorded in the scoreboard's README and identified in the receipts by hash, not published with them.
+Both looks used fresh row splits, but of the same DEV tables on which the encoder was designed and selected, so they say little about tables or lineages outside that set; adaptive reuse of a development set biases such estimates upward~\citep{dwork2015reusable}.
+The pre-registration and its hash log are committed with the receipts; the schedules are identified in the receipts by hash and not published.
 
 \paragraph{Small panel and an unfrozen contract.}
-The look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
+The report look has \VThree{Families} informative families, as few as \VThree{BinaryFamilies} in one task.
 The sign-flip null shows that the percentile interval is anti-conservative at this size (\S\ref{sec:results}), Holm's adjustment covers a single comparison, and the matched-size gain is not resolved.
 The contract is a candidate and not frozen, so the rule itself may change before a confirmatory look.
 
+\paragraph{The final look.}
+The final look has the same limits, with \VThree{FlFamilies} informative families, and on it the rule is not calibrated.
+Neither look shows the released engine improving on release~\VThree{BaseVersion} under the contract; the candidate's PROMOTE rests on \VThree{FlNonzeroFamilies} families and did not change what shipped.
+
 \paragraph{Third-party baselines.}
-Each third-party generator was fitted once per cell on this one development look, with library defaults, no tuning and no byte cap (its files were scored up to \VThree{MethodsScoreBudget}~bytes).
-It therefore fails the byte guard by construction, and its TRG describes it at its own file sizes, not at the budget.
+Each third-party generator was fitted once per cell on this development look, with library defaults, no tuning and no byte cap (files scored up to \VThree{MethodsScoreBudget}~bytes), so it fails the byte guard by construction; its TRG reflects its own file sizes.
 Entries whose sample holds a single class score \VThree{FailedValue} by protocol; the run's report (\path{methods-report.md}) attributes TVAE's failed cells to such samples.
-The comparisons are between these configurations on these splits, not between the methods in general.
-SDV and its libraries are licensed \VThree{SdvLicense} and arfpy \VThree{ArfpyLicense}.
+The comparisons are between these configurations on these splits, not the methods in general; SDV and its libraries are licensed \VThree{SdvLicense} and arfpy \VThree{ArfpyLicense}.
 
 \paragraph{Provenance.}
-The receipts record \texttt{dope\_kpi} version \VThree{ToolVersion} with build commit ``\VThree{ToolGitSha}'', and the scored packets and run directory are not in the repository, so the scores cannot be recomputed from committed files alone.
-The scoreboard's README states that the released binary was re-run on every scheduled cell before the tag; no committed receipt records that re-run, so this paper does not claim that the released binary reproduces every scored packet.
+The receipts record \texttt{dope\_kpi} \VThree{ToolVersion} with build commit ``\VThree{ToolGitSha}'', and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.
+The scoreboard's README reports that a local build of the release source reproduced every scheduled packet's SHA-256 and that the signed binary must too; no committed receipt records either, so we do not claim that the released binary reproduces every scored packet.

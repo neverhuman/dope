@@ -7,7 +7,7 @@ The contract's status is ``\VThree{ContractStatus}'' and it is not frozen.
 A cell is one table with one row split into disjoint roles: $A$, the rows a generator sees; $B$, a real twin with as many rows as $A$; $C$, calibration rows; and $T$, held-out test rows.
 No duplicate group straddles two roles.
 An arm fits on $A$ and emits a synthetic sample $S$ of $m\,|A|$ rows; the headline multiplier is $m=\VThree{PrimaryMult}$ and a matched-size statistic with $m=\VThree{MatchedMult}$ is reported beside it.
-Tables belong to lineage families (tables derived from the same source), and every family is assigned to one task.
+Tables belong to lineage families (tables from one source), each assigned to one task.
 
 \paragraph{Retention and the twin-referenced gap.}
 An auditor is a fixed learning recipe.
@@ -25,7 +25,7 @@ Values are averaged over sample seeds; a cell takes the minimum over the two sta
 \begin{equation}\label{eq:trg}
   \TRG = \frac{1}{|\mathcal T|}\sum_{t\in\mathcal T}\frac{1}{|\mathcal F_t|}\sum_{f\in\mathcal F_t}\frac{1}{|\mathcal C_f|}\sum_{c\in\mathcal C_f}\ \min_{a}\ \bar v_{c,a}.
 \end{equation}
-Zero means that the synthetic rows train the auditors as well as a second real sample of the same size; higher is better.
+Zero means that the synthetic rows train the auditors as well as a real twin the size of the fitting split; higher is better. Only at $m=\VThree{MatchedMult}$ do the synthetic sample and the twin have the same size.
 A third auditor, a seeded MLP, is aggregated the same way, held out of the statistic and read only by a guard.
 A (cell, auditor) unit enters only if it is informative on real data alone: the auditor fitted on $A$ must beat the null on $T$ by a material margin with a positive bootstrap lower bound, and the twin's retention must be close to one.
 

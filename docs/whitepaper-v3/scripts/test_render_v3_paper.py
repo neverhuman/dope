@@ -1,4 +1,4 @@
-"""Tests for the DOPE v3.0.0 paper renderer (`render_v3_paper.py`, `v3_paper_tables.py`).
+"""Tests for the DOPE v3.0.0 paper renderer and its modules (tables, third-party methods, final look).
 
 Run: python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py'
 """
@@ -12,6 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import render_v3_paper as rp  # noqa: E402
+import v3_paper_final_look as final_mod  # noqa: E402
 import v3_paper_methods as methods_mod  # noqa: E402
 import v3_paper_tables as tables  # noqa: E402
 
@@ -172,16 +173,40 @@ def methods_info(primary: dict, files: dict | None = None) -> dict | None:
                             rp.check_same_run)
 
 
+def final_info(primary: dict, files: dict | None = None, shas: dict | None = None) -> dict:
+    """The committed final look, with receipts replaced via `files` (by file name) or hashes via `shas`."""
+    files, shas = files or {}, shas or {}
+    roles = rp.role_ids(primary, load("compare.json")["comparisons"][0])
+
+    def read_json(rel: str) -> dict:
+        name = rel.rsplit("/", 1)[1]
+        return copy.deepcopy(files[name]) if name in files else rp.read_json(rel)
+
+    def exists(rel: str) -> bool:
+        name = rel.rsplit("/", 1)[1]
+        return files[name] is not None if name in files else (rp.REPO / rel).is_file()
+
+    def sha256(rel: str) -> str:
+        return shas.get(rel.rsplit("/", 1)[1]) or rp.sha256(rel)
+    return final_mod.load(rp.SCOREBOARD, read_json, lambda rel: (rp.REPO / rel).read_text(encoding="utf-8"),
+                          exists, sha256, primary, roles["Base"], roles["Cand"], rp.check_same_run)
+
+
+def look(name: str) -> dict:
+    return load(f"{final_mod.LOOK}/{name}")
+
+
 class ProseClaims(unittest.TestCase):
     def setUp(self):
         self.primary, compare = load("primary.json"), load("compare.json")
         self.comp = compare["comparisons"][0]
         self.roles = rp.role_ids(self.primary, self.comp)
         self.methods = methods_info(self.primary)
+        self.final = final_info(self.primary)
 
-    def errors(self, comp=None, methods="committed") -> list[str]:
+    def errors(self, comp=None, methods="committed", final=None) -> list[str]:
         info = self.methods if methods == "committed" else methods
-        return rp.prose_errors(self.primary, comp or self.comp, self.roles, info, -1.0)
+        return rp.prose_errors(self.primary, comp or self.comp, self.roles, info, -1.0, final or self.final)
 
     def test_committed_receipts_support_every_claim(self):
         self.assertEqual(self.errors(), [])
@@ -243,6 +268,59 @@ class ThirdPartyReceipts(unittest.TestCase):
         self.assertTrue(note.startswith("\u2020 Scored with packets above 2048 B"))
         self.assertEqual(note.count(" files, TRG at 2048 B -1.000"), len(info["third"]))
         self.assertEqual(tables.above_budget_note(self.primary["arms"]), "")
+
+
+class FinalLook(unittest.TestCase):
+    def setUp(self):
+        self.primary = load("primary.json")
+
+    def test_committed_look_is_the_frozen_run_and_the_candidate_does_not_ship(self):
+        info = final_info(self.primary)
+        self.assertEqual((info["outcome_a"], info["outcome_b"]), ("PROMOTE", "HOLD"))
+        self.assertLess(info["b"]["delta"], 0)
+        self.assertEqual(info["served_build"], "b8a0037c")
+        macros = dict(final_mod.macros(info, rp.num, rp.sha256))
+        self.assertEqual((macros["FlSeeds"], macros["ReportSeeds"], macros["WideSeeds"]), ("9--12", "5--8", "1--4"))
+
+    def test_holm_and_exact_sign_flip_are_recomputed(self):
+        self.assertEqual(final_mod.holm([0.04, 0.01]), [0.04, 0.02])
+        self.assertEqual(final_mod.sign_flip_p([0.3, 0.0, 0.2, 0.1], 0.6), 0.125)
+        self.assertEqual(final_mod.sign_flip_p([0.3, -0.2], 0.1), 0.5)
+
+    def test_a_missing_or_altered_file_is_an_error(self):
+        with self.assertRaisesRegex(final_mod.FinalLookError, "missing"):
+            final_info(self.primary, files={"null-a.json": None})
+        with self.assertRaisesRegex(final_mod.FinalLookError, "SHA256SUMS"):
+            final_info(self.primary, shas={"compare-b.json": "0" * 64})
+
+    def test_receipts_of_another_run_or_build_are_errors(self):
+        compare = look("compare-a.json")
+        compare["tool"]["git_sha"] = "0" * 40
+        with self.assertRaisesRegex(final_mod.FinalLookError, "frozen dope_kpi"):
+            final_info(self.primary, files={"compare-a.json": compare})
+        family = look("family.json")
+        family["comparisons"][0]["p_holm_family"] = family["comparisons"][0]["p_one_sided"]
+        with self.assertRaisesRegex(final_mod.FinalLookError, "Holm"):
+            final_info(self.primary, files={"family.json": family})
+        disclosure = look("family-disclosure-rc-vs-v2.json")
+        disclosure["exact_sign_flip_p"] = 0.05
+        with self.assertRaisesRegex(final_mod.FinalLookError, "sign-flip"):
+            final_info(self.primary, files={"family-disclosure-rc-vs-v2.json": disclosure})
+        served = look("served-vs-v2-descriptive.json")
+        served["arms"][0]["primary"]["trg"] += 0.001
+        with self.assertRaisesRegex(final_mod.FinalLookError, "field for field"):
+            final_info(self.primary, files={"served-vs-v2-descriptive.json": served})
+
+    def test_a_candidate_at_or_above_the_released_engine_invalidates_the_prose(self):
+        compare = look("compare-b.json")
+        compare["comparisons"][0]["delta"] = 0.001
+        with self.assertRaisesRegex(final_mod.FinalLookError, "family.json does not repeat"):
+            final_info(self.primary, files={"compare-b.json": compare})
+        info = copy.deepcopy(final_info(self.primary))
+        info["b"]["delta"] = 0.001
+        comp = load("compare.json")["comparisons"][0]
+        errors = [text for text, ok in final_mod.claims(info, comp) if not ok]
+        self.assertIn("the ship rule's second condition alone fails", errors)
 
 
 class CommittedPaper(unittest.TestCase):

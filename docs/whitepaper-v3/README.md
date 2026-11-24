@@ -25,13 +25,27 @@ No number is typed into the manuscript. Every quantity is a `\VThree{...}` macro
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-results-table.tex` | Table 2: the README arm table, same rows, columns and values, wrapped into two panels |
 | `generated/v3-comparison-table.tex` | Table 3: the README comparison row with each condition and guard of the decision rule |
-| `generated/v3-methods-table.tex` | Table 4: each third-party generator against `auto-v8` (`compare-methods.json`) |
+| `generated/v3-methods-table.tex` | Table 4 (Appendix C): each third-party generator against `auto-v8` (`compare-methods.json`) |
 | `generated/v3-render-manifest.json` | SHA-256 of every input and output, and the hero conversion command, tool and hashes |
 | `scripts/render_v3_paper.py` | Renderer and checker (stdlib only) |
 | `scripts/v3_paper_tables.py` | Port of `dope_kpi render-readme` cell formatting; fails unless every cell equals the README block |
 | `scripts/v3_paper_methods.py` | Loads and checks the third-party receipts, writes their macros, checks the prose about them |
+| `scripts/v3_paper_final_look.py` | Loads and checks the final-look receipts (Addendum F), writes their macros, checks the prose about them |
 | `scripts/test_render_v3_paper.py` | Unit tests |
 | `scripts/build_v3_pdf.sh` | Deterministic `latexmk` build in `target/paper-v3/` |
+
+## Final look (Addendum F)
+
+`bench/real-world/results/scoreboard/v3.0.0/evidence/` holds the pre-registration
+(`selection/V3_SELECTION_PREREG.md`, `selection/PREREG_LOG.txt`), the Addendum F wide-DEV
+eligibility receipts (`selection/wide-dev/cmp-v3c-*`, `family-disclosure-cand6b-vs-v2.json`) and
+the final look on DEV data seeds 9-12 (`final-look-s9-12/`). The renderer requires every look file
+to match that directory's `SHA256SUMS`; the look to be scored by `dope_kpi` 3.0.0 at `bc92df0b`
+under schedule `beaa2a0f…` and contract `200ea0ed…`; the pre-registration's freeze and result to
+name that schedule, the candidate's source and binaries and the look's receipts; and the hash
+log's last entry to hash the committed pre-registration. It recomputes the Holm family (m = 2),
+the family sums and the exact family sign-flip p values. The paper reports the look in section 6
+("Final look"), section 8 and Appendix C.
 
 ## Third-party baselines
 

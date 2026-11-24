@@ -1,0 +1,92 @@
+{
+ "schema": "dope.v3-family-disclosure/v1",
+ "candidate": "rc-auto-v8",
+ "baseline": "served-auto-v8",
+ "delta": -0.001945225699,
+ "sum_of_family_contributions": -0.0019452257000000016,
+ "families": 10,
+ "nonzero_families": 4,
+ "exact_sign_flip_p": 0.5625,
+ "contract_null_calibration": {
+  "families": 10,
+  "flip_guard_rule": {
+   "acceptable": false,
+   "count": 128,
+   "rate": 0.064,
+   "wilson95_high": 0.075584665877,
+   "wilson95_low": 0.054086999353
+  },
+  "max_false_promote_rate": 0.05,
+  "replicates": 2000,
+  "seed": 20261124,
+  "statistical_pass": {
+   "acceptable": false,
+   "count": 250,
+   "rate": 0.125,
+   "wilson95_high": 0.140216956503,
+   "wilson95_low": 0.111220828958
+  }
+ },
+ "family_contributions": [
+  {
+   "task": "binary",
+   "family_id": "lf-00e7544cd5451d04",
+   "cells": 2,
+   "contribution": 0.015358805298
+  },
+  {
+   "task": "binary",
+   "family_id": "lf-0a64bb31a2e67d78",
+   "cells": 7,
+   "contribution": -0.014368575818
+  },
+  {
+   "task": "binary",
+   "family_id": "lf-13ff6b2586f4a3ed",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-0b01bd8849b4bacb",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-2bd18a479f55b736",
+   "cells": 4,
+   "contribution": -0.003649319362
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-4dac59057a47eddc",
+   "cells": 3,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0199bc69cae5e74b",
+   "cells": 8,
+   "contribution": 0.000713864182
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-02ce36e8cae6b90f",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0a15cea1414cc797",
+   "cells": 1,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0bdc07ba70c321d7",
+   "cells": 4,
+   "contribution": 0.0
+  }
+ ]
+}

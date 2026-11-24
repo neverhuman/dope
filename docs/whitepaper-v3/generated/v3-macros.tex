@@ -44,6 +44,9 @@
 \expandafter\newcommand\csname VThree@MinCheckGroups\endcsname{80}
 \expandafter\newcommand\csname VThree@CheckSynthFactor\endcsname{2}
 \expandafter\newcommand\csname VThree@SelectionMargin\endcsname{0.02}
+\expandafter\newcommand\csname VThree@SupportFloorK\endcsname{10}
+\expandafter\newcommand\csname VThree@TailMinDen\endcsname{20}
+\expandafter\newcommand\csname VThree@TailCap\endcsname{0.20}
 \expandafter\newcommand\csname VThree@TreeDepth\endcsname{3}
 \expandafter\newcommand\csname VThree@RegressionFamilies\endcsname{4}
 \expandafter\newcommand\csname VThree@BinaryFamilies\endcsname{3}
@@ -409,6 +412,8 @@
 \expandafter\newcommand\csname VThree@ArfpyVersion\endcsname{0.1.1}
 \expandafter\newcommand\csname VThree@TorchVersion\endcsname{2.10.0}
 \expandafter\newcommand\csname VThree@SklearnVersion\endcsname{1.7.2}
+\expandafter\newcommand\csname VThree@MethodsAuditFiles\endcsname{3}
+\expandafter\newcommand\csname VThree@MethodsScheduledCells\endcsname{108}
 \expandafter\newcommand\csname VThree@MethodsHolmM\endcsname{4}
 \expandafter\newcommand\csname VThree@MethodsCount\endcsname{4}
 \expandafter\newcommand\csname VThree@MethodsPythonVersion\endcsname{3.12.3}
@@ -418,5 +423,51 @@
 \expandafter\newcommand\csname VThree@MethodsPrimarySha\endcsname{47ff73b1e35b}
 \expandafter\newcommand\csname VThree@MethodsCompareSha\endcsname{36f00d467dcb}
 \expandafter\newcommand\csname VThree@MethodsManifestSha\endcsname{c44db0cc0178}
+\expandafter\newcommand\csname VThree@FlRcId\endcsname{\texttt{rc-auto-v8}}
+\expandafter\newcommand\csname VThree@FlServedId\endcsname{\texttt{served-auto-v8}}
+\expandafter\newcommand\csname VThree@FlRcBuild\endcsname{bc92df0b}
+\expandafter\newcommand\csname VThree@FlServedBuild\endcsname{b8a0037c}
+\expandafter\newcommand\csname VThree@FlSeeds\endcsname{9--12}
+\expandafter\newcommand\csname VThree@ReportSeeds\endcsname{5--8}
+\expandafter\newcommand\csname VThree@WideSeeds\endcsname{1--4}
+\expandafter\newcommand\csname VThree@FlScheduleSha\endcsname{beaa2a0fa3e2}
+\expandafter\newcommand\csname VThree@FlPrimarySha\endcsname{892a8ee0442a}
+\expandafter\newcommand\csname VThree@FlFamilySha\endcsname{2be57ae09637}
+\expandafter\newcommand\csname VThree@FlPreregSha\endcsname{f711447b500c}
+\expandafter\newcommand\csname VThree@FlScheduled\endcsname{64}
+\expandafter\newcommand\csname VThree@FlUninformative\endcsname{23}
+\expandafter\newcommand\csname VThree@FlCells\endcsname{41}
+\expandafter\newcommand\csname VThree@FlFamilies\endcsname{10}
+\expandafter\newcommand\csname VThree@FlHolmM\endcsname{2}
+\expandafter\newcommand\csname VThree@FlVsBaseDelta\endcsname{+0.0165 [+0.0022, +0.0374]}
+\expandafter\newcommand\csname VThree@FlVsBasePHolm\endcsname{0.023}
+\expandafter\newcommand\csname VThree@FlVsBaseOutcome\endcsname{PROMOTE}
+\expandafter\newcommand\csname VThree@FlVsBaseGuards\endcsname{6}
+\expandafter\newcommand\csname VThree@FlVsServedDelta\endcsname{\ensuremath{-}0.0019 [\ensuremath{-}0.0453, +0.0424]}
+\expandafter\newcommand\csname VThree@FlVsServedMatched\endcsname{\ensuremath{-}0.035}
+\expandafter\newcommand\csname VThree@FlMatchedMult\endcsname{1}
+\expandafter\newcommand\csname VThree@FlVsServedOutcome\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@FlNonzeroFamilies\endcsname{3}
+\expandafter\newcommand\csname VThree@FlTopFamily\endcsname{4dac5905}
+\expandafter\newcommand\csname VThree@FlTopSharePct\endcsname{71\%}
+\expandafter\newcommand\csname VThree@FlSignFlipP\endcsname{0.125}
+\expandafter\newcommand\csname VThree@FlNullFlipRate\endcsname{0.137}
+\expandafter\newcommand\csname VThree@FlNullMaxRate\endcsname{0.05}
+\expandafter\newcommand\csname VThree@FlServedVsBaseDelta\endcsname{+0.0184 [\ensuremath{-}0.0282, +0.0669]}
+\expandafter\newcommand\csname VThree@FlServedVsBaseOutcome\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@FlServedRealism\endcsname{\ensuremath{-}0.056}
+\expandafter\newcommand\csname VThree@FlServedTaskLow\endcsname{\ensuremath{-}0.138}
+\expandafter\newcommand\csname VThree@WideBuilds\endcsname{2}
+\expandafter\newcommand\csname VThree@WideSixId\endcsname{\texttt{v3c-cand6}}
+\expandafter\newcommand\csname VThree@WideSixbId\endcsname{\texttt{v3c-cand6b}}
+\expandafter\newcommand\csname VThree@WideSixOutcome\endcsname{HOLD}
+\expandafter\newcommand\csname VThree@WideSixPrivacy\endcsname{\ensuremath{-}0.035}
+\expandafter\newcommand\csname VThree@WideSixbDelta\endcsname{+0.049 [+0.003, +0.119]}
+\expandafter\newcommand\csname VThree@WideSixbOutcome\endcsname{PROMOTE}
+\expandafter\newcommand\csname VThree@WideSixbPHolm\endcsname{0.022}
+\expandafter\newcommand\csname VThree@WideSixbVsCand\endcsname{+0.012}
+\expandafter\newcommand\csname VThree@WideSixbNonzero\endcsname{3}
+\expandafter\newcommand\csname VThree@WideSixbFamilies\endcsname{11}
+\expandafter\newcommand\csname VThree@WideSixbSignFlipP\endcsname{0.125}
 \expandafter\newcommand\csname VThree@HeroSvgSha\endcsname{bcd83c2f81b5}
 \expandafter\newcommand\csname VThree@HeroPdfSha\endcsname{40a05869ea72}

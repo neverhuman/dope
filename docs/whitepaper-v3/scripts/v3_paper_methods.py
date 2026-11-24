@@ -83,8 +83,13 @@ def macros(info: dict[str, Any], arm_macros: Callable, num: Callable, ci: Callab
     budget = re.search(r"--budget-bytes (\d+)", manifest["commands"]["score"])
     if not budget:
         raise MethodsError(f"{MANIFEST}: the score command names no --budget-bytes")
+    evidence = manifest["artifact_class_evidence"]
+    scheduled = {m["cells"]["scheduled"] for m in manifest["methods"]}
+    if len(scheduled) != 1 or sorted(evidence["per_method"]) != sorted(ROLES) or any(
+            len(files) != len(evidence["smoke_cells"]) for files in evidence["per_method"].values()):
+        raise MethodsError(f"{MANIFEST}: the audit does not cover the same smoke cells for every method")
     primary_path, compare_path, manifest_path = info["paths"]
-    return out + [("MethodsHolmM", str(len(info["comparisons"]))), ("MethodsCount", str(len(info["third"]))),
+    return out + [("MethodsAuditFiles", str(len(evidence["smoke_cells"]))), ("MethodsScheduledCells", str(scheduled.pop())),("MethodsHolmM", str(len(info["comparisons"]))), ("MethodsCount", str(len(info["third"]))),
                   ("MethodsPythonVersion", manifest["runtime"]["python"]),
                   ("SdvLicense", manifest["licenses"]["sdv"]), ("ArfpyLicense", manifest["licenses"]["arfpy"]),
                   ("MethodsScoreBudget", grouped(float(budget.group(1)))),
@@ -119,4 +124,7 @@ def claims(info: dict[str, Any] | None, release: dict[str, dict[str, Any]], fail
          and all(a["bytes"]["within_budget"] == 0 and a["trg_at_budget"] == failed_value for a in arm.values())),
         ("CTGAN alone fails the exact-copy guard", [r for r, f in failed.items() if "exact_copy_excess" in f] == ["Ctgan"]),
         ("TVAE alone has failed cells", [r for r, a in arm.items() if a["primary"]["failed_cells"] > 0] == ["Tvae"]),
+        ("the packet audit found no row container and no column copy in any audited file",
+         all(f["audit_row_containers"] == 0 and f["audit_column_copies"] == 0
+             for files in info["manifest"]["artifact_class_evidence"]["per_method"].values() for f in files)),
     ]

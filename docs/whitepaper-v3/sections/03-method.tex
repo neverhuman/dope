@@ -69,7 +69,7 @@ The generative model is a factor copula:
   x_j &= Q_j\bigl(\Phi(z_j)\bigr),
 \end{align}
 with loadings $L_j$, noise scales $\sigma_j$ and monotone quantile functions $Q_j$ given by the marginal knots and typed tails (lattice steps, atoms, zero inflation, missingness).
-One-hot nominal groups are decoded jointly from their level probabilities, tilted by the latent scores, so every decoded row has exactly one active level per group.
+One-hot nominal groups are decoded jointly from their level probabilities, tilted by the latent scores: in each decoded row at most one indicator of a group is active, with all zero when the group's omitted baseline level is drawn.
 The target is drawn last from logits
 $\eta = b + W x + \sum_e g_e(z) + \sum_q h_q(z) + \sum_t \mathrm{tree}_t(z)$
 of the linear head, the main effects, the pair interactions and the oblivious trees: a softmax or logistic draw at a fitted temperature for classification, and for regression the head's mean plus noise whose scale may depend on $z$ and whose quantiles are shifted by the residual section.
@@ -77,7 +77,7 @@ of the linear head, the main effects, the pair interactions and the oblivious tr
 \subsection{Analytic fit from the fitting rows}\label{sec:fit}
 The released encoder fits \texttt{DSE8} without learned weights.
 \begin{enumerate}
-  \item \textbf{Scale card and typed marginals.} Column kinds (continuous, lattice, discrete atoms, zero-inflated, constant) are inferred from $D_{\mathrm{fit}}$. Each column's encoded range runs between empirical quantiles at a tail level of at least $k/(n+1)$, with support floor $k=\VThree{SupportK}$, so the most extreme $k$ values of each tail are never written.
+  \item \textbf{Scale card and typed marginals.} Column kinds (continuous, lattice, discrete atoms, zero-inflated, constant) are inferred from $D_{\mathrm{fit}}$. Each column's encoded range runs between its empirical quantiles at levels $u$ and $1-u$, where $u=\min(\VThree{TailCap},\,k/\max(n_{\mathrm{obs}}+1,\VThree{TailMinDen}))$ for $n_{\mathrm{obs}}$ observed values and support floor $k=\VThree{SupportK}$; discrete values that occur at least $k$ times may instead be encoded as atoms, depending on the column's type.
   \item \textbf{Copula.} Rank-$r$ loadings are fitted to tie-aware normal scores, with loading norms capped below one so that every column keeps its own noise; a small mixture of factor means (regimes) is fitted when the budget allows.
   \item \textbf{Target head.} Ridge-penalized Newton (IRLS) fits the linear head, with the penalty chosen by out-of-fold cross-validation and the logit temperature calibrated out of fold.
   \item \textbf{Gated residual boosting.} Main effects, pairwise product and XOR interactions, and depth-\VThree{TreeDepth} oblivious trees are fitted in that order on the working residual. Because the decoder evaluates them on latent scores $z$, each real value is binned by the interval of $z$ that its tie group occupies, so fitting and decoding see the same bins. A component is kept only if it lowers a proper loss~\citep{gneiting2007strictly} on a deterministic inner validation split.

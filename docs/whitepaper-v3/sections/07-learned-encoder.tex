@@ -2,10 +2,10 @@
 
 \texttt{DSE8} reserves room for a learned refinement.
 \texttt{SingleEncV8} is an encoder--decoder pair: the encoder reads the evidence bank of \S\ref{sec:evidence} on the fitting rows and writes a short quantized code section into the packet; the decoder reads only the packet and refines the analytic decode with residual heads (marginal knot warps, loading updates, a row-local coupling flow and soft oblivious trees on the target) designed so that zero-initialized heads leave the analytic decode unchanged.
-A neural packet records the first bytes of the checkpoint's SHA-256 in both the \texttt{DPA1} header and the packet, and the sampler refuses a mismatched checkpoint.
+A neural packet carries a SHA-256 prefix of its checkpoint, and the sampler refuses a mismatch.
 The Rust inference path is matched by a Python reference in parity tests, and training runs on fresh FIT-only episodes from the factory of \S\ref{sec:evidence} with an objective built from differentiable stand-ins for the auditors.
 
 The result so far is negative.
 In the development screens run to date, no checkpoint has passed the promotion rule of \S\ref{sec:protocol} against the analytic packet.
-The screening receipts are not committed to this repository, so we report no numbers for them.
+The screening receipts, information only and not selection steps, are committed under the scoreboard's \path{evidence/selection/dev-lite/}; we report no numbers from them.
 The release therefore ships no learned weights, and \cli{auto-v8} without \cli{-{}-v8-weights} never writes a neural packet.

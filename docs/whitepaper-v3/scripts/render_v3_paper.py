@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import v3_paper_final_look as final_mod  # noqa: E402
 import v3_paper_methods as methods_mod  # noqa: E402
 import v3_paper_tables as tables  # noqa: E402
 
@@ -70,6 +71,9 @@ RUST = {  # macro: (source, regex); the first group is the value.
     "MinCheckGroups": ("engine/dope-core/src/auto/check.rs", r"pub const MIN_CHECK_GROUPS: usize = (\d+);"),
     "CheckSynthFactor": ("engine/dope-core/src/auto/check.rs", r"pub const CHECK_SYNTH_FACTOR: usize = (\d+);"),
     "SelectionMargin": ("engine/dope-core/src/auto/mod.rs", r"pub const SELECTION_MARGIN: f64 = ([0-9.]+);"),
+    "SupportFloorK": ("engine/dope-core/src/evidence/primitives.rs", r"pub const SUPPORT_FLOOR_K: usize = (\d+);"),
+    "TailMinDen": ("engine/dope-core/src/evidence/primitives.rs", r"\(n_obs as f64 \+ 1\.0\)\.max\((\d+)\.0\)\)\.min\("),
+    "TailCap": ("engine/dope-core/src/evidence/primitives.rs", r"\.max\(\d+\.0\)\)\.min\(([0-9.]+)\)"),
 }
 LINT_ALLOW = ("SHA-256", "Format~1", r"-{}-format 1")
 # Inside math, a lone 0 or 1 is structure (N(0, I), 1/|T|, 1 - R_B), not a measured quantity.
@@ -241,7 +245,7 @@ def check_same_run(primary: dict[str, Any], other: dict[str, Any], name: str) ->
 
 
 def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str, str],
-                 methods: dict[str, Any] | None, failed_value: float) -> list[str]:
+                 methods: dict[str, Any] | None, failed_value: float, final: dict[str, Any]) -> list[str]:
     """The comparative wording of the sections, checked against the receipts.
 
     The sections cite every value through a macro, but words such as "fails", "below", "the same
@@ -282,7 +286,7 @@ def prose_errors(primary: dict[str, Any], comp: dict[str, Any], roles: dict[str,
         ("binary has the fewest families", families["binary"] == min(families.values())),
         ("Holm covers a single comparison", comp["holm_m"] == 1),
         ("the contract is not frozen", primary["contract"]["protocol_frozen"] is False),
-    ] + methods_mod.claims(methods, arm, failed_value)
+    ] + methods_mod.claims(methods, arm, failed_value) + final_mod.claims(final, comp)
     return [f"prose claim no longer holds for the receipts: {text}" for text, ok in claims if not ok]
 
 
@@ -300,11 +304,13 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     methods = methods_mod.load(SCOREBOARD, read_json, lambda rel: (REPO / rel).is_file(), primary,
                                sha256(f"{SCOREBOARD}/primary.json"), check_same_run)
     third = methods["third"] if methods else []
+    roles = role_ids(primary, comp)
+    final = final_mod.load(SCOREBOARD, read_json, lambda rel: (REPO / rel).read_text(encoding="utf-8"),
+                           lambda rel: (REPO / rel).is_file(), sha256, primary, roles["Base"], roles["Cand"], check_same_run)
     readme = (REPO / f"{SCOREBOARD}/readme-block.md").read_text(encoding="utf-8")
     tables.cross_check(readme, primary["arms"] + third, compare["comparisons"], {a["arm_id"] for a in third})
     consts, rust_files = rust_constants()
     by_id = {a["arm_id"]: a for a in primary["arms"]}
-    roles = role_ids(primary, comp)
     cand = by_id[roles["Cand"]]["primary"]
     entries = [("ReleaseVersion", Path(SCOREBOARD).name), ("BaseVersion", roles["PrevSmall"].split("-")[1]),
                ("OldVersion", roles["OldSmall"].split("-")[1]), ("PrimarySha", sha256(f"{SCOREBOARD}/primary.json")[:12]),
@@ -320,11 +326,14 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     for t in cand["tasks"]:
         entries.append((f"{t['task'].capitalize()}Families", str(t["families"])))
     entries += contract_macros(kpi, fid, layout)
+    if consts["SupportFloorK"] != str(layout["support_floor_k"]):
+        raise RenderError("SUPPORT_FLOOR_K in the Rust sources differs from the evidence layout's support_floor_k")
     for role, arm_id in roles.items():
         entries += arm_macros(role, by_id[arm_id])
     entries += comparison_macros(comp, compare)
     if methods:
         entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256)
+    entries += final_mod.macros(final, num, sha256)
     if hero:
         entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
     names = [k for k, _ in entries]
@@ -340,12 +349,12 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
            "methods": tables.render_methods_table(methods["comparisons"] if methods else [])}
     inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json")}
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
-                       "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []))
+                       "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"]))
     manifest = {"schema": "dope.whitepaper-v3-render/v1", "hero": hero,
                 "inputs": {rel: sha256(rel) for rel in inputs},
                 "outputs": {OUT[k]: hashlib.sha256(v.encode()).hexdigest() for k, v in out.items()}}
     out["manifest"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-    return out, prose_errors(primary, comp, roles, methods, float(kpi["statistic"]["failed_value"]))
+    return out, prose_errors(primary, comp, roles, methods, float(kpi["statistic"]["failed_value"]), final)
 
 
 def convert_hero() -> dict[str, Any]:
@@ -425,7 +434,8 @@ def main() -> int:
         hero = convert_hero() if args.figures and not args.check else old.get("hero")
         errors = hero_errors(hero)
         out, prose = render(hero)
-    except (RenderError, KeyError, subprocess.CalledProcessError, tables.TableError, methods_mod.MethodsError) as err:
+    except (RenderError, KeyError, subprocess.CalledProcessError, tables.TableError, methods_mod.MethodsError,
+            final_mod.FinalLookError) as err:
         print(f"render_v3_paper: {err}", file=sys.stderr)
         return 1
     errors += prose + paper_errors(out["macros"])

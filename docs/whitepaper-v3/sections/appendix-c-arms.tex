@@ -1,6 +1,6 @@
-\section{Arms of the report look}\label{app:arms}
+\section{Arms of the report and final looks}\label{app:arms}
 
-\begin{table}[ht]
+\begin{center}
   \centering\small
   \begin{tabular}{@{}lp{0.68\linewidth}@{}}
     \toprule
@@ -19,13 +19,23 @@
     \VThree{IndepId} & every column of $A$ permuted on its own, target included \\
     \VThree{LabelShuffleId} & $A$ with only the target permuted \\
     \midrule
+    \VThree{FlRcId} & final look only: candidate build \VThree{FlRcBuild} (\VThree{WideSixbId}), \cli{-{}-format auto-v8}, which routes away from \texttt{DSE8} where the FIT-only privacy and fold guards fail \\
+    \VThree{FlServedId} & final look only: the released engine \VThree{FlServedBuild}, \cli{-{}-format auto-v8} \\
+    \midrule
     \VThree{GcId} & SDV~\VThree{SdvVersion} \texttt{GaussianCopulaSynthesizer} (copulas~\VThree{CopulasVersion}) \\
     \VThree{CtganId} & SDV~\VThree{SdvVersion} \texttt{CTGANSynthesizer} (CTGAN~\VThree{CtganVersion}) \\
     \VThree{TvaeId} & SDV~\VThree{SdvVersion} \texttt{TVAESynthesizer} (CTGAN~\VThree{CtganVersion}) \\
     \VThree{ArfId} & arfpy~\VThree{ArfpyVersion}: an adversarial random forest, its density estimate (\texttt{forde}) and sampler (\texttt{forge}) \\
     \bottomrule
   \end{tabular}
-\end{table}
+\end{center}
+
+\paragraph{Addendum F and the final look.}
+Addendum~F admitted a build to the final look only if, on wide DEV (data seeds \VThree{WideSeeds}), it was PROMOTE against release~\VThree{BaseVersion} and its point difference against \VThree{FlServedBuild} was at least zero.
+Of the \VThree{WideBuilds} builds tried, \VThree{WideSixId} was \VThree{WideSixOutcome} (privacy coverage \VThree{WideSixPrivacy} fails its guard) and \VThree{WideSixbId} was \VThree{WideSixbOutcome} at \VThree{WideSixbDelta}, with Holm $p=\VThree{WideSixbPHolm}$ over the builds and a difference of \VThree{WideSixbVsCand} against \VThree{FlServedBuild}; its gain there also came from \VThree{WideSixbNonzero} of \VThree{WideSixbFamilies} families (sign-flip $p=\VThree{WideSixbSignFlipP}$).
+Under the scoreboard directory, the eligibility receipts are in \path{evidence/selection/wide-dev/} and the look's in \path{evidence/final-look-s9-12/} (primary \texttt{\VThree{FlPrimarySha}}, family \texttt{\VThree{FlFamilySha}}).
+The renderer requires every look file to match \path{SHA256SUMS}; the look to be scored by the frozen \texttt{dope\_kpi} build under the frozen schedule and contract; the pre-registration's freeze to name that schedule, the candidate's source and the three binaries, and its result to name the look's receipts; and its hash log to end with the committed pre-registration's SHA-256. It recomputes the Holm family, the family sums and the sign-flip $p$ values.
+The descriptive comparison of the released engine with release~\VThree{BaseVersion} was scored without the families file, so its panel lacks the families hash; its two arms equal those of the look's primary receipt field for field.
 
 \paragraph{Third-party configuration.}
 Each method ran with its library defaults (no hyperparameter was passed or tuned) on CPU with one thread, through a wrapper that fits once per cell on $A$ and samples once per multiplier.
@@ -34,5 +44,12 @@ A file is the pickled fitted object: SDV's own save, and for ARF the fitted obje
 No byte cap was applied, and the files were scored with a byte limit of \VThree{MethodsScoreBudget}.
 The run manifest (\path{MANIFEST.json}, SHA-256 prefix \texttt{\VThree{MethodsManifestSha}}) records the software: Python~\VThree{MethodsPythonVersion}, SDV~\VThree{SdvVersion} with CTGAN~\VThree{CtganVersion}, copulas~\VThree{CopulasVersion} and RDT~\VThree{RdtVersion}, arfpy~\VThree{ArfpyVersion}, PyTorch~\VThree{TorchVersion} and scikit-learn~\VThree{SklearnVersion}, with every recipe and command.
 SDV and its libraries are licensed \VThree{SdvLicense}; arfpy is licensed \VThree{ArfpyLicense}.
-The run labels these arms \texttt{source\_free} after an audit found no stored table of fitting rows and no copy of a fitting column in any file.
+The run labels these arms \texttt{source\_free} after an audit of \VThree{MethodsAuditFiles} smoke-run files per method (the run scored \VThree{MethodsScheduledCells} cells per method) found no stored table of fitting rows and no copy of a fitting column.
 The files do keep per-column ranges, category values and fitted transformer parameters (SDV) and per-leaf means, deviations, bounds and class probabilities (ARF).
+
+\begin{table}[ht]
+  \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+  \caption{Each third-party generator against \cli{auto-v8} (receipt \texttt{\VThree{MethodsCompareSha}}) in the README's format, Holm-adjusted over the \VThree{MethodsHolmM} comparisons. $\Delta$ is the method minus \cli{auto-v8}. A guard value is the method's difference from \cli{auto-v8} (for tasks, the lowest per-task lower bound) or, for copies and bytes, the method's own exact-copy excess (largest file in parentheses) and largest file.}
+  \label{tab:methods}
+  \input{generated/v3-methods-table}
+\end{table}

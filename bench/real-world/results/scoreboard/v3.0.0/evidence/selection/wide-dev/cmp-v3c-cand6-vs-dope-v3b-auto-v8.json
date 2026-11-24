@@ -1,0 +1,445 @@
+{
+  "arms": [
+    {
+      "arm_id": "v3c-cand6",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 64,
+        "max": 2048,
+        "median": 1834.0,
+        "over_budget": 0,
+        "over_budget_unmeasured": 0,
+        "scored_above_budget": 0,
+        "share_within_budget": 1.0,
+        "with_packet": 64,
+        "within_budget": 64
+      },
+      "c2st_files": 46,
+      "c2st_median": 0.947248220444,
+      "exact_copy": {
+        "files": 46,
+        "max": 0.001953125,
+        "mean": 0.000063688859,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "exact_copy_excess": 0.000063688859,
+      "matched": {
+        "cells": 46,
+        "ci_high": -0.190260542985,
+        "ci_low": -0.432291405677,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.039315485306,
+            "ci_low": -0.368205920768,
+            "families": 4,
+            "task": "regression",
+            "value": -0.171258242132
+          },
+          {
+            "ci_high": -0.236636946147,
+            "ci_low": -0.447717617611,
+            "families": 3,
+            "task": "binary",
+            "value": -0.360969205144
+          },
+          {
+            "ci_high": -0.088264607398,
+            "ci_low": -0.685829714418,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.387047160908
+          }
+        ],
+        "trg": -0.306424869395,
+        "uninformative_cells": 18
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 34,
+          "median": 0.937325417273
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 36,
+          "median": 0.90648519924
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 25,
+          "median": 0.932925185351
+        }
+      ],
+      "mlp_trg": -0.147214504714,
+      "primary": {
+        "cells": 46,
+        "ci_high": -0.081119160557,
+        "ci_low": -0.258613021212,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": 0.047961790283,
+            "ci_low": -0.338336997056,
+            "families": 4,
+            "task": "regression",
+            "value": -0.113833249974
+          },
+          {
+            "ci_high": -0.16492009053,
+            "ci_low": -0.322584718693,
+            "families": 3,
+            "task": "binary",
+            "value": -0.233565358435
+          },
+          {
+            "ci_high": -0.029449382124,
+            "ci_low": -0.322439090984,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.141107311419
+          }
+        ],
+        "trg": -0.162835306609,
+        "uninformative_cells": 18
+      },
+      "privacy_coverage": 0.537037037037,
+      "realism_coverage": 0.289351851852,
+      "trg_failed_at_floor": -0.162835306609
+    },
+    {
+      "arm_id": "dope-v3b-auto-v8",
+      "artifact_class": "source_free",
+      "bytes": {
+        "budget": 2048,
+        "files": 64,
+        "max": 2048,
+        "median": 1814.0,
+        "over_budget": 0,
+        "over_budget_unmeasured": 0,
+        "scored_above_budget": 0,
+        "share_within_budget": 1.0,
+        "with_packet": 64,
+        "within_budget": 64
+      },
+      "c2st_files": 46,
+      "c2st_median": 0.966852996163,
+      "exact_copy": {
+        "files": 46,
+        "max": 0.001953125,
+        "mean": 0.000063688859,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "exact_copy_excess": 0.000063688859,
+      "matched": {
+        "cells": 46,
+        "ci_high": -0.174863227555,
+        "ci_low": -0.397150307259,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 1,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": -0.045238831161,
+            "ci_low": -0.294253230924,
+            "families": 4,
+            "task": "regression",
+            "value": -0.162201537216
+          },
+          {
+            "ci_high": -0.191167484959,
+            "ci_low": -0.447717617611,
+            "families": 3,
+            "task": "binary",
+            "value": -0.309952206191
+          },
+          {
+            "ci_high": -0.088264607398,
+            "ci_low": -0.666238628457,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.377251617928
+          }
+        ],
+        "trg": -0.283135120445,
+        "uninformative_cells": 18
+      },
+      "median_retention": [
+        {
+          "auditor": "linear-seeded-v1",
+          "entries": 34,
+          "median": 0.943022344074
+        },
+        {
+          "auditor": "gbdt",
+          "entries": 36,
+          "median": 0.939967633835
+        },
+        {
+          "auditor": "mlp-seeded-v1",
+          "entries": 25,
+          "median": 0.932925185351
+        }
+      ],
+      "mlp_trg": -0.359930179335,
+      "primary": {
+        "cells": 46,
+        "ci_high": -0.084352774123,
+        "ci_low": -0.265308860746,
+        "failed_cells": 0,
+        "families": 11,
+        "mlp_only_cells": 0,
+        "multiplier": 4,
+        "not_applicable_cells": 0,
+        "scheduled_cells": 64,
+        "tasks": [
+          {
+            "ci_high": 0.024615384084,
+            "ci_low": -0.291702526361,
+            "families": 4,
+            "task": "regression",
+            "value": -0.111525723652
+          },
+          {
+            "ci_high": -0.113042146102,
+            "ci_low": -0.401750920658,
+            "families": 3,
+            "task": "binary",
+            "value": -0.279125928484
+          },
+          {
+            "ci_high": -0.015231522064,
+            "ci_low": -0.317679774647,
+            "families": 4,
+            "task": "multiclass",
+            "value": -0.120786892945
+          }
+        ],
+        "trg": -0.170479515027,
+        "uninformative_cells": 18
+      },
+      "privacy_coverage": 0.505787037037,
+      "realism_coverage": 0.289351851852,
+      "trg_failed_at_floor": -0.170479515027
+    }
+  ],
+  "bootstrap": {
+    "draws": 10000,
+    "lower_quantile": 0.025,
+    "lower_rank": 249,
+    "seed": 20261123,
+    "upper_quantile": 0.975,
+    "upper_rank": 9750
+  },
+  "command": "compare",
+  "comparisons": [
+    {
+      "baseline": "dope-v3b-auto-v8",
+      "baseline_above_budget": 0,
+      "baseline_trg": -0.170479515027,
+      "candidate_trg": -0.162835306609,
+      "cells": 46,
+      "ci_high": 0.066986663102,
+      "ci_low": -0.043436998429,
+      "decision": {
+        "conditions": [
+          {
+            "check": "fail",
+            "name": "ci_low",
+            "threshold": 0.0,
+            "value": -0.043436998429
+          },
+          {
+            "check": "fail",
+            "name": "holm_p",
+            "threshold": 0.05,
+            "value": 0.411458854115
+          },
+          {
+            "check": "fail",
+            "name": "min_delta",
+            "threshold": 0.01,
+            "value": 0.007644208418
+          }
+        ],
+        "guards": [
+          {
+            "check": "fail",
+            "name": "task_ci_low",
+            "threshold": -0.02,
+            "value": -0.100149119979
+          },
+          {
+            "check": "pass",
+            "name": "mlp_delta",
+            "threshold": 0.0,
+            "value": 0.212715674621
+          },
+          {
+            "check": "pass",
+            "name": "realism_coverage_delta",
+            "threshold": -0.03,
+            "value": 0.0
+          },
+          {
+            "check": "pass",
+            "name": "privacy_coverage_delta",
+            "threshold": -0.03,
+            "value": 0.03125
+          },
+          {
+            "check": "pass",
+            "name": "exact_copy_excess",
+            "threshold": 0.005,
+            "value": 0.000063688859
+          },
+          {
+            "check": "pass",
+            "name": "bytes",
+            "threshold": 2048.0,
+            "value": 2048.0
+          }
+        ],
+        "outcome": "HOLD"
+      },
+      "delta": 0.007644208418,
+      "exact_copy": {
+        "files": 46,
+        "max": 0.001953125,
+        "mean": 0.000063688859,
+        "over_bound": 0,
+        "share_over_bound": 0.0
+      },
+      "families": 11,
+      "holm_m": 1,
+      "id": "v3c-cand6",
+      "kind": "candidate",
+      "matched": {
+        "cells": 46,
+        "ci_high": 0.004503119831,
+        "ci_low": -0.053554763145,
+        "delta": -0.02328974895,
+        "families": 11,
+        "multiplier": 1,
+        "p_one_sided": 0.947905209479
+      },
+      "member_deltas": [],
+      "members": [
+        "v3c-cand6"
+      ],
+      "mlp_cells": 25,
+      "null_calibration": {
+        "families": 11,
+        "flip_guard_rule": {
+          "acceptable": true,
+          "count": 0,
+          "rate": 0.0,
+          "wilson95_high": 0.001917047281,
+          "wilson95_low": 0.0
+        },
+        "max_false_promote_rate": 0.05,
+        "replicates": 2000,
+        "seed": 20261124,
+        "statistical_pass": {
+          "acceptable": false,
+          "count": 256,
+          "rate": 0.128,
+          "wilson95_high": 0.143358336032,
+          "wilson95_low": 0.114067947146
+        }
+      },
+      "p_holm": 0.411458854115,
+      "p_one_sided": 0.411458854115,
+      "tasks": [
+        {
+          "ci_high": 0.033562036904,
+          "ci_low": -0.044584519087,
+          "delta": -0.002307526322,
+          "families": 4,
+          "task": "regression"
+        },
+        {
+          "ci_high": 0.236830830128,
+          "ci_low": -0.100149119979,
+          "delta": 0.04556057005,
+          "families": 3,
+          "task": "binary"
+        },
+        {
+          "ci_high": 0.0,
+          "ci_low": -0.056881188646,
+          "delta": -0.020320418474,
+          "families": 4,
+          "task": "multiclass"
+        }
+      ]
+    }
+  ],
+  "contract": {
+    "id": "dope-kpi/v2",
+    "protocol_frozen": false,
+    "sha256": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
+    "source": "embedded",
+    "status": "candidate"
+  },
+  "inputs": {
+    "guards_sha256": {
+      "dope-v3b-auto-v8": "c660099b9cea62ef4b923dd6a970af1cff1b53ec2f96440aff2e4d112d52e7ea",
+      "v3c-cand6": "8dac4474f1b317aa9e641c52b81dd6540a4e085e3b10b583b02f963418ec81c9"
+    },
+    "guards_summary_sha256": {
+      "dope-v3b-auto-v8": "04b4be3cf540204228607d4e2b230c465473a84b4b83f142f75cf06954705ec2",
+      "v3c-cand6": "83b8b4e8ce80002b9d2df1e3b668489aab33943e609c5ea32659b1cf73d0f56d"
+    },
+    "realref_auditors": [
+      "gbdt",
+      "linear-seeded-v1",
+      "mlp-seeded-v1"
+    ],
+    "realref_sha256": "bb9ec3bed13721f3ee946d8c2d9b99c460ef91d266b62cd660147b0e8a3cb721",
+    "rows_sha256": {
+      "dope-v3b-auto-v8": "3be771b2b78bb60ae5270ce4fe663583a7697478edffa1eda52c7516e83d4b1d",
+      "v3c-cand6": "3a0081946759a2b620755ba8006c4c8805a47b1412464b5fd9e16a4861e625d2"
+    },
+    "schedule_file": "schedule-wide-dev.jsonl",
+    "schedule_panel_sha256": "8d18e7837d6cc1bdf640f8e695045225a9c66d0d330ee4e835f8058cdcb7b29e",
+    "schedule_sha256": "97439e8a978bfb3502c96b19fccc0302063f8090877a39512b1d576b85e25658"
+  },
+  "noise_sd": {
+    "source": "default",
+    "value": 0.01
+  },
+  "panel": {
+    "dev_families": 0,
+    "dev_tables": 0,
+    "dev_tables_scheduled": 0,
+    "dev_tables_sha256": null,
+    "dev_tables_unmatched": 0,
+    "families": 22,
+    "families_sha256": null,
+    "family_set_sha256": "005cf45182c0966843f998fe63af6f054241af4bbe9e83bfe22367a0d34feaec",
+    "id": "all"
+  },
+  "schema": "dope.kpi-receipt/v2",
+  "tool": {
+    "git_sha": "unset",
+    "name": "dope_kpi",
+    "version": "2.0.0"
+  }
+}

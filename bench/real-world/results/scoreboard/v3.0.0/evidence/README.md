@@ -12,12 +12,17 @@ number in them is a `dope_kpi` output (`dope.kpi-receipt/v2`).
 - **Neural screens are information only.** The `SingleEncV8` checkpoint screens under
   `selection/dev-lite/` were not selection steps. None of them beat the analytic `DSE8` packet,
   and v3.0.0 ships no V8 weights as the default.
+- **Final look.** Addendum F's single final look (DEV data seeds 9-12, Holm m = 2) and its
+  disclosures are in [`final-look-s9-12/`](final-look-s9-12/README.md), with their own
+  `SHA256SUMS`. The candidate PROMOTEs against v2.0.0 but is below the released engine
+  `b8a0037c`, so `b8a0037c` ships; the wide-DEV eligibility receipts of the builds tried are
+  the `selection/wide-dev/cmp-v3c-*` and `family-disclosure-cand6b-vs-v2.json` rows below.
 
 | File | SHA-256 | Origin | Content |
 | --- | --- | --- | --- |
 | `dev-tables.txt` | `6fe722304bdef26b…` | the DEV-SELECT table list (dataset hashes only), for `dope_kpi --panel dev --dev-tables` |  |
-| `selection/PREREG_LOG.txt` | `0c9168394d8c1606…` | the pre-registration and its append-only hash log |  |
-| `selection/V3_SELECTION_PREREG.md` | `d4820ca7192e0bc1…` | the pre-registration and its append-only hash log |  |
+| `selection/PREREG_LOG.txt` | `b719db03bf92c706…` | the pre-registration and its append-only hash log |  |
+| `selection/V3_SELECTION_PREREG.md` | `f711447b500cba4a…` | the pre-registration and its append-only hash log |  |
 | `selection/dev-lite/primary-dope-1.3.0-small.json` | `30f0be76386cacd4…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `dope-1.3.0-small` TRG -0.2386 [-0.443, -0.073] |
 | `selection/dev-lite/primary-dope-2.0.0-auto.json` | `30e5ecd8ab032276…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `dope-2.0.0-auto` TRG -0.2246 [-0.422, -0.087] |
 | `selection/dev-lite/primary-dope-2.0.0-small.json` | `e288a5f05d2910ac…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `dope-2.0.0-small` TRG -0.2386 [-0.443, -0.073] |
@@ -44,9 +49,14 @@ number in them is a `dope_kpi` output (`dope.kpi-receipt/v2`).
 | `selection/dev-lite/primary-v8-r3-surg-r2d128-k001000.json` | `b829438b10f0cd6b…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `v8-r3-surg-r2d128-k001000` TRG -0.4966 [-0.727, -0.286] |
 | `selection/dev-lite/primary-v8-r3-surg-r2d128-k002000.json` | `4fcf02b6ab346391…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `v8-r3-surg-r2d128-k002000` TRG -0.3572 [-0.523, -0.208] |
 | `selection/dev-lite/primary-v8-s7w-k001000.json` | `8e017eee03bcf3d8…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-lite/`: 27-cell DEV-lite (data seed 0; 12 cells informative at 4×), schedule sha256 `9207d1575415…` | `v8-s7w-k001000` TRG -0.2596 [-0.440, -0.118] |
+| `selection/wide-dev/cmp-v3c-cand6-vs-dope-2.0.0-auto.json` | `5dfca6bc4bd3a7d0…` | xbabe2 `~/dope-data/kpi-runs/v3c-route-compose/`: Addendum F eligibility, wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `v3c-cand6` vs `dope-2.0.0-auto` +0.0444 [+0.002, +0.119] HOLD |
+| `selection/wide-dev/cmp-v3c-cand6-vs-dope-v3b-auto-v8.json` | `f8702b510839e0ae…` | xbabe2 `~/dope-data/kpi-runs/v3c-route-compose/`: Addendum F eligibility, wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `v3c-cand6` vs `dope-v3b-auto-v8` +0.0076 [-0.043, +0.067] HOLD |
+| `selection/wide-dev/cmp-v3c-cand6b-vs-dope-2.0.0-auto.json` | `82429777eb9b1487…` | xbabe2 `~/dope-data/kpi-runs/v3c-route-compose/`: Addendum F eligibility, wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `v3c-cand6b` vs `dope-2.0.0-auto` +0.0489 [+0.003, +0.119] PROMOTE |
+| `selection/wide-dev/cmp-v3c-cand6b-vs-dope-v3b-auto-v8.json` | `e6675a4e8036d131…` | xbabe2 `~/dope-data/kpi-runs/v3c-route-compose/`: Addendum F eligibility, wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `v3c-cand6b` vs `dope-v3b-auto-v8` +0.0121 [-0.037, +0.072] HOLD |
 | `selection/wide-dev/compare-auto-v8-vs-2.0.0-auto.json` | `24a09277d37d7533…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dope-v3-auto-v8` − `dope-2.0.0-auto` -0.0267 [-0.0679, +0.0075], Holm p 1.0000, HOLD |
 | `selection/wide-dev/compare-v3b-guards.json` | `782376d394cb069e…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dope-v3b-auto-v8` − `dope-2.0.0-auto` +0.0368 [+0.0084, +0.0623], Holm p 0.0047, HOLD |
 | `selection/wide-dev/compare-v3b-vs-2.0.0-auto.json` | `72a5347de5ecd8b5…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dope-v3b-auto-v8` − `dope-2.0.0-auto` +0.0368 [+0.0084, +0.0623], Holm p 0.0094, HOLD |
+| `selection/wide-dev/family-disclosure-cand6b-vs-v2.json` | `f8f2e145d41f91a9…` | xbabe2 `~/dope-data/kpi-runs/v3-disclose-dev-cand6b-vs-v2/family-disclosure.json` | disclosure only: `v3c-cand6b` vs `dope-2.0.0-auto` gain from 3 of 11 families, exact family sign-flip p 0.125 |
 | `selection/wide-dev/primary-dope-2.0.0-auto.json` | `84c814fc6bff625a…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dope-2.0.0-auto` TRG -0.2073 [-0.312, -0.117] |
 | `selection/wide-dev/primary-dope-v3b-auto-v8.json` | `8375116c7553687c…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dope-v3b-auto-v8` TRG -0.1705 [-0.265, -0.084] |
 | `selection/wide-dev/primary-dse8-p0-v3b.json` | `c63b2fd234533b86…` | xbabe6 `~/dope-data/kpi-runs/v3-dev-wide/`: 108-cell wide DEV, data seeds 1-4, schedule sha256 `97439e8a978b…` | `dse8-p0-v3b` TRG -0.1897 [-0.362, -0.047] |

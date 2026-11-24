@@ -9,19 +9,12 @@
 
 \begin{table}[t]
   \centering\footnotesize
-  \caption{The pre-registered comparison (receipt \texttt{\VThree{CompareSha}}): the README row, then each condition and guard of the decision rule with its contract threshold. Sign-flip PROMOTE is the false-PROMOTE rate of the conditions and the guards a sign flip moves (\S\ref{sec:protocol}).}
+  \caption{The pre-registered comparison (receipt \texttt{\VThree{CompareSha}}): the README row, then each condition and guard with its contract threshold. Sign-flip PROMOTE is the false-PROMOTE rate of the conditions and the guards a sign flip moves (\S\ref{sec:protocol}).}
   \label{tab:compare}
   \input{generated/v3-comparison-table}
 \end{table}
 
-\begin{table}[t]
-  \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
-  \caption{Each third-party generator against \cli{auto-v8} (receipt \texttt{\VThree{MethodsCompareSha}}) in the README's format, Holm-adjusted over the \VThree{MethodsHolmM} comparisons. $\Delta$ is the method minus \cli{auto-v8}. A guard value is the method's difference from \cli{auto-v8} (for tasks, the lowest per-task lower bound) or, for copies and bytes, the method's own exact-copy excess (largest file in parentheses) and largest file.}
-  \label{tab:methods}
-  \input{generated/v3-methods-table}
-\end{table}
-
-Figure~\ref{fig:hero} and Tables~\ref{tab:arms}--\ref{tab:methods} report the single look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
+Figure~\ref{fig:hero} and Tables~\ref{tab:arms}, \ref{tab:compare} and~\ref{tab:methods} describe the report look of \S\ref{sec:protocol}: \VThree{Scheduled} scheduled cells, of which \VThree{Uninformative} are uninformative on real data and leave every arm, and \VThree{CandCells} informative cells in \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary and \VThree{MulticlassFamilies} multiclass).
 
 \paragraph{Headline.}
 \cli{auto-v8} reaches a TRG of \VThree{CandTrg}, against \VThree{BaseTrg} for the release~\VThree{BaseVersion} encoder, a paired gain of \VThree{Delta} with $p=\VThree{PHolm}$ (Holm over $m=\VThree{HolmM}$).
@@ -38,22 +31,19 @@ Used alone it is worse than the baseline; within \cli{auto-v8} it is written onl
 The Format~1 \texttt{small} programs of releases \VThree{BaseVersion} and \VThree{OldVersion} score \VThree{PrevSmallTrg} and \VThree{OldSmallTrg} and fail \VThree{PrevSmallFailed} of \VThree{PrevSmallCells} cells, and the V7 packet with untrained decoder weights (\VThree{V7Id}) scores \VThree{V7Trg}.
 
 \paragraph{Third-party generators.}
-The look also scores four third-party generators, fitted on the same rows with their library defaults and no byte cap: the Gaussian copula, CTGAN and TVAE synthesizers of SDV~\VThree{SdvVersion} and ARF from arfpy~\VThree{ArfpyVersion} (configuration in Appendix~\ref{app:arms}).
+The look also scores four third-party generators, fitted on the same rows with library defaults and no byte cap: the Gaussian copula, CTGAN and TVAE of SDV~\VThree{SdvVersion} and ARF from arfpy~\VThree{ArfpyVersion} (Appendix~\ref{app:arms}).
 Each has a lower TRG than \cli{auto-v8} (Tables~\ref{tab:arms} and~\ref{tab:methods}).
-ARF comes closest: its TRG is \VThree{ArfTrg} and its paired difference \VThree{ArfVsDelta}, an interval that contains zero (\VThree{ArfVsOutcome}; Holm over $m=\VThree{MethodsHolmM}$).
-It is higher than \cli{auto-v8} on regression (\VThree{ArfRegression} against \VThree{CandRegression}) and lower on binary and multiclass targets, with a median file of \VThree{ArfBytesMed}~bytes.
-The Gaussian copula (\VThree{GcVsDelta}), TVAE (\VThree{TvaeVsDelta}) and CTGAN (\VThree{CtganVsDelta}) are REJECT, and CTGAN's TRG, \VThree{CtganTrgPoint}, is below that of independently permuted columns.
-No third-party file is within the budget, so all four fail the byte guard by construction; counted against the \VThree{BudgetBytes}-byte budget, each scores the floor of \VThree{FailedValue} (the note under Table~\ref{tab:arms}).
-CTGAN also fails the exact-copy guard (mean excess \VThree{CtganCopyMean} against a bound of \VThree{CopyLe}), and TVAE fails \VThree{TvaeFailed} of \VThree{TvaeCells} cells.
+ARF comes closest, at \VThree{ArfTrg} and a paired difference of \VThree{ArfVsDelta} (\VThree{ArfVsOutcome}; Holm over $m=\VThree{MethodsHolmM}$), higher than \cli{auto-v8} on regression (\VThree{ArfRegression} against \VThree{CandRegression}) and lower on binary and multiclass targets, with a median file of \VThree{ArfBytesMed}~bytes.
+The Gaussian copula (\VThree{GcVsDelta}), TVAE (\VThree{TvaeVsDelta}) and CTGAN (\VThree{CtganVsDelta}) are REJECT; CTGAN's TRG, \VThree{CtganTrgPoint}, is below that of independently permuted columns, and CTGAN alone fails the exact-copy guard.
+No third-party file is within the budget: all four fail the byte guard by construction and score \VThree{FailedValue} at the budget (Table~\ref{tab:arms} note).
 
 \paragraph{Controls.}
-Training on $A$ itself (\VThree{CopyAId}) scores \VThree{CopyATrgPoint} rather than zero: its entry value is $1-R_B$, and the minimum over auditors falls below zero whenever the twin trains one auditor better than $A$ does. A bootstrap resample of $A$ scores \VThree{BootATrgPoint}.
-Both are reference points for a generator that only sees $A$.
+Training on $A$ itself (\VThree{CopyAId}) scores \VThree{CopyATrgPoint} rather than zero: its entry value is $1-R_B$, and the minimum over auditors falls below zero whenever the twin trains one auditor better than $A$ does. A bootstrap resample of $A$ scores \VThree{BootATrgPoint}; both are reference points for a generator that only sees $A$.
 Permuting each column independently (\VThree{IndepId}) scores \VThree{IndepTrgPoint}, and permuting only the target scores \VThree{LabelShuffleTrgPoint}.
 The real-twin control from the calibration rows is applicable on only \VThree{TwinCCells} cells (\VThree{TwinCNotApplicable} lack enough rows).
 
 \paragraph{The decision.}
-Conditions (i)--(iii) hold, but \VThree{GuardsFailed} of the \VThree{GuardsTotal} guards fail (Table~\ref{tab:compare}): the regression lower bound (\VThree{GuardTasks} against a threshold of \VThree{TaskCiLowGt}), the held-out MLP difference (\VThree{GuardMlp}), realism coverage (\VThree{GuardRealism}; \VThree{CandRealism} against \VThree{BaseRealism}) and privacy coverage (\VThree{GuardPrivacy} against a threshold of \VThree{PrivacyDeltaGt}).
+Conditions (i)--(iii) hold, but \VThree{GuardsFailed} of the \VThree{GuardsTotal} guards fail (Table~\ref{tab:compare}): the regression lower bound (\VThree{GuardTasks} against a threshold of \VThree{TaskCiLowGt}), the held-out MLP (\VThree{GuardMlp}), realism coverage (\VThree{GuardRealism}; \VThree{CandRealism} against \VThree{BaseRealism}) and privacy coverage (\VThree{GuardPrivacy} against a threshold of \VThree{PrivacyDeltaGt}).
 The exact-copy and byte guards pass.
 The outcome is \textbf{\VThree{Outcome}}.
 
@@ -61,3 +51,12 @@ The outcome is \textbf{\VThree{Outcome}}.
 Under the comparison's sign-flip null, the statistical conditions alone pass in \VThree{StatPassPct} of \VThree{NullReplicates} replicates (Wilson interval \VThree{StatPassLowPct}--\VThree{StatPassHighPct}), far above the contract's \VThree{NullMaxRatePct}.
 With \VThree{Families} families (\VThree{RegressionFamilies}, \VThree{BinaryFamilies} and \VThree{MulticlassFamilies} per task), the percentile interval is too narrow, and the headline $p$ should be read in that light.
 With the guards a flip can move, the rate is \VThree{FlipRatePct} (upper Wilson bound \VThree{FlipHighPct}): the guards, not the interval, are what keep the rule calibrated on this panel.
+
+\paragraph{Final look.}
+After this report, Addendum~F of the pre-registration (SHA-256 \texttt{\VThree{FlPreregSha}}) reopened the release for one candidate build, \VThree{FlRcBuild}, which routes away from \texttt{DSE8} where the FIT-only privacy and fold guards fail (Appendix~\ref{app:arms}).
+Before any score on data seeds \VThree{FlSeeds}, it froze the build, the schedule, a Holm family of $m=\VThree{FlHolmM}$ comparisons and a ship rule: the candidate ships if and only if it is PROMOTE against release~\VThree{BaseVersion} and its point difference against the released engine, \VThree{FlServedBuild} (this paper's \cli{auto-v8}), is at least zero.
+On that look (\VThree{FlCells} informative cells, \VThree{FlFamilies} families), the candidate is \VThree{FlVsBaseOutcome} against release~\VThree{BaseVersion} at \VThree{FlVsBaseDelta} (Holm $p=\VThree{FlVsBasePHolm}$; all \VThree{FlVsBaseGuards} guards pass) but \VThree{FlVsServedOutcome} at \VThree{FlVsServedDelta} against \VThree{FlServedBuild} (\VThree{FlVsServedMatched} at $m=\VThree{FlMatchedMult}$).
+The second condition fails, so the released engine remains \VThree{FlServedBuild}.
+The pre-registered disclosures qualify the PROMOTE: \VThree{FlNonzeroFamilies} of \VThree{FlFamilies} families carry the gain, \VThree{FlTopSharePct} of it one multiclass family (\texttt{\VThree{FlTopFamily}}); the exact family sign-flip $p$ is \VThree{FlSignFlipP}; and the contract's sign-flip null promotes in \VThree{FlNullFlipRate} of replicates with or without the guards a flip can move, above its limit of \VThree{FlNullMaxRate}, so the rule is not calibrated on this look.
+Descriptively, outside the Holm family, the released engine is \VThree{FlServedVsBaseOutcome} against release~\VThree{BaseVersion} at \VThree{FlServedVsBaseDelta}, failing the realism (\VThree{FlServedRealism}) and task lower-bound (\VThree{FlServedTaskLow}) guards.
+It is the second fresh look, after data seeds \VThree{ReportSeeds} above, on which the released engine is HOLD against release~\VThree{BaseVersion}.

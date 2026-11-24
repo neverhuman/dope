@@ -1,0 +1,98 @@
+{
+ "schema": "dope.v3-family-disclosure/v1",
+ "candidate": "v3c-cand6b",
+ "baseline": "dope-2.0.0-auto",
+ "delta": 0.048912527107,
+ "sum_of_family_contributions": 0.048912527107,
+ "families": 11,
+ "nonzero_families": 3,
+ "exact_sign_flip_p": 0.125,
+ "contract_null_calibration": {
+  "families": 11,
+  "flip_guard_rule": {
+   "acceptable": false,
+   "count": 265,
+   "rate": 0.1325,
+   "wilson95_high": 0.148065502213,
+   "wilson95_low": 0.118343527538
+  },
+  "max_false_promote_rate": 0.05,
+  "replicates": 2000,
+  "seed": 20261124,
+  "statistical_pass": {
+   "acceptable": false,
+   "count": 265,
+   "rate": 0.1325,
+   "wilson95_high": 0.148065502213,
+   "wilson95_low": 0.118343527538
+  }
+ },
+ "family_contributions": [
+  {
+   "task": "binary",
+   "family_id": "lf-00e7544cd5451d04",
+   "cells": 3,
+   "contribution": 0.039692088898
+  },
+  {
+   "task": "binary",
+   "family_id": "lf-0a64bb31a2e67d78",
+   "cells": 8,
+   "contribution": 0.002900306137
+  },
+  {
+   "task": "binary",
+   "family_id": "lf-13ff6b2586f4a3ed",
+   "cells": 3,
+   "contribution": 0.0
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-0b01bd8849b4bacb",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-2bd18a479f55b736",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-4dac59057a47eddc",
+   "cells": 4,
+   "contribution": 0.006320132072
+  },
+  {
+   "task": "multiclass",
+   "family_id": "lf-4f8793723a3148b5",
+   "cells": 1,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0199bc69cae5e74b",
+   "cells": 8,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-02ce36e8cae6b90f",
+   "cells": 4,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0a15cea1414cc797",
+   "cells": 3,
+   "contribution": 0.0
+  },
+  {
+   "task": "regression",
+   "family_id": "lf-0bdc07ba70c321d7",
+   "cells": 4,
+   "contribution": 0.0
+  }
+ ]
+}
