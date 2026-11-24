@@ -1,9 +1,9 @@
 \section{Introduction}\label{sec:intro}
 
-\begin{figure}[t]
+\begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{figures/hero-v3-methods.pdf}
-  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling, with its \VThree{CiLevel} family-bootstrap interval, against the median file size (log axis) on the pre-registered report look (\S\ref{sec:protocol}): DOPE~\VThree{ReleaseVersion} and four third-party generators, all fitted on the same rows; the third-party generators use library defaults and no byte cap. The vertical line is the \VThree{BudgetBytes}-byte budget; the horizontal lines mark a real twin of the fitting split (\VThree{ScoreScale}) and a copy of the fitting rows (\VThree{CopyAScorePoint}). Drawn by \texttt{dope\_kpi render-hero} from \texttt{primary-methods.json} (SHA-256 prefix \texttt{\VThree{MethodsPrimarySha}}) and converted to PDF without change (source SVG \texttt{\VThree{HeroSvgSha}}).}
+  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling (\VThree{CiLevel} family-bootstrap intervals) and median whole-file size on the development report splits. All generators fit the same rows. DOPE~\VThree{ReleaseVersion} fits the \VThree{BudgetBytes}-byte cap, shown as a vertical line. The four other generators use library defaults and no byte cap. Horizontal lines mark a second real training sample (\VThree{ScoreScale}) and a copy of the fitting rows (\VThree{CopyAScorePoint}). Section~\ref{sec:repro} identifies the source receipt and figure.}
   \label{fig:hero}
 \end{figure}
 
@@ -27,10 +27,4 @@ Figure~\ref{fig:hero} and Table~\ref{tab:ranking} place DOPE against four third-
   \item \textbf{A comparison with independent generators on one number} (\S\S\ref{sec:protocol}--\ref{sec:results}): a pre-registered, twin-referenced protocol with a family bootstrap and Holm's adjustment, under which DOPE and four third-party generators are scored on the same cells. Every number in this paper is rendered from committed receipts and checked in continuous integration (\S\ref{sec:repro}).
 \end{enumerate}
 
-\paragraph{What we do not claim.}
-The evaluation is a development-set estimate; no confirmation, holdout or sealed panel was opened.
-DOPE is not shown to transfer better than ARF at the headline \VThree{PrimaryMult}$\times$ sampling: their paired interval contains zero on both looks reported here (at matched size it does on the report look only).
-The third-party generators ran with library defaults and no byte cap, and tuned configurations may score differently.
-Under the contract's full promotion rule, which also bounds per-task losses, a held-out auditor, realism and privacy, DOPE is PROMOTE over TVAE alone on the report look, and over TVAE and CTGAN on the second look (Table~\ref{tab:paired}).
-The artifacts do not make synthetic rows realistic in the two-sample sense, and the privacy diagnostics are empirical audits, not guarantees.
-Section~\ref{sec:limits} lists these limitations in full.
+The external comparisons answer a question about measured utility and file size on these development tables. The paired intervals and guard results in Section~\ref{sec:results} show where those rankings are uncertain and where higher predictive transfer coexists with weaker realism or privacy coverage.

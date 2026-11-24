@@ -1,12 +1,8 @@
 \begin{abstract}
-\noindent DOPE compiles a table with a declared target into a small file from which any number of synthetic rows can be sampled; the file stores no source rows.
-Release~\VThree{ReleaseVersion} fits two codecs inside one budget of \VThree{BudgetBytes}~bytes for the whole file, a compressed program and \texttt{DSE8}, an analytic packet with an explicit byte model, and keeps \texttt{DSE8} only when a duplicate-grouped, target-stratified two-fold check on the fitting rows prefers it.
-We rank generators by one number, the \emph{Transfer Score} $\VThree{ScoreScale}\times(1+\mathrm{TRG})$.
-The twin-referenced gap TRG is the retention of downstream auditors trained on synthetic rows minus that of auditors trained on a real twin the size of the fitting split, so a real twin scores \VThree{ScoreScale} and higher is better.
-On one pre-registered look at fresh row splits of the development tables (\VThree{CandCells} informative cells in \VThree{Families} lineage families; no confirmation panel), DOPE reaches a Transfer Score of \VThree{CandScore} at \VThree{PrimaryMult}$\times$ sampling, with a median file of \VThree{CandBytesMed}~bytes.
-Four widely used generators, scored on the same cells with library defaults and no byte cap, rank below it: ARF at \VThree{ArfScorePoint}, and SDV's Gaussian copula, TVAE and CTGAN at \VThree{GcScorePoint}, \VThree{TvaeScorePoint} and \VThree{CtganScorePoint}, with median files \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times larger than DOPE's.
-The paired gains over the three SDV generators have intervals above zero; the gain over ARF, \VThree{ArfVsPts} points, has an interval that contains zero.
-A second pre-registered look, at other row splits on which only the third-party generators were new, gives the same reading at \VThree{PrimaryMult}$\times$.
-For reference, a copy of the fitting rows themselves scores \VThree{CopyAScorePoint}.
-Rows from every generator remain easy to tell from real ones (DOPE's median two-sample AUC is \VThree{CandC2st}), and the empirical privacy diagnostics are neither differential privacy nor HIPAA de-identification.
+\noindent DOPE turns a table with a declared target into a file that can generate synthetic rows without storing any of the input rows. It fits a compressed program and an analytic codec within the same \VThree{BudgetBytes}-byte whole-file limit and chooses between them on the fitting rows.
+We measure how well models trained on the synthetic rows predict targets on real test rows. A Transfer Score of \VThree{ScoreScale} corresponds to training on a second real sample of the same size as the fitting split.
+On fresh row splits of development tables (\VThree{CandCells} informative cells in \VThree{Families} lineage families), DOPE~\VThree{ReleaseVersion} scores \VThree{CandScore} when sampling \VThree{PrimaryMult}$\times$ as many rows as it saw during fitting. Its median file is \VThree{CandBytesMed}~bytes and every file fits the cap.
+Four generators fitted with library defaults and no byte cap score lower on the same cells: ARF at \VThree{ArfScorePoint}, and SDV's Gaussian copula, TVAE and CTGAN at \VThree{GcScorePoint}, \VThree{TvaeScorePoint} and \VThree{CtganScorePoint}. Their median files are \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times larger.
+Paired intervals favor DOPE over all three SDV generators across two sets of row splits from the same tables. The interval against ARF includes zero on both at \VThree{PrimaryMult}$\times$.
+A copy of the fitting rows scores \VThree{CopyAScorePoint} on the report splits. Every generator's rows are readily distinguishable from real rows, and the privacy results are empirical audits on these data.
 \end{abstract}

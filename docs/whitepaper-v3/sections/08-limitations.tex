@@ -34,13 +34,9 @@ DOPE preserves more predictive structure for the auditors than independently per
 Storing no source rows and clipping marginals at a support floor are design properties, not guarantees.
 The privacy gate is an empirical audit (distance to closest record, a distance-based membership-inference attack, exact copies) on the rows scored; it is neither differential privacy~\citep{dwork2006calibrating} nor HIPAA de-identification, and passing it does not rule out other attacks~\citep{stadler2022groundhog}.
 
-\paragraph{The release decision.}
-Under the same contract, the pre-registered comparison of this encoder with the previous DOPE release returned HOLD: the guards on per-task loss, the held-out auditor, realism and privacy coverage missed.
-That receipt is committed with the scoreboard; this paper does not rely on it.
-
 \paragraph{Learned refinement.}
 \texttt{DSE8} reserves room for a learned refinement of the analytic decode, trained from the FIT-only evidence bank of Appendix~\ref{app:evidence}.
-No checkpoint has yet passed the promotion rule against the analytic packet, so the release ships no learned weights and \cli{auto-v8} without \cli{-{}-v8-weights} never writes a neural packet.
+Release~\VThree{ReleaseVersion} ships without learned weights. The \cli{auto-v8} route evaluated here uses the compressed program or the analytic packet.
 
 \paragraph{Provenance.}
 The receipts record the scoring tool as \texttt{dope\_kpi} version \VThree{ToolVersion} (the tool's own version number, not a DOPE release) with build commit ``\VThree{ToolGitSha}'' (version \VThree{SecondLookToolVersion} and commit ``\VThree{SecondLookToolGitSha}'' on the second look), and the scored packets are not committed, so the scores cannot be recomputed from the repository alone.

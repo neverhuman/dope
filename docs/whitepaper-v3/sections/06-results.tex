@@ -26,8 +26,9 @@ Permuting every column independently scores \VThree{IndepScorePoint} and permuti
 \paragraph{Paired differences.}
 DOPE is ahead of the Gaussian copula by \VThree{GcVsPts} points, of TVAE by \VThree{TvaeVsPts} and of CTGAN by \VThree{CtganVsPts}; each interval is above zero.
 Against ARF the difference is \VThree{ArfVsPts} points, and its interval contains zero: on this look DOPE is not shown to transfer better than ARF.
-The two differ by task, in point estimates that carry no interval of their own.
+The task-level point estimates show different strengths.
 ARF is higher on regression (\VThree{ArfRegressionScore} against \VThree{CandRegressionScore}); DOPE is higher on binary (\VThree{CandBinaryScore} against \VThree{ArfBinaryScore}) and multiclass targets (\VThree{CandMulticlassScore} against \VThree{ArfMulticlassScore}).
+The held-out MLP also favors ARF (TRG \VThree{ArfMlp} against \VThree{CandMlp}). This auditor enters the guard only.
 
 \paragraph{Matched size.}
 With a synthetic sample the size of $A$ ($m=\VThree{MatchedMult}$), the order is unchanged: DOPE \VThree{CandMatchedScorePoint}, ARF \VThree{ArfMatchedScorePoint}, Gaussian copula \VThree{GcMatchedScorePoint}, TVAE \VThree{TvaeMatchedScorePoint} and CTGAN \VThree{CtganMatchedScorePoint}.
@@ -36,7 +37,7 @@ The difference from ARF is \VThree{ArfVsPtsMatched} points.
 \paragraph{Size.}
 Every DOPE file is within the budget: the median is \VThree{CandBytesMed}~bytes and the largest \VThree{CandBytesMax}.
 The third-party files have median sizes from \VThree{GcBytesMed}~bytes (Gaussian copula) to \VThree{ArfBytesMed}~bytes (ARF), \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times DOPE's median, and none is within the budget.
-Their scores are therefore those of unconstrained files; held to the budget, every entry would take the floor value (TRG \VThree{FailedValue}, a Transfer Score of \VThree{FailedScore}).
+Applying the cap to their emitted files would assign every entry the failure floor (TRG \VThree{FailedValue}, a Transfer Score of \VThree{FailedScore}). This calculation rejects oversize outputs from the observed default fits. A comparison with generators fitted under the same cap would require separate runs.
 
 \paragraph{Realism, privacy and copies.}
 Realism coverage is \VThree{CandRealism} for DOPE, lower than ARF's \VThree{ArfRealism} and higher than the Gaussian copula's \VThree{GcRealism}; TVAE and CTGAN pass the realism gate on no entry.

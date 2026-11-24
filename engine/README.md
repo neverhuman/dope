@@ -14,6 +14,8 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 
 ## Commands
 
+For the signed v3.0.0 release's `--format auto-v8` artifacts, use `dope fit` and `dope sample` in raw space. Use `wc -c < model.dope` to measure the whole file. The `inspect` and `eval` commands below read standalone Format 1 artifacts.
+
 | Command | What it does |
 | --- | --- |
 | `dope fit data.csv --target y [--budget 4k] [--seed 0] [--anonymize] [--device auto]` | Compile a program within a byte budget (whole file) and print its self-audit. |
