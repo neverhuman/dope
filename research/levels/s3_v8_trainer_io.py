@@ -23,15 +23,55 @@ from research.levels.v8_packet import (
     fit_dse8_rust,
     unpack_dse8_packet_py,
 )
+from research.levels.v8_parity_decode import compute_fit_midrank_z_np, extract_packet_analytic_tensors
 from research.levels.v8_single_encoding import SingleEncV8
 
 
-def check_cuda_exclusive_guard(device: str, shared_vram_gb: float = 0.0) -> None:
-    """Fail-closed CUDA guard.
+def _resolve_target_gpu_uuid(dev_idx: int) -> str:
+    """Resolve the verified physical NVIDIA GPU UUID for logical CUDA device `dev_idx` (fail-closed)."""
+    props = torch.cuda.get_device_properties(dev_idx)
+    raw_uuid = getattr(props, "uuid", None)
+    if raw_uuid is not None:
+        s = str(raw_uuid).strip()
+        if s:
+            return s if s.startswith("GPU-") else f"GPU-{s}"
+    # Fallback via CUDA_VISIBLE_DEVICES -> nvidia-smi physical index/UUID table.
+    vis = os.environ.get("CUDA_VISIBLE_DEVICES", "").strip()
+    out = subprocess.check_output(
+        ["nvidia-smi", "--query-gpu=index,uuid", "--format=csv,noheader"],
+        text=True,
+        stderr=subprocess.DEVNULL,
+    ).strip()
+    idx_to_uuid: dict[str, str] = {}
+    ordered_uuids: list[str] = []
+    for ln in out.splitlines():
+        parts = [p.strip() for p in ln.split(",")]
+        if len(parts) >= 2 and parts[1]:
+            idx_to_uuid[parts[0]] = parts[1]
+            ordered_uuids.append(parts[1])
+    if vis:
+        tokens = [t.strip() for t in vis.split(",") if t.strip()]
+        if dev_idx >= len(tokens):
+            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: dev_idx {dev_idx} out of CUDA_VISIBLE_DEVICES={vis!r}")
+        tok = tokens[dev_idx]
+        if tok.startswith("GPU-"):
+            if tok in ordered_uuids:
+                return tok
+            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: unknown GPU UUID {tok!r} in CUDA_VISIBLE_DEVICES")
+        if tok in idx_to_uuid:
+            return idx_to_uuid[tok]
+        raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: cannot map CUDA_VISIBLE_DEVICES token {tok!r} to GPU UUID")
+    if dev_idx < len(ordered_uuids):
+        return ordered_uuids[dev_idx]
+    raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: indeterminate GPU UUID mapping for dev_idx={dev_idx}")
 
-    By default (`shared_vram_gb <= 0`), refuses CUDA launch if ANY foreign process occupies the GPU.
-    When `shared_vram_gb > 0` (guarded JSR coexistence mode), verifies that free VRAM >= shared_vram_gb + 4.0 GiB
-    and caps PyTorch's CUDA allocator via `torch.cuda.set_per_process_memory_fraction`.
+
+def check_cuda_exclusive_guard(device: str, shared_vram_gb: float = 0.0) -> None:
+    """Fail-closed per-GPU CUDA guard scoped to the verified physical GPU UUID.
+
+    By default (`shared_vram_gb <= 0`), refuses CUDA launch if ANY foreign numeric PID occupies the
+    target GPU UUID (allowing independent jobs on separate GPUs of a multi-GPU host like xbabe7!).
+    Fails closed if `nvidia-smi` is missing or GPU UUID mapping is indeterminate.
     """
     if not device.startswith("cuda"):
         return
@@ -50,17 +90,31 @@ def check_cuda_exclusive_guard(device: str, shared_vram_gb: float = 0.0) -> None
         torch.cuda.set_per_process_memory_fraction(frac, dev_idx)
         return
     try:
+        target_uuid = _resolve_target_gpu_uuid(dev_idx)
         out = subprocess.check_output(
-            ["nvidia-smi", "--query-compute-apps=pid,process_name", "--format=csv,noheader"],
+            ["nvidia-smi", "--query-compute-apps=gpu_uuid,pid,process_name", "--format=csv,noheader"],
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
-        my_pid = str(os.getpid())
-        foreign = [ln for ln in out.splitlines() if ln.strip() and not ln.strip().startswith(my_pid)]
-        if foreign:
-            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: foreign GPU process active: {foreign[0]}")
-    except FileNotFoundError:
-        pass
+    except Exception as exc:
+        raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: fail-closed GPU inspection error: {exc}") from exc
+    my_pid = os.getpid()
+    for ln in out.splitlines():
+        s = ln.strip()
+        if not s:
+            continue
+        parts = [p.strip() for p in s.split(",")]
+        if len(parts) < 2:
+            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: malformed nvidia-smi compute row: {s!r}")
+        gpu_uuid = parts[0]
+        if gpu_uuid != target_uuid:
+            continue
+        try:
+            pid = int(parts[1])
+        except ValueError as exc:
+            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: non-numeric GPU PID in row: {s!r}") from exc
+        if pid != my_pid:
+            raise RuntimeError(f"CUDA_EXCLUSIVE_GUARD: foreign GPU process on {target_uuid}: {s}")
 
 
 def consume_episode_tensors(
@@ -83,6 +137,22 @@ def consume_episode_tensors(
             t = v if isinstance(v, torch.Tensor) else torch.as_tensor(np.asarray(v, dtype=np.float32))
             return t.to(device=device, dtype=torch.float32, non_blocking=non_blocking)
 
+        pkt_analytic = None
+        if ep.get("packet"):
+            try:
+                pkt_analytic = extract_packet_analytic_tensors(
+                    unpack_dse8_packet_py(bytes(ep["packet"])), device
+                )
+            except Exception:
+                pkt_analytic = None
+        if "Z_qry" in ep:
+            z_qry_t = _t("Z_qry")
+        else:
+            xf_np = np.asarray(ep["X_fit"], dtype=np.float32)
+            xq_np = np.asarray(ep["X_qry"], dtype=np.float32)
+            z_qry_t = torch.from_numpy(compute_fit_midrank_z_np(xf_np, xq_np)).to(
+                device=device, dtype=torch.float32, non_blocking=non_blocking
+            )
         return {
             "ev_col": _t("ev_col"),
             "ev_edge": _t("ev_edge"),
@@ -101,8 +171,10 @@ def consume_episode_tensors(
             "y_fit": _t("y_fit"),
             "X_qry": _t("X_qry"),
             "y_qry": _t("y_qry"),
+            "z_qry": z_qry_t,
             "task_id": int(ep["task_id"]),
             "n_classes": int(ep["n_classes"]),
+            "pkt_analytic": pkt_analytic,
         }
     return _episode_to_tensors(
         ep, device, use_rust_packet=use_rust_packet, budget_bytes=budget_bytes,
@@ -129,12 +201,14 @@ def _episode_to_tensors(
 
     ev = extract_evidence_fast_numpy(Xf, yf, task_id, n_classes, seed=seed, drop_tier_prob=drop_tier_prob)
 
+    pkt_analytic = None
     if use_rust_packet:
         pkt_b = fit_dse8_rust(
             Xf, yf, task_id, budget_bytes=budget_bytes, normalized_only=True,
             col_meta=ep.get("col_meta"), seed=seed,
         )
         pkt = unpack_dse8_packet_py(pkt_b)
+        pkt_analytic = extract_packet_analytic_tensors(pkt, device)
         dc, de, dg, _dz = build_decoder_inputs_py(pkt)
         p_eff = pkt["header"]["p_eff"]
         knots = np.stack([m["knots17"] for m in pkt["marginals"]], axis=0)
@@ -197,6 +271,7 @@ def _episode_to_tensors(
         dg[15] = n_classes / 8.0
         is_cont = (ev["col"][:, 6] < 0.5).astype(np.float32)
 
+    zq_np = compute_fit_midrank_z_np(Xf[:, :p_eff], Xq[:, :p_eff])
     return {
         "ev_col": torch.from_numpy(ev["col"]).to(device),
         "ev_edge": torch.from_numpy(ev["edge"]).to(device),
@@ -215,8 +290,10 @@ def _episode_to_tensors(
         "y_fit": torch.from_numpy(yf).to(device),
         "X_qry": torch.from_numpy(Xq[:, :p_eff]).to(device),
         "y_qry": torch.from_numpy(yq).to(device),
+        "z_qry": torch.from_numpy(zq_np).to(device),
         "task_id": task_id,
         "n_classes": n_classes,
+        "pkt_analytic": pkt_analytic,
     }
 
 
@@ -248,27 +325,38 @@ def save_full_checkpoint(
     step: int,
     rng_state: dict[str, Any],
     config: dict[str, Any],
+    run_flags: dict[str, Any] | None = None,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".part")
-    torch.save(
-        {
-            "step": step,
-            "config": config,
-            "model": model.state_dict(),
-            "optimizer": optimizer.state_dict(),
-            "scheduler": scheduler.state_dict() if scheduler is not None else None,
-            "emas": emas,
-            "rng_state": rng_state,
-        },
-        tmp,
-    )
+    payload: dict[str, Any] = {
+        "step": step,
+        "config": config,
+        "model": model.state_dict(),
+        "optimizer": optimizer.state_dict(),
+        "scheduler": scheduler.state_dict() if scheduler is not None else None,
+        "emas": emas,
+        "rng_state": rng_state,
+    }
+    if run_flags is not None:
+        payload["run_flags"] = dict(run_flags)
+    torch.save(payload, tmp)
     os.replace(tmp, path)
 
 
 def _export_state_dict_safetensors(
-    model_cfg: dict[str, Any], state_dict: dict[str, torch.Tensor], out_path: Path
+    model_cfg: dict[str, Any],
+    state_dict: dict[str, torch.Tensor],
+    out_path: Path,
+    dtype: str = "f32",
+    decoder_capability: str | None = "active-rank-v1",
+    assert_zero_delta_w: bool = False,
 ) -> Path:
     tmp_model = SingleEncV8(**model_cfg).cpu()
     tmp_model.load_state_dict({k: v.detach().cpu() for k, v in state_dict.items()})
-    return tmp_model.export_v8_safetensors(out_path)
+    return tmp_model.export_v8_safetensors(
+        out_path,
+        dtype=dtype,
+        decoder_capability=decoder_capability,
+        assert_zero_delta_w=assert_zero_delta_w,
+    )

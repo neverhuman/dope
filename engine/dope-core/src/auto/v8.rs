@@ -109,11 +109,9 @@ pub fn select_v8_candidate(
     V8Choice::Format1
 }
 
-fn raw_to_numeric_inputs(
-    raw: &RawTable,
-    target: usize,
-    schema: &Schema,
-) -> Result<(Vec<Vec<f64>>, Vec<f64>, u8)> {
+type NumericInputs = (Vec<Vec<f64>>, Vec<f64>, u8, Vec<u64>);
+
+fn raw_to_numeric_inputs(raw: &RawTable, target: usize, schema: &Schema) -> Result<NumericInputs> {
     let task_id: u8 = match (&schema.task, &schema.target.kind) {
         (Task::Regression, _) => 0,
         (Task::Classification, Kind::Categorical(spec)) if spec.levels.len() > 2 => 2,
@@ -134,6 +132,7 @@ fn raw_to_numeric_inputs(
             y.push(v);
         }
     }
+    let row_ids: Vec<u64> = rows.iter().map(|&r| r as u64).collect();
     let mut x = Vec::with_capacity(schema.features.len());
     for f in &schema.features {
         let c = raw
@@ -154,7 +153,7 @@ fn raw_to_numeric_inputs(
                 .collect(),
         );
     }
-    Ok((x, y, task_id))
+    Ok((x, y, task_id, row_ids))
 }
 
 fn decoded_v8_to_raw(schema: &Schema, x: &[Vec<f64>], y: &[f64]) -> RawTable {
@@ -204,7 +203,7 @@ pub(super) fn fit_auto_v8_with_payload_room(
         ..Default::default()
     };
     let schema = infer(raw, target, &intake)?;
-    let (x_full, y_full, task_id) = raw_to_numeric_inputs(raw, target, &schema)?;
+    let (x_full, y_full, task_id, full_row_ids) = raw_to_numeric_inputs(raw, target, &schema)?;
     let mut f1_opts = opts.format1.clone();
     f1_opts.budget = Some(opts.format1.budget.unwrap_or(opts.budget));
     f1_opts.task = Some(schema.task);
@@ -220,7 +219,11 @@ pub(super) fn fit_auto_v8_with_payload_room(
         enable_residual_model: opts.enable_residual_model,
         enable_skew_t: opts.enable_skew_t,
         code_tier: opts.code_tier,
+        reserve_neural_code: false,
         col_meta: full_meta.as_deref(),
+        fit_row_ids: weights
+            .filter(|w| w.active_rank_v1)
+            .map(|_| full_row_ids.as_slice()),
         seed: opts.format1.seed,
     };
 

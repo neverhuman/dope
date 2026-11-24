@@ -57,7 +57,8 @@ enum Cmd {
         code_tier: u8,
         #[arg(long = "checkpoint", visible_alias = "weights")]
         checkpoint: Option<PathBuf>,
-        #[arg(long, default_value_t = 4)]
+        /// Attention heads (0 = auto-infer from SafeTensors `edge_proj` shape).
+        #[arg(long, default_value_t = 0)]
         n_heads: usize,
         #[arg(long = "col-meta")]
         col_meta: Option<PathBuf>,
@@ -76,7 +77,8 @@ enum Cmd {
         model: PathBuf,
         #[arg(long = "checkpoint", visible_alias = "weights")]
         checkpoint: Option<PathBuf>,
-        #[arg(long, default_value_t = 4)]
+        /// Attention heads (0 = auto-infer from SafeTensors `edge_proj` shape).
+        #[arg(long, default_value_t = 0)]
         n_heads: usize,
         #[arg(long)]
         rows: usize,
@@ -190,7 +192,9 @@ fn main() {
                 enable_residual_model: !no_resid,
                 enable_skew_t: skew_t,
                 code_tier,
+                reserve_neural_code: false,
                 col_meta: meta.as_deref(),
+                fit_row_ids: None,
                 seed,
             };
             let fit_res = if let Some(wp) = checkpoint {

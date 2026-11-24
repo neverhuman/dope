@@ -28,12 +28,13 @@ pub mod scale_v8;
 pub mod target_v8;
 pub mod trees_v8;
 
+pub use calibrate::project_fit_midrank;
 pub use copula_regimes::{RegimeV8, RegimesSectionV8, V8_MAX_RANK};
 pub use decode::{
     build_decode_plan_v8, decode_dse8_row_at, decode_dse8_rows, extract_jopedime_embedding,
     DecodePlanV8, DecodedV8Row, DecodedV8Table,
 };
-pub use fit_meta::{fit_unit_meta, fit_unit_meta_v2};
+pub use fit_meta::{extract_fit_evidence_v8, fit_unit_meta, fit_unit_meta_v2};
 pub use marginals::{
     MarginalColV8, MARG_ATOMS, MARG_CONST, MARG_CONT, MARG_LATTICE, MARG_ZERO_INFLATED,
 };
@@ -44,8 +45,8 @@ pub use model::{
 pub use nominal::NominalGroupV8;
 pub use packet::{
     pack_dse8_packet, truncate_dse8_packet, unpack_dse8_packet, Dse8Header, Dse8Packet, DSE8_MAGIC,
-    DSE8_VERSION, FLAG_HAS_COL_MAP, FLAG_HAS_CUSTOM_CLASSES, FLAG_HAS_DROPPED_MEDS,
-    FLAG_HAS_NEURAL_ENCODER, FLAG_HAS_SKEW_T, FLAG_NORMALIZED_ONLY,
+    DSE8_VERSION, FLAG_ACTIVE_RANK_V1, FLAG_HAS_COL_MAP, FLAG_HAS_CUSTOM_CLASSES,
+    FLAG_HAS_DROPPED_MEDS, FLAG_HAS_NEURAL_ENCODER, FLAG_HAS_SKEW_T, FLAG_NORMALIZED_ONLY,
 };
 pub use replay::{ReplayArmV8, ReplayPlanV8};
 pub use scale_v8::{Dse8ColumnMeta, ScaleCardV8, V8_MAX_CLASSES, V8_MAX_COLS};
@@ -54,9 +55,7 @@ pub use trees_v8::{OblivTreeV8, TreesSectionV8};
 
 use crate::error::{DopeError, Result};
 use crate::evidence::primitives::canonical_row_order;
-use crate::evidence::{
-    extract as extract_evidence, ColumnMeta as EvColMeta, EvidenceInput, EvidenceTier,
-};
+use crate::evidence::EvidenceTier;
 use crate::stats::norm_ppf;
 use calibrate::{
     calibrate_intercepts_on_packet, eval_true_loss, sample_synthetic_x_probe, CdfIntervals,
@@ -80,7 +79,12 @@ pub struct Dse8FitOptions<'a> {
     pub enable_skew_t: bool,
     /// Requested nested FSQ neural code tier (`0=off, 1=32B, 2=64B, 3=128B`).
     pub code_tier: u8,
+    /// When `true` and `weights` is `None` with `code_tier > 0`, pack a zeroed `TAG_CODE` +
+    /// reserved `TAG_WEIGHTS_FP` so training episodes charge exact neural TLV overhead.
+    pub reserve_neural_code: bool,
     pub col_meta: Option<&'a [Dse8ColumnMeta]>,
+    /// Optional stable physical FIT row ids (used when `active-rank-v1` checkpoint is loaded).
+    pub fit_row_ids: Option<&'a [u64]>,
     pub seed: u64,
 }
 
@@ -96,7 +100,9 @@ impl Default for Dse8FitOptions<'_> {
             enable_residual_model: true,
             enable_skew_t: false,
             code_tier: 0,
+            reserve_neural_code: false,
             col_meta: None,
+            fit_row_ids: None,
             seed: 0,
         }
     }
@@ -205,8 +211,12 @@ fn fit_dse8_attempt(
         1 => 2,
         _ => probe.classes.len(),
     };
-    let want_code = if weights.is_some() {
-        opts.code_tier.max(1)
+    let want_code = if let Some(w) = weights {
+        if opts.code_tier > 0 {
+            opts.code_tier
+        } else {
+            w.preferred_code_tier()
+        }
     } else {
         opts.code_tier
     };
@@ -376,25 +386,24 @@ fn fit_dse8_attempt(
     };
     let need_ev = opts.enable_skew_t || (weights.is_some() && code_tier > 0);
     if need_ev {
-        let ev_meta: Option<Vec<EvColMeta>> = active_meta
-            .as_ref()
-            .map(|ms| ms.iter().map(EvColMeta::from).collect());
-        if let Ok(ev) = extract_evidence(&EvidenceInput {
-            x_unit: &x_unit,
-            x_raw: None,
-            y: &y_sc,
-            task_id: opts.task_id,
-            n_classes: k_eff,
-            col_meta: ev_meta.as_deref(),
-            packet_probe: None,
-            tier: if weights.is_some() {
-                EvidenceTier::T2
-            } else {
-                EvidenceTier::T1
-            },
-            target_free: false,
-            seed: opts.seed,
-        }) {
+        let ev_tier = if weights.is_some() {
+            EvidenceTier::T2
+        } else {
+            EvidenceTier::T1
+        };
+        let use_shared_ev = weights.is_some_and(|w| w.active_rank_v1);
+        if let Ok(ev) = extract_fit_evidence_v8(
+            x_raw,
+            &x_unit,
+            &y_sc,
+            &valid_rows,
+            &card,
+            active_meta.as_deref(),
+            ev_tier,
+            opts.seed,
+            opts.fit_row_ids,
+            use_shared_ev,
+        ) {
             if opts.enable_skew_t {
                 inv_nu = ev.glob[42].clamp(0.0, 0.45);
             }
@@ -408,6 +417,12 @@ fn fit_dse8_attempt(
         }
     }
 
+    let mut reserved_fp: Option<[u8; 8]> = None;
+    if weights.is_none() && opts.reserve_neural_code && plan.code_tier > 0 {
+        code = CodeSectionV8::from_unit_vec(&[], plan.code_tier);
+        reserved_fp = Some([0xFFu8; 8]);
+    }
+
     let has_col_map = !card.normalized_only
         && (p_eff != x_cols_raw || card.col_indices.iter().enumerate().any(|(a, &r)| a != r));
     let has_custom_classes = !card.normalized_only
@@ -419,25 +434,23 @@ fn fit_dse8_attempt(
             .any(|(i, &cid)| cid != i as i32);
     let has_dropped_meds = !card.normalized_only && !card.dropped_medians.is_empty();
 
-    let mut flags = 0u8;
-    if card.normalized_only {
-        flags |= FLAG_NORMALIZED_ONLY;
-    }
-    if has_col_map {
-        flags |= FLAG_HAS_COL_MAP;
-    }
-    if has_custom_classes {
-        flags |= FLAG_HAS_CUSTOM_CLASSES;
-    }
-    if has_dropped_meds {
-        flags |= FLAG_HAS_DROPPED_MEDS;
-    }
-    if inv_nu > 1e-4 {
-        flags |= FLAG_HAS_SKEW_T;
-    }
-    if weights.is_some() {
-        flags |= FLAG_HAS_NEURAL_ENCODER;
-    }
+    let flags = [
+        (card.normalized_only, FLAG_NORMALIZED_ONLY),
+        (has_col_map, FLAG_HAS_COL_MAP),
+        (has_custom_classes, FLAG_HAS_CUSTOM_CLASSES),
+        (has_dropped_meds, FLAG_HAS_DROPPED_MEDS),
+        (inv_nu > 1e-4, FLAG_HAS_SKEW_T),
+        (
+            weights.is_some() || reserved_fp.is_some(),
+            FLAG_HAS_NEURAL_ENCODER,
+        ),
+        (
+            weights.is_some_and(|w| w.active_rank_v1) || reserved_fp.is_some(),
+            FLAG_ACTIVE_RANK_V1,
+        ),
+    ]
+    .into_iter()
+    .fold(0u8, |acc, (on, bit)| if on { acc | bit } else { acc });
 
     let p1_prior = if opts.task_id == 1 {
         (y_sc.iter().filter(|&&v| v > 0.5).count() as f32 / n_fit as f32).clamp(0.01, 0.99)
@@ -473,7 +486,7 @@ fn fit_dse8_attempt(
         trees,
         resid_model,
         code,
-        weights_fp: weights.map(|w| w.fingerprint()),
+        weights_fp: weights.map(|w| w.fingerprint()).or(reserved_fp),
     };
 
     // Pack strictly within budget, then calibrate intercepts `b` against the EXACT

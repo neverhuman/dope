@@ -26,6 +26,7 @@ use dope_core::single_encoding::{
 pub const ABI_VERSION: u32 = 4;
 
 pub mod v8;
+pub mod v8_reserved;
 /// Largest packet budget accepted (the 64 KiB development frontier).
 pub const MAX_BUDGET: u32 = 65_536;
 

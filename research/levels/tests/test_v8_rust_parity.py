@@ -257,3 +257,274 @@ def test_cli_inspect_embed_truncate(v8_emit_bin: Path, tmp_path: Path) -> None:
         )
     )
     assert tr_out["bytes"] <= 1024
+
+
+def test_active_rank_v1_and_legacy_parity_plus_fit_midrank_z(v8_emit_bin: Path, tmp_path: Path) -> None:
+    """Verify active-rank-v1 and legacy SafeTensors parity vs Rust AND FIT-only midrank z invariance."""
+    from research.levels.v8_parity_decode import compute_fit_midrank_z_np
+
+    fx = FIXTURES[0]  # regression
+    X, y = fx["X"], fx["y"]
+    # Query poisoning invariance on FIT-only midrank z:
+    z_a = compute_fit_midrank_z_np(X[:60], X[60:80])
+    X_alt = X[60:80].copy()
+    X_alt[10:] = 1e6
+    z_b = compute_fit_midrank_z_np(X[:60], X_alt)
+    assert np.allclose(z_a[:10], z_b[:10], atol=0.0)
+    assert np.all(np.isfinite(z_a)) and np.max(np.abs(z_a)) <= 3.5
+
+    torch.manual_seed(77)
+    model = SingleEncV8(d_model=32, n_heads=4, n_enc_layers=1, n_dec_layers=1, with_owner_encoder=True)
+    with torch.no_grad():
+        for name, p in model.named_parameters():
+            if any(k in name for k in ("delta_", "node_", "bilin_", "flow_", "gate_head")):
+                p.normal_(0.0, 0.12)
+
+    for cap, active_flag in (("active-rank-v1", True), (None, False)):
+        ckpt_p = tmp_path / f"v8_{cap or 'legacy'}.safetensors"
+        model.export_v8_safetensors(ckpt_p, decoder_capability=cap)
+        pkt_b = fit_dse8_rust(X, y, 0, budget_bytes=2048, checkpoint=ckpt_p, code_tier=1, seed=19, bin_path=v8_emit_bin)
+        pkt_py = unpack_dse8_packet_py(pkt_b)
+        xs_rs, ys_rs = sample_dse8_rust(pkt_b, n_rows=32, seed=404, checkpoint=ckpt_p, n_heads=4, bin_path=v8_emit_bin)
+        xs_py, ys_py = decode_dse8_rows_py_parity(pkt_py, model, n_rows=32, seed=404, active_rank_v1=active_flag)
+        assert float(np.max(np.abs(xs_rs - xs_py))) <= 1e-4, f"cap={cap} X diff"
+        assert float(np.max(np.abs(ys_rs - ys_py))) <= 1e-4, f"cap={cap} Y diff"
+
+    # Unconditional differentiable Torch training forward (`decode_batch_differentiable`) parity
+    # directly against Rust `sample_dse8_rust` at <= 1e-5 with exact counter normals, Student-t, and regimes!
+    from research.levels.v8_packet import (
+        STREAM_FACTOR,
+        STREAM_NOISE,
+        STREAM_REGIME,
+        STREAM_TARGET,
+        V8_MAX_CLASSES,
+        build_decoder_inputs_py,
+        counter_normal,
+        counter_student_t_scale,
+        counter_uniform,
+    )
+    from research.levels.v8_parity_decode import extract_packet_analytic_tensors
+
+    ckpt_act = tmp_path / "v8_diff_parity.safetensors"
+    model.export_v8_safetensors(ckpt_act, decoder_capability="active-rank-v1")
+    pkt_b = fit_dse8_rust(
+        X, y, 0, budget_bytes=2048, normalized_only=True, checkpoint=ckpt_act, code_tier=1, seed=23, bin_path=v8_emit_bin
+    )
+    pkt_py = unpack_dse8_packet_py(pkt_b)
+    xs_rs, ys_rs = sample_dse8_rust(pkt_b, n_rows=24, seed=707, checkpoint=ckpt_act, n_heads=4, bin_path=v8_emit_bin)
+    p_eff = int(pkt_py["header"]["p_eff"])
+    dc, de, dg, dz = build_decoder_inputs_py(pkt_py)
+    model.eval()
+    with torch.no_grad():
+        plan = model.decode_plan(
+            torch.from_numpy(dc)[None], torch.from_numpy(de)[None],
+            torch.from_numpy(dg)[None], torch.from_numpy(dz)[None],
+        )
+        knots = torch.from_numpy(np.stack([m["knots17"] for m in pkt_py["marginals"]], axis=0))[None]
+        loadings = torch.from_numpy(pkt_py["loadings"])[None]
+        w_b = np.zeros((V8_MAX_CLASSES, p_eff), dtype=np.float32)
+        b_b = np.zeros(V8_MAX_CLASSES, dtype=np.float32)
+        o_dim = int(pkt_py["linear"]["o_dim"])
+        w_b[:o_dim, :] = pkt_py["linear"]["w"]
+        b_b[:o_dim] = pkt_py["linear"]["b"]
+        is_cont = torch.tensor([[1.0 if m["kind"] == 0 else 0.0 for m in pkt_py["marginals"]]], dtype=torch.float32)
+        zf = np.zeros((1, 24, 12), dtype=np.float32)
+        zn = np.zeros((1, 24, p_eff), dtype=np.float32)
+        yn = np.zeros((1, 24), dtype=np.float32)
+        ts = np.ones((1, 24, 1), dtype=np.float32)
+        reg_idx = np.zeros((1, 24), dtype=np.int64)
+        regs = pkt_py.get("regimes") or []
+        reg_probs = [max(float(rg["weight"]), 0.0) for rg in regs]
+        reg_sum = sum(reg_probs)
+        inv_nu = float(pkt_py["header"]["inv_nu"])
+        for ri in range(24):
+            ts[0, ri, 0] = counter_student_t_scale(707, ri, inv_nu)
+            for r in range(12):
+                zf[0, ri, r] = counter_normal(707, ri, STREAM_FACTOR, r)
+            for j in range(p_eff):
+                zn[0, ri, j] = counter_normal(707, ri, STREAM_NOISE, j)
+            yn[0, ri] = counter_normal(707, ri, STREAM_TARGET, 0)
+            if len(regs) >= 2 and reg_sum > 1e-12:
+                u_rg = min(max(counter_uniform(707, ri, STREAM_REGIME, 0), 0.0), 1.0 - 1e-15) * reg_sum
+                acc = 0.0
+                chosen = len(regs) - 1
+                for idx_r, pr in enumerate(reg_probs):
+                    acc += pr
+                    if u_rg <= acc:
+                        chosen = idx_r
+                        break
+                reg_idx[0, ri] = chosen
+        pkt_an = extract_packet_analytic_tensors(pkt_py, torch.device("cpu"))
+        dec = model.decode_batch_differentiable(
+            plan, knots, loadings, torch.from_numpy(w_b)[None], torch.from_numpy(b_b)[None],
+            torch.tensor([float(pkt_py["header"]["resid_sd"])]),
+            torch.tensor([float(pkt_py["header"]["z_max"])]),
+            is_cont, torch.ones(1, p_eff), n_rows=24, antithetic=False,
+            z_factor=torch.from_numpy(zf), z_noise=torch.from_numpy(zn), y_noise=torch.from_numpy(yn),
+            pkt_analytic=pkt_an, active_rank_v1=True,
+            t_scale_override=torch.from_numpy(ts),
+            regime_idx_override=torch.from_numpy(reg_idx) if len(regs) >= 2 else None,
+        )
+        max_dx_diff = float(np.max(np.abs(dec["x_syn"][0].numpy() - xs_rs)))
+        max_dy_diff = float(np.max(np.abs(dec["y_reg"][0].numpy() - ys_rs)))
+        assert max_dx_diff <= 1e-5, f"decode_batch_differentiable X parity diff {max_dx_diff} > 1e-5"
+        assert max_dy_diff <= 1e-5, f"decode_batch_differentiable Y parity diff {max_dy_diff} > 1e-5"
+
+
+def test_shared_fit_schema_wrapper_budget_matches_canonical_and_renamed_headers() -> None:
+    """Verify exact DPA1 schema wrapper bytes through shared Rust FFI on canonical and renamed headers."""
+    import hashlib
+    from research.levels.s3_episode_native import dpa_v8_wrapper_bytes, native_v8
+    from research.levels.v8_packet import unpack_dse8_packet_py
+
+    canon_names = [f"c{j}" for j in range(48)]
+    renamed_names = [f"measurement_{hashlib.sha256(str(j).encode()).hexdigest()[:12]}" for j in range(48)]
+    w_canon = dpa_v8_wrapper_bytes(canon_names, feature_kinds=["real"] * 48, target_name="target")
+    w_renamed = dpa_v8_wrapper_bytes(renamed_names, feature_kinds=["real"] * 48, target_name="target")
+    w_anon = dpa_v8_wrapper_bytes(renamed_names, feature_kinds=["real"] * 48, target_name="target", anonymize=True)
+    w_cls = dpa_v8_wrapper_bytes(
+        canon_names, feature_kinds=["real"] * 48, target_name="outcome",
+        target_labels=["alpha_class", "beta_class", "gamma_class"],
+    )
+    assert w_canon == 91, f"expected 91 B canonical wrapper, got {w_canon}"
+    assert w_renamed == 390, f"expected 390 B renamed wrapper, got {w_renamed}"
+    assert w_anon < w_renamed
+    assert w_cls > w_canon
+
+    rng = np.random.default_rng(174)
+    X = rng.normal(size=(128, 48)).astype(np.float32)
+    Xq = rng.normal(size=(16, 48)).astype(np.float32)
+    y = (X[:, 0] - X[:, 1] + rng.normal(size=128)).astype(np.float32)
+    ep_base = {
+        "dataset_hash": "fit-schema-test", "family_stem": "synthetic", "source_kind": "synthetic",
+        "X_fit": X, "X_qry": Xq, "y_fit": y, "y_qry": np.zeros(len(Xq), dtype=np.float32),
+        "fit_rows": np.arange(len(X), dtype=np.uint64),
+        "split_sig": "fixture-split", "view_sig": "fixture-view", "task": "regression",
+    }
+    out_canon = native_v8(ep_base, code_tier=1, reserve_dpa_wrapper=True, wrapper_bytes=w_canon)
+    ep_renamed = dict(
+        ep_base,
+        v7_schema={"feature_names": renamed_names, "feature_kinds": ["real"] * 48, "target_name": "target"},
+    )
+    out_renamed = native_v8(ep_renamed, code_tier=1, reserve_dpa_wrapper=True)
+    hdr_canon = unpack_dse8_packet_py(out_canon["packet"])["header"]
+    hdr_renamed = unpack_dse8_packet_py(out_renamed["packet"])["header"]
+    assert len(out_canon["packet"]) + w_canon <= 2048
+    assert len(out_renamed["packet"]) + w_renamed <= 2048
+    assert hdr_canon["rank_use"] == 6
+    assert hdr_renamed["rank_use"] == 5
+
+
+def test_v300_forward_incompatibility_guard(v8_emit_bin: Path, tmp_path: Path) -> None:
+    """Verify active-rank-v1 checkpoints (F32 & BF16) and packets fail closed on v3.0.0 binaries."""
+    import os
+    import struct
+
+    fx = FIXTURES[0]
+    X, y = fx["X"], fx["y"]
+    torch.manual_seed(300)
+    model = SingleEncV8(d_model=32, n_heads=4, n_enc_layers=1, n_dec_layers=1, with_owner_encoder=True)
+
+    ckpt_f32 = model.export_v8_safetensors(tmp_path / "active_f32.safetensors", dtype="f32", decoder_capability="active-rank-v1")
+    ckpt_bf16 = model.export_v8_safetensors(tmp_path / "active_bf16.safetensors", dtype="bf16", decoder_capability="active-rank-v1")
+    ckpt_hist = model.export_v8_safetensors(tmp_path / "hist_f32.safetensors", dtype="f32", decoder_capability=None)
+
+    for p_ckpt in (ckpt_f32, ckpt_bf16):
+        raw = p_ckpt.read_bytes()
+        hlen = struct.unpack("<Q", raw[:8])[0]
+        hdr = json.loads(raw[8:8 + hlen])
+        assert hdr["__metadata__"]["dope_dse8_decoder"] == "active-rank-v1"
+        assert hdr["__dope_dse8_decoder_active_rank_v1__"]["dtype"] == "U8"
+        assert hdr["__dope_dse8_decoder_active_rank_v1__"]["shape"] == [1]
+
+    raw_h = ckpt_hist.read_bytes()
+    hlen_h = struct.unpack("<Q", raw_h[:8])[0]
+    hdr_h = json.loads(raw_h[8:8 + hlen_h])
+    assert "__metadata__" not in hdr_h
+    assert "__dope_dse8_decoder_active_rank_v1__" not in hdr_h
+
+    pkt_active = fit_dse8_rust(X, y, 0, budget_bytes=2048, checkpoint=ckpt_f32, code_tier=1, seed=31, bin_path=v8_emit_bin)
+    pkt_hist = fit_dse8_rust(X, y, 0, budget_bytes=2048, checkpoint=ckpt_hist, code_tier=1, seed=31, bin_path=v8_emit_bin)
+    assert (pkt_active[10] & 0x40) != 0, "active-rank-v1 packet must set bit 0x40 outside v3.0.0 mask 0x3F"
+    assert (pkt_hist[10] & 0x40) == 0, "historical packet must leave bit 0x40 clear"
+
+    # When a real v3.0.0 binary is provided (DOPE_V300_EMIT_BIN), prove live fail-closed refusal!
+    v300_emit = os.environ.get("DOPE_V300_EMIT_BIN")
+    if v300_emit:
+        from research.levels.v8_evidence import write_dopemat
+        dm = tmp_path / "fit.mat"
+        write_dopemat(dm, X, y)
+        pkt_act_p = tmp_path / "active.dse8"
+        pkt_act_p.write_bytes(pkt_active)
+        pkt_hist_p = tmp_path / "hist.dse8"
+        pkt_hist_p.write_bytes(pkt_hist)
+
+        # v3.0.0 MUST refuse F32 active-rank-v1 checkpoint, BF16 active-rank-v1 checkpoint, AND active-rank-v1 packet!
+        for bad_ckpt in (ckpt_f32, ckpt_bf16):
+            r = subprocess.run(
+                [v300_emit, "fit", "--in", str(dm), "--task", "regression", "--budget", "2048",
+                 "--out", str(tmp_path / "out.dse8"),
+                 "--checkpoint", str(bad_ckpt), "--code-tier", "1", "--seed", "31"],
+                capture_output=True, text=True, check=False,
+            )
+            assert r.returncode != 0, f"v3.0.0 binary accepted active-rank-v1 checkpoint {bad_ckpt.name}!"
+
+        r_smp_zero = subprocess.run(
+            [v300_emit, "sample", "--model", str(pkt_act_p), "--rows", "8", "--seed", "7",
+             "--out", str(tmp_path / "syn.mat")],
+            capture_output=True, text=True, check=False,
+        )
+        assert r_smp_zero.returncode != 0, "v3.0.0 binary unpacked active-rank-v1 packet!"
+
+        # v3.0.0 MUST still accept historical checkpoint & packet cleanly!
+        r_ok = subprocess.run(
+            [v300_emit, "sample", "--model", str(pkt_hist_p), "--rows", "8", "--seed", "7",
+             "--checkpoint", str(ckpt_hist), "--out", str(tmp_path / "syn_ok.mat")],
+            capture_output=True, text=True, check=False,
+        )
+        assert r_ok.returncode == 0, f"v3.0.0 binary failed on historical packet: {r_ok.stderr}"
+
+    v300_cli = os.environ.get("DOPE_V300_BIN")
+    v31_cli = os.environ.get("DOPE_V31_BIN")
+    if v300_cli and v31_cli:
+        import csv
+        csv_p = tmp_path / "fit.csv"
+        with csv_p.open("w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow([*[f"c{j}" for j in range(X.shape[1])], "target"])
+            for row, tv in zip(X, y):
+                w.writerow([*(f"{float(v):.6f}" for v in row), f"{float(tv):.6f}"])
+        dpa_act = tmp_path / "active.dpa1"
+        dpa_hist = tmp_path / "hist.dpa1"
+        subprocess.run(
+            [v31_cli, "fit", str(csv_p), "--target", "target", "--format", "v8",
+             "--v8-weights", str(ckpt_f32), "--budget", "2048", "--seed", "31", "-o", str(dpa_act)],
+            check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
+            [v31_cli, "fit", str(csv_p), "--target", "target", "--format", "v8",
+             "--v8-weights", str(ckpt_hist), "--budget", "2048", "--seed", "31", "-o", str(dpa_hist)],
+            check=True, capture_output=True, text=True,
+        )
+        # v3.0.0 CLI MUST refuse active-rank-v1 checkpoints (F32 & BF16) and active-rank-v1 DPA1 artifacts!
+        for bad_ckpt in (ckpt_f32, ckpt_bf16):
+            r = subprocess.run(
+                [v300_cli, "fit", str(csv_p), "--target", "target", "--format", "v8",
+                 "--v8-weights", str(bad_ckpt), "--budget", "2048", "-o", str(tmp_path / "bad.dpa1")],
+                capture_output=True, text=True, check=False,
+            )
+            assert r.returncode != 0, f"v3.0.0 CLI accepted active-rank-v1 checkpoint {bad_ckpt.name}!"
+        for extra in (["--v8-zero-init"], ["--v8-weights", str(ckpt_f32)]):
+            r = subprocess.run(
+                [v300_cli, "sample", str(dpa_act), "--rows", "8", "--seed", "7",
+                 *extra, "-o", str(tmp_path / "bad_out.csv")],
+                capture_output=True, text=True, check=False,
+            )
+            assert r.returncode != 0, f"v3.0.0 CLI decoded active-rank-v1 DPA1 with {extra}!"
+        # v3.0.0 CLI MUST still decode historical DPA1 artifact cleanly!
+        r_hist = subprocess.run(
+            [v300_cli, "sample", str(dpa_hist), "--rows", "8", "--seed", "7",
+             "--v8-weights", str(ckpt_hist), "-o", str(tmp_path / "hist_out.csv")],
+            capture_output=True, text=True, check=False,
+        )
+        assert r_hist.returncode == 0, f"v3.0.0 CLI failed on historical DPA1: {r_hist.stderr}"

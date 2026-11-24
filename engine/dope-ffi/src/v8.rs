@@ -9,19 +9,20 @@
 //! `lattice_q0_unit` as the lattice step of its marginals, so meta fitted in any other unit
 //! would put decoded values off the grid.
 
-use dope_core::evidence::{
-    extract_with_rows, ColumnMeta as EvidenceMeta, EvidenceInput, EvidenceTier, RowIdentity,
-    COL_DIM, EDGE_DIM, GLOB_DIM as EV_GLOB_DIM,
-};
+use dope_core::evidence::{EvidenceTier, COL_DIM, EDGE_DIM, GLOB_DIM as EV_GLOB_DIM};
 use dope_core::marginal::column_meta::META_FIELDS;
 use dope_core::single_encoding::v8::{
-    build_decoder_inputs, fit_dse8_packet, fit_unit_meta_v2, unpack_dse8_packet, Dse8ColumnMeta,
-    Dse8FitOptions, ScaleCardV8, DEC_CODE_DIM, DEC_COL_DIM, DEC_EDGE_DIM, DEC_GLOB_DIM, MARG_CONT,
-    V8_MAX_CLASSES, V8_MAX_COLS, V8_MAX_RANK,
+    build_decoder_inputs, extract_fit_evidence_v8, fit_dse8_packet, fit_unit_meta_v2,
+    unpack_dse8_packet, Dse8ColumnMeta, Dse8FitOptions, ScaleCardV8, DEC_CODE_DIM, DEC_COL_DIM,
+    DEC_EDGE_DIM, DEC_GLOB_DIM, MARG_CONT, V8_MAX_CLASSES, V8_MAX_COLS, V8_MAX_RANK,
 };
 use dope_core::single_encoding::KNOT_COUNT;
 
-use crate::{columns, copy_input, Code, MAX_BUDGET};
+pub use crate::v8_reserved::{
+    dope_ffi_project_fit_midrank, dope_ffi_v8_episode, dope_ffi_v8_episode_prepared,
+    dope_ffi_v8_episode_reserved, dope_ffi_v8_schema_wrapper_bytes,
+};
+use crate::{columns, Code, MAX_BUDGET};
 
 /// Number of `MISC` slots. In order: resid_sd, z_max, p_eff, k_eff, x_cols_raw, task_id,
 /// rank_use, knot_level, normalized_only, packet_len, y_mean, y_sd, n_classes (the packet's
@@ -105,24 +106,6 @@ pub struct V8Episode {
     pub floats: Vec<f32>,
 }
 
-/// Target in the packet's coordinates: regression standardized by the card (clamped to +-6;
-/// `normalized_only` only clamps), classes as their index in the packet's class list, -1 for a
-/// class the packet does not carry (masked, never another class).
-fn target_code(v: f32, card: &ScaleCardV8) -> f32 {
-    if card.task_id == 0 {
-        let z = if card.normalized_only {
-            v
-        } else {
-            (v - card.y_mean) / card.y_sd.max(1e-5)
-        };
-        z.clamp(-6.0, 6.0)
-    } else {
-        card.classes
-            .binary_search(&(v.round() as i32))
-            .map_or(-1.0, |k| k as f32)
-    }
-}
-
 fn fit_card(
     x_raw: &[Vec<f64>],
     y_raw: &[f64],
@@ -193,11 +176,90 @@ pub fn v8_episode_rows(
     seed: u64,
     fit_row_ids: Option<&[u64]>,
 ) -> Result<V8Episode, Code> {
+    v8_episode_with_reserve(
+        x_fit,
+        n_fit,
+        p,
+        y_fit,
+        x_qry,
+        n_qry,
+        y_qry,
+        task,
+        budget,
+        normalized_only,
+        tier,
+        seed,
+        fit_row_ids,
+        0,
+        false,
+    )
+}
+
+/// Shared native V8 episode builder with optional exact neural code-tier + DPA wrapper reservation.
+#[allow(clippy::too_many_arguments)]
+pub fn v8_episode_with_reserve(
+    x_fit: &[f32],
+    n_fit: usize,
+    p: usize,
+    y_fit: &[f32],
+    x_qry: &[f32],
+    n_qry: usize,
+    y_qry: &[f32],
+    task: u8,
+    budget: usize,
+    normalized_only: bool,
+    tier: u8,
+    seed: u64,
+    fit_row_ids: Option<&[u64]>,
+    code_tier: u8,
+    reserve_dpa_wrapper: bool,
+) -> Result<V8Episode, Code> {
+    v8_episode_prepared(
+        x_fit,
+        n_fit,
+        p,
+        y_fit,
+        x_qry,
+        n_qry,
+        y_qry,
+        task,
+        budget,
+        normalized_only,
+        tier,
+        seed,
+        fit_row_ids,
+        code_tier,
+        reserve_dpa_wrapper,
+        0,
+    )
+}
+
+/// Shared native V8 episode builder with exact neural code-tier + real `V7Schema` wrapper bytes.
+#[allow(clippy::too_many_arguments)]
+pub fn v8_episode_prepared(
+    x_fit: &[f32],
+    n_fit: usize,
+    p: usize,
+    y_fit: &[f32],
+    x_qry: &[f32],
+    n_qry: usize,
+    y_qry: &[f32],
+    task: u8,
+    budget: usize,
+    normalized_only: bool,
+    tier: u8,
+    seed: u64,
+    fit_row_ids: Option<&[u64]>,
+    code_tier: u8,
+    reserve_dpa_wrapper: bool,
+    wrapper_bytes_override: usize,
+) -> Result<V8Episode, Code> {
     let shape_ok = p > 0
         && p <= u16::MAX as usize
         && n_fit >= 4
         && task <= 2
         && tier <= 2
+        && code_tier <= 3
         && budget > 0
         && budget <= MAX_BUDGET as usize
         && x_fit.len() == n_fit * p
@@ -217,12 +279,26 @@ pub fn v8_episode_rows(
     // FIT-only meta in the packet's unit space, shared with every other DSE8 fit path.
     let meta = fit_unit_meta_v2(&x_raw, &y_raw, task, normalized_only).map_err(|_| Code::Fit)?;
     let dse8_meta: Vec<Dse8ColumnMeta> = meta.iter().map(Dse8ColumnMeta::from).collect();
+    let dpa_overhead = if wrapper_bytes_override > 0 {
+        wrapper_bytes_override
+    } else if reserve_dpa_wrapper {
+        dope_core::auto::v8_dpa::estimate_dpa_v8_wrapper_bytes(&x_raw, &y_raw, task)
+    } else {
+        0
+    };
+    let eff_budget = budget
+        .checked_sub(dpa_overhead)
+        .filter(|&b| b >= 128)
+        .ok_or(Code::Shape)?;
 
     let opts = Dse8FitOptions {
         task_id: task,
-        budget_bytes: budget,
+        budget_bytes: eff_budget,
         normalized_only,
+        code_tier,
+        reserve_neural_code: code_tier > 0,
         col_meta: Some(&dse8_meta),
+        fit_row_ids,
         seed,
         ..Dse8FitOptions::default()
     };
@@ -240,11 +316,10 @@ pub fn v8_episode_rows(
     }
 
     let x_unit_fit = card.forward_x(&x_raw);
-    let y_codes_fit: Vec<f32> = y_fit.iter().map(|&v| target_code(v, &card)).collect();
-
-    // Evidence on the packet's active columns and the FIT rows whose target the packet carries.
-    let keep: Vec<usize> = (0..n_fit)
-        .filter(|&i| y_codes_fit[i] >= 0.0 || task == 0)
+    let (ev_y, keep) = card.forward_y(&y_raw);
+    let y_codes_fit: Vec<f32> = y_raw
+        .iter()
+        .map(|&v| card.forward_y_one(v).map_or(-1.0, |ys| ys as f32))
         .collect();
     if keep.len() < 4 {
         return Err(Code::Target);
@@ -253,46 +328,23 @@ pub fn v8_episode_rows(
         .iter()
         .map(|col| keep.iter().map(|&i| col[i]).collect())
         .collect();
-    let ev_raw: Vec<Vec<f64>> = card
-        .col_indices
-        .iter()
-        .map(|&j| keep.iter().map(|&i| x_raw[j][i]).collect())
-        .collect();
-    let ev_y: Vec<f64> = keep.iter().map(|&i| y_codes_fit[i] as f64).collect();
-    let ev_meta: Vec<EvidenceMeta> = card
-        .col_indices
-        .iter()
-        .map(|&j| EvidenceMeta::from(&dse8_meta[j]))
-        .collect();
+    let active_meta: Vec<Dse8ColumnMeta> = card.col_indices.iter().map(|&j| dse8_meta[j]).collect();
     let tier_enum = match tier {
         0 => EvidenceTier::T0,
         1 => EvidenceTier::T1,
         _ => EvidenceTier::T2,
     };
-    let n_classes = match task {
-        0 => 1,
-        1 => 2,
-        _ => card.classes.len().clamp(2, V8_MAX_CLASSES),
-    };
-    let ev_ids: Option<Vec<u64>> = fit_row_ids.map(|ids| keep.iter().map(|&i| ids[i]).collect());
-    let rows = ev_ids.as_deref().map(|row_ids| RowIdentity {
-        row_ids,
-        group_ids: None,
-    });
-    let ev = extract_with_rows(
-        &EvidenceInput {
-            x_unit: &ev_unit,
-            x_raw: Some(&ev_raw),
-            y: &ev_y,
-            task_id: task,
-            n_classes,
-            col_meta: Some(&ev_meta),
-            packet_probe: None,
-            tier: tier_enum,
-            target_free: false,
-            seed,
-        },
-        rows,
+    let ev = extract_fit_evidence_v8(
+        &x_raw,
+        &ev_unit,
+        &ev_y,
+        &keep,
+        &card,
+        Some(&active_meta),
+        tier_enum,
+        seed,
+        fit_row_ids,
+        true,
     )
     .map_err(|_| Code::Fit)?;
     if ev.p != p_eff || ev.col.len() != p_eff || ev.edge.len() != p_eff * p_eff {
@@ -363,11 +415,7 @@ pub fn v8_episode_rows(
         put_unit_rows(&mut out[at..at + n_qry * width], &x_unit_qry, n_qry, width);
         at += n_qry * width;
         for (i, &v) in y_qry.iter().enumerate() {
-            out[at + i] = if v.is_finite() {
-                target_code(v, &card)
-            } else {
-                -1.0
-            };
+            out[at + i] = card.forward_y_one(v as f64).map_or(-1.0, |ys| ys as f32);
         }
     }
     Ok(V8Episode {
@@ -395,93 +443,4 @@ pub extern "C" fn dope_ffi_v8_len(p: u32, n_fit: u32, n_qry: u32) -> u64 {
 pub extern "C" fn dope_ffi_v8_offset(block: u32, p: u32) -> u64 {
     let off = offsets(p_cap(p as usize));
     off.get(block as usize).map_or(u64::MAX, |&v| v as u64)
-}
-
-/// # Safety
-/// Same buffer contract as `dope_ffi_dse7_episode`; `out_f32_cap` must be at least
-/// `dope_ffi_v8_len(p, n_fit, n_qry)`. Each input is an aligned, initialized range within one
-/// live allocation and stays immutable for the call. The output ranges are writable and do not
-/// overlap any input or each other. `fit_row_ids` is null or `n_fit` distinct stable physical ids
-/// of the FIT rows (ABI 4), see [`v8_episode_rows`].
-#[no_mangle]
-#[allow(clippy::too_many_arguments)]
-pub unsafe extern "C" fn dope_ffi_v8_episode(
-    x_fit: *const f32,
-    n_fit: u32,
-    p: u32,
-    y_fit: *const f32,
-    x_qry: *const f32,
-    n_qry: u32,
-    y_qry: *const f32,
-    task: u8,
-    budget: u32,
-    normalized_only: u8,
-    tier: u8,
-    seed: u64,
-    fit_row_ids: *const u64,
-    out_f32: *mut f32,
-    out_f32_cap: u64,
-    out_packet: *mut u8,
-    out_packet_cap: u32,
-    out_packet_len: *mut u32,
-) -> i32 {
-    let qry_missing = n_qry > 0 && (x_qry.is_null() || y_qry.is_null());
-    if x_fit.is_null()
-        || y_fit.is_null()
-        || qry_missing
-        || out_f32.is_null()
-        || out_packet.is_null()
-        || out_packet_len.is_null()
-    {
-        return Code::NullPointer as i32;
-    }
-    let (n_fit, p, n_qry) = (n_fit as usize, p as usize, n_qry as usize);
-    let (Some(cells), Some(qry_cells)) = (n_fit.checked_mul(p), n_qry.checked_mul(p)) else {
-        return Code::Shape as i32;
-    };
-    if (out_f32_cap as usize) < total(p, n_fit, n_qry) {
-        return Code::Capacity as i32;
-    }
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        // SAFETY: FIT pointers were checked for null. The caller guarantees both source ranges.
-        let (xf, yf) = unsafe { (copy_input(x_fit, cells)?, copy_input(y_fit, n_fit)?) };
-        // SAFETY: the caller guarantees the query ranges. Nonempty query pointers were checked
-        // for null, and copy_input never dereferences a pointer for an empty range.
-        let (xq, yq) = unsafe { (copy_input(x_qry, qry_cells)?, copy_input(y_qry, n_qry)?) };
-        // SAFETY: a non-null id pointer covers n_fit values by the caller's contract.
-        let ids = (!fit_row_ids.is_null())
-            .then(|| unsafe { copy_input(fit_row_ids, n_fit) })
-            .transpose()?;
-        v8_episode_rows(
-            &xf,
-            n_fit,
-            p,
-            &yf,
-            &xq,
-            n_qry,
-            &yq,
-            task,
-            budget as usize,
-            normalized_only != 0,
-            tier,
-            seed,
-            ids.as_deref(),
-        )
-    }));
-    match result {
-        Err(_) => Code::Panic as i32,
-        Ok(Err(code)) => code as i32,
-        Ok(Ok(ep)) => {
-            if ep.packet.len() > out_packet_cap as usize {
-                return Code::Capacity as i32;
-            }
-            // SAFETY: capacities were checked against the written lengths.
-            unsafe {
-                std::ptr::copy_nonoverlapping(ep.floats.as_ptr(), out_f32, ep.floats.len());
-                std::ptr::copy_nonoverlapping(ep.packet.as_ptr(), out_packet, ep.packet.len());
-                *out_packet_len = ep.packet.len() as u32;
-            }
-            Code::Ok as i32
-        }
-    }
 }

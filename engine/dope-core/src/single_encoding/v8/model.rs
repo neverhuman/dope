@@ -1,12 +1,12 @@
-//! Pure-Rust F32 `rank <= 2` SafeTensors inference runtime for `SingleEncV8`.
+//! Pure-Rust F32/BF16 `rank <= 2` SafeTensors inference runtime for `SingleEncV8` (`<= 1 GiB`).
 //!
 //! Zero Python, zero ONNX, zero LibTorch. Implements exact 1:1 parity with PyTorch
 //! `research/levels/v8_single_encoding.py`:
 //! - `PairSplitAttnBlock`: Pre-LN split-QKV multi-head attention with pairwise edge bias + GELU FFN.
 //! - Optional Owner Evidence Encoder (`enc_*`): consumes `(col [P, 128], edge [P, P, 16], glob [160])`
-//!   -> emits nested FSQ code `Z` (`<= 256` dims in `[-1, 1]`) and allocation utility bias.
+//!   -> emits nested FSQ code `Z` (`64 / 128 / 256` dims in `[-1, 1]`, Tiers 1/2/3 = `32/64/128 B`).
 //! - Source-free Receiver Decoder (`dec_*`): consumes dequantized `DSE8` packet features
-//!   `(col [P, 48], edge [P, P, 4], glob [32], code [64])` -> emits zero-init-safe `NeuralPlanV8`:
+//!   `(col [P, 48], edge [P, P, 4], glob [32], code [64|128|256])` -> emits zero-init-safe `NeuralPlanV8`:
 //!   - Knot & loading shrinkage residuals,
 //!   - 2-layer row-local RealNVP affine coupling flow on `z_lat`,
 //!   - Soft-NODE (`T = 8`, depth `D = 3`, exact closed-form `entmax_1.5`),
@@ -21,8 +21,9 @@ use crate::error::{DopeError, Result};
 use crate::evidence::{
     Evidence, COL_DIM as EV_COL_DIM, EDGE_DIM as EV_EDGE_DIM, GLOB_DIM as EV_GLOB_DIM,
 };
+pub use crate::single_encoding::safetensors::ACTIVE_RANK_V1_MARKER_TENSOR;
 use crate::single_encoding::safetensors::{
-    parse_f32_rank2_safetensors_with_metadata, take_layernorm, take_linear, LayerNorm, Linear,
+    parse_rank2_safetensors_v8_with_meta, take_layernorm, take_linear, LayerNorm, Linear,
 };
 use crate::single_encoding::KNOT_COUNT;
 use sha2::{Digest, Sha256};
@@ -32,18 +33,21 @@ pub use super::model_ops::{
     apply_row_local_flow, build_decoder_inputs, entmax_15, eval_neural_target_residual,
 };
 
+/// The SafeTensors metadata is covered by the packet's existing weight fingerprint.
+pub const DECODER_CAPABILITY_KEY: &str = "dope_dse8_decoder";
+pub const ACTIVE_RANK_V1: &str = "active-rank-v1";
+pub const DECODER_ACTIVE_RANK_V1: &str = ACTIVE_RANK_V1;
+
 pub const DEC_COL_DIM: usize = 48;
 pub const DEC_EDGE_DIM: usize = 4;
 pub const DEC_GLOB_DIM: usize = 32;
 pub const DEC_CODE_DIM: usize = 64;
+pub const DEC_CODE_MAX_DIM: usize = 256;
 pub const NODE_TREES: usize = 8;
 pub const NODE_DEPTH: usize = 3;
 pub const NODE_LEAVES: usize = 8;
 pub const BILIN_RANK: usize = 4;
 pub const FLOW_HIDDEN: usize = 16;
-/// The SafeTensors metadata is covered by the packet's existing weight fingerprint.
-pub const DECODER_CAPABILITY_KEY: &str = "dope_dse8_decoder";
-pub const ACTIVE_RANK_V1: &str = "active-rank-v1";
 
 /// Optional Owner Evidence Encoder (`enc_*` prefix in SafeTensors).
 #[derive(Clone, Debug)]
@@ -53,17 +57,18 @@ struct OwnerEncoderV8 {
     glob_in: Linear,
     blocks: Vec<PairSplitAttnBlock>,
     final_norm: LayerNorm,
-    code_head: Linear, // d_model -> 64..256
+    code_head: Linear, // d_model -> 64|128|256
 }
 
-/// Pure-Rust `SingleEncV8` model weights (strictly F32, `rank <= 2`, `<= 16 MiB`).
+/// Pure-Rust `SingleEncV8` model weights (`F32` or `BF16`, `rank <= 2`, `<= 1 GiB`).
 #[derive(Clone, Debug)]
 pub struct SingleEncV8Weights {
     pub d_model: usize,
     pub n_heads: usize,
     pub n_dec_layers: usize,
+    pub code_dim: usize,
+    pub active_rank_v1: bool,
     sha256: [u8; 32],
-    pub(super) active_rank_mask: bool,
     owner_enc: Option<OwnerEncoderV8>,
     dec_col_in: Linear,
     dec_glob_in: Linear,
@@ -108,22 +113,58 @@ pub struct NeuralPlanV8 {
     pub flow_s: Vec<[f32; 2]>,
     pub flow_t: Vec<[f32; 2]>,
     pub is_identity: bool,
+    pub active_rank_v1: bool,
 }
 
 impl SingleEncV8Weights {
-    /// Fail-closed parser for canonical F32 `rank <= 2` SafeTensors (`<= 16 MiB`).
+    /// Fail-closed parser for `SingleEncV8` SafeTensors (`F32` or `BF16`, `rank <= 2`, `<= 1 GiB`)
+    /// with automatic attention-head inference from `dec_blocks.0.edge_proj.weight`.
+    pub fn from_safetensors_auto(bytes: &[u8]) -> Result<Self> {
+        Self::from_safetensors_bytes(bytes, 0)
+    }
+
+    /// Fail-closed parser for `SingleEncV8` SafeTensors (`F32` or `BF16`, `rank <= 2`, `<= 1 GiB`).
+    /// Pass `n_heads == 0` to auto-infer `n_heads` from `edge_proj.weight`.
     pub fn from_safetensors_bytes(bytes: &[u8], n_heads: usize) -> Result<Self> {
-        let (tensors, metadata) = parse_f32_rank2_safetensors_with_metadata(bytes)?;
-        let active_rank_mask = match metadata.get(DECODER_CAPABILITY_KEY) {
-            None => false,
-            Some(value) if value.as_str() == Some(ACTIVE_RANK_V1) => true,
-            Some(_) => return Err(DopeError::Artifact("v8_unknown_decoder_capability".into())),
+        let (tensors, metadata, has_active_rank_marker) =
+            parse_rank2_safetensors_v8_with_meta(bytes)?;
+        let active_rank_v1 = match (
+            metadata.get(DECODER_CAPABILITY_KEY).map(String::as_str),
+            has_active_rank_marker,
+        ) {
+            (None, false) => false,
+            (Some(DECODER_ACTIVE_RANK_V1), true) => true,
+            (Some(DECODER_ACTIVE_RANK_V1), false) => {
+                return Err(DopeError::Artifact(
+                    "v8 active-rank-v1 checkpoint missing required U8 guard tensor".into(),
+                ));
+            }
+            (None, true) => {
+                return Err(DopeError::Artifact(
+                    "v8 active-rank-v1 marker requires matching dope_dse8_decoder metadata".into(),
+                ));
+            }
+            (Some(_), _) => {
+                return Err(DopeError::Artifact(
+                    "v8 unsupported dope_dse8_decoder capability".into(),
+                ));
+            }
         };
         let dec_col_in = take_linear(&tensors, "dec_col_in", Some(DEC_COL_DIM), None)?;
         let d_model = dec_col_in.out_dim;
-        if n_heads == 0 || !d_model.is_multiple_of(n_heads) {
+        let inferred_heads = if n_heads > 0 {
+            n_heads
+        } else {
+            tensors
+                .get("dec_blocks.0.edge_proj.weight")
+                .or_else(|| tensors.get("enc_blocks.0.edge_proj.weight"))
+                .and_then(|(s, _)| s.first().copied())
+                .unwrap_or(4)
+        };
+        if inferred_heads == 0 || !d_model.is_multiple_of(inferred_heads) {
             return Err(DopeError::Artifact("v8 invalid n_heads for d_model".into()));
         }
+        let n_heads = inferred_heads;
 
         // Optional Owner Evidence Encoder (`enc_*`)
         let owner_enc = if tensors.contains_key("enc_col_in.weight") {
@@ -156,7 +197,13 @@ impl SingleEncV8Weights {
         };
 
         let dec_glob_in = take_linear(&tensors, "dec_glob_in", Some(DEC_GLOB_DIM), Some(d_model))?;
-        let dec_code_in = take_linear(&tensors, "dec_code_in", Some(DEC_CODE_DIM), Some(d_model))?;
+        let dec_code_in = take_linear(&tensors, "dec_code_in", None, Some(d_model))?;
+        let code_dim = dec_code_in.in_dim;
+        if !matches!(code_dim, 64 | 128 | 256) {
+            return Err(DopeError::Artifact(format!(
+                "v8 dec_code_in in_dim must be 64, 128, or 256, got {code_dim}"
+            )));
+        }
         let mut dec_blocks = Vec::new();
         let mut idx = 0usize;
         while tensors.contains_key(&format!("dec_blocks.{idx}.q_proj.weight")) {
@@ -207,8 +254,9 @@ impl SingleEncV8Weights {
             d_model,
             n_heads,
             n_dec_layers: dec_blocks.len(),
+            code_dim,
+            active_rank_v1,
             sha256: Sha256::digest(bytes).into(),
-            active_rank_mask,
             owner_enc,
             dec_col_in,
             dec_glob_in,
@@ -235,6 +283,15 @@ impl SingleEncV8Weights {
         self.sha256
     }
 
+    /// Preferred nested FSQ code tier matching `dec_code_in.in_dim` (`64->1, 128->2, 256->3`).
+    pub fn preferred_code_tier(&self) -> u8 {
+        match self.code_dim {
+            256 => 3,
+            128 => 2,
+            _ => 1,
+        }
+    }
+
     /// 8-byte decoder weights fingerprint stored in `TAG_WEIGHTS_FP` for fail-closed identity checks.
     pub fn fingerprint(&self) -> [u8; 8] {
         let mut fp = [0u8; 8];
@@ -243,8 +300,8 @@ impl SingleEncV8Weights {
     }
 
     pub(super) fn loading_rank(&self, packet: &Dse8Packet) -> usize {
-        if self.active_rank_mask {
-            usize::from(packet.header.rank_use)
+        if self.active_rank_v1 {
+            usize::from(packet.header.rank_use).min(V8_MAX_RANK)
         } else {
             V8_MAX_RANK
         }
@@ -282,7 +339,8 @@ impl SingleEncV8Weights {
     pub fn build_neural_plan(&self, pkt: &Dse8Packet) -> NeuralPlanV8 {
         let p = pkt.header.p_eff as usize;
         let o_dim = pkt.linear.o_dim;
-        let (col_feats, edge_feats, glob_feats, code_feats) = build_decoder_inputs(pkt);
+        let (col_feats, edge_feats, glob_feats, _) = build_decoder_inputs(pkt);
+        let code_feats = pkt.code.dequantize(self.code_dim);
 
         let g_tok = self.dec_glob_in.forward_vec(&glob_feats);
         let z_tok = self.dec_code_in.forward_vec(&code_feats);
@@ -316,7 +374,6 @@ impl SingleEncV8Weights {
         let mut flow_t = vec![[0.0f32; 2]; p];
         let mut max_effect = 0.0f32;
         let rank = self.loading_rank(pkt);
-
         for c in 0..p {
             let dk = self.delta_knots.forward_vec(&h[c]);
             for k in 0..KNOT_COUNT {
@@ -413,6 +470,7 @@ impl SingleEncV8Weights {
             flow_s,
             flow_t,
             is_identity: max_effect < 1e-7,
+            active_rank_v1: self.active_rank_v1,
         }
     }
 }

@@ -59,6 +59,15 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     shared_vram_gb = float(getattr(args, "allow_shared_gpu_vram_gb", 0.0) or 0.0)
     check_cuda_exclusive_guard(args.device, shared_vram_gb=shared_vram_gb)
     device = torch.device(args.device)
+    deterministic = bool(getattr(args, "deterministic", False))
+    no_tf32 = bool(getattr(args, "no_tf32", False))
+    if deterministic:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        torch.use_deterministic_algorithms(True, warn_only=True)
+    if no_tf32 and device.type == "cuda":
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
     use_amp = bool(getattr(args, "amp", False)) and device.type == "cuda"
     amp_dtype = torch.bfloat16 if (use_amp and torch.cuda.is_bf16_supported()) else torch.float16
     torch.manual_seed(args.seed)
@@ -69,14 +78,35 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         "n_heads": args.n_heads,
         "n_enc_layers": args.n_enc_layers,
         "n_dec_layers": args.n_dec_layers,
-        "code_dim": int(getattr(args, "code_dim", DEC_CODE_DIM)),
+        "code_dim": int(getattr(args, "code_dim", DEC_CODE_DIM) or DEC_CODE_DIM),
         "with_owner_encoder": not args.decoder_only,
+        "ff_mult": int(getattr(args, "ff_mult", 2) or 2),
+    }
+    export_dtype = str(getattr(args, "export_dtype", "f32") or "f32")
+    no_delta_w = bool(getattr(args, "no_delta_w", False))
+    historical_forward = bool(getattr(args, "historical_forward", False))
+    all_rank_norm = bool(getattr(args, "all_rank_norm", False)) or historical_forward
+    active_rank_v1 = not all_rank_norm
+    dec_cap = None if all_rank_norm else "active-rank-v1"
+    run_flags = {
+        "no_delta_w": no_delta_w,
+        "historical_forward": historical_forward,
+        "all_rank_norm": all_rank_norm,
+        "deterministic": deterministic,
+        "no_tf32": no_tf32,
     }
     model = SingleEncV8(**cfg).to(device)
     init_from = str(getattr(args, "init_from", "") or "")
     if init_from:
         from safetensors.torch import load_file as _st_load
         model.load_state_dict(_st_load(init_from, device=str(device)), strict=False)
+    if no_delta_w:
+        with torch.no_grad():
+            model.delta_W.weight.zero_()
+            model.delta_W.bias.zero_()
+        for name, p in model.named_parameters():
+            if name.startswith("delta_W."):
+                p.requires_grad_(False)
     if bool(getattr(args, "freeze_target_heads", False)):
         for name, p in model.named_parameters():
             if any(name.startswith(pfx) for pfx in ("delta_W.", "node_", "bilin_", "gate_head.")):
@@ -131,13 +161,29 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     ckpt_path = out_dir / "latest.pt"
     if args.resume and ckpt_path.is_file():
         ck = torch.load(ckpt_path, map_location=device, weights_only=False)
+        saved_flags = ck.get("run_flags")
+        if isinstance(saved_flags, dict):
+            for fk, fv in run_flags.items():
+                if fk in saved_flags and bool(saved_flags[fk]) != bool(fv):
+                    raise ValueError(
+                        f"resume flag mismatch on {fk}: checkpoint={saved_flags[fk]} vs current={fv}"
+                    )
         model.load_state_dict(ck["model"])
         optimizer.load_state_dict(ck["optimizer"])
         if ck.get("scheduler") is not None:
             scheduler.load_state_dict(ck["scheduler"])
         emas = ck["emas"]
+        if no_delta_w:
+            for dname in ("delta_W.weight", "delta_W.bias"):
+                if float(model.state_dict()[dname].detach().abs().max().item()) != 0.0:
+                    raise ValueError(f"resumed model has non-zero {dname} under --no-delta-w")
+                for decay_s, ema_st in emas.items():
+                    if float(ema_st[dname].detach().abs().max().item()) != 0.0:
+                        raise ValueError(f"resumed EMA {decay_s} has non-zero {dname} under --no-delta-w")
         start_step = int(ck["step"])
         torch.set_rng_state(ck["rng_state"]["torch"].cpu())
+        if device.type == "cuda" and ck["rng_state"].get("cuda") is not None:
+            torch.cuda.set_rng_state(ck["rng_state"]["cuda"].cpu(), device=device)
         np_rng.bit_generator.state = ck["rng_state"]["numpy"]
 
     sync_dir = str(getattr(args, "sync_dir", "") or "")
@@ -156,6 +202,12 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             float(getattr(args, "sync_outer_momentum", 0.70)),
             base_round=0, worker_id=str(getattr(args, "run_name", "v8_w0")),
         )
+        if no_delta_w:
+            with torch.no_grad():
+                model.delta_W.weight.zero_()
+                model.delta_W.bias.zero_()
+                ema_proxy.delta_W.weight.zero_()
+                ema_proxy.delta_W.bias.zero_()
         emas["0.999"] = copy.deepcopy(ema_proxy.state_dict())
 
     t0 = time.monotonic()
@@ -172,7 +224,9 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
     alpha_floor_w = float(getattr(args, "alpha_floor_weight", 0.05) or 0.05)
     resid_cond_w = float(getattr(args, "resid_cond_weight", 0.0) or 0.0)
 
-    for step in range(start_step + 1, args.steps + 1):
+    stop_at = int(getattr(args, "stop_at_step", 0) or 0)
+    end_step = min(args.steps, stop_at) if stop_at > 0 else args.steps
+    for step in range(start_step + 1, end_step + 1):
         if args.max_wall_s > 0 and (time.monotonic() - t0) >= args.max_wall_s:
             break
         model.train()
@@ -229,19 +283,27 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                         cur_a_floor = 0.2 * alpha_floor
                     plan = dict(plan)
                     plan["alpha_table"] = torch.clamp(raw_alpha, min=cur_a_floor)
+                pkt_an = None if historical_forward else td.get("pkt_analytic")
                 dec = model.decode_batch_differentiable(
                     plan,
                     td["knots"][None], td["loadings"][None], td["W_base"][None], td["b_base"][None],
                     td["resid_sd"][None], td["z_max"][None], td["is_cont"][None], col_mask,
-                    n_rows=args.n_syn, antithetic=True,
+                    n_rows=args.n_syn, antithetic=True, pkt_analytic=pkt_an,
+                    active_rank_v1=active_rank_v1,
                 )
                 xq_clean = torch.nan_to_num(td["X_qry"], nan=0.0)
+                zq_in = None if historical_forward else (td["z_qry"][None] if "z_qry" in td else None)
+                knots_q = None if historical_forward else td["knots"][None]
+                zmax_q = None if historical_forward else td["z_max"][None]
                 logits_qry = model.predict_target_on_x(
-                    plan, td["W_base"][None], td["b_base"][None], xq_clean[None]
+                    plan, td["W_base"][None], td["b_base"][None], xq_clean[None],
+                    z_in=zq_in, base_knots=knots_q, z_max=zmax_q, pkt_analytic=pkt_an,
                 )[0]
                 loss_w = {
                     "direct_cond": float(getattr(args, "direct_cond_weight", 0.60)),
                     "anchor": float(getattr(args, "anchor_weight", 0.15)),
+                    "anchor_nl": float(getattr(args, "anchor_nonlinear_weight", 0.40)),
+                    "joint_swd": float(getattr(args, "joint_swd_weight", 0.0)),
                 }
                 ld = compute_v8_episode_loss(
                     dec["x_syn"][0], dec["logits"][0], dec["y_reg"][0], dec["resid_sd_eff"][0],
@@ -259,11 +321,22 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                     plan_nl = dict(plan)
                     plan_nl["delta_W"] = torch.zeros_like(plan["delta_W"])
                     logits_nl = model.predict_target_on_x(
-                        plan_nl, td["W_base"][None].detach(), td["b_base"][None].detach(), xq_clean[None]
+                        plan_nl, td["W_base"][None].detach(), td["b_base"][None].detach(), xq_clean[None],
+                        z_in=zq_in, base_knots=knots_q, z_max=zmax_q, pkt_analytic=pkt_an,
                     )[0]
-                    l_resid_nl = loss_direct_conditional_nll(
-                        logits_nl, dec["resid_sd_eff"][0].detach(), td["y_qry"], td["task_id"], td["n_classes"]
-                    )
+                    yq_raw = td["y_qry"]
+                    if td["task_id"] == 0:
+                        vq = torch.isfinite(yq_raw)
+                    else:
+                        k_lim = 2 if td["task_id"] == 1 else max(2, min(int(td["n_classes"]), logits_nl.shape[-1]))
+                        vq = torch.isfinite(yq_raw) & (yq_raw >= 0.0) & (yq_raw < float(k_lim))
+                    if int(vq.sum().item()) >= 4:
+                        l_resid_nl = loss_direct_conditional_nll(
+                            logits_nl[vq], dec["resid_sd_eff"][0].detach(), yq_raw[vq],
+                            td["task_id"], td["n_classes"],
+                        )
+                    else:
+                        l_resid_nl = l_aux.new_tensor(0.0)
                 else:
                     l_resid_nl = l_aux.new_tensor(0.0)
                 ep_tot = ld["total"] + l_aux + l_a_pen + resid_cond_w * l_resid_nl
@@ -297,21 +370,6 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
             continue
         non_finite_streak = 0
 
-        if args.use_asam and (step % max(args.asam_every, 1) == 0):
-            rho = 0.02
-            with torch.no_grad():
-                e_ws = []
-                for p in model.parameters():
-                    if p.grad is None:
-                        e_ws.append(None)
-                        continue
-                    ew = (rho * (p.abs() + 1e-3) * p.grad) / max(grad_norm, 1e-6)
-                    p.add_(ew)
-                    e_ws.append(ew)
-                for p, ew in zip(model.parameters(), e_ws):
-                    if ew is not None:
-                        p.sub_(ew)
-
         optimizer.step()
         scheduler.step()
         for decay_s, ema_st in emas.items():
@@ -327,6 +385,12 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
                 float(getattr(args, "sync_outer_momentum", 0.70)),
                 base_round=sync_round, worker_id=str(getattr(args, "run_name", "v8_w0")),
             )
+            if no_delta_w:
+                with torch.no_grad():
+                    model.delta_W.weight.zero_()
+                    model.delta_W.bias.zero_()
+                    ema_proxy.delta_W.weight.zero_()
+                    ema_proxy.delta_W.bias.zero_()
             emas["0.999"] = copy.deepcopy(ema_proxy.state_dict())
 
         bilin_norm = float(
@@ -350,18 +414,35 @@ def train_v8(args: argparse.Namespace, episode_provider: Any | None = None) -> d
         with log_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec) + "\n")
 
-        if args.save_every > 0 and (step % args.save_every == 0 or step == args.steps):
+        if args.save_every > 0 and (step % args.save_every == 0 or step == end_step):
+            rng_payload: dict[str, Any] = {
+                "torch": torch.get_rng_state(),
+                "numpy": np_rng.bit_generator.state,
+            }
+            if device.type == "cuda":
+                rng_payload["cuda"] = torch.cuda.get_rng_state(device=device)
             save_full_checkpoint(
-                ckpt_path, model, optimizer, scheduler, emas, step,
-                {"torch": torch.get_rng_state(), "numpy": np_rng.bit_generator.state}, cfg,
+                ckpt_path, model, optimizer, scheduler, emas, step, rng_payload, cfg,
+                run_flags=run_flags,
             )
         if ckpt_every > 0 and (step % ckpt_every == 0):
             ckpt_dir = out_dir / "checkpoints"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
-            _export_state_dict_safetensors(cfg, emas["0.999"], ckpt_dir / f"step_{step:06d}_ema.safetensors")
+            _export_state_dict_safetensors(
+                cfg, emas["0.999"], ckpt_dir / f"step_{step:06d}_ema.safetensors",
+                dtype=export_dtype, decoder_capability=dec_cap, assert_zero_delta_w=no_delta_w,
+            )
 
-    st_path = model.export_v8_safetensors(out_dir / "model_v8.safetensors")
-    _export_state_dict_safetensors(cfg, emas["0.999"], out_dir / "model_v8_ema.safetensors")
+    st_path = model.export_v8_safetensors(
+        out_dir / "model_v8.safetensors",
+        dtype=export_dtype,
+        decoder_capability=dec_cap,
+        assert_zero_delta_w=no_delta_w,
+    )
+    _export_state_dict_safetensors(
+        cfg, emas["0.999"], out_dir / "model_v8_ema.safetensors",
+        dtype=export_dtype, decoder_capability=dec_cap, assert_zero_delta_w=no_delta_w,
+    )
     return {
         "steps_done": steps_done,
         "last_step": metrics_last.get("step", start_step),
@@ -396,8 +477,27 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--code-dim",
         type=int,
         default=DEC_CODE_DIM,
-        help="learned FSQ code width; the wire and the Rust receiver use the default (64 values = 32 B), "
+        help="learned FSQ code width; native wire Tiers 1/2/3 use 64/128/256 (32/64/128 B), "
         "other widths are research-only capacity/channel probes",
+    )
+    ap.add_argument("--ff-mult", type=int, default=2)
+    ap.add_argument("--export-dtype", type=str, default="f32", choices=["f32", "bf16"])
+    ap.add_argument(
+        "--all-rank-norm",
+        action="store_true",
+        help="use historical 12-rank loading normalization and omit dope_dse8_decoder=active-rank-v1 metadata",
+    )
+    ap.add_argument(
+        "--historical-forward",
+        action="store_true",
+        help="reproduce pre-parity training forward (no packet analytic/typed-marginal/FIT-midrank terms, "
+        "all-12-rank loading norm, omits active-rank-v1 metadata and marker tensor)",
+    )
+    ap.add_argument(
+        "--no-delta-w",
+        action="store_true",
+        help="zero and freeze delta_W linear correction head while keeping feature, nonlinear, and residual-scale "
+        "heads matched; asserted exact zero on every SafeTensors export",
     )
     ap.add_argument("--use-rust-packet", action="store_true")
     ap.add_argument("--budget-bytes", type=int, default=2048)
@@ -409,6 +509,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--grad-clip", type=float, default=1.0)
     ap.add_argument("--direct-cond-weight", type=float, default=0.60)
     ap.add_argument("--anchor-weight", type=float, default=0.15)
+    ap.add_argument("--anchor-nonlinear-weight", type=float, default=0.40)
+    ap.add_argument("--joint-swd-weight", type=float, default=0.0)
     ap.add_argument("--alpha-floor", type=float, default=0.0)
     ap.add_argument("--alpha-floor-steps", type=int, default=1000)
     ap.add_argument("--alpha-floor-weight", type=float, default=0.05)
@@ -429,6 +531,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--sync-outer-lr", type=float, default=0.25)
     ap.add_argument("--sync-outer-momentum", type=float, default=0.70)
     ap.add_argument("--resume", action="store_true")
+    ap.add_argument(
+        "--stop-at-step",
+        type=int,
+        default=0,
+        help="optional early stop step (0=disabled) preserving --steps schedule/phase boundaries for exact resume",
+    )
+    ap.add_argument(
+        "--deterministic",
+        action="store_true",
+        help="disable cuDNN autotune and enable deterministic PyTorch kernels for exact GPU resume parity",
+    )
+    ap.add_argument(
+        "--no-tf32",
+        action="store_true",
+        help="disable CUDA TF32 matmul/cuDNN precision (kept enabled by default for throughput)",
+    )
     ap.add_argument("--max-wall-s", type=float, default=0.0)
     ap.add_argument("--seed", type=int, default=42)
     return ap.parse_args(argv)

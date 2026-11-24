@@ -1,12 +1,29 @@
 use super::build_zero_init_v8_safetensors;
 use dope_core::rng::Rng;
-use dope_core::single_encoding::v8::model::{ACTIVE_RANK_V1, DECODER_CAPABILITY_KEY};
+use dope_core::single_encoding::v8::model::{
+    ACTIVE_RANK_V1, ACTIVE_RANK_V1_MARKER_TENSOR, DECODER_CAPABILITY_KEY,
+};
 use dope_core::single_encoding::v8::{
     build_decode_plan_v8, decode_dse8_row_at, fit_dse8_packet, pack_dse8_packet,
-    unpack_dse8_packet, Dse8FitOptions, ReplayArmV8, ReplayPlanV8, SingleEncV8Weights, V8_MAX_RANK,
+    unpack_dse8_packet, Dse8FitOptions, ReplayArmV8, ReplayPlanV8, SingleEncV8Weights,
+    FLAG_ACTIVE_RANK_V1, V8_MAX_RANK,
 };
 
 fn checkpoint(capability: Option<&str>, first_changed_lane: usize, target_bias: f32) -> Vec<u8> {
+    checkpoint_with_marker(
+        capability,
+        capability == Some(ACTIVE_RANK_V1),
+        first_changed_lane,
+        target_bias,
+    )
+}
+
+fn checkpoint_with_marker(
+    capability: Option<&str>,
+    with_u8_marker: bool,
+    first_changed_lane: usize,
+    target_bias: f32,
+) -> Vec<u8> {
     let bytes = build_zero_init_v8_safetensors(16, 4);
     let header_len = u64::from_le_bytes(bytes[..8].try_into().unwrap()) as usize;
     let data_at = 8 + header_len;
@@ -21,6 +38,15 @@ fn checkpoint(capability: Option<&str>, first_changed_lane: usize, target_bias: 
     data[at..at + 4].copy_from_slice(&target_bias.to_le_bytes());
     if let Some(capability) = capability {
         header["__metadata__"] = serde_json::json!({ (DECODER_CAPABILITY_KEY): capability });
+    }
+    if with_u8_marker {
+        let off = data.len();
+        header[ACTIVE_RANK_V1_MARKER_TENSOR] = serde_json::json!({
+            "dtype": "U8",
+            "shape": [1],
+            "data_offsets": [off, off + 1],
+        });
+        data.push(1u8);
     }
     let header = serde_json::to_vec(&header).unwrap();
     [
@@ -67,6 +93,9 @@ fn corrected_checkpoint_ignores_inactive_loading_sentinels_at_every_rank() {
             let legacy_plan = build_decode_plan_v8(&packet, Some(&legacy)).unwrap();
             assert!(build_decode_plan_v8(&packet, Some(&corrected)).is_err());
             packet.weights_fp = Some(corrected.fingerprint());
+            // Without FLAG_ACTIVE_RANK_V1 on the packet, corrected checkpoint must refuse!
+            assert!(build_decode_plan_v8(&packet, Some(&corrected)).is_err());
+            packet.header.flags |= FLAG_ACTIVE_RANK_V1;
             let corrected_plan = build_decode_plan_v8(&packet, Some(&corrected)).unwrap();
 
             assert_eq!(corrected_plan.l_eff, base.l_eff);
@@ -88,6 +117,9 @@ fn corrected_checkpoint_ignores_inactive_loading_sentinels_at_every_rank() {
 fn unknown_decoder_capability_is_refused() {
     let checkpoint = checkpoint(Some("unsupported"), V8_MAX_RANK, 0.0);
     assert!(SingleEncV8Weights::from_safetensors_bytes(&checkpoint, 4).is_err());
+    // Metadata-only active-rank-v1 lacking the U8 guard tensor must also be refused.
+    let meta_only = checkpoint_with_marker(Some(ACTIVE_RANK_V1), false, V8_MAX_RANK, 0.0);
+    assert!(SingleEncV8Weights::from_safetensors_bytes(&meta_only, 4).is_err());
 }
 
 #[test]

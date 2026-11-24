@@ -4236,6 +4236,18 @@
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_replay && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8",
       "purpose": "verify the native fixed-counter replay tool and fingerprint-bound V8 decoder behavior"
     },
+    "engine/dope-core/src/auto/v8_budget.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_fit_parity",
+      "purpose": "verify shared DPA1 V8 schema wrapper budget preparation and byte-for-byte non-neural section parity"
+    },
+    "engine/dope-core/tests/single_encoding_v8_scale.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_scale",
+      "purpose": "verify 1GiB BF16/F32 SafeTensors loading, active-rank-v1 capability, and Tier 1-3 code heads"
+    },
+    "engine/dope-core/tests/single_encoding_v8_fit_parity.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test single_encoding_v8_fit_parity",
+      "purpose": "verify shared FIT evidence extraction, ScaleCardV8 f64 target scaling, and canonical/renamed wrapper budget parity"
+    },
     "engine/dope-arena/src/bin/dope_v8_emit.rs": {
       "command": "cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_v8_emit && PYTHONPATH=. python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py",
       "purpose": "verify pure-Rust dope_v8_emit CLI fit/sample/evidence/embed/truncate/inspect and <=1e-4 parity across 12 fixtures"

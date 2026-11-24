@@ -32,7 +32,7 @@ import numpy as np
 from . import s3_episode_factory as ef
 
 LOSS_KEYS_FIT = ("X_fit", "y_fit", "M_fit")
-LOSS_KEYS_QRY = ("X_qry", "y_qry", "M_qry")
+LOSS_KEYS_QRY = ("X_qry", "y_qry", "M_qry", "Z_qry")
 
 
 def _cap_rows(ep: dict[str, Any], keys: Sequence[str], cap: int) -> None:
@@ -41,7 +41,8 @@ def _cap_rows(ep: dict[str, Any], keys: Sequence[str], cap: int) -> None:
         return
     idx = np.linspace(0, n - 1, cap).round().astype(np.int64)
     for key in keys:
-        ep[key] = ep[key][idx]
+        if key in ep:
+            ep[key] = ep[key][idx]
 
 
 class FactoryFeed:
@@ -131,11 +132,15 @@ def feed_start_step(done_steps: int, grad_accum: int | None = 1) -> int:
 
 
 def v8_factory_spec(arena: str, seed: int, episodes_per_step: int, budget: int = 2048,
-                    normalized_only: bool = False, **sampler: Any) -> ef.FactorySpec:
+                    normalized_only: bool = False, code_tier: int = 0,
+                    reserve_dpa_wrapper: bool = False, **sampler: Any) -> ef.FactorySpec:
     """The v3 preset (``ef.V3_SAMPLER``), planning ``episodes_per_step`` slots, with the ``native_v8`` stage."""
     spec = ef.v3_spec(arena, seed, batch_size=episodes_per_step, budget=budget, **sampler)
-    return dataclasses.replace(spec, stage=f"{ef.__name__}:native_v8",
-                               stage_kwargs={"budget": budget, "normalized_only": normalized_only})
+    kwargs: dict[str, Any] = {"budget": budget, "normalized_only": normalized_only}
+    if code_tier > 0 or reserve_dpa_wrapper:
+        kwargs["code_tier"] = int(code_tier)
+        kwargs["reserve_dpa_wrapper"] = bool(reserve_dpa_wrapper)
+    return dataclasses.replace(spec, stage=f"{ef.__name__}:native_v8", stage_kwargs=kwargs)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -148,6 +153,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--max-loss-fit", type=int, default=1024)
     ap.add_argument("--max-loss-qry", type=int, default=512)
     ap.add_argument("--normalized-only", action="store_true")
+    ap.add_argument("--code-tier", type=int, default=0, choices=[0, 1, 2, 3],
+                    help="reserve exact TAG_CODE + TAG_WEIGHTS_FP bytes for Tier 1/2/3 (32/64/128 B)")
+    ap.add_argument("--reserve-dpa-wrapper", action="store_true",
+                    help="also deduct exact DPA1 header + V7Schema wrapper overhead before DSE8 layout selection")
+    ap.add_argument("--reserve-code-bytes", type=int, default=0,
+                    help="alias mapping 32/64/128 -> --code-tier 1/2/3 with --reserve-dpa-wrapper")
     a = ap.parse_args(argv[:split])
     from . import s3_v8_trainer as tr  # imports torch: only the leader does, never a producer
 
@@ -161,8 +172,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         done = int(torch.load(out / "latest.pt", map_location="cpu", weights_only=False)["step"])
     start = feed_start_step(done, getattr(targs, "grad_accum_steps", 1))
     cpus = [int(c) for c in a.producer_cpus.split(",") if c != ""] or None
-    spec = v8_factory_spec(a.arena, targs.seed, targs.episodes_per_step, budget=targs.budget_bytes,
-                           normalized_only=a.normalized_only)
+    code_tier = int(a.code_tier)
+    reserve_dpa = bool(a.reserve_dpa_wrapper)
+    if code_tier == 0 and int(a.reserve_code_bytes) > 0:
+        code_tier = 3 if a.reserve_code_bytes >= 128 else (2 if a.reserve_code_bytes >= 64 else 1)
+        reserve_dpa = True
+    spec = v8_factory_spec(a.arena, targs.seed, targs.episodes_per_step, budget=int(targs.budget_bytes),
+                           normalized_only=a.normalized_only, code_tier=code_tier,
+                           reserve_dpa_wrapper=reserve_dpa)
     with FactoryFeed(spec, targs.episodes_per_step, a.producers, start_step=start, cpus=cpus,
                      max_loss_fit=a.max_loss_fit, max_loss_qry=a.max_loss_qry, log_path=out / "feed.jsonl") as feed:
         result = tr.train_v8(targs, episode_provider=feed)

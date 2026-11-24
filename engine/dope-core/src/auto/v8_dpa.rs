@@ -15,8 +15,14 @@ use super::container::{
 };
 mod sampling;
 
-use super::v7_schema::{decode_section, encode_section, V7Schema};
+use super::v7_schema::{decode_section, V7Schema};
 use super::v8::{fit_auto_v8_with_payload_room, AutoV8Options, V8Choice};
+use super::v8_budget::prepare_dpa_v8_budget;
+pub use super::v8_budget::{
+    compare_reserved_and_serving_dpa1, dpa_v8_wrapper_bytes_from_json,
+    estimate_dpa_v8_wrapper_bytes, DpaV8KindSpec, DpaV8SchemaSpec, Dse8PackComparison,
+    Dse8SectionDiff,
+};
 use crate::error::{DopeError, Result};
 use crate::schema::{infer, IntakeOptions, Kind, Schema};
 use crate::single_encoding::v8::{
@@ -34,7 +40,14 @@ pub struct V8Model {
 }
 
 impl V8Model {
-    /// Fail-closed parser for canonical F32 `rank <= 2` SingleEncV8 SafeTensors.
+    /// Fail-closed parser for `SingleEncV8` SafeTensors (`F32` or `BF16`, `rank <= 2`, `<= 1 GiB`)
+    /// with automatic attention-head inference.
+    pub fn from_safetensors_auto(bytes: &[u8]) -> Result<Self> {
+        let weights = SingleEncV8Weights::from_safetensors_auto(bytes)?;
+        Ok(Self { weights })
+    }
+
+    /// Fail-closed parser for `SingleEncV8` SafeTensors (`F32` or `BF16`, `rank <= 2`, `<= 1 GiB`).
     pub fn from_safetensors(bytes: &[u8], n_heads: usize) -> Result<Self> {
         let weights = SingleEncV8Weights::from_safetensors_bytes(bytes, n_heads)?;
         Ok(Self { weights })
@@ -118,11 +131,9 @@ fn target_value(schema: &Schema, cell: &str) -> Option<f64> {
     }
 }
 
-fn packet_inputs(
-    raw: &RawTable,
-    target: usize,
-    schema: &Schema,
-) -> Result<(Vec<Vec<f64>>, Vec<f64>)> {
+type PacketInputs = (Vec<Vec<f64>>, Vec<f64>, Vec<u64>);
+
+fn packet_inputs(raw: &RawTable, target: usize, schema: &Schema) -> Result<PacketInputs> {
     let cells = &raw.columns[target];
     let rows: Vec<usize> = (0..raw.rows())
         .filter(|&r| target_value(schema, &cells[r]).is_some())
@@ -131,6 +142,7 @@ fn packet_inputs(
         .iter()
         .filter_map(|&r| target_value(schema, &cells[r]))
         .collect();
+    let row_ids: Vec<u64> = rows.iter().map(|&r| r as u64).collect();
     let mut x = Vec::with_capacity(schema.features.len());
     for f in &schema.features {
         let c = raw
@@ -151,7 +163,7 @@ fn packet_inputs(
                 .collect(),
         );
     }
-    Ok((x, y))
+    Ok((x, y, row_ids))
 }
 
 /// Fit a V8 or 3-way Auto-V8 `DPA1` artifact strictly within `opts.budget` bytes.
@@ -200,8 +212,9 @@ fn fit_dpa1_v8_inner(
     };
     let schema = infer(raw, target, &intake)?;
     let v7s = V7Schema::from_schema(&schema);
-    let section = encode_section(&v7s, opts.format1.anonymize)?;
-    let (x_raw, y_raw) = packet_inputs(raw, target, &schema)?;
+    let prep = prepare_dpa_v8_budget(&v7s, budget, opts.format1.anonymize)?;
+    let section = prep.schema_section;
+    let (x_raw, y_raw, row_ids) = packet_inputs(raw, target, &schema)?;
     let tid = task_id_for(v7s.classes());
     let active_model = match mode {
         V8DpaMode::V8Analytic => None,
@@ -210,11 +223,12 @@ fn fit_dpa1_v8_inner(
 
     let (encoder, choice, fp, payload, sf1, sp0, snn, note) = match mode {
         V8DpaMode::V8Analytic | V8DpaMode::V8 => {
-            let packet_room = room.checked_sub(section.len()).ok_or_else(|| {
-                DopeError::Budget(
+            if prep.wrapper_bytes > budget {
+                return Err(DopeError::Budget(
                     "the V8 column schema alone exceeds the budget (try --anonymize)".into(),
-                )
-            })?;
+                ));
+            }
+            let packet_room = prep.packet_budget;
             let unit_meta = fit_unit_meta(&x_raw, &y_raw, tid, opts.normalized_only).ok();
             let dse8_opts = Dse8FitOptions {
                 task_id: tid,
@@ -230,7 +244,11 @@ fn fit_dpa1_v8_inner(
                 } else {
                     0
                 },
+                reserve_neural_code: false,
                 col_meta: unit_meta.as_deref(),
+                fit_row_ids: active_model
+                    .filter(|m| m.weights().active_rank_v1)
+                    .map(|_| row_ids.as_slice()),
                 seed: opts.format1.seed,
             };
             let (pkt, ch, fp) = match active_model {
@@ -269,7 +287,7 @@ fn fit_dpa1_v8_inner(
         V8DpaMode::AutoV8 => {
             // If the V8 schema section leaves too little room for a DSE8 packet, fall back
             // directly to Format 1 inside `room` instead of failing over_budget!
-            let packet_room = room.saturating_sub(section.len());
+            let packet_room = prep.packet_budget;
             if packet_room < 96 {
                 let mut f1_opts = opts.format1.clone();
                 f1_opts.budget = Some(room);

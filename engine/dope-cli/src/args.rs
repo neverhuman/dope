@@ -204,8 +204,8 @@ pub(crate) struct FitArgs {
     /// compiled into dope; sampling the artifact then needs the same --v7-weights.
     #[arg(long, value_name = "SAFETENSORS")]
     pub(crate) v7_weights: Option<PathBuf>,
-    /// SingleEncV8 F32 SafeTensors (4 heads) for --format v8|auto-v8; sampling a neural V8
-    /// DPA1 artifact then needs the same --v8-weights (or --v8-zero-init).
+    /// SingleEncV8 F32/BF16 SafeTensors (auto-inferred heads & Tier 1/2/3 code width, <= 1 GiB)
+    /// for --format v8|auto-v8; sampling a neural V8 DPA1 artifact needs the same --v8-weights.
     #[arg(long, value_name = "SAFETENSORS")]
     pub(crate) v8_weights: Option<PathBuf>,
     /// Teacher mode for --format 2: native | external:<DIR>.

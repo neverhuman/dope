@@ -12,10 +12,10 @@ use super::copula_regimes::{RegimesSectionV8, V8_MAX_RANK};
 use super::marginals::MarginalColV8;
 use super::nominal::NominalGroupV8;
 use super::packet::{
-    Dse8Header, Dse8Packet, ALL_KNOWN_FLAGS, DSE8_MAGIC, DSE8_VERSION, FLAG_HAS_COL_MAP,
-    FLAG_HAS_CUSTOM_CLASSES, FLAG_HAS_DROPPED_MEDS, FLAG_HAS_NEURAL_ENCODER, FLAG_NORMALIZED_ONLY,
-    TAG_CODE, TAG_COPULA, TAG_EFFECTS, TAG_LINEAR, TAG_MARG, TAG_NOMINAL, TAG_PAIRS, TAG_REGIMES,
-    TAG_RESID, TAG_SCALE, TAG_TREES, TAG_WEIGHTS_FP,
+    Dse8Header, Dse8Packet, ALL_KNOWN_FLAGS, DSE8_MAGIC, DSE8_VERSION, FLAG_ACTIVE_RANK_V1,
+    FLAG_HAS_COL_MAP, FLAG_HAS_CUSTOM_CLASSES, FLAG_HAS_DROPPED_MEDS, FLAG_HAS_NEURAL_ENCODER,
+    FLAG_NORMALIZED_ONLY, TAG_CODE, TAG_COPULA, TAG_EFFECTS, TAG_LINEAR, TAG_MARG, TAG_NOMINAL,
+    TAG_PAIRS, TAG_REGIMES, TAG_RESID, TAG_SCALE, TAG_TREES, TAG_WEIGHTS_FP,
 };
 use super::planner::{DSE8_CRC_BYTES, DSE8_HEADER_BYTES, TLV_HDR_BYTES};
 use super::scale_v8::{ScaleCardV8, V8_MAX_CLASSES, V8_MAX_COLS};
@@ -61,6 +61,11 @@ pub fn unpack_dse8_packet(bytes: &[u8]) -> Result<Dse8Packet> {
 
     if (flags & !ALL_KNOWN_FLAGS) != 0 {
         return Err(DopeError::Artifact("dse8 unknown header flags".into()));
+    }
+    if (flags & FLAG_ACTIVE_RANK_V1) != 0 && (flags & FLAG_HAS_NEURAL_ENCODER) == 0 {
+        return Err(DopeError::Artifact(
+            "dse8 active_rank_v1 flag requires neural encoder".into(),
+        ));
     }
     if reserved != 0 {
         return Err(DopeError::Artifact(

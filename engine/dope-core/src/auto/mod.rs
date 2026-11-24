@@ -19,6 +19,7 @@ mod container;
 mod v7;
 mod v7_schema;
 pub mod v8;
+pub mod v8_budget;
 pub mod v8_dpa;
 
 pub use check::{
