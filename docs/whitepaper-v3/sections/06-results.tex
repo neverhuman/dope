@@ -36,7 +36,7 @@ The difference from ARF is \VThree{ArfVsPtsMatched} points.
 \paragraph{Size.}
 Every DOPE file is within the budget: the median is \VThree{CandBytesMed}~bytes and the largest \VThree{CandBytesMax}.
 The third-party files have median sizes from \VThree{GcBytesMed}~bytes (Gaussian copula) to \VThree{ArfBytesMed}~bytes (ARF), \VThree{MethodsRatioMin} to \VThree{MethodsRatioMax} times DOPE's median, and none is within the budget.
-Their scores are therefore those of unconstrained files; held to the budget, each would score the floor value \VThree{FailedValue} on every entry.
+Their scores are therefore those of unconstrained files; held to the budget, every entry would take the floor value (TRG \VThree{FailedValue}, a Transfer Score of \VThree{FailedScore}).
 
 \paragraph{Realism, privacy and copies.}
 Realism coverage is \VThree{CandRealism} for DOPE, lower than ARF's \VThree{ArfRealism} and higher than the Gaussian copula's \VThree{GcRealism}; TVAE and CTGAN pass the realism gate on no entry.
