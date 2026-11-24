@@ -304,3 +304,195 @@ fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
     assert!(stdout_att.contains("sigstore-oidc-attestation + sha256-content-integrity"));
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+fn fixture_with_v8(name: &str) -> (PathBuf, String, usize) {
+    let dir = std::env::temp_dir().join(format!("dope-release-v8-{name}-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(dir.join("tools")).unwrap();
+    let gh = dir.join("tools/gh");
+    std::fs::write(
+        &gh,
+        r#"#!/bin/bash
+case "$*" in
+  --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
+esac
+printf '%s\n' "$@" >> "$GH_TEST_LOG"
+if [[ -n "${GH_REJECT_SUBJECT:-}" && "$*" == *"$GH_REJECT_SUBJECT"* ]]; then exit 1; fi
+[[ "${GH_TEST_MODE:-ok}" == ok ]]
+"#,
+    )
+    .unwrap();
+    std::fs::set_permissions(&gh, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let weights = b"synthetic v8 safetensors fixture; never execute";
+    let w_sha = format!("{:x}", Sha256::digest(weights));
+    let w_len = weights.len();
+    let manifest = serde_json::json!({
+        "schema": "dope.single-enc-v8-weights/v1",
+        "file": "model.safetensors",
+        "arch": "single_enc_v8",
+        "bytes": w_len,
+        "sha256": w_sha
+    })
+    .to_string();
+    let buildinfo = serde_json::json!({
+        "schema_version": 1,
+        "product": "dope-engine",
+        "version": "3.1.0",
+        "source_commit": SHA,
+        "v8_weights_sha256": w_sha,
+        "v8_weights_bytes": w_len
+    })
+    .to_string();
+    std::fs::write(dir.join("BUILDINFO.json"), buildinfo).unwrap();
+    for f in [
+        "Cargo.lock",
+        "DEPENDENCIES.txt",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES",
+        "dope-linux-x86_64",
+    ] {
+        std::fs::write(dir.join(f), b"fixture; never execute").unwrap();
+    }
+    std::fs::write(dir.join("V8_WEIGHTS_MANIFEST.json"), manifest).unwrap();
+    std::fs::write(dir.join("dope-v8-weights.safetensors"), weights).unwrap();
+    let mut sums = String::new();
+    for f in [
+        "BUILDINFO.json",
+        "Cargo.lock",
+        "DEPENDENCIES.txt",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES",
+        "V8_WEIGHTS_MANIFEST.json",
+        "dope-linux-x86_64",
+        "dope-v8-weights.safetensors",
+    ] {
+        let b = std::fs::read(dir.join(f)).unwrap();
+        sums.push_str(&format!("{:x}  {f}\n", Sha256::digest(&b)));
+    }
+    std::fs::write(dir.join("SHA256SUMS"), sums).unwrap();
+    (dir, w_sha, w_len)
+}
+
+#[test]
+fn signed_engine_with_v8_weights_verifies_four_subjects_and_fails_closed() {
+    let (dir, _, _) = fixture_with_v8("ok");
+    let out = verify(&dir, "dope-engine-v3.1.0", SHA, "ok");
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let log = std::fs::read_to_string(dir.join("gh.log")).unwrap();
+    assert_eq!(log.matches("attestation\nverify\n").count(), 4);
+    assert!(log.contains("dope-v8-weights.safetensors"));
+    assert!(log.contains("V8_WEIGHTS_MANIFEST.json"));
+    // OIDC failure on weights subject must fail closed.
+    let rej = Command::new("/bin/bash")
+        .arg(root().join("scripts/verify-engine-release.sh"))
+        .args([dir.to_str().unwrap(), "dope-engine-v3.1.0", SHA])
+        .env(
+            "PATH",
+            format!("{}:/usr/bin:/bin", dir.join("tools").display()),
+        )
+        .env("GH_TEST_LOG", dir.join("gh_rej.log"))
+        .env("GH_REJECT_SUBJECT", "dope-v8-weights.safetensors")
+        .output()
+        .unwrap();
+    assert!(!rej.status.success());
+    // Tampered weights, bad manifest, BUILDINFO mismatch, partial SHA256SUMS, and symlinks fail closed.
+    std::fs::write(dir.join("dope-v8-weights.safetensors"), b"tampered").unwrap();
+    assert!(!verify(&dir, "dope-engine-v3.1.0", SHA, "ok")
+        .status
+        .success());
+    std::fs::remove_dir_all(&dir).unwrap();
+
+    let (dir, w_sha, w_len) = fixture_with_v8("bad-buildinfo");
+    std::fs::write(
+        dir.join("BUILDINFO.json"),
+        serde_json::json!({"v8_weights_sha256": "0".repeat(64), "v8_weights_bytes": w_len})
+            .to_string(),
+    )
+    .unwrap();
+    let mut sums = String::new();
+    for f in [
+        "BUILDINFO.json",
+        "Cargo.lock",
+        "DEPENDENCIES.txt",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES",
+        "V8_WEIGHTS_MANIFEST.json",
+        "dope-linux-x86_64",
+        "dope-v8-weights.safetensors",
+    ] {
+        let b = std::fs::read(dir.join(f)).unwrap();
+        sums.push_str(&format!("{:x}  {f}\n", Sha256::digest(&b)));
+    }
+    std::fs::write(dir.join("SHA256SUMS"), &sums).unwrap();
+    assert!(!verify(&dir, "dope-engine-v3.1.0", SHA, "ok")
+        .status
+        .success());
+    // Partial 7-member inventory must fail closed.
+    let partial: String = sums.lines().take(7).map(|l| format!("{l}\n")).collect();
+    std::fs::write(dir.join("SHA256SUMS"), partial).unwrap();
+    assert!(!verify(&dir, "dope-engine-v3.1.0", SHA, "ok")
+        .status
+        .success());
+    let _ = w_sha;
+    std::fs::remove_dir_all(&dir).unwrap();
+
+    // Stray unindexed V8 weights alongside a 6-member weight-free release must fail closed.
+    let stray = fixture("stray-v8");
+    std::fs::write(stray.join("dope-v8-weights.safetensors"), b"stray").unwrap();
+    let out = verify(&stray, TAG, SHA, "ok");
+    assert!(!out.status.success());
+    assert!(String::from_utf8_lossy(&out.stderr).contains("stray_v8_weights"));
+    std::fs::remove_dir_all(&stray).unwrap();
+}
+
+#[test]
+fn engine_release_preflight_refuses_bad_v8_weights_overrides_before_cargo() {
+    let dir = std::env::temp_dir().join(format!("dope-rel-preflight-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(dir.join("tools")).unwrap();
+    for tool in ["cargo", "rustc"] {
+        let p = dir.join("tools").join(tool);
+        std::fs::write(&p, "#!/bin/bash\nexit 99\n").unwrap();
+        std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+    let path_env = format!("{}:/usr/bin:/bin", dir.join("tools").display());
+    let out_dir = dir.join("out");
+    let run = |extra: &[(&str, &str)]| {
+        let mut cmd = Command::new("/bin/bash");
+        cmd.arg(root().join("ops/ci/engine-release.sh"))
+            .arg(&out_dir)
+            .env("PATH", &path_env);
+        for (k, v) in extra {
+            cmd.env(k, v);
+        }
+        cmd.output().unwrap()
+    };
+    let on_tag = run(&[
+        ("ENGINE_RELEASE_TAG", "dope-engine-v3.1.0"),
+        ("DOPE_V8_WEIGHTS_SOURCE_DIR", dir.to_str().unwrap()),
+    ]);
+    assert_eq!(on_tag.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&on_tag.stderr).contains("override_forbidden_on_tag"));
+    let missing = run(&[(
+        "DOPE_V8_WEIGHTS_SOURCE_DIR",
+        dir.join("missing").to_str().unwrap(),
+    )]);
+    assert_eq!(missing.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("override_missing"));
+    let bad = dir.join("bad-v8");
+    std::fs::create_dir_all(&bad).unwrap();
+    std::fs::write(bad.join("manifest.json"), "{}").unwrap();
+    let incomplete = run(&[("DOPE_V8_WEIGHTS_SOURCE_DIR", bad.to_str().unwrap())]);
+    assert_eq!(incomplete.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&incomplete.stderr).contains("v8_weights_incomplete"));
+    std::fs::write(bad.join("model.safetensors"), b"bytes").unwrap();
+    let bad_manifest = run(&[("DOPE_V8_WEIGHTS_SOURCE_DIR", bad.to_str().unwrap())]);
+    assert_eq!(bad_manifest.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&bad_manifest.stderr).contains("manifest_invalid"));
+    std::fs::remove_dir_all(&dir).unwrap();
+}

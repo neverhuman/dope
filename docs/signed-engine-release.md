@@ -51,22 +51,32 @@ fixtures with an empty executable-helper `PATH`.
 The normal/build dependency inventory refuses Python bindings, libtorch and implicit
 GPU dependencies. ELF imports are also checked for Python/libtorch/CUDA/MKL linkage.
 The package contains one application executable (the V7 encoder weights are compiled in;
-MLC model data is supplied separately; no learned V8 weights ship), and
-build/license/verification sidecars. It contains no Python scripts or environments.
+MLC model data is supplied separately; `dope-engine-v3.0.0` ships zero learned V8 weights),
+and build/license/verification sidecars. When a future admitted release commits verified
+`SingleEncV8` weights under `models/single-enc-v8/{manifest.json,model.safetensors}`,
+`ops/ci/engine-release.sh` validates the manifest schema (`dope.single-enc-v8-weights/v1`),
+exact SHA-256 and byte length (`<= 1 GiB`), smoke-tests `--format v8 --v8-weights` and
+`--format auto-v8 --v8-weights` with an empty `PATH`, records `v8_weights_sha256` and
+`v8_weights_bytes` in `BUILDINFO.json`, and stages the fixed 8-member package. Committing
+weights under `models/single-enc-v8/` remains gated on the repository's scientific and
+publication gates; weight-free builds produce the exact 6-member inventory below.
+It contains no Python scripts or environments.
 It can still link ordinary OS libraries such as libc/libm; this GNU build is not a
 universally static image or a macOS/Windows release. CUDA and Metal remain separate
 source builds and are not qualified by the signed CPU workflow.
 
-Fixed package members:
+Fixed package members (6-member weight-free baseline, or fixed 8-member inventory when
+`models/single-enc-v8/` is admitted):
 
 | File | Purpose |
 |---|---|
 | `dope-linux-x86_64` | The single Rust application executable |
-| `BUILDINFO.json` | Version, source commit, compiler, target, source cleanliness, binary and lock hashes |
+| `BUILDINFO.json` | Version, source commit, compiler, target, source cleanliness, binary and lock hashes (plus `v8_weights_sha256`/`v8_weights_bytes` when bundled) |
 | `Cargo.lock` | Exact engine package versions |
 | `DEPENDENCIES.txt` | Actual default CPU normal/build closure |
 | `LICENSE`, `THIRD_PARTY_NOTICES` | Project license, upstream dependency license bytes and Rust library notices |
-| `SHA256SUMS` | Fixed allowlisted package inventory and digests |
+| `V8_WEIGHTS_MANIFEST.json`, `dope-v8-weights.safetensors` | Optional admitted `SingleEncV8` manifest and SafeTensors weights (absent in `v3.0.0`; both present or both absent) |
+| `SHA256SUMS` | Fixed allowlisted package inventory and digests (6 members weight-free, or 8 members with `SingleEncV8` weights) |
 | `dope.sigstore.json` | Signed provenance bundle, added by the trusted tag job |
 
 The notice collector uses the actual locked normal/build graph, including build-time
@@ -131,10 +141,19 @@ install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
 install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
 ```
 
-The helper verifies the two signed subjects online using `gh attestation verify`, then
-checks every fixed package hash and refuses symlinks, traversal inventory entries,
-missing files and malformed tag/commit identities. It never executes the unverified
-binary. The GitHub CLI is an installation-time verifier, not an application dependency.
+The helper verifies the two signed subjects (`dope-linux-x86_64` and `SHA256SUMS`) online
+using `gh attestation verify`, then checks every fixed package hash and refuses symlinks,
+traversal inventory entries, missing files, stray unindexed weight files and malformed
+tag/commit identities. When an admitted 8-member release includes `SingleEncV8` weights,
+the helper additionally runs `gh attestation verify` on `dope-v8-weights.safetensors` and
+`V8_WEIGHTS_MANIFEST.json` (four attested subjects total) and cross-checks
+`V8_WEIGHTS_MANIFEST.json` and `BUILDINFO.json` (`v8_weights_sha256`, `v8_weights_bytes`).
+`scripts/install.sh` supports `--v8-weights` (require and install attested `SingleEncV8`
+weights into `$DOPE_WEIGHTS_DIR/single-enc-v8/{manifest.json,model.safetensors}`, restricted
+to attested `dope-engine-v*` tags and failing closed on legacy tags or weight-free tags such
+as `dope-engine-v3.0.0`) and `--no-v8-weights` (skip even if bundled). Signing establishes
+build/packaging identity only; it never certifies model quality or privacy. It never executes the unverified binary. The GitHub CLI is an
+installation-time verifier, not an application dependency.
 Retain the bundle and exact source commit with your deployment record. Offline bundle
 verification is possible with GitHub CLI's `--bundle` mode, but is not an unsigned
 fallback and requires maintaining the correct trust policy independently.

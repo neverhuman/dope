@@ -22,6 +22,18 @@ WEIGHTS_DIR="${DOPE_WEIGHTS_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/dope/weights}"
 SHARE_DIR="${DOPE_SHARE_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/dope-engine}"
 REQUIRE_ATTESTATION=0
 SKIP_WEIGHTS=0
+V8_WEIGHTS_MODE="${DOPE_INSTALL_V8_WEIGHTS:-auto}"
+V8_WEIGHTS_EXPLICIT=0
+if [[ "$V8_WEIGHTS_MODE" == "1" || "$V8_WEIGHTS_MODE" == "require" ]]; then
+  V8_WEIGHTS_MODE=require
+  V8_WEIGHTS_EXPLICIT=1
+elif [[ "$V8_WEIGHTS_MODE" == "0" || "$V8_WEIGHTS_MODE" == "skip" ]]; then
+  V8_WEIGHTS_MODE=skip
+  V8_WEIGHTS_EXPLICIT=1
+elif [[ "$V8_WEIGHTS_MODE" != "auto" ]]; then
+  echo "error: DOPE_INSTALL_V8_WEIGHTS must be auto, require/1, or skip/0" >&2
+  exit 2
+fi
 COLOR_MODE="${DOPE_COLOR:-auto}"
 
 usage() {
@@ -38,6 +50,8 @@ Options:
   --install-dir <DIR>       Destination directory for the `dope` binary (default: ~/.local/bin)
   --weights-dir <DIR>       Destination directory for verified .safetensors weights (default: ~/.cache/dope/weights)
   --share-dir <DIR>         Destination directory for LICENSE and THIRD_PARTY_NOTICES (default: ~/.local/share/dope-engine)
+  --v8-weights              Require and install attested SingleEncV8 weights from the engine release
+  --no-v8-weights           Skip SingleEncV8 weights even if bundled with the engine release
   --no-weights              Install only the standalone `dope` binary and legal notices (skip .safetensors weights)
   --color <auto|always|never>
   -h, --help                Show this help
@@ -46,6 +60,7 @@ Signed engine tags require gh >= 2.102.0 and all attestation policy flags before
 The engine tag selects the binary; --model-tag selects models independently:
   ./scripts/install.sh --tag dope-engine-v3.0.0 --model-tag v1.0.0
   ./scripts/install.sh --tag dope-engine-v3.0.0 --no-weights
+  ./scripts/install.sh --tag dope-engine-v3.1.0 --no-weights --v8-weights
 For an offline split, supply --from-dir ENGINE_DIR --model-from-dir MODEL_DIR.
 A one-directory offline release with no model members remains engine-only unless
 models were explicitly requested. Partial models are refused, never relabeled.
@@ -65,7 +80,9 @@ while [[ $# -gt 0 ]]; do
     --weights-dir|--cache-dir) WEIGHTS_DIR="${2:-}"; shift 2 ;;
     --share-dir) SHARE_DIR="${2:-}"; shift 2 ;;
     --with-weights|--verify-sample) SKIP_WEIGHTS=0; MODEL_EXPLICIT=1; shift ;;
-    --no-weights) SKIP_WEIGHTS=1; shift ;;
+    --v8-weights) V8_WEIGHTS_MODE=require; V8_WEIGHTS_EXPLICIT=1; shift ;;
+    --no-v8-weights) V8_WEIGHTS_MODE=skip; V8_WEIGHTS_EXPLICIT=1; shift ;;
+    --no-weights) SKIP_WEIGHTS=1; [[ $V8_WEIGHTS_EXPLICIT -eq 1 ]] || V8_WEIGHTS_MODE=skip; shift ;;
     --color) COLOR_MODE="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "error: unknown argument: $1" >&2; usage >&2; exit 2 ;;
@@ -96,6 +113,10 @@ for selected_tag in "$TAG" "$MODEL_TAG"; do
   fi
 done
 if [[ "$TAG" == dope-engine-v* ]]; then REQUIRE_ATTESTATION=1; fi
+if [[ "$V8_WEIGHTS_MODE" == "require" && ( "$TAG" != dope-engine-v* || $REQUIRE_ATTESTATION -ne 1 ) ]]; then
+  echo "error: --v8-weights requires an attested dope-engine-v* release tag (got '$TAG')" >&2
+  exit 1
+fi
 
 # 2. Platform & tool check.
 if [[ "$(uname -s):$(uname -m)" != "Linux:x86_64" ]]; then
@@ -216,12 +237,56 @@ for name in BUILDINFO.json LICENSE THIRD_PARTY_NOTICES dope-linux-x86_64; do
   verify_in_sha256sums "$ENGINE_STAGE" "$name"
 done
 
+# Detect and validate optional SingleEncV8 weights bundled with the engine release.
+HAS_V8_MANIFEST_SUM=$(awk '$2 == "V8_WEIGHTS_MANIFEST.json" {n++} END {print n+0}' "$ENGINE_STAGE/SHA256SUMS")
+HAS_V8_MODEL_SUM=$(awk '$2 == "dope-v8-weights.safetensors" {n++} END {print n+0}' "$ENGINE_STAGE/SHA256SUMS")
+HAVE_V8_WEIGHTS=0
+V8_ACTUAL_SHA=""
+V8_ACTUAL_BYTES=0
+if [[ $HAS_V8_MANIFEST_SUM -ne $HAS_V8_MODEL_SUM || $HAS_V8_MANIFEST_SUM -gt 1 ]]; then
+  echo "error: partial or duplicate SingleEncV8 weights inventory in engine SHA256SUMS" >&2
+  exit 1
+fi
+if [[ $HAS_V8_MANIFEST_SUM -eq 1 ]]; then
+  if [[ "$V8_WEIGHTS_MODE" != "skip" ]]; then
+    if [[ "$TAG" != dope-engine-v* || $REQUIRE_ATTESTATION -ne 1 ]]; then
+      echo "error: bundled SingleEncV8 weights require an attested dope-engine-v* release tag (pass --no-v8-weights to skip on legacy tags)" >&2
+      exit 1
+    fi
+    for name in V8_WEIGHTS_MANIFEST.json dope-v8-weights.safetensors; do
+      fetch_asset "$ENGINE_STAGE" "$FROM_DIR" "$TAG" "$name"
+      verify_in_sha256sums "$ENGINE_STAGE" "$name"
+    done
+    HAVE_V8_WEIGHTS=1
+  fi
+elif [[ "$V8_WEIGHTS_MODE" == "require" ]]; then
+  echo "error: release $TAG does not ship SingleEncV8 weights in SHA256SUMS" >&2
+  exit 1
+fi
+
 # Cross-check BUILDINFO.json binary_sha256 against dope-linux-x86_64.
 BIN_SHA=$(sha256sum "$ENGINE_STAGE/dope-linux-x86_64" | awk '{print $1}')
 BUILDINFO_BIN_SHA=$(jq -r '.binary_sha256 // empty' "$ENGINE_STAGE/BUILDINFO.json")
 if [[ -z "$BUILDINFO_BIN_SHA" || "$BIN_SHA" != "$BUILDINFO_BIN_SHA" ]]; then
   echo "error: BUILDINFO.json binary_sha256 ($BUILDINFO_BIN_SHA) does not match dope-linux-x86_64 ($BIN_SHA)" >&2
   exit 1
+fi
+
+if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  V8_ACTUAL_SHA=$(sha256sum "$ENGINE_STAGE/dope-v8-weights.safetensors" | awk '{print $1}')
+  V8_ACTUAL_BYTES=$(wc -c < "$ENGINE_STAGE/dope-v8-weights.safetensors" | tr -d ' ')
+  jq -e --arg sha "$V8_ACTUAL_SHA" --argjson bytes "$V8_ACTUAL_BYTES" \
+    '.schema == "dope.single-enc-v8-weights/v1" and .file == "model.safetensors" and .arch == "single_enc_v8" and .sha256 == $sha and .bytes == $bytes and .bytes > 0 and .bytes <= 1073741824' \
+    "$ENGINE_STAGE/V8_WEIGHTS_MANIFEST.json" >/dev/null || {
+    echo "error: SingleEncV8 weights failed V8_WEIGHTS_MANIFEST.json verification" >&2
+    exit 1
+  }
+  jq -e --arg sha "$V8_ACTUAL_SHA" --argjson bytes "$V8_ACTUAL_BYTES" \
+    '.v8_weights_sha256 == $sha and .v8_weights_bytes == $bytes' \
+    "$ENGINE_STAGE/BUILDINFO.json" >/dev/null || {
+    echo "error: BUILDINFO.json v8_weights metadata does not match dope-v8-weights.safetensors" >&2
+    exit 1
+  }
 fi
 
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
@@ -267,7 +332,11 @@ if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
     echo "error: BUILDINFO.json source_commit differs from expected engine source digest" >&2
     exit 1
   fi
-  for subject in dope-linux-x86_64 SHA256SUMS; do
+  attest_subjects=(dope-linux-x86_64 SHA256SUMS)
+  if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+    attest_subjects+=(dope-v8-weights.safetensors V8_WEIGHTS_MANIFEST.json)
+  fi
+  for subject in "${attest_subjects[@]}"; do
     gh attestation verify "$ENGINE_STAGE/$subject" --repo "$REPO_SLUG" \
       --signer-workflow "$SIGNER_WORKFLOW" \
       --source-ref "refs/tags/$TAG" \
@@ -277,6 +346,22 @@ if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
   ATTESTATION_VERIFIED=1
   VERIFICATION_LEVEL="sigstore-oidc-attestation + sha256-content-integrity (verified against $SIGNER_WORKFLOW @ refs/tags/$TAG [$SOURCE_COMMIT])"
 
+fi
+
+if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  [[ $ATTESTATION_VERIFIED -eq 1 ]] || { echo "error: SingleEncV8 weights require verified Sigstore OIDC attestation" >&2; exit 1; }
+  V8_DST_DIR="$WEIGHTS_DIR/single-enc-v8"
+  if [[ -L "$WEIGHTS_DIR" || ( -e "$WEIGHTS_DIR" && ! -d "$WEIGHTS_DIR" ) || -L "$V8_DST_DIR" || ( -e "$V8_DST_DIR" && ! -d "$V8_DST_DIR" ) ]]; then
+    echo "error: refusing to install SingleEncV8 weights through symlink or non-directory path" >&2
+    exit 1
+  fi
+  for v8_name in manifest.json model.safetensors; do
+    v8_dst="$V8_DST_DIR/$v8_name"
+    if [[ -L "$v8_dst" || ( -e "$v8_dst" && ! -f "$v8_dst" ) ]]; then
+      echo "error: refusing to install SingleEncV8 weights over symlink or non-regular path: $v8_dst" >&2
+      exit 1
+    fi
+  done
 fi
 
 chmod u+x -- "$ENGINE_STAGE/dope-linux-x86_64"
@@ -289,7 +374,7 @@ if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
     --wire "$MODEL_STAGE/packet_high_regression.dml3" -n 16 --seed 42 -o "$STAGE/smoke.csv" >/dev/null
 fi
 
-# 6. Atomic installation (refusing symlinks at destination paths).
+# 6. Atomic installation (refusing symlinks and non-regular destination files).
 atomic_install() {
   local src="$1"
   local dst_dir="$2"
@@ -297,20 +382,25 @@ atomic_install() {
   local mode="$4"
   mkdir -p -- "$dst_dir"
   local dst="$dst_dir/$dst_name"
-  if [[ -L "$dst" ]]; then
-    echo "error: refusing to overwrite symlink at $dst" >&2
+  if [[ -L "$dst" || ( -e "$dst" && ! -f "$dst" ) ]]; then
+    echo "error: refusing to overwrite symlink or non-regular destination at $dst" >&2
     exit 1
   fi
   local tmp="$dst_dir/.${dst_name}.tmp.$$"
   rm -f -- "$tmp"
   install -m "$mode" "$src" "$tmp"
-  mv -f -- "$tmp" "$dst"
+  mv -fT -- "$tmp" "$dst"
 }
 
 atomic_install "$ENGINE_STAGE/dope-linux-x86_64" "$INSTALL_DIR" "dope" 0755
 atomic_install "$ENGINE_STAGE/LICENSE" "$SHARE_DIR" "LICENSE" 0644
 atomic_install "$ENGINE_STAGE/THIRD_PARTY_NOTICES" "$SHARE_DIR" "THIRD_PARTY_NOTICES" 0644
 atomic_install "$ENGINE_STAGE/BUILDINFO.json" "$SHARE_DIR" "BUILDINFO.json" 0644
+
+if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  atomic_install "$ENGINE_STAGE/V8_WEIGHTS_MANIFEST.json" "$V8_DST_DIR" "manifest.json" 0644
+  atomic_install "$ENGINE_STAGE/dope-v8-weights.safetensors" "$V8_DST_DIR" "model.safetensors" 0644
+fi
 
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
   atomic_install "$MODEL_STAGE/MODEL_MANIFEST.json" "$WEIGHTS_DIR" "MODEL_MANIFEST.json" 0644
@@ -320,6 +410,10 @@ fi
 
 echo "$(c_green "✓ Installed") $(c_bold "$INSTALL_DIR/dope") (sha256: ${BIN_SHA:0:16}…)"
 echo "  $(c_dim "notices")       $SHARE_DIR/{LICENSE,THIRD_PARTY_NOTICES,BUILDINFO.json}"
+if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  echo "  $(c_dim "v8 weights")    $WEIGHTS_DIR/single-enc-v8/model.safetensors (${V8_ACTUAL_BYTES} B, sha256: ${V8_ACTUAL_SHA:0:16}…)"
+  echo "  $(c_dim "v8 verification") tag $TAG · sigstore-oidc-attestation + sha256-content-integrity (build/packaging identity only; not quality or privacy certification)"
+fi
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
   echo "  $(c_dim "weights")       $WEIGHTS_DIR/dope_mlc_v3_multitask_best.safetensors (${ST_ACTUAL_BYTES} B, sha256: ${ST_ACTUAL_SHA:0:16}…)"
   echo "  $(c_dim "sample wire")   $WEIGHTS_DIR/packet_high_regression.dml3 (${WIRE_ACTUAL_BYTES} B, sha256: ${WIRE_ACTUAL_SHA:0:16}…)"
@@ -333,6 +427,9 @@ fi
 echo ""
 echo "$(c_bold "Quick Start:")"
 echo "  $INSTALL_DIR/dope doctor"
+if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+  echo "  $INSTALL_DIR/dope fit data.csv --target y --format auto-v8 --v8-weights $WEIGHTS_DIR/single-enc-v8/model.safetensors -o model.dope"
+fi
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
   echo "  $INSTALL_DIR/dope mlc-v3 sample --wire $WEIGHTS_DIR/packet_high_regression.dml3 -n 10 --seed 42"
 fi

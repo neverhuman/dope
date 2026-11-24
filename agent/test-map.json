@@ -3496,6 +3496,10 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test installer_policy",
       "purpose": "verify independent engine/model inventories, early GitHub CLI compatibility refusal and strict pre-install integrity/provenance checks"
     },
+    "engine/dope-cli/tests/v8_weights_installer_policy.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test v8_weights_installer_policy",
+      "purpose": "verify optional attested SingleEncV8 weights installation, four-subject OIDC policy and fail-closed refusals before binary execution or installation"
+    },
     "ops/ci/engine-release.sh": {
       "command": "bash ops/ci/engine-release.sh",
       "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"
@@ -3869,8 +3873,8 @@
       "purpose": "verify 100% pure-Rust DOPE-MLC-v3 SafeTensors loading, 4-tier routing, CRC32 wire tamper refusal and synthetic table sampling"
     },
     "scripts/install.sh": {
-      "command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy",
-      "purpose": "verify independent concrete engine/model tags, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"
+      "command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy --test v8_weights_installer_policy",
+      "purpose": "verify independent concrete engine/model tags, optional attested SingleEncV8 weights, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"
     },
     "ops/merge_guard/frozen_evidence.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",

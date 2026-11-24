@@ -2,11 +2,11 @@ name: Signed Rust engine
 
 on:
   pull_request:
-    paths: ['engine/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/install.sh', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
+    paths: ['engine/**', 'models/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/install.sh', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
   push:
     branches: [main]
     tags: ['dope-engine-v*']
-    paths: ['engine/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/install.sh', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
+    paths: ['engine/**', 'models/**', 'ops/ci/engine*.sh', 'ops/licenses/engine/**', 'rust-toolchain.toml', 'scripts/install.sh', 'scripts/verify-engine-release.sh', '.github/workflows/engine-release.yml']
 
 permissions:
   contents: read
@@ -95,10 +95,28 @@ jobs:
         run: |
           bash scripts/verify-engine-release.sh target/engine-release "$ENGINE_RELEASE_TAG" "$GITHUB_SHA"
           cp -- "$ATTESTATION_BUNDLE" target/engine-release/dope.sigstore.json
+          assets=(
+            target/engine-release/BUILDINFO.json
+            target/engine-release/Cargo.lock
+            target/engine-release/DEPENDENCIES.txt
+            target/engine-release/LICENSE
+            target/engine-release/THIRD_PARTY_NOTICES
+            target/engine-release/dope-linux-x86_64
+            target/engine-release/SHA256SUMS
+            target/engine-release/dope.sigstore.json
+          )
+          release_notes='Signed CPU Rust engine for Linux x86-64. Verify binary and SHA256SUMS attestations before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-engine-release.md.'
+          if [[ -f target/engine-release/V8_WEIGHTS_MANIFEST.json && ! -L target/engine-release/V8_WEIGHTS_MANIFEST.json && -f target/engine-release/dope-v8-weights.safetensors && ! -L target/engine-release/dope-v8-weights.safetensors ]]; then
+            assets+=(
+              target/engine-release/V8_WEIGHTS_MANIFEST.json
+              target/engine-release/dope-v8-weights.safetensors
+            )
+            release_notes='Signed CPU Rust engine for Linux x86-64 with bundled SingleEncV8 weights. Verify binary, SHA256SUMS, and weight attestations before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-engine-release.md.'
+          elif [[ -e target/engine-release/V8_WEIGHTS_MANIFEST.json || -L target/engine-release/V8_WEIGHTS_MANIFEST.json || -e target/engine-release/dope-v8-weights.safetensors || -L target/engine-release/dope-v8-weights.safetensors ]]; then
+            echo 'engine_release_partial_or_symlink_v8_weights' >&2
+            exit 1
+          fi
           gh release create "$ENGINE_RELEASE_TAG" --verify-tag --draft \
             --title "DOPE Rust engine $ENGINE_RELEASE_TAG" \
-            --notes 'Signed CPU Rust engine for Linux x86-64. Verify binary and SHA256SUMS attestations before installation. Signing establishes build identity; it does not certify model quality or privacy. See docs/signed-engine-release.md.' \
-            target/engine-release/BUILDINFO.json target/engine-release/Cargo.lock \
-            target/engine-release/DEPENDENCIES.txt target/engine-release/LICENSE \
-            target/engine-release/THIRD_PARTY_NOTICES target/engine-release/dope-linux-x86_64 \
-            target/engine-release/SHA256SUMS target/engine-release/dope.sigstore.json
+            --notes "$release_notes" \
+            "${assets[@]}"
