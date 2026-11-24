@@ -36,11 +36,16 @@ integration branch. A local static-pie build of `dope 3.0.0` from `3fb802fd` rep
 all 108 scheduled packet SHA-256 digests. The signed draft binary must reproduce
 the same digests before publication.
 
-**Read the guards with the headline.** The comparison's outcome under the `dope-kpi/v2`
-promotion rule is HOLD, not PROMOTE. TRG improves, but four guards fail: the regression lower
-bound, the held-out MLP auditor, realism coverage and privacy coverage. The block reports each
-one. The release ships `--format auto-v8` as the encoder with the best TRG at 2 KiB, with those
-trade-offs stated. `--format 1` remains the CLI default.
+**Read the guards with the headline.** In the archived internal release comparison of
+`dope-v3b-auto-v8` against `dope-2.0.0-auto` ([`compare.json`](compare.json)), the outcome
+under the `dope-kpi/v2` promotion rule is HOLD, not PROMOTE: TRG improves, but four guards
+fail (the regression lower bound, the held-out MLP auditor, realism coverage, and privacy
+coverage). The visible README scoreboard block reports the four external method comparisons
+from [`evidence/paper/v3-vs-*.json`](evidence/paper/README.md) (`PROMOTE` against SDV TVAE;
+`HOLD` against ARF, SDV Gaussian copula, and SDV CTGAN) together with each pair's guards.
+The release ships `--format auto-v8` as the encoder with the best TRG at 2 KiB among the
+evaluated DOPE release candidates, with those trade-offs stated. `--format 1` remains the
+CLI default.
 
 ## TRG, the twin-referenced gap
 
@@ -92,7 +97,12 @@ labels=(--label "dope-v3b-auto-v8=DOPE v3" --label "arfpy-arf=ARF"
   --label "bootstrap_a=Bootstrap of fitting rows" --label "indep_marginals=Independent marginals"
   --label "label_shuffle=Label shuffle")
 "$KPI" render-readme --ranked "${args[@]}" "${include[@]}" "${labels[@]}" < /dev/null > "$S/readme-block.md"
+for t in light dark; do
+  "$KPI" render-hero --methods --receipt "$D/primary-methods.json" --theme "$t" \
+    --out "$S/hero-v3-methods-$t.svg" < /dev/null
+done
 cmp "$S/readme-block.md" "$D/readme-block.md"
+for t in light dark; do cmp "$S/hero-v3-methods-$t.svg" "$F/hero-v3-methods-$t.svg"; done
 python3 tools/claims/dope1.py --check
 CHECK
 ```

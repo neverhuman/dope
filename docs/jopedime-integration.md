@@ -11,7 +11,7 @@ consumer's responsibility. No JopeDimeMicro runtime changes are required here.
 | Item | Pin |
 | --- | --- |
 | Repository | `https://github.com/neverhuman/dope` |
-| Recommended encoder source commit | `e15c415bad9554f7c419dd240aa670d1a79a27fe` (signed [`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0), annotated tag `590386580fecfb7f95ff7d41149c86de4f18551d`; 0-byte diff vs `v1.3.0` across `engine/dope-core/src/{mlc_v3/**,prepare.rs,landmark.rs,landmarks.rs}`, `engine/dope-core/Cargo.toml`, and `research/levels/{encoder.py,multilevel_model.py,building_block_landmarks.py}`; adds `DSE8` / `auto-v8`) |
+| Recommended encoder source commit | `e15c415bad9554f7c419dd240aa670d1a79a27fe` ([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0), unsigned annotated tag `590386580fecfb7f95ff7d41149c86de4f18551d` peeling to verified GitHub commit `e15c415b`, with Sigstore OIDC attestations on the published binary and `SHA256SUMS`; 0-byte diff vs `v1.3.0` across `engine/dope-core/src/{mlc_v3/**,prepare.rs,landmark.rs,landmarks.rs}`, `engine/dope-core/Cargo.toml`, and `research/levels/{encoder.py,multilevel_model.py,building_block_landmarks.py}`; adds `DSE8` / `auto-v8`) |
 | Source engine workspace version | `3.0.0` ([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0), tag commit `e15c415bad9554f7c419dd240aa670d1a79a27fe`) |
 | Previous rollback pins | `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`), `5fc96f2819a97ed313658c336a9a46e637299352` (`dope-engine-v1.2.0`), `15e12aa3dc33851655580f6aa7c9c66353143f23` (`dope-engine-v1.1.0`) |
 | Model release | [`v1.0.0`](https://github.com/neverhuman/dope/releases/tag/v1.0.0) (preserved; engine releases carry signed binaries, not MLC SafeTensors weights) |
@@ -34,15 +34,24 @@ model source used by Micro. Checking out that tag does not provide the encoder.
 Use the exact source commit above, separately from the weight asset URL.
 
 **Upgrading from `dope-engine-v1.3.0` to `dope-engine-v3.0.0`:** Commit
-`e15c415bad9554f7c419dd240aa670d1a79a27fe` (`dope-engine-v3.0.0`) updates the
-`dope-core` crate version to `3.0.0` while keeping the entire `mlc_v3`,
-`prepare`, `landmark`/`landmarks`, and `research/levels/{encoder,multilevel_model,building_block_landmarks}`
-surface byte-for-byte identical to `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` (`dope-engine-v1.3.0`),
-with zero `dope-core/Cargo.toml` dependency changes. Downstream JopeDime parity
-checks against the `v1.3.0` pin confirm bit-exact (`0` ULP) outputs across
-`Dope512` (`c5bf4ffb…`), `LandmarkBundle` (`3efc658b…`), and `ultra 629`
-(`4ee07c77…`). To roll back, detach the DOPE source pin back to
-`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b` and revert the `dope-core` lockfile entry.
+`e15c415bad9554f7c419dd240aa670d1a79a27fe` (`dope-engine-v3.0.0`, unsigned
+annotated tag `590386580fecfb7f95ff7d41149c86de4f18551d` with verified source
+commit and Sigstore-attested release binary and `SHA256SUMS`) updates the
+`dope-core` crate version to `3.0.0` (inherited from the engine workspace)
+while keeping the entire `mlc_v3`, `prepare`, `landmark`/`landmarks`, and
+`research/levels/{encoder,multilevel_model,building_block_landmarks}` surface
+byte-for-byte identical to `cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`
+(`dope-engine-v1.3.0`), with zero `dope-core/Cargo.toml` dependency changes.
+Downstream fixture-probe parity evidence in
+[JopeDime #2429](https://github.com/neverhuman/JopeDime/pull/2429) confirms
+bit-exact (`0` ULP) outputs against the `v1.3.0` pin across `Dope512`
+(`c5bf4ffb…`), `LandmarkBundle` (`3efc658b…`), and `ultra 629` (`4ee07c77…`).
+To roll back without leaving Rust lock and provenance on mixed pins, restore
+the previous downstream dependency pins (`dope-core` and `dope-norm`),
+preparation source pin (`PREPARATION_SOURCE`), and compatibility manifest
+(`models/dope-compat.json`) together to
+`cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b`, detach any vendored checkout to
+that commit, and regenerate `Cargo.lock`.
 
 The 1.70 MiB checkpoint fits comfortably within GitHub's per-asset limit of under
 2 GiB ([GitHub release documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)).
