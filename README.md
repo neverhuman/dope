@@ -16,15 +16,10 @@ from the artifact on a recipient CPU.
 - `v2.0.0` introduced `auto` selection between `Format 1` and a V7 packet. The current CLI reads V7 artifacts.
 - `v1.3.0` and earlier use `Format 1` and historical artifact readers. Plain `dope fit` still defaults to `Format 1`.
 
-<details>
-<summary>Transfer versus packet size</summary>
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v3-dark.svg">
   <img alt="DEV scoreboard showing transfer with uncertainty against artifact bytes for auto-v8, earlier encoders and real-row controls." src="bench/real-world/figures/hero-v3-light.svg">
 </picture>
-
-</details>
 
 ## Results
 
@@ -145,7 +140,7 @@ your normal data-handling rules to them.
 
 ## Documentation
 
-- [Current white paper](docs/whitepaper-v3/) and [independent verification](docs/plans/v3-major/verification/).
+- [Current white paper (PDF)](docs/whitepaper-v3/dope-v3.pdf), its [sources](docs/whitepaper-v3/), and [independent verification](docs/plans/v3-major/verification/).
 - [Rust SDK](engine/dope-sdk/), [native CLI](engine/dope-cli/), and [downstream integrations](docs/jopedime-integration.md).
 - [Benchmark](docs/benchmark.md), [metric definitions](docs/metric.md), and [claims policy](docs/claims-policy.md).
 - [Previous scoreboard](bench/real-world/results/scoreboard/v2.0.0/README.md) and [changelog](CHANGELOG.md).

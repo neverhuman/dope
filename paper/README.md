@@ -1,6 +1,9 @@
 # The DOPE White Paper
 
-The white paper of the DOPE repository is **`dope1.tex`** (`target/paper/dope1.pdf`, [compiled PDF on v1.0.0 release](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1.pdf)) and its companion supplement **`dope1-supplement.tex`** (`target/paper/dope1-supplement.pdf`, [compiled supplement PDF on v1.0.0 release](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1-supplement.pdf)):
+> **Archived.** This manuscript describes an earlier DOPE release and is kept unchanged for reproducibility.
+> The current paper is the [DOPE v3 white paper](../docs/whitepaper-v3/dope-v3.pdf).
+
+The DOPE v1.0.0 white paper is **`dope1.tex`** (`target/paper/dope1.pdf`, [compiled PDF on v1.0.0 release](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1.pdf)) and its companion supplement **`dope1-supplement.tex`** (`target/paper/dope1-supplement.pdf`, [compiled supplement PDF on v1.0.0 release](https://github.com/neverhuman/dope/releases/download/v1.0.0/dope1-supplement.pdf)):
 
 > **D.O.P.E.: Downstream Objective-Preserving Encoding — Learning to Compile Tables into Small Generative Programs That Train Real-World Models**
 

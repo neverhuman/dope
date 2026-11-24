@@ -27,6 +27,29 @@ as an uncertified research-engine package. The single release PR is
 | Signed delivery | Engine version is 3.0.0. #404 preserved the full `engine/` tree from `7810eed1`, whose signed-engine workflow passed its main-branch check. [Engine check](https://github.com/neverhuman/dope/actions/runs/45216307415) | Build and verify the exact approved tag's signed draft. Verify the staged archive as an isolated recipient and match the frozen report's 108 packet digests before publication. |
 | Neural increment | r1 was rejected on wide DEV. r2 k1500 was HOLD despite a positive screen. The new s7w w1 k1500 and r2 k3000 receipts are in [STATUS](STATUS.md#dev-select-receipts). | The s7w w1 checkpoint was rejected and r2 k3000 stays under evaluation. A checkpoint enters a release PR only with a passing, replayable DEV decision for its exact serving route. |
 
+## Publication record (v3.0.0)
+
+`dope-engine-v3.0.0` was published on 2026-11-24 at 03:02:47 UTC as the Latest release. It is an uncertified
+research-engine package. Its `dope-kpi/v2` outcome is HOLD.
+
+| Item | Value |
+| --- | --- |
+| Source | `e15c415bad9554f7c419dd240aa670d1a79a27fe` (PR #406 squash), tree `901a9e170c52a7014fdef8894f995df68eaa0b1c`. `cpu`, `paper-clean`, `security` and `jankurai-audit` succeeded on it. |
+| Annotated tag | `dope-engine-v3.0.0`, tag object `590386580fecfb7f95ff7d41149c86de4f18551d`, peels to the source above. |
+| Signed build | [Signed Rust engine run 45313406130](https://github.com/neverhuman/dope/actions/runs/45313406130), Sigstore OIDC attestation against `engine-release.yml @ refs/tags/dope-engine-v3.0.0`. |
+| Binary | `dope-linux-x86_64`, sha256 `8723955b1fcd59cab8996842a39b3a579c596c957ac1f89f291b0a9d1ebfaea0`. `BUILDINFO.json` records version 3.0.0, that source commit, `dirty_source: false` and rustc 1.88.0. Linux x86-64 GNU only, glibc 2.39 or newer. |
+| SBOM | CI run 45308315817 artifact `dope-sbom.spdx.json`, SPDX-2.3, 840 packages, sha256 `9d7c35753a3191fa3100d0499c3058b3f970614baad1396b3d6726ad379f831f`. |
+| Packet reproduction (G13) | Before publication, the signed binary re-emitted every scored packet of both DEV looks: the seeds 5–8 report arm `dope-v3b-auto-v8` and the seeds 9–12 look arm `served-auto-v8`. On each look, 216 of 216 emission keys matched in status, size and sha256. Receipts `76d43389…` and `b74bb290…` (`dope.v3-release-repro/v2`). Codex re-joined both ledgers independently. |
+| Recipient install | `install.sh --from-dir`, the tagged `install.sh` and the README's `curl … main/scripts/install.sh` each verified the attestation and installed the same binary. `dope --version`, `dope doctor`, `fit --format auto-v8` and `sample` ran with only `HOME` set. |
+| Rollback | `bash scripts/install.sh --tag dope-engine-v1.3.0 --source-digest cd35d9d0f0a772bea0e1ae2352eb8eb7d34ad09b --require-attestation --no-weights`. |
+| Not done | JopeDime is not re-pinned (owner decision). No learned V8 weights ship; `--v8-weights` takes research SafeTensors only, and `active-rank-v1` checkpoints need a later engine. |
+
+The successor is v3.1. It carries the Q4 large-model enabler, the `active-rank-v1` decoder and the 3.0.0 forward
+guard. A learned V8 tier qualifies only if Addendum G of the selection pre-registration selects it and a fresh DEV look
+confirms it. Public `dope-engine-v3.1.0` is published only when five gates pass: that look PROMOTEs, the signed
+binary plus weights reproduce every scored packet, Sigstore verification passes, a clean recipient install passes,
+and the release commit has all four required checks on main. Otherwise the enabler stays on main and v3.1.0 is HOLD.
+
 ## Tips traced to current main
 
 All six v3 tip hashes matched the [source register](STATUS.md#source-register). The detailed
