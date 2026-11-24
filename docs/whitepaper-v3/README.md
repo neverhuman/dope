@@ -23,7 +23,7 @@ checker rejects a digit typed into a section.
 | `sections/*.tex` | One file per section (`00-abstract` to `09-reproducibility`) and per appendix (`appendix-*`) |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
-| `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-methods-light.svg` (`dope_kpi render-hero --methods`), converted with `rsvg-convert -f pdf` |
+| `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-comparison-light.svg` (`dope_kpi render-hero --methods --same-cap-rows`), converted with `rsvg-convert -f pdf` |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-ranking-table.tex` | Ranking by Transfer Score (`dope_kpi render-paper-tables`) |
 | `generated/v3-paired-table.tex` | DOPE minus each generator on the report splits and the second set of splits (`dope_kpi render-paper-tables`) |
@@ -59,6 +59,11 @@ and `family-h.json` binds the four pairs by SHA-256 with Holm p, outcomes and th
 "replicates" flag equal to a recomputation. The appendix comparison table shows each set of splits
 in its own block. The ranking table and Figure 1 use the report splits.
 
+Part (b) repeats the same baseline comparison on a third set of development splits, data seeds 13–16.
+The [part (b) evidence](../../bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/part-b/)
+contains the signed v3 primary, paired and Holm-adjusted receipts. The appendix reads the bound
+aggregate summary directly. Each split set is analyzed independently.
+
 ## Build and verify
 
 From the repository root:
@@ -78,8 +83,8 @@ python3 docs/whitepaper-v3/scripts/render_v3_paper.py --check      # drift, hero
 bash docs/whitepaper-v3/scripts/build_v3_pdf.sh                    # dope-v3.pdf and dope-v3.bbl
 ```
 
-`just paper-v3` runs the last three. The PDF build checks the budget and training inputs against
-`evidence/addendum-k/SHA256SUMS`. `just paper-check` and `just paper-tests` include the v3
+`just paper-v3` runs the last three. The PDF build verifies the supplementary budget, training
+and split-set evidence against its SHA-256 manifests. `just paper-check` and `just paper-tests` include the v3
 paper, and `ops/ci/paper-clean.sh` deletes its generated files, rebuilds it and requires a
 zero diff.
 

@@ -1,10 +1,10 @@
 {
   "hero": {
-    "command": "SOURCE_DATE_EPOCH=1795392000 rsvg-convert -f pdf -o docs/whitepaper-v3/figures/hero-v3-methods.pdf bench/real-world/figures/hero-v3-methods-light.svg",
+    "command": "SOURCE_DATE_EPOCH=1795392000 rsvg-convert -f pdf -o docs/whitepaper-v3/figures/hero-v3-methods.pdf bench/real-world/figures/hero-v3-comparison-light.svg",
     "output": "docs/whitepaper-v3/figures/hero-v3-methods.pdf",
-    "output_sha256": "4d148bf55b57a5b2c6a3248b5f658daa31d132df2cc562a79b09117e744fcef3",
-    "source": "bench/real-world/figures/hero-v3-methods-light.svg",
-    "source_sha256": "2e7a8dda62ac5b201dac72231090811b17a581ee1ca20e190fe8673d1e8b0c76",
+    "output_sha256": "85686e45e4b2a70b7ca3b4680da7d38af4f09ee609773a26c1fdfe5e178f7c86",
+    "source": "bench/real-world/figures/hero-v3-comparison-light.svg",
+    "source_sha256": "e69fb33b94b2901d75d4611f1e918f57bcc0131ecb55aae4158d34f65e9dfa62",
     "tool": "rsvg-convert version 2.58.0"
   },
   "inputs": {
@@ -20,6 +20,7 @@
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-ctgan-h.json": "fe5628b34134f90f089ef1f796bda5066df4e3724c112c923c7660bdb1e13d4f",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-gaussian-copula-h.json": "518563fdbc0b73d0f4d94a5eb0425eb5b215b74223438303a3b895b2edb735ce",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-tvae-h.json": "4fb4c744065ba0f2b0a47e90ad156b6902885ef81e41f21c1b441e1d77e4e510",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/rows.csv": "4dedbd3b9dcfac5f7b575e5c172f8e587b4ca12c595b4837324d29bbad6bfa08",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/SHA256SUMS": "9cd78cd414eb88a67289ae1c44c92276845df4f2734fbe3cc1e2e343da01e6d6",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/arms.json": "02cdf99c852ad5ebf3f6b9d6822145a85a9c36f619e06e1d6a3ba37af73d00be",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/compare-a.json": "4ddabe593b3f2b8715f3f073c14e9cf7011a647e068eecbbba92374594cc1ee6",
@@ -44,7 +45,7 @@
     "bench/real-world/results/scoreboard/v3.0.0/primary-methods.json": "47ff73b1e35b8b29210de6df55538d60c65b59486c405d641027aff2124deda2",
     "bench/real-world/results/scoreboard/v3.0.0/primary.json": "55974867a938ff03c9c12108c9bc054c0dd40a6e2c6691e32a8b2c074c8eefba",
     "bench/real-world/results/scoreboard/v3.0.0/readme-block.md": "6842e2065af28994a5e27549cc4899765823566ee18c5a24298315795ef132c7",
-    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "1ee5820a29bb75d4363108444fb3259b6a33650cad6b55b40adec66d863704e7",
+    "bench/real-world/results/scoreboard/v3.0.0/render-manifest.json": "6fab4ba0e7648b8c2ccc91a5e07d465fe4b35d1bbd8c19c84884babbb21a117b",
     "contracts/dope-fidelity-v3-candidate.json": "87bc12eef5191d60b75e40f7c3f556f4816f64c50b7c2c6cb1a689e5aea29f60",
     "contracts/dope-kpi.json": "200ea0ed1ba23a25be89de2dac2a4101656119514e0d69b4ff86a98fa4857623",
     "contracts/evidence-layout-v1.json": "e99647eb75cd078e0951ea93e12f48980475cab17f9fae028e05e4eb0d38999c",
@@ -66,7 +67,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-macros.tex": "2e69e1e52072435c050d53d93a6076bb58ee68e280ab01d8393f0ede65d7cd22"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "59452e950866cddfb2c6519ae2d897f8a60e05992d99718498255d2d4f161e2f"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }

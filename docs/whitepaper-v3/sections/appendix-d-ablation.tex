@@ -35,3 +35,8 @@ The signed replay selected Format~1 on \FormatRouteValue{fits} fits and analytic
 \end{table}
 
 The two groups differ in task mix. For example, the selector chose analytic \texttt{DSE8} for \AnalyticRouteValue{binary} binary headline cells and \AnalyticRouteValue{regression} regression headline cells. Some families contribute to both groups. The analytic \texttt{DSE8} interval is based on only \AnalyticRouteValue{families} informative families. The grouped scores measure transfer after the selector's choice and cannot estimate the effect of assigning a different codec to the same cells.
+
+\subsection{Comparing configurations where Format~1 fits}
+Forced Format~1 fitted on \FitValue{headline} of \VThree{Scheduled} headline cells. On the informative cells of that subset, per-table selection scores \FitScore{served} at \VThree{PrimaryMult}$\times$, compared with \FitScore{forced} for Format~1 alone. The paired difference is \FitScore{delta} [\FitScore{low}, \FitScore{high}] points at \VThree{PrimaryMult}$\times$ and \FitScore{matched_delta} [\FitScore{matched_low}, \FitScore{matched_high}] points at matched size. Median files are \FitValue{served_bytes} and \FitValue{forced_bytes} bytes, respectively.
+
+On the other \FitFailedValue{headline} headline cells, Format~1 failed to fit. Its \FitFailedValue{informative} informative cells score at the failure floor, and per-table selection scores \FitFailedScore{served} at \VThree{PrimaryMult}$\times$. Only \FitFailedValue{families} informative families enter that estimate. Both comparisons condition on observed fit status and include differences in container framing.

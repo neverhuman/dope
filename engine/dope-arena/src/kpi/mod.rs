@@ -29,6 +29,7 @@ pub mod guard_eval;
 pub mod guard_merge;
 pub mod guards;
 pub mod hero;
+mod hero_comparison;
 pub mod hero_labels;
 pub mod hero_layout;
 pub mod hero_model;

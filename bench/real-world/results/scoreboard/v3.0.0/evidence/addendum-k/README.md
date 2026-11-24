@@ -36,6 +36,8 @@ The score reducer requires private per-cell artifacts and ledgers. Public inputs
 
 `k3-census-public.json` counts the selected codecs by task and stratum across all 108 signed report fits. An independent census matched every packet digest to the original emission ledger before reading the container tag and weights fingerprint. `k3-group.json` binds the full and partitioned reductions of the original score files for all cells, the Format 1 selections and the analytic DSE8 selections. The independent check regenerated the four filtered inputs, both guard files and the native primary receipt for each group byte for byte. The full replay reproduces the released score. `k3-group.csv` projects the public aggregates used by the paper's grouped table. Differences reflect the cells the selector assigned to each codec, including differences in task mix.
 
+`k33-result.json` records a separate partition based on the two scheduled emissions of forced Format 1. It has 85 successful fits and 23 fit exits. The independent check classified all 216 keys, re-filtered the original schedules and ledgers, reproduced all 35 bound input and receipt files byte for byte and checked the results arithmetic. `k33-summary.csv` projects the public aggregates used in the paper. The pairwise differences are conditional on Format 1 fit status, and they compare the complete configurations, including their framing.
+
 ## Learned refinement pilot
 
 - `k5-plot-inputs.json` contains the plotted medians over non-overlapping windows of 200 applied updates and the paired Transfer Score differences by schedule. The telemetry spans three seeds at 8,000 corrected-objective updates and three controls at 2,000 updates, with no skipped nonfinite updates.

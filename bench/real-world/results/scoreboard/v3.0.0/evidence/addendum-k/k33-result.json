@@ -1,0 +1,104 @@
+{
+  "bind1_sha256": "b0be3356610fbf13d2d344000bad53862660344cf273b98045a78df3b69546e2",
+  "bind2_sha256": "b4a9fd1f02f8e334b6085d6880eef769dfb36f41ceba0c3f0e2ff9f9a2a298f3",
+  "f1_fit_share_of_headline": 0.828125,
+  "production_custody": true,
+  "role": "descriptive DEV evidence (Addendum K K3.3); outcome-conditioned subsets",
+  "schema": "dope.addendum-k33-result/v1",
+  "subsets": {
+    "f1-failed": {
+      "arms": {
+        "dope-v3b-auto-v8": {
+          "bytes_median": 2036.0,
+          "ci_4x": [
+            85.5230161528,
+            85.5230161528
+          ],
+          "failed_cells": 0,
+          "families": 2,
+          "informative_cells": 7,
+          "mlp_ts": 35.586434578,
+          "ts_1x": 79.3859296797,
+          "ts_4x": 85.5230161528
+        },
+        "served-f1": {
+          "bytes_median": null,
+          "ci_4x": [
+            0.0,
+            0.0
+          ],
+          "failed_cells": 7,
+          "families": 2,
+          "informative_cells": 7,
+          "mlp_ts": 0.0,
+          "ts_1x": 0.0,
+          "ts_4x": 0.0
+        }
+      },
+      "headline_scheduled_cells": 11,
+      "paired_1x_ts": {
+        "ci": [
+          79.3859296797,
+          79.3859296797
+        ],
+        "delta": 79.3859296797
+      },
+      "paired_4x_ts": {
+        "cells": 7,
+        "ci": [
+          85.5230161528,
+          85.5230161528
+        ],
+        "delta": 85.5230161528,
+        "families": 2
+      }
+    },
+    "f1-fit": {
+      "arms": {
+        "dope-v3b-auto-v8": {
+          "bytes_median": 1521.0,
+          "ci_4x": [
+            81.6339120873,
+            95.5698665012
+          ],
+          "failed_cells": 0,
+          "families": 11,
+          "informative_cells": 37,
+          "mlp_ts": 70.0120815407,
+          "ts_1x": 69.14165093860001,
+          "ts_4x": 88.4408855002
+        },
+        "served-f1": {
+          "bytes_median": 1508.0,
+          "ci_4x": [
+            68.4173574673,
+            89.9056076333
+          ],
+          "failed_cells": 0,
+          "families": 11,
+          "informative_cells": 37,
+          "mlp_ts": 62.8183094146,
+          "ts_1x": 58.2334920942,
+          "ts_4x": 79.0024540781
+        }
+      },
+      "headline_scheduled_cells": 53,
+      "paired_1x_ts": {
+        "ci": [
+          0.9317922953,
+          18.9033147004
+        ],
+        "delta": 10.908158844399999
+      },
+      "paired_4x_ts": {
+        "cells": 37,
+        "ci": [
+          0.7848265184,
+          16.3378624377
+        ],
+        "delta": 9.4384314221,
+        "families": 11
+      }
+    }
+  }
+}

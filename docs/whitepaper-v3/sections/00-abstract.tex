@@ -3,6 +3,6 @@
 We evaluate how models trained on those rows predict held-out real targets. Transfer Score sets a real training twin to \VThree{ScoreScale} by definition.
 On fresh splits of development tables (\VThree{CandCells} informative cells in \VThree{Families} lineage families), DOPE~\VThree{ReleaseVersion} scores \VThree{CandMatchedScorePoint} at matched sample size and \VThree{CandScore} at \VThree{PrimaryMult}$\times$. Its median file is \VThree{CandBytesMed}~bytes.
 Uniformly retaining and resampling fitting rows under the same byte cap gives \CapScore{\RowsBudget}{score} [\CapScore{\RowsBudget}{low}, \CapScore{\RowsBudget}{high}] at \VThree{PrimaryMult}$\times$.
-Among four uncapped library defaults, ARF has the highest point estimate (\VThree{ArfScorePoint}). DOPE's paired intervals favor it over all three SDV configurations on two sets of splits of the same tables. The paired interval against ARF includes zero on both at \VThree{PrimaryMult}$\times$.
+Among four uncapped library defaults, ARF has the highest report point estimate (\VThree{ArfScorePoint}). DOPE's paired intervals favor it over all three SDV configurations on three sets of splits of the same development tables. The paired interval against ARF includes zero on each at \VThree{PrimaryMult}$\times$.
 A discriminator separates DOPE's samples from real rows about as readily as it separates independently permuted columns (median two-sample AUC \VThree{CandC2st} for each). The benchmark measures predictive transfer on these tables and includes empirical privacy audits.
 \end{abstract}

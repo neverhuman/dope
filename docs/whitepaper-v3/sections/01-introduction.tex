@@ -3,7 +3,7 @@
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{figures/hero-v3-methods.pdf}
-  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling (\VThree{CiLevel} family-bootstrap intervals) and median whole-file size on the development report splits. All generators fit the same rows. DOPE~\VThree{ReleaseVersion} fits the \VThree{BudgetBytes}-byte cap. The four other generators use uncapped library-default serialization. Horizontal lines mark the real-twin definition (\VThree{ScoreScale}) and the observed score for a copy of the fitting rows (\VThree{CopyAScorePoint}).}
+  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling on the development report splits. The left panel compares signed DOPE with storing and resampling a uniform subset of fitting rows under the same \VThree{BudgetBytes}-byte cap. The right panel compares DOPE with four generators fitted with library defaults and no cap, and gives the median whole-file sizes. Whiskers are \VThree{CiLevel} family-bootstrap intervals for individual scores. The final column gives paired differences in Transfer Score points and their intervals.}
   \label{fig:hero}
 \end{figure}
 

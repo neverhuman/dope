@@ -297,6 +297,26 @@ Downstream Cargo projects may use
 `dope-core = { path = "vendor/dope/engine/dope-core" }` with the source gitlink
 pinned above and their own committed Cargo lockfile.
 
+## Use v3 synthetic rows in a downstream experiment
+
+JopeDime main is pinned to the v3.0.0 source. Its compatibility record uses
+the existing MLC checkpoint and the approved fixture probes returned bit-identical
+encoder outputs. See [JopeDime PR #2429](https://github.com/neverhuman/JopeDime/pull/2429).
+
+The signed `dope fit --format auto-v8` and `dope sample` workflow gives an
+offline experiment a generator under a whole-file byte cap. Follow the
+[signed-engine quickstart](getting-started.md) to generate training rows.
+Evaluate the downstream learner on separately held real rows.
+
+Rust callers can use `dope_core::auto::fit_dpa1_v8` in
+`V8DpaMode::AutoV8` with no model argument. Read the container tag before
+decoding. `V8Decoder` opens tag-8 DSE8 payloads, and Format 1 payloads
+use the Format 1 reader. The pinned `dope_core::evidence` module also
+exposes fitting-only descriptors defined by
+[the evidence layout](../contracts/evidence-layout-v1.json).
+The source-pin compatibility tests measure encoder parity. Downstream
+performance of these v3 paths remains to be measured in JopeDime.
+
 ## Proposed downstream CPU projection optimization
 
 Micro Stage 1A computes

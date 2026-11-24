@@ -12,6 +12,7 @@ scoreboard and its receipts stay in [`../v2.0.0/`](../v2.0.0/README.md).
 | `primary.json`, `compare.json` | archived DOPE-internal receipts for the release decision (HOLD) |
 | `readme-block.md` | `dope_kpi render-readme --ranked --only-included` from `primary-methods.json` and `evidence/paper/v3-vs-*.json`. This page embeds the full block byte for byte; root `README.md` embeds its visible leaderboard prefix before `<details>`. |
 | `../../../figures/hero-v3-methods-light.svg`, `../../../figures/hero-v3-methods-dark.svg` | `dope_kpi render-hero` from `primary-methods.json` |
+| `../../../figures/hero-v3-comparison-{light,dark}.svg` | README and paper figure combining the default-fit benchmark with the same-cap stored-row result in `evidence/addendum-k/rows.csv` |
 | `render-manifest.json` | the SHA-256 of every rendered receipt, of `readme-block.md`, and of the hero SVG files |
 
 ## Full benchmark metrics and guard results
@@ -131,8 +132,8 @@ TRG ordering. Paired gains and interval bounds are in points on the same scale.
 
 ## Regenerate from the receipts
 
-Run from the repository root, with `KPI` set to a `dope_kpi` binary. It re-renders the
-block and both hero files from the committed receipts into a staging directory under
+Run from the repository root, with `KPI` set to `dope_kpi` built from this checkout. It re-renders the
+block and the hero figures from the committed evidence into a staging directory under
 `target/` and compares them with the committed files.
 
 ```bash
@@ -157,9 +158,15 @@ labels=(--label "dope-v3b-auto-v8=DOPE v3" --label "arfpy-arf=ARF"
 for t in light dark; do
   "$KPI" render-hero --methods --receipt "$D/primary-methods.json" --theme "$t" \
     --out "$S/hero-v3-methods-$t.svg" < /dev/null
+  "$KPI" render-hero --methods "${args[@]}" \
+    --same-cap-rows "$D/evidence/addendum-k/rows.csv" --theme "$t" \
+    --out "$S/hero-v3-comparison-$t.svg" < /dev/null
 done
 cmp "$S/readme-block.md" "$D/readme-block.md"
-for t in light dark; do cmp "$S/hero-v3-methods-$t.svg" "$F/hero-v3-methods-$t.svg"; done
+for t in light dark; do
+  cmp "$S/hero-v3-methods-$t.svg" "$F/hero-v3-methods-$t.svg"
+  cmp "$S/hero-v3-comparison-$t.svg" "$F/hero-v3-comparison-$t.svg"
+done
 python3 tools/claims/dope1.py --check
 CHECK
 ```

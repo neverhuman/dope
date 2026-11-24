@@ -360,6 +360,12 @@ fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
         .to_path_buf();
     let receipt_path = repo.join("bench/real-world/results/scoreboard/v3.0.0/primary-methods.json");
     let raw = std::fs::read(&receipt_path).expect("committed primary-methods.json");
+    let scoreboard = receipt_path.parent().unwrap();
+    let stored_rows = std::fs::read(scoreboard.join("evidence/addendum-k/rows.csv")).unwrap();
+    let comparisons = ["arfpy-arf", "sdv-gaussian-copula", "sdv-tvae", "sdv-ctgan"].map(|id| {
+        let path = scoreboard.join(format!("evidence/paper/v3-vs-{id}.json"));
+        serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap()
+    });
     let args = HeroArgs {
         receipts: vec![receipt_path],
         theme: ThemeArg::Light,
@@ -372,6 +378,7 @@ fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
         score_scale: false,
         real_twin: None,
         methods: true,
+        same_cap_rows: None,
         title: None,
         note: None,
     };
@@ -440,6 +447,20 @@ fn methods_preset_renders_receipt_on_transfer_score_scale_without_overlaps() {
             svg, committed,
             "{committed_name} drifted from committed receipts"
         );
+        let comparison =
+            super::hero_comparison::render(&h, theme, &stored_rows, &comparisons).unwrap();
+        well_formed(&comparison).unwrap();
+        assert!(comparison.contains(">2.6</text>"));
+        assert!(comparison.contains(">+10.8  [−3.5, 29.5]</text>"));
+        let name = format!(
+            "bench/real-world/figures/hero-v3-comparison-{}.svg",
+            theme.name()
+        );
+        assert_eq!(
+            comparison,
+            std::fs::read_to_string(repo.join(&name)).unwrap(),
+            "{name} drifted from its inputs"
+        );
     }
 }
 
@@ -466,6 +487,7 @@ fn include_rejects_excluded_highlight_and_anchors_to_plotted_arm() {
         score_scale: true,
         real_twin: None,
         methods: false,
+        same_cap_rows: None,
         title: None,
         note: None,
     };
@@ -499,6 +521,7 @@ fn include_rejects_excluded_highlight_and_anchors_to_plotted_arm() {
         score_scale: true,
         real_twin: None,
         methods: false,
+        same_cap_rows: None,
         title: None,
         note: None,
     };

@@ -42,10 +42,14 @@ fn main() {
     } else {
         sample_source_free(root, &a[3], &a[4], 8, 17, &BundleLimits::default()).map(|s| {
             let encoded: Vec<u8> = s.values.iter().flat_map(|v| v.to_le_bytes()).collect();
-            println!("{}", serde_json::json!({"sample_sha256":dope_kernel::bundle::content_fingerprint(&encoded),
-                "charged_bundle_bytes":s.accounting.charged_sampling_bytes,
-                "cold_sampling_closure_bytes":s.cold_sampling_closure_bytes,
-                "decoder_bytes":s.decoder_files.iter().map(|f| f.bytes).sum::<usize>()}));
+            // The sealed worker can format fixed keys, hex and integers without
+            // a JSON map that might initialize a randomized hasher.
+            println!(concat!("{{\"sample_sha256\":\"{}\",\"charged_bundle_bytes\":{},",
+                "\"cold_sampling_closure_bytes\":{},\"decoder_bytes\":{}}}"),
+                dope_kernel::bundle::content_fingerprint(&encoded),
+                s.accounting.charged_sampling_bytes,
+                s.cold_sampling_closure_bytes,
+                s.decoder_files.iter().map(|f| f.bytes).sum::<usize>());
             s.values.len()
         })
     };
@@ -106,8 +110,6 @@ fn worker() -> &'static Path {
             .arg(format!("dependency={}", deps.display()))
             .arg("--extern")
             .arg(format!("dope_kernel={}", kernel_rlib.display()))
-            .arg("--extern")
-            .arg(format!("serde_json={}", find("libserde_json-").display()))
             .arg("--extern")
             .arg(format!("libc={}", find("liblibc-").display()))
             .status()
