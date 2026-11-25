@@ -77,39 +77,41 @@ impl Workspace {
     }
 }
 
-fn all_bash_blocks(section: &str) -> Vec<&str> {
-    section
+fn bash_blocks(section: &str) -> [&str; 2] {
+    let blocks: Vec<_> = section
         .split("```bash\n")
         .skip(1)
         .map(|block| block.split_once("\n```").unwrap().0)
-        .collect()
+        .collect();
+    blocks.try_into().unwrap()
 }
 
-fn bash_blocks(section: &str) -> [&str; 2] {
-    all_bash_blocks(section).try_into().unwrap()
+fn readme_quick_start() -> [&'static str; 2] {
+    let (_, rest) = README.split_once("## Quick start\n").unwrap();
+    let (section, _) = rest.split_once("## Results\n").unwrap();
+    bash_blocks(section)
+}
+
+fn own_data_walkthrough() -> [&'static str; 2] {
+    let (_, rest) = GETTING_STARTED.split_once("## Fit a table\n").unwrap();
+    let (section, _) = rest
+        .split_once("## Historical kernel demonstration\n")
+        .unwrap();
+    bash_blocks(section)
 }
 
 #[test]
-fn readme_appendix_matches_the_executed_guides() {
-    let (_, appendix) = README
-        .split_once("## Appendix: quick start and run examples\n")
-        .unwrap();
-    let blocks = all_bash_blocks(appendix);
-    assert_eq!(blocks.len(), 4);
-    let (_, quick) = README.split_once("## Quick start\n").unwrap();
-    let (quick, _) = quick.split_once("## Results\n").unwrap();
-    let [install, demo] = bash_blocks(quick);
-    assert_eq!(blocks[0], install);
-    assert_eq!(blocks[1], demo);
-    let (_, fit) = GETTING_STARTED.split_once("## Fit a table\n").unwrap();
-    let (fit, _) = fit
-        .split_once("## Historical kernel demonstration\n")
-        .unwrap();
-    let [fit_and_sample, evaluate] = bash_blocks(fit);
-    assert!(blocks[2].contains(fit_and_sample));
-    assert!(blocks[2].contains(evaluate));
-    assert!(GETTING_STARTED.contains(&format!("```bash\n{}\n```", blocks[3])));
-    assert!(blocks[3].contains("ubuntu:24.04"));
+fn paper_examples_match_smoke_commands() {
+    let [_, demo] = readme_quick_start();
+    assert_eq!(
+        include_bytes!("../../../docs/whitepaper-v3/examples/toy-run.bash"),
+        [demo, "\n"].concat().as_bytes()
+    );
+    let [fit_and_sample, evaluate] = own_data_walkthrough();
+    assert_eq!(
+        include_bytes!("../../../docs/whitepaper-v3/examples/own-csv.bash"),
+        [fit_and_sample, evaluate, ""].join("\n").as_bytes()
+    );
 }
 
 fn assert_release_binary(workspace: &Workspace) {
@@ -220,11 +222,7 @@ fn assert_evaluation(work: &Path, artifact_bytes: u64, synth_rows: usize) {
 }
 
 fn run_own_data_walkthrough(workspace: &Workspace, train: &str, test: &str) {
-    let (_, rest) = GETTING_STARTED.split_once("## Fit a table\n").unwrap();
-    let (section, _) = rest
-        .split_once("## Historical kernel demonstration\n")
-        .unwrap();
-    let [fit_and_sample, evaluate] = bash_blocks(section);
+    let [fit_and_sample, evaluate] = own_data_walkthrough();
     let work = workspace.root.join("own-data");
     fs::create_dir(&work).unwrap();
     fs::write(work.join("train.csv"), train).unwrap();
@@ -259,9 +257,7 @@ fn run_own_data_walkthrough(workspace: &Workspace, train: &str, test: &str) {
 #[ignore = "requires public GitHub and Sigstore access on Linux x86-64 with glibc 2.39+"]
 fn published_readme_quick_start() {
     let workspace = Workspace::new();
-    let (_, rest) = README.split_once("## Quick start\n").unwrap();
-    let (section, _) = rest.split_once("## Results\n").unwrap();
-    let [install, demo] = bash_blocks(section);
+    let [install, demo] = readme_quick_start();
     assert!(install.contains(INSTALLER_URL));
     assert!(install.contains(&digest(INSTALLER)));
     for block in [install, demo] {

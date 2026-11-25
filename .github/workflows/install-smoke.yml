@@ -9,6 +9,8 @@ on:
     paths:
       - "README.md"
       - "docs/getting-started.md"
+      - "docs/whitepaper-v3/dope-v3.tex"
+      - "docs/whitepaper-v3/examples/**"
       - "docs/install.md"
       - "docs/signed-engine-release.md"
       - "AGENTS.md"
@@ -21,6 +23,8 @@ on:
     paths:
       - "README.md"
       - "docs/getting-started.md"
+      - "docs/whitepaper-v3/dope-v3.tex"
+      - "docs/whitepaper-v3/examples/**"
       - "docs/install.md"
       - "docs/signed-engine-release.md"
       - "AGENTS.md"

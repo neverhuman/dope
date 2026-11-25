@@ -20,6 +20,7 @@ checker rejects a digit typed into the manuscript prose or into display math. Fi
 | Path | Role |
 | --- | --- |
 | `dope-v3.tex` | The manuscript: house layout, receipt macros, and appendices in one file |
+| `examples/` | Verbatim quick-start listings, checked against the install smoke commands |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
 | `figures/hero-v3-methods.pdf` | README methods hero, converted from the scoreboard SVG. The manuscript draws its own figures from the same receipts. |
