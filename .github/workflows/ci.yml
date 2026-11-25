@@ -270,6 +270,14 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Upload the rebuilt release paper
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dope-v3-paper
+          path: ci-source/docs/whitepaper-v3/dope-v3.pdf
+          if-no-files-found: error
+          retention-days: 14
+
   security:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on:

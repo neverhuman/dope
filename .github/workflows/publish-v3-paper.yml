@@ -1,0 +1,63 @@
+name: Publish rebuilt v3 paper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/whitepaper-v3/**'
+      - 'ops/ci/paper-clean.sh'
+      - 'ops/ci/publish-paper.rs'
+      - '.github/workflows/publish-v3-paper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-v3-paper
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    if: github.ref == 'refs/heads/main' && github.repository == 'neverhuman/dope'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install the TeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends latexmk poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures lmodern just
+      - name: Rebuild from the committed receipts
+        run: bash ops/ci/paper-clean.sh --v3-only
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: v3-paper-publication
+          path: docs/whitepaper-v3/dope-v3.pdf
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.ref == 'refs/heads/main' && github.repository == 'neverhuman/dope'
+    needs: rebuild
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: v3-paper-publication
+          path: target/paper-artifact
+      - run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Build the paper publisher
+        run: rustc --edition 2021 -D warnings ops/ci/publish-paper.rs -o target/publish-paper
+      - name: Push the verified PDF to its publication branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: target/publish-paper target/paper-artifact/dope-v3.pdf

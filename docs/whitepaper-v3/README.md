@@ -20,7 +20,7 @@ checker rejects a digit typed into a section.
 | Path | Role |
 | --- | --- |
 | `dope-v3.tex` | Preamble, title block and `\input` of each section |
-| `sections/*.tex` | One file per section (`00-abstract` to `09-reproducibility`) and per appendix (`appendix-*`) |
+| `sections/*.tex` | One file per section (`00-abstract` to `10-conclusion`) and per appendix (`appendix-*`) |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
 | `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-comparison-light.svg` (`dope_kpi render-hero --methods --same-cap-rows`), converted with `rsvg-convert -f pdf` |
@@ -87,6 +87,13 @@ bash docs/whitepaper-v3/scripts/build_v3_pdf.sh                    # dope-v3.pdf
 and split-set evidence against its SHA-256 manifests. `just paper-check` and `just paper-tests` include the v3
 paper, and `ops/ci/paper-clean.sh` deletes its generated files, rebuilds it and requires a
 zero diff.
+
+CI attaches the rebuilt v3 PDF to every successful `paper-clean` run. When
+a paper change reaches `main`, the publication workflow runs its own
+verified rebuild and pushes the PDF to `paper/v3-pdf`.
+That branch holds the publication copy. The commit message identifies the
+source commit, and an identical PDF needs no new publication commit. Update
+the source and committed PDF together through a PR.
 
 When the scoreboard receipts change (for example after a rebase onto a new release), re-run
 `render_v3_paper.py` (with `--figures` if the hero SVG changed) and `build_v3_pdf.sh`. The text

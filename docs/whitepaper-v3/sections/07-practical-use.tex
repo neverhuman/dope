@@ -1,0 +1,7 @@
+\section{Using a fitted artifact}\label{sec:practical}
+
+There are three distinct steps in a deployment. First, declare the target and split real rows by duplicate group. Fit locally under a whole-file budget, using only the fitting split to choose the codec. Second, reload the artifact in another process and generate a training CSV with a recorded row count and seed. Third, fit the same downstream recipe on real fitting rows and on synthetic rows, and score both on the same withheld real rows. A null model fitted on the real fitting set anchors the retention calculation in Eq.~\eqref{eq:retention}. This gives a useful application check even without the real twin required to compute Transfer Score.
+
+For storage or exchange, the per-table file is independent of the original runtime process. A change to the task, schema, or budget calls for a new fit. The artifact contains schema and fitted summaries, and synthetic rows can also carry information about the source. Decide whether either may cross the data boundary under the same policy that governs other derived data. This paper measures some of that risk empirically in Appendix~\ref{app:guards}.
+
+The \href{https://github.com/neverhuman/dope#quick-start}{signed-engine quick start} demonstrates fitting, cold-process sampling, and evaluation on a deterministic fixture. The \href{https://github.com/neverhuman/dope/blob/main/docs/getting-started.md}{own-data walkthrough} covers the signed codec's sampling route and shows how to evaluate the resulting CSV.

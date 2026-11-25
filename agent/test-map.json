@@ -712,6 +712,14 @@
       "command": "just paper-check",
       "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"
     },
+    "ops/ci/publish-paper.rs": {
+      "command": "mkdir -p target && rustc --edition 2021 -D warnings ops/ci/publish-paper.rs -o target/publish-paper",
+      "purpose": "compile the publisher for exact-head, reproducible PDF output from protected main"
+    },
+    ".github/workflows/publish-v3-paper.yml": {
+      "command": "actionlint .github/workflows/publish-v3-paper.yml && bash ops/ci/paper-clean.sh --v3-only",
+      "purpose": "verify publication workflow syntax and reproduce its PDF without output drift"
+    },
     "ops/ci/paper-inputs/": {
       "command": "just paper-check",
       "purpose": "authenticate paper inputs, reproduce declared review reductions and figures, and check ICLR anonymous main and supplement text, metadata, and URL destinations"

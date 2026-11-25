@@ -2,6 +2,11 @@
 # A disposable CI checkout must regenerate the complete paper from committed inputs.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+if [[ "${1:-}" == --v3-only ]]; then
+  just paper-v3
+  git diff --exit-code -- docs/whitepaper-v3
+  exit
+fi
 output_paths=(
   docs/whitepaper/generated docs/whitepaper/figures
   docs/whitepaper/dope-mfs.pdf docs/whitepaper/dope-mfs-anonymous.pdf

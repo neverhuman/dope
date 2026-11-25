@@ -1,0 +1,40 @@
+\section{Describing a table}\label{sec:features}
+
+A compact generator has to decide which features of a table are worth encoding. Ties and atoms matter when a sampler must stay on the right support. A large residual after an additive fit can justify spending bytes on interactions. Strong class imbalance may make a fold or a proposed sample uninformative. These are properties of the fitting split and its declared task, so we recompute them whenever that split changes.
+
+\subsection{Fitting-only evidence}
+
+The evidence bank records named statistics by column, pair, class, feature group, and table. Its shape depends on the schema, and each coordinate has a validity mask. A measured zero and an unavailable measurement therefore have different representations. Appendix~\ref{app:evidence} gives the frozen layout and support rule.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \begin{tabularx}{\linewidth}{@{}p{0.23\linewidth}X@{}}
+    \toprule
+    Evidence & Measurements \\
+    \midrule
+    Support and shape & Ties, supported atoms, lattice structure, quantile residuals, missingness, and tail summaries. \\
+    Dependence and target & Tie-aware associations, factor structure, class summaries, out-of-fold residual structure, and pairwise effects. \\
+    Learner witnesses & Out-of-fold linear and boosted-tree gain, grouped permutation importance, interaction energy, and calibration. \\
+    Candidate diagnostics & When a packet is supplied, compare decoded rows with fitting rows using a discriminator, dependence gaps, proximity to records, and packet size. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{What the evidence bank measures. Row-derived inputs come from the fitting split. Candidate diagnostics also use rows decoded from the packet.}
+  \label{tab:evidence-families}
+\end{table}
+
+The release's analytic fit uses the shared ordering and support primitives and estimates the quantities stored by each codec. The learned refinement pilot consumes the evidence tensors. A separate landmark panel can be used to diagnose a table or a synthetic draw. The default \cli{dope fit} route does not run that panel.
+
+\subsection{Landmarks and their uses}
+
+A landmark is the result of a small learning experiment~\citep{pfahringer2000landmarking}. Within the fitting split, train a fixed recipe on each fold's training rows and score it on that fold's validation rows. Use the fold's training rows to fit preprocessing and the constant predictor. A missing, unsupported, or unstable result remains visible as such.
+
+A panel of recipes is more informative than a single accuracy estimate. Comparing a shaped additive fit with a tree can indicate where interactions deserve inspection. Comparing the full fit with a single-feature fit can reveal concentration of predictive signal. These contrasts are diagnostic: correlated features, finite samples, and the inductive biases of the recipes can produce large contrasts even when the underlying mechanism is simple. They do not establish that the same drivers are preserved for a different model family.
+
+The release's codec selector uses a related idea with a different purpose. It fits and samples each candidate on fitting-only folds and checks how well fixed auditors transfer to the other fold. It uses the comparison to choose a packet before the external test rows are opened (\S\ref{sec:select}).
+
+\subsection{How this differs from an in-context predictor}
+
+TabPFN's technical report describes a predictor that embeds cells using, among other inputs, Fourier features and ranks computed against the column's training values. Kumo Tabular embeds cells, builds row representations with column- and row-wise attention, and predicts queries from labeled context~\citep{priorlabs2026tabpfn,nvidia2026kumotabular}. They can run within the owner's boundary, subject to the deployment setting.
+
+DOPE summarizes the fitting split before fitting a per-table generator. The receiver needs the artifact to sample, and can choose a learner afterward. One possible composition is to use synthetic rows as context for an in-context predictor. The benchmark in this report evaluates linear, boosted-tree, and MLP learners. Transfer to an in-context model remains unmeasured.

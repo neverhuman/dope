@@ -1,4 +1,4 @@
-\begin{thebibliography}{33}
+\begin{thebibliography}{36}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -155,11 +155,31 @@ Beata Nowok, Gillian~M. Raab, and Chris Dibben.
   1--26, 2016.
 \newblock \doi{10.18637/jss.v074.i11}.
 
+\bibitem[{NVIDIA and Kumo}(2026)]{nvidia2026kumotabular}
+{NVIDIA and Kumo}.
+\newblock {NVIDIA Kumo Tabular}: Pushing the accuracy--efficiency frontier for
+  tabular prediction.
+\newblock arXiv:2611.23001, 2026.
+\newblock URL \url{https://arxiv.org/abs/2611.23001}.
+
 \bibitem[Patki et~al.(2016)Patki, Wedge, and Veeramachaneni]{patki2016sdv}
 Neha Patki, Roy Wedge, and Kalyan Veeramachaneni.
 \newblock The synthetic data vault.
 \newblock In \emph{IEEE International Conference on Data Science and Advanced
   Analytics (DSAA)}, pages 399--410, 2016.
+
+\bibitem[Pfahringer et~al.(2000)Pfahringer, Bensusan, and
+  Giraud-Carrier]{pfahringer2000landmarking}
+Bernhard Pfahringer, Hilan Bensusan, and Christophe Giraud-Carrier.
+\newblock Meta-learning by landmarking various learning algorithms.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning}, pages 743--750, 2000.
+
+\bibitem[{Prior Labs Team}(2026)]{priorlabs2026tabpfn}
+{Prior Labs Team}.
+\newblock {TabPFN-3.5}: Technical report.
+\newblock arXiv:2609.17895, 2026.
+\newblock URL \url{https://arxiv.org/abs/2609.17895}.
 
 \bibitem[Qian et~al.(2023)Qian, Davis, and van~der Schaar]{qian2023synthcity}
 Zhaozhi Qian, Rob Davis, and Mihaela van~der Schaar.

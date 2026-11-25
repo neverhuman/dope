@@ -1,8 +1,13 @@
 \begin{abstract}
-\noindent DOPE fits a table with a declared prediction target into a file of at most \VThree{BudgetBytes}~bytes. The file stores no complete input record. It generates synthetic training rows for a learner chosen by the recipient.
-We evaluate how models trained on those rows predict held-out real targets. Transfer Score sets a real training twin to \VThree{ScoreScale} by definition.
-On fresh splits of development tables (\VThree{CandCells} informative cells in \VThree{Families} lineage families), DOPE~\VThree{ReleaseVersion} scores \VThree{CandMatchedScorePoint} at matched sample size and \VThree{CandScore} at \VThree{PrimaryMult}$\times$. Its median file is \VThree{CandBytesMed}~bytes.
-Uniformly retaining and resampling fitting rows under the same byte cap gives \CapScore{\RowsBudget}{score} [\CapScore{\RowsBudget}{low}, \CapScore{\RowsBudget}{high}] at \VThree{PrimaryMult}$\times$.
-Among four uncapped library defaults, ARF has the highest report point estimate (\VThree{ArfScorePoint}). DOPE's paired intervals favor it over all three SDV configurations on three sets of splits of the same development tables. The paired interval against ARF includes zero on each at \VThree{PrimaryMult}$\times$.
-A discriminator separates DOPE's samples from real rows about as readily as it separates independently permuted columns (median two-sample AUC \VThree{CandC2st} for each). The benchmark measures predictive transfer on these tables and includes empirical privacy audits.
+\noindent When an outside team cannot take possession of a table, it can be difficult to test a new modeling pipeline on the task that matters. DOPE fits a table and a declared prediction target into a file of at most \VThree{BudgetBytes}~bytes. The file stores no complete fitting record and generates synthetic training rows for a learner chosen by the recipient. Transfer Score measures prediction on held-out real rows on a scale where a real training twin scores \VThree{ScoreScale}.
+On fresh row splits of development tables (\VThree{CandCells} informative cells in \VThree{Families} lineage families), DOPE~\VThree{ReleaseVersion} scores \VThree{CandScore} at \VThree{PrimaryMult}$\times$ sampling from a median file of \VThree{CandBytesMed}~bytes. A uniform subset of fitting rows stored and resampled under the same cap scores \CapScore{\RowsBudget}{score} [\CapScore{\RowsBudget}{low}, \CapScore{\RowsBudget}{high}].
+DOPE has the highest report point estimate and the smallest artifact among the tested generators. Paired intervals favor DOPE over three SDV configurations on each of three development split sets. The interval against ARF includes zero on each.
+We describe the fitting-only statistics, learner landmarks, and the learned refinement pilot that did not ship. These are development estimates. A discriminator readily separates the samples from real rows, and the privacy audits are empirical.
 \end{abstract}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{figures/hero-v3-methods.pdf}
+  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling on the development report splits. The left panel compares signed DOPE with storing and resampling a uniform subset of fitting rows under the same \VThree{BudgetBytes}-byte cap. The right panel compares DOPE with four generators fitted with library defaults and no cap, and gives the median whole-file sizes. Whiskers are \VThree{CiLevel} family-bootstrap intervals for individual scores. The final column gives paired differences in Transfer Score points and their intervals.}
+  \label{fig:hero}
+\end{figure}

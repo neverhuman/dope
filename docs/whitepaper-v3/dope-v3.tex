@@ -4,18 +4,20 @@
 \pdfminorversion=7
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{mathptmx}
-\usepackage[scaled=0.9]{helvet}
-\usepackage{courier}
-\usepackage[letterpaper,textwidth=6.5in,textheight=9in,centering]{geometry}
+\usepackage{charter}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{lmodern}
+\renewcommand{\rmdefault}{bch}
+\usepackage[letterpaper,textwidth=6.7in,textheight=9in,centering]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{booktabs}
+\usepackage{booktabs,tabularx}
 \usepackage{makecell}
 \usepackage{graphicx}
 \usepackage{pgfplots,pgfplotstable}
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta,positioning}
 \usepackage{xcolor}
+\usepackage{titlesec}
 \usepackage{natbib}
 \usepackage{microtype}
 \usepackage{enumitem}
@@ -26,9 +28,19 @@
 \input{generated/v3-macros}
 \input{budget/data}
 
+\definecolor{paperink}{HTML}{111827}
+\definecolor{paperaccent}{HTML}{B53A0B}
+\definecolor{paperblue}{HTML}{245995}
+\definecolor{papergray}{HTML}{4B5563}
+\titleformat{\section}{\large\sffamily\bfseries\color{paperink}}{\textcolor{paperaccent}{\thesection}}{0.75em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{paperink}}{\thesubsection}{0.75em}{}
+\captionsetup{labelfont={sf,bf,color=paperaccent}}
 \hypersetup{
   pdftitle={D.O.P.E.: Downstream Objective-Preserving Encoding},
-  pdfauthor={Jepson Taylor; Alton Alexander; Jordan Morrow}
+  pdfauthor={Jepson Taylor; Ricky Ray Butler; Jordan Morrow; Alton Alexander; Jordan Hildebrandt; Besterlyne Jirongo},
+  pdfsubject={Task-conditioned synthesis and downstream predictive transfer at a fixed byte budget},
+  pdfkeywords={tabular synthesis, predictive transfer, compression, landmarking},
+  linkcolor=paperaccent,citecolor=paperblue,urlcolor=paperblue
 }
 \setlist{leftmargin=1.4em,itemsep=1pt,topsep=2pt}
 \renewcommand{\arraystretch}{1.08}
@@ -40,28 +52,42 @@
 \setlength{\floatsep}{10pt plus 2pt minus 2pt}
 \newcommand{\cli}[1]{\texttt{#1}}
 \newcommand{\TRG}{\mathrm{TRG}}
+\newcommand{\papercover}{%
+  \begingroup
+  \setlength{\parindent}{0pt}%
+  \noindent\textcolor{paperaccent}{\rule{1.45in}{2pt}}\par\smallskip
+  {\small\sffamily\bfseries\color{papergray} NEVERHUMAN RESEARCH\quad\textperiodcentered\quad TECHNICAL REPORT\par}
+  \vspace{0.7em}
+  {\LARGE\sffamily\bfseries\color{paperink} D.O.P.E.\par}
+  {\LARGE\bfseries Downstream Objective-Preserving Encoding\par}
+  \vspace{0.35em}
+  {\large\color{papergray} Synthetic training rows from a file of at most \VThree{BudgetBytes} bytes\par}
+  \vspace{0.85em}
+  {\normalsize Jepson Taylor\textsuperscript{*}\quad Ricky Ray Butler\textsuperscript{*}\par}
+  {\normalsize Jordan Morrow\quad Alton Alexander\quad Jordan Hildebrandt\quad Besterlyne Jirongo\par}
+  \smallskip
+  {\small\sffamily\color{papergray} \textsuperscript{*}Primary authors\quad\textperiodcentered\quad
+    Release \VThree{ReleaseVersion}\quad\textperiodcentered\quad
+    \href{https://github.com/neverhuman/dope}{Code and receipts}\par}
+  \vspace{0.65em}%
+  \endgroup
+}
 
 \begin{document}
 
-\begin{center}
-  {\LARGE\bfseries D.O.P.E.: Downstream Objective-Preserving Encoding\par}
-  \vspace{0.4em}
-  {\large\itshape Release~\VThree{ReleaseVersion}: task-preserving synthetic training rows from at most \VThree{BudgetKiB}\,KiB,\\
-  ranked against independent generators by Transfer Score\par}
-  \vspace{0.8em}
-  {\normalsize Jepson Taylor \qquad Alton Alexander \qquad Jordan Morrow\par}
-  {\small NEVERHUMAN Research\par}
-\end{center}
-\vspace{0.3em}
-
+\papercover
 \input{sections/00-abstract}
+\clearpage
 \input{sections/01-introduction}
 \input{sections/02-related-work}
 \input{sections/03-method}
+\input{sections/04-evidence-and-landmarks}
 \input{sections/05-evaluation-protocol}
 \input{sections/06-results}
+\input{sections/07-practical-use}
 \input{sections/08-limitations}
 \input{sections/09-reproducibility}
+\input{sections/10-conclusion}
 
 \bibliographystyle{plainnat}
 \bibliography{references-v3}

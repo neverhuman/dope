@@ -1,7 +1,12 @@
 \clearpage
 \section{Learned refinement pilot}\label{app:training}
 
-The pilot trained a learned correction to the analytic decoder using the fitting-only inputs of Appendix~\ref{app:evidence}.
+The pilot trained a learned correction to the analytic decoder using the fitting-only inputs of Appendix~\ref{app:evidence}. The training unit was an episode with one table, a fresh duplicate-grouped split, and an objective computed on that episode's query rows. The fit side supplied the analytic packet and evidence tensors. Query rows entered the training loss and never entered packet fitting or featurization. The training design combines real tables with declared targets, target-swap views of real tables, and synthetic tables from a prior over tabular mechanisms. In a target-swap view, the selected column leaves the features. Mixing these sources in encoder training is distinct from the benchmark's train-on-synthetic evaluation.
+
+The owner-side model maps evidence to a short quantized code. The receiver-side decoder uses that code and information available in the packet to propose residual corrections to the analytic sample. A learned deployment would also require shared decoder weights identified by the artifact. Those weights are separate from the per-table byte budget.
+
+The retention term compares differentiable auditors trained on draws with the same auditors trained on the fit rows, with losses evaluated on the episode's query rows. A smooth maximum emphasizes the weakest auditor, and a bounded transform limits the influence of episodes with little real signal. Additional terms penalize discrepancies in marginals, dependence, calibration, and record proximity. The training objective uses a fit reference. Transfer Score uses a disjoint real twin and independent downstream evaluation, so lower training loss alone cannot establish better transfer.
+
 On one \TrainingGpu{}, \TrainingValue{corrected_runs} corrected-objective runs reached \TrainingValue{corrected_steps} updates each and \TrainingValue{control_runs} controls reached \TrainingValue{control_steps} each.
 The median logged elapsed times were \TrainingHours{corrected_hours} and \TrainingHours{control_hours} hours per run, respectively.
 All \TrainingValue{applied_steps} logged optimizer updates completed without a nonfinite skip. The corrected objective ran through the final curriculum phase. Its control ended earlier, so comparisons late in training cannot isolate the effect of the objective or the number of updates.

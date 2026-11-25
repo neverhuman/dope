@@ -156,6 +156,8 @@
     "ops/ci/install-python-v1.sh": "governance",
     "ops/ci/paper-architecture.tex": "governance",
     "ops/ci/paper-clean.sh": "governance",
+    "ops/ci/publish-paper.rs": "governance",
+    ".github/workflows/publish-v3-paper.yml": "governance",
     "ops/ci/paper-inputs/": "governance",
     "ops/ci/paper-prepare.py": "governance",
     "ops/ci/paper-review-inputs.json": "governance",

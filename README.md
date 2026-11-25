@@ -118,7 +118,7 @@ Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGA
 ```bibtex
 @techreport{taylor2026dope,
   title       = {{D.O.P.E.}: Downstream Objective-Preserving Encoding},
-  author      = {Taylor, Jepson and Alexander, Alton and Morrow, Jordan},
+  author      = {Taylor, Jepson and Butler, Ricky Ray and Morrow, Jordan and Alexander, Alton and Hildebrandt, Jordan and Jirongo, Besterlyne},
   institution = {NEVERHUMAN Research},
   year        = {2026},
   note        = {Release v3.0.0 white paper (docs/whitepaper-v3/dope-v3.pdf); source and receipts: https://github.com/neverhuman/dope}

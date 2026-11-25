@@ -1,16 +1,8 @@
 \section{Introduction}\label{sec:intro}
 
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=\linewidth]{figures/hero-v3-methods.pdf}
-  \caption{Transfer Score at \VThree{PrimaryMult}$\times$ sampling on the development report splits. The left panel compares signed DOPE with storing and resampling a uniform subset of fitting rows under the same \VThree{BudgetBytes}-byte cap. The right panel compares DOPE with four generators fitted with library defaults and no cap, and gives the median whole-file sizes. Whiskers are \VThree{CiLevel} family-bootstrap intervals for individual scores. The final column gives paired differences in Transfer Score points and their intervals.}
-  \label{fig:hero}
-\end{figure}
+The data owner may have a prediction task and a way to score predictions on real rows, while the recipient has a learner or an evaluation pipeline that the owner cannot run. A compact, target-aware generator gives the two sides something concrete to exchange. The owner fits it locally. The recipient draws training rows and works with their existing preprocessing and model-selection tools. The owner can then score the resulting learner on real test rows.
 
-Much of the demand for synthetic tabular data is downstream: a model is trained on synthetic rows and then used on real ones.
-DOPE treats this as a compression problem.
-A table with a declared target is the input to a compiler. Its output is an artifact of at most $B$ bytes that stores no complete input record. A sampler draws rows from that artifact alone. The recipient can fit a learner of their choice or feed rows through an existing preprocessing and model-selection pipeline.
-The questions are how much of the table's predictive structure survives at a fixed byte budget, measured by learners that never see the source rows during training, and how that compares with generators that may use as many bytes as they need.
+This use case makes synthetic data a compression problem. Given a declared target and $B$ bytes, we ask how much improvement over a constant prediction survives in training rows drawn from the artifact. We compare two ways of spending those bytes, fitting a generator and storing a uniform subset of rows, and report where uncapped generators land on the same utility scale. The comparison records the size of each complete per-table file.
 
 Release~\VThree{ReleaseVersion} encodes a table with \cli{dope fit -{}-format auto-v8}.
 It fits two codecs under a common container, Format~1 and the analytic \texttt{DSE8} packet. Both fit parameters from the input table without a pretrained checkpoint. A duplicate-grouped two-fold check on the fitting rows chooses the codec.

@@ -8,6 +8,7 @@ Every statistic in $a$ is computed from $D_{\mathrm{fit}}$ alone; nothing is fit
 
 \begin{center}
   \input{method/pipeline}
+  \captionsetup{hypcap=false}
   \captionof{figure}{Fitting uses the declared target and the fitting rows. Sampling uses the selected artifact and a seed.}
   \label{fig:pipeline}
 \end{center}
@@ -44,7 +45,7 @@ where $D$, $H$, $T$ and $C$ are the fixed sizes of Table~\ref{tab:bytes}, $s$ is
   \centering\small
   \caption{Byte accounting of a \texttt{DSE8} file. Fixed sizes and the planner's byte model are read from the Rust sources by the paper renderer; $p$ active columns ($p\le\VThree{MaxCols}$), copula rank $r\le\VThree{MaxRank}$, $\kappa\le\VThree{KnotCount}$ quantile knots, $o=K$ outputs for multiclass targets and $o=$ one output otherwise.}
   \label{tab:bytes}
-  \begin{tabular}{@{}lll@{}}
+  \begin{tabularx}{\linewidth}{@{}llX@{}}
     \toprule
     Component & Bytes & Content \\
     \midrule
@@ -69,7 +70,7 @@ where $D$, $H$, $T$ and $C$ are the fixed sizes of Table~\ref{tab:bytes}, $s$ is
     \midrule
     CRC32 trailer ($C$) & \VThree{CrcBytes} & over every preceding byte \\
     \bottomrule
-  \end{tabular}
+  \end{tabularx}
 \end{table}
 
 \paragraph{Planning and packing.}
