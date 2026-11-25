@@ -3876,6 +3876,14 @@
       "command": "bash -n scripts/install.sh && cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test release_policy --test installer_policy --test v8_weights_installer_policy",
       "purpose": "verify independent concrete engine/model tags, optional attested SingleEncV8 weights, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"
     },
+    "ops/ci/install-smoke.sh": {
+      "command": "bash -n ops/ci/install-smoke.sh",
+      "purpose": "install the pinned signed engine from the README quick start without a GitHub token and check dope 3.0.0"
+    },
+    ".github/workflows/install-smoke.yml": {
+      "command": "actionlint .github/workflows/install-smoke.yml",
+      "purpose": "verify the accountless install smoke stays read-only and path-filtered"
+    },
     "ops/merge_guard/frozen_evidence.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",
       "purpose": "test frozen path scope, strict manifest/hash admission, reason validation, protected inventory and evidence-byte refusal"

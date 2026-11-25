@@ -1,0 +1,37 @@
+name: Install smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/getting-started.md"
+      - "docs/install.md"
+      - "docs/signed-engine-release.md"
+      - "AGENTS.md"
+      - "scripts/install.sh"
+      - "scripts/verify-engine-release.sh"
+      - "ops/ci/install-smoke.sh"
+      - ".github/workflows/install-smoke.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: install-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install curl and jq
+        run: sudo apt-get update && sudo apt-get install -y curl jq ca-certificates
+      - name: Run the README quick start with no GitHub token
+        run: bash ops/ci/install-smoke.sh

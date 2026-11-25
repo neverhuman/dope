@@ -12,26 +12,36 @@ To consume the installed engine, follow [Using DOPE](#using-dope).
 ### Install
 
 The public binary is the signed Linux x86-64 engine, tag `dope-engine-v3.0.0`
-(`glibc` 2.39 or newer). `gh` 2.102.0 or newer is required. The installer
-below is pinned to release commit `e15c415bad9554f7c419dd240aa670d1a79a27fe`.
-It checks `SHA256SUMS` and the GitHub/Sigstore attestation for that tag and
-source commit before it installs the binary.
+(`glibc` 2.39 or newer). No Python, no model download, and no GitHub account.
+`curl`, `jq`, and `gh` 2.102.0 or newer are required. Ubuntu 24.04 packages
+`gh` 2.45.0; the README quick start installs pinned `gh` 2.102.0 (archive
+SHA-256 `bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386`,
+binary SHA-256 `7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b`).
+`--source-digest` is the source commit of the binary. The URL pins this installer.
+It checks `SHA256SUMS` and the published `dope.sigstore.json` bundle for that
+tag and source commit before it installs the binary.
 
 ```bash
+export PATH="$HOME/.local/bin:$PATH"
 curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/e15c415bad9554f7c419dd240aa670d1a79a27fe/scripts/install.sh \
   | bash -s -- \
       --tag dope-engine-v3.0.0 \
       --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
       --require-attestation \
       --no-weights
-dope doctor
+export PATH="$HOME/.local/bin:$PATH"
+dope --version
 ```
 
-`--no-weights` installs the analytic engine. The published `dope-engine-v3.0.0`
-release does not ship `dope-v8-weights.safetensors`, so do not pass installer
-`--v8-weights` for that tag. Do not invent a `dope-engine-v3.1.0` tag. Source on
-`main` can package a later weights path; the signed release users download is
-still `dope-engine-v3.0.0`.
+`dope --version` prints `dope 3.0.0`. Run the `export` line when the install
+directory is not already on `PATH`. `--no-weights` installs the analytic engine.
+The published `dope-engine-v3.0.0` release does not ship
+`dope-v8-weights.safetensors`, so do not pass installer `--v8-weights` for that
+tag. Do not invent a `dope-engine-v3.1.0` tag. Source on `main` can package a
+later weights path; the signed release users download is still
+`dope-engine-v3.0.0`. `dope inspect` and `dope eval` on this binary reject an
+`--format auto-v8` file. That error is the command's format limit. `dope sample`
+reads the file.
 
 Verification and a from-source build are in
 [docs/signed-engine-release.md](docs/signed-engine-release.md).
