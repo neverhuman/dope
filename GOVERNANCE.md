@@ -22,3 +22,12 @@ Discuss disagreements in the issue or pull request with reproducible evidence.
 Escalate unresolved scope or protocol decisions to the owner. Report misconduct
 privately as described in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md); report
 vulnerabilities through [SECURITY.md](SECURITY.md).
+
+## Contributor Recognition & Co-Authorship
+
+External contributors whose merged pull requests deliver substantive, verified scientific
+or engineering advances that ship in a future DOPE release (such as retained Evidence Bank
+features, improved neural training/decoding, formal differential privacy mechanisms,
+expanded benchmark/auditor suites, or major engine capabilities) will be invited as
+co-authors on the corresponding future white paper, arXiv submission, and
+[CITATION.cff](CITATION.cff). See [ROADMAP.md](ROADMAP.md) for current research priorities.

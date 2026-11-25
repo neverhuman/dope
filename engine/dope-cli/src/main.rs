@@ -347,7 +347,11 @@ fn run(cli: Cli) -> Result<(), String> {
                 .map(|p| RawTable::read(p))
                 .transpose()
                 .map_err(e)?;
-            let result = evaluate(&model, &train, &test, synth.as_ref(), &opts).map_err(e)?;
+            let result =
+                match auto_fit::eval_dpa1(&a, &model, &train, &test, synth.as_ref(), &opts)? {
+                    Some(r) => r,
+                    None => evaluate(&model, &train, &test, synth.as_ref(), &opts).map_err(e)?,
+                };
             print_eval_report(&result, style);
             if let Some(p) = &a.json {
                 std::fs::write(p, serde_json::to_string_pretty(&result).unwrap_or_default())

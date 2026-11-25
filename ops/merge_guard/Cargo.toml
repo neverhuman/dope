@@ -29,6 +29,10 @@ path = "ci_shard.rs"
 name = "native-process"
 path = "native_process.rs"
 
+[[bin]]
+name = "repo-hygiene"
+path = "repo_hygiene.rs"
+
 [dependencies]
 clap = { version = "=4.6.2", features = ["derive"] }
 libc = { version = "=0.2.186" }

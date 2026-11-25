@@ -158,8 +158,8 @@ def host_view(host: str, sample: dict[str, Any] | None, seen: float | None, deta
     elif "rust_arena" in roles:
         badge = "ARENA"
     elif any((g.get("other_vram_mib") or 0) > 1000 for g in gpus):
-        badge = "JSR-HOST"
-    elif host in ("xbabe0", "xbabe2"):
+        badge = "BUSY-GPU"
+    elif host in ("localhost", "ctrl-0"):
         badge = "CTRL"
     else:
         badge = "IDLE"
@@ -171,7 +171,7 @@ def host_view(host: str, sample: dict[str, Any] | None, seen: float | None, deta
 
 
 def attach_shared_runs(hosts: list[dict[str, Any]]) -> None:
-    """Mirror xbabe3:~/jsr/: link DDP follower hosts to their rank-0 leader run telemetry."""
+    """Link DDP follower hosts to their rank-0 leader run telemetry."""
     leaders: dict[str, tuple[str, dict[str, Any]]] = {}
     for h in hosts:
         if h["status"] != "live":

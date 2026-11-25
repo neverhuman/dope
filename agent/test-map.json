@@ -1,21 +1,5 @@
 {
   "tests": {
-    "catboost_info/catboost_training.json": {
-      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
-      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
-    },
-    "catboost_info/learn/events.out.tfevents": {
-      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
-      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
-    },
-    "catboost_info/learn_error.tsv": {
-      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
-      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
-    },
-    "catboost_info/time_left.tsv": {
-      "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3.DopeMlcV3Tests.test_canonical_6auditor_roster_equal_wire_comparators_and_csc1_categorical -v",
-      "purpose": "Generated ignored CatBoost diagnostic from v3_canonical_roster_eval.fit_and_score_canonical_auditor in the synthetic60-row compatibility fixture; retain generator proof, not artifact outcome content or Rust-only policy compliance."
-    },
     "research/levels/v3_canonical_summary.py": {
       "command": "python3 -B -m unittest research.levels.tests.test_dope_mlc_v3 -v",
       "purpose": "verify canonical ledger summary and Elo reducer compatibility"
@@ -180,14 +164,6 @@
       "command": "just fast",
       "purpose": "verify repository metadata"
     },
-    "PYTHON_EXCEPTIONS.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "PY_TO_RUST_PLAN.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
     "README.md": {
       "command": "just fast",
       "purpose": "verify onboarding guidance"
@@ -324,14 +300,6 @@
       "command": "just score",
       "purpose": "internal planning records kept for provenance"
     },
-    "docs/internal/PYTHON_EXCEPTIONS.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
-    "docs/internal/PY_TO_RUST_PLAN.md": {
-      "command": "just fast",
-      "purpose": "verify Python exception inventory and Rust port plan"
-    },
     "docs/internal/whitepaper/COMPREHENSION_v1.md": {
       "command": "just paper-tests && just paper-check",
       "purpose": "preserve frozen comprehension questions/pass rule and unmeasured frontier terminology beside final source-bound claim verification and four-PDF build"
@@ -379,10 +347,6 @@
     "docs/readme/jankurai.svg": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
       "purpose": "refuse partial/stale/malformed reports and render actual full audit status without privileged publication"
-    },
-    "docs/readme/retention-bars.png": {
-      "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
-      "purpose": "keep the README CatBoost table and retention figure on the committed density table"
     },
     "docs/release.md": {
       "command": "cargo test --locked --test vnext_custody",
@@ -688,10 +652,6 @@
       "command": "python3 -B -m unittest discover -s docs/whitepaper/scripts -p test_readme_benchmark.py -v",
       "purpose": "regenerate the README toy tables from the documented unit-interval formula"
     },
-    "launch_tuner_tui.sh": {
-      "command": "bash -n launch_tuner_tui.sh",
-      "purpose": "verify launcher syntax"
-    },
     "ops/": {
       "command": "bash scripts/ci-local.sh cpu",
       "purpose": "verify CI execution scripts"
@@ -867,10 +827,6 @@
     "pyproject.toml": {
       "command": "PYTHONPATH=src python3 -m pytest -q tests",
       "purpose": "verify V1 package compatibility"
-    },
-    "receipts/claude_pr285_c46b53b2_independent_review_20261019.json": {
-      "command": "python3 -m json.tool receipts/claude_pr285_c46b53b2_independent_review_20261019.json >/dev/null",
-      "purpose": "preserve exact historical source/provenance and test only public toy binder fixtures; no real CSV/model replay or scientific/release admission"
     },
     "research/": {
       "command": "python3 -m unittest discover -s research/benchmark/tests -v",
@@ -3368,10 +3324,6 @@
       "command": "cargo test --locked --lib --test rust_cli --test vnext_raw_workflow --test vnext_byte_allocation --test vnext_artifact_only",
       "purpose": "verify full native library167 and CLI7, all12 raw-workflow cases including charged DOPMIX01 dictionaries/five masks/fit-only numeric split and actual CLI/fresh-worker parity; retain byte-allocation3, artifact-only4 and historical Gaussian/DPK3.2/raw-v1/raw-v2 decoding; development only, no mixed/tail/calibration/transfer/privacy qualification"
     },
-    "todo/": {
-      "command": "test -z \"$(git ls-files -- todo/)\"",
-      "purpose": "verify local external-feedback planning packets remain untracked and outside committed product evidence; this route certifies no planning claims"
-    },
     "tools/": {
       "command": "bash tools/security-lane.sh",
       "purpose": "verify canonical security wrapper"
@@ -4160,14 +4112,6 @@
       "command": "python3 -B docs/whitepaper-v2/scripts/render_v2_paper.py --check",
       "purpose": "verify DOPE v2.0.0 white paper receipt-bound macros stay strictly synchronized with committed receipts and Rust constants"
     },
-    "H1/": {
-      "command": "python3 -m json.tool H1/metrics.json >/dev/null",
-      "purpose": "verify H1 (V7.1/V7.2 wave) DEV-only experiment record JSON syntax and S3 provenance references"
-    },
-    "H2/": {
-      "command": "python3 -m json.tool H2/metrics.json >/dev/null",
-      "purpose": "verify H2 (V7.3 DiLoCo + zero-repeat + tree-realism wave) DEV-only experiment record JSON syntax"
-    },
     "engine/dope-core/src/auto/": {
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --lib auto:: && cargo test --manifest-path engine/Cargo.toml --locked -p dope-core --test auto_encoder",
       "purpose": "verify --format auto: DPA1 container and fingerprint refusals, V7 column schema section, grouped 75/25 internal check with linear and GBDT auditors, margin-gated selection, budget caps and same-seed byte identity"
@@ -4371,6 +4315,54 @@
     "docs/whitepaper-v3/": {
       "command": "python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py' && python3 -B docs/whitepaper-v3/scripts/render_v3_paper.py --check && bash docs/whitepaper-v3/scripts/build_v3_pdf.sh && git diff --exit-code -- docs/whitepaper-v3",
       "purpose": "rebuild the DOPE v3.0.0 white paper from the scoreboard/v3.0.0 receipts, contracts and Rust constants: README-identical tables, hero provenance, no hand-typed digits, deterministic PDF with zero drift"
+    },
+    "ROADMAP.md": {
+      "command": "just hygiene",
+      "purpose": "verify public roadmap links, leak hygiene, and contributor regression instructions"
+    },
+    "docs/training.md": {
+      "command": "just hygiene",
+      "purpose": "verify SingleEncV8 training documentation links and public hygiene"
+    },
+    "docs/briefs/": {
+      "command": "just briefs-check && just hygiene",
+      "purpose": "verify 2-page CEO and CTO executive brief PDFs compile cleanly and web companions remain free of internal leaks and broken links"
+    },
+    "docs/archive/waves/": {
+      "command": "just hygiene",
+      "purpose": "preserve sanitized historical H1/H2 wave provenance summaries"
+    },
+    "docs/archive/reviews/": {
+      "command": "just hygiene",
+      "purpose": "preserve sanitized historical PR review provenance receipt"
+    },
+    "docs/whitepaper-v3/ARXIV_UPLOAD.md": {
+      "command": "bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --check",
+      "purpose": "verify arXiv upload instructions and bundle parity"
+    },
+    "docs/whitepaper-v3/arxiv/": {
+      "command": "bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --check",
+      "purpose": "verify staged arXiv submission bundle matches committed LaTeX sources without drift"
+    },
+    "docs/whitepaper-v3/dope-v3-arxiv.zip": {
+      "command": "bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --check",
+      "purpose": "verify deterministic arXiv zip matches staged submission tree"
+    },
+    "docs/whitepaper-v3/scripts/build_arxiv_bundle.sh": {
+      "command": "bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --check",
+      "purpose": "verify turnkey arXiv bundle builder reproduces committed bundle deterministically"
+    },
+    "examples/v3-quickstart/": {
+      "command": "bash examples/v3-quickstart/run.sh",
+      "purpose": "exercise offline UCI Airfoil fit, source-free sampling, and held-out downstream evaluation"
+    },
+    "ops/merge_guard/repo_hygiene.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin repo-hygiene",
+      "purpose": "verify pure-Rust root hygiene, leak scan, owner/test map integrity, and Markdown link checks"
+    },
+    "ops/merge_guard/repo_hygiene_tests.rs": {
+      "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin repo-hygiene",
+      "purpose": "verify unit and live repository tests for pure-Rust repo-hygiene checker"
     }
   },
   "workspace": "dope"

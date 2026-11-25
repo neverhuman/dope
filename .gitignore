@@ -20,3 +20,18 @@ __pycache__/
 /engine/target/
 examples/adult/data/
 examples/adult/*.dope
+
+# Local tooling, caches, and operator scratch logs
+/.agent/
+/.jankurai/
+/.ruff_cache/
+/agent_chat.md
+/AGENT_CHAT.md
+/AGENT_CHAT.md.lock
+/COMMS.md
+/COMMS.md.lock
+/comms.md
+/change_log.log
+/change_log.log.lock
+/tips/
+/todo/

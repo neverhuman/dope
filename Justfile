@@ -147,3 +147,41 @@ paper-tests:
     python3 -B -m unittest discover -s docs/whitepaper/scripts -p 'test_*.py'
     python3 -B -m unittest discover -s research/benchmark/tests -p test_paper_build_pipeline.py -v
     python3 -B -m unittest discover -s docs/whitepaper-v3/scripts -p 'test_*.py'
+
+# Pure-Rust repository hygiene gate (root cleanliness, public leak scan, map & link integrity).
+hygiene:
+    cargo fmt --manifest-path ops/merge_guard/Cargo.toml --all -- --check
+    cargo clippy --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin repo-hygiene -- -D warnings
+    cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin repo-hygiene
+    cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin repo-hygiene -- --root .
+
+# Build and verify the turnkey arXiv upload staging directory and zip for DOPE v3.
+arxiv-v3:
+    bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --verify
+
+# Verify committed arXiv upload bundle matches LaTeX sources and compiles cleanly in isolation.
+arxiv-v3-check:
+    bash docs/whitepaper-v3/scripts/build_arxiv_bundle.sh --check --verify
+
+# Build deterministic 2-page CEO and CTO executive PDF briefs.
+briefs:
+    bash docs/briefs/scripts/build_briefs.sh
+
+# Verify CEO and CTO executive PDF briefs compile cleanly at exactly 2 pages.
+briefs-check:
+    bash docs/briefs/scripts/build_briefs.sh --check
+
+# Fast contributor regression gate for Evidence Bank & SingleEncV8 changes.
+v8-regression:
+    cargo test --manifest-path engine/Cargo.toml --locked -p dope-core evidence
+    cargo test --manifest-path engine/Cargo.toml --locked -p dope-core single_encoding::v8
+    cargo test --manifest-path engine/Cargo.toml --locked -p dope-core auto::v8
+    cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli
+    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit
+    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
+    python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py research/levels/tests/test_v8_losses.py research/levels/tests/test_v8_code_dim.py research/levels/tests/test_v8_surgery.py research/levels/tests/test_s3_v8_feed.py
+
+# End-to-end offline real-dataset quick start (UCI Airfoil Self-Noise).
+v3-quickstart:
+    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-cli --bin dope
+    bash examples/v3-quickstart/run.sh --binary engine/target/release/dope

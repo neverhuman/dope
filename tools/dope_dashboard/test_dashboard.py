@@ -65,7 +65,7 @@ class TestDopeDashboardUnits(unittest.TestCase):
             )
             snap = collect_snapshot((td,))
             self.assertEqual(len(snap["runs"]), 1)
-            hv = host_view("xbabe5", snap, 1006.0, "", 1007.0)
+            hv = host_view("worker-1", snap, 1006.0, "", 1007.0)
             self.assertEqual(hv["status"], "live")
             hist: deque = deque(maxlen=32)
             summ = fleet_summary([hv], hist, 1007.0)
@@ -77,8 +77,8 @@ class TestDopeDashboardUnits(unittest.TestCase):
 
 class TestDopeDashboardServer(AioHTTPTestCase):
     async def get_application(self):
-        state = DopeFleetState(("xbabe0", "xbabe5"))
-        state.feed("xbabe5", {"host": "xbabe5", "at": 100.0, "resources": {"cpus": 60}, "gpus": [], "procs": [], "runs": []})
+        state = DopeFleetState(("ctrl-0", "worker-1"))
+        state.feed("worker-1", {"host": "worker-1", "at": 100.0, "resources": {"cpus": 60}, "gpus": [], "procs": [], "runs": []})
         state.pulse()
         return build_app(state)
 
@@ -101,7 +101,7 @@ class TestDopeDashboardMacro(AioHTTPTestCase):
         self._tmp = tempfile.TemporaryDirectory()
         self.macro = Path(self._tmp.name) / "fleet_macro.json"
         self.macro.write_text(json.dumps({"schema": "dope.fleet-macro/v1", "headline": {"tables_per_s_now": 0.0}}), encoding="utf-8")
-        return build_app(DopeFleetState(("xbabe0",)), self.macro)
+        return build_app(DopeFleetState(("ctrl-0",)), self.macro)
 
     async def tearDownAsync(self) -> None:
         self._tmp.cleanup()

@@ -1,0 +1,75 @@
+name: V8 feature and parity regression
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'contracts/evidence-layout-*.json'
+      - 'engine/dope-core/src/evidence/**'
+      - 'engine/dope-core/src/single_encoding/v8/**'
+      - 'engine/dope-core/src/auto/**'
+      - 'engine/dope-core/src/eval/**'
+      - 'engine/dope-cli/src/auto_fit.rs'
+      - 'engine/dope-cli/tests/auto_v8_cli.rs'
+      - 'engine/dope-arena/src/bin/dope_v8_emit.rs'
+      - 'research/levels/*v8*'
+      - 'research/levels/tests/test_*v8*'
+      - 'docs/training.md'
+      - 'ROADMAP.md'
+      - 'ops/ci/v8-feature-regression.sh'
+      - '.github/workflows/v8-feature-regression.yml'
+  pull_request:
+    paths:
+      - 'contracts/evidence-layout-*.json'
+      - 'engine/dope-core/src/evidence/**'
+      - 'engine/dope-core/src/single_encoding/v8/**'
+      - 'engine/dope-core/src/auto/**'
+      - 'engine/dope-core/src/eval/**'
+      - 'engine/dope-cli/src/auto_fit.rs'
+      - 'engine/dope-cli/tests/auto_v8_cli.rs'
+      - 'engine/dope-arena/src/bin/dope_v8_emit.rs'
+      - 'research/levels/*v8*'
+      - 'research/levels/tests/test_*v8*'
+      - 'docs/training.md'
+      - 'ROADMAP.md'
+      - 'ops/ci/v8-feature-regression.sh'
+      - '.github/workflows/v8-feature-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v8-feature-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  v8-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Pin Rust toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: v8-regression-cargo-${{ hashFiles('engine/Cargo.lock') }}
+          restore-keys: v8-regression-cargo-
+      - name: Install CPU PyTorch and parity test dependencies
+        run: python3 -m pip install --upgrade pip && python3 -m pip install --index-url https://download.pytorch.org/whl/cpu torch && python3 -m pip install numpy scipy pandas scikit-learn safetensors pytest
+      - name: Run V8 feature, parity, and CPU reload regression lane
+        run: bash ops/ci/v8-feature-regression.sh

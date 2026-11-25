@@ -71,7 +71,7 @@ def check_cuda_exclusive_guard(device: str, shared_vram_gb: float = 0.0) -> None
     """Fail-closed per-GPU CUDA guard scoped to the verified physical GPU UUID.
 
     By default (`shared_vram_gb <= 0`), refuses CUDA launch if ANY foreign numeric PID occupies the
-    target GPU UUID (allowing independent jobs on separate GPUs of a multi-GPU host like xbabe7!).
+    target GPU UUID (allowing independent jobs on separate GPUs of a multi-GPU host).
     Fails closed if `nvidia-smi` is missing or GPU UUID mapping is indeterminate.
     """
     if not device.startswith("cuda"):

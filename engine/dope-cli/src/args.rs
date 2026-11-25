@@ -399,6 +399,9 @@ pub(crate) struct EvalArgs {
     /// Held-out real rows (never seen by fit).
     #[arg(long)]
     pub(crate) test: PathBuf,
+    /// Optional target column override (for DPA1 artifacts fitted with --anonymize).
+    #[arg(short, long)]
+    pub(crate) target: Option<String>,
     /// Synthetic CSV; by default draws `--factor` × |train| rows from the model.
     #[arg(long)]
     pub(crate) synth: Option<PathBuf>,
@@ -411,6 +414,18 @@ pub(crate) struct EvalArgs {
     pub(crate) seed: u64,
     #[arg(long)]
     pub(crate) json: Option<PathBuf>,
+    /// SingleEncV7 SafeTensors for a V7 DPA1 artifact.
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v7_weights: Option<PathBuf>,
+    /// Decode a V7 DPA1 artifact with the analytic zero-init decoder.
+    #[arg(long, conflicts_with = "v7_weights")]
+    pub(crate) v7_zero_init: bool,
+    /// SingleEncV8 SafeTensors for a neural V8 DPA1 artifact.
+    #[arg(long, value_name = "SAFETENSORS")]
+    pub(crate) v8_weights: Option<PathBuf>,
+    /// Decode a V8 DPA1 artifact with the weightless analytic Step-0 decoder.
+    #[arg(long, conflicts_with = "v8_weights")]
+    pub(crate) v8_zero_init: bool,
 }
 
 #[derive(Args)]

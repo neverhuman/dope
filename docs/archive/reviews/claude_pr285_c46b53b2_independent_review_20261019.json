@@ -1,9 +1,9 @@
 {
   "schema": "dope-claude-pr285-exact-head-review-v1",
   "generated_utc": "2026-10-19T18:59:44Z",
+  "archive_note": "Archived from root receipts/; local worktree paths, runner hostnames, and process IDs redacted for public release.",
   "reviewer": {
-    "reviewer_id": "1061468.dope_paper_claude:0",
-    "session": "SAME dope_paper_claude PID 379338",
+    "reviewer_id": "independent-review-session-pr285",
     "authored_reviewed_items": false
   },
   "pr": {
@@ -24,25 +24,25 @@
   },
   "evidence": {
     "V2_terminal_failure": {
-      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v2/validation-result.json",
+      "path": "target/p04-explicit-packet-20261019T1755Z/v2/validation-result.json",
       "sha256": "c6fac4563bec57410e049e9000ce29f574719a3c70923279f22f0d2fe5b349d3",
       "expected": "c6fac4563bec57410e049e9000ce29f574719a3c70923279f22f0d2fe5b349d3",
       "match": true
     },
     "V3_terminal_failure": {
-      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v3/validation-result.json",
+      "path": "target/p04-explicit-packet-20261019T1755Z/v3/validation-result.json",
       "sha256": "7dceba8779e671e7bd532758777bed5c58614ccafe76ba73b1e2e91210e99c37",
       "expected": "7dceba8779e671e7bd532758777bed5c58614ccafe76ba73b1e2e91210e99c37",
       "match": true
     },
     "V4_result": {
-      "path": "/home/ubuntu/dope/.agent/worktrees/lane-durable-acceptance/target/p04-explicit-packet-20261019T1755Z/v4/validation-result.json",
+      "path": "target/p04-explicit-packet-20261019T1755Z/v4/validation-result.json",
       "sha256": "da0fc186ddb21d81a93eb464dc0737320e53acb312ad3e8557d6128fe5baec55",
       "success": true,
       "tree_before": "ab3a741d7e8808d6f682c04bb4d68529316e1dcd",
       "tree_after": "ab3a741d7e8808d6f682c04bb4d68529316e1dcd",
       "unstaged_diff_empty": true,
-      " commands_rc": {
+      "commands_rc": {
         "actual-loaded-module-provenance": 0,
         "refusal-and-no-disabled-case-tests": 0,
         "unit-cli-report": 0,
@@ -71,7 +71,7 @@
       {
         "id": "F1",
         "severity": "blocking_until_cpu_green",
-        "summary": "cpu job 118235007875 (runner xbabe3-lan-4-20261019182600-25194) fails 6 Rust custody tests in tests/vnext_custody.rs:147 with 'owner fixture endpoint did not start' (15 s socket wait). Not caused by the PR diff (no Rust change). main's cpu job 118209723442 passed on f7a97db2. Looks like runner/timing; root cause not verified here."
+        "summary": "cpu job 118235007875 (self-hosted LAN runner) fails 6 Rust custody tests in tests/vnext_custody.rs:147 with 'owner fixture endpoint did not start' (15 s socket wait). Not caused by the PR diff (no Rust change). main's cpu job 118209723442 passed on f7a97db2. Looks like runner/timing; root cause not verified here."
       },
       {
         "id": "F2",
@@ -81,26 +81,11 @@
     ]
   },
   "checks_at_review": [
-    {
-      "c": "success",
-      "n": "paper-clean"
-    },
-    {
-      "c": "success",
-      "n": "arm64-portability"
-    },
-    {
-      "c": "failure",
-      "n": "cpu"
-    },
-    {
-      "c": "success",
-      "n": "security"
-    },
-    {
-      "c": "success",
-      "n": "jankurai-audit"
-    }
+    {"c": "success", "n": "paper-clean"},
+    {"c": "success", "n": "arm64-portability"},
+    {"c": "failure", "n": "cpu"},
+    {"c": "success", "n": "security"},
+    {"c": "success", "n": "jankurai-audit"}
   ],
   "verdict": "CONTENT_CLEAR_CPU_RED",
   "approval_posted": false,

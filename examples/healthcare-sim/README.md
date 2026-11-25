@@ -44,7 +44,7 @@ through the files themselves and their SHA-256 digests. Re-running `prepare`
 overwrites the fixture with identical bytes. Put all generated files under
 `target/` so they remain local evidence.
 
-One measured run used Linux x86_64 (`Linux xbabe2 6.8.0-146-generic`), with 1
+One measured run used Linux x86_64 (`Linux 6.8.0-146-generic`), with 1
 visible CPU. Prepare took 0.21 s, fixture verify 0.05 s, compile 0.16 s, sample
 0.08 s, and evaluation 0.18 s. The debug CLI build took 109 s. These are one
 small-run measurements, not repeated service benchmarks. They do not justify

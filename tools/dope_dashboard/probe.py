@@ -1,7 +1,7 @@
 """Zero-dependency stdlib host probe for DOPE multi-node training, Arena, and GPU telemetry.
 
-Piped over SSH (`ssh -T xbabeN python3 -u -`) to emit bounded JSONL snapshots every 2 seconds.
-Read-only: never modifies training jobs, jsr processes, or files.
+Piped over SSH (`ssh -T <worker-host> python3 -u -`) to emit bounded JSONL snapshots every 2 seconds.
+Read-only: never modifies training jobs, background processes, or files.
 """
 from __future__ import annotations
 
@@ -21,7 +21,8 @@ import time
 POLL_SECONDS = 2.0
 TAIL_TRAIN = 180
 TAIL_EVAL = 100
-DEFAULT_RUN_ROOTS = ("/home/ubuntu/dope-data/runs", "/home/ubuntu/dope-data/arena")
+_DEFAULT_DATA_DIR = Path(os.environ.get("DOPE_DATA_DIR", str(Path.home() / "dope-data")))
+DEFAULT_RUN_ROOTS = (str(_DEFAULT_DATA_DIR / "runs"), str(_DEFAULT_DATA_DIR / "arena"))
 
 
 def _cmd(args: list[str], timeout: float = 2.0) -> str | None:
@@ -182,7 +183,7 @@ def _host_resources() -> dict[str, object]:
             ram_free_gib = round(vals["MemAvailable"], 1) if "MemAvailable" in vals else None
         except (OSError, ValueError):
             pass
-    disk_path = Path("/home/ubuntu/dope-data") if Path("/home/ubuntu/dope-data").exists() else Path.home()
+    disk_path = _DEFAULT_DATA_DIR if _DEFAULT_DATA_DIR.exists() else Path.home()
     disk_free_gib = None
     try:
         disk_free_gib = round(shutil.disk_usage(disk_path).free / (1024.0 ** 3), 1)

@@ -30,8 +30,7 @@ before downloading the engine. To remove the standalone installation, remove
 `$HOME/.local/opt/dope/3.0.0`. The `--uninstall` flag is for custom-directory
 installations.
 
-On macOS, Windows, or a Linux host older than `glibc 2.39`, Docker can run
-the same quick start. There is no macOS, Windows, or ARM release asset.
+On macOS, Windows, or a Linux host older than `glibc 2.39`, build from source with Rust 1.88+ (`cargo install --locked --path engine/dope-cli`) or run the signed Linux binary in Docker. There is no macOS, Windows, or ARM signed release asset yet.
 
 ```bash
 docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04 bash
@@ -40,6 +39,8 @@ docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04
 Inside that container, run `apt-get update && apt-get install -y ca-certificates
 curl jq`, then run the [README quick start](../README.md#quick-start). CI
 executes that quick start inside `ubuntu:24.04` on a Linux x86-64 runner.
+
+To run the complete lifecycle (`fit -> sample -> train models -> test on real holdout`) on a real, offline CC BY 4.0 dataset in under 10 seconds, see [examples/v3-quickstart](../examples/v3-quickstart/README.md).
 
 ## Fit a table
 

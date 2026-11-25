@@ -119,7 +119,7 @@ Machine-readable form: `DECISIONS.json` (proposed; see the packet's `DECISIONS_D
 
 ### SC-DEC-097 E07 CPU smoke admission (2026-10-18)
 
-`SC-DEC-097` authorized local CPU-only execution of the bounded `bikeshare-observational` CPU smoke loop on `xbabe2`. Its 21-test preflight receipt is retained as fixture evidence; the empirical comparator run is separately recorded under SC-DEC-106. The Rust frozen-evidence parity binary in `ops/merge_guard/Cargo.toml` is named `check-frozen-evidence`.
+`SC-DEC-097` authorized local CPU-only execution of the bounded `bikeshare-observational` CPU smoke loop on an internal Linux x86-64 host. Its 21-test preflight receipt is retained as fixture evidence; the empirical comparator run is separately recorded under SC-DEC-106. The Rust frozen-evidence parity binary in `ops/merge_guard/Cargo.toml` is named `check-frozen-evidence`.
 
 ### SC-DEC-101 and SC-DEC-106 E07 observational smoke and Q01.FIG-3A/3B separation (2026-10-18)
 
