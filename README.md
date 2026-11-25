@@ -55,7 +55,7 @@ Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGA
 
 ## Quick start
 
-Linux x86-64 with glibc 2.39 or newer. The signed engine is one CPU binary: no Python, no model download, and no GitHub account. You do need `curl`, `jq`, and `gh` 2.102.0 or newer. Ubuntu 24.04's packaged `gh` is 2.45.0, which is too old; the block below installs the pinned 2.102.0 archive when yours is older (archive SHA-256 `bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386`, binary SHA-256 `7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b`).
+Linux x86-64 with `glibc 2.39` or newer. The signed engine is one CPU binary: no Python, no model download, and no GitHub account. You do need `curl`, `jq`, and `gh 2.102.0` or newer. The packaged `gh` on `Ubuntu 24.04` is `gh 2.45.0`, which is too old; the block below installs the pinned `gh 2.102.0` archive when yours is older (archive SHA-256 `bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386`, binary SHA-256 `7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b`).
 
 The installer checks the published `dope.sigstore.json` bundle, so it does not ask you to log in. It still needs network access for the download and for Sigstore's trust root. `--source-digest` is the source commit of the [`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) binary. The URL pins this installer script.
 
@@ -90,7 +90,7 @@ dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
 
 `dope --version` prints `dope 3.0.0`. If the installer says `~/.local/bin` is not on `PATH`, run the `export` line it prints. It does not edit your shell startup files; add that line yourself if you want it in new shells. `command -v dope` should be `$HOME/.local/bin/dope`. Another `dope` earlier on `PATH` is a different program.
 
-The 160-row table is the release smoke table (`y = 2*a + b*b`). A file of at most 2048 bytes and a 1,000-row `synthetic.csv` mean the commands ran. They do not measure quality. Use a new path for `-o` and for the sample CSV. Name your own target explicitly ([target-last data contract](docs/data-contract.md)). Hold real test rows out before you fit, and score a learner trained on the synthetic rows against one trained on the fitting rows:
+The 160-row table is the release smoke table (`y = 2*a + b*b`). A file within the `--budget 2048` limit and a `synthetic.csv` of the `-n 1000` rows mean the commands ran. They do not measure quality. Use a new path for `-o` and for the sample CSV. Name your own target explicitly ([target-last data contract](docs/data-contract.md)). Hold real test rows out before you fit, and score a learner trained on the synthetic rows against one trained on the fitting rows:
 
 ```text
 (L_null - L_syn) / (L_null - L_real)
@@ -98,7 +98,7 @@ The 160-row table is the release smoke table (`y = 2*a + b*b`). A file of at mos
 
 On this signed binary, `dope inspect` and `dope eval` reject the `--format auto-v8` file, including `eval --synth` when `-m` is that file. The message `artifact: not a DOPE artifact (stored artifact limit)` is that limit. The file is not corrupt: `dope sample` reads it. The walkthrough, the duplicate-grouped split, and troubleshooting are in [Getting started](docs/getting-started.md).
 
-A `.dope` file and any synthetic CSV are derived data. Schema and fitted summaries can carry information about the input. That is not formal differential privacy or HIPAA de-identification.
+A `.dope` file and any synthetic CSV are derived data. Schema and fitted summaries can carry information about the input. That is not formal differential privacy and not HIPAA de-identification.
 
 Confirm the installed binary when you want the release identity:
 
