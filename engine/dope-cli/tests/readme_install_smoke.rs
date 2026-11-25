@@ -77,13 +77,39 @@ impl Workspace {
     }
 }
 
-fn bash_blocks(section: &str) -> [&str; 2] {
-    let blocks: Vec<_> = section
+fn all_bash_blocks(section: &str) -> Vec<&str> {
+    section
         .split("```bash\n")
         .skip(1)
         .map(|block| block.split_once("\n```").unwrap().0)
-        .collect();
-    blocks.try_into().unwrap()
+        .collect()
+}
+
+fn bash_blocks(section: &str) -> [&str; 2] {
+    all_bash_blocks(section).try_into().unwrap()
+}
+
+#[test]
+fn readme_appendix_matches_the_executed_guides() {
+    let (_, appendix) = README
+        .split_once("## Appendix: quick start and run examples\n")
+        .unwrap();
+    let blocks = all_bash_blocks(appendix);
+    assert_eq!(blocks.len(), 4);
+    let (_, quick) = README.split_once("## Quick start\n").unwrap();
+    let (quick, _) = quick.split_once("## Results\n").unwrap();
+    let [install, demo] = bash_blocks(quick);
+    assert_eq!(blocks[0], install);
+    assert_eq!(blocks[1], demo);
+    let (_, fit) = GETTING_STARTED.split_once("## Fit a table\n").unwrap();
+    let (fit, _) = fit
+        .split_once("## Historical kernel demonstration\n")
+        .unwrap();
+    let [fit_and_sample, evaluate] = bash_blocks(fit);
+    assert!(blocks[2].contains(fit_and_sample));
+    assert!(blocks[2].contains(evaluate));
+    assert!(GETTING_STARTED.contains(&format!("```bash\n{}\n```", blocks[3])));
+    assert!(blocks[3].contains("ubuntu:24.04"));
 }
 
 fn assert_release_binary(workspace: &Workspace) {
