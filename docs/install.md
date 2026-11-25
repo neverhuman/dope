@@ -2,43 +2,15 @@
 
 ## Signed Linux engine
 
-The program a new user runs is the signed `dope` binary from
-[dope-engine-v3.0.0](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0).
-It is Linux x86-64, glibc 2.39 or newer. It needs `curl`, `jq`, and `gh`
-2.102.0 or newer. Ubuntu 24.04's packaged `gh` is 2.45.0; the
-[README quick start](../README.md#quick-start) installs pinned `gh` 2.102.0
-when needed. A GitHub login is not required. `--source-digest` below is the
-source commit of that binary. The URL pins this installer.
+Follow the [README quick start](../README.md#quick-start) to install the signed
+v3.0.0 engine on Linux x86-64 with glibc 2.39 or newer and exercise it on a
+held-out fixture. It installs `$HOME/.local/opt/dope/3.0.0/bin/dope` and
+uses the release's verified Sigstore bundle. The installer can download a
+verified temporary copy of GitHub CLI without a GitHub account.
 
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/68295d6b97c06e9d97ffe031a743c49fbdb02855/scripts/install.sh \
-  | bash -s -- \
-      --tag dope-engine-v3.0.0 \
-      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
-      --require-attestation \
-      --no-weights
-export PATH="$HOME/.local/bin:$PATH"
-dope --version
-```
-
-`dope --version` prints `dope 3.0.0`. `--no-weights` skips model downloads.
-The analytic `auto-v8` path needs no checkpoint. Installer `--v8-weights`
-demands `dope-v8-weights.safetensors` from that same release and fails on
-`dope-engine-v3.0.0`, which does not ship it. The copy-paste fit and sample
-are in [getting-started.md](getting-started.md).
-
-Offline verification and a from-source package are in
-[signed-engine-release.md](signed-engine-release.md). Command details for this
-binary are in [engine/README.md](../engine/README.md).
-
-Three programs in this repository are named like `dope`. Keep one on `PATH`.
-
-| Program | What you run |
-|---|---|
-| Signed engine `dope 3.0.0` | The installer above. `dope fit` and `dope sample`. |
-| Alpha facade | `cargo build --locked --release --bin dope` at the repository root, then the historical installer below. |
-| `dope-kernel` | `cargo build --locked --release --bin dope-kernel`. Documented in [cli.md](cli.md). |
+The [signed package guide](signed-engine-release.md) covers the release
+inventory, manual verification, and source builds. See the
+[own-data walkthrough](getting-started.md#fit-a-table) to fit a CSV.
 
 ## Historical CPU alpha facade
 

@@ -75,11 +75,12 @@ jobs:
         run: |
           verifier_dir=$(mktemp -d "$RUNNER_TEMP/dope-gh.XXXXXX")
           archive=gh_2.102.0_linux_amd64.tar.gz
-          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 --retry 3 \
+          curl --disable --fail --location --silent --show-error --proto '=https' --tlsv1.2 --retry 3 \
             --output "$verifier_dir/$archive" \
             "https://github.com/cli/cli/releases/download/v2.102.0/$archive"
           printf '%s  %s\n' bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386 "$verifier_dir/$archive" | sha256sum --check
           tar -xzf "$verifier_dir/$archive" -C "$verifier_dir" gh_2.102.0_linux_amd64/bin/gh
+          printf '%s  %s\n' 7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b "$verifier_dir/gh_2.102.0_linux_amd64/bin/gh" | sha256sum --check
           printf '%s\n' "$verifier_dir/gh_2.102.0_linux_amd64/bin" >> "$GITHUB_PATH"
       - name: Sign provenance for the binary and all fixed package members
         id: attest
@@ -93,8 +94,8 @@ jobs:
           GH_REPO: ${{ github.repository }}
           ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
         run: |
-          bash scripts/verify-engine-release.sh target/engine-release "$ENGINE_RELEASE_TAG" "$GITHUB_SHA"
           cp -- "$ATTESTATION_BUNDLE" target/engine-release/dope.sigstore.json
+          bash scripts/verify-engine-release.sh target/engine-release "$ENGINE_RELEASE_TAG" "$GITHUB_SHA"
           assets=(
             target/engine-release/BUILDINFO.json
             target/engine-release/Cargo.lock
