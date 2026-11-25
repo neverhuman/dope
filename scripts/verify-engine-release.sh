@@ -48,12 +48,12 @@ expected_core=(BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NO
 expected_with_v8=(BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NOTICES V8_WEIGHTS_MANIFEST.json dope-linux-x86_64 dope-v8-weights.safetensors)
 mapfile -t lines < "$release_dir/SHA256SUMS"
 have_v8_weights=0
-if [[ ${#lines[@]} == ${#expected_core[@]} ]]; then
+if [[ ${#lines[@]} == "${#expected_core[@]}" ]]; then
   expected=("${expected_core[@]}")
   for stray in V8_WEIGHTS_MANIFEST.json dope-v8-weights.safetensors; do
     [[ ! -e "$release_dir/$stray" && ! -L "$release_dir/$stray" ]] || { echo 'engine_release_stray_v8_weights_forbidden' >&2; exit 1; }
   done
-elif [[ ${#lines[@]} == ${#expected_with_v8[@]} ]]; then
+elif [[ ${#lines[@]} == "${#expected_with_v8[@]}" ]]; then
   expected=("${expected_with_v8[@]}")
   have_v8_weights=1
 else

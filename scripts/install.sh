@@ -22,6 +22,7 @@ WEIGHTS_DIR="${DOPE_WEIGHTS_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/dope/weights}"
 SHARE_DIR="${DOPE_SHARE_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/dope-engine}"
 REQUIRE_ATTESTATION=0
 SKIP_WEIGHTS=0
+UNINSTALL=0
 V8_WEIGHTS_MODE="${DOPE_INSTALL_V8_WEIGHTS:-auto}"
 V8_WEIGHTS_EXPLICIT=0
 if [[ "$V8_WEIGHTS_MODE" == "1" || "$V8_WEIGHTS_MODE" == "require" ]]; then
@@ -53,6 +54,7 @@ Options:
   --v8-weights              Require and install attested SingleEncV8 weights from the engine release
   --no-v8-weights           Skip SingleEncV8 weights even if bundled with the engine release
   --no-weights              Install only the standalone `dope` binary and legal notices (skip .safetensors weights)
+  --uninstall               Remove only files this installer owns, then exit
   --color <auto|always|never>
   -h, --help                Show this help
 
@@ -61,6 +63,7 @@ verify the published dope.sigstore.json bundle, so a GitHub login is not require
 Pass --with-weights to also install the independent model release.
   ./scripts/install.sh --tag dope-engine-v3.0.0 --source-digest <SHA40>
   ./scripts/install.sh --tag dope-engine-v3.0.0 --with-weights --model-tag v1.0.0
+  ./scripts/install.sh --uninstall
 For an offline split, supply --from-dir ENGINE_DIR --model-from-dir MODEL_DIR.
 A one-directory offline release with no model members remains engine-only unless
 models were explicitly requested. Partial models are refused, never relabeled.
@@ -84,11 +87,49 @@ while [[ $# -gt 0 ]]; do
     --v8-weights) V8_WEIGHTS_MODE=require; V8_WEIGHTS_EXPLICIT=1; shift ;;
     --no-v8-weights) V8_WEIGHTS_MODE=skip; V8_WEIGHTS_EXPLICIT=1; shift ;;
     --no-weights) SKIP_WEIGHTS=1; [[ $V8_WEIGHTS_EXPLICIT -eq 1 ]] || V8_WEIGHTS_MODE=skip; shift ;;
+    --uninstall) UNINSTALL=1; shift ;;
     --color) COLOR_MODE="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "error: unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
+
+# Remove owned files before platform, gh, or glibc checks so a host that cannot
+# install can still uninstall. Refuse symlinks and non-regular paths.
+uninstall_dope() {
+  local path
+  local owned=(
+    "$INSTALL_DIR/dope"
+    "$SHARE_DIR/LICENSE"
+    "$SHARE_DIR/THIRD_PARTY_NOTICES"
+    "$SHARE_DIR/BUILDINFO.json"
+    "$WEIGHTS_DIR/MODEL_MANIFEST.json"
+    "$WEIGHTS_DIR/dope_mlc_v3_multitask_best.safetensors"
+    "$WEIGHTS_DIR/packet_high_regression.dml3"
+    "$WEIGHTS_DIR/single-enc-v8/manifest.json"
+    "$WEIGHTS_DIR/single-enc-v8/model.safetensors"
+  )
+  for path in "${owned[@]}"; do
+    if [[ -L "$path" ]]; then
+      echo "error: refusing to remove symlink: $path" >&2
+      exit 1
+    fi
+    if [[ -e "$path" && ! -f "$path" ]]; then
+      echo "error: refusing to remove non-regular file: $path" >&2
+      exit 1
+    fi
+  done
+  for path in "${owned[@]}"; do
+    if [[ -f "$path" ]]; then
+      rm -f -- "$path"
+    fi
+  done
+  echo "uninstalled owned dope files"
+  exit 0
+}
+if [[ $UNINSTALL -eq 1 ]]; then
+  uninstall_dope
+fi
 
 USE_COLOR=0
 if [[ "$COLOR_MODE" == "always" ]]; then
@@ -163,6 +204,9 @@ preflight() {
   fi
   if [[ "${DOPE_SKIP_GLIBC_CHECK:-0}" != 1 ]]; then
     glibc=$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')
+    if [[ -z "$glibc" ]] && command -v ldd >/dev/null 2>&1; then
+      glibc=$(ldd --version 2>/dev/null | awk 'NR==1 { print $NF }')
+    fi
     if [[ -z "$glibc" || "$(printf '%s\n' "2.39" "$glibc" | sort -V | head -n 1)" != "2.39" ]]; then
       echo "error: dope-linux-x86_64 needs glibc 2.39 or newer (found: ${glibc:-no glibc})." >&2
       echo "  fix: use Ubuntu 24.04+, Debian 13+ or a container such as ubuntu:24.04, or build from source:" >&2
@@ -175,12 +219,25 @@ preflight
 if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then require_gh_policy; fi
 
 STAGE=$(mktemp -d "${TMPDIR:-/tmp}/dope-install.XXXXXX")
-trap 'rm -rf -- "$STAGE"' EXIT
+TMP_PATHS=()
+cleanup_install() {
+  rm -rf -- "$STAGE"
+  local path
+  if ((${#TMP_PATHS[@]})); then
+    for path in "${TMP_PATHS[@]}"; do
+      rm -f -- "$path"
+    done
+  fi
+}
+trap cleanup_install EXIT
 ENGINE_STAGE="$STAGE/engine"
 MODEL_STAGE="$STAGE/models"
 mkdir -- "$ENGINE_STAGE" "$MODEL_STAGE"
 
 echo "$(c_cyan "● DOPE Installer") · concrete release tag $(c_bold "$TAG") · repo $(c_bold "$REPO_SLUG")"
+# Runtime members only. Cargo.lock and DEPENDENCIES.txt stay in the signed
+# release inventory checked by scripts/verify-engine-release.sh. The attestation
+# bundle dope.sigstore.json is fetched separately and is not a SHA256SUMS member.
 REQUIRED_CORE=(BUILDINFO.json LICENSE THIRD_PARTY_NOTICES dope-linux-x86_64 SHA256SUMS)
 MODEL_ASSETS=(MODEL_MANIFEST.json dope_mlc_v3_multitask_best.safetensors packet_high_regression.dml3)
 
@@ -426,9 +483,20 @@ atomic_install() {
     exit 1
   fi
   local tmp="$dst_dir/.${dst_name}.tmp.$$"
+  TMP_PATHS+=("$tmp")
   rm -f -- "$tmp"
   install -m "$mode" "$src" "$tmp"
   mv -fT -- "$tmp" "$dst"
+}
+
+probe_dir_writable() {
+  local dir="$1"
+  local probe="$dir/.dope-write-probe.$$"
+  if ! touch -- "$probe" 2>/dev/null; then
+    echo "error: destination is not writable: $dir" >&2
+    exit 1
+  fi
+  rm -f -- "$probe"
 }
 
 prepare_install_dirs() {
@@ -476,6 +544,14 @@ prepare_install_dirs() {
       fi
     done
   fi
+  probe_dir_writable "$INSTALL_DIR"
+  probe_dir_writable "$SHARE_DIR"
+  if [[ $HAVE_MODEL_ASSETS -eq 1 || $HAVE_V8_WEIGHTS -eq 1 ]]; then
+    probe_dir_writable "$WEIGHTS_DIR"
+  fi
+  if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+    probe_dir_writable "$V8_DST_DIR"
+  fi
 }
 prepare_install_dirs
 
@@ -515,8 +591,9 @@ DOPE_CMD="$INSTALL_DIR/dope"
 case ":$PATH:" in
   *":$INSTALL_DIR:"*) DOPE_CMD=dope ;;
   *)
-    echo "$(c_yellow "! $INSTALL_DIR is not on your PATH.") Run this now, and add it to your shell startup if you want it in new shells:"
+    echo "$(c_yellow "! $INSTALL_DIR is not on your PATH.") Run this now:"
     echo "    export PATH=\"$INSTALL_DIR:\$PATH\""
+    echo "    Add that line to ~/.bashrc yourself if you want it in new shells."
     ;;
 esac
 other=$(command -v dope 2>/dev/null || true)
@@ -524,10 +601,12 @@ if [[ -n "$other" && "$other" != "$INSTALL_DIR/dope" ]]; then
   echo "$(c_yellow "! Another dope is first on PATH:") $other   (this installer wrote $INSTALL_DIR/dope)"
 fi
 echo ""
-echo "$(c_bold "Next:")"
+c_bold "Next:"
+echo
 echo "  $DOPE_CMD --version"
-echo "  $DOPE_CMD fit train.csv --target <column> --format auto-v8 --budget 2048 -o model.dope"
-echo "  $DOPE_CMD sample model.dope -n 1000 -o synthetic.csv"
+echo "  $DOPE_CMD doctor"
+echo "  $DOPE_CMD fit train.csv --target <column> --format auto-v8 --budget 2048 --seed 1 -o model.dope"
+echo "  $DOPE_CMD sample model.dope -n 1000 --seed 1 -o synthetic.csv"
 if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
   echo "  $DOPE_CMD fit data.csv --target y --format auto-v8 --v8-weights $WEIGHTS_DIR/single-enc-v8/model.safetensors -o model.dope"
 fi

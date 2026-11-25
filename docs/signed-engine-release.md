@@ -120,8 +120,8 @@ git push origin dope-engine-v3.0.0
 # Publish that draft through the normal release process.
 ```
 
-This PR implements the workflow; actual GitHub OIDC issuance, transparency-log
-registration and signed release publication are measured only when a trusted tag runs.
+GitHub OIDC issuance, transparency-log registration, and signed release publication
+happen only when a trusted tag runs.
 Local policy fixtures use a fake verification command to prove argument binding and
 failure propagation. They are not cryptographic signing evidence.
 
@@ -143,6 +143,7 @@ bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
 install -Dm755 release/dope-linux-x86_64 "$HOME/.local/bin/dope"
 install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
 install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
+install -Dm644 release/BUILDINFO.json "$HOME/.local/share/dope-engine/BUILDINFO.json"
 ```
 
 The helper requires `gh` 2.102.0 or newer, then verifies the two signed subjects
