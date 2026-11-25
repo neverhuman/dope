@@ -18,7 +18,7 @@ DOPE fits a small **program** that generates synthetic rows for training predict
 
 ## Quick start
 
-Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with glibc 2.39 or newer. No GitHub account is required. On Ubuntu, install `ca-certificates`, `curl`, and `jq` first. This block checks the installer, then places the binary at `$HOME/.local/opt/dope/3.0.0/bin/dope`.
+Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with `glibc 2.39` or newer. No GitHub account is required. On Ubuntu, install `ca-certificates`, `curl`, and `jq` first. This block checks the installer, then places the binary at `$HOME/.local/opt/dope/3.0.0/bin/dope`.
 
 ```bash
 (
@@ -65,7 +65,7 @@ The next block fits, samples, and evaluates a toy table. The test rows never ent
 )
 ```
 
-Retention is `(null loss − synthetic loss) / (null loss − real loss)`. For your own CSV, fit with `--format auto-v8` and follow the [own-data walkthrough](docs/getting-started.md#fit-a-table). `eval` on this binary reads the Format 1 file above. [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
+Retention is `(null loss − synthetic loss) / (null loss − real loss)`. For your own CSV, fit with `--format auto-v8` and follow the [own-data walkthrough](docs/getting-started.md#fit-a-table). `eval` on this binary reads the `--format 1` file above. [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
 
 ## Results
 

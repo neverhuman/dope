@@ -28,6 +28,17 @@ it downloads. To remove this prefix, delete `$HOME/.local/opt/dope/3.0.0`.
 `--uninstall` removes the custom-directory layout, and it refuses
 `--standalone-prefix`.
 
+On macOS, Windows, or a Linux host older than `glibc 2.39`, Docker can run
+the same quick start. There is no macOS, Windows, or ARM release asset.
+
+```bash
+docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04 bash
+```
+
+Inside that container, install `ca-certificates`, `curl`, and `jq`, then run
+the [README quick start](../README.md#quick-start). CI runs those same two
+command blocks inside `ubuntu:24.04`.
+
 ## Fit a table
 
 Declare the target by name. Keep the original file, and follow the

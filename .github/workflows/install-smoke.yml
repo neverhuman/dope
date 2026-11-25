@@ -54,3 +54,23 @@ jobs:
       - run: rustup toolchain install 1.88.0 --profile minimal
       - name: Refuse Ubuntu 22.04 before fetching the engine
         run: bash ops/ci/install-smoke.sh ubuntu_22_04_refuses_before_download
+
+  install-smoke-docker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Run the README quick start inside Ubuntu 24.04
+        run: |
+          docker run --rm -v "$PWD":/src -w /src ubuntu:24.04 bash -lc '
+            set -euo pipefail
+            apt-get update
+            apt-get install -y --no-install-recommends ca-certificates curl jq git build-essential pkg-config
+            curl --proto "=https" --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.88.0
+            . "$HOME/.cargo/env"
+            export CARGO_INCREMENTAL=0
+            export CARGO_PROFILE_DEV_DEBUG=line-tables-only
+            bash ops/ci/install-smoke.sh
+          '
