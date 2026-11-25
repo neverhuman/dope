@@ -368,6 +368,14 @@
       "command": "python3 -B -m unittest research.benchmark.tests.test_public_demo -q && python3 -B tools/claims/check.py",
       "purpose": "Preserve the real-source demonstration contract and public claim boundaries; inspect documentation links and manuscript layout in the PR."
     },
+    "docs/readme/dope-v3-figure-1.png": {
+      "command": "python3 -B tools/claims/check.py && sha256sum --check --strict docs/readme/dope-v3-figure-1.sha256",
+      "purpose": "verify the README hero allowlist and the Figure 1 crop and source PDF digests"
+    },
+    "docs/readme/dope-v3-figure-1.sha256": {
+      "command": "sha256sum --check --strict docs/readme/dope-v3-figure-1.sha256",
+      "purpose": "verify the source PDF and README crop recorded with the reproduction settings"
+    },
     "docs/readme/jankurai.svg": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin audit-proof",
       "purpose": "refuse partial/stale/malformed reports and render actual full audit status without privileged publication"

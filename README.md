@@ -1,20 +1,14 @@
 # D.O.P.E.: Downstream Objective-Preserving Encoding
 
-DOPE fits a small **program** that generates synthetic rows for training predictive models. The file contains fitted summaries and schema without any complete fitting records.
+DOPE fits a small **program** to a table with a declared target. The program generates synthetic training rows from fitted summaries and schema, without storing complete fitting records.
 
-[![White Paper (PDF)](https://img.shields.io/badge/white%20paper-PDF-b31b1b.svg)](docs/whitepaper-v3/dope-v3.pdf)
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai full-audit score snapshot](docs/readme/jankurai.svg)](https://github.com/neverhuman/dope/actions/workflows/jankurai.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-- **Compact, self-contained artifacts:** `dope fit --format auto-v8` fits a table with a declared target within the whole-file cap. `dope sample` generates rows from the file and a seed.
-- **One signed CPU Rust executable:** No Python, PyTorch, or LibTorch required at runtime; signed Linux x86-64 releases carry GitHub/Sigstore OIDC attestations ([`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0)).
-- **Adaptive codec selection and twin-referenced ranking:** Per-table duplicate-grouped cross-fitting chooses between `Format 1` and the `DSE8` packet inside the byte cap, ranked against third-party generators on one headline Transfer Score ([white paper PDF](docs/whitepaper-v3/dope-v3.pdf)).
+[Quick start](#quick-start) · [Results](#results) · [White paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="bench/real-world/figures/hero-v3-comparison-dark.svg">
-  <img alt="At the same byte cap, DOPE scores higher than stored fitting rows. DOPE has the highest score and smallest file among the tested generators. The paired interval against ARF includes zero." src="bench/real-world/figures/hero-v3-comparison-light.svg">
-</picture>
+![Figure 1 from the DOPE v3 paper. The top panel shows how DOPE fits a file where the source table lives, then generates synthetic training rows elsewhere from the file and a seed. The bottom panel plots Transfer Score against whole-file size on the development report splits for DOPE, stored fitting rows, and four third-party generators. The paired interval against ARF includes zero.](docs/readme/dope-v3-figure-1.png)
 
 ## Quick start
 
@@ -69,6 +63,7 @@ Retention is `(null loss − synthetic loss) / (null loss − real loss)`. For y
 
 ## Results
 
+Figure 1 plots Transfer Score against whole-file size on the development report splits.
 Under the same byte cap, **DOPE transferred more predictive utility than storing and resampling fitting rows**. The third-party generators used library defaults with no byte cap. Their scores below apply to the files they actually produced.
 
 <!-- BEGIN DOPE1 SCOREBOARD -->
@@ -116,7 +111,7 @@ Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGA
 ```bibtex
 @techreport{taylor2026dope,
   title       = {{D.O.P.E.}: Downstream Objective-Preserving Encoding},
-  author      = {Taylor, Jepson and Alexander, Alton and Morrow, Jordan},
+  author      = {Taylor, Jepson and Butler, Ricky Ray and Morrow, Jordan and Alexander, Alton and Hildebrandt, Jordan and Jirongo, Besterlyne},
   institution = {NEVERHUMAN Research},
   year        = {2026},
   note        = {Release v3.0.0 white paper (docs/whitepaper-v3/dope-v3.pdf); source and receipts: https://github.com/neverhuman/dope}
