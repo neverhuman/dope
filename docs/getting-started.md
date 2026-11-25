@@ -14,9 +14,30 @@ Agents that only need to fit a table should follow this page and
 
 ## Install the signed engine
 
-Use the [README quick start](../README.md#quick-start) to install signed
-`dope-engine-v3.0.0` and run a held-out evaluation on a deterministic fixture.
-The commands below use the installed executable's absolute path.
+Use the [README quick start](../README.md#quick-start). It installs signed
+`dope-engine-v3.0.0` under `$HOME/.local/opt/dope/3.0.0` and evaluates a
+deterministic toy table. That toy checks the binary. The scores on the landing
+page come from the development report, not from that table.
+
+The commands below call `$HOME/.local/opt/dope/3.0.0/bin/dope`. The installer
+does not add that directory to `PATH`.
+
+Signed tags need `gh` 2.102.0 or newer. The quick start also needs `curl`,
+`jq`, and `sha256sum`. If glibc is older than 2.39, the installer stops before
+it downloads. To remove this prefix, delete `$HOME/.local/opt/dope/3.0.0`.
+`--uninstall` removes the custom-directory layout, and it refuses
+`--standalone-prefix`.
+
+On macOS, Windows, or a Linux host older than `glibc 2.39`, Docker can run
+the same quick start. There is no macOS, Windows, or ARM release asset.
+
+```bash
+docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04 bash
+```
+
+Inside that container, install `ca-certificates`, `curl`, and `jq`, then run
+the [README quick start](../README.md#quick-start). CI runs those same two
+command blocks inside `ubuntu:24.04`.
 
 ## Fit a table
 
