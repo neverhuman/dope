@@ -28,7 +28,9 @@ Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/d
 )
 ```
 
-The next block fits, samples, and evaluates a toy table. The test rows never enter the fit. This checks the install. It is not the scoreboard.
+### Run the toy example
+
+This example checks the install on a toy table. The test rows stay separate from the fit.
 
 ```bash
 (
@@ -58,7 +60,13 @@ The next block fits, samples, and evaluates a toy table. The test rows never ent
 )
 ```
 
-Retention is `(null loss − synthetic loss) / (null loss − real loss)`. For your own CSV, fit with `--format auto-v8` and follow the [own-data walkthrough](docs/getting-started.md#fit-a-table). `eval` on this binary reads the `--format 1` file above. [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
+The printed directory contains `train.csv`, `test.csv`, `model.dope`, `synthetic.csv`, and `evaluation.json`. Retention is `(null loss − synthetic loss) / (null loss − real loss)`.
+
+### Use your own CSV
+
+Declare the target by name and split duplicate rows as groups. The [fit and sample guide](docs/getting-started.md#fit-a-table) produces `model.dope` and `synthetic.csv` with `--format auto-v8`. The [held-out evaluation guide](docs/getting-started.md#evaluate-the-synthetic-csv) uses a separate `audit-schema.dope` to write `evaluation.json`.
+
+[Paper appendix with both examples](docs/whitepaper-v3/dope-v3.pdf#nameddest=quick-start) · [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
 
 ## Results
 
