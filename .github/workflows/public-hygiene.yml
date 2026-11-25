@@ -1,0 +1,38 @@
+name: Public repository hygiene
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-hygiene-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-hygiene:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Pin Rust toolchain
+        run: rustup toolchain install 1.88.0 --profile minimal --component rustfmt --component clippy
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: public-hygiene-cargo-${{ hashFiles('ops/merge_guard/Cargo.lock') }}
+          restore-keys: public-hygiene-cargo-
+      - name: Run pure-Rust repository hygiene lane
+        run: bash ops/ci/public-hygiene.sh

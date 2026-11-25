@@ -1,0 +1,40 @@
+name: arXiv v3 upload bundle
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/whitepaper-v3/**'
+      - 'docs/briefs/**'
+      - 'bench/real-world/results/scoreboard/v3.0.0/evidence/**'
+      - 'ops/ci/arxiv-bundle.sh'
+      - '.github/workflows/arxiv-bundle.yml'
+  pull_request:
+    paths:
+      - 'docs/whitepaper-v3/**'
+      - 'docs/briefs/**'
+      - 'bench/real-world/results/scoreboard/v3.0.0/evidence/**'
+      - 'ops/ci/arxiv-bundle.sh'
+      - '.github/workflows/arxiv-bundle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arxiv-bundle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  arxiv-bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install TeX Live and archive tools
+        run: sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends poppler-utils texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers lmodern zip unzip
+      - name: Run arXiv bundle and executive PDF verification lane
+        run: bash ops/ci/arxiv-bundle.sh
