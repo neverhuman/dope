@@ -98,7 +98,9 @@ with GitHub OIDC and short-lived Sigstore credentials. There is no long-lived si
 key to commit or distribute. It signs build provenance whose subjects include the exact
 binary, checksum inventory and remaining fixed package members.
 
-After signing, the job verifies both the binary and SHA256SUMS against:
+After signing, the job verifies both the binary and SHA256SUMS with the
+generated Sigstore bundle and a pinned GitHub CLI. Its policy binds all of the
+following identities.
 
 - Repository `neverhuman/dope`.
 - Signer workflow `neverhuman/dope/.github/workflows/engine-release.yml`.
@@ -120,37 +122,36 @@ git push origin dope-engine-v3.0.0
 # Publish that draft through the normal release process.
 ```
 
-GitHub OIDC issuance, transparency-log registration, and signed release publication
-happen only when a trusted tag runs.
-Local policy fixtures use a fake verification command to prove argument binding and
-failure propagation. They are not cryptographic signing evidence.
+Local policy fixtures use a fake verification command to check argument binding
+and failure propagation. The README install smoke verifies the published
+v3.0.0 bundle and release assets.
 
 ## Verify before install
 
-Install GitHub CLI 2.102.0 or newer from its official distribution. Ubuntu 24.04's
-packaged `gh` is 2.45.0, which this check refuses. A GitHub login is not required:
-verification uses the published `dope.sigstore.json` bundle. `gh` may still fetch
-Sigstore's trust root. Run these commands from this source checkout.
+For the public install and a held-out evaluation, use the
+[README quick start](../README.md#quick-start). To verify a downloaded
+v3.0.0 package manually, install GitHub CLI 2.102.0 or newer from its official
+distribution and run these commands from this source checkout.
 
 ```bash
-release_tag=dope-engine-v3.0.0
-release_commit=e15c415bad9554f7c419dd240aa670d1a79a27fe
-gh release download "$release_tag" --repo neverhuman/dope --dir release
-# Cross-check only. The pin above is the source commit named by the release.
-# gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha
-bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
-# Only after successful verification:
-install -Dm755 release/dope-linux-x86_64 "$HOME/.local/bin/dope"
-install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
-install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
-install -Dm644 release/BUILDINFO.json "$HOME/.local/share/dope-engine/BUILDINFO.json"
+(
+  set -euo pipefail
+  release_tag=dope-engine-v3.0.0
+  release_commit=e15c415bad9554f7c419dd240aa670d1a79a27fe
+  mkdir release
+  for asset in BUILDINFO.json Cargo.lock DEPENDENCIES.txt LICENSE THIRD_PARTY_NOTICES \
+               dope-linux-x86_64 SHA256SUMS dope.sigstore.json; do
+    curl -q -fsSL --proto '=https' --tlsv1.2 -o "release/$asset" \
+      "https://github.com/neverhuman/dope/releases/download/$release_tag/$asset"
+  done
+  bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
+)
 ```
 
-The helper requires `gh` 2.102.0 or newer, then verifies the two signed subjects
-(`dope-linux-x86_64` and `SHA256SUMS`) with `gh attestation verify --bundle release/dope.sigstore.json`.
-It checks every fixed package hash and refuses symlinks, traversal inventory entries,
-a missing bundle, stray unindexed weight files and malformed tag/commit identities.
-When an admitted 8-member release includes `SingleEncV8` weights,
+The helper verifies the two signed subjects (`dope-linux-x86_64` and `SHA256SUMS`)
+using `gh attestation verify --bundle`, then checks every fixed package hash and refuses symlinks,
+traversal inventory entries, missing files, stray unindexed weight files and malformed
+tag/commit identities. When an admitted 8-member release includes `SingleEncV8` weights,
 the helper additionally runs `gh attestation verify` on `dope-v8-weights.safetensors` and
 `V8_WEIGHTS_MANIFEST.json` (four attested subjects total) and cross-checks
 `V8_WEIGHTS_MANIFEST.json` and `BUILDINFO.json` (`v8_weights_sha256`, `v8_weights_bytes`).
@@ -160,18 +161,14 @@ to attested `dope-engine-v*` tags and failing closed on legacy tags or weight-fr
 as `dope-engine-v3.0.0`) and `--no-v8-weights` (skip even if bundled). Signing establishes
 build/packaging identity only; it never certifies model quality or privacy. It never executes the unverified binary. The GitHub CLI is an
 installation-time verifier, not an application dependency.
-Retain the bundle and exact source commit with your deployment record. `--bundle`
-removes the authenticated GitHub API lookup. It is not an unsigned fallback: the
-repository, signer workflow, tag and source commit stay mandatory.
-
-For direct verification without the helper, repeat this command for `SHA256SUMS` as well
-as the binary, then check the signed checksum inventory before installing:
+Retain the bundle and exact source commit with your deployment record. GitHub CLI
+can need network access for Sigstore trust roots even when the package is local.
+To install the package with the same verification policy and versioned layout:
 
 ```bash
-gh attestation verify release/dope-linux-x86_64 \
-  --bundle release/dope.sigstore.json --repo neverhuman/dope \
-  --signer-workflow neverhuman/dope/.github/workflows/engine-release.yml \
-  --source-ref "refs/tags/$release_tag" --source-digest "$release_commit" --format json
+bash scripts/install.sh --from-dir release \
+  --tag dope-engine-v3.0.0 --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
+  --standalone-prefix "$HOME/.local/opt/dope/3.0.0"
 ```
 
 ## Checks

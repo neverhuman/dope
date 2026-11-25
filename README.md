@@ -16,6 +16,59 @@ DOPE fits a small **program** that generates synthetic rows for training predict
   <img alt="At the same byte cap, DOPE scores higher than stored fitting rows. DOPE has the highest score and smallest file among the tested generators. The paired interval against ARF includes zero." src="bench/real-world/figures/hero-v3-comparison-light.svg">
 </picture>
 
+## Quick start
+
+Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with `glibc 2.39` or newer. No GitHub account is required. On Ubuntu, run `sudo apt-get install -y ca-certificates curl jq`.
+
+```bash
+(
+  set -euo pipefail
+  installer=$(mktemp)
+  trap 'rm -f -- "$installer"' EXIT
+  curl -q -fsSL --proto '=https' --tlsv1.2 \
+    -H 'Accept: application/vnd.github.raw+json' -o "$installer" \
+    https://api.github.com/repos/neverhuman/dope/git/blobs/2f34bc7239fe970e68227b47624a2cf74a067bb8
+  printf '%s  %s\n' 808729d2382fc37fbdcf69520d808430536b858074387198920b250033baa213 "$installer" |
+    sha256sum --check --status
+  bash "$installer" --standalone-prefix "$HOME/.local/opt/dope/3.0.0" \
+    --tag dope-engine-v3.0.0 --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe
+)
+```
+
+The executable is `$HOME/.local/opt/dope/3.0.0/bin/dope`. This workflow check uses separate fitting and test rows.
+
+```bash
+(
+  set -euo pipefail
+  export LC_ALL=C
+  dope="$HOME/.local/opt/dope/3.0.0/bin/dope"
+  cd "$(mktemp -d "${TMPDIR:-/tmp}/dope-quick-start.XXXXXX")"
+
+  fixture='BEGIN {
+    print "a,b,y"
+    for (i=first; i<end; i++) {
+      a=(17*i%997)/997; b=(31*i%991)/991
+      print a "," b "," 2*a+b*b
+    }
+  }'
+  awk -v first=0 -v end=160 "$fixture" > train.csv
+  awk -v first=160 -v end=200 "$fixture" > test.csv
+
+  "$dope" --threads 1 fit train.csv --target y --format 1 --budget 2048 --seed 42 -o model.dope
+  bytes=$(wc -c < model.dope)
+  test "$bytes" -le 2048
+  printf 'Artifact size: %s bytes\n' "$bytes"
+  "$dope" --threads 1 sample model.dope -n 640 --seed 7 -o synthetic.csv
+  "$dope" --threads 1 eval -m model.dope --train train.csv --test test.csv \
+    --synth synthetic.csv --auditors linear --seed 7 --json evaluation.json
+  printf 'Workflow files: %s\n' "$PWD"
+)
+```
+
+The evaluator prints held-out mean squared errors for the null, real-trained, and synthetic-trained models. Retention is `(null loss − synthetic loss) / (null loss − real loss)`, the share of real-trained improvement recovered.
+
+For your CSV, declare the target, group duplicate rows before splitting, and hold test rows back from fitting. [Own-data walkthrough](docs/getting-started.md#fit-a-table) · [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
+
 ## Results
 
 Under the same byte cap, **DOPE transferred more predictive utility than storing and resampling fitting rows**. The third-party generators used library defaults with no byte cap. Their scores below apply to the files they actually produced.
@@ -52,68 +105,6 @@ Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGA
 · [Equal-budget comparison with stored fitting rows](bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/)
 · [Full metrics and guard results](bench/real-world/results/scoreboard/v3.0.0/README.md#full-benchmark-metrics-and-guard-results)
 · [Third-party evaluation receipts](bench/real-world/results/scoreboard/v3.0.0/evidence/paper/README.md)
-
-## Quick start
-
-Linux x86-64 with `glibc 2.39` or newer. The signed engine is one CPU binary: no Python, no model download, and no GitHub account. You do need `curl`, `jq`, and `gh 2.102.0` or newer. The packaged `gh` on `Ubuntu 24.04` is `gh 2.45.0`, which is too old; the block below installs the pinned `gh 2.102.0` archive when yours is older (archive SHA-256 `bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386`, binary SHA-256 `7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b`).
-
-The installer checks the published `dope.sigstore.json` bundle, so it does not ask you to log in. It still needs network access for the download and for Sigstore's trust root. `--source-digest` is the source commit of the [`dope-engine-v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) binary. The URL pins this installer script.
-
-```bash
-set -euo pipefail
-if ! command -v gh >/dev/null 2>&1 || ! gh --version | awk 'NR==1 { split($3,v,"."); ok=(v[1]>2 || (v[1]==2 && v[2]>=102)); exit !ok }'; then
-  mkdir -p "$HOME/.local/bin" "$HOME/.cache"
-  stage=$(mktemp -d "$HOME/.cache/dope-gh.XXXXXX")
-  curl -fsSL --proto '=https' --tlsv1.2 --retry 2 --connect-timeout 15 --max-time 180 \
-    -o "$stage/gh.tar.gz" \
-    https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz
-  echo "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386  $stage/gh.tar.gz" | sha256sum --check
-  tar -xzf "$stage/gh.tar.gz" -C "$stage" gh_2.102.0_linux_amd64/bin/gh
-  install -m 0755 "$stage/gh_2.102.0_linux_amd64/bin/gh" "$HOME/.local/bin/gh"
-  echo "7469124f706944133d6a169691dd1c6c3511b12e85878d255e044e2948df4c9b  $HOME/.local/bin/gh" | sha256sum --check
-  rm -rf "$stage"
-fi
-export PATH="$HOME/.local/bin:$PATH"
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/68295d6b97c06e9d97ffe031a743c49fbdb02855/scripts/install.sh \
-  | bash -s -- \
-      --tag dope-engine-v3.0.0 \
-      --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
-      --require-attestation \
-      --no-weights
-export PATH="$HOME/.local/bin:$PATH"
-dope --version
-dope doctor
-awk 'BEGIN {print "a,b,y"; for(i=0;i<160;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > train.csv
-awk 'BEGIN {print "a,b,y"; for(i=160;i<200;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > test.csv
-dope fit train.csv --target y --format auto-v8 --budget 2048 --seed 1 -o model.dope
-wc -c < model.dope
-dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
-```
-
-`dope --version` prints `dope 3.0.0`. If the installer says `~/.local/bin` is not on `PATH`, run the `export` line it prints. It does not edit your shell startup files; add that line yourself if you want it in new shells. `command -v dope` should be `$HOME/.local/bin/dope`. Another `dope` earlier on `PATH` is a different program.
-
-`train.csv` is the release smoke table (`y = 2*a + b*b`). `test.csv` is the following rows of that same formula. The two files share no rows, and the fit does not read `test.csv`. A file within the `--budget 2048` limit and a `synthetic.csv` of the `-n 1000` rows mean the commands ran. They do not measure quality. Use a new path for `-o` and for the sample CSV. Name your own target explicitly ([target-last data contract](docs/data-contract.md)). Hold real test rows out before you fit, and score a learner trained on the synthetic rows against one trained on the fitting rows:
-
-```text
-(L_null - L_syn) / (L_null - L_real)
-```
-
-On this signed binary, `dope inspect` and `dope eval` reject the `--format auto-v8` file, including `eval --synth` when `-m` is that file. The message `artifact: not a DOPE artifact (stored artifact limit)` is that limit. The file is not corrupt: `dope sample` reads it. The walkthrough, the duplicate-grouped split, and troubleshooting are in [Getting started](docs/getting-started.md).
-
-A `.dope` file and any synthetic CSV are derived data. Schema and fitted summaries can carry information about the input. That is not formal differential privacy and not HIPAA de-identification.
-
-Confirm the installed binary when you want the release identity:
-
-```bash
-dope doctor --json | jq -r .executable_sha256
-```
-
-That digest is `8723955b1fcd59cab8996842a39b3a579c596c957ac1f89f291b0a9d1ebfaea0`.
-
-[Verify a downloaded release](docs/signed-engine-release.md#verify-before-install)
-· [Build from source](docs/signed-engine-release.md#build-and-package)
-· [Getting started](docs/getting-started.md)
-· [AGENTS.md](AGENTS.md)
 
 ## Documentation
 

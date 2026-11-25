@@ -3500,6 +3500,10 @@
       "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test v8_weights_installer_policy",
       "purpose": "verify optional attested SingleEncV8 weights installation, four-subject OIDC policy and fail-closed refusals before binary execution or installation"
     },
+    "engine/dope-cli/tests/readme_install_smoke.rs": {
+      "command": "cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test readme_install_smoke published_readme_quick_start -- --ignored --exact --nocapture",
+      "purpose": "exercise the public README on glibc 2.39+ with an empty HOME and verify digest, artifact replay, and evaluation"
+    },
     "ops/ci/engine-release.sh": {
       "command": "bash ops/ci/engine-release.sh",
       "purpose": "build and exercise the locked Rust CPU executable and package provenance/notices"
@@ -3877,12 +3881,12 @@
       "purpose": "verify independent concrete engine/model tags, optional attested SingleEncV8 weights, SHA-256 inventories, required signed-engine Sigstore policy and supported GitHub CLI before fetching or installing"
     },
     "ops/ci/install-smoke.sh": {
-      "command": "bash -n ops/ci/install-smoke.sh",
-      "purpose": "install the pinned signed engine from the README quick start without a GitHub token and check dope 3.0.0"
+      "command": "bash ops/ci/install-smoke.sh",
+      "purpose": "run the Rust README smoke against the signed release"
     },
     ".github/workflows/install-smoke.yml": {
       "command": "actionlint .github/workflows/install-smoke.yml",
-      "purpose": "verify the accountless install smoke stays read-only and path-filtered"
+      "purpose": "verify the read-only hosted install and glibc refusal checks"
     },
     "ops/merge_guard/frozen_evidence.rs": {
       "command": "cargo test --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked --bin check-frozen-evidence",

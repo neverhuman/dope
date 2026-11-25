@@ -11,8 +11,11 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 const ENGINE_V31: &str = "dope-engine-v3.1.0";
 const ENGINE_V30: &str = "dope-engine-v3.0.0";
 const SOURCE: &str = "fedcba9876543210fedcba9876543210fedcba98";
-const CORE: [&str; 4] = [
+const V30_SOURCE: &str = "e15c415bad9554f7c419dd240aa670d1a79a27fe";
+const CORE: [&str; 6] = [
     "BUILDINFO.json",
+    "Cargo.lock",
+    "DEPENDENCIES.txt",
     "LICENSE",
     "THIRD_PARTY_NOTICES",
     "dope-linux-x86_64",
@@ -68,7 +71,7 @@ impl V8Fixture {
             r#"#!/bin/bash
 case "$*" in
   --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
-  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format --bundle'; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--bundle --hostname --repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
 esac
 printf '%s\n' "$@" >> "$GH_LOG"
 if [[ -n "${GH_REJECT_SUBJECT:-}" && "$*" == *"$GH_REJECT_SUBJECT"* ]]; then exit 1; fi
@@ -98,6 +101,9 @@ cp -- "$src" "$dst"
         fs::write(engine.join("dope-linux-x86_64"), bin).unwrap();
         fs::write(engine.join("LICENSE"), b"MIT").unwrap();
         fs::write(engine.join("THIRD_PARTY_NOTICES"), b"notices").unwrap();
+        for name in ["Cargo.lock", "DEPENDENCIES.txt", "dope.sigstore.json"] {
+            fs::write(engine.join(name), b"policy fixture").unwrap();
+        }
         let weights_bytes = b"synthetic SingleEncV8 safetensors payload".to_vec();
         let w_sha = digest(&weights_bytes);
         if with_v8 {
@@ -129,6 +135,8 @@ cp -- "$src" "$dst"
                 &engine,
                 &[
                     "BUILDINFO.json",
+                    "Cargo.lock",
+                    "DEPENDENCIES.txt",
                     "LICENSE",
                     "THIRD_PARTY_NOTICES",
                     "V8_WEIGHTS_MANIFEST.json",
@@ -140,7 +148,7 @@ cp -- "$src" "$dst"
             fs::write(
                 engine.join("BUILDINFO.json"),
                 serde_json::to_vec(&serde_json::json!({
-                    "source_commit": SOURCE,
+                    "source_commit": V30_SOURCE,
                     "binary_sha256": digest(bin.as_bytes())
                 }))
                 .unwrap(),
@@ -148,7 +156,6 @@ cp -- "$src" "$dst"
             .unwrap();
             write_sums(&engine, &CORE);
         }
-        fs::write(engine.join("dope.sigstore.json"), b"{\"fixture\":true}\n").unwrap();
         Self {
             root,
             engine,
@@ -239,7 +246,6 @@ fn online_and_offline_v8_weights_verify_four_subjects_and_skip_mlc() {
         assert!(!f.prefix.join("weights/MODEL_MANIFEST.json").exists());
         let gh_log = fs::read_to_string(f.root.join("gh.log")).unwrap();
         assert_eq!(gh_log.matches("attestation\nverify\n").count(), 4);
-        assert_eq!(gh_log.matches("--bundle\n").count(), 4);
         assert!(gh_log.contains("dope-v8-weights.safetensors"));
         assert!(gh_log.contains("V8_WEIGHTS_MANIFEST.json"));
         let curl_log = fs::read_to_string(f.root.join("curl.log")).unwrap();
@@ -303,7 +309,7 @@ fn v8_weights_failures_refuse_before_execution_or_install() {
             "--tag",
             ENGINE_V30,
             "--source-digest",
-            SOURCE,
+            V30_SOURCE,
             "--no-weights",
             "--v8-weights",
             "--from-dir",
@@ -319,6 +325,8 @@ fn v8_weights_failures_refuse_before_execution_or_install() {
         &partial.engine,
         &[
             "BUILDINFO.json",
+            "Cargo.lock",
+            "DEPENDENCIES.txt",
             "LICENSE",
             "THIRD_PARTY_NOTICES",
             "V8_WEIGHTS_MANIFEST.json",
@@ -358,6 +366,8 @@ fn v8_weights_failures_refuse_before_execution_or_install() {
         &bad_bi.engine,
         &[
             "BUILDINFO.json",
+            "Cargo.lock",
+            "DEPENDENCIES.txt",
             "LICENSE",
             "THIRD_PARTY_NOTICES",
             "V8_WEIGHTS_MANIFEST.json",

@@ -857,6 +857,7 @@
     "engine/dope-cli/tests/release_policy.rs": "rust-core",
     "engine/dope-cli/tests/installer_policy.rs": "rust-core",
     "engine/dope-cli/tests/v8_weights_installer_policy.rs": "rust-core",
+    "engine/dope-cli/tests/readme_install_smoke.rs": "rust-core",
     "ops/ci/engine-release.sh": "release",
     "ops/ci/engine-release-smoke.sh": "release",
     "ops/ci/engine-runtime-graph.sh": "release",
