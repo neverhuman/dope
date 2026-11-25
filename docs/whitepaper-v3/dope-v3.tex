@@ -1998,7 +1998,7 @@ dope fit train.csv --target y \textbackslash\\
 wc -c < model.dope\hspace{2.2em}{\color{muted}\# at most \VThree{BudgetBytesPlain}}\\
 dope sample model.dope -n <rows> -o synthetic.csv
 \end{codebox}
-\noindent The repository README gives a pinned installer for Linux x86-64 that verifies checksums and the signing identity before installing. Fitting and sampling need no Python, no LibTorch and no external weights.
+\noindent The repository README gives a pinned installer for Linux x86-64 that verifies checksums and the signing identity before installing. Fitting and sampling need no Python, no LibTorch and no external weights. The pinned installer, the toy check, an own-table run, and the container command are in Appendix~\ref{app:quickstart}.
 
 \runin{From receipts to numbers} The scoring tool writes sorted-key JSON receipts that record the SHA-256 of the contract, the schedule and every rows file read: \cli{primary-methods.json} for the ranking, one pair receipt per third-party generator, and the receipts of the two repeats. The equal-storage comparison, the budget sweep, the codec attribution and the learned-tier traces are aggregate files under \cli{evidence/addendum-k/}, each bound to its inputs by digest. Every measured value in this report is a receipt macro or a number read from the bound aggregate files under the \VThree{ReleaseVersion} scoreboard. The figures are drawn from those same files. The receipts identify the schedule and the real reference by hash; the tables and packets themselves are private.
 
@@ -2012,6 +2012,68 @@ Three things make that result usable. The metric measures what the rows are for,
 The remaining work is plain: a confirmatory look on sealed tables, foundation models among the auditors, and a formal privacy mechanism on the packet's statistics. Until then the claim is the one the receipts support. On these development tables, for these learners, most of a table's training value fits in \VThree{BudgetBytes} bytes, and that is small enough to change which evaluations are possible at all.
 % =============================================================================
 \appendix
+\section{Quick start and run examples}\label{app:quickstart}
+The signed engine is \texttt{dope-engine-\VThree{ReleaseVersion}}. The first command block installs it. The second checks that binary on a toy table whose test rows never enter the fit. That toy is an install check. The scores in this report come from the development report, not from that table. \cli{eval} on this binary reads a Format~1 file. The third block fits another table with \cli{auto-v8} inside \VThree{BudgetBytesPlain} bytes, draws samples from that file, and scores them with a separate Format~1 schema file. The fourth block starts the container in which the repository runs the same quick start. The README pins the installer checksum and names the glibc requirement.
+
+\begin{codebox}
+(\textbackslash\\
+\hspace*{1.6em}set -euo pipefail\\
+\hspace*{1.6em}installer=\$(mktemp)\\
+\hspace*{1.6em}trap 'rm -f -- "\$installer"' EXIT\\
+\hspace*{1.6em}curl -q -fsSL --proto '=https' --tlsv1.2 -o "\$installer" \textbackslash\\
+\hspace*{3.2em}https://raw.githubusercontent.com/neverhuman/dope/\textbackslash\\
+\hspace*{3.2em}51df4554bc292c3ad59ec2099fccbbde19cffadc/scripts/install.sh\\
+\hspace*{1.6em}printf '\%s  \%s\textbackslash n' \textbackslash\\
+\hspace*{3.2em}808729d2382fc37fbdcf69520d808430536b858074387198920b250033baa213 \textbackslash\\
+\hspace*{3.2em}"\$installer" |\\
+\hspace*{1.6em}sha256sum --check --status\\
+\hspace*{1.6em}bash "\$installer" --standalone-prefix \textbackslash\\
+\hspace*{3.2em}"\$HOME/.local/opt/dope/3.0.0" \textbackslash\\
+\hspace*{3.2em}--tag dope-engine-v3.0.0 \textbackslash\\
+\hspace*{3.2em}--source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe\\
+)
+\end{codebox}
+
+\begin{codebox}
+(\textbackslash\\
+\hspace*{1.6em}set -euo pipefail\\
+\hspace*{1.6em}export LC\_ALL=C\\
+\hspace*{1.6em}dope="\$HOME/.local/opt/dope/3.0.0/bin/dope"\\
+\hspace*{1.6em}cd "\$(mktemp -d "\$\{TMPDIR:-/tmp\}/dope-quick-start.XXXXXX")"\\
+\hspace*{1.6em}fixture='BEGIN \{'\\
+\hspace*{3.2em}print "a,b,y"\\
+\hspace*{3.2em}for (i=first; i<end; i++) \{\\
+\hspace*{4.8em}a=(17*i\%997)/997; b=(31*i\%991)/991\\
+\hspace*{4.8em}print a "," b "," 2*a+b*b\\
+\hspace*{3.2em}\}\\
+\hspace*{1.6em}\}'\\
+\hspace*{1.6em}awk -v first=0 -v end=160 "\$fixture" > train.csv\\
+\hspace*{1.6em}awk -v first=160 -v end=200 "\$fixture" > test.csv\\
+\hspace*{1.6em}"\$dope" --threads 1 fit train.csv --target y --format 1 \textbackslash\\
+\hspace*{3.2em}--budget 2048 --seed 42 -o model.dope\\
+\hspace*{1.6em}bytes=\$(wc -c < model.dope)\\
+\hspace*{1.6em}test "\$bytes" -le 2048\\
+\hspace*{1.6em}"\$dope" --threads 1 sample model.dope -n 640 --seed 7 -o synthetic.csv\\
+\hspace*{1.6em}"\$dope" --threads 1 eval -m model.dope --train train.csv \textbackslash\\
+\hspace*{3.2em}--test test.csv --synth synthetic.csv --auditors linear \textbackslash\\
+\hspace*{3.2em}--seed 7 --json evaluation.json\\
+)
+\end{codebox}
+
+\begin{codebox}
+dope="\$HOME/.local/opt/dope/3.0.0/bin/dope"\\
+"\$dope" fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope\\
+wc -c < model.dope\\
+"\$dope" sample model.dope -n 1000 --seed 1 -o synthetic.csv\\
+"\$dope" fit train.csv --target y --format 1 --budget 2048 -o audit-schema.dope\\
+"\$dope" eval -m audit-schema.dope --train train.csv --test test.csv \textbackslash\\
+\hspace*{1.6em}--synth synthetic.csv --auditors linear --seed 1 --json evaluation.json
+\end{codebox}
+
+\begin{codebox}
+docker run --rm -it --platform linux/amd64 -v "\$PWD":/work -w /work ubuntu:24.04 bash
+\end{codebox}
+
 \section{Codec details}\label{app:codec}
 \subsection{The \texttt{DSE8} wire format}
 \runin{Header} The \VThree{DseHeaderBytes}-byte header holds, in order: the magic \cli{DSE8}, the format version, the task, the class count $K$, the active column count $p$, the raw column count, a flag byte, the copula rank $r$, the knot level $\kappa$, the quantized logarithm of the fitting-row count, the latent clip $z_{\max}$, the residual scale, the positive-class prior, the inverse degrees of freedom $1/\nu$ of a row-level Student-$t$ scale on the factors (zero for Gaussian factors), the section count, the code tier and a reserved field. The flags mark a normalized-only packet, a column map, custom class ids, stored medians of dropped columns, skew-$t$ factors, and a neural encoder.
