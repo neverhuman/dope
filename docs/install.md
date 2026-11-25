@@ -6,11 +6,17 @@ Follow the [README quick start](../README.md#quick-start) to install the signed
 v3.0.0 engine on Linux x86-64 with glibc 2.39 or newer and exercise it on a
 held-out fixture. It installs `$HOME/.local/opt/dope/3.0.0/bin/dope` and
 uses the release's verified Sigstore bundle. The installer can download a
-verified temporary copy of GitHub CLI without a GitHub account.
+verified temporary copy of GitHub CLI without a GitHub account, and it leaves
+your `PATH` alone. The manual download and verification route needs a
+separately installed GitHub CLI 2.102.0 or newer.
 
 The [signed package guide](signed-engine-release.md) covers the release
 inventory, manual verification, and source builds. See the
-[own-data walkthrough](getting-started.md#fit-a-table) to fit a CSV.
+[own-data walkthrough](getting-started.md#fit-a-table) to fit a CSV. The
+[install smoke workflow](../.github/workflows/install-smoke.yml) runs the README
+quick start, the own-data fit and evaluation, and the manual verification and
+installation commands against the published signed release. It also checks
+that Ubuntu 22.04 refuses the binary before downloading it.
 
 ## Historical CPU alpha facade
 
@@ -18,11 +24,10 @@ The alpha facade and historical `dope-kernel` are separate executables from the
 signed engine above. The facade installer preserves the kernel installation and
 its historical readers.
 
-The DOPE 1.0 engine CLI (`engine/dope-cli`) is also named `dope`. The signed
-release above is that engine. This alpha section is an older local package:
-keep only one `dope` on `PATH`, or call the facade by its absolute path under
-the install prefix. A hash in this section checks byte identity. It is not the
-Sigstore attestation on `dope-engine-v3.0.0`.
+The signed engine and the alpha facade both use the executable name `dope`.
+Call the alpha facade by its absolute path under the install prefix. The
+alpha package's hash checks byte identity. The signed engine also uses the
+publisher's Sigstore attestation.
 
 Build from a reviewed checkout with the pinned Rust toolchain and locked graph:
 

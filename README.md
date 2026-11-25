@@ -12,16 +12,15 @@ DOPE fits a small **program** to a table with a declared target. The program gen
 
 ## Quick start
 
-Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with `glibc 2.39` or newer. No GitHub account is required. On Ubuntu, install `ca-certificates`, `curl`, and `jq` first. This block checks the installer, then places the binary at `$HOME/.local/opt/dope/3.0.0/bin/dope`.
+Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with `glibc 2.39` or newer. No GitHub account is required. On Ubuntu, run `sudo apt-get install -y ca-certificates curl jq`. This block checks the installer, then places the binary at `$HOME/.local/opt/dope/3.0.0/bin/dope`.
 
 ```bash
 (
   set -euo pipefail
   installer=$(mktemp)
   trap 'rm -f -- "$installer"' EXIT
-  curl -q -fsSL --proto '=https' --tlsv1.2 \
-    -H 'Accept: application/vnd.github.raw+json' -o "$installer" \
-    https://api.github.com/repos/neverhuman/dope/git/blobs/2f34bc7239fe970e68227b47624a2cf74a067bb8
+  curl -q -fsSL --proto '=https' --tlsv1.2 -o "$installer" \
+    https://raw.githubusercontent.com/neverhuman/dope/51df4554bc292c3ad59ec2099fccbbde19cffadc/scripts/install.sh
   printf '%s  %s\n' 808729d2382fc37fbdcf69520d808430536b858074387198920b250033baa213 "$installer" |
     sha256sum --check --status
   bash "$installer" --standalone-prefix "$HOME/.local/opt/dope/3.0.0" \

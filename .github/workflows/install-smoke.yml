@@ -4,6 +4,19 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "docs/getting-started.md"
+      - "docs/install.md"
+      - "docs/signed-engine-release.md"
+      - "AGENTS.md"
+      - "scripts/install.sh"
+      - "scripts/verify-engine-release.sh"
+      - "ops/ci/install-smoke.sh"
+      - "engine/dope-cli/tests/readme_install_smoke.rs"
+      - ".github/workflows/install-smoke.yml"
   pull_request:
     paths:
       - "README.md"
@@ -38,7 +51,7 @@ jobs:
       - name: Install curl and jq
         run: sudo apt-get update && sudo apt-get install -y curl jq ca-certificates
       - run: rustup toolchain install 1.88.0 --profile minimal
-      - name: Run the README quick start with no GitHub token
+      - name: Run the public install guides with no GitHub token
         run: bash ops/ci/install-smoke.sh
 
   install-old-glibc:
@@ -62,14 +75,13 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Run the README quick start inside Ubuntu 24.04
+      - name: Run the public install guides inside Ubuntu 24.04
         run: |
           docker run --rm -v "$PWD":/src -w /src ubuntu:24.04 bash -lc '
             set -euo pipefail
             apt-get update
-            apt-get install -y --no-install-recommends ca-certificates curl jq git build-essential pkg-config
-            curl --proto "=https" --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.88.0
-            . "$HOME/.cargo/env"
+            apt-get install -y --no-install-recommends ca-certificates curl jq git build-essential pkg-config rustup
+            rustup toolchain install 1.88.0 --profile minimal --no-self-update
             export CARGO_INCREMENTAL=0
             export CARGO_PROFILE_DEV_DEBUG=line-tables-only
             bash ops/ci/install-smoke.sh
