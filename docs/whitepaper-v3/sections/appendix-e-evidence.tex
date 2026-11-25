@@ -1,5 +1,0 @@
-\section{The FIT-only evidence bank}\label{app:evidence}
-
-The pilot summarizes fitting rows with \path{engine/dope-core/src/evidence/}. The input type excludes query rows. Tests for the episode interface change the query rows and require identical packets, decoder inputs and evidence. Every episode uses a fresh split and computes its evidence from its own fitting rows.
-
-The bank uses a support floor of $k=\VThree{SupportK}$ and breaks ties in canonical row order with stable physical IDs when available. The tensor slots and validity masks are specified in \path{contracts/evidence-layout-v1.json} (SHA-256 prefix \texttt{\VThree{EvLayoutSha}}). The signed analytic encoder uses the bank's ordering and support primitives. The learned refinement consumes the full tensors.

@@ -267,6 +267,7 @@ jobs:
             ci-source/target/paper/dope1.pdf
             ci-source/target/paper/dope1-supplement.pdf
             ci-source/target/paper/dope1-venue.pdf
+            ci-source/docs/whitepaper-v3/dope-v3.pdf
           if-no-files-found: error
           retention-days: 14
 

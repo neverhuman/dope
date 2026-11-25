@@ -419,10 +419,12 @@ class CommittedPaper(unittest.TestCase):
         macros = (rp.REPO / rp.OUT["macros"]).read_text(encoding="utf-8")
         self.assertEqual(rp.paper_errors(macros), [])
 
-    def test_every_section_file_is_input_by_the_main_file(self):
-        main = (rp.REPO / "docs/whitepaper-v3/dope-v3.tex").read_text(encoding="utf-8")
-        for path in (rp.REPO / "docs/whitepaper-v3/sections").glob("*.tex"):
-            self.assertIn(r"\input{sections/" + path.stem + "}", main, path.name)
+    def test_manuscript_is_one_file(self):
+        root = rp.REPO / "docs/whitepaper-v3"
+        self.assertEqual(list((root / "sections").glob("*.tex")), [])
+        main = (root / "dope-v3.tex").read_text(encoding="utf-8")
+        for label in ("sec:intro", "sec:metric", "sec:results", "app:pairs", "app:landmark"):
+            self.assertIn(r"\label{" + label + "}", main)
 
     def test_hero_manifest_points_at_the_readme_svg(self):
         manifest = json.loads((rp.REPO / rp.OUT["manifest"]).read_text(encoding="utf-8"))

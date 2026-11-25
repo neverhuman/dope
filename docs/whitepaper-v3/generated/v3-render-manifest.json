@@ -21,6 +21,7 @@
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-gaussian-copula-h.json": "518563fdbc0b73d0f4d94a5eb0425eb5b215b74223438303a3b895b2edb735ce",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-h/v3-vs-sdv-tvae-h.json": "4fb4c744065ba0f2b0a47e90ad156b6902885ef81e41f21c1b441e1d77e4e510",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/rows.csv": "4dedbd3b9dcfac5f7b575e5c172f8e587b4ca12c595b4837324d29bbad6bfa08",
+    "bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/served.csv": "0214bce6a54bc2f90470d9e0925bc9e041e047102c2e3e5ab2db185897591567",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/SHA256SUMS": "9cd78cd414eb88a67289ae1c44c92276845df4f2734fbe3cc1e2e343da01e6d6",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/arms.json": "02cdf99c852ad5ebf3f6b9d6822145a85a9c36f619e06e1d6a3ba37af73d00be",
     "bench/real-world/results/scoreboard/v3.0.0/evidence/final-look-s9-12/compare-a.json": "4ddabe593b3f2b8715f3f073c14e9cf7011a647e068eecbbba92374594cc1ee6",
@@ -67,7 +68,7 @@
     "engine/dope-core/src/single_encoding/v8/trees_v8.rs": "85d5111ff9f74c88e0e5129afc73436d96351dec745c6e4e3ea5d33b75e6d49e"
   },
   "outputs": {
-    "docs/whitepaper-v3/generated/v3-macros.tex": "59452e950866cddfb2c6519ae2d897f8a60e05992d99718498255d2d4f161e2f"
+    "docs/whitepaper-v3/generated/v3-macros.tex": "060b75121299fb90b1eb1b885c5e35e56791862e9a5118ec2dcdfa9717e6d933"
   },
   "schema": "dope.whitepaper-v3-render/v1"
 }
