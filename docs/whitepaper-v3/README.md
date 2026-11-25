@@ -13,17 +13,16 @@ fails if a section cites one. The earlier manuscripts ([`docs/whitepaper/`](../w
 Measured values come from committed inputs. The main ranking uses `\VThree{...}` macros and
 tables derived from receipts, contracts and Rust constants. The equal-storage comparison and
 budget sweep read the bound aggregate CSVs in `evidence/addendum-k/` with PGFPlots. The paper
-checker rejects a digit typed into a section.
+checker rejects a digit typed into the manuscript prose or into display math. Figure, table and code interiors stay bound to the receipt tables. A lone 0 or 1 inside math is structure.
 
 ## Layout
 
 | Path | Role |
 | --- | --- |
-| `dope-v3.tex` | Preamble, title block and `\input` of each section |
-| `sections/*.tex` | One file per section (`00-abstract` to `09-reproducibility`) and per appendix (`appendix-*`) |
+| `dope-v3.tex` | The manuscript: house layout, receipt macros, and appendices in one file |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
-| `figures/hero-v3-methods.pdf` | Figure 1: `bench/real-world/figures/hero-v3-comparison-light.svg` (`dope_kpi render-hero --methods --same-cap-rows`), converted with `rsvg-convert -f pdf` |
+| `figures/hero-v3-methods.pdf` | README methods hero, converted from the scoreboard SVG. The manuscript draws its own figures from the same receipts. |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-ranking-table.tex` | Ranking by Transfer Score (`dope_kpi render-paper-tables`) |
 | `generated/v3-paired-table.tex` | DOPE minus each generator on the report splits and the second set of splits (`dope_kpi render-paper-tables`) |

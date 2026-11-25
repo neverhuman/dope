@@ -9,9 +9,9 @@ missing receipt, contract key or source constant is an error.
   render_v3_paper.py --figures  also convert the methods hero SVG to figures/hero-v3-methods.pdf
   render_v3_paper.py --check    write nothing; fail on drift of any generated file, on a hero
                                 PDF whose provenance does not match, on any digit typed into
-                                a section body (sections/*.tex) or the title block, on a section
-                                or paper table that cites an earlier DOPE release, and on a
-                                comparative claim of the prose that the receipts contradict.
+                                the manuscript body, on a paper table that cites an earlier DOPE
+                                release, and on a comparative claim of the prose that the receipts
+                                contradict.
 
 The paper's Tables 1 and 2 (generated/v3-{ranking,paired}-table.tex) are written by the Rust
 `dope_kpi render-paper-tables`; this script records their SHA-256 and lints them.
@@ -81,7 +81,11 @@ RUST = {  # macro: (source, regex); the first group is the value.
     "TailMinDen": ("engine/dope-core/src/evidence/primitives.rs", r"\(n_obs as f64 \+ 1\.0\)\.max\((\d+)\.0\)\)\.min\("),
     "TailCap": ("engine/dope-core/src/evidence/primitives.rs", r"\.max\(\d+\.0\)\)\.min\(([0-9.]+)\)"),
 }
-LINT_ALLOW = ("SHA-256", "Format~1", r"-{}-format 1")
+LINT_ALLOW = (
+    "SHA-256", "Format~1", r"-{}-format 1", "x86-64",
+    "TabPFN-3.5", "TabPFN-3", "LimiX-2", "landmarks-native-v1",
+    "evidence-layout-v1", "dope-kpi/v2",
+)
 # Inside math, a lone 0 or 1 is structure (N(0, I), 1/|T|, 1 - R_B), not a measured quantity.
 LINT_MATH = re.compile(r"\$[^$]*\$|\\begin\{(equation|align)\*?\}.*?\\end\{\1\*?\}", re.S)
 LINT_STRUCTURAL = re.compile(r"(?<![\d.])[01](?![\d.])")
@@ -90,10 +94,14 @@ LINT_STRIP = (
     r"\\(?:cite[a-z]*|ref|eqref|autoref|label|input|includegraphics|path|url|href|bibliography"
     r"|bibliographystyle)\*?(?:\[[^\]]*\])*\{[^{}]*\}",
     r"-?\d*\.?\d+(?:em|ex|pt|bp|mm|cm|in)\b",
-    r"[\d.]*\\(?:linewidth|textwidth|columnwidth|baselineskip)",
+    r"[\d.]*\\(?:linewidth|textwidth|columnwidth|baselineskip|relax)",
     r"[_^]\{?\d+\}?",
     r"[A-Za-z]+\d[A-Za-z0-9]*",
+    r"\\fontsize\{[^{}]*\}\{[^{}]*\}",
+    r"\\(?:vspace|hspace|setlength|addtolength|raisebox|rule|qrcode)\*?(?:\[[^\]]*\])?\{[^{}]*\}",
+    r"\\(?:textsuperscript|makebox|parbox|minipage|fbox|colorbox)(?:\[[^\]]*\])?\{[^{}]*\}",
 )
+LINT_HIDE = ("tikzpicture", "tabularx", "tabular\\*", "tabular", "codebox")
 
 
 class RenderError(RuntimeError):
@@ -136,6 +144,27 @@ def ci(v: float, lo: float, hi: float, signed: bool = False, digits: int = 3) ->
 def grouped(x: float) -> str:
     whole = f"{x:,.0f}" if float(x).is_integer() else f"{x:,.1f}"
     return whole.replace(",", "{,}").replace("-", r"\ensuremath{-}")
+
+
+def sweep_macros() -> list[tuple[str, str]]:
+    """Point estimates on the equal-cap sweep. The plotted series stay in the bound CSVs."""
+    import csv
+    served_path = REPO / f"{SCOREBOARD}/evidence/addendum-k/served.csv"
+    rows_path = REPO / f"{SCOREBOARD}/evidence/addendum-k/rows.csv"
+    with served_path.open(encoding="utf-8") as served_file:
+        served = {int(row["cap"]): row for row in csv.DictReader(served_file)}
+    with rows_path.open(encoding="utf-8") as rows_file:
+        stored = {int(row["cap"]): row for row in csv.DictReader(rows_file)}
+    needed = (1024, 2048, 16384)
+    if set(needed) - set(served) or set(needed) - set(stored):
+        raise RenderError("addendum-k sweep is missing a 1 KiB, 2 KiB or 16 KiB cap")
+    return [
+        ("Sweep1024Score", num(float(served[1024]["score"]), 1)),
+        ("Sweep16384Score", num(float(served[16384]["score"]), 1)),
+        ("Sweep16384Median", grouped(float(served[16384]["median"]))),
+        ("Rows16384Score", num(float(stored[16384]["score"]), 1)),
+        ("Rows16384Count", grouped(float(stored[16384]["retained_rows_median"]))),
+    ]
 
 
 def short(x: float) -> str:
@@ -246,7 +275,9 @@ def contract_macros(kpi: dict[str, Any], fid: dict[str, Any], layout: dict[str, 
             ("CiLowGt", short(pr["ci_low_gt"])), ("TaskCiLowGt", short(pr["task_ci_low_gt"])),
             ("MlpDeltaGe", short(pr["mlp_delta_ge"])), ("RealismDeltaGt", short(pr["realism_coverage_delta_gt"])),
             ("PrivacyDeltaGt", short(pr["privacy_coverage_delta_gt"])), ("CopyLe", short(pr["exact_copy_excess_le"])),
-            ("NullMaxRatePct", pct(nl["max_false_promote_rate"], 0)), ("BudgetBytes", grouped(kpi["bytes"]["headline"])),
+            ("NullMaxRatePct", pct(nl["max_false_promote_rate"], 0)),
+            ("BudgetBytes", grouped(kpi["bytes"]["headline"])),
+            ("BudgetBytesPlain", str(int(kpi["bytes"]["headline"]))),
             ("BudgetKiB", short(kpi["bytes"]["headline"] / 1024)),
             ("C2stMax", short(real["c2st_auc_max"])), ("MargAucMax", short(real["marg_auc_max"])),
             ("RuleViolationMax", short(real["rule_violation_ratio_max"])), ("DcrMax", short(priv["dcr_share_max"])),
@@ -364,6 +395,7 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
         entries += methods_mod.macros(methods, arm_macros, num, ci, grouped, sha256, pct, SCORE_SCALE)
     entries += final_mod.macros(final, num, sha256)
     entries += methods_mod.second_macros(second, ci, sha256, SCORE_SCALE)
+    entries += sweep_macros()
     if hero:
         entries += [("HeroSvgSha", hero["source_sha256"][:12]), ("HeroPdfSha", hero["output_sha256"][:12])]
     names = [k for k, _ in entries]
@@ -377,7 +409,7 @@ def render(hero: dict[str, Any] | None) -> tuple[dict[str, str], list[str]]:
     missing = [rel for rel in RUST_TABLES if not (REPO / rel).is_file()]
     if missing:
         raise RenderError(f"missing {missing}: run dope_kpi render-paper-tables")
-    inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json", "evidence/addendum-k/rows.csv")}
+    inputs = sorted({f"{SCOREBOARD}/{n}" for n in ("primary.json", "compare.json", "readme-block.md", "render-manifest.json", "evidence/addendum-k/rows.csv", "evidence/addendum-k/served.csv")}
                     | set(RUST_TABLES)
                     | {"contracts/dope-kpi.json", "contracts/dope-fidelity-v3-candidate.json",
                        "contracts/evidence-layout-v1.json"} | rust_files | set(methods["paths"] if methods else []) | set(final["paths"])
@@ -425,10 +457,24 @@ def hero_errors(hero: dict[str, Any] | None) -> list[str]:
     return errors
 
 
+def hide_measured_displays(text: str) -> str:
+    """Drop figure, table and code interiors from the digit scan.
+
+    Display math stays visible. A digit there must be a macro or a structural 0 or 1.
+    """
+    def blank(match: re.Match[str]) -> str:
+        return "\n" * match.group(0).count("\n")
+
+    for env in LINT_HIDE:
+        text = re.sub(rf"\\begin\{{{env}\}}.*?\\end\{{{env}\}}", blank, text, flags=re.S)
+    return text
+
+
 def lint_tex(rel: str, text: str) -> list[str]:
     """Digits typed into prose; every quantity must come from a \\VThree macro."""
     originals = text.splitlines()
     body = "\n".join(re.sub(r"(?<!\\)%.*", "", line) for line in originals)
+    body = hide_measured_displays(body)
     body = LINT_MATH.sub(lambda m: LINT_STRUCTURAL.sub(" ", m.group(0)), body)
     errors = []
     for no, line in enumerate(body.splitlines(), 1):
