@@ -362,8 +362,20 @@ pub fn evaluate(
     opts: &EvalOptions,
 ) -> Result<EvalResult> {
     let program = decode(model)?;
+    evaluate_program(&program, model.len(), train, test, synth, opts)
+}
+
+/// Evaluate using an already-decoded schema/program carrier while charging `artifact_bytes`.
+pub fn evaluate_program(
+    program: &Program,
+    artifact_bytes: usize,
+    train: &RawTable,
+    test: &RawTable,
+    synth: Option<&RawTable>,
+    opts: &EvalOptions,
+) -> Result<EvalResult> {
     let head = program.head;
-    let enc = MlEncoder::new(&program, Scaling::Unit);
+    let enc = MlEncoder::new(program, Scaling::Unit);
     let real = program.schema.to_model(train)?;
     let held = program.schema.to_model(test)?;
     let real_rows = observed(&real, MAX_AUDIT_ROWS);
@@ -374,7 +386,7 @@ pub fn evaluate(
             let n =
                 ((real_rows.len() as f64 * opts.factor).round() as usize).clamp(1, MAX_AUDIT_ROWS);
             let s = sample(
-                &program,
+                program,
                 &SampleOptions {
                     rows: n,
                     seed: opts.seed ^ 0x5a,
@@ -428,7 +440,7 @@ pub fn evaluate(
         .collect();
     Ok(EvalResult {
         task: format!("{:?}", program.schema.task).to_lowercase(),
-        artifact_bytes: model.len(),
+        artifact_bytes,
         train_rows: real_rows.len(),
         test_rows: test_rows.len(),
         synth_rows: syn_rows.len(),

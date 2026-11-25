@@ -1,6 +1,6 @@
 //! `dope fit --format auto|v7|v8|v8-analytic|auto-v8` and the `DPA1` branch of `dope sample`.
 
-use crate::args::{FitArgs, SampleArgs};
+use crate::args::{EvalArgs, FitArgs, SampleArgs};
 use crate::style::{group, Style};
 use crate::v7_weights::load_model;
 use crate::v8_weights::load_v8_model;
@@ -9,7 +9,9 @@ use dope_core::auto::{
     fit_auto, fit_dpa1_v8, is_dpa1, parse_dpa1, AutoOptions, AutoReport, CandidateReport, Encoder,
     V7Decode, V7Decoder, V8Decoder, V8DpaMode, V8DpaReport, DEFAULT_AUTO_BUDGET,
 };
-use dope_core::{DopeError, EmissionMode, FitOptions, ModelSize, RawTable};
+use dope_core::eval::{evaluate_program, schema_program, EvalOptions, EvalResult, MAX_AUDIT_ROWS};
+use dope_core::schema::{infer, IntakeOptions};
+use dope_core::{decode, DopeError, EmissionMode, FitOptions, ModelSize, RawTable};
 
 fn e(err: DopeError) -> String {
     format!(
@@ -230,4 +232,112 @@ pub(crate) fn sample_dpa1(
         );
     }
     Ok(None)
+}
+
+/// Evaluate a `DPA1` artifact (`Format 1`, `V7`, or `V8`) directly, charging its whole-file size.
+pub(crate) fn eval_dpa1(
+    a: &EvalArgs,
+    model: &[u8],
+    train: &RawTable,
+    test: &RawTable,
+    synth: Option<&RawTable>,
+    opts: &EvalOptions,
+) -> Result<Option<EvalResult>, String> {
+    if !is_dpa1(model) {
+        if a.v7_weights.is_some() || a.v7_zero_init {
+            return Err("--v7-weights and --v7-zero-init apply only to V7 artifacts".into());
+        }
+        if a.v8_weights.is_some() || a.v8_zero_init {
+            return Err("--v8-weights and --v8-zero-init apply only to V8 artifacts".into());
+        }
+        return Ok(None);
+    }
+    let dpa = parse_dpa1(model).map_err(e)?;
+    if dpa.encoder == Encoder::Format1 {
+        if a.v7_weights.is_some() || a.v7_zero_init || a.v8_weights.is_some() || a.v8_zero_init {
+            return Err("V7/V8 weight flags do not apply to Format 1 DPA1 artifacts".into());
+        }
+        let program = decode(dpa.payload).map_err(e)?;
+        return evaluate_program(&program, model.len(), train, test, synth, opts)
+            .map(Some)
+            .map_err(e);
+    }
+    let n_rows = ((train.rows().min(MAX_AUDIT_ROWS) as f64 * opts.factor).round() as usize)
+        .clamp(1, MAX_AUDIT_ROWS);
+    let sample_seed = opts.seed ^ 0x5a;
+    let (target_name, generated) = match dpa.encoder {
+        Encoder::V8 => {
+            if a.v7_weights.is_some() || a.v7_zero_init {
+                return Err("--v7-weights and --v7-zero-init apply only to V7 artifacts".into());
+            }
+            let weights = match a.v8_zero_init {
+                true => None,
+                false => load_v8_model(a.v8_weights.as_deref())?,
+            };
+            let decoder = V8Decoder::open(&dpa, weights.as_ref(), a.v8_zero_init).map_err(e)?;
+            let target = a
+                .target
+                .clone()
+                .or_else(|| decoder.headers().pop())
+                .ok_or_else(|| "V8 artifact has no target header".to_string())?;
+            let sampled = match synth {
+                Some(_) => None,
+                None => {
+                    let mut buf = Vec::new();
+                    decoder
+                        .write_csv(
+                            weights.as_ref(),
+                            a.v8_zero_init,
+                            n_rows,
+                            sample_seed,
+                            &mut buf,
+                        )
+                        .map_err(e)?;
+                    Some(RawTable::from_reader(&buf[..]).map_err(e)?)
+                }
+            };
+            (target, sampled)
+        }
+        Encoder::V7 => {
+            if a.v8_weights.is_some() || a.v8_zero_init {
+                return Err("--v8-weights and --v8-zero-init apply only to V8 artifacts".into());
+            }
+            let weights = match a.v7_zero_init {
+                true => None,
+                false => Some(load_model(a.v7_weights.as_deref())?),
+            };
+            let decoder = match &weights {
+                Some(m) => V7Decoder::open(&dpa, m),
+                None => V7Decoder::open_weightless(&dpa),
+            }
+            .map_err(e)?;
+            let target = a
+                .target
+                .clone()
+                .or_else(|| decoder.headers().pop())
+                .ok_or_else(|| "V7 artifact has no target header".to_string())?;
+            let sampled = match synth {
+                Some(_) => None,
+                None => {
+                    let mut buf = Vec::new();
+                    let how = weights
+                        .as_ref()
+                        .map_or(V7Decode::ZeroInit, V7Decode::Trained);
+                    decoder
+                        .write_csv(how, n_rows, sample_seed, &mut buf)
+                        .map_err(e)?;
+                    Some(RawTable::from_reader(&buf[..]).map_err(e)?)
+                }
+            };
+            (target, sampled)
+        }
+        Encoder::Format1 => unreachable!(),
+    };
+    let target_idx = train.column_index(&target_name).map_err(e)?;
+    let schema = infer(train, target_idx, &IntakeOptions::default()).map_err(e)?;
+    let carrier = schema_program(&schema, train).map_err(e)?;
+    let syn_ref = synth.or(generated.as_ref());
+    evaluate_program(&carrier, model.len(), train, test, syn_ref, opts)
+        .map(Some)
+        .map_err(e)
 }

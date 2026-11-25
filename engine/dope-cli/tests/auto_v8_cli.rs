@@ -460,3 +460,74 @@ fn weighted_auto_keeps_the_complete_budget_comparator_when_code_is_absent() {
         ],
     );
 }
+
+#[test]
+fn eval_supports_dpa1_v8_and_auto_v8_directly() {
+    let dir = workdir("eval-dpa1");
+    write_mixed(&dir, 260);
+    let full = std::fs::read_to_string(dir.join("mixed.csv")).unwrap();
+    let mut lines = full.lines();
+    let header = lines.next().unwrap();
+    let rows: Vec<&str> = lines.collect();
+    let train = format!("{header}\n{}\n", rows[..200].join("\n"));
+    let test = format!("{header}\n{}\n", rows[200..].join("\n"));
+    std::fs::write(dir.join("train.csv"), train).unwrap();
+    std::fs::write(dir.join("test.csv"), test).unwrap();
+
+    for (fmt, name) in [("v8-analytic", "v8a.dope"), ("auto-v8", "auto.dope")] {
+        ok(
+            &dir,
+            &[
+                "--threads",
+                "1",
+                "fit",
+                "train.csv",
+                "-t",
+                "label",
+                "--format",
+                fmt,
+                "--budget",
+                "2048",
+                "--seed",
+                "11",
+                "-o",
+                name,
+            ],
+        );
+        let art_len = std::fs::metadata(dir.join(name)).unwrap().len();
+        assert!(art_len <= 2048);
+        let json_out = format!("{fmt}.eval.json");
+        ok(
+            &dir,
+            &[
+                "--threads",
+                "1",
+                "eval",
+                "-m",
+                name,
+                "--train",
+                "train.csv",
+                "--test",
+                "test.csv",
+                "--auditors",
+                "linear,gbdt",
+                "--factor",
+                "2",
+                "--seed",
+                "7",
+                "--json",
+                &json_out,
+            ],
+        );
+        let report: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(dir.join(&json_out)).unwrap()).unwrap();
+        assert_eq!(report["artifact_bytes"], art_len);
+        assert_eq!(report["train_rows"], 200);
+        assert_eq!(report["test_rows"], 60);
+        assert_eq!(report["synth_rows"], 400);
+        assert_eq!(report["auditors"].as_array().unwrap().len(), 2);
+        for aud in report["auditors"].as_array().unwrap() {
+            assert!(aud["retention"].as_f64().is_some_and(f64::is_finite));
+        }
+    }
+}
