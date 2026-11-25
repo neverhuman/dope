@@ -326,7 +326,6 @@ class TestQ02FreshUserAndPdfQa(unittest.TestCase):
             if collapsed == stripped:
                 break
             stripped = collapsed
-        stripped = re.sub(r"```.*?```", "", stripped, flags=re.S)
         self.assertTrue(200 <= len(stripped.split()) <= 650, f"unexpected README prose word count: {len(stripped.split())}")
         wp_env = {**os.environ, "PYTHONPATH": str(REPO_ROOT / "docs/whitepaper/scripts")}
         for mod in ("test_readme_benchmark", "test_figure_one", "test_hero_figure"):
