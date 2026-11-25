@@ -626,6 +626,130 @@ fn truncated_installer_prefix_does_not_install() {
 }
 
 #[test]
+fn uninstall_removes_owned_files_and_keeps_siblings() {
+    let f = Fixture::new();
+    let installed = succeeded(
+        f.command()
+            .args(["--tag", ENGINE, "--source-digest", SOURCE, "--from-dir"])
+            .arg(&f.engine)
+            .output()
+            .unwrap(),
+    );
+    assert!(installed.contains("Installed"), "{installed}");
+    let sibling = f.prefix.join("bin/keep-me");
+    fs::write(&sibling, b"keep").unwrap();
+    let removed = succeeded(
+        f.command()
+            .env("PATH", "/usr/bin:/bin")
+            .arg("--uninstall")
+            .output()
+            .unwrap(),
+    );
+    assert!(
+        removed.contains("uninstalled owned dope files"),
+        "{removed}"
+    );
+    assert!(!f.prefix.join("bin/dope").exists());
+    assert!(!f.prefix.join("share/LICENSE").exists());
+    assert!(!f.prefix.join("share/THIRD_PARTY_NOTICES").exists());
+    assert!(!f.prefix.join("share/BUILDINFO.json").exists());
+    assert_eq!(fs::read(&sibling).unwrap(), b"keep");
+    let again = succeeded(
+        f.command()
+            .env("PATH", "/usr/bin:/bin")
+            .arg("--uninstall")
+            .output()
+            .unwrap(),
+    );
+    assert!(again.contains("uninstalled owned dope files"), "{again}");
+    assert_eq!(fs::read(&sibling).unwrap(), b"keep");
+}
+
+#[test]
+fn uninstall_refuses_a_symlinked_binary() {
+    let f = Fixture::new();
+    let install = f.prefix.join("bin");
+    fs::create_dir_all(&install).unwrap();
+    let real = f.root.join("real-dope");
+    fs::write(&real, b"real").unwrap();
+    symlink(&real, install.join("dope")).unwrap();
+    let sibling = install.join("keep-me");
+    fs::write(&sibling, b"keep").unwrap();
+    let out = f
+        .command()
+        .env("PATH", "/usr/bin:/bin")
+        .arg("--uninstall")
+        .output()
+        .unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(!out.status.success(), "{err}");
+    assert!(err.contains("refusing to remove symlink"), "{err}");
+    assert_eq!(fs::read(&real).unwrap(), b"real");
+    assert_eq!(fs::read(&sibling).unwrap(), b"keep");
+    assert!(install
+        .join("dope")
+        .symlink_metadata()
+        .unwrap()
+        .file_type()
+        .is_symlink());
+}
+
+#[test]
+fn symlink_install_dir_is_refused() {
+    let f = Fixture::new();
+    let real = f.root.join("real-bin");
+    fs::create_dir(&real).unwrap();
+    fs::create_dir_all(&f.prefix).unwrap();
+    symlink(&real, f.prefix.join("bin")).unwrap();
+    let out = f
+        .command()
+        .args(["--tag", ENGINE, "--source-digest", SOURCE, "--from-dir"])
+        .arg(&f.engine)
+        .output()
+        .unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(!out.status.success(), "{err}");
+    assert!(err.contains("refusing to install through symlink"), "{err}");
+    assert!(!real.join("dope").exists());
+    assert!(!f.prefix.join("share").exists());
+}
+
+#[test]
+fn read_only_share_dir_leaves_the_existing_binary_and_no_temp_files() {
+    let f = Fixture::new();
+    let install = f.prefix.join("bin");
+    let share = f.prefix.join("share");
+    fs::create_dir_all(&install).unwrap();
+    fs::create_dir_all(&share).unwrap();
+    let existing = b"existing-dope";
+    fs::write(install.join("dope"), existing).unwrap();
+    let mut perms = fs::metadata(&share).unwrap().permissions();
+    perms.set_mode(0o555);
+    fs::set_permissions(&share, perms).unwrap();
+    let out = f
+        .command()
+        .args(["--tag", ENGINE, "--source-digest", SOURCE, "--from-dir"])
+        .arg(&f.engine)
+        .output()
+        .unwrap();
+    let mut perms = fs::metadata(&share).unwrap().permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(&share, perms).unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(!out.status.success(), "{err}");
+    assert!(err.contains("destination is not writable"), "{err}");
+    assert_eq!(fs::read(install.join("dope")).unwrap(), existing);
+    for dir in [&install, &share] {
+        for entry in fs::read_dir(dir).unwrap() {
+            let name = entry.unwrap().file_name();
+            let name = name.to_string_lossy();
+            assert!(!name.contains(".tmp."), "{name}");
+            assert!(!name.starts_with(".dope-write-probe."), "{name}");
+        }
+    }
+}
+
+#[test]
 fn installer_and_verifier_share_the_gh_policy_bodies() {
     let install = fs::read_to_string(repo().join("scripts/install.sh")).unwrap();
     let verify = fs::read_to_string(repo().join("scripts/verify-engine-release.sh")).unwrap();

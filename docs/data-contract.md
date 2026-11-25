@@ -19,6 +19,8 @@ Use the shared intake command, with the actual declared target:
 python3 -B -m research.transfer.target_last --csv SOURCE.csv --schema SOURCE.schema.json --target DECLARED_TARGET --out /absolute/new/canonical-directory
 ```
 
+The signed engine does not use that Python command. Pass `--target` to `dope fit` on a headered CSV. `dope normalize` on the signed binary is an owner-private card workflow (`fit`, `apply`, `inverse-target`), not this contract.
+
 The output is `table.csv`, `schema.json` and `normalization.json`. Existing output
 directories are refused. Original source files are never overwritten. The receipt
 binds both source and normalized hashes, the exact column permutation, and row
@@ -45,14 +47,6 @@ as the target is refused; including `y` in query features is invalid qualificati
 
 Validation: `python3 -B -m unittest research.transfer.tests.test_target_last research.transfer.tests.test_pilot_worker_inputs -v`
 and `cargo test --locked --lib typed_data::tests`.
-
-The Python pilot/model CSV intake accepts feature and target roles only. Identifier,
-timestamp, group and excluded-sensitive columns are refused rather than promoted
-to features. The native mixed-table API retains its explicit non-feature roles and
-excludes them through its typed projection; it still places its declared target last.
-For a reordered CSV, the receipt identifies UTF-8, LF record separators and minimal
-CSV quoting. Cell strings remain identical; CSV syntax bytes may differ. Already
-canonical input preserves its exact CSV and schema bytes.
 
 The Python pilot/model CSV intake accepts feature and target roles only. Identifier,
 timestamp, group and excluded-sensitive columns are refused rather than promoted

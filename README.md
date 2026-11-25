@@ -82,15 +82,17 @@ curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/15ad4c12ab42661838a
       --no-weights
 export PATH="$HOME/.local/bin:$PATH"
 dope --version
+dope doctor
 awk 'BEGIN {print "a,b,y"; for(i=0;i<160;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > train.csv
-dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
+awk 'BEGIN {print "a,b,y"; for(i=160;i<200;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > test.csv
+dope fit train.csv --target y --format auto-v8 --budget 2048 --seed 1 -o model.dope
 wc -c < model.dope
 dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
 ```
 
 `dope --version` prints `dope 3.0.0`. If the installer says `~/.local/bin` is not on `PATH`, run the `export` line it prints. It does not edit your shell startup files; add that line yourself if you want it in new shells. `command -v dope` should be `$HOME/.local/bin/dope`. Another `dope` earlier on `PATH` is a different program.
 
-The 160-row table is the release smoke table (`y = 2*a + b*b`). A file within the `--budget 2048` limit and a `synthetic.csv` of the `-n 1000` rows mean the commands ran. They do not measure quality. Use a new path for `-o` and for the sample CSV. Name your own target explicitly ([target-last data contract](docs/data-contract.md)). Hold real test rows out before you fit, and score a learner trained on the synthetic rows against one trained on the fitting rows:
+`train.csv` is the release smoke table (`y = 2*a + b*b`). `test.csv` is the following rows of that same formula. The two files share no rows, and the fit does not read `test.csv`. A file within the `--budget 2048` limit and a `synthetic.csv` of the `-n 1000` rows mean the commands ran. They do not measure quality. Use a new path for `-o` and for the sample CSV. Name your own target explicitly ([target-last data contract](docs/data-contract.md)). Hold real test rows out before you fit, and score a learner trained on the synthetic rows against one trained on the fitting rows:
 
 ```text
 (L_null - L_syn) / (L_null - L_real)

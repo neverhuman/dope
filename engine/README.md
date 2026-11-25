@@ -14,7 +14,7 @@ cargo test  --release --manifest-path engine/Cargo.toml          # unit, end-to-
 
 ## Commands
 
-For the signed v3.0.0 release's `--format auto-v8` artifacts, use `dope fit` and `dope sample` in raw space. Use `wc -c < model.dope` to measure the whole file. The `inspect` and `eval` commands below read standalone Format 1 artifacts.
+For the signed v3.0.0 release, `dope fit` and raw `dope sample` accept `--format auto-v8` (a DPA1 file). Use `wc -c < model.dope` to measure the whole file. On that signed binary, `inspect`, `eval`, `predict`, `encode`, and `throughput` do not read an auto-v8 file. The recipes below are Format 1 unless a line says otherwise. `dope doctor` reports the binary you are running.
 
 | Command | What it does |
 | --- | --- |
