@@ -107,7 +107,7 @@ fn listing(script: &str) -> String {
     format!("{script}\n")
 }
 
-fn executed_docker() -> &'static str {
+fn docker_walkthrough() -> &'static str {
     all_bash_blocks(GETTING_STARTED)
         .into_iter()
         .find(|block| block.contains("ubuntu:24.04"))
@@ -130,7 +130,7 @@ fn paper_examples_match_smoke_commands() {
         include_bytes!("../../../docs/whitepaper-v3/examples/own-csv.bash"),
         listing(&[fit_and_sample, evaluate].join("\n")).as_bytes()
     );
-    let docker = executed_docker();
+    let docker = docker_walkthrough();
     assert_eq!(
         include_bytes!("../../../docs/whitepaper-v3/examples/docker.bash"),
         listing(docker).as_bytes()

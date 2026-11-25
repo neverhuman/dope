@@ -129,7 +129,7 @@ Licensed under [MIT](LICENSE); see [CITATION.cff](CITATION.cff).
 
 ## Appendix: quick start and run examples
 
-The first two blocks are the install check from [Quick start](#quick-start). The toy table is not the scoreboard. CI runs these guides on Ubuntu and inside the container in the last block. The third block is the [own-data walkthrough](docs/getting-started.md#fit-a-table): fit with `--format auto-v8`, then evaluate with a separate `--format 1` schema file. `eval` on this binary reads that `--format 1` file.
+The first two blocks are the install check from [Quick start](#quick-start). The scoreboard uses the development report. CI runs the guide commands on Ubuntu and in the image shown in the last block. The third block follows the [own-data walkthrough](docs/getting-started.md#fit-a-table). It fits with `--format auto-v8` and evaluates with a separate `--format 1` schema file, which `eval` reads on this binary.
 
 ```bash
 (

@@ -2,5 +2,5 @@
 # Poppler pdftoppm 24.02.0, 288 DPI. Crop starts at (208, 1484) pixels from the top left and spans 2032 by 1224 pixels.
 # Run from the repository root.
 # pdftoppm -f 1 -l 1 -r 288 -x 208 -y 1484 -W 2032 -H 1224 -png -singlefile docs/whitepaper-v3/dope-v3.pdf docs/readme/dope-v3-figure-1
-b3cc1a4d060fd0d08671dff97452a40f7b8ca411cc32e0047038857d3402022a  docs/whitepaper-v3/dope-v3.pdf
+7039ef3d26c65475cb0e5f2c300118fa6ed83c07ea1a3e56de96835c79ec60b0  docs/whitepaper-v3/dope-v3.pdf
 fcfee598aeb99ea5434db4c1bba082eea22eb16040a60a9e537cdec2949677c6  docs/readme/dope-v3-figure-1.png
