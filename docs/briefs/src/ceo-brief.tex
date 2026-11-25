@@ -1,0 +1,338 @@
+% D.O.P.E. v3.0.0 — Executive Brief (CEO / C-Suite / Enterprise Decision Makers)
+% Strict 2-page US Letter PDF bound to committed v3.0.0 receipts via v3-macros.tex.
+\documentclass[8.8pt,letterpaper]{article}
+\pdfminorversion=7
+\usepackage{dope-brief-style}
+\input{../../whitepaper-v3/generated/v3-macros}
+
+% Exact receipt-derived tables from docs/whitepaper-v3/dope-v3.tex
+\pgfplotstableread{
+cap score low high
+256 1.79 -18.92 23.03
+512 52.51 24.20 77.40
+1024 86.62 74.24 96.43
+2048 87.94 81.09 95.07
+4096 85.13 76.37 93.48
+8192 85.16 76.27 93.56
+16384 84.45 76.49 92.45
+}\ServedSweep
+\pgfplotstableread{
+cap score low high
+256 -36.15 -67.63 -6.73
+512 -57.45 -89.52 -21.08
+1024 -38.57 -69.80 -3.80
+2048 2.63 -30.94 34.78
+4096 28.45 -2.71 55.88
+8192 54.18 29.60 75.47
+16384 73.44 58.73 87.35
+}\RowsSweep
+\pgfplotstableread{
+bytes score low high
+2937782.5 77.15 58.38 89.96
+140675.5 40.17 27.91 51.81
+475125.5 -3.93 -26.16 17.79
+1053957.5 -69.16 -82.68 -55.20
+}\ThirdParty
+
+\renewcommand{\briefrunningtitle}{Executive Brief}
+\hypersetup{
+  pdftitle={D.O.P.E. v3.0.0 — Executive Brief},
+  pdfauthor={NEVERHUMAN Research},
+  pdfsubject={Evaluating AI Models on Locked Enterprise Tables Without Moving Rows},
+  pdfkeywords={DOPE, synthetic tabular data, generative compression, enterprise AI, Transfer Score}
+}
+
+\begin{document}
+\thispagestyle{briefpage1}
+
+\briefmasthead{Executive Brief \;\textbar\; For CEOs, CAOs \& Enterprise Data Leaders}%
+  {Evaluate Any AI Model on Locked Data --- Without Moving a Single Row}%
+  {D.O.P.E. compiles an enterprise table and its business target \emph{inside your firewall} into a \textbf{$\le$\,\VThree{BudgetBytes}-byte program} that trains external ML models while keeping every complete record behind your walls.}
+
+% ---- 4-Column Hero KPI Strip ------------------------------------------------
+\noindent
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{accent}{$\le$\,\VThree{BudgetBytes}\,B}{Hard Whole-File Cap}{Median \textbf{\VThree{CandBytesMed}\,B} --- smaller than an email; stores zero complete input records.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{navy}{\VThree{CandScorePoint}\;{\fontsize{8.5}{9.5}\selectfont\color{sub}/ 100}}{Transfer Score (4\x)}{Real twin\,=\,100; constant\,=\,0. Stored real rows at the same 2\,KiB cap score just \textbf{2.6}.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{teal}{1,644\x}{Smaller Than Next Best}{Versus ARF's \textbf{2.94\,MB} median file (77.2); \textbf{\VThree{MethodsRatioMin}\x{}--590\x} smaller than SDV.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{blue}{\VThree{CandFailed} / \VThree{CandCells}}{Failed Cells \textbar{} Offline}{Signed MIT pure-Rust CPU binary. Zero cloud calls, zero GPUs, zero pretrained weights.}
+\end{minipage}
+
+\vspace{5pt}
+
+% ---- Executive Narrative (side-by-side top-aligned minipages) ---------------
+\noindent
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \colheading{The Trillion-Dollar Data-Lock Paradox}
+  {\fontsize{8.45}{10.5}\selectfont
+  Most enterprise data worth learning from never leaves the systems that collected it. Clinical records, insurance claims, banking ledgers, pricing tables, and industrial telemetry sit behind strict regulatory, contractual, and competitive firewalls --- while the models and external AI vendors that could create value sit outside.
+
+  \vspace{2.5pt}
+  Today, leaders face three broken choices: \textbf{(1)~export records}, triggering months of legal review and irreversible transfer risk; \textbf{(2)~trust vendor demos on public data}, buying blind on tables unlike your business; or \textbf{(3)~build every model internally}, paying twice in talent and time-to-market. Most high-value vendor evaluations are never attempted.
+  }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \colheading{The Paradigm Shift: Ship a 2\,KiB Compiler Output}
+  {\fontsize{8.45}{10.5}\selectfont
+  \textbf{\wordmark{} (Downstream Objective-Preserving Encoding)} reframes tabular AI evaluation as \emph{extreme generative compression}. A signed pure-Rust executable compiles your table and one declared prediction target (churn, credit risk, claims cost, yield) inside your firewall into a \textbf{$\le$\,\VThree{BudgetBytes}-byte generative program} with every stored bucket backed by at least \VThree{SupportK} fitting rows.
+
+  \vspace{2.5pt}
+  Any number of internal teams or external AI vendors draw synthetic training rows from that tiny file, train and tune models normally, and return finished models --- which \textbf{your team scores back inside on untouched real holdout rows}. One approved 2\,KiB file turns a six-month impasse into a parallel multi-vendor bake-off.
+  }
+\end{minipage}
+
+\vspace{6pt}
+
+% ---- Signature Vector Hero Graphic (Paper Figure 1 DNA) ---------------------
+\begin{tcolorbox}[enhanced,colback=white,colframe=hair,boxrule=0.5pt,arc=2.5pt,
+  left=7pt,right=7pt,top=5pt,bottom=4.5pt,before skip=0pt,after skip=0pt]
+  \noindent{\sffamily\bfseries\fontsize{8.2}{9.8}\selectfont\color{ink}Visual Proof of Scale: The Entire \VThree{CandBytesMed}-Byte Median File at Actual Size \& Transfer Frontier}\par
+  \vspace{3.5pt}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm,font=\fsfont]
+    \tikzset{
+      hcard/.style={rounded corners=2pt,minimum height=2.28cm,inner sep=0pt,anchor=north west},
+      zl/.style={anchor=south west,inner sep=0pt,font=\sffamily\bfseries\fontsize{6.2}{7.4}\selectfont},
+      zs/.style={font=\sffamily\fontsize{6.0}{7.2}\selectfont,text=sub}
+    }
+    % Zone headers (total width 18.2cm fits 7.5in textwidth cleanly)
+    \draw[accent,line width=0.85pt] (0,0.10) -- (6.50,0.10);
+    \node[zl,text=accentdark] at (0,0.17) {INSIDE YOUR FIREWALL\;{\normalfont\color{sub}rows never move}};
+    \draw[ink,line width=0.85pt] (6.95,0.10) -- (12.71,0.10);
+    \node[zl,text=ink] at (6.95,0.17) {CROSSES BOUNDARY\;{\normalfont\color{sub}\VThree{CandBytesMed}\,B median}};
+    \draw[blue,line width=0.85pt] (13.15,0.10) -- (18.10,0.10);
+    \node[zl,text=blue] at (13.15,0.17) {ANY VENDOR / ML STACK\;{\normalfont\color{sub}scored inside}};
+
+    % Card 1: Real table
+    \node[hcard,fill=surface,minimum width=3.02cm] at (0,0) {};
+    \node[anchor=north west,inner sep=0pt] at (0.20,-0.16) {\ftitlefont ENTERPRISE TABLE};
+    \begin{scope}[shift={(0.20,-0.52)}]
+      \foreach \r in {0,...,4} {
+        \foreach \c in {0,...,5} {
+          \pgfmathsetmacro{\xx}{\c*0.43}
+          \pgfmathsetmacro{\yy}{-\r*0.195}
+          \ifnum\r=0
+            \ifnum\c=5 \fill[accent] (\xx,\yy) rectangle ++(0.38,-0.145);
+            \else \fill[muted] (\xx,\yy) rectangle ++(0.38,-0.145); \fi
+          \else
+            \ifnum\c=5 \fill[tierA] (\xx,\yy) rectangle ++(0.38,-0.145);
+            \else \fill[hair] (\xx,\yy) rectangle ++(0.38,-0.145); \fi
+          \fi
+        }
+      }
+    \end{scope}
+    \node[anchor=north west,inner sep=0pt,align=flush left,text width=2.62cm] at (0.20,-1.55) {\fbodyfont Sensitive rows + declared target stay inside your network.};
+
+    % Card 2: Compiler
+    \node[hcard,fill=white,draw=accent,line width=0.75pt,minimum width=3.04cm] at (3.46,0) {};
+    \node[anchor=north,inner sep=0pt] at (4.98,-0.24) {\sffamily\bfseries\fontsize{14}{15}\selectfont\color{ink}\wordmark};
+    \node[anchor=north,inner sep=0pt] at (4.98,-0.88) {\tcli{dope fit --budget 2048}};
+    \node[anchor=north,inner sep=0pt,align=flush center,text width=2.72cm] at (4.98,-1.28) {\fbodyfont Signed offline CPU binary. Zero cloud calls. Zero stored records.};
+
+    % Card 3: 64x32 byte grid (0.90mm x 0.7125mm -> 5.76cm x 2.28cm)
+    \begin{scope}[shift={(6.95,0)},x=0.90mm,y=0.7125mm]
+      \fill[gridline] (0,0) rectangle (64,-32);
+      \fill[accent] (0,0) rectangle (64,-27);
+      \fill[accent] (0,-27) rectangle (59,-28);
+      \foreach \i in {1,...,63} \draw[white,line width=0.28pt] (\i,0) -- (\i,-32);
+      \foreach \j in {1,...,31} \draw[white,line width=0.28pt] (0,-\j) -- (64,-\j);
+    \end{scope}
+
+    % Card 4: Any learner + score inside
+    \node[hcard,fill=bluetint,minimum width=4.95cm] at (13.15,0) {};
+    \node[anchor=north west,inner sep=0pt] at (13.38,-0.16) {\ftitlefont TRAIN OUTSIDE $\rightarrow$ SCORE INSIDE};
+    \node[anchor=north west,inner sep=0pt] at (13.38,-0.54) {\tcli{dope sample model.dope -n 4N}};
+    \node[anchor=north west,inner sep=0pt,align=flush left,text width=4.50cm] at (13.38,-0.94) {\fbodyfont Vendors draw synthetic rows from the 2\,KiB file, train \& tune any ML model, and return models to score on \textbf{\color{ink}untouched real holdout rows} inside your firewall.};
+
+    \foreach \xa/\xb in {3.02/3.46,6.50/6.95,12.71/13.15}
+      \draw[-{Stealth[length=3.8pt,width=3.2pt]},line width=0.6pt,draw=sub] (\xa+0.05,-1.14) -- (\xb-0.05,-1.14);
+
+    % Legend under band 1 (clean horizontal spacing, zero collision)
+    \node[anchor=north west,inner sep=0pt,zs] at (0,-2.40) {At this scale, ARF's 2.94\,MB file covers {\bfseries\color{ink}48.7 letter pages}.};
+    \fill[accent] (6.95,-2.44) rectangle ++(0.14,-0.14);
+    \node[anchor=north west,inner sep=0pt,zs] (lg1) at (7.16,-2.40) {\VThree{CandBytesMed}\,B used};
+    \fill[gridline] ([xshift=7pt,yshift=-1.2pt]lg1.north east) rectangle ++(0.14,-0.14);
+    \node[anchor=north west,inner sep=0pt,zs] at ([xshift=14pt]lg1.north east) {261\,B unused of 2,048\,B cap};
+    \node[anchor=north east,inner sep=0pt,zs] at (18.10,-2.40) {1 square = 1 byte};
+
+    % Band 2: Transfer Score vs Whole-File Size Frontier
+    \begin{axis}[
+      at={(1.02cm,-2.95cm)},anchor=north west,
+      width=12.80cm,height=4.00cm,scale only axis,
+      xmode=log,xmin=165,xmax=3.4e7,ymin=-105,ymax=126,
+      axis background/.style={shading=tswash},
+      axis line style={draw=none},tick style={draw=none},
+      ymajorgrids,grid style={white,line width=0.55pt},
+      ytick={-100,-50,0,50,100},yticklabels={\m100,\m50,0,50,100},
+      xtick={256,2048,16384,131072,1048576,8388608},
+      xticklabels={256\,B,2\,KiB,16\,KiB,128\,KiB,1\,MiB,8\,MiB},
+      tick label style={font=\sffamily\fontsize{6.6}{8.0}\selectfont,text=sub},
+      xlabel={Whole per-table artifact size (bytes, log scale)},ylabel={Transfer Score (4\x)},
+      label style={font=\sffamily\fontsize{7.0}{8.4}\selectfont,text=sub},
+      ylabel style={yshift=-3pt},xlabel style={yshift=2pt},
+      clip=false,
+    ]
+      \draw[ink,line width=0.5pt] (axis cs:165,100) -- (axis cs:3.4e7,100);
+      \draw[sub,line width=0.4pt] (axis cs:165,0) -- (axis cs:3.4e7,0);
+      \draw[accent,line width=0.65pt] (axis cs:2048,-105) -- (axis cs:2048,87.94) -- (axis cs:3.4e7,87.94);
+      \node[anchor=north west,font=\sffamily\fontsize{6.3}{7.6}\selectfont,text=accentdark,inner sep=2pt] at (axis cs:2048,-87) {2,048\,B hard cap};
+
+      \addplot[name path=rlo,draw=none,forget plot] table[x=cap,y=low]{\RowsSweep};
+      \addplot[name path=rhi,draw=none,forget plot] table[x=cap,y=high]{\RowsSweep};
+      \addplot[blue,fill opacity=0.12,forget plot] fill between[of=rlo and rhi];
+      \addplot[blue,line width=1.2pt,line join=round,mark=*,mark size=1.7pt,mark options={fill=blue,draw=white,line width=0.5pt}] table[x=cap,y=score]{\RowsSweep};
+
+      \addplot[name path=slo,draw=none,forget plot] table[x=cap,y=low]{\ServedSweep};
+      \addplot[name path=shi,draw=none,forget plot] table[x=cap,y=high]{\ServedSweep};
+      \addplot[accent,fill opacity=0.16,forget plot] fill between[of=slo and shi];
+      \addplot[accent,line width=1.4pt,line join=round,mark=*,mark size=1.7pt,mark options={fill=accent,draw=white,line width=0.5pt}] table[x=cap,y=score]{\ServedSweep};
+
+      \addplot[only marks,mark=*,mark size=3.0pt,mark options={fill=ink,draw=white,line width=0.8pt},
+        error bars/.cd,y dir=both,y explicit,error bar style={ink,line width=0.65pt},error mark options={ink,line width=0.65pt,mark size=2pt,rotate=90}]
+        table[x=bytes,y=score,y error plus expr=\thisrow{high}-\thisrow{score},y error minus expr=\thisrow{score}-\thisrow{low}]{\ThirdParty};
+
+      \node[circle,fill=accent,draw=white,line width=1.3pt,inner sep=0pt,minimum size=9.5pt] at (axis cs:2048,87.94) {};
+
+      \node[anchor=south west,align=left,inner sep=0pt] at (axis cs:210,104) {{\sffamily\bfseries\fontsize{9.2}{10.6}\selectfont\color{accentdark}DOPE v3\; 87.9}\hspace{0.5em}{\sffamily\fontsize{6.5}{7.8}\selectfont\color{sub}1,787\,B median}};
+      \node[anchor=north west,align=left,inner sep=0pt] at (axis cs:2650,-11) {{\sffamily\bfseries\fontsize{7.0}{8.4}\selectfont\color{blue}Stored real rows\; 2.6}\\[0.4pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}same 2,048\,B cap}};
+      \node[anchor=north west,align=left,inner sep=0pt] at (axis cs:3.7e6,73) {{\sffamily\bfseries\fontsize{7.0}{8.4}\selectfont\color{ink}ARF\; 77.2}\\[0.4pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}1,644\x{} larger}};
+      \node[anchor=west,align=left,inner sep=0pt] at (axis cs:1.85e5,40.17) {{\sffamily\bfseries\fontsize{7.0}{8.4}\selectfont\color{ink}Gauss.\ copula\; 40.2}\\[0.4pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}79\x{} larger}};
+      \node[anchor=north west,align=left,inner sep=0pt] at (axis cs:6.1e5,-7) {{\sffamily\bfseries\fontsize{7.0}{8.4}\selectfont\color{ink}TVAE\; \m3.9}\\[0.4pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}266\x{} larger}};
+      \node[anchor=west,align=left,inner sep=0pt] at (axis cs:1.42e6,-69.16) {{\sffamily\bfseries\fontsize{7.0}{8.4}\selectfont\color{ink}CTGAN\; \m69.2}\\[0.4pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}590\x{} larger}};
+
+      \node[anchor=west,inner sep=0pt] at (axis cs:2.2e4,-50) {\sffamily\bfseries\fontsize{18.5}{19.5}\selectfont\color{accent}1,644\texttimes};
+      \node[anchor=north west,align=left,inner sep=0pt] at (axis cs:2.2e4,-70) {{\sffamily\bfseries\fontsize{6.7}{8.2}\selectfont\color{ink}smaller than next-best file}\\[0.3pt]{\sffamily\fontsize{6.1}{7.4}\selectfont\color{sub}ARF: 77.2 from 2.94\,MB (uncapped)}};
+
+      \coordinate (rA) at (axis cs:3.4e7,100);
+      \coordinate (rB) at (axis cs:3.4e7,96.09);
+      \coordinate (rC) at (axis cs:3.4e7,91.23);
+      \coordinate (rD) at (axis cs:3.4e7,87.94);
+      \coordinate (rE) at (axis cs:3.4e7,0);
+      \coordinate (rF) at (axis cs:3.4e7,-16.36);
+    \end{axis}
+
+    % Reference ladder on right (clean spacing)
+    \tikzset{lad/.style={anchor=west,inner sep=0pt,font=\sffamily\fontsize{6.3}{7.6}\selectfont,text=sub},
+             ldr/.style={draw=sub,line width=0.4pt}}
+    \newcommand{\lv}[1]{{\bfseries\color{ink}\makebox[2.05em][r]{#1}}\hspace{0.45em}}
+    \draw[ldr] (rA) -- ++(3pt,0) -- ([xshift=10pt,yshift=13pt]rB) -- ++(2.5pt,0);
+    \node[lad] at ([xshift=15pt,yshift=13pt]rB) {\lv{100}second real sample};
+    \draw[ldr] (rB) -- ++(3pt,0) -- ([xshift=10pt,yshift=4.5pt]rB) -- ++(2.5pt,0);
+    \node[lad] at ([xshift=15pt,yshift=4.5pt]rB) {\lv{96.1}copy of fitting rows};
+    \draw[ldr] (rC) -- ++(3pt,0) -- ([xshift=10pt,yshift=-4pt]rB) -- ++(2.5pt,0);
+    \node[lad] at ([xshift=15pt,yshift=-4pt]rB) {\lv{91.2}real-row bootstrap};
+    \draw[accent,line width=0.6pt] (rD) -- ++(3pt,0) -- ([xshift=10pt,yshift=-12.5pt]rB) -- ++(2.5pt,0);
+    \node[lad,text=accentdark] at ([xshift=15pt,yshift=-12.5pt]rB) {{\bfseries\color{accentdark}\makebox[2.05em][r]{87.9}}\hspace{0.45em}\textbf{DOPE v3} (1,787\,B)};
+    \draw[ldr] (rE) -- ++(11pt,0);
+    \node[lad] at ([xshift=15pt]rE) {\lv{0}constant predictor};
+    \draw[ldr] (rF) -- ++(11pt,0);
+    \node[lad] at ([xshift=15pt]rF) {\lv{\m16.4}label shuffle};
+  \end{tikzpicture}\par
+  \vspace{2pt}
+  \noindent{\sffamily\fontsize{6.4}{8.0}\selectfont\color{sub}\textbf{\color{ink}Scope note:} Fresh-split DEV-SELECT development estimate (\VThree{CandCells} informative cells, \VThree{Families} dataset families, \VThree{PrimaryMult}\x{} sampling; weakest of linear and boosted-tree learners scored per cell; \VThree{CiLevel} family-bootstrap CIs). Third-party generators ran uncapped with library defaults. Paired 95\% CI vs.\ ARF includes zero (\VThree{ArfVsPts}).}
+\end{tcolorbox}
+
+% ==================== PAGE 2 =================================================
+\clearpage
+\thispagestyle{briefpage2}
+
+\briefsection{01}{Where DOPE Creates Immediate Enterprise Advantage}
+
+\noindent
+\begin{minipage}[t]{0.324\textwidth}
+  \vspace{0pt}%
+  \playcard{Play 01}{accent}{Multi-Vendor AI Bake-Offs}{Replace six-month NDA and data-export reviews with one inspectable $\le$\,2\,KiB file. Let 10 vendors train and tune freely outside; pick the winner on untouched real holdouts inside.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.324\textwidth}
+  \vspace{0pt}%
+  \playcard{Play 02}{navy}{M\&A \& Partner Signal Diligence}{Quantify whether a partner's or acquisition target's tabular data actually drives predictive lift on your KPI before negotiating full microdata integration.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.324\textwidth}
+  \vspace{0pt}%
+  \playcard{Play 03}{teal}{Zero-Infra Regulated Sandboxes}{Single MIT-licensed pure-Rust CPU executable with zero GPUs, zero cloud egress, and zero SaaS lock-in --- built for air-gapped healthcare, finance, and defense networks.}
+\end{minipage}
+
+\vspace{2pt}
+\briefsection{02}{Development-Panel Scoreboard at a Glance}
+
+\noindent{\fontsize{7.9}{9.9}\selectfont\color{sub}Models trained purely on synthetic rows are tested on real held-out targets. \textbf{\color{ink}Transfer Score = 100} equals a second real sample; \textbf{\color{ink}0} equals a constant guess; negative scores mislead downstream learners. Across three development split sets, DOPE led every SDV generator (\VThree{GcVsPts} vs.\ Gaussian copula, \VThree{TvaeVsPts} vs.\ TVAE, \VThree{CtganVsPts} vs.\ CTGAN); against ARF, the paired interval (\VThree{ArfVsPts}) includes zero, so DOPE is not shown to transfer better than ARF on this look.}
+
+\vspace{2.5pt}
+\noindent
+{\fontsize{7.5}{9.3}\selectfont\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}L{3.95cm}R{2.70cm}R{2.30cm}R{1.85cm}Y@{}}
+\toprule
+\thd{Generator / Scale Reference} & \thd{Transfer Score [95\% CI] $\uparrow$} & \thd{Median File} & \thd{Size vs.\ DOPE} & \thd{Benchmark Decision Rule (DEV-SELECT)} \\
+\midrule
+\rowcolor{accenttint}
+\textbf{DOPE v3} (\tcli{auto-v8}, $\le$\,2\,KiB) & \textbf{\VThree{CandScore}} & \textbf{\VThree{CandBytesMed}\,B} & \textbf{1\x} & \textbf{Highest point estimate; \VThree{CandFailed}/\VThree{CandCells} failures} \\
+Stored real rows (same 2\,KiB cap) & 2.6 {\color{sub}[\m30.9, 34.8]} & 2,016\,B {\color{sub}(28.5 rows)} & 1.1\x & Severe underfitting under equal 2\,KiB budget \\
+ARF (\tcli{arfpy}, uncapped)$^\dagger$ & \VThree{ArfScorePoint} {\color{sub}[58.4, 90.0]} & 2.94\,MB & \textbf{1,644\x{} larger} & \textbf{HOLD} (paired CI includes 0: \VThree{ArfVsPts}) \\
+SDV Gaussian copula$^\dagger$ & \VThree{GcScorePoint} {\color{sub}[27.9, 51.8]} & 141\,KB & 79\x{} larger & \textbf{HOLD} (\VThree{GcVsPts}; task-guard rule) \\
+SDV TVAE (uncapped)$^\dagger$ & \VThree{TvaeScorePoint} {\color{sub}[\m26.2, 17.8]} & 475\,KB & 266\x{} larger & \textbf{PROMOTE} (\VThree{TvaeVsPts}; \VThree{TvaeFailed}/\VThree{CandCells} failed) \\
+SDV CTGAN (uncapped)$^\dagger$ & \VThree{CtganScorePoint} {\color{sub}[\m82.7, \m55.2]} & 1.05\,MB & 590\x{} larger & \textbf{HOLD} (\VThree{CtganVsPts}; privacy-guard rule) \\
+\midrule
+\textit{Scale: copy / bootstrap of real rows} & \textit{\VThree{CopyAScorePoint} \; / \; \VThree{BootAScorePoint}} & \textit{---} & \textit{---} & \textit{Upper reference ceiling (full real training table)} \\
+\textit{Scale: indep.\ marginals / shuffle} & \textit{\VThree{IndepScorePoint} \; / \; \VThree{LabelShuffleScorePoint}} & \textit{---} & \textit{---} & \textit{Destroyed target-feature signal floor} \\
+\bottomrule
+\end{tabularx}}
+\vspace{1.5pt}
+\noindent{\sffamily\fontsize{6.2}{7.7}\selectfont\color{sub}$^\dagger$\,Uncapped library defaults: zero files met the \VThree{BudgetBytes}\,B cap (cap penalty without refitting scores 0.0). Sizes report the whole per-table file and exclude the shared public sampler binary/library. Receipts: \texttt{bench/real-world/results/scoreboard/v3.0.0/}.}
+
+\vspace{3pt}
+\briefsection{03}{How to Pilot Safely in 30 Days --- and What Governance Must Know}
+
+\noindent
+\begin{minipage}[t]{0.478\textwidth}
+  \vspace{0pt}
+  \colheading{3-Step Low-Risk Enterprise Pilot}
+  \vspace{1pt}
+  {\fontsize{7.8}{9.8}\selectfont\raggedright
+  \noindent\stepbadge{1}\;\textbf{Compile inside on one approved table (Day 1).}\\
+  Select one internally approved tabular problem with a clear business target. Run the signed offline \tcli{dope} CPU binary inside your firewall to emit a $\le$\,\VThree{BudgetBytes}-byte file in seconds. (On our public UCI Airfoil walkthrough, a 46.5\,KB CSV compiles to 2,044\,B and retains 0.971--0.977 held-out accuracy in 5.5 seconds.)
+
+  \vspace{3pt}
+  \noindent\stepbadge{2}\;\textbf{Run a blind build outside (Weeks 1--2).}\\
+  Hand the 2\,KiB file to an internal ML team or 2--5 external vendors. Using only synthetic draws from \tcli{dope sample}, each contender engineers features, trains, and tunes candidate models on their preferred ML stack.
+
+  \vspace{3pt}
+  \noindent\stepbadge{3}\;\textbf{Score every model back inside (Week 3).}\\
+  Import only the trained models behind your firewall and score them on untouched real holdout rows. Measure vendor ranking accuracy directly on your own ground truth before expanding to additional business units.
+  }
+
+  \vspace{3.5pt}
+  \begin{execbox}[accent]{Why Leaders Trust Open, Auditable Tooling}
+    DOPE v3.0.0 is \textbf{MIT-licensed}, ships \textbf{zero pretrained weights}, runs \textbf{100\% offline}, and publishes every benchmark receipt and Sigstore build attestation in the public repository --- eliminating black-box vendor lock-in.
+  \end{execbox}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.495\textwidth}
+  \vspace{0pt}
+  \begin{govbox}{Governance, Risk \& Honest Scientific Scope}
+    \textbf{Enterprise rigor requires clear boundaries. Release \VThree{ReleaseVersion} carries five explicit limits:}
+    \begin{itemize}[leftmargin=1.10em,itemsep=1.6pt,topsep=2pt]
+      \item \textbf{Derived data --- Legal decides:} Treat \tcli{.dope} files and synthetic CSVs as \emph{derived data}. Fitted schema and summaries can carry source information; compliance governs boundary release.
+      \item \textbf{No formal differential privacy \& not HIPAA de-identification:} Release \VThree{ReleaseVersion} implements \textbf{no formal differential privacy mechanism} and is \textbf{not HIPAA de-identification} (Safe Harbor or Expert Determination). Privacy checks are empirical diagnostics (\VThree{CandPrivacy} pass rate, 0.000 exact-copy excess, $k=\VThree{SupportK}$ floor).
+      \item \textbf{Uncertified DEV-SELECT estimates:} Published scores come from fresh development splits. No confirmation, holdout, or sealed certification panel has been opened (\texttt{docs/release.md}).
+      \item \textbf{Statistical nuance vs.\ ARF:} While DOPE's point estimate leads ARF by +10.8 points from a 1,644\x{} smaller file, the 95\% paired interval (\VThree{ArfVsPts}) includes zero; DOPE is not shown to outperform ARF on transfer alone.
+      \item \textbf{Built for training models, not realistic rows:} A boosted-tree discriminator still distinguishes DOPE rows from real rows easily (median C2ST AUC \textbf{\VThree{CandC2st}}). Cross-model feature-driver preservation is unmeasured.
+    \end{itemize}
+  \end{govbox}
+\end{minipage}
+
+\brieffooterstrip{Ready to Evaluate DOPE or Share With Your Engineering Team?}%
+  {\textbf{Next reads:} CTO Technical \& Architecture Brief (\texttt{docs/briefs/dope-v3-cto-brief.pdf}) \;\textbar\; Full 27-Page White Paper (\texttt{docs/whitepaper-v3/dope-v3.pdf}) \;\textbar\; 5-Second Real-Dataset Quick Start (\texttt{examples/v3-quickstart/}) \;\textbar\; Open Roadmap \& Co-Authorship (\texttt{ROADMAP.md})}%
+  {https://github.com/neverhuman/dope}
+
+\end{document}

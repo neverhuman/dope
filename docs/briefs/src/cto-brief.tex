@@ -1,0 +1,314 @@
+% D.O.P.E. v3.0.0 — Technical & Architecture Brief (CTO / VP Engineering / ML Architects)
+% Strict 2-page US Letter PDF bound to committed v3.0.0 receipts via v3-macros.tex.
+\documentclass[8.5pt,letterpaper]{article}
+\pdfminorversion=7
+\usepackage{dope-brief-style}
+\input{../../whitepaper-v3/generated/v3-macros}
+
+% Exact receipt-derived tables from docs/whitepaper-v3/dope-v3.tex
+\pgfplotstableread{
+cap score low high
+256 1.79 -18.92 23.03
+512 52.51 24.20 77.40
+1024 86.62 74.24 96.43
+2048 87.94 81.09 95.07
+4096 85.13 76.37 93.48
+8192 85.16 76.27 93.56
+16384 84.45 76.49 92.45
+}\ServedSweep
+\pgfplotstableread{
+cap score low high
+256 -36.15 -67.63 -6.73
+512 -57.45 -89.52 -21.08
+1024 -38.57 -69.80 -3.80
+2048 2.63 -30.94 34.78
+4096 28.45 -2.71 55.88
+8192 54.18 29.60 75.47
+16384 73.44 58.73 87.35
+}\RowsSweep
+
+\renewcommand{\briefrunningtitle}{Technical \& Architecture Brief}
+\hypersetup{
+  pdftitle={D.O.P.E. v3.0.0 — Technical and Architecture Brief},
+  pdfauthor={NEVERHUMAN Research},
+  pdfsubject={Pure-Rust Tabular Generative Compression Under a Strict 2,048-Byte Cap},
+  pdfkeywords={DOPE, Rust, DSE8, DPA1, Evidence Bank, Sigstore, Transfer Score, tabular synthetic data}
+}
+
+\begin{document}
+\thispagestyle{briefpage1}
+
+\briefmasthead{Technical \& Architecture Brief \;\textbar\; For CTOs, VP Engineering \& ML Architects}%
+  {Pure-Rust Generative Table Compression Under a Hard 2,048-Byte Cap}%
+  {\texttt{dope-engine-v3.0.0} (MIT) is a standalone, Sigstore-attested Rust CPU binary with \textbf{zero Python, zero LibTorch, and zero pretrained weights} --- compiling tabular predictive structure into CRC-checked $\le$\,2\,KiB generative programs.}
+
+% ---- 4-Column Engineering KPI Strip -----------------------------------------
+\noindent
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{accent}{\VThree{CandBytesMed}\,B / 2\,KiB}{Median / Hard Wire Cap}{\textbf{25.7\x} smaller than median float32 fit matrix; 100\% cap conformance, CRC-32 verified.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{navy}{\VThree{CandScorePoint}\;{\fontsize{8}{9}\selectfont\color{sub}(4\x)} \textbar{} \VThree{CandMatchedScorePoint}\;{\fontsize{8}{9}\selectfont\color{sub}(1\x)}}{Transfer Score (0/44 Fail)}{Regr \VThree{CandRegressionScore} \textbar{} Bin \VThree{CandBinaryScore} \textbar{} Multi \VThree{CandMulticlassScore}. Clears Format\,1's 7/44 fails.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{teal}{Zero Python / Wt.}{Minimal Attack Surface}{Stripped LTO x86-64 binary; Sigstore OIDC attested; zero outbound network calls.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.242\textwidth}
+  \vspace{0pt}%
+  \kpicard{blue}{\VThree{EvColDim} \textbar{} \VThree{EvEdgeDim} \textbar{} \VThree{EvGlobDim}}{FIT-Only Evidence Bank}{Col / pair / global slots across \VThree{EvTiers} tiers ($T_0$--$T_3$); $k=\VThree{SupportK}$ floor; no query field.}
+\end{minipage}
+
+\vspace{4.5pt}
+
+% ---- Full-Width Vector Architecture & Dual Chart Panel ----------------------
+\begin{tcolorbox}[enhanced,colback=white,colframe=hair,boxrule=0.5pt,arc=2.5pt,
+  left=6.5pt,right=6.5pt,top=4.5pt,bottom=4.5pt,before skip=0pt,after skip=0pt]
+  \noindent{\sffamily\bfseries\fontsize{7.9}{9.4}\selectfont\color{ink}A. End-to-End Trust Boundary, \tcli{auto-v8} Dual-Codec Selector \& \tcli{DPA1}/\tcli{DSE8} Wire Anatomy}\par
+  \vspace{3pt}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm,font=\fsfont]
+    % Enclave box (left 8.55cm)
+    \fill[surface,rounded corners=2.2pt] (0,0) rectangle (8.55,-2.52);
+    \draw[accent,line width=0.8pt,rounded corners=2.2pt] (0,0) rectangle (8.55,-2.52);
+    \node[anchor=north west,font=\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont,text=accentdark] at (0.16,-0.08) {OWNER ENCLAVE (FIT-ONLY, ZERO QUERY ROWS)};
+
+    % Intake node
+    \node[rounded corners=1.6pt,fill=white,draw=hair,line width=0.5pt,minimum width=2.45cm,minimum height=1.88cm,anchor=north west] at (0.18,-0.46) {};
+    \node[anchor=north west,text width=2.22cm,align=left] at (0.28,-0.54) {\ftitlefont CSV + \tcli{--target}\\[2pt]\fbodyfont Mandatory target-last intake; dup-grouped split; $k\ge 10$ support floor; zero raw echo.};
+
+    % Dual codec selector
+    \node[rounded corners=1.6pt,fill=white,draw=accent,line width=0.65pt,minimum width=5.38cm,minimum height=1.88cm,anchor=north west] at (2.98,-0.46) {};
+    \node[anchor=north west,font=\ttfamily\bfseries\fontsize{6.5}{7.8}\selectfont,text=ink] at (3.10,-0.52) {dope fit --format auto-v8 --budget 2048};
+    \node[rounded corners=1.4pt,fill=bluetint,minimum width=2.46cm,minimum height=0.72cm,anchor=north west] at (3.10,-0.92) {};
+    \node[anchor=north west,text width=2.32cm,align=left] at (3.18,-0.98) {{\sffamily\bfseries\fontsize{6.2}{7.4}\selectfont\color{navy}Format 1} {\sffamily\fontsize{5.8}{7}\selectfont\color{sub}(Brotli-11)}\\{\sffamily\fontsize{5.8}{7}\selectfont\color{sub}Copula + tanh + trees}};
+    \node[rounded corners=1.4pt,fill=accenttint,minimum width=2.52cm,minimum height=0.72cm,anchor=north west] at (5.72,-0.92) {};
+    \node[anchor=north west,text width=2.38cm,align=left] at (5.80,-0.98) {{\sffamily\bfseries\fontsize{6.2}{7.4}\selectfont\color{accentdark}Analytic DSE8} {\sffamily\fontsize{5.8}{7}\selectfont\color{sub}(TLV)}\\{\sffamily\fontsize{5.8}{7}\selectfont\color{sub}Closed-form + optional}};
+    \node[anchor=north west,text width=5.12cm,align=left] at (3.10,-1.70) {\sffamily\fontsize{5.9}{7.1}\selectfont\color{sub}Dup-grouped 2-fold check ($\ge 80$ groups, 2\x{} synth, lin+GBDT): picks \tcli{DSE8} iff $\Delta \ge 0.02$ \& fold veto $\le 0.05$.};
+
+    \draw[-{Stealth[length=3.5pt,width=2.9pt]},line width=0.55pt,draw=sub] (2.65,-1.40) -- (2.96,-1.40);
+
+    % Wire artifact + external consumer (right 9.10cm -> total width 18.10cm)
+    \fill[bluetint,rounded corners=2.2pt] (9.00,0) rectangle (18.10,-2.52);
+    \draw[blue,line width=0.8pt,rounded corners=2.2pt] (9.00,0) rectangle (18.10,-2.52);
+    \node[anchor=north west,font=\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont,text=blue] at (9.16,-0.08) {SOURCE-FREE RECIPIENT (ZERO SOURCE ACCESS)};
+
+    % Packet anatomy stacked bar
+    \node[anchor=north west,font=\sffamily\bfseries\fontsize{6.5}{7.8}\selectfont,text=ink] at (9.16,-0.40) {\tcli{DPA1} / \tcli{DSE8} Wire Frame ($\le$\,2,048 bytes total, strict fail-closed parser):};
+    \begin{scope}[shift={(9.16,-0.74)}]
+      \fill[ink] (0,0) rectangle (0.98,-0.54);
+      \node[text=white,font=\sffamily\bfseries\fontsize{5.4}{6.2}\selectfont,align=center] at (0.49,-0.27) {DPA1\\13\,B};
+      \fill[slate] (1.02,0) rectangle (2.12,-0.54);
+      \node[text=white,font=\sffamily\bfseries\fontsize{5.4}{6.2}\selectfont,align=center] at (1.57,-0.27) {Schema\\+24\,B hdr};
+      \fill[navy] (2.16,0) rectangle (5.16,-0.54);
+      \node[text=white,font=\sffamily\bfseries\fontsize{5.4}{6.2}\selectfont,align=center] at (3.66,-0.27) {Mandatory (closed-form)\\Marginals ($k{=}10$), Copula, IRLS};
+      \fill[accent] (5.20,0) rectangle (7.94,-0.54);
+      \node[text=white,font=\sffamily\bfseries\fontsize{5.4}{6.2}\selectfont,align=center] at (6.57,-0.27) {Optional (utility-ordered)\\Regimes, Effects, Pairs, Trees};
+      \fill[teal] (7.98,0) rectangle (8.74,-0.54);
+      \node[text=white,font=\sffamily\bfseries\fontsize{5.4}{6.2}\selectfont,align=center] at (8.36,-0.27) {CRC32\\4\,B};
+    \end{scope}
+
+    % Sampler & downstream boxes (generous inner padding, clean 2 lines)
+    \node[rounded corners=1.6pt,fill=white,draw=blue!50,line width=0.5pt,minimum width=4.22cm,minimum height=0.98cm,anchor=north west] at (9.16,-1.40) {};
+    \node[anchor=north west,text width=4.04cm,align=left] at (9.26,-1.47) {{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{ink}\tcli{dope sample} (Rayon parallel)}\\[1pt]{\sffamily\fontsize{5.65}{6.8}\selectfont\color{sub}Counter RNG \tcli{(seed,row,stream,col)}; deterministic across all threads.}};
+    \node[rounded corners=1.6pt,fill=white,draw=blue!50,line width=0.5pt,minimum width=4.14cm,minimum height=0.98cm,anchor=north west] at (13.76,-1.40) {};
+    \node[anchor=north west,text width=3.96cm,align=left] at (13.86,-1.47) {{\sffamily\bfseries\fontsize{6.3}{7.4}\selectfont\color{ink}Any Downstream ML Stack}\\[1pt]{\sffamily\fontsize{5.65}{6.8}\selectfont\color{sub}Train linear/GBDT/NN outside; owner scores on held-out real test split.}};
+    \draw[-{Stealth[length=3.5pt,width=2.9pt]},line width=0.55pt,draw=sub] (13.40,-1.89) -- (13.74,-1.89);
+
+    % Boundary arrow
+    \draw[-{Stealth[length=4.2pt,width=3.5pt]},line width=0.9pt,draw=accent] (8.57,-1.05) -- (8.98,-1.05);
+  \end{tikzpicture}
+
+  \vspace{4pt}
+  \noindent\textcolor{gridline}{\rule{\linewidth}{0.45pt}}\par
+  \vspace{3pt}
+  \noindent{\sffamily\bfseries\fontsize{7.9}{9.4}\selectfont\color{ink}B. Why Dual-Codec \tcli{auto-v8} Wins Across Tasks \& Byte Budgets (DEV-SELECT Receipts)}\par
+  \vspace{2.5pt}
+
+  % Side-by-side pgfplots panels
+  \noindent
+  \begin{minipage}[t]{0.51\linewidth}
+    \vspace{0pt}\centering
+    \begin{tikzpicture}[font=\fsfont]
+      \begin{axis}[
+        briefhouse,
+        ybar=1.5pt,
+        bar width=5.6pt,
+        width=8.10cm,height=2.95cm,scale only axis,
+        ymin=0,ymax=108,
+        ymajorgrids,
+        ytick={0,25,50,75,100},
+        symbolic x coords={Overall,Regr,Binary,Multi,MLP},
+        xtick=data,
+        xticklabels={Overall 4\x,Regr.,Binary,Multiclass,Held-out MLP},
+        ylabel={Transfer Score},
+        ylabel style={yshift=-4pt},
+        legend style={at={(0.5,1.03)},anchor=south,legend columns=4,draw=none,fill=none,
+          font=\sffamily\fontsize{6.1}{7.1}\selectfont,text=sub,/tikz/every even column/.style={column sep=4pt}},
+      ]
+        \addplot[fill=accent,draw=none] coordinates {(Overall,87.9) (Regr,86.3) (Binary,86.4) (Multi,91.1) (MLP,65.1)};
+        \addplot[fill=navy,draw=none] coordinates {(Overall,77.2) (Regr,92.9) (Binary,58.8) (Multi,79.7) (MLP,77.0)};
+        \addplot[fill=blue!65,draw=none] coordinates {(Overall,73.3) (Regr,75.0) (Binary,56.2) (Multi,88.8) (MLP,58.5)};
+        \addplot[fill=teal!75,draw=none] coordinates {(Overall,65.8) (Regr,90.6) (Binary,72.4) (Multi,34.5) (MLP,50.9)};
+        \legend{DOPE v3,ARF (2.94\,MB),Fmt\,1 alone,DSE8 alone}
+      \end{axis}
+    \end{tikzpicture}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.47\linewidth}
+    \vspace{0pt}\centering
+    \begin{tikzpicture}[font=\fsfont]
+      \begin{axis}[
+        briefhouse,
+        xmode=log,
+        width=7.30cm,height=2.95cm,scale only axis,
+        xmin=200,xmax=22000,ymin=-95,ymax=114,
+        axis background/.style={shading=tswash},
+        ymajorgrids,grid style={white,line width=0.5pt},
+        ytick={-50,0,50,100},yticklabels={\m50,0,50,100},
+        xtick={256,512,1024,2048,4096,8192,16384},
+        xticklabels={256,512,1K,2K,4K,8K,16K},
+        xlabel={Whole-file budget (bytes, log)},ylabel={Transfer Score},
+        ylabel style={yshift=-4pt},xlabel style={yshift=2pt},
+      ]
+        \draw[sub,line width=0.4pt] (axis cs:200,0) -- (axis cs:22000,0);
+        \draw[accent,densely dashed,line width=0.55pt] (axis cs:2048,-95) -- (axis cs:2048,105);
+        \addplot[name path=rlo2,draw=none,forget plot] table[x=cap,y=low]{\RowsSweep};
+        \addplot[name path=rhi2,draw=none,forget plot] table[x=cap,y=high]{\RowsSweep};
+        \addplot[blue,fill opacity=0.14,forget plot] fill between[of=rlo2 and rhi2];
+        \addplot[blue,line width=1.2pt,mark=*,mark size=1.6pt,mark options={fill=blue,draw=white,line width=0.5pt}] table[x=cap,y=score]{\RowsSweep};
+        \addplot[name path=slo2,draw=none,forget plot] table[x=cap,y=low]{\ServedSweep};
+        \addplot[name path=shi2,draw=none,forget plot] table[x=cap,y=high]{\ServedSweep};
+        \addplot[accent,fill opacity=0.18,forget plot] fill between[of=slo2 and shi2];
+        \addplot[accent,line width=1.4pt,mark=*,mark size=1.7pt,mark options={fill=accent,draw=white,line width=0.5pt}] table[x=cap,y=score]{\ServedSweep};
+        \node[circle,fill=accent,draw=white,line width=1.1pt,inner sep=0pt,minimum size=6.8pt] at (axis cs:2048,87.94) {};
+        \node[anchor=south west,font=\sffamily\bfseries\fontsize{6.4}{7.6}\selectfont,text=accentdark] at (axis cs:1850,92) {DOPE v3 (87.9)};
+        \node[anchor=north west,font=\sffamily\bfseries\fontsize{6.4}{7.6}\selectfont,text=blue] at (axis cs:2350,-16) {Stored real rows (2.6)};
+        \node[anchor=north east,font=\sffamily\fontsize{5.9}{7.0}\selectfont,text=sub] at (axis cs:20500,40) {235 rows @ 16\,KiB};
+      \end{axis}
+    \end{tikzpicture}
+  \end{minipage}
+\end{tcolorbox}
+
+\vspace{5.5pt}
+
+% ---- Technical Deep Dive (side-by-side top-aligned minipages on Page 1) -----
+\noindent
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \colheading{Dual-Codec Design \& Parser Hardening}
+  {\fontsize{8.05}{10.0}\selectfont
+  Why does \tcli{auto-v8} outperform either codec alone? Format\,1 compresses dense continuous and multiclass structure well (73.3) but fails 7/44 cells under tight budgets; analytic \tcli{DSE8} never fails (0/44) and excels on regression (90.6) via closed-form mandatory sizing and utility-ordered optional prefix truncation without refitting. Together they hit \textbf{87.9} with \textbf{0/44 failures}.
+
+  \vspace{2.5pt}
+  Every parser fails closed: \tcli{DSE8} rejects unknown magic/version/flags/tags, duplicate or out-of-order TLV tags, truncation, trailing bytes, missing mandatory frames, and CRC-32 mismatches. Format\,1 enforces 64\,MiB inflation/materialization caps, 1\,MiB JSON header limits, 4,096-feature bounds, and acyclic tree checks against decompression bombs. Errors and public sidecars never echo source values, headers, or extrema.
+  }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \colheading{FIT-Only Evidence Bank (\tcli{evidence-layout-v1})}
+  {\fontsize{8.05}{10.0}\selectfont
+  DOPE's owner-side featurization is pure, single-threaded, deterministic, uncached Rust whose input struct has \textbf{no query-row field by construction}. It emits row-count-independent masked tensors --- \textbf{\VThree{EvColDim}} col / \textbf{\VThree{EvEdgeDim}} pair / \textbf{\VThree{EvGlobDim}} global slots (+16/class, 4/class-col, 8/group) across \textbf{4 tiers}:
+  \begin{itemize}[leftmargin=1.12em,itemsep=1.5pt,topsep=2pt]
+    \item \textbf{$T_0$:} 1 sort/col --- $k{=}10$ support floor, 17-knot quantile residuals, L-moments/tails, missingness, task/size.
+    \item \textbf{$T_1$:} Rank-12 factor/precision copula, tail/directional dependence, 16 pair channels (product/XOR target terms), 3-fold OOF IRLS.
+    \item \textbf{$T_2$:} 2-fold depth-3 GBDT witness, Walsh--Hadamard functional ANOVA, calibration, 1-NN noise floor.
+    \item \textbf{$T_3$:} Uncached closed-loop packet probes (AUC, correlation gap, DCR share; masked unless a packet is passed).
+  \end{itemize}
+  }
+\end{minipage}
+
+% ==================== PAGE 2 =================================================
+\clearpage
+\thispagestyle{briefpage2}
+
+\briefsection{01}{Full Benchmark Metrics, Guards \& Ablations (DEV-SELECT Fresh Splits)}
+
+\noindent{\sffamily\fontsize{6.8}{8.4}\selectfont\color{sub}\tcli{dope-kpi/v2} candidate contract: \VThree{CandCells} informative cells across \VThree{Families} families (\VThree{RegressionFamilies} regression, \VThree{BinaryFamilies} binary, \VThree{MulticlassFamilies} multiclass). Transfer Score $= 100 \times (1 + \mathrm{TRG})$, scoring the weaker of linear and GBDT per cell; failures stay at 0.0. Uncertified release.}
+
+\vspace{2.5pt}
+\noindent
+{\fontsize{7.2}{9.0}\selectfont\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{@{}Y R{2.42cm} R{1.15cm} c R{1.15cm} R{1.18cm} c R{1.72cm} R{1.12cm} R{0.78cm}@{}}
+\toprule
+\thd{Generator / Ablation} & \thd{4\x{} [95\% CI] $\uparrow$} & \thd{1\x} & \thd{Regr / Bin / Multi} & \thd{MLP} & \thd{Med.\ File} & \thd{Real.\ / Priv.} & \thd{Copies $\mu$ (max)} & \thd{C2ST} & \thd{Failed} \\
+\midrule
+\rowcolor{accenttint}
+\textbf{DOPE v3} (\tcli{auto-v8}) & \textbf{\VThree{CandScore}} & \textbf{\VThree{CandMatchedScorePoint}} & 86.3 / 86.4 / 91.1 & 65.1 & \textbf{1,787\,B} & 0.194 / 0.688 & 0.000 (0.000) & \VThree{CandC2st} & \textbf{0 / 44} \\
+ARF (\tcli{arfpy})$^\dagger$ & 77.2 {\color{sub}[58.4, 90.0]} & \VThree{ArfMatchedScorePoint} & 92.9 / 58.8 / 79.7 & \textbf{77.0} & 2.94\,MB & 0.278 / 0.031 & 0.000 (0.004) & \VThree{ArfC2st} & 0 / 44 \\
+SDV Gauss.\ copula$^\dagger$ & 40.2 {\color{sub}[27.9, 51.8]} & \VThree{GcMatchedScorePoint} & 83.2 / 38.8 / \m1.5 & 18.9 & 141\,KB & 0.111 / 0.601 & 0.005 (0.200) & \VThree{GcC2st} & 0 / 44 \\
+SDV TVAE$^\dagger$ & \m3.9 {\color{sub}[\m26.2, 17.8]} & \VThree{TvaeMatchedScorePoint} & 30.0 / \m43.2 / 1.4 & \m4.5 & 475\,KB & 0.000 / 0.326 & 0.000 (0.000) & \VThree{TvaeC2st} & 5 / 44 \\
+SDV CTGAN$^\dagger$ & \m69.2 {\color{sub}[\m82.7, \m55.2]} & \VThree{CtganMatchedScorePoint} & \m50.2 / \m88.8 / \m68.5 & \m65.6 & 1.05\,MB & 0.000 / 0.743 & 0.006 (0.271) & \VThree{CtganC2st} & 0 / 44 \\
+\midrule
+\textit{Ablation: Format\,1 only} & \textit{73.3 {\color{sub}[59.8, 86.7]}} & \textit{53.0} & \textit{75.0 / 56.2 / 88.8} & \textit{58.5} & \textit{1,508\,B} & \textit{0.306 / 0.507} & \textit{---} & \textit{0.925} & \textit{7 / 44} \\
+\textit{Ablation: DSE8 only} & \textit{65.8 {\color{sub}[34.8, 89.7]}} & \textit{54.8} & \textit{90.6 / 72.4 / 34.5} & \textit{50.9} & \textit{868\,B} & \textit{0.194 / 0.753} & \textit{---} & \textit{0.977} & \textit{0 / 44} \\
+Stored rows ($\le$\,2\,KiB) & 2.6 {\color{sub}[\m30.9, 34.8]} & \m0.9 & --- & --- & 2,016\,B & --- & --- & --- & 0 / 44 \\
+\textit{Copy / Bootstrap real} & \textit{96.1 / 91.2} & \textit{96.1/78.6} & \textit{---} & \textit{98.6/85.5} & \textit{---} & \textit{---} & \textit{---} & \textit{0.53/0.57} & \textit{0 / 44} \\
+\bottomrule
+\end{tabularx}}
+\vspace{1.5pt}
+\noindent{\sffamily\fontsize{6.3}{7.8}\selectfont\color{sub}$^\dagger$\,Uncapped library defaults; 0 files $\le$\,\VThree{BudgetBytes}\,B (0.0 under cap penalty). Median per-cell retention on DOPE v3: linear \VThree{CandRetLinear}, GBDT \VThree{CandRetGbdt}, held-out MLP \VThree{CandRetMlp}.}
+
+\vspace{4.5pt}
+
+% ---- Page 2 Two-Column Technical Split --------------------------------------
+\noindent
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \briefsection{02}{Paired Statistics \& Why \tcli{SingleEncV8} Did Not Ship}
+  {\fontsize{7.85}{9.9}\selectfont
+  \textbf{Paired contrasts (4\x, Holm-adjusted):} Against \textbf{ARF}, DOPE's paired difference is \textbf{\VThree{ArfVsPts}} (Holm $p=0.114$) $\rightarrow$ \textbf{HOLD} (missed tasks, MLP, realism); the 95\% interval includes zero across all three DEV split sets, so DOPE is not shown to transfer better than ARF on this look. Against SDV, DOPE is \textbf{PROMOTE} vs.\ TVAE (\VThree{TvaeVsPts}) and \textbf{HOLD} vs.\ Gaussian copula (\VThree{GcVsPts}, tasks) and CTGAN (\VThree{CtganVsPts}, privacy).
+
+  \vspace{2.5pt}
+  \textbf{Transparent neural pilot result:} We trained a learned encoder-decoder (\tcli{SingleEncV8}) over the Evidence Bank on real tables, target swaps, and synthetic priors (3 runs $\times$ 8,000 updates on RTX\,4090). It lowered training loss and screening error, but scored \textbf{\m0.37} (95\% CI \textbf{[\m2.71, +1.72]}) on fresh DEV splits and missed task/MLP guards. Release \VThree{ReleaseVersion} therefore ships weight-free --- and \texttt{ROADMAP.md} invites external contributors to enrich the Evidence Bank with data-specific features (with co-authorship on future releases).
+  }
+
+  \vspace{3.5pt}
+  \briefsection{03}{Supply Chain, Attestation \& Portability}
+  {\fontsize{7.75}{9.8}\selectfont\raggedright
+  \begin{itemize}[leftmargin=1.12em,itemsep=1.7pt,topsep=1.5pt]
+    \item \textbf{Signed binary (\tcli{dope-engine-v3.0.0}):} Linux x86-64 GNU (\tcli{glibc 2.39+}), built with \tcli{--no-default-features}, LTO, stripped, abort-on-panic, and attested via commit-pinned \tcli{actions/attest} + GitHub OIDC Sigstore (no long-lived keys).
+    \item \textbf{Fixed 6-member weight-free inventory:} \tcli{dope-linux-x86\_64}, \tcli{BUILDINFO.json}, \tcli{Cargo.lock}, \tcli{DEPENDENCIES.txt}, \tcli{LICENSE}, \tcli{THIRD\_PARTY\_NOTICES} + \tcli{SHA256SUMS} + \tcli{dope.sigstore.json}.
+    \item \textbf{Linkage \& runtime firewall:} CI blocks Python, LibTorch, CUDA, and MKL linkage. Accountless install via SHA-256-pinned \tcli{scripts/install.sh} (manual check: \tcli{scripts/verify-engine-release.sh}). Zero outbound network calls at runtime.
+    \item \textbf{macOS / ARM / older Linux:} Build from source offline with \tcli{cargo install --locked --path engine/dope-cli} (Rust 1.88+), or run the signed x86-64 binary in \tcli{ubuntu:24.04} Docker.
+  \end{itemize}
+  }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.486\textwidth}
+  \vspace{0pt}
+  \briefsection{04}{5-Minute Offline Technical Proof}
+  \begin{codecard}{End-to-End CLI Lifecycle (Zero Python / Zero Cloud)}
+{\color{codecomment}\# 1. Run bundled UCI Airfoil lifecycle (\textasciitilde 5.5s offline):}\\
+bash examples/v3-quickstart/run.sh\\[2.5pt]
+{\color{codecomment}\# Verified result on UCI Airfoil (CC BY 4.0, 1,190/313 split):}\\
+{\color{codecomment}\#   46,520 B train CSV -> 2,044 B model.dope (22.8x smaller)}\\
+{\color{codecomment}\#   4,760 synthetic rows -> Linear 0.977 | GBDT 0.971 ret.}\\[3.5pt]
+{\color{codecomment}\# 2. Or compile \& test your own headered CSV:}\\
+dope="\$HOME/.local/opt/dope/3.0.0/bin/dope"\\
+"\$dope" fit train.csv --target y --format auto-v8 \textbackslash\\
+\hspace*{1.2em}--budget 2048 --seed 42 -o model.dope\\
+"\$dope" sample model.dope -n 4000 --seed 7 -o synth.csv\\
+{\color{codecomment}\# Source builds on main evaluate DPA1 directly:}\\
+"\$dope" eval -m model.dope --train train.csv \textbackslash\\
+\hspace*{1.2em}--test test.csv --synth synth.csv \textbackslash\\
+\hspace*{1.2em}--auditors linear,gbdt --json eval.json
+  \end{codecard}
+
+  \vspace{2.5pt}
+  \begin{govbox}{Hard Technical Limits \& Open Frontier}
+    \begin{itemize}[leftmargin=1.1em,itemsep=1.7pt,topsep=1.5pt]
+      \item \textbf{DEV-SELECT only (uncertified):} No confirmation, holdout, or sealed certification panel has been opened (\texttt{docs/release.md}).
+      \item \textbf{Empirical privacy only --- no formal DP:} Privacy gate requires DCR\,$\le$\,0.55, MIA AUC\,$\le$\,0.55, TPR@1\%FPR\,$\le$\,0.02, copy excess\,$\le$\,0.005, and $k\ge 10$. Release \VThree{ReleaseVersion} has \textbf{no formal differential privacy} and is \textbf{not HIPAA de-identification}.
+      \item \textbf{Realism \& driver gaps:} Boosted-tree C2ST separates DOPE rows easily (\VThree{CandC2st}); cross-model feature-driver preservation is unmeasured; tabular foundation-model auditors are unqualified.
+      \item \textbf{CLI compatibility note:} On published \tcli{v3.0.0}, \tcli{fit} and \tcli{sample} read \tcli{auto-v8}/\tcli{DPA1}, while \tcli{eval} requires a separate \tcli{--format 1} schema carrier; source builds on \tcli{main} add direct \tcli{DPA1} support to \tcli{dope eval}.
+      \item \textbf{Open roadmap (\texttt{ROADMAP.md}):} Data-specific Evidence Bank features (\tcli{evidence-layout-v2}), promoted \tcli{SingleEncV8} weights, cross-model driver benchmarks, and formal $(\varepsilon,\delta)$ \tcli{DP-DSE8}.
+    \end{itemize}
+  \end{govbox}
+\end{minipage}
+
+\brieffooterstrip{Inspect the Code, Train \tcli{SingleEncV8}, or Contribute to v3.1+ (Co-Authorship)}%
+  {\textbf{Key links:} CEO Executive Brief (\texttt{docs/briefs/dope-v3-ceo-brief.pdf}) \;\textbar\; Full 27-Page White Paper (\texttt{docs/whitepaper-v3/dope-v3.pdf}) \;\textbar\; Neural Training Guide (\texttt{docs/training.md}) \;\textbar\; Signed Release Audit (\texttt{docs/signed-engine-release.md}) \;\textbar\; Open Roadmap (\texttt{ROADMAP.md})}%
+  {https://github.com/neverhuman/dope}
+
+\end{document}
