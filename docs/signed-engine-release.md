@@ -127,13 +127,17 @@ failure propagation. They are not cryptographic signing evidence.
 
 ## Verify before install
 
-Install GitHub CLI 2.102.0 or newer from its official distribution. Run these
-commands from this source checkout.
+Install GitHub CLI 2.102.0 or newer from its official distribution. Ubuntu 24.04's
+packaged `gh` is 2.45.0, which this check refuses. A GitHub login is not required:
+verification uses the published `dope.sigstore.json` bundle. `gh` may still fetch
+Sigstore's trust root. Run these commands from this source checkout.
 
 ```bash
 release_tag=dope-engine-v3.0.0
+release_commit=e15c415bad9554f7c419dd240aa670d1a79a27fe
 gh release download "$release_tag" --repo neverhuman/dope --dir release
-release_commit=$(gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha)
+# Cross-check only. The pin above is the source commit named by the release.
+# gh api "repos/neverhuman/dope/commits/$release_tag" --jq .sha
 bash scripts/verify-engine-release.sh release "$release_tag" "$release_commit"
 # Only after successful verification:
 install -Dm755 release/dope-linux-x86_64 "$HOME/.local/bin/dope"
@@ -141,10 +145,11 @@ install -Dm644 release/LICENSE "$HOME/.local/share/dope-engine/LICENSE"
 install -Dm644 release/THIRD_PARTY_NOTICES "$HOME/.local/share/dope-engine/THIRD_PARTY_NOTICES"
 ```
 
-The helper verifies the two signed subjects (`dope-linux-x86_64` and `SHA256SUMS`) online
-using `gh attestation verify`, then checks every fixed package hash and refuses symlinks,
-traversal inventory entries, missing files, stray unindexed weight files and malformed
-tag/commit identities. When an admitted 8-member release includes `SingleEncV8` weights,
+The helper requires `gh` 2.102.0 or newer, then verifies the two signed subjects
+(`dope-linux-x86_64` and `SHA256SUMS`) with `gh attestation verify --bundle release/dope.sigstore.json`.
+It checks every fixed package hash and refuses symlinks, traversal inventory entries,
+a missing bundle, stray unindexed weight files and malformed tag/commit identities.
+When an admitted 8-member release includes `SingleEncV8` weights,
 the helper additionally runs `gh attestation verify` on `dope-v8-weights.safetensors` and
 `V8_WEIGHTS_MANIFEST.json` (four attested subjects total) and cross-checks
 `V8_WEIGHTS_MANIFEST.json` and `BUILDINFO.json` (`v8_weights_sha256`, `v8_weights_bytes`).
@@ -154,15 +159,16 @@ to attested `dope-engine-v*` tags and failing closed on legacy tags or weight-fr
 as `dope-engine-v3.0.0`) and `--no-v8-weights` (skip even if bundled). Signing establishes
 build/packaging identity only; it never certifies model quality or privacy. It never executes the unverified binary. The GitHub CLI is an
 installation-time verifier, not an application dependency.
-Retain the bundle and exact source commit with your deployment record. Offline bundle
-verification is possible with GitHub CLI's `--bundle` mode, but is not an unsigned
-fallback and requires maintaining the correct trust policy independently.
+Retain the bundle and exact source commit with your deployment record. `--bundle`
+removes the authenticated GitHub API lookup. It is not an unsigned fallback: the
+repository, signer workflow, tag and source commit stay mandatory.
 
 For direct verification without the helper, repeat this command for `SHA256SUMS` as well
 as the binary, then check the signed checksum inventory before installing:
 
 ```bash
-gh attestation verify release/dope-linux-x86_64 --repo neverhuman/dope \
+gh attestation verify release/dope-linux-x86_64 \
+  --bundle release/dope.sigstore.json --repo neverhuman/dope \
   --signer-workflow neverhuman/dope/.github/workflows/engine-release.yml \
   --source-ref "refs/tags/$release_tag" --source-digest "$release_commit" --format json
 ```

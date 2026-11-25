@@ -56,17 +56,18 @@ Options:
   --color <auto|always|never>
   -h, --help                Show this help
 
-Signed engine tags require gh >= 2.102.0 and all attestation policy flags before fetching.
-The engine tag selects the binary; --model-tag selects models independently:
-  ./scripts/install.sh --tag dope-engine-v3.0.0 --model-tag v1.0.0
-  ./scripts/install.sh --tag dope-engine-v3.0.0 --no-weights
-  ./scripts/install.sh --tag dope-engine-v3.1.0 --no-weights --v8-weights
+Signed engine tags install the standalone binary. They require gh >= 2.102.0 and
+verify the published dope.sigstore.json bundle, so a GitHub login is not required.
+Pass --with-weights to also install the independent model release.
+  ./scripts/install.sh --tag dope-engine-v3.0.0 --source-digest <SHA40>
+  ./scripts/install.sh --tag dope-engine-v3.0.0 --with-weights --model-tag v1.0.0
 For an offline split, supply --from-dir ENGINE_DIR --model-from-dir MODEL_DIR.
 A one-directory offline release with no model members remains engine-only unless
 models were explicitly requested. Partial models are refused, never relabeled.
 EOF
 }
 
+main() {
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tag|--version) TAG="${2:-}"; shift 2 ;;
@@ -113,6 +114,8 @@ for selected_tag in "$TAG" "$MODEL_TAG"; do
   fi
 done
 if [[ "$TAG" == dope-engine-v* ]]; then REQUIRE_ATTESTATION=1; fi
+# Analytic engine tags do not download model files unless a model flag asks for them.
+if [[ "$TAG" == dope-engine-v* && $MODEL_EXPLICIT -eq 0 ]]; then SKIP_WEIGHTS=1; fi
 if [[ "$V8_WEIGHTS_MODE" == "require" && ( "$TAG" != dope-engine-v* || $REQUIRE_ATTESTATION -ne 1 ) ]]; then
   echo "error: --v8-weights requires an attested dope-engine-v* release tag (got '$TAG')" >&2
   exit 1
@@ -125,15 +128,12 @@ if [[ "$(uname -s):$(uname -m)" != "Linux:x86_64" ]]; then
   exit 1
 fi
 
-for tool in sha256sum jq awk install mktemp; do
-  command -v "$tool" >/dev/null 2>&1 || { echo "error: required tool missing: $tool" >&2; exit 1; }
-done
-
 # Fail before any asset fetch or destination creation. Older gh releases lack policy
 # flags or the patched attestation enforcement; flag presence alone is insufficient.
 gh_upgrade_error() {
-  echo "error: upgrade gh to 2.102.0 or newer with attestation verify --repo, --signer-workflow, --source-ref, --source-digest and --format support" >&2
+  echo "error: upgrade gh to 2.102.0 or newer with attestation verify --repo, --signer-workflow, --source-ref, --source-digest, --bundle and --format support" >&2
   echo "  https://github.com/cli/cli/releases/tag/v2.102.0" >&2
+  echo "  note: Ubuntu 24.04's packaged gh is 2.45.0; use the release above or GitHub's apt repository" >&2
   exit 1
 }
 require_gh_policy() {
@@ -144,10 +144,34 @@ require_gh_policy() {
   major=$((10#${BASH_REMATCH[1]})); minor=$((10#${BASH_REMATCH[2]}))
   (( major > 2 || (major == 2 && minor >= 102) )) || gh_upgrade_error
   gh_help=$(gh attestation verify --help 2>/dev/null) || gh_upgrade_error
-  for flag in --repo --signer-workflow --source-ref --source-digest --format; do
+  for flag in --repo --signer-workflow --source-ref --source-digest --format --bundle; do
     [[ "$gh_help" =~ (^|[[:space:]])${flag}([[:space:]=,]|$) ]] || gh_upgrade_error
   done
 }
+preflight() {
+  local missing=() tool glibc
+  for tool in sha256sum jq awk install mktemp sort getconf; do
+    command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
+  done
+  if [[ -z "$FROM_DIR" ]]; then
+    command -v curl >/dev/null 2>&1 || missing+=(curl)
+  fi
+  if (( ${#missing[@]} )); then
+    echo "error: required tools missing: ${missing[*]}" >&2
+    echo "  fix (Debian/Ubuntu): sudo apt-get install -y curl jq coreutils" >&2
+    exit 1
+  fi
+  if [[ "${DOPE_SKIP_GLIBC_CHECK:-0}" != 1 ]]; then
+    glibc=$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')
+    if [[ -z "$glibc" || "$(printf '%s\n' "2.39" "$glibc" | sort -V | head -n 1)" != "2.39" ]]; then
+      echo "error: dope-linux-x86_64 needs glibc 2.39 or newer (found: ${glibc:-no glibc})." >&2
+      echo "  fix: use Ubuntu 24.04+, Debian 13+ or a container such as ubuntu:24.04, or build from source:" >&2
+      echo "       cargo build --manifest-path engine/Cargo.toml --locked --release --bin dope" >&2
+      exit 1
+    fi
+  fi
+}
+preflight
 if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then require_gh_policy; fi
 
 STAGE=$(mktemp -d "${TMPDIR:-/tmp}/dope-install.XXXXXX")
@@ -173,13 +197,16 @@ fetch_asset() {
   else
     command -v curl >/dev/null 2>&1 || { echo "error: curl is required for HTTPS download" >&2; exit 1; }
     local url="https://github.com/$REPO_SLUG/releases/download/$tag/$name"
-    if ! curl -fsSL --proto '=https' --tlsv1.2 --retry 2 -o "$dst" "$url"; then
+    if ! curl -fsSL --proto '=https' --tlsv1.2 --retry 2 --connect-timeout 15 --max-time 600 -o "$dst" "$url"; then
       echo "error: failed to download required asset: $url" >&2
       exit 1
     fi
   fi
 }
 for name in "${REQUIRED_CORE[@]}"; do fetch_asset "$ENGINE_STAGE" "$FROM_DIR" "$TAG" "$name"; done
+if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
+  fetch_asset "$ENGINE_STAGE" "$FROM_DIR" "$TAG" "dope.sigstore.json"
+fi
 
 HAVE_MODEL_ASSETS=0
 if [[ $SKIP_WEIGHTS -eq 0 ]]; then
@@ -325,7 +352,7 @@ if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
     SOURCE_COMMIT=$(gh api "repos/$REPO_SLUG/commits/$TAG" --jq .sha 2>/dev/null || true)
   fi
   if [[ ! "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
-    echo "error: could not resolve 40-char source commit SHA for tag $TAG; pass --source-digest <SHA40>" >&2
+    echo "error: pass --source-digest <SHA40> (shown in the README). Resolving it with gh api needs a GitHub login." >&2
     exit 1
   fi
   if [[ "$(jq -r '.source_commit // empty' "$ENGINE_STAGE/BUILDINFO.json")" != "$SOURCE_COMMIT" ]]; then
@@ -336,12 +363,24 @@ if [[ $REQUIRE_ATTESTATION -eq 1 ]]; then
   if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
     attest_subjects+=(dope-v8-weights.safetensors V8_WEIGHTS_MANIFEST.json)
   fi
+  if [[ ! -f "$ENGINE_STAGE/dope.sigstore.json" || -L "$ENGINE_STAGE/dope.sigstore.json" ]]; then
+    echo "error: attestation bundle missing: dope.sigstore.json" >&2
+    echo "  Nothing was installed." >&2
+    exit 1
+  fi
   for subject in "${attest_subjects[@]}"; do
-    gh attestation verify "$ENGINE_STAGE/$subject" --repo "$REPO_SLUG" \
+    if ! gh attestation verify "$ENGINE_STAGE/$subject" \
+      --bundle "$ENGINE_STAGE/dope.sigstore.json" \
+      --repo "$REPO_SLUG" \
       --signer-workflow "$SIGNER_WORKFLOW" \
       --source-ref "refs/tags/$TAG" \
       --source-digest "$SOURCE_COMMIT" \
-      --format json >/dev/null
+      --format json >/dev/null; then
+      echo "error: attestation verification failed for $subject (tag $TAG, commit $SOURCE_COMMIT)." >&2
+      echo "  Nothing was installed. Either Sigstore's trust root could not be reached, or this file" >&2
+      echo "  is not the one the release workflow signed. Do not work around this check." >&2
+      exit 1
+    fi
   done
   ATTESTATION_VERIFIED=1
   VERIFICATION_LEVEL="sigstore-oidc-attestation + sha256-content-integrity (verified against $SIGNER_WORKFLOW @ refs/tags/$TAG [$SOURCE_COMMIT])"
@@ -392,6 +431,54 @@ atomic_install() {
   mv -fT -- "$tmp" "$dst"
 }
 
+prepare_install_dirs() {
+  local dir name dst
+  for dir in "$INSTALL_DIR" "$SHARE_DIR"; do
+    if [[ -L "$dir" || ( -e "$dir" && ! -d "$dir" ) ]]; then
+      echo "error: refusing to install through symlink or non-directory path: $dir" >&2
+      exit 1
+    fi
+    mkdir -p -- "$dir"
+  done
+  for dst in "$INSTALL_DIR/dope" "$SHARE_DIR/LICENSE" "$SHARE_DIR/THIRD_PARTY_NOTICES" "$SHARE_DIR/BUILDINFO.json"; do
+    if [[ -L "$dst" || ( -e "$dst" && ! -f "$dst" ) ]]; then
+      echo "error: refusing to overwrite symlink or non-regular destination at $dst" >&2
+      exit 1
+    fi
+  done
+  if [[ $HAVE_MODEL_ASSETS -eq 1 || $HAVE_V8_WEIGHTS -eq 1 ]]; then
+    if [[ -L "$WEIGHTS_DIR" || ( -e "$WEIGHTS_DIR" && ! -d "$WEIGHTS_DIR" ) ]]; then
+      echo "error: refusing to install through symlink or non-directory path: $WEIGHTS_DIR" >&2
+      exit 1
+    fi
+    mkdir -p -- "$WEIGHTS_DIR"
+  fi
+  if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
+    if [[ -L "$V8_DST_DIR" || ( -e "$V8_DST_DIR" && ! -d "$V8_DST_DIR" ) ]]; then
+      echo "error: refusing to install through symlink or non-directory path: $V8_DST_DIR" >&2
+      exit 1
+    fi
+    mkdir -p -- "$V8_DST_DIR"
+    for name in manifest.json model.safetensors; do
+      dst="$V8_DST_DIR/$name"
+      if [[ -L "$dst" || ( -e "$dst" && ! -f "$dst" ) ]]; then
+        echo "error: refusing to overwrite symlink or non-regular destination at $dst" >&2
+        exit 1
+      fi
+    done
+  fi
+  if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
+    for name in MODEL_MANIFEST.json dope_mlc_v3_multitask_best.safetensors packet_high_regression.dml3; do
+      dst="$WEIGHTS_DIR/$name"
+      if [[ -L "$dst" || ( -e "$dst" && ! -f "$dst" ) ]]; then
+        echo "error: refusing to overwrite symlink or non-regular destination at $dst" >&2
+        exit 1
+      fi
+    done
+  fi
+}
+prepare_install_dirs
+
 atomic_install "$ENGINE_STAGE/dope-linux-x86_64" "$INSTALL_DIR" "dope" 0755
 atomic_install "$ENGINE_STAGE/LICENSE" "$SHARE_DIR" "LICENSE" 0644
 atomic_install "$ENGINE_STAGE/THIRD_PARTY_NOTICES" "$SHARE_DIR" "THIRD_PARTY_NOTICES" 0644
@@ -424,12 +511,29 @@ if [[ $ATTESTATION_VERIFIED -eq 1 ]]; then
 else
   echo "  $(c_dim "verification")  $(c_yellow "$VERIFICATION_LEVEL")"
 fi
+DOPE_CMD="$INSTALL_DIR/dope"
+case ":$PATH:" in
+  *":$INSTALL_DIR:"*) DOPE_CMD=dope ;;
+  *)
+    echo "$(c_yellow "! $INSTALL_DIR is not on your PATH.") Run this now, and add it to your shell startup if you want it in new shells:"
+    echo "    export PATH=\"$INSTALL_DIR:\$PATH\""
+    ;;
+esac
+other=$(command -v dope 2>/dev/null || true)
+if [[ -n "$other" && "$other" != "$INSTALL_DIR/dope" ]]; then
+  echo "$(c_yellow "! Another dope is first on PATH:") $other   (this installer wrote $INSTALL_DIR/dope)"
+fi
 echo ""
-echo "$(c_bold "Quick Start:")"
-echo "  $INSTALL_DIR/dope doctor"
+echo "$(c_bold "Next:")"
+echo "  $DOPE_CMD --version"
+echo "  $DOPE_CMD fit train.csv --target <column> --format auto-v8 --budget 2048 -o model.dope"
+echo "  $DOPE_CMD sample model.dope -n 1000 -o synthetic.csv"
 if [[ $HAVE_V8_WEIGHTS -eq 1 ]]; then
-  echo "  $INSTALL_DIR/dope fit data.csv --target y --format auto-v8 --v8-weights $WEIGHTS_DIR/single-enc-v8/model.safetensors -o model.dope"
+  echo "  $DOPE_CMD fit data.csv --target y --format auto-v8 --v8-weights $WEIGHTS_DIR/single-enc-v8/model.safetensors -o model.dope"
 fi
 if [[ $HAVE_MODEL_ASSETS -eq 1 ]]; then
-  echo "  $INSTALL_DIR/dope mlc-v3 sample --wire $WEIGHTS_DIR/packet_high_regression.dml3 -n 10 --seed 42"
+  echo "  $DOPE_CMD mlc-v3 sample --wire $WEIGHTS_DIR/packet_high_regression.dml3 -n 10 --seed 42"
 fi
+}
+
+main "$@"

@@ -10,8 +10,8 @@ const SHA: &str = "0123456789abcdef0123456789abcdef01234567";
 fn installer_gh_fixture() -> &'static str {
     r#"#!/bin/bash
 case "$*" in
-  --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
-  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
+  --version) printf 'gh version %s (policy fixture)\n' "${GH_TEST_VERSION:-2.102.0}"; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format --bundle'; exit 0 ;;
 esac
 printf '%s\n' "$@" >> "$GH_TEST_LOG"
 [[ "${GH_TEST_MODE:-ok}" == ok ]]
@@ -43,6 +43,7 @@ fn fixture(name: &str) -> PathBuf {
         sums.push_str(&format!("{:x}  {name}\n", Sha256::digest(bytes)));
     }
     std::fs::write(dir.join("SHA256SUMS"), sums).unwrap();
+    std::fs::write(dir.join("dope.sigstore.json"), b"{}\n").unwrap();
     dir
 }
 fn verify(dir: &Path, tag: &str, sha: &str, mode: &str) -> std::process::Output {
@@ -77,6 +78,7 @@ fn signer_policy_binds_binary_and_inventory_to_exact_source() {
     assert_eq!(log.matches(&format!("refs/tags/{TAG}")).count(), 2);
     assert_eq!(log.matches(SHA).count(), 2);
     assert!(log.contains("--repo\nneverhuman/dope\n"));
+    assert_eq!(log.matches("--bundle\n").count(), 2);
     std::fs::remove_dir_all(dir).unwrap();
 }
 #[test]
@@ -206,6 +208,7 @@ fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
         sums.push_str(&format!("{:x}  {name}\n", Sha256::digest(&bytes)));
     }
     std::fs::write(dir.join("stage/SHA256SUMS"), sums).unwrap();
+    std::fs::write(dir.join("stage/dope.sigstore.json"), b"{}\n").unwrap();
 
     // 1. Refuse floating 'latest' tag.
     let bad_tag = Command::new("/bin/bash")
@@ -305,6 +308,29 @@ fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
     std::fs::remove_dir_all(dir).unwrap();
 }
 
+#[test]
+fn verifier_rejects_gh_below_2_102_0() {
+    let dir = fixture("old-gh");
+    let out = Command::new("/bin/bash")
+        .arg(root().join("scripts/verify-engine-release.sh"))
+        .args([dir.to_str().unwrap(), TAG, SHA])
+        .env(
+            "PATH",
+            format!("{}:/usr/bin:/bin", dir.join("tools").display()),
+        )
+        .env("GH_TEST_LOG", dir.join("gh.log"))
+        .env("GH_TEST_MODE", "ok")
+        .env("GH_TEST_VERSION", "2.45.0")
+        .output()
+        .unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(!out.status.success(), "{err}");
+    assert!(err.contains("upgrade gh to 2.102.0"), "{err}");
+    assert!(!String::from_utf8_lossy(&out.stdout).contains("Verified signed Rust engine release"));
+    assert!(!dir.join("gh.log").exists());
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
 fn fixture_with_v8(name: &str) -> (PathBuf, String, usize) {
     let dir = std::env::temp_dir().join(format!("dope-release-v8-{name}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
@@ -314,8 +340,8 @@ fn fixture_with_v8(name: &str) -> (PathBuf, String, usize) {
         &gh,
         r#"#!/bin/bash
 case "$*" in
-  --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
-  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
+  --version) printf 'gh version %s (policy fixture)\n' "${GH_TEST_VERSION:-2.102.0}"; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format --bundle'; exit 0 ;;
 esac
 printf '%s\n' "$@" >> "$GH_TEST_LOG"
 if [[ -n "${GH_REJECT_SUBJECT:-}" && "$*" == *"$GH_REJECT_SUBJECT"* ]]; then exit 1; fi
@@ -371,6 +397,7 @@ if [[ -n "${GH_REJECT_SUBJECT:-}" && "$*" == *"$GH_REJECT_SUBJECT"* ]]; then exi
         sums.push_str(&format!("{:x}  {f}\n", Sha256::digest(&b)));
     }
     std::fs::write(dir.join("SHA256SUMS"), sums).unwrap();
+    std::fs::write(dir.join("dope.sigstore.json"), b"{}\n").unwrap();
     (dir, w_sha, w_len)
 }
 

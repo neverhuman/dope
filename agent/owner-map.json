@@ -952,6 +952,8 @@
     "docs/optional-landmarks-qualification.md": "external-evidence",
     "engine/dope-core/tests/mlc_v3_safetensors.rs": "rust-core",
     "scripts/install.sh": "release",
+    "ops/ci/install-smoke.sh": "release",
+    ".github/workflows/install-smoke.yml": "release",
     "engine/dope-norm/": "rust-core",
     "engine/dope-core/src/mlc_v4/": "rust-core",
     "engine/dope-core/src/dvs/": "rust-core",

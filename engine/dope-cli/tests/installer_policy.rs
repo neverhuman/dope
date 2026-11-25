@@ -3,9 +3,10 @@
 #![cfg(all(target_os = "linux", target_arch = "x86_64"))]
 use sha2::{Digest, Sha256};
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
+use std::io::Write;
+use std::os::unix::fs::{symlink, PermissionsExt};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 const ENGINE: &str = "dope-engine-v3.0.0";
@@ -73,7 +74,9 @@ case "$*" in
     printf '%s\n' "$@" >> "$GH_FIXTURE_LOG"
     printf '%s\n' "$GH_FIXTURE_SOURCE_SHA"; exit 0 ;;
   'attestation verify --help')
-    printf '%s\n' '--repo --signer-workflow --source-digest --format'
+    flags='--repo --signer-workflow --source-digest --format'
+    [[ "${GH_FIXTURE_NO_BUNDLE:-0}" == 1 ]] || flags="$flags --bundle"
+    printf '%s\n' "$flags"
     [[ "${GH_FIXTURE_NO_SOURCE_REF:-0}" == 1 ]] || printf '%s\n' '--source-ref'
     exit 0 ;;
 esac
@@ -120,6 +123,7 @@ exit 0
             b"policy fixture notices",
         )
         .unwrap();
+        fs::write(f.engine.join("dope.sigstore.json"), b"{\"fixture\":true}\n").unwrap();
         f.engine_sums(false);
         let weights = b"synthetic policy fixture; not safetensors";
         let wire = b"synthetic policy fixture; not DML3";
@@ -229,6 +233,7 @@ fn signed_engine_and_independent_model_release_use_separate_inventories() {
         "--signer-workflow\nneverhuman/dope/.github/workflows/engine-release.yml\n",
         &format!("--source-ref\nrefs/tags/{ENGINE}\n"),
         &format!("--source-digest\n{SOURCE}\n"),
+        "--bundle\n",
     ] {
         assert_eq!(log.matches(expected).count(), 2, "{expected}");
     }
@@ -247,8 +252,12 @@ fn default_engine_resolves_signed_source_and_independent_models() {
     assert!(text.contains(&format!("concrete release tag {ENGINE}")));
     let requests = fs::read_to_string(f.root.join("curl.log")).unwrap();
     assert!(requests.contains(&format!("/download/{ENGINE}/dope-linux-x86_64")));
-    assert!(requests.contains(&format!("/download/{MODEL}/MODEL_MANIFEST.json")));
-    assert!(!requests.contains(&format!("/download/{ENGINE}/MODEL_MANIFEST.json")));
+    assert!(requests.contains(&format!("/download/{ENGINE}/dope.sigstore.json")));
+    assert!(
+        !requests.contains(&format!("/download/{MODEL}/")),
+        "engine-only default fetched model assets: {requests}"
+    );
+    assert!(!f.prefix.join("weights").exists());
     let log = fs::read_to_string(f.root.join("gh.log")).unwrap();
     assert!(log.contains(&format!(
         "api\nrepos/neverhuman/dope/commits/{ENGINE}\n--jq\n.sha\n"
@@ -262,7 +271,8 @@ fn default_engine_resolves_signed_source_and_independent_models() {
         log.matches(&format!("--source-digest\n{SOURCE}\n")).count(),
         2
     );
-    assert!(f.prefix.join("weights").join(MEMBERS[1]).is_file());
+    assert_eq!(log.matches("--bundle\n").count(), 2);
+    assert!(text.contains("export PATH="));
 }
 
 #[test]
@@ -270,13 +280,14 @@ fn online_split_fetch_uses_the_engine_tag_and_independent_model_tag() {
     let f = Fixture::new();
     let out = f
         .command()
-        .args(["--tag", ENGINE, "--source-digest", SOURCE])
+        .args(["--tag", ENGINE, "--source-digest", SOURCE, "--with-weights"])
         .env("CURL_FIXTURE_MODE", "assets")
         .output()
         .unwrap();
     succeeded(out);
     let requests = fs::read_to_string(f.root.join("curl.log")).unwrap();
     assert!(requests.contains(&format!("/download/{ENGINE}/dope-linux-x86_64")));
+    assert!(requests.contains(&format!("/download/{ENGINE}/dope.sigstore.json")));
     assert!(requests.contains(&format!("/download/{MODEL}/MODEL_MANIFEST.json")));
     assert!(requests.contains(&format!(
         "/download/{MODEL}/dope_mlc_v3_multitask_best.safetensors"
@@ -331,6 +342,16 @@ fn old_or_missing_policy_flags_refuse_before_any_fetch_or_install() {
         assert!(!f.root.join("curl.log").exists());
         assert!(!f.root.join("gh.log").exists());
     }
+    let f = Fixture::new();
+    f.refused(
+        f.command()
+            .args(["--source-digest", SOURCE, "--no-weights"])
+            .env("GH_FIXTURE_NO_BUNDLE", "1")
+            .output()
+            .unwrap(),
+        "upgrade gh to 2.102.0 or newer",
+    );
+    assert!(!f.root.join("curl.log").exists());
 }
 
 #[test]
@@ -432,4 +453,187 @@ fn partial_offline_models_and_empty_model_selectors_fail_without_fetching() {
         "release asset",
     );
     assert!(!f.root.join("curl.log").exists());
+}
+
+fn host_tool(name: &str) -> PathBuf {
+    for dir in ["/usr/bin", "/bin"] {
+        let path = PathBuf::from(dir).join(name);
+        if path.is_file() {
+            return path;
+        }
+    }
+    panic!("host tool missing: {name}");
+}
+
+fn bash_function(source: &str, name: &str) -> String {
+    let marker = format!("{name}() {{");
+    let start = source
+        .find(&marker)
+        .unwrap_or_else(|| panic!("missing {name}"));
+    let mut depth = 0;
+    for (index, ch) in source[start..].char_indices() {
+        match ch {
+            '{' => depth += 1,
+            '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return source[start..start + index + 1].to_string();
+                }
+            }
+            _ => {}
+        }
+    }
+    panic!("{name} is not closed");
+}
+
+#[test]
+fn missing_attestation_bundle_fails_closed_before_install() {
+    let f = Fixture::new();
+    fs::remove_file(f.engine.join("dope.sigstore.json")).unwrap();
+    f.refused(
+        f.command()
+            .args(["--tag", ENGINE, "--source-digest", SOURCE, "--from-dir"])
+            .arg(&f.engine)
+            .output()
+            .unwrap(),
+        "dope.sigstore.json",
+    );
+    assert!(!f.root.join("curl.log").exists());
+}
+
+#[test]
+fn old_glibc_and_missing_jq_fail_before_fetch() {
+    let f = Fixture::new();
+    executable(
+        &f.root.join("tools/getconf"),
+        "#!/bin/bash\nprintf '%s\\n' 'glibc 2.35'\n",
+    );
+    let out = f.command().output().unwrap();
+    let err = String::from_utf8(out.stderr.clone()).unwrap();
+    assert!(err.contains("2.35"), "{err}");
+    f.refused(out, "glibc 2.39");
+    assert!(!f.root.join("curl.log").exists());
+
+    let f = Fixture::new();
+    let bare = f.root.join("bare");
+    fs::create_dir(&bare).unwrap();
+    for name in [
+        "sha256sum",
+        "awk",
+        "install",
+        "mktemp",
+        "sort",
+        "getconf",
+        "uname",
+    ] {
+        symlink(host_tool(name), bare.join(name)).unwrap();
+    }
+    f.refused(
+        f.command()
+            .env("PATH", bare.display().to_string())
+            .args(["--tag", ENGINE, "--source-digest", SOURCE, "--from-dir"])
+            .arg(&f.engine)
+            .output()
+            .unwrap(),
+        "required tools missing: jq",
+    );
+    assert!(!f.root.join("curl.log").exists());
+}
+
+#[test]
+fn path_hint_is_printed_only_when_the_install_dir_is_absent() {
+    let f = Fixture::new();
+    let install_dir = f.prefix.join("bin");
+    let text = succeeded(
+        f.command()
+            .env(
+                "PATH",
+                format!(
+                    "{}:{}:/usr/bin:/bin",
+                    f.root.join("tools").display(),
+                    install_dir.display()
+                ),
+            )
+            .env("CURL_FIXTURE_MODE", "assets")
+            .output()
+            .unwrap(),
+    );
+    assert!(!text.contains("export PATH="), "{text}");
+    assert!(text.contains("dope --version"));
+}
+
+#[test]
+fn help_names_with_weights_and_no_unpublished_engine_tag() {
+    let f = Fixture::new();
+    let out = f.command().arg("--help").output().unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let text = String::from_utf8(out.stdout).unwrap();
+    assert!(text.contains("--with-weights"));
+    assert!(!text.contains("dope-engine-v3.1.0"));
+    assert!(!f.prefix.exists());
+}
+
+#[test]
+fn truncated_installer_prefix_does_not_install() {
+    let script = fs::read_to_string(repo().join("scripts/install.sh")).unwrap();
+    let lines: Vec<&str> = script.lines().collect();
+    for n in [50usize, 150, 300, 394] {
+        let prefix = lines[..n].join("\n") + "\n";
+        assert!(
+            !prefix.contains("main \"$@\""),
+            "prefix of {n} lines already invokes main"
+        );
+        let dest = repo().join(format!(
+            "target/installer-policy/trunc-{n}-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dest);
+        let mut child = Command::new("/bin/bash")
+            .arg("-s")
+            .arg("--")
+            .arg("--install-dir")
+            .arg(dest.join("bin"))
+            .arg("--share-dir")
+            .arg(dest.join("share"))
+            .arg("--color")
+            .arg("never")
+            .arg("--tag")
+            .arg(ENGINE)
+            .arg("--source-digest")
+            .arg(SOURCE)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(prefix.as_bytes())
+            .unwrap();
+        let _ = child.wait_with_output().unwrap();
+        assert!(
+            !dest.join("bin/dope").exists(),
+            "a {n}-line prefix installed a binary"
+        );
+        assert!(!dest.exists(), "a {n}-line prefix created {dest:?}");
+    }
+}
+
+#[test]
+fn installer_and_verifier_share_the_gh_policy_bodies() {
+    let install = fs::read_to_string(repo().join("scripts/install.sh")).unwrap();
+    let verify = fs::read_to_string(repo().join("scripts/verify-engine-release.sh")).unwrap();
+    for name in ["gh_upgrade_error", "require_gh_policy"] {
+        assert_eq!(
+            bash_function(&install, name),
+            bash_function(&verify, name),
+            "{name}"
+        );
+    }
 }

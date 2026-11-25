@@ -68,7 +68,7 @@ impl V8Fixture {
             r#"#!/bin/bash
 case "$*" in
   --version) printf '%s\n' 'gh version 2.102.0 (policy fixture)'; exit 0 ;;
-  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format'; exit 0 ;;
+  'attestation verify --help') printf '%s\n' '--repo --signer-workflow --source-ref --source-digest --format --bundle'; exit 0 ;;
 esac
 printf '%s\n' "$@" >> "$GH_LOG"
 if [[ -n "${GH_REJECT_SUBJECT:-}" && "$*" == *"$GH_REJECT_SUBJECT"* ]]; then exit 1; fi
@@ -148,6 +148,7 @@ cp -- "$src" "$dst"
             .unwrap();
             write_sums(&engine, &CORE);
         }
+        fs::write(engine.join("dope.sigstore.json"), b"{\"fixture\":true}\n").unwrap();
         Self {
             root,
             engine,
@@ -238,6 +239,7 @@ fn online_and_offline_v8_weights_verify_four_subjects_and_skip_mlc() {
         assert!(!f.prefix.join("weights/MODEL_MANIFEST.json").exists());
         let gh_log = fs::read_to_string(f.root.join("gh.log")).unwrap();
         assert_eq!(gh_log.matches("attestation\nverify\n").count(), 4);
+        assert_eq!(gh_log.matches("--bundle\n").count(), 4);
         assert!(gh_log.contains("dope-v8-weights.safetensors"));
         assert!(gh_log.contains("V8_WEIGHTS_MANIFEST.json"));
         let curl_log = fs::read_to_string(f.root.join("curl.log")).unwrap();
