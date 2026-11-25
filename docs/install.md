@@ -12,7 +12,7 @@ source commit of that binary. The URL pins this installer.
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/15ad4c12ab42661838acca519b38c7778c02ac49/scripts/install.sh \
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/8b58d259f84b40dc5b51419943f58cef114eccc8/scripts/install.sh \
   | bash -s -- \
       --tag dope-engine-v3.0.0 \
       --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
