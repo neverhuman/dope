@@ -29,7 +29,7 @@ are not using the installer.
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
-curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/15ad4c12ab42661838acca519b38c7778c02ac49/scripts/install.sh \
+curl -fsSL https://raw.githubusercontent.com/neverhuman/dope/68295d6b97c06e9d97ffe031a743c49fbdb02855/scripts/install.sh \
   | bash -s -- \
       --tag dope-engine-v3.0.0 \
       --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe \
@@ -59,10 +59,13 @@ not a quality result.
 
 ```bash
 awk 'BEGIN {print "a,b,y"; for(i=0;i<160;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > train.csv
-dope fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
+awk 'BEGIN {print "a,b,y"; for(i=160;i<200;i++){a=(i*17%997)/997;b=(i*31%991)/991;print a "," b "," 2*a+b*b}}' > test.csv
+dope fit train.csv --target y --format auto-v8 --budget 2048 --seed 1 -o model.dope
 wc -c < model.dope
 dope sample model.dope -n 1000 --seed 1 -o synthetic.csv
 ```
+
+`test.csv` is 40 later rows (`i` from 160 through 199). It shares no rows with `train.csv`, and this fit does not read it.
 
 `--format 1` remains the CLI default and can be 4 KiB. `--format auto-v8` fits
 Format 1 and analytic DSE8 separately and writes one file of at most 2048

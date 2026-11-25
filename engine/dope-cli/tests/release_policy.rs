@@ -310,25 +310,30 @@ fn installer_verifies_release_integrity_and_attestation_policy_fail_closed() {
 
 #[test]
 fn verifier_rejects_gh_below_2_102_0() {
-    let dir = fixture("old-gh");
-    let out = Command::new("/bin/bash")
-        .arg(root().join("scripts/verify-engine-release.sh"))
-        .args([dir.to_str().unwrap(), TAG, SHA])
-        .env(
-            "PATH",
-            format!("{}:/usr/bin:/bin", dir.join("tools").display()),
-        )
-        .env("GH_TEST_LOG", dir.join("gh.log"))
-        .env("GH_TEST_MODE", "ok")
-        .env("GH_TEST_VERSION", "2.45.0")
-        .output()
-        .unwrap();
-    let err = String::from_utf8_lossy(&out.stderr);
-    assert!(!out.status.success(), "{err}");
-    assert!(err.contains("upgrade gh to 2.102.0"), "{err}");
-    assert!(!String::from_utf8_lossy(&out.stdout).contains("Verified signed Rust engine release"));
-    assert!(!dir.join("gh.log").exists());
-    std::fs::remove_dir_all(dir).unwrap();
+    for version in ["2.45.0", "2.101.9"] {
+        let dir = fixture(&format!("old-gh-{version}"));
+        let out = Command::new("/bin/bash")
+            .arg(root().join("scripts/verify-engine-release.sh"))
+            .args([dir.to_str().unwrap(), TAG, SHA])
+            .env(
+                "PATH",
+                format!("{}:/usr/bin:/bin", dir.join("tools").display()),
+            )
+            .env("GH_TEST_LOG", dir.join("gh.log"))
+            .env("GH_TEST_MODE", "ok")
+            .env("GH_TEST_VERSION", version)
+            .output()
+            .unwrap();
+        let err = String::from_utf8_lossy(&out.stderr);
+        assert!(!out.status.success(), "{version}: {err}");
+        assert!(err.contains("upgrade gh to 2.102.0"), "{version}: {err}");
+        assert!(
+            !String::from_utf8_lossy(&out.stdout).contains("Verified signed Rust engine release"),
+            "{version}"
+        );
+        assert!(!dir.join("gh.log").exists(), "{version}");
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 }
 
 fn fixture_with_v8(name: &str) -> (PathBuf, String, usize) {
