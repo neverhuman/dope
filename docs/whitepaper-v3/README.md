@@ -23,6 +23,7 @@ checker rejects a digit typed into the manuscript prose or into display math. Fi
 | `examples/` | Verbatim quick-start listings, checked against the install smoke commands |
 | `references-v3.bib`, `dope-v3.bbl` | Bibliography and the bibtex output the PDF was built with |
 | `dope-v3.pdf` | The built paper (deterministic: `scripts/build_v3_pdf.sh`) |
+| `arxiv/`, `dope-v3-arxiv.zip`, `ARXIV_UPLOAD.md` | Turnkey self-contained arXiv upload folder, deterministic `.zip`, and upload guide (`scripts/build_arxiv_bundle.sh`) |
 | `figures/hero-v3-methods.pdf` | README methods hero, converted from the scoreboard SVG. The manuscript draws its own figures from the same receipts. |
 | `generated/v3-macros.tex` | Every `\VThree` macro |
 | `generated/v3-ranking-table.tex` | Ranking by Transfer Score (`dope_kpi render-paper-tables`) |

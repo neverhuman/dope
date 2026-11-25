@@ -1,0 +1,395 @@
+\begin{thebibliography}{57}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alaa et~al.(2022)Alaa, van Breugel, Saveliev, and van~der
+  Schaar]{alaa2022faithful}
+Ahmed~M. Alaa, Boris van Breugel, Evgeny Saveliev, and Mihaela van~der Schaar.
+\newblock How faithful is your synthetic data? sample-level metrics for
+  evaluating and auditing generative models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2022.
+
+\bibitem[Bachem et~al.(2017)Bachem, Lucic, and Krause]{bachem2017coresets}
+Olivier Bachem, Mario Lucic, and Andreas Krause.
+\newblock Practical coreset constructions for machine learning.
+\newblock \emph{arXiv preprint arXiv:1703.06476}, 2017.
+
+\bibitem[Borisov et~al.(2023)Borisov, Se{\ss}ler, Leemann, Pawelczyk, and
+  Kasneci]{borisov2023great}
+V.~Borisov, K.~Se{\ss}ler, T.~Leemann, M.~Pawelczyk, and G.~Kasneci.
+\newblock Language models are realistic tabular data generators.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+
+\bibitem[Chatterjee(2021)]{chatterjee2021xi}
+S.~Chatterjee.
+\newblock A new coefficient of correlation.
+\newblock \emph{Journal of the American Statistical Association}, 116\penalty0
+  (536):\penalty0 2009--2022, 2021.
+
+\bibitem[{CTGAN Developers}()]{ctgan013sampler}
+{CTGAN Developers}.
+\newblock {CTGAN} data sampler.
+\newblock URL
+  \url{https://github.com/sdv-dev/CTGAN/blob/v0.13.0/ctgan/data_sampler.py}.
+\newblock Source code, version 0.13.0.
+
+\bibitem[Davison and Hinkley(1997)]{davison1997bootstrap}
+Anthony~C. Davison and David~V. Hinkley.
+\newblock \emph{Bootstrap Methods and their Application}.
+\newblock Cambridge University Press, 1997.
+
+\bibitem[Dinh et~al.(2017)Dinh, Sohl-Dickstein, and Bengio]{dinh2017realnvp}
+L.~Dinh, J.~Sohl-Dickstein, and S.~Bengio.
+\newblock Density estimation using {Real NVP}.
+\newblock In \emph{International Conference on Learning Representations}, 2017.
+
+\bibitem[Dwork et~al.(2006)Dwork, McSherry, Nissim, and
+  Smith]{dwork2006calibrating}
+Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam Smith.
+\newblock Calibrating noise to sensitivity in private data analysis.
+\newblock In \emph{Theory of Cryptography Conference (TCC)}, pages 265--284,
+  2006.
+
+\bibitem[Dwork et~al.(2015)Dwork, Feldman, Hardt, Pitassi, Reingold, and
+  Roth]{dwork2015reusable}
+Cynthia Dwork, Vitaly Feldman, Moritz Hardt, Toniann Pitassi, Omer Reingold,
+  and Aaron Roth.
+\newblock The reusable holdout: Preserving validity in adaptive data analysis.
+\newblock \emph{Science}, 349\penalty0 (6248):\penalty0 636--638, 2015.
+
+\bibitem[Efron(1979)]{efron1979bootstrap}
+Bradley Efron.
+\newblock Bootstrap methods: Another look at the jackknife.
+\newblock \emph{The Annals of Statistics}, 7\penalty0 (1):\penalty0 1--26,
+  1979.
+
+\bibitem[Esteban et~al.(2017)Esteban, Hyland, and R{\"a}tsch]{esteban2017tstr}
+Crist{\'o}bal Esteban, Stephanie~L. Hyland, and Gunnar R{\"a}tsch.
+\newblock Real-valued (medical) time series generation with recurrent
+  conditional {GANs}.
+\newblock \emph{arXiv preprint arXiv:1706.02633}, 2017.
+
+\bibitem[Fey et~al.(2025)Fey, Kocijan, Lopez, Lenssen, and Leskovec]{kumorfm}
+M.~Fey, V.~Kocijan, F.~Lopez, J.~E. Lenssen, and J.~Leskovec.
+\newblock {KumoRFM}: A foundation model for in-context learning on relational
+  data, 2025.
+\newblock URL
+  \url{https://kumo.ai/research/kumo_relational_foundation_model.pdf}.
+
+\bibitem[Gao and Parameswaran(2016)]{gao2016squish}
+Yihan Gao and Aditya Parameswaran.
+\newblock {Squish}: Near-optimal compression for archival of relational
+  datasets.
+\newblock In \emph{Proceedings of the ACM SIGKDD International Conference on
+  Knowledge Discovery and Data Mining}, 2016.
+\newblock URL \url{https://arxiv.org/abs/1602.04256}.
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007strictly}
+Tilmann Gneiting and Adrian~E. Raftery.
+\newblock Strictly proper scoring rules, prediction, and estimation.
+\newblock \emph{Journal of the American Statistical Association}, 102\penalty0
+  (477):\penalty0 359--378, 2007.
+
+\bibitem[Grinsztajn et~al.(2026)Grinsztajn, Fl{\"o}ge, Key, Birkel, Jund,
+  et~al.]{tabpfn3}
+L.~Grinsztajn, K.~Fl{\"o}ge, O.~Key, F.~Birkel, P.~Jund, et~al.
+\newblock {TabPFN-3}: Technical report, 2026.
+\newblock arXiv:2605.13986.
+
+\bibitem[Hollmann et~al.(2023)Hollmann, M{\"u}ller, Eggensperger, and
+  Hutter]{hollmann2023tabpfn}
+N.~Hollmann, S.~M{\"u}ller, K.~Eggensperger, and F.~Hutter.
+\newblock {TabPFN}: A transformer that solves small tabular classification
+  problems in a second.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+
+\bibitem[Hollmann et~al.(2025)Hollmann, M{\"u}ller, Purucker, Krishnakumar,
+  K{\"o}rfer, Hoo, Schirrmeister, and Hutter]{hollmann2025nature}
+N.~Hollmann, S.~M{\"u}ller, L.~Purucker, A.~Krishnakumar, M.~K{\"o}rfer, S.~B.
+  Hoo, R.~T. Schirrmeister, and F.~Hutter.
+\newblock Accurate predictions on small data with a tabular foundation model.
+\newblock \emph{Nature}, 637:\penalty0 319--326, 2025.
+
+\bibitem[Holm(1979)]{holm1979simple}
+Sture Holm.
+\newblock A simple sequentially rejective multiple test procedure.
+\newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
+  65--70, 1979.
+
+\bibitem[Hosking(1990)]{hosking1990lmoments}
+J.~R.~M. Hosking.
+\newblock L-moments: Analysis and estimation of distributions using linear
+  combinations of order statistics.
+\newblock \emph{Journal of the Royal Statistical Society: Series B},
+  52\penalty0 (1):\penalty0 105--124, 1990.
+
+\bibitem[Hudovernik et~al.(2026)Hudovernik, L{\'o}pez, Kocijan, Nitta, Lenssen,
+  Leskovec, and Fey]{kumorfm2}
+V.~Hudovernik, F.~L{\'o}pez, V.~Kocijan, A.~Nitta, J.~E. Lenssen, J.~Leskovec,
+  and M.~Fey.
+\newblock {KumoRFM-2}: Scaling foundation models for relational learning, 2026.
+\newblock arXiv:2604.12596.
+
+\bibitem[Ilkhechi et~al.(2020)Ilkhechi, Crotty, Galakatos, Mao, Fan, Shi, and
+  Cetintemel]{ilkhechi2020deepsqueeze}
+Amir Ilkhechi, Andrew Crotty, Alex Galakatos, Yicong Mao, Grace Fan, Xiran Shi,
+  and Ugur Cetintemel.
+\newblock {DeepSqueeze}: Deep semantic compression for tabular data.
+\newblock In \emph{Proceedings of the ACM SIGMOD International Conference on
+  Management of Data}, 2020.
+\newblock \doi{10.1145/3318464.3389734}.
+
+\bibitem[J{\"a}ger et~al.(2026)J{\"a}ger, Erickson, Grinsztajn, Birkel,
+  Fl{\"o}ge, et~al.]{tabpfn35}
+B.~J{\"a}ger, N.~Erickson, L.~Grinsztajn, F.~Birkel, K.~Fl{\"o}ge, et~al.
+\newblock {TabPFN-3.5}: Technical report, 2026.
+\newblock arXiv:2609.17895.
+
+\bibitem[Jolicoeur-Martineau et~al.(2024)Jolicoeur-Martineau, Fatras, and
+  Kachman]{jolicoeur2024forest}
+Alexia Jolicoeur-Martineau, Kilian Fatras, and Tal Kachman.
+\newblock Generating and imputing tabular data via diffusion and flow-based
+  gradient-boosted trees.
+\newblock In \emph{Proceedings of the International Conference on Artificial
+  Intelligence and Statistics}, volume 238 of \emph{Proceedings of Machine
+  Learning Research}, pages 1288--1296, 2024.
+\newblock URL
+  \url{https://proceedings.mlr.press/v238/jolicoeur-martineau24a.html}.
+
+\bibitem[Kong et~al.(2026)Kong, {Louidor Ilan}, Nie, Narayan, Sen, Zhou, Fu,
+  Oymak, and Das]{tabfm}
+W.~Kong, E.~{Louidor Ilan}, S.~Nie, T.~Narayan, R.~Sen, Y.~Zhou, D.~Fu,
+  S.~Oymak, and A.~Das.
+\newblock {TabFM}: A zero-shot foundation model for tabular data, 2026.
+\newblock arXiv:2609.37959.
+
+\bibitem[Kotelnikov et~al.(2023)Kotelnikov, Baranchuk, Rubachev, and
+  Babenko]{kotelnikov2023tabddpm}
+Akim Kotelnikov, Dmitry Baranchuk, Ivan Rubachev, and Artem Babenko.
+\newblock {TabDDPM}: Modelling tabular data with diffusion models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2023.
+
+\bibitem[Lopez-Paz and Oquab(2017)]{lopezpaz2017c2st}
+David Lopez-Paz and Maxime Oquab.
+\newblock Revisiting classifier two-sample tests.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2017.
+
+\bibitem[Ma et~al.(2025)Ma, Thomas, Hosseinzadeh, Labach, Kamkari,
+  et~al.]{tabdpt}
+J.~Ma, V.~Thomas, R.~Hosseinzadeh, A.~Labach, H.~Kamkari, et~al.
+\newblock {TabDPT}: Scaling tabular foundation models on real data.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2025.
+\newblock arXiv:2410.18164.
+
+\bibitem[McKenna et~al.(2021)McKenna, Miklau, and Sheldon]{mckenna2021mst}
+Ryan McKenna, Gerome Miklau, and Daniel Sheldon.
+\newblock Winning the {NIST} contest: A scalable and general approach to
+  differentially private synthetic data.
+\newblock \emph{Journal of Privacy and Confidentiality}, 11\penalty0 (3), 2021.
+\newblock URL \url{https://arxiv.org/abs/2108.04978}.
+
+\bibitem[McKenna et~al.(2022)McKenna, Mullins, Sheldon, and
+  Miklau]{mckenna2022aim}
+Ryan McKenna, Brett Mullins, Daniel Sheldon, and Gerome Miklau.
+\newblock {AIM}: An adaptive and iterative mechanism for differentially private
+  synthetic data.
+\newblock \emph{Proceedings of the VLDB Endowment}, 15\penalty0 (11):\penalty0
+  2599--2612, 2022.
+\newblock \doi{10.14778/3551793.3551817}.
+
+\bibitem[Mentzer et~al.(2024)Mentzer, Minnen, Agustsson, and
+  Tschannen]{mentzer2024fsq}
+F.~Mentzer, D.~Minnen, E.~Agustsson, and M.~Tschannen.
+\newblock Finite scalar quantization: {VQ-VAE} made simple.
+\newblock In \emph{International Conference on Learning Representations}, 2024.
+
+\bibitem[Mirzasoleiman et~al.(2020)Mirzasoleiman, Bilmes, and
+  Leskovec]{mirzasoleiman2020craig}
+Baharan Mirzasoleiman, Jeff Bilmes, and Jure Leskovec.
+\newblock Coresets for data-efficient training of machine learning models.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning (ICML)}, 2020.
+
+\bibitem[M{\"u}ller et~al.(2022)M{\"u}ller, Hollmann, Arango, Grabocka, and
+  Hutter]{muller2022pfn}
+S.~M{\"u}ller, N.~Hollmann, S.~Pineda Arango, J.~Grabocka, and F.~Hutter.
+\newblock Transformers can do {Bayesian} inference.
+\newblock In \emph{International Conference on Learning Representations}, 2022.
+
+\bibitem[{NEVERHUMAN Research}(2026)]{dope2026v3release}
+{NEVERHUMAN Research}.
+\newblock {DOPE} engine v3.0.0: signed release record.
+\newblock
+  \url{https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0},
+  2026.
+\newblock Source commit \texttt{e15c415b}; lists the packet-reproduction replay
+  of the signed binary and its receipts.
+
+\bibitem[Nosek et~al.(2018)Nosek, Ebersole, DeHaven, and
+  Mellor]{nosek2018preregistration}
+Brian~A. Nosek, Charles~R. Ebersole, Alexander~C. DeHaven, and David~T. Mellor.
+\newblock The preregistration revolution.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 115\penalty0
+  (11):\penalty0 2600--2606, 2018.
+
+\bibitem[Nowok et~al.(2016)Nowok, Raab, and Dibben]{nowok2016synthpop}
+Beata Nowok, Gillian~M. Raab, and Chris Dibben.
+\newblock {synthpop}: Bespoke creation of synthetic data in {R}.
+\newblock \emph{Journal of Statistical Software}, 74\penalty0 (11):\penalty0
+  1--26, 2016.
+\newblock \doi{10.18637/jss.v074.i11}.
+
+\bibitem[{NVIDIA}(2026)]{kumotabular}
+{NVIDIA}.
+\newblock Kumo tabular model card, 2026.
+\newblock URL \url{https://build.nvidia.com/nvidia/kumo-tabular/modelcard}.
+
+\bibitem[Patki et~al.(2016)Patki, Wedge, and Veeramachaneni]{patki2016sdv}
+Neha Patki, Roy Wedge, and Kalyan Veeramachaneni.
+\newblock The synthetic data vault.
+\newblock In \emph{IEEE International Conference on Data Science and Advanced
+  Analytics (DSAA)}, pages 399--410, 2016.
+
+\bibitem[Pfahringer et~al.(2000)Pfahringer, Bensusan, and
+  Giraud-Carrier]{pfahringer2000landmarking}
+B.~Pfahringer, H.~Bensusan, and C.~Giraud-Carrier.
+\newblock Meta-learning by landmarking various learning algorithms.
+\newblock In \emph{International Conference on Machine Learning}, pages
+  743--750, 2000.
+
+\bibitem[Popov et~al.(2020)Popov, Morozov, and Babenko]{popov2020node}
+S.~Popov, S.~Morozov, and A.~Babenko.
+\newblock Neural oblivious decision ensembles for deep learning on tabular
+  data.
+\newblock In \emph{International Conference on Learning Representations}, 2020.
+
+\bibitem[Qian et~al.(2023)Qian, Davis, and van~der Schaar]{qian2023synthcity}
+Zhaozhi Qian, Rob Davis, and Mihaela van~der Schaar.
+\newblock {Synthcity}: A benchmark framework for diverse use cases of tabular
+  synthetic data.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~36, 2023.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/09723c9f291f6056fd1885081859c186-Abstract.html}.
+
+\bibitem[Qu et~al.(2025)Qu, Holzm{\"u}ller, Varoquaux, and {Le Morvan}]{tabicl}
+J.~Qu, D.~Holzm{\"u}ller, G.~Varoquaux, and M.~{Le Morvan}.
+\newblock {TabICL}: A tabular foundation model for in-context learning on large
+  data, 2025.
+\newblock arXiv:2502.05564.
+
+\bibitem[Rahimi and Recht(2007)]{rahimi2007rff}
+A.~Rahimi and B.~Recht.
+\newblock Random features for large-scale kernel machines.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~20, 2007.
+
+\bibitem[Rivolli et~al.(2022)Rivolli, Garcia, Soares, Vanschoren, and
+  de~Carvalho]{rivolli2022metafeatures}
+A.~Rivolli, L.~P.~F. Garcia, C.~Soares, J.~Vanschoren, and A.~C. P. L.~F.
+  de~Carvalho.
+\newblock Meta-features for meta-learning.
+\newblock \emph{Knowledge-Based Systems}, 240:\penalty0 108101, 2022.
+
+\bibitem[Rubin(1993)]{rubin1993}
+D.~B. Rubin.
+\newblock Discussion: Statistical disclosure limitation.
+\newblock \emph{Journal of Official Statistics}, 9\penalty0 (2):\penalty0
+  461--468, 1993.
+
+\bibitem[{SDV Developers}()]{sdv22save}
+{SDV Developers}.
+\newblock {SDV} fitted-object serialization.
+\newblock URL
+  \url{https://github.com/sdv-dev/SDV/blob/v2.2.0/sdv/single_table/base.py}.
+\newblock Source code, version 2.2.0.
+
+\bibitem[Shokri et~al.(2017)Shokri, Stronati, Song, and
+  Shmatikov]{shokri2017membership}
+Reza Shokri, Marco Stronati, Congzheng Song, and Vitaly Shmatikov.
+\newblock Membership inference attacks against machine learning models.
+\newblock In \emph{IEEE Symposium on Security and Privacy (S\&P)}, pages 3--18,
+  2017.
+
+\bibitem[Sklar(1959)]{sklar1959fonctions}
+Abe Sklar.
+\newblock Fonctions de r{\'e}partition {\`a} {$n$} dimensions et leurs marges.
+\newblock \emph{Publications de l'Institut de Statistique de l'Universit{\'e}
+  de Paris}, 8:\penalty0 229--231, 1959.
+
+\bibitem[Snoke et~al.(2018)Snoke, Raab, Nowok, Dibben, and
+  Slavkovic]{snoke2018utility}
+Joshua Snoke, Gillian~M. Raab, Beata Nowok, Chris Dibben, and Aleksandra
+  Slavkovic.
+\newblock General and specific utility measures for synthetic data.
+\newblock \emph{Journal of the Royal Statistical Society: Series A},
+  181\penalty0 (3):\penalty0 663--688, 2018.
+\newblock \doi{10.1111/rssa.12358}.
+
+\bibitem[Stadler et~al.(2022)Stadler, Oprisanu, and
+  Troncoso]{stadler2022groundhog}
+Theresa Stadler, Bristena Oprisanu, and Carmela Troncoso.
+\newblock Synthetic data -- anonymisation groundhog day.
+\newblock In \emph{USENIX Security Symposium}, 2022.
+
+\bibitem[Taylor et~al.(2026)Taylor, Alexander, and Morrow]{dope2026v1}
+Jepson Taylor, Alton Alexander, and Jordan Morrow.
+\newblock {D.O.P.E.}: Downstream objective-preserving encoding --- generative
+  compression of predictive structure.
+\newblock Technical report, NEVERHUMAN Research, 2026.
+\newblock DOPE v1.0.0 manuscript, \texttt{docs/whitepaper/dope-mfs.tex}.
+
+\bibitem[{U.S. Department of Health and Human Services, Office for Civil
+  Rights}(2012)]{hhs2012deid}
+{U.S. Department of Health and Human Services, Office for Civil Rights}.
+\newblock Guidance regarding methods for de-identification of protected health
+  information in accordance with the {HIPAA} privacy rule, 2012.
+\newblock URL
+  \url{https://www.hhs.gov/hipaa/for-professionals/special-topics/de-identification/index.html}.
+
+\bibitem[Vanschoren(2018)]{vanschoren2018metalearning}
+J.~Vanschoren.
+\newblock Meta-learning: A survey, 2018.
+\newblock arXiv:1810.03548.
+
+\bibitem[Wang et~al.(2018)Wang, Zhu, Torralba, and Efros]{wang2018distillation}
+Tongzhou Wang, Jun-Yan Zhu, Antonio Torralba, and Alexei~A. Efros.
+\newblock Dataset distillation.
+\newblock \emph{arXiv preprint arXiv:1811.10959}, 2018.
+
+\bibitem[Watson et~al.(2023)Watson, Blesch, Kapar, and Wright]{watson2023arf}
+David~S. Watson, Kristin Blesch, Jan Kapar, and Marvin~N. Wright.
+\newblock Adversarial random forests for density estimation and generative
+  modeling.
+\newblock In \emph{Proceedings of the International Conference on Artificial
+  Intelligence and Statistics (AISTATS)}, 2023.
+
+\bibitem[Xu et~al.(2019)Xu, Skoularidou, Cuesta-Infante, and
+  Veeramachaneni]{xu2019ctgan}
+Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, and Kalyan Veeramachaneni.
+\newblock Modeling tabular data using conditional {GAN}.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, volume~32, 2019.
+
+\bibitem[Zhang et~al.(2024)Zhang, Zhang, Srinivasan, Shen, Qin, Faloutsos,
+  Rangwala, and Karypis]{zhang2024tabsyn}
+Hengrui Zhang, Jiani Zhang, Balasubramaniam Srinivasan, Zhengyuan Shen, Xiao
+  Qin, Christos Faloutsos, Huzefa Rangwala, and George Karypis.
+\newblock Mixed-type tabular data synthesis with score-based diffusion in
+  latent space.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+
+\bibitem[Zhang et~al.(2026)Zhang, Ren, Yuan, Zou, Tan, et~al.]{limix2}
+X.~Zhang, G.~Ren, H.~Yuan, H.~Zou, H.~Tan, et~al.
+\newblock {LimiX-2}: A contextual mechanism network towards general
+  structured-data intelligence, 2026.
+\newblock arXiv:2609.17488.
+
+\end{thebibliography}
