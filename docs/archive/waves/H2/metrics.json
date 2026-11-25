@@ -2,13 +2,9 @@
   "schema": "dope.h-wave-record/v1",
   "wave": "H2",
   "name": "SingleEncV7 V7.3 / V7.3c Cross-Host DiLoCo, Zero-Repeat, Tree-Visible Realism & GPU Wave",
-  "status": "active",
+  "status": "archived",
   "scope": "DEV-only gate milestones (schedule-lite-dev.jsonl) and live training telemetry (not CONFIRM scoreboard KPIs)",
-  "s3_receipts": {
-    "best_checkpoints_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/best/",
-    "global_rounds_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/",
-    "retired_d192l4_prefix": "s3://veox-jopedime-learning-use2/checkpoints/v73-diloco/retired-d192l4/"
-  },
+  "archive_note": "Checkpoints archived in private object storage (internal bucket paths redacted for public release; pre-redaction SHA-256 was a00c6788f5bd78ceafac1eeffd00c627ec35de65fd688a31ed682a0f19ca4f8d).",
   "config": {
     "cohorts": [
       {"sync_group": "ag-v73-diloco-d160l3", "d_model": 160, "n_layers": 3, "h_target": 32, "bytes": 2757948},

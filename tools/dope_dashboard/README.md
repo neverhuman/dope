@@ -9,15 +9,15 @@ or certification authority.
 # Campaign aggregator (Rust): rebuilds the macro file every 60 s.
 cargo build --manifest-path engine/Cargo.toml --locked -p dope-arena --bin dope_fleet_macro
 engine/target/debug/dope_fleet_macro \
-  --root ~/dope-data/fleet-mirror \
-  --checkpoint-kpi ~/dope-data/dashboard/checkpoint_kpi.jsonl \
-  --corpus-index ~/dope-data/flat/s3-v250/index.jsonl \
-  --guard-dir ~/dope/.agent/tools/cpu_fleet/state \
-  --out ~/dope-data/dashboard/fleet_macro.json --watch 60
+  --root "$DOPE_DATA_DIR/fleet-mirror" \
+  --checkpoint-kpi "$DOPE_DATA_DIR/dashboard/checkpoint_kpi.jsonl" \
+  --corpus-index "$DOPE_DATA_DIR/flat/s3-v250/index.jsonl" \
+  --out "$DOPE_DATA_DIR/dashboard/fleet_macro.json" --watch 60
 
-# Live per-node probes plus the campaign view.
+# Live per-node probes plus the campaign view (defaults to --hosts localhost).
 python3 -m tools.dope_dashboard.server --port 8768 \
-  --macro-json ~/dope-data/dashboard/fleet_macro.json
+  --hosts localhost \
+  --macro-json "$DOPE_DATA_DIR/dashboard/fleet_macro.json"
 ```
 
 `--root` is repeatable. A run is any directory holding `train.jsonl`, up to four

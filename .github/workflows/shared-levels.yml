@@ -17,7 +17,7 @@ jobs:
   contracts:
     runs-on:
       group: neverhuman-lan
-      # Native matrix below also exercises the Linux ARM64 guest on xbabe4.
+      # Native matrix below also exercises the self-hosted Linux ARM64 guest.
       labels: [self-hosted, Linux, X64, lan-ci, ubuntu24]
     timeout-minutes: 10
     steps:

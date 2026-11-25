@@ -2,13 +2,10 @@
   "schema": "dope.h-wave-record/v1",
   "wave": "H1",
   "name": "SingleEncV7 V7.1/V7.2 CPU-Fleet Pretraining Wave & DEV Head Ablations",
-  "status": "retired_archived_s3",
+  "status": "retired_archived",
   "scope": "DEV-only selection and persisted train.jsonl telemetry (not CONFIRM scoreboard KPIs)",
-  "s3_archive_prefixes": [
-    "s3://veox-jopedime-learning-use2/dope/v2.0.0-wave/",
-    "s3://veox-jopedime-learning-use2/checkpoints/v2.0.0-wave/"
-  ],
-  "s3_verified_objects": {
+  "archive_note": "Durable logs and checkpoints archived in private object storage (internal bucket paths redacted for public release).",
+  "verified_archive_objects": {
     "jsonl_configs_macro_objects": 517,
     "jsonl_configs_macro_bytes": 297246661,
     "latest_checkpoint_objects": 65,

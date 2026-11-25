@@ -6,7 +6,7 @@ The finite registry contains `fit-iid-65-v1` and `outer5-iid-fold0-v1` through `
 
 Physical IDs derive from the catalog dataset ID, independently of eventual family names. Row ordering binds physical ID, split seed and physical source indices; consumers must retain that ID through `physical_dataset_id`. The exact training CSV hash, schema, row scope, task, options, native binary, producer source, CPU/platform and allocation bind every result. Only explicitly declared targets are moved to the final canonical column. Predictor type inference sees selected training rows only. No source values or headers appear in error receipts.
 
-The new namespace is `s3://veox-jopedime-datasets-use2/derived/dope/landmark-inputs/fit-cv-v1/precalc-20261023/`. The earlier whole-TRAIN diagnostic corpus remains immutable and cannot stand in for these split-bound input features.
+The new split-bound cache uses the private derived-dataset namespace `derived/dope/landmark-inputs/fit-cv-v1/precalc-20261023/` (internal object-store bucket redacted). The earlier whole-TRAIN diagnostic corpus remains immutable and cannot stand in for these split-bound input features.
 
 - `datasets/<dataset>/physical-<id>/splits/<split>/seed-<seed>/train-<row-hash>/cv-<options-hash>/producer-<key>.json` indexes each measurement.
 - `objects/sha256/<hash>.json` stores complete private native reports, 23 scores plus masks, and input manifests. The 2T native work budget is explicit; budget-refused/uninformative coordinates remain masked, never invented.

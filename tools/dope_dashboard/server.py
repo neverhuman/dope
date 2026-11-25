@@ -5,6 +5,7 @@ import argparse
 import asyncio
 from collections import deque
 import json
+import os
 from pathlib import Path
 import socket
 import sys
@@ -18,7 +19,9 @@ from .metrics import fleet_summary, host_view
 HERE = Path(__file__).resolve().parent
 HTML_PATH = HERE / "static" / "dope-dashboard.html"
 PROBE_PATH = HERE / "probe.py"
-DEFAULT_HOSTS = tuple(f"xbabe{i}" for i in range(10))
+DEFAULT_HOSTS = tuple(
+    h.strip() for h in os.environ.get("DOPE_DASHBOARD_HOSTS", "localhost").split(",") if h.strip()
+) or ("localhost",)
 SSH_CMD = (
     "ssh",
     "-T",
@@ -32,7 +35,9 @@ SSH_CMD = (
     "ServerAliveCountMax=2",
 )
 FRAME_LIMIT = 2 << 20
-DEFAULT_MACRO = "/home/ubuntu/dope-data/dashboard/fleet_macro.json"
+_DEFAULT_DATA_DIR = os.environ.get("DOPE_DATA_DIR", str(Path.cwd() / "target" / "dope-data"))
+DEFAULT_MACRO = str(Path(_DEFAULT_DATA_DIR) / "dashboard" / "fleet_macro.json")
+DEFAULT_HISTORY_LOG = str(Path(_DEFAULT_DATA_DIR) / "dashboard" / "fleet_history.jsonl")
 
 
 def _wire(msg: dict) -> str:
@@ -266,7 +271,7 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=8768)
     ap.add_argument("--hosts", default=",".join(DEFAULT_HOSTS))
     ap.add_argument("--local-host", default="")
-    ap.add_argument("--history-log", default="/home/ubuntu/dope-data/dashboard/fleet_history.jsonl")
+    ap.add_argument("--history-log", default=DEFAULT_HISTORY_LOG)
     ap.add_argument("--macro-json", default=DEFAULT_MACRO, help="dope_fleet_macro output served at /api/macro")
     asyncio.run(_serve(ap.parse_args()))
 

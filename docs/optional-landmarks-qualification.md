@@ -1,6 +1,6 @@
 # Optional and progressive landmarks: qualification record
 
-Measured on 27–28 October 2026 on the host xbabe2: AMD Threadripper PRO 3995WX (64 cores), RTX 3090, CUDA 12.8,
+Measured on 27–28 October 2026 on a Linux x86-64 workstation: AMD Threadripper PRO 3995WX (64 cores), RTX 3090, CUDA 12.8,
 Rust 1.88.0, numpy 1.26.4. All numbers below come from the evidence files in
 [`evidence/optional-landmarks/`](evidence/optional-landmarks/) and the post-`#349` (`29ba3db72df79b2a799cbfb13d55485eb46bb2d5`)
 qualification runs. The harness that produced them is
