@@ -1,18 +1,26 @@
 # D.O.P.E.: Downstream Objective-Preserving Encoding
 
-DOPE fits a small **program** to a table with a declared target. The program generates synthetic training rows from fitted summaries and schema, without storing complete fitting records.
+**Compile a sensitive table and its prediction target inside your firewall into a tiny generative program — train external AI models without moving complete records.**
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai full-audit score snapshot](docs/readme/jankurai.svg)](https://github.com/neverhuman/dope/actions/workflows/jankurai.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CEO Brief PDF](https://img.shields.io/badge/CEO_Brief-PDF-D9480F.svg)](docs/briefs/dope-v3-ceo-brief.pdf)
+[![CTO Brief PDF](https://img.shields.io/badge/CTO_Brief-PDF-1E3A5F.svg)](docs/briefs/dope-v3-cto-brief.pdf)
+[![White Paper v3 PDF](https://img.shields.io/badge/White_Paper_v3-PDF-006D77.svg)](docs/whitepaper-v3/dope-v3.pdf)
+[![arXiv Bundle](https://img.shields.io/badge/arXiv-Upload_Bundle-256ABF.svg)](docs/whitepaper-v3/ARXIV_UPLOAD.md)
 
-[Quick start](#quick-start) · [Results](#results) · [White paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)
+| Executives & Leaders | CTOs & ML Architects | Full Technical Paper |
+| :---: | :---: | :---: |
+| **[CEO Brief (PDF)](docs/briefs/dope-v3-ceo-brief.pdf)** ([MD](docs/briefs/ceo-brief.md))<br>*Business case, scale proof & governance* | **[CTO Brief (PDF)](docs/briefs/dope-v3-cto-brief.pdf)** ([MD](docs/briefs/cto-brief.md))<br>*Rust codec, wire layout & Evidence Bank* | **[DOPE v3 White Paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)**<br>*[arXiv Upload Bundle](docs/whitepaper-v3/ARXIV_UPLOAD.md) · [Receipts](bench/real-world/results/scoreboard/v3.0.0/README.md)* |
+
+[Quick start](#quick-start) · [Real-data example](examples/v3-quickstart/README.md) · [Results](#results) · [Train a model](#train-the-neural-model) · [Roadmap & Co-Authorship](#roadmap--contributing) · [Docs](#documentation)
 
 ![Figure 1 from the DOPE v3 paper. The top panel shows how DOPE fits a file where the source table lives, then generates synthetic training rows elsewhere from the file and a seed. The bottom panel plots Transfer Score against whole-file size on the development report splits for DOPE, stored fitting rows, and four third-party generators. The paired interval against ARF includes zero.](docs/readme/dope-v3-figure-1.png)
 
 ## Quick start
 
-Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 with `glibc 2.39` or newer. No GitHub account is required. On Ubuntu, run `sudo apt-get install -y ca-certificates curl jq`. This block checks the installer, then places the binary at `$HOME/.local/opt/dope/3.0.0/bin/dope`.
+Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/dope-engine-v3.0.0) on Linux x86-64 (`glibc 2.39+`, zero Python, zero GPUs, zero cloud calls). On Ubuntu, run `sudo apt-get install -y ca-certificates curl jq`. Binary installs to `$HOME/.local/opt/dope/3.0.0/bin/dope`.
 
 ```bash
 (
@@ -30,7 +38,7 @@ Install [signed DOPE `v3.0.0`](https://github.com/neverhuman/dope/releases/tag/d
 
 ### Run the toy example
 
-This example checks the install on a toy table. The test rows stay separate from the fit.
+Verifies the install on a toy table (test rows stay separate from fit).
 
 ```bash
 (
@@ -60,18 +68,13 @@ This example checks the install on a toy table. The test rows stay separate from
 )
 ```
 
-The printed directory contains `train.csv`, `test.csv`, `model.dope`, `synthetic.csv`, and `evaluation.json`. Retention is `(null loss − synthetic loss) / (null loss − real loss)`.
-
-### Use your own CSV
-
-Declare the target by name and split duplicate rows as groups. The [fit and sample guide](docs/getting-started.md#fit-a-table) produces `model.dope` and `synthetic.csv` with `--format auto-v8`. The [held-out evaluation guide](docs/getting-started.md#evaluate-the-synthetic-csv) uses a separate `audit-schema.dope` to write `evaluation.json`.
-
-[Paper appendix with both examples](docs/whitepaper-v3/dope-v3.pdf#nameddest=quick-start) · [Verify a release](docs/signed-engine-release.md#verify-before-install) · [Agent instructions](AGENTS.md)
+- **Real dataset (fast, offline):** Run `bash examples/v3-quickstart/run.sh` for an end-to-end UCI Airfoil lifecycle (`fit` → source-free `sample` → train/test on real holdout; [walkthrough](examples/v3-quickstart/README.md)).
+- **macOS / ARM / older Linux / `PATH`:** Build offline via `cargo install --locked --path engine/dope-cli` (`Rust 1.88+`), or use Docker ([guide](docs/getting-started.md#install-the-signed-engine)).
+- **Own CSV:** Follow [getting started](docs/getting-started.md#fit-a-table) (`--format auto-v8`, explicit `--target`, duplicate-grouped splits). [Paper appendix](docs/whitepaper-v3/dope-v3.pdf#nameddest=quick-start) · [Verify release](docs/signed-engine-release.md#verify-before-install) · [AGENTS.md](AGENTS.md)
 
 ## Results
 
-Figure 1 plots Transfer Score against whole-file size on the development report splits.
-Under the same byte cap, **DOPE transferred more predictive utility than storing and resampling fitting rows**. The third-party generators used library defaults with no byte cap. Their scores below apply to the files they actually produced.
+Figure 1 plots Transfer Score against whole-file size on development report splits. Under the same byte cap, **DOPE transferred more predictive utility than storing and resampling fitting rows**; third-party generators ran uncapped with library defaults.
 
 <!-- BEGIN DOPE1 SCOREBOARD -->
 <!-- Generated by dope_kpi render-readme from dope.kpi-receipt/v2 receipts; do not edit. -->
@@ -99,19 +102,46 @@ A tie spans less than 1 point.
 
 <!-- END DOPE1 SCOREBOARD -->
 
-Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGAN at the headline sampling rate. The paired interval against ARF included zero on each set. The paper reports the task, realism and privacy guards alongside these results.
+Across three development split sets, DOPE led Gaussian copula, TVAE, and CTGAN; the paired interval against ARF included zero on each set. Privacy checks are empirical diagnostics (no formal differential privacy mechanism and not HIPAA de-identification); `v3.0.0` is an uncertified `DEV-SELECT` release.
 
-[White paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)
-· [Equal-budget comparison with stored fitting rows](bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/)
-· [Full metrics and guard results](bench/real-world/results/scoreboard/v3.0.0/README.md#full-benchmark-metrics-and-guard-results)
-· [Third-party evaluation receipts](bench/real-world/results/scoreboard/v3.0.0/evidence/paper/README.md)
+**[White paper (PDF)](docs/whitepaper-v3/dope-v3.pdf)** · **[CEO Brief (PDF)](docs/briefs/dope-v3-ceo-brief.pdf)** · **[CTO Brief (PDF)](docs/briefs/dope-v3-cto-brief.pdf)** · [Equal-budget comparison](bench/real-world/results/scoreboard/v3.0.0/evidence/addendum-k/) · [Full metrics & guards](bench/real-world/results/scoreboard/v3.0.0/README.md#full-benchmark-metrics-and-guard-results)
+
+## Train the neural model
+
+Release `v3.0.0` fits tables analytically with **no pretrained weights**. To train the optional `SingleEncV8` encoder-decoder (`research/levels/s3_v8_trainer.py`) and load your SafeTensors weights directly in pure Rust:
+
+```bash
+# 1. Build the Rust CLI, V8 packet emitter, and FFI library
+cargo build --manifest-path engine/Cargo.toml --locked --release \
+  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit -p dope-ffi
+
+# 2. Run a 5-minute CPU smoke train on synthetic structural priors (needs PyTorch + safetensors)
+python3 -m research.levels.s3_v8_trainer \
+  --out-dir target/v8-quickstart --device cpu --steps 50 --episodes-per-step 2 \
+  --d-model 64 --n-heads 4 --n-enc-layers 2 --n-dec-layers 2 \
+  --use-rust-packet --budget-bytes 2048 --save-every 25 --seed 42
+
+# 3. Load exported SafeTensors weights directly in pure Rust
+engine/target/release/dope fit examples/v3-quickstart/data/airfoil_train.csv \
+  --target sound_pressure_db --format v8 --budget 2048 \
+  --v8-weights target/v8-quickstart/model_v8_ema.safetensors -o target/v8-quickstart/model.dope
+```
+
+See [docs/training.md](docs/training.md) for GPU arenas (`s3_v8_feed.py`), DiLoCo, and the Rust-vs-Python parity suite (`just v8-regression`).
+
+## Roadmap & Contributing
+
+The fastest way to push DOPE beyond `v3.0.0` is adding **data-specific features** to the FIT-only Evidence Bank (`contracts/evidence-layout-v1.json`) and running fast regression tests. External contributors whose merged work improves future versions (`v3.1+` / `v4.0`) are **invited as co-authors on future white papers, arXiv submissions, and `CITATION.cff`**. See [ROADMAP.md](ROADMAP.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Documentation
 
-- **White paper:** [DOPE v3 PDF](docs/whitepaper-v3/dope-v3.pdf) · [LaTeX sources & receipt verifier](docs/whitepaper-v3/)
-- **Engine & integration:** [Signed engine releases](docs/signed-engine-release.md) · [Downstream JopeDime pin guide](docs/jopedime-integration.md) · [Rust SDK](engine/dope-sdk/) · [Native CLI](engine/dope-cli/)
-- **Protocol & governance:** [Metric definitions](docs/metric.md) · [Benchmark protocol](docs/benchmark.md) · [Release gates](docs/release.md) · [Claims policy](docs/claims-policy.md)
-- **History & earlier versions:** [Changelog](CHANGELOG.md) · [Archived results, earlier releases & historical manuscripts](HISTORY.md)
+| Area | Quick Links |
+| --- | --- |
+| **Executive Briefs** | **[CEO Brief (PDF)](docs/briefs/dope-v3-ceo-brief.pdf)** ([MD](docs/briefs/ceo-brief.md)) · **[CTO Brief (PDF)](docs/briefs/dope-v3-cto-brief.pdf)** ([MD](docs/briefs/cto-brief.md)) |
+| **White Paper & arXiv** | **[DOPE v3 PDF](docs/whitepaper-v3/dope-v3.pdf)** · [arXiv Upload Bundle](docs/whitepaper-v3/ARXIV_UPLOAD.md) · [LaTeX Sources](docs/whitepaper-v3/) |
+| **Guides & Training** | [Real-dataset quickstart](examples/v3-quickstart/README.md) · [Getting started](docs/getting-started.md) · [Training](docs/training.md) · [Repo map](docs/REPO_MAP.md) |
+| **Engine & Releases** | [Signed releases](docs/signed-engine-release.md) · [CLI](engine/dope-cli/) · [Rust SDK](engine/dope-sdk/) · [JopeDime pin](docs/jopedime-integration.md) |
+| **Roadmap & Policy** | [ROADMAP.md](ROADMAP.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [Metrics](docs/metric.md) · [Release gates](docs/release.md) · [History](HISTORY.md) |
 
 ## Citation
 
@@ -129,7 +159,7 @@ Licensed under [MIT](LICENSE); see [CITATION.cff](CITATION.cff).
 
 ## Appendix: quick start and run examples
 
-The first two blocks are the install check from [Quick start](#quick-start). The scoreboard uses the development report. CI runs the guide commands on Ubuntu and in the image shown in the last block. The third block follows the [own-data walkthrough](docs/getting-started.md#fit-a-table). It fits with `--format auto-v8` and evaluates with a separate `--format 1` schema file, which `eval` reads on this binary.
+The first two blocks match [Quick start](#quick-start); the third follows [getting started](docs/getting-started.md#fit-a-table); the fourth shows the Ubuntu container.
 
 ```bash
 (
