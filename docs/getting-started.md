@@ -22,11 +22,13 @@ page come from the development report, not from that table.
 The commands below call `$HOME/.local/opt/dope/3.0.0/bin/dope`. The installer
 does not add that directory to `PATH`.
 
-Signed tags need `gh` 2.102.0 or newer. The quick start also needs `curl`,
-`jq`, and `sha256sum`. If glibc is older than 2.39, the installer stops before
-it downloads. To remove this prefix, delete `$HOME/.local/opt/dope/3.0.0`.
-`--uninstall` removes the custom-directory layout, and it refuses
-`--standalone-prefix`.
+The quick start uses `curl`, `jq`, and `sha256sum` and downloads a verified
+temporary GitHub CLI if needed. For the [manual verification and installation
+route](signed-engine-release.md#verify-before-install), install GitHub CLI
+`2.102.0` or newer first. If glibc is older than `2.39`, the installer stops
+before downloading the engine. To remove the standalone installation, remove
+`$HOME/.local/opt/dope/3.0.0`. The `--uninstall` flag is for custom-directory
+installations.
 
 On macOS, Windows, or a Linux host older than `glibc 2.39`, Docker can run
 the same quick start. There is no macOS, Windows, or ARM release asset.
@@ -35,9 +37,9 @@ the same quick start. There is no macOS, Windows, or ARM release asset.
 docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04 bash
 ```
 
-Inside that container, install `ca-certificates`, `curl`, and `jq`, then run
-the [README quick start](../README.md#quick-start). CI runs those same two
-command blocks inside `ubuntu:24.04`.
+Inside that container, run `apt-get update && apt-get install -y ca-certificates
+curl jq`, then run the [README quick start](../README.md#quick-start). CI
+executes that quick start inside `ubuntu:24.04` on a Linux x86-64 runner.
 
 ## Fit a table
 

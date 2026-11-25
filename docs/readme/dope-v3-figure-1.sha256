@@ -1,0 +1,6 @@
+# Figure 1 artwork on page 1 of the merged v3 paper. The paper caption is below the crop.
+# Poppler pdftoppm 24.02.0, 288 DPI. Crop starts at (208, 1484) pixels from the top left and spans 2032 by 1224 pixels.
+# Run from the repository root.
+# pdftoppm -f 1 -l 1 -r 288 -x 208 -y 1484 -W 2032 -H 1224 -png -singlefile docs/whitepaper-v3/dope-v3.pdf docs/readme/dope-v3-figure-1
+ecd33152f49bb792acb4552132cbca696edee2468551b709ec560bbfe9f7bc66  docs/whitepaper-v3/dope-v3.pdf
+fcfee598aeb99ea5434db4c1bba082eea22eb16040a60a9e537cdec2949677c6  docs/readme/dope-v3-figure-1.png

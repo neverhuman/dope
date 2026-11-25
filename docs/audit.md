@@ -4,6 +4,9 @@ The full v1.7.1 audit is a required PR gate: score at least 85,
 `decision=pass`, zero applied caps, and zero high or critical findings. Its
 JSON and Markdown reports are retained even when the gate fails. The audit
 must cover tracked product source; ignored `runs/` output is not product code.
+The Rust verifier used by `just score` checks the audit version, scope, commit,
+freshness and decision. A passing scan made with uncommitted changes is labeled
+`local`.
 `agent/baselines/main.repo-score.json` preserves the original 1.6.11
 read-only report as a ratchet comparison; the required PR decision is the
 clean full v1.7.1 scan with the 85-point floor. The historical scan included

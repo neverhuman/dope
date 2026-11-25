@@ -372,7 +372,8 @@ def demo_metadata_failures(data: dict, inspected: dict, native_pin: dict) -> lis
 README_HEROES = ("paper/generated/hero-frontier.png", "bench/real-world/figures/hero.png",
                  "bench/real-world/figures/hero-v3-light.svg", "bench/real-world/figures/hero-v3-dark.svg",
                  "bench/real-world/figures/hero-v3-methods-light.svg", "bench/real-world/figures/hero-v3-methods-dark.svg",
-                 "bench/real-world/figures/hero-v3-comparison-light.svg", "bench/real-world/figures/hero-v3-comparison-dark.svg")
+                 "bench/real-world/figures/hero-v3-comparison-light.svg", "bench/real-world/figures/hero-v3-comparison-dark.svg",
+                 "docs/readme/dope-v3-figure-1.png")
 
 
 def readme_hero_failures(readme: str) -> list[str]:

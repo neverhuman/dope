@@ -19,6 +19,12 @@ enum Action {
     Focus {
         filter: String,
     },
+    Verify {
+        #[arg(long)]
+        report: PathBuf,
+        #[arg(long)]
+        expected_head: String,
+    },
     Badge {
         #[arg(long)]
         report: PathBuf,
@@ -33,6 +39,10 @@ enum Action {
 fn main() {
     let result = match Args::parse().command {
         Action::Focus { filter } => focus::run(&filter),
+        Action::Verify {
+            report,
+            expected_head,
+        } => badge::verify(&report, &expected_head),
         Action::Badge {
             report,
             expected_head,

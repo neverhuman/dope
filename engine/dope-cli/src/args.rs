@@ -17,11 +17,11 @@ pub(crate) struct Cli {
     #[arg(long, global = true, default_value = "auto", value_parser = ["auto", "always", "never"])]
     pub(crate) color: String,
     #[command(subcommand)]
-    pub(crate) command: Command,
+    pub(crate) command: EngineCommand,
 }
 
 #[derive(Subcommand)]
-pub(crate) enum Command {
+pub(crate) enum EngineCommand {
     /// Owner-private normalize-once workflow from explicitly declared typed input.
     #[command(subcommand)]
     Normalize(crate::normalize::NormalizeCommand),
