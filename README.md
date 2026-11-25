@@ -126,3 +126,64 @@ Across three sets of development splits, DOPE led Gaussian copula, TVAE and CTGA
 ```
 
 Licensed under [MIT](LICENSE); see [CITATION.cff](CITATION.cff).
+
+## Appendix: quick start and run examples
+
+The first two blocks are the install check from [Quick start](#quick-start). The toy table is not the scoreboard. CI runs these guides on Ubuntu and inside the container in the last block. The third block is the [own-data walkthrough](docs/getting-started.md#fit-a-table): fit with `--format auto-v8`, then evaluate with a separate `--format 1` schema file. `eval` on this binary reads that `--format 1` file.
+
+```bash
+(
+  set -euo pipefail
+  installer=$(mktemp)
+  trap 'rm -f -- "$installer"' EXIT
+  curl -q -fsSL --proto '=https' --tlsv1.2 -o "$installer" \
+    https://raw.githubusercontent.com/neverhuman/dope/51df4554bc292c3ad59ec2099fccbbde19cffadc/scripts/install.sh
+  printf '%s  %s\n' 808729d2382fc37fbdcf69520d808430536b858074387198920b250033baa213 "$installer" |
+    sha256sum --check --status
+  bash "$installer" --standalone-prefix "$HOME/.local/opt/dope/3.0.0" \
+    --tag dope-engine-v3.0.0 --source-digest e15c415bad9554f7c419dd240aa670d1a79a27fe
+)
+```
+
+```bash
+(
+  set -euo pipefail
+  export LC_ALL=C
+  dope="$HOME/.local/opt/dope/3.0.0/bin/dope"
+  cd "$(mktemp -d "${TMPDIR:-/tmp}/dope-quick-start.XXXXXX")"
+
+  fixture='BEGIN {
+    print "a,b,y"
+    for (i=first; i<end; i++) {
+      a=(17*i%997)/997; b=(31*i%991)/991
+      print a "," b "," 2*a+b*b
+    }
+  }'
+  awk -v first=0 -v end=160 "$fixture" > train.csv
+  awk -v first=160 -v end=200 "$fixture" > test.csv
+
+  "$dope" --threads 1 fit train.csv --target y --format 1 --budget 2048 --seed 42 -o model.dope
+  bytes=$(wc -c < model.dope)
+  test "$bytes" -le 2048
+  printf 'Artifact size: %s bytes\n' "$bytes"
+  "$dope" --threads 1 sample model.dope -n 640 --seed 7 -o synthetic.csv
+  "$dope" --threads 1 eval -m model.dope --train train.csv --test test.csv \
+    --synth synthetic.csv --auditors linear --seed 7 --json evaluation.json
+  printf 'Workflow files: %s\n' "$PWD"
+)
+```
+
+```bash
+dope="$HOME/.local/opt/dope/3.0.0/bin/dope"
+"$dope" fit train.csv --target y --format auto-v8 --budget 2048 -o model.dope
+wc -c < model.dope
+"$dope" sample model.dope -n 1000 --seed 1 -o synthetic.csv
+
+"$dope" fit train.csv --target y --format 1 --budget 2048 -o audit-schema.dope
+"$dope" eval -m audit-schema.dope --train train.csv --test test.csv \
+  --synth synthetic.csv --auditors linear --seed 1 --json evaluation.json
+```
+
+```bash
+docker run --rm -it --platform linux/amd64 -v "$PWD":/work -w /work ubuntu:24.04 bash
+```

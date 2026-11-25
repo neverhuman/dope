@@ -64,6 +64,13 @@
 \usepackage{qrcode}
 \usepackage{verbatim}
 \usepackage{upquote}
+\makeatletter
+\newcommand{\quickstartfile}[1]{%
+  \par\begingroup
+  \renewcommand{\verbatim@font}{\footnotesize\ttfamily}%
+  \verbatiminput{#1}%
+  \endgroup\par}
+\makeatother
 \usepgfplotslibrary{fillbetween}
 \usepackage[numbers,sort&compress,square]{natbib}
 
@@ -1988,7 +1995,7 @@ The path from here is concrete. A packet is a short list of bounded statistics, 
 \begin{minipage}[c]{1.6cm}\raggedleft\color{ink}\qrcode[height=1.55cm,level=M,nolink]{https://github.com/neverhuman/dope}\end{minipage}
 \end{tcolorbox}
 
-\runin{Run it} Appendix~\ref{app:quick-start} links to the pinned installer and gives complete fit, sample and held-out evaluation commands.
+\runin{Run it} Appendix~\ref{app:quick-start} gives the pinned installer, the toy check, an own-table run, and the container command.
 
 \runin{From receipts to numbers} The scoring tool writes sorted-key JSON receipts that record the SHA-256 of the contract, the schedule and every rows file read: \cli{primary-methods.json} for the ranking, one pair receipt per third-party generator, and the receipts of the two repeats. The equal-storage comparison, the budget sweep, the codec attribution and the learned-tier traces are aggregate files under \cli{evidence/addendum-k/}, each bound to its inputs by digest. Every measured value in this report is a receipt macro or a number read from the bound aggregate files under the \VThree{ReleaseVersion} scoreboard. The figures are drawn from those same files. The receipts identify the schedule and the real reference by hash; the tables and packets themselves are private.
 
@@ -2002,6 +2009,28 @@ Three things make that result usable. The metric measures what the rows are for,
 The remaining work is plain: a confirmatory look on sealed tables, foundation models among the auditors, and a formal privacy mechanism on the packet's statistics. Until then the claim is the one the receipts support. On these development tables, for these learners, most of a table's training value fits in \VThree{BudgetBytes} bytes, and that is small enough to change which evaluations are possible at all.
 % =============================================================================
 \appendix
+\onecolumn
+\hypertarget{quick-start}{}
+\section{Quick start and run examples}\label{app:quick-start}
+The signed engine is \texttt{dope-engine-\VThree{ReleaseVersion}}. These four listings are the commands the repository runs for the public install. The toy is an install check. The scores in this report come from the development report, not from that table. \cli{eval} on this binary reads a Format~1 file. The third listing fits another table with \cli{auto-v8} inside \VThree{BudgetBytesPlain} bytes and scores the samples with a separate Format~1 schema file. The README pins the installer checksum and names the glibc requirement.
+
+\subsection{Install}
+\quickstartfile{examples/install.bash}
+
+\subsection{Run the toy example}
+This block generates disjoint fitting and test CSVs. The \cli{--target y} flag names the outcome and keeps it out of the predictors. The printed directory contains \cli{train.csv}, \cli{test.csv}, the fitted \cli{model.dope}, the sampled \cli{synthetic.csv}, and \cli{evaluation.json} with test losses and retention.
+\quickstartfile{examples/toy-run.bash}
+
+\subsection{Use your own CSV}
+From a headered CSV, declare the target by name and follow the \href{https://github.com/neverhuman/dope/blob/main/docs/data-contract.md}{target-last contract}. Group duplicate physical rows before assigning whole groups to \cli{train.csv} or \cli{test.csv}. Fit and choose the encoder using only the training split. Run both steps below from the directory containing those files and replace \cli{y} with your target name.
+\quickstartfile{examples/own-csv.bash}
+
+\noindent The first fit writes \cli{model.dope} and the sampler writes \cli{synthetic.csv}. The \VThree{ReleaseVersion} evaluator reads schema and encoding from a Format~1 artifact, so the second fit writes \cli{audit-schema.dope}. The evaluator trains the synthetic arm on the CSV supplied to \cli{--synth}, including rows drawn from \cli{DSE8}. It scores both arms on \cli{test.csv} and writes the losses and retention to \cli{evaluation.json}. This report counts the bytes in \cli{audit-schema.dope}. The \cli{wc} command measures the size of \cli{model.dope}. If Format~1 cannot fit the schema, use the fixed-learner procedure in the \href{https://github.com/neverhuman/dope/blob/main/docs/getting-started.md\#evaluate-the-synthetic-csv}{held-out evaluation guide}.
+
+\subsection{Container}
+This starts the container in which the repository runs the same quick start.
+\quickstartfile{examples/docker.bash}
+\twocolumn
 \section{Codec details}\label{app:codec}
 \subsection{The \texttt{DSE8} wire format}
 \runin{Header} The \VThree{DseHeaderBytes}-byte header holds, in order: the magic \cli{DSE8}, the format version, the task, the class count $K$, the active column count $p$, the raw column count, a flag byte, the copula rank $r$, the knot level $\kappa$, the quantized logarithm of the fitting-row count, the latent clip $z_{\max}$, the residual scale, the positive-class prior, the inverse degrees of freedom $1/\nu$ of a row-level Student-$t$ scale on the factors (zero for Gaussian factors), the section count, the code tier and a reserved field. The flags mark a normalized-only packet, a column map, custom class ids, stored medians of dropped columns, skew-$t$ factors, and a neural encoder.
@@ -2147,25 +2176,5 @@ The decisions in this report do not use the panel.
 
 \bibliographystyle{plainnat}
 \bibliography{references-v3}
-
-\onecolumn
-\hypertarget{quick-start}{}
-\section{Quick start and runnable examples}\label{app:quick-start}
-
-Follow the \href{https://github.com/neverhuman/dope/blob/bd5e9386281523d9ce7407c8b5e1af7c3924e9d0/README.md\#quick-start}{pinned install instructions} for the signed \VThree{ReleaseVersion} engine on Linux x86-64. The installer verifies the release checksum and signing identity before installing.
-
-\subsection{Run the toy example}
-
-This block generates disjoint fitting and test CSVs. The \cli{--target y} flag names the outcome and keeps it out of the predictors. The printed directory contains \cli{train.csv}, \cli{test.csv}, the fitted \cli{model.dope}, the sampled \cli{synthetic.csv}, and \cli{evaluation.json} with test losses and retention.
-
-{\small\verbatiminput{examples/toy-run.bash}}
-
-\subsection{Use your own CSV}
-
-From a headered CSV, declare the target by name and follow the \href{https://github.com/neverhuman/dope/blob/main/docs/data-contract.md}{target-last contract}. Group duplicate physical rows before assigning whole groups to \cli{train.csv} or \cli{test.csv}. Fit and choose the encoder using only the training split. Run both steps below from the directory containing those files and replace \cli{y} with your target name.
-
-{\small\verbatiminput{examples/own-csv.bash}}
-
-\noindent The first fit writes \cli{model.dope} and the sampler writes \cli{synthetic.csv}. The \VThree{ReleaseVersion} evaluator reads schema and encoding from a Format~1 artifact, so the second fit writes \cli{audit-schema.dope}. The evaluator trains the synthetic arm on the CSV supplied to \cli{--synth}, including rows drawn from \cli{DSE8}. It scores both arms on \cli{test.csv} and writes the losses and retention to \cli{evaluation.json}. This report counts the bytes in \cli{audit-schema.dope}. The \cli{wc} command measures the size of \cli{model.dope}. If Format~1 cannot fit the schema, use the fixed-learner procedure in the \href{https://github.com/neverhuman/dope/blob/main/docs/getting-started.md\#evaluate-the-synthetic-csv}{held-out evaluation guide}.
 
 \end{document}

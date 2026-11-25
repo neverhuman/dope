@@ -77,13 +77,16 @@ impl Workspace {
     }
 }
 
-fn bash_blocks(section: &str) -> [&str; 2] {
-    let blocks: Vec<_> = section
+fn all_bash_blocks(section: &str) -> Vec<&str> {
+    section
         .split("```bash\n")
         .skip(1)
         .map(|block| block.split_once("\n```").unwrap().0)
-        .collect();
-    blocks.try_into().unwrap()
+        .collect()
+}
+
+fn bash_blocks(section: &str) -> [&str; 2] {
+    all_bash_blocks(section).try_into().unwrap()
 }
 
 fn readme_quick_start() -> [&'static str; 2] {
@@ -100,18 +103,49 @@ fn own_data_walkthrough() -> [&'static str; 2] {
     bash_blocks(section)
 }
 
+fn listing(script: &str) -> String {
+    format!("{script}\n")
+}
+
+fn executed_docker() -> &'static str {
+    all_bash_blocks(GETTING_STARTED)
+        .into_iter()
+        .find(|block| block.contains("ubuntu:24.04"))
+        .unwrap()
+}
+
 #[test]
 fn paper_examples_match_smoke_commands() {
-    let [_, demo] = readme_quick_start();
+    let [install, demo] = readme_quick_start();
+    assert_eq!(
+        include_bytes!("../../../docs/whitepaper-v3/examples/install.bash"),
+        listing(install).as_bytes()
+    );
     assert_eq!(
         include_bytes!("../../../docs/whitepaper-v3/examples/toy-run.bash"),
-        [demo, "\n"].concat().as_bytes()
+        listing(demo).as_bytes()
     );
     let [fit_and_sample, evaluate] = own_data_walkthrough();
     assert_eq!(
         include_bytes!("../../../docs/whitepaper-v3/examples/own-csv.bash"),
-        [fit_and_sample, evaluate, ""].join("\n").as_bytes()
+        listing(&[fit_and_sample, evaluate].join("\n")).as_bytes()
     );
+    let docker = executed_docker();
+    assert_eq!(
+        include_bytes!("../../../docs/whitepaper-v3/examples/docker.bash"),
+        listing(docker).as_bytes()
+    );
+
+    let (_, appendix) = README
+        .split_once("## Appendix: quick start and run examples\n")
+        .unwrap();
+    let blocks = all_bash_blocks(appendix);
+    assert_eq!(blocks.len(), 4);
+    assert_eq!(blocks[0], install);
+    assert_eq!(blocks[1], demo);
+    assert!(blocks[2].contains(fit_and_sample));
+    assert!(blocks[2].contains(evaluate));
+    assert_eq!(blocks[3], docker);
 }
 
 fn assert_release_binary(workspace: &Workspace) {
