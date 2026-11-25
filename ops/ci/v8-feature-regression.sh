@@ -10,8 +10,10 @@ cargo test --manifest-path engine/Cargo.toml --locked -p dope-core auto::v8
 cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli
 
 # 2. Build release dope CLI, dope_v8_emit binary, and dope-ffi shared library.
+# Build dope-ffi in a separate invocation so --bin target filters never skip its cdylib.
 cargo build --manifest-path engine/Cargo.toml --locked --release \
-  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit -p dope-ffi
+  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit
+cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
 
 # 3. Run 12-fixture Rust-vs-Python V8 parity, loss, code-dim, surgery, and feed suites.
 python3 -m pytest -v \

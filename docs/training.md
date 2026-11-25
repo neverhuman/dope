@@ -16,9 +16,8 @@ You need the pinned Rust toolchain (`rust-toolchain.toml`, Rust `1.88.0`) and Py
 ```bash
 # 1. Build the pure-Rust DOPE CLI, V8 packet emitter, and C FFI library
 cargo build --manifest-path engine/Cargo.toml --locked --release \
-  -p dope-cli --bin dope \
-  -p dope-arena --bin dope_v8_emit \
-  -p dope-ffi
+  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit
+cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
 
 # 2. Create an isolated Python training environment
 python3 -m venv target/v8-train-env
@@ -148,10 +147,11 @@ Before opening a pull request that adds Evidence Bank features or modifies `Sing
 
 ```bash
 # 1. Pure-Rust Evidence Bank, DSE8 codec, and auto-v8 unit tests
-cargo test --manifest-path engine/Cargo.toml --locked -p dope-core evidence single_encoding::v8 auto::v8
+cargo test --manifest-path engine/Cargo.toml --locked -p dope-core -- evidence single_encoding::v8 auto::v8
 
 # 2. Rebuild native emitter + FFI library and run the 12-fixture Rust-vs-Python parity suite
-cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit -p dope-ffi
+cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit
+cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
 target/v8-train-env/bin/pytest \
   research/levels/tests/test_v8_rust_parity.py \
   research/levels/tests/test_v8_losses.py \

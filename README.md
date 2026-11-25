@@ -1,6 +1,6 @@
 # D.O.P.E.: Downstream Objective-Preserving Encoding
 
-**Compile a sensitive table and its prediction target inside your firewall into a tiny generative program — train external AI models without moving complete records.**
+Compile a sensitive table and its prediction target inside your firewall into a small **program** — train external AI models without moving complete records.
 
 [![CI](https://github.com/neverhuman/dope/actions/workflows/ci.yml/badge.svg)](https://github.com/neverhuman/dope/actions/workflows/ci.yml)
 [![Jankurai full-audit score snapshot](docs/readme/jankurai.svg)](https://github.com/neverhuman/dope/actions/workflows/jankurai.yml)
@@ -113,7 +113,8 @@ Release `v3.0.0` fits tables analytically with **no pretrained weights**. To tra
 ```bash
 # 1. Build the Rust CLI, V8 packet emitter, and FFI library
 cargo build --manifest-path engine/Cargo.toml --locked --release \
-  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit -p dope-ffi
+  -p dope-cli --bin dope -p dope-arena --bin dope_v8_emit
+cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
 
 # 2. Run a 5-minute CPU smoke train on synthetic structural priors (needs PyTorch + safetensors)
 python3 -m research.levels.s3_v8_trainer \

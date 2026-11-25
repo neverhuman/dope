@@ -77,10 +77,11 @@ Every feature proposal follows a fast, self-contained engineering loop you can r
 3. **Run fast local regression & parity checks (`just v8-regression`):**
    ```bash
    # Rust evidence + DSE8 codec unit tests
-   cargo test --manifest-path engine/Cargo.toml --locked -p dope-core evidence single_encoding::v8 auto::v8
+   cargo test --manifest-path engine/Cargo.toml --locked -p dope-core -- evidence single_encoding::v8 auto::v8
 
    # 12-fixture Rust-vs-Python parity suite (max |py - rs| <= 1e-4, <= 2048 B, 0 illegal one-hot rows)
    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit
+   cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
    pytest research/levels/tests/test_v8_rust_parity.py research/levels/tests/test_v8_losses.py -v
    ```
 4. **Run a quick synthetic/real ablation (`docs/training.md`):**

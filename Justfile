@@ -177,7 +177,8 @@ v8-regression:
     cargo test --manifest-path engine/Cargo.toml --locked -p dope-core single_encoding::v8
     cargo test --manifest-path engine/Cargo.toml --locked -p dope-core auto::v8
     cargo test --manifest-path engine/Cargo.toml --locked -p dope-cli --test auto_v8_cli
-    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit -p dope-ffi
+    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-arena --bin dope_v8_emit
+    cargo build --manifest-path engine/Cargo.toml --locked --release -p dope-ffi
     python3 -m pytest -q research/levels/tests/test_v8_rust_parity.py research/levels/tests/test_v8_losses.py research/levels/tests/test_v8_code_dim.py research/levels/tests/test_v8_surgery.py research/levels/tests/test_s3_v8_feed.py
 
 # End-to-end offline real-dataset quick start (UCI Airfoil Self-Noise).
