@@ -2,6 +2,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 source ops/ci/lib.sh
+verify_report() {
+  ci_require_artifact "$1"
+  ci_require_artifact "$2"
+  cargo run --manifest-path ops/merge_guard/Cargo.toml --target-dir target --locked \
+    --bin audit-proof -- verify --report "$1" --expected-head "$(git rev-parse HEAD)"
+}
 case "${1:-run}" in
   prepare)
     python3 -m venv --system-site-packages target/ci-python
@@ -20,25 +26,14 @@ PY
     bash agent/check-benchmark-boundary.sh
     ;;
   verify)
-    ci_require_artifact "$2"
-    ci_require_artifact "$3"
-    python3 - "$2" <<'PY'
-import json
-import sys
-with open(sys.argv[1]) as source:
-    report = json.load(source)
-assert report['auditor_version'] == '1.7.1'
-assert report['score'] >= 85
-assert report['decision']['status'] == 'pass'
-assert not report.get('caps_applied')
-assert not any(item['severity'] in {'high', 'critical'} for item in report.get('findings', []))
-PY
+    verify_report "$2" "$3"
     ;;
   run)
     bash agent/check-python-v1-boundary.sh
     bash agent/check-external-boundary.sh
     bash agent/check-benchmark-boundary.sh
     bash agent/run-jankurai.sh
+    verify_report target/jankurai/repo-score.json target/jankurai/repo-score.md
     ;;
   *) echo "Usage: $0 {prepare|verify JSON MD|run}" >&2; exit 2 ;;
 esac

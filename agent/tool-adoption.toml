@@ -26,6 +26,11 @@ mode = "advisory"
 notes = "Rust witness output supports review; locked tests and Clippy remain required."
 
 [[tools]]
+id = "contract-drift"
+mode = "auto"
+notes = "The native contract-drift lane checks embedded contracts in CPU CI and retains its receipt. The audit can report its own contract findings alongside that proof."
+
+[[tools]]
 id = "proofbind"
 mode = "advisory"
 notes = "The current verifier cannot analyze the intentionally removed C++ bridge; the full audit and CPU tests remain the gate."

@@ -10,7 +10,7 @@ fn svg(label: &str, color: &str) -> Vec<u8> {
     format!("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"230\" height=\"20\" role=\"img\" aria-label=\"Jankurai: {label}\">\n<title>Jankurai full audit: {label}</title>\n<rect width=\"110\" height=\"20\" fill=\"#555\"/>\n<rect x=\"110\" width=\"120\" height=\"20\" fill=\"{color}\"/>\n<g fill=\"#fff\" text-anchor=\"middle\" font-family=\"Verdana,sans-serif\" font-size=\"11\">\n<text x=\"55\" y=\"14\">Jankurai 1.7.1</text>\n<text x=\"170\" y=\"14\">{label}</text>\n</g>\n</svg>\n").into_bytes()
 }
 
-pub(super) fn render(report: &Value, head: &str, now: u64) -> Option<(Vec<u8>, &'static str)> {
+fn assess(report: &Value, head: &str, now: u64) -> Option<(u64, &'static str)> {
     if head.len() != 40
         || !head
             .bytes()
@@ -63,12 +63,37 @@ pub(super) fn render(report: &Value, head: &str, now: u64) -> Option<(Vec<u8>, &
     } else {
         "pass"
     };
+    Some((score, state))
+}
+
+pub(super) fn render(report: &Value, head: &str, now: u64) -> Option<(Vec<u8>, &'static str)> {
+    let (score, state) = assess(report, head, now)?;
     let color = match state {
         "fail" => "#b31d28",
         "local" => "#777",
         _ => "#22863a",
     };
     Some((svg(&format!("{score}/100 {state}"), color), state))
+}
+
+pub(super) fn verify(report: &Path, head: &str) -> io::Result<i32> {
+    let report: Value = serde_json::from_slice(&fs::read(report)?)?;
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(io::Error::other)?
+        .as_secs();
+    match assess(&report, head, now) {
+        Some((score, state @ ("pass" | "local"))) => {
+            println!("Jankurai full audit: {score}/100 {state}");
+            Ok(0)
+        }
+        _ => {
+            eprintln!(
+                "Jankurai report did not verify as a passing full audit for the expected head"
+            );
+            Ok(1)
+        }
+    }
 }
 
 pub(super) fn write(

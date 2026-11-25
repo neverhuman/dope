@@ -75,14 +75,14 @@ fn run(cli: Cli) -> Result<(), String> {
         )
     };
     match cli.command {
-        Command::Normalize(a) => normalize::run(a)?,
-        Command::TransferReport(a) => dvs::run(a)?,
-        Command::MlcV4(a) => mlc_v4::run(a)?,
-        Command::Landmarks(a) => landmarks::run(a)?,
-        Command::Learned(a) => learned::run(a)?,
-        Command::MlcV3(a) => mlc_v3::run(a, style)?,
-        Command::FitLevels(a) => levels::run(a)?,
-        Command::Fit(a) => {
+        EngineCommand::Normalize(a) => normalize::run(a)?,
+        EngineCommand::TransferReport(a) => dvs::run(a)?,
+        EngineCommand::MlcV4(a) => mlc_v4::run(a)?,
+        EngineCommand::Landmarks(a) => landmarks::run(a)?,
+        EngineCommand::Learned(a) => learned::run(a)?,
+        EngineCommand::MlcV3(a) => mlc_v3::run(a, style)?,
+        EngineCommand::FitLevels(a) => levels::run(a)?,
+        EngineCommand::Fit(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
             let target = table.column_index(&a.target).map_err(e)?;
             let task = match a.task.as_deref() {
@@ -161,8 +161,8 @@ fn run(cli: Cli) -> Result<(), String> {
                 );
             }
         }
-        Command::FitTiers(a) => tiers::fit_tiers(a)?,
-        Command::Sample(a) => {
+        EngineCommand::FitTiers(a) => tiers::fit_tiers(a)?,
+        EngineCommand::Sample(a) => {
             let raw_bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
             let Some(raw_bytes) = auto_fit::sample_dpa1(&a, raw_bytes, style)? else {
                 return Ok(());
@@ -247,7 +247,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 );
             }
         }
-        Command::Predict(a) => {
+        EngineCommand::Predict(a) => {
             let program =
                 decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
             let table = RawTable::read(&a.csv).map_err(e)?;
@@ -275,7 +275,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 writeln!(w, "{}", cells.join(",")).map_err(|x| x.to_string())?;
             }
         }
-        Command::Inspect(a) => {
+        EngineCommand::Inspect(a) => {
             let bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
             let program = decode(&bytes).map_err(e)?;
             let report = byte_report(&bytes).map_err(e)?;
@@ -296,14 +296,14 @@ fn run(cli: Cli) -> Result<(), String> {
                 print_inspect_report(&a.model, &program, &report, style);
             }
         }
-        Command::Embed(a) => {
+        EngineCommand::Embed(a) => {
             let bytes = std::fs::read(&a.model).map_err(|x| x.to_string())?;
             let emb = dope_core::embed::embed_packet(&bytes).map_err(e)?;
             let json = serde_json::to_string_pretty(&emb).map_err(|x| x.to_string())?;
             let mut w = writer(&a.out)?;
             writeln!(w, "{json}").map_err(|x| x.to_string())?;
         }
-        Command::Encode(a) => {
+        EngineCommand::Encode(a) => {
             let table = RawTable::read(&a.csv).map_err(e)?;
             let scaling = Scaling::parse(&a.scaling).ok_or("--scaling must be unit or quantile")?;
             let program = match &a.model {
@@ -328,7 +328,7 @@ fn run(cli: Cli) -> Result<(), String> {
             };
             output::write_ml(&MlEncoder::new(&program, scaling), &s, writer(&a.out)?).map_err(e)?;
         }
-        Command::Retention(a) => {
+        EngineCommand::Retention(a) => {
             let opts = EvalOptions {
                 auditors: a
                     .auditors
@@ -354,7 +354,7 @@ fn run(cli: Cli) -> Result<(), String> {
                     .map_err(|x| x.to_string())?;
             }
         }
-        Command::Frontier(a) => {
+        EngineCommand::Frontier(a) => {
             let train = RawTable::read(&a.train).map_err(e)?;
             let test = RawTable::read(&a.test).map_err(e)?;
             let target = train.column_index(&a.target).map_err(e)?;
@@ -383,7 +383,7 @@ fn run(cli: Cli) -> Result<(), String> {
                     .map_err(|x| x.to_string())?;
             }
         }
-        Command::Throughput(a) => {
+        EngineCommand::Throughput(a) => {
             let program =
                 decode(&std::fs::read(&a.model).map_err(|x| x.to_string())?).map_err(e)?;
             let dev = device::parse(&a.device).map_err(e)?;
@@ -408,7 +408,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 device::describe(&dev)
             );
         }
-        Command::Doctor(a) => runtime::doctor(a.json, style)?,
+        EngineCommand::Doctor(a) => runtime::doctor(a.json, style)?,
     }
     Ok(())
 }
